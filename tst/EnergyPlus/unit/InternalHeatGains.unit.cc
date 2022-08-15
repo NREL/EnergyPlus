@@ -311,6 +311,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentReset)
 {
+    using namespace DataHeatBalance;
 
     std::string const idf_objects = delimited_string({
         "Zone,Main Zone;",
@@ -481,17 +482,19 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(1);
     Real64 InitialPower =
-        state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
+        thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan] + thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
 
     state->dataLoopNodes->Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
+    Real64 NewPower =
+        thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan] + thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
     ASSERT_NE(InitialPower, NewPower);
     HVACManager::ResetNodeData(*state);
 
     InternalHeatGains::CalcZoneITEq(*state);
-    NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
+    NewPower = thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan] + thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
     ASSERT_EQ(InitialPower, NewPower);
 }
 
@@ -898,14 +901,14 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
     state->dataLoopNodes->Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
-    ASSERT_DOUBLE_EQ(state->dataHeatBal->ZoneITEq(1).AirOutletDryBulbT + state->dataHeatBal->ZoneITEq(1).ReturnApproachTemp,
-                     state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
-    ASSERT_DOUBLE_EQ(state->dataLoopNodes->Node(1).Temp + state->dataHeatBal->ZoneITEq(1).SupplyApproachTemp,
-                     state->dataHeatBal->ZoneITEq(1).AirInletDryBulbT);
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(1);
+    ASSERT_DOUBLE_EQ(thisZoneITEq.AirOutletDryBulbT + thisZoneITEq.ReturnApproachTemp, state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
+    ASSERT_DOUBLE_EQ(state->dataLoopNodes->Node(1).Temp + thisZoneITEq.SupplyApproachTemp, thisZoneITEq.AirInletDryBulbT);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 {
+    using namespace DataHeatBalance;
 
     std::string const idf_objects =
         delimited_string({"Zone,Main Zone;",
@@ -1050,11 +1053,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
 
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(1);
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
-    Real64 DefaultUPSPower = (state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower) *
-                             max((1.0 - state->dataHeatBal->ZoneITEq(1).DesignUPSEfficiency), 0.0);
+    Real64 DefaultUPSPower = (thisZoneITEq.PowerRpt[(int)PERptVars::CPU] + thisZoneITEq.PowerRpt[(int)PERptVars::Fan]) *
+                             max((1.0 - thisZoneITEq.DesignUPSEfficiency), 0.0);
 
-    ASSERT_EQ(DefaultUPSPower, state->dataHeatBal->ZoneITEq(1).UPSPower);
+    ASSERT_EQ(DefaultUPSPower, thisZoneITEq.PowerRpt[(int)PERptVars::UPS]);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
@@ -2541,6 +2545,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_GetHeatColdStressTemp)
 
 TEST_F(EnergyPlusFixture, ITEwithUncontrolledZoneTest)
 {
+    using namespace DataHeatBalance;
+
     std::string const idf_objects = delimited_string({
         " Zone,",
         "  ZONE ONE,                !- Name",
@@ -2651,11 +2657,14 @@ TEST_F(EnergyPlusFixture, ITEwithUncontrolledZoneTest)
 
     state->dataEnvrn->StdBaroPress = 101400.0;
 
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(1);
+
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 calculatedResult1 = state->dataHeatBal->ZoneITEq(1).CPUPower;
-    Real64 calculatedResult2 = state->dataHeatBal->ZoneITEq(1).FanPower;
-    Real64 calculatedResult3 = state->dataHeatBal->ZoneITEq(1).UPSPower;
-    Real64 calculatedResult4 = state->dataHeatBal->ZoneITEq(1).UPSGainRateToZone;
+    Real64 calculatedResult1 = thisZoneITEq.PowerRpt[(int)PERptVars::CPU];
+    Real64 calculatedResult2 = thisZoneITEq.PowerRpt[(int)PERptVars::Fan];
+    Real64 calculatedResult3 = thisZoneITEq.PowerRpt[(int)PERptVars::UPS];
+    Real64 calculatedResult4 = thisZoneITEq.PowerRpt[(int)PERptVars::UPSGainToZone];
+
     Real64 expectedResult1 = 480.024;
     Real64 expectedResult2 = 380.0;
     Real64 expectedResult3 = 86.0024;
@@ -3070,4 +3079,308 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Fix_39C)
     EXPECT_NE(state->dataHeatBal->ZoneRpt(NZ).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
     EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
     EXPECT_NE(state->dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+}
+
+TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
+{
+    // Test PR 9537 for Issue 9418
+    std::string const idf_objects = delimited_string({
+        " Zone,",
+        "  ZONE ONE,                !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  autocalculate,           !- Ceiling Height {m}",
+        "  autocalculate;           !- Volume {m3}",
+
+        " ElectricEquipment:ITE:AirCooled,",
+        "  Data Center Servers,     !- Name",
+        "  ZONE ONE,                !- Zone Name",
+        "  FlowFromSystem,          !- Air Flow Calculation Method",
+        "  Watts/Unit,              !- Design Power Input Calculation Method",
+        "  50,                      !- Watts per Unit {W}",
+        "  10,                      !- Number of Units",
+        "  ,                        !- Watts per Zone Floor Area {W/m2}",
+        "  ,                        !- Design Power Input Schedule Name",
+        "  ,                        !- CPU Loading  Schedule Name",
+        "  Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+        "  0.4,                     !- Design Fan Power Input Fraction",
+        "  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+        "  Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+        "  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+        "  15,                      !- Design Entering Air Temperature {C}",
+        "  H1,                      !- Environmental Class",
+        "  ZoneAirNode,             !- Air Inlet Connection Type",
+        "  ,                        !- Air Inlet Room Air Model Node Name",
+        "  ,                        !- Air Outlet Room Air Model Node Name",
+        "  ,                        !- Supply Air Node Name",
+        "  0.1,                     !- Design Recirculation Fraction",
+        "  ,                        !- Recirculation Function of Loading and Supply Temperature Curve Name",
+        "  0.9,                     !- Design Electric Power Supply Efficiency",
+        "  ,                        !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+        "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
+        "  ITE-CPU,                 !- CPU End-Use Subcategory",
+        "  ITE-Fans,                !- Fan End-Use Subcategory",
+        "  ITE-UPS,                 !- Electric Power Supply End-Use Subcategory",
+        "  2,                       !- Supply Temperature Difference {deltaC}",
+        "  ,                        !- Supply Temperature Difference Schedule",
+        "  -1,                      !- Return Temperature Difference {deltaC}",
+        "  ;                        !- Return Temperature Difference Schedule",
+
+        " Curve:Biquadratic,",
+        "  Data Center Servers Power fLoadTemp,  !- Name",
+        "  -1.0,                    !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.06667,                 !- Coefficient4 y",
+        "  0.0,                     !- Coefficient5 y**2",
+        "  0.0,                     !- Coefficient6 x*y",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  99.0,                    !- Maximum Value of y",
+        "  0.0,                     !- Minimum Curve Output",
+        "  99.0,                    !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "  Data Center Servers Airflow fLoadTemp,  !- Name",
+        "  -1.4,                    !- Coefficient1 Constant",
+        "  0.9,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.1,                     !- Coefficient4 y",
+        "  0.0,                     !- Coefficient5 y**2",
+        "  0.0,                     !- Coefficient6 x*y",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  99.0,                    !- Maximum Value of y",
+        "  0.0,                     !- Minimum Curve Output",
+        "  99.0,                    !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        " Curve:Quadratic,",
+        "  ECM FanPower fFlow,      !- Name",
+        "  0.0,                     !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Minimum Value of x",
+        "  99.0;                    !- Maximum Value of x",
+    });
+
+    static constexpr std::array<Real64, static_cast<int>(DataHeatBalance::ITEClass::Num)> DBMin = {
+        -99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0, 5.0}; // Minimum dry-bulb temperature [C]
+    static constexpr std::array<Real64, static_cast<int>(DataHeatBalance::ITEClass::Num)> DBMax = {
+        99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0, 25.0}; // Maximum dry-bulb temperature [C]
+    static constexpr std::array<Real64, static_cast<int>(DataHeatBalance::ITEClass::Num)> DPMin = {
+        -99.0, -12.0, -12.0, -12.0, -12.0, -99.0, -99.0, -12.0}; // Minimum dewpoint temperature [C]
+    static constexpr std::array<Real64, static_cast<int>(DataHeatBalance::ITEClass::Num)> DPMax = {
+        99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0, 17.0}; // Maximum dewpoint temperature [C]
+    static constexpr std::array<Real64, static_cast<int>(DataHeatBalance::ITEClass::Num)> RHMin = {
+        0.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0}; // Minimum relative humidity [%]
+    static constexpr std::array<Real64, static_cast<int>(DataHeatBalance::ITEClass::Num)> RHMax = {
+        99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0, 80.0}; // Maximum relative humidity [%]
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+
+    state->dataGlobal->TimeStepZone = 1.0;
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+
+    state->dataEnvrn->StdBaroPress = 101325.0;
+
+    // Test: 41C
+    state->dataHeatBalFanSys->MAT(1) = 41.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.015;
+
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    ASSERT_FALSE(ErrorsFound);
+
+    int Loop = 1;
+    auto &thisZoneITEq = state->dataHeatBal->ZoneITEq(Loop);
+    // Test the processing results of the Environmental Class H1 input
+    EXPECT_TRUE(thisZoneITEq.Class == DataHeatBalance::ITEClass::H1);
+
+    InternalHeatGains::CalcZoneITEq(*state);
+
+    int NZ = 1;
+    int spaceNum = 1;
+    int EnvClass = static_cast<int>(thisZoneITEq.Class); // DataHeatBalance::ITEClass::H1, or 7
+    Real64 TAirIn = state->dataHeatBalFanSys->MAT(1);
+    Real64 TDPAirIn = 20;
+    Real64 RHAirIn = 40;
+
+    TDPAirIn = 20.323364421767739;
+    RHAirIn = 30.644383318971691;
+
+    EXPECT_NEAR(state->dataGlobal->TimeStepZone, 1.0, 1e-6);
+
+    auto &thisZnRpt = state->dataHeatBal->ZoneRpt(NZ);
+    auto &thisspaceRpt = state->dataHeatBal->spaceRpt(spaceNum);
+    // Test: The following test should pass
+    // if (TAirIn > DBMax[EnvClass])
+    EXPECT_EQ(thisZoneITEq.TimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_GT(thisZoneITEq.DryBulbTAboveDeltaT, 0.0);
+    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    EXPECT_EQ(thisZoneITEq.TimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, 1.0);
+    EXPECT_EQ(thisZoneITEq.DryBulbTAboveDeltaT, TAirIn - DBMax[EnvClass]);
+    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, 1.0);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, 1.0);
+
+    // if (TAirIn < DBMin[EnvClass])
+    EXPECT_NE(thisZoneITEq.TimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.DryBulbTBelowDeltaT, TAirIn - DBMin[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // This block should be activated and set to correct tests when PR9541 is merged
+    // if (TDPAirIn > DPMax[EnvClass])
+    EXPECT_EQ(thisZoneITEq.TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (TDPAirIn < DPMin[EnvClass])
+    EXPECT_NE(thisZoneITEq.TimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.DewpointTBelowDeltaT, TDPAirIn - DPMin[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (RHAirIn > RHMax[EnvClass])
+    EXPECT_NE(thisZoneITEq.TimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.RHAboveDeltaRH, RHAirIn - RHMax[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (RHAirIn < RHMin[EnvClass])
+    EXPECT_NE(thisZoneITEq.TimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.RHBelowDeltaRH, RHAirIn - RHMin[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // Now Test 33C (after PR9541/Issue9538 is merged/fixed)
+    state->dataHeatBalFanSys->MAT(1) = 33.0;
+    // state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.015;
+
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    ASSERT_FALSE(ErrorsFound);
+
+    EXPECT_TRUE(thisZoneITEq.Class == DataHeatBalance::ITEClass::H1);
+
+    InternalHeatGains::CalcZoneITEq(*state);
+
+    TAirIn = state->dataHeatBalFanSys->MAT(1);
+    TDPAirIn = 20.323364421767739;
+    RHAirIn = 47.395745113895885;
+
+    EXPECT_NEAR(state->dataGlobal->TimeStepZone, 1.0, 1e-6);
+
+    // Test: The following test should pass
+    // if (TAirIn > DBMax[EnvClass])
+    EXPECT_EQ(thisZoneITEq.TimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_GT(thisZoneITEq.DryBulbTAboveDeltaT, 0.0);
+    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    EXPECT_EQ(thisZoneITEq.TimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, 1.0);
+    EXPECT_EQ(thisZoneITEq.DryBulbTAboveDeltaT, TAirIn - DBMax[EnvClass]);
+    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, 1.0);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDryBulbT, 1.0);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, 1.0);
+
+    // if (TAirIn < DBMin[EnvClass])
+    EXPECT_NE(thisZoneITEq.TimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.DryBulbTBelowDeltaT, TAirIn - DBMin[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeBelowDryBulbT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // This block should be activated and set to correct tests when PR9541 is merged
+    // if (TDPAirIn > DPMax[EnvClass])
+    EXPECT_EQ(thisZoneITEq.TimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    EXPECT_EQ(thisZoneITEq.TimeAboveDewpointT, 1.0);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, 1.0);
+    EXPECT_EQ(thisZoneITEq.DewpointTAboveDeltaT, TDPAirIn - DPMax[EnvClass]);
+    EXPECT_EQ(thisZnRpt.ITEqTimeAboveDewpointT, 1.0);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, 1.0);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeAboveDewpointT, 1.0);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, 1.0);
+
+    // if (TDPAirIn < DPMin[EnvClass])
+    EXPECT_NE(thisZoneITEq.TimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.DewpointTBelowDeltaT, TDPAirIn - DPMin[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeBelowDewpointT, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (RHAirIn > RHMax[EnvClass])
+    EXPECT_NE(thisZoneITEq.TimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.RHAboveDeltaRH, RHAirIn - RHMax[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeAboveRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+
+    // if (RHAirIn < RHMin[EnvClass])
+    EXPECT_NE(thisZoneITEq.TimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZoneITEq.TimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisZoneITEq.RHBelowDeltaRH, RHAirIn - RHMin[EnvClass]);
+    EXPECT_NE(thisZnRpt.ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisZnRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
+    EXPECT_NE(thisspaceRpt.ITEqTimeBelowRH, state->dataGlobal->TimeStepZone);
+    EXPECT_EQ(thisspaceRpt.ITEqTimeOutOfOperRange, state->dataGlobal->TimeStepZone);
 }
