@@ -568,6 +568,56 @@ namespace DataHeatBalance {
         EPVector<int> spaces;                           // Pointers to Spaces in the list
     };
 
+    //    number of columns in resilience report tables
+    constexpr int numColumnThermalTbl(5);
+    constexpr int numColumnUnmetDegreeHourTbl(6);
+    constexpr int numColumnDiscomfortWtExceedHourTbl(4);
+    constexpr int numColumnCO2Tbl(3);
+    constexpr int numColumnVisualTbl(4);
+
+    struct ZoneResilience
+    {
+        Real64 ZoneNumOcc;
+        Real64 ColdStressTempThresh;
+        Real64 HeatStressTempThresh;
+        Real64 PierceSET;
+        Real64 PMV;
+        Real64 ZonePierceSET;
+        Real64 ZonePierceSETLastStep;
+        Real64 ZoneHeatIndex;
+        Real64 ZoneHumidex;
+        bool CrossedColdThresh;
+        bool CrossedHeatThresh;
+
+        std::array<Real64, numColumnThermalTbl> ZoneHeatIndexHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHeatIndexOccuHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHeatIndexOccupiedHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHumidexHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHumidexOccuHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHumidexOccupiedHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneLowSETHours = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHighSETHours = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneColdHourOfSafetyBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHeatHourOfSafetyBins = {0.0};
+        std::array<Real64, numColumnUnmetDegreeHourTbl> ZoneUnmetDegreeHourBins = {0.0};
+        std::array<Real64, numColumnDiscomfortWtExceedHourTbl> ZoneDiscomfortWtExceedOccuHourBins = {0.0};
+        std::array<Real64, numColumnDiscomfortWtExceedHourTbl> ZoneDiscomfortWtExceedOccupiedHourBins = {0.0};
+
+        std::array<Real64, numColumnCO2Tbl> ZoneCO2LevelHourBins = {0.0};
+        std::array<Real64, numColumnCO2Tbl> ZoneCO2LevelOccuHourBins = {0.0};
+        std::array<Real64, numColumnCO2Tbl> ZoneCO2LevelOccupiedHourBins = {0.0};
+
+        std::array<Real64, numColumnVisualTbl> ZoneLightingLevelHourBins = {0.0};
+        std::array<Real64, numColumnVisualTbl> ZoneLightingLevelOccuHourBins = {0.0};
+        std::array<Real64, numColumnVisualTbl> ZoneLightingLevelOccupiedHourBins = {0.0};
+
+        // Default Constructor
+        ZoneResilience()
+            : ZoneNumOcc(0.0), ColdStressTempThresh(15.56), HeatStressTempThresh(30.0), PierceSET(-999.0), PMV(0.0), ZonePierceSET(-1.0),
+              ZonePierceSETLastStep(-1.0), ZoneHeatIndex(0.0), ZoneHumidex(0.0), CrossedColdThresh(false), CrossedHeatThresh(false)
+        {
+        }
+    };
     struct ZoneData : ZoneSpaceData
     {
         // Members
@@ -794,8 +844,10 @@ namespace DataHeatBalance {
         bool Show55Warning = false;                              // show the warning messages about ASHRAE 55-2004
         Real64 CO2RateFactor = 0.0;                              // Carbon Dioxide Generation Rate [m3/s-W]
         // Report variables
-        Real64 NumOcc = 0.0;                 // Number of occupants at current timestep []
-        Real64 TemperatureInZone = 0.0;      // Temperature in zone (C)
+        Real64 NumOcc = 0.0;            // Number of occupants at current timestep []
+        Real64 TemperatureInZone = 0.0; // Temperature in zone (C)
+        Real64 ColdStressTempThresh = 15.56;
+        Real64 HeatStressTempThresh = 30.0;
         Real64 RelativeHumidityInZone = 0.0; // Relative humidity in zone
         Real64 RadGainRate = 0.0;            // Radiant heat gain [W]
         Real64 ConGainRate = 0.0;            // Convective heat gain [W]
@@ -2189,6 +2241,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::SpaceData> space;
     EPVector<DataHeatBalance::SpaceListData> spaceList;
     EPVector<DataHeatBalance::ZoneData> Zone;
+    EPVector<DataHeatBalance::ZoneResilience> Resilience;
     EPVector<DataHeatBalance::ZoneListData> ZoneList;
     EPVector<DataHeatBalance::ZoneGroupData> ZoneGroup;
     EPVector<DataHeatBalance::PeopleData> People;
