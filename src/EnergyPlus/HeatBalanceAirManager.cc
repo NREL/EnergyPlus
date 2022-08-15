@@ -949,7 +949,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             ErrorsFound = true;
                         }
                     }
-                    if (lAlphaFieldBlanks(3)) {
+                    if (lNumericFieldBlanks(3)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
                                                 RoutineName,
@@ -983,7 +983,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             ErrorsFound = true;
                         }
                     }
-                    if (lAlphaFieldBlanks(3)) {
+                    if (lNumericFieldBlanks(3)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
                                                 RoutineName,
@@ -1017,7 +1017,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             ErrorsFound = true;
                         }
                     }
-                    if (lAlphaFieldBlanks(4)) {
+                    if (lNumericFieldBlanks(4)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Infiltration will result.",
                                                 RoutineName,
@@ -1508,7 +1508,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
                     thisVentilation.DesignLevel = rNumericArgs(1);
-                    if (lAlphaFieldBlanks(1)) {
+                    if (lNumericFieldBlanks(1)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                              cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(1) +
@@ -1536,7 +1536,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             ErrorsFound = true;
                         }
                     }
-                    if (lAlphaFieldBlanks(2)) {
+                    if (lNumericFieldBlanks(2)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                              cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(2) +
@@ -1564,7 +1564,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             ErrorsFound = true;
                         }
                     }
-                    if (lAlphaFieldBlanks(3)) {
+                    if (lNumericFieldBlanks(3)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                              cAlphaFieldNames(4) + "specifies " + cNumericFieldNames(3) +
@@ -1592,7 +1592,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             ErrorsFound = true;
                         }
                     }
-                    if (lAlphaFieldBlanks(4)) {
+                    if (lNumericFieldBlanks(4)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisVentilation.Name + "\", " +
                                              cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
@@ -2703,7 +2703,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             ErrorsFound = true;
                         }
                     }
-                    if (lAlphaFieldBlanks(4)) {
+                    if (lNumericFieldBlanks(4)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Mixing will result.",
                                                 RoutineName,
@@ -3269,7 +3269,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             ErrorsFound = true;
                         }
                     }
-                    if (lAlphaFieldBlanks(4)) {
+                    if (lNumericFieldBlanks(4)) {
                         ShowWarningError(state,
                                          format("{}{}=\"{}\", {} specifies {}, but that field is blank.  0 Cross Mixing will result.",
                                                 RoutineName,
