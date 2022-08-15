@@ -1111,13 +1111,12 @@ namespace SurfaceGeometry {
 
         static constexpr std::string_view RoutineName("GetSurfaceData: ");
 
-        int ConstrNum;         // Construction number
-        int Found;             // For matching interzone surfaces
-        int ConstrNumFound;    // Construction number of matching interzone surface
-        bool NonMatch(false);  // Error for non-matching interzone surfaces
-        int MovedSurfs;        // Number of Moved Surfaces (when sorting into hierarchical structure)
-        bool SurfError(false); // General Surface Error, causes fatal error at end of routine
-        int BaseSurfNum;
+        int ConstrNum;            // Construction number
+        int Found;                // For matching interzone surfaces
+        int ConstrNumFound;       // Construction number of matching interzone surface
+        bool NonMatch(false);     // Error for non-matching interzone surfaces
+        int MovedSurfs;           // Number of Moved Surfaces (when sorting into hierarchical structure)
+        bool SurfError(false);    // General Surface Error, causes fatal error at end of routine
         int TotLay;               // Total layers in a construction
         int TotLayFound;          // Total layers in the construction of a matching interzone surface
         int TotDetachedFixed;     // Total Shading:Site:Detailed entries
@@ -1569,6 +1568,13 @@ namespace SurfaceGeometry {
         MovedSurfs = 0;
         Array1D<bool> SurfaceTmpClassMoved; // Tmp class is moved
         SurfaceTmpClassMoved.dimension(state.dataSurface->TotSurfaces, false);
+        state.dataSurface->AllSurfaceListReportOrder.reserve(state.dataSurface->TotSurfaces);
+
+        // Old SurfNum to New SurfNum
+        // Old = order in state.dataSurfaceGeometry->SurfaceTmp
+        // New = order in state.dataSurface->Surface
+        EPVector<int> oldToNewSurfNums;
+        oldToNewSurfNums.resize(state.dataSurface->TotSurfaces, -1);
 
         // Move all shading Surfaces to Front
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -1582,7 +1588,8 @@ namespace SurfaceGeometry {
             // Store list of moved surface numbers in reporting order
             state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
             SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
-            state.dataSurface->AllSurfaceListReportOrder.push_back(MovedSurfs);
+            state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
+            oldToNewSurfNums(SurfNum) = MovedSurfs;
         }
 
         //  For each zone
@@ -1604,12 +1611,12 @@ namespace SurfaceGeometry {
                 if ((state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == state.dataSurfaceGeometry->BaseSurfIDs(1)) ||
                     (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == state.dataSurfaceGeometry->BaseSurfIDs(2)) ||
                     (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == state.dataSurfaceGeometry->BaseSurfIDs(3))) {
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = -1; // Default has base surface = base surface
-                    state.dataSurface->Surface(MovedSurfs).BaseSurf = MovedSurfs;
+                    // Store list of moved surface numbers in reporting order. We use the old position, we'll reconcile later
+                    // We don't do it for Air Door/Air Windows yet, we want them listed below each base surf they belong to
+                    state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
                 }
+                oldToNewSurfNums(SurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
-                // Store list of moved surface numbers in reporting order
-                state.dataSurface->AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
 
             //  For each Base Surface Type (Wall, Floor, Roof/Ceiling) - put these first
@@ -1627,22 +1634,20 @@ namespace SurfaceGeometry {
 
                     ++MovedSurfs;
                     state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
-                    SurfaceTmpClassMoved(SurfNum) = true;                         // 'Moved'
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = -1; // Default has base surface = base surface
-                    BaseSurfNum = MovedSurfs;
-                    state.dataSurface->Surface(MovedSurfs).BaseSurf = BaseSurfNum;
+                    oldToNewSurfNums(SurfNum) = MovedSurfs;
+                    SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
                     // Store list of moved surface numbers in order reporting order (subsurfaces follow their base surface)
-                    state.dataSurface->AllSurfaceListReportOrder.push_back(MovedSurfs);
+                    state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
 
-                    //  Find all subsurfaces to this surface - just to update the base surface number - don't move these yet
+                    //  Find all subsurfaces to this surface - just to update Report them in order
                     for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
-
+                        // Gotta avoid pushing myself again!
+                        if (SubSurfNum == SurfNum) continue;
+                        // We don't check if already moved, because we didn't add them to AllSurfaceListReportOrder above!
                         if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone == 0) continue;
                         if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf != SurfNum) continue;
-                        // Set BaseSurf to negative of new BaseSurfNum (to avoid confusion with other base surfaces)
-                        state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -BaseSurfNum;
                         // Add original sub-surface numbers as placeholders in surface list for reporting
-                        state.dataSurface->AllSurfaceListReportOrder.push_back(-SubSurfNum);
+                        state.dataSurface->AllSurfaceListReportOrder.push_back(SubSurfNum);
                     }
                 }
             }
@@ -1656,10 +1661,10 @@ namespace SurfaceGeometry {
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::IntMass) continue;
                 ++MovedSurfs;
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
-                state.dataSurface->Surface(MovedSurfs).BaseSurf = MovedSurfs;
+                oldToNewSurfNums(SurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
                 // Store list of moved surface numbers in reporting order
-                state.dataSurface->AllSurfaceListReportOrder.push_back(MovedSurfs);
+                state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
             }
 
             // Opaque door goes next
@@ -1671,15 +1676,8 @@ namespace SurfaceGeometry {
 
                 ++MovedSurfs;
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // Reset BaseSurf to it's positive value (set to negative earlier)
-                state.dataSurface->Surface(MovedSurfs).BaseSurf = -state.dataSurface->Surface(MovedSurfs).BaseSurf;
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
-                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
-                std::replace(state.dataSurface->AllSurfaceListReportOrder.begin(),
-                             state.dataSurface->AllSurfaceListReportOrder.end(),
-                             -SubSurfNum,
-                             MovedSurfs);
             }
 
             // The exterior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
@@ -1694,15 +1692,8 @@ namespace SurfaceGeometry {
 
                 ++MovedSurfs;
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // Reset BaseSurf to it's positive value (set to negative earlier)
-                state.dataSurface->Surface(MovedSurfs).BaseSurf = -state.dataSurface->Surface(MovedSurfs).BaseSurf;
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
-                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
-                std::replace(state.dataSurface->AllSurfaceListReportOrder.begin(),
-                             state.dataSurface->AllSurfaceListReportOrder.end(),
-                             -SubSurfNum,
-                             MovedSurfs);
             }
 
             // The interior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
@@ -1717,15 +1708,8 @@ namespace SurfaceGeometry {
 
                 ++MovedSurfs;
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // Reset BaseSurf to it's positive value (set to negative earlier)
-                state.dataSurface->Surface(MovedSurfs).BaseSurf = -state.dataSurface->Surface(MovedSurfs).BaseSurf;
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
-                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
-                std::replace(state.dataSurface->AllSurfaceListReportOrder.begin(),
-                             state.dataSurface->AllSurfaceListReportOrder.end(),
-                             -SubSurfNum,
-                             MovedSurfs);
             }
 
             // The SurfaceClass::TDD_Diffuser (OriginalClass = Window) goes next
@@ -1737,15 +1721,8 @@ namespace SurfaceGeometry {
 
                 ++MovedSurfs;
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // Reset BaseSurf to it's positive value (set to negative earlier)
-                state.dataSurface->Surface(MovedSurfs).BaseSurf = -state.dataSurface->Surface(MovedSurfs).BaseSurf;
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
-                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
-                std::replace(state.dataSurface->AllSurfaceListReportOrder.begin(),
-                             state.dataSurface->AllSurfaceListReportOrder.end(),
-                             -SubSurfNum,
-                             MovedSurfs);
             }
 
             // Last but not least, SurfaceClass::TDD_Dome
@@ -1757,17 +1734,22 @@ namespace SurfaceGeometry {
 
                 ++MovedSurfs;
                 state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                oldToNewSurfNums(SubSurfNum) = MovedSurfs;
                 SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // Reset BaseSurf to it's positive value (set to negative earlier)
-                state.dataSurface->Surface(MovedSurfs).BaseSurf = -state.dataSurface->Surface(MovedSurfs).BaseSurf;
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
-                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
-                std::replace(state.dataSurface->AllSurfaceListReportOrder.begin(),
-                             state.dataSurface->AllSurfaceListReportOrder.end(),
-                             -SubSurfNum,
-                             MovedSurfs);
             }
         }
+
+        // Validity checking
+        assert(state.dataSurface->TotSurfaces == MovedSurfs);
+        assert(state.dataSurface->TotSurfaces == static_cast<int>(state.dataSurface->AllSurfaceListReportOrder.size()));
+        assert(state.dataSurface->TotSurfaces == static_cast<int>(oldToNewSurfNums.size()));
+
+        // Assert validity of indices
+        assert(std::find_if(state.dataSurface->AllSurfaceListReportOrder.cbegin(), state.dataSurface->AllSurfaceListReportOrder.cend(), [](int i) {
+                   return i < 1;
+               }) == state.dataSurface->AllSurfaceListReportOrder.cend());
+
+        assert(std::find_if(oldToNewSurfNums.cbegin(), oldToNewSurfNums.cend(), [](int i) { return i < 1; }) == oldToNewSurfNums.cend());
 
         if (MovedSurfs != state.dataSurface->TotSurfaces) {
             ShowSevereError(
@@ -1786,6 +1768,30 @@ namespace SurfaceGeometry {
                                  "Remaining surface checks will use \"reordered number of surfaces\", not number of original surfaces");
         }
 
+        // Realign the relationship: surface to base surface
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            auto &movedSurf = state.dataSurface->Surface(SurfNum);
+            if (movedSurf.BaseSurf > 0) {
+                int newBaseSurfNum = oldToNewSurfNums(movedSurf.BaseSurf);
+                movedSurf.BaseSurf = newBaseSurfNum;
+
+                if (newBaseSurfNum < 1) {
+                    ShowFatalError(
+                        state,
+                        format("{}Couldn't find the new Surface Number for surface index {} named '{}'. Looking for BaseSurf old index of {}",
+                               RoutineName,
+                               SurfNum,
+                               movedSurf.Name,
+                               movedSurf.BaseSurf));
+                }
+            }
+            auto &reportOrderNum = state.dataSurface->AllSurfaceListReportOrder[SurfNum - 1];
+            if (reportOrderNum > 0) {
+                int newReportOrderNum = oldToNewSurfNums(reportOrderNum);
+                reportOrderNum = newReportOrderNum;
+            }
+        }
+
         state.dataSurfaceGeometry->SurfaceTmp.deallocate(); // DeAllocate the Temp Surface derived type
 
         CreateMissingSpaces(state, ErrorsFound);
@@ -1793,7 +1799,6 @@ namespace SurfaceGeometry {
         //  For each Base Surface Type (Wall, Floor, Roof)
 
         for (int Loop = 1; Loop <= 3; ++Loop) {
-
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
                 if (state.dataSurface->Surface(SurfNum).Zone == 0) continue;
@@ -2282,7 +2287,10 @@ namespace SurfaceGeometry {
                     if (state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst == 0) {
                         state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst = SurfNum;
                     }
-                    if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) continue;
+                    if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) {
+                        state.dataSurface->Surface(SurfNum).HeatTransSurf = false;
+                        continue;
+                    }
                     if (state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst == 0) {
                         state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = SurfNum;
                         // Non window surfaces are grouped next within each zone
@@ -2654,7 +2662,6 @@ namespace SurfaceGeometry {
         state.dataSurface->AllExtSolWindowSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllExtSolWinWithFrameSurfaceList.reserve(state.dataSurface->TotWindows);
         state.dataSurface->AllHTKivaSurfaceList.reserve(state.dataSurface->TotSurfaces);
-        state.dataSurface->AllSurfaceListReportOrder.reserve(state.dataSurface->TotSurfaces);
 
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
@@ -5025,7 +5032,8 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Dome) {
 
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction != 0) {
-                    if (!state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsWindow) {
+                    auto &construction = state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction);
+                    if (!construction.TypeIsWindow && !construction.TypeIsAirBoundary) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
@@ -5428,7 +5436,8 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor) {
 
                     if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction != 0) {
-                        if (!state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsWindow) {
+                        auto &construction = state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction);
+                        if (!construction.TypeIsWindow && !construction.TypeIsAirBoundary) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
@@ -12766,6 +12775,10 @@ namespace SurfaceGeometry {
         Vector TVect;
         Vector CoordinateTransVector;
 
+        if (state.dataSurface->Surface(ThisSurf).VerticesProcessed) {
+            return;
+        }
+
         ErrorInSurface = false;
 
         if (state.dataSurfaceGeometry->ProcessSurfaceVerticesOneTimeFlag) {
@@ -13251,11 +13264,17 @@ namespace SurfaceGeometry {
             // SHIFT RELATIVE COORDINATES FROM LOWER LEFT CORNER TO ORIGIN DEFINED
             // BY CTRAN AND SET DIRECTION COSINES SAME AS BASE SURFACE.
             if (!state.dataSurface->Surface(ThisBaseSurface).VerticesProcessed) {
-                ShowSevereError(state, std::string{RoutineName} + "Developer error for Subsurface=" + state.dataSurface->Surface(ThisSurf).Name);
-                ShowContinueError(state,
-                                  "Base surface=" + state.dataSurface->Surface(ThisBaseSurface).Name +
-                                      " vertices must be processed before any subsurfaces.");
-                ShowFatalError(state, std::string{RoutineName});
+
+                if (state.dataSurface->Surface(ThisSurf).IsAirBoundarySurf) {
+                    ProcessSurfaceVertices(state, ThisBaseSurface, ErrorsFound);
+                } else {
+
+                    ShowSevereError(state, std::string{RoutineName} + "Developer error for Subsurface=" + state.dataSurface->Surface(ThisSurf).Name);
+                    ShowContinueError(state,
+                                      "Base surface=" + state.dataSurface->Surface(ThisBaseSurface).Name +
+                                          " vertices must be processed before any subsurfaces.");
+                    ShowFatalError(state, std::string{RoutineName});
+                }
             }
 
             for (n = 1; n <= state.dataSurface->Surface(ThisSurf).Sides; ++n) {

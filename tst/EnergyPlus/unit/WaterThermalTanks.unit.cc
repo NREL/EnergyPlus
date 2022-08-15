@@ -2563,9 +2563,12 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    14067.4113682534,        !- Gross Rated Total Cooling Capacity {W}",
         "    10297.3451215615,        !- Gross Rated Sensible Cooling Capacity {W}",
         "    5.3555091458258,         !- Gross Rated Cooling COP",
+        "    ,                        !- Rated Entering Water Temperature",
+        "    ,                        !- Rated Entering Air Dry-Bulb Temperature",
+        "    ,                        !- Rated Entering Air Wet-Bulb Temperature",
         "    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
         "    SensCoolCapCurve,        !- Sensible Cooling Name",
-        "    CoolPowCurve,           !- Cooling Power Consumption Curve Name",
+        "    CoolPowCurve,            !- Cooling Power Consumption Curve Name",
         "    1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
         "    1.5;                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 

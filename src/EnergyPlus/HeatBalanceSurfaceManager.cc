@@ -1101,24 +1101,28 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
                     nomUfact = state.dataHeatBal->NominalU(Surface(iSurf).Construction);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenUfact, surfName, nomUfact, 3);
-                    // if the construction report is requested the SummerSHGC is already calculated
-                    if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
-                        SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
-                        TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
-                    } else {
-                        // must calculate Summer SHGC
-                        if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
-                            CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                    if (!state.dataConstruction->Construct(curCons).TypeIsAirBoundary) {
+                        // Solar properties not applicable for air boundary surfaces
+                        // if the construction report is requested the SummerSHGC is already calculated
+                        if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
+                            SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
+                            TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
+                        } else {
+                            // must calculate Summer SHGC
+                            if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
+                                CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                            }
                         }
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenSHGC, surfName, SHGCSummer, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenVisTr, surfName, TransVisNorm, 3);
+                        // compute totals for area weighted averages
+                        intShgcArea += SHGCSummer * windowAreaWMult;
+                        intVistranArea += TransVisNorm * windowAreaWMult;
                     }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenSHGC, surfName, SHGCSummer, 3);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenVisTr, surfName, TransVisNorm, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenParent, surfName, Surface(iSurf).BaseSurfName);
                     // compute totals for area weighted averages
                     intFenTotArea += windowAreaWMult;
                     intUfactArea += nomUfact * windowAreaWMult;
-                    intShgcArea += SHGCSummer * windowAreaWMult;
-                    intVistranArea += TransVisNorm * windowAreaWMult;
                 }
             } else if (Surface(iSurf).Class == SurfaceClass::Door) {
                 surfName = Surface(iSurf).Name;
@@ -2673,14 +2677,20 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 state.dataSurface->SurfReflFacBmToDiffSolGnd)); // For linear indexing
         Real64 GndReflSolarRad = 0.0;
         Real64 GndSolarRadInc = max(state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad, 0.0);
+
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
+            state.dataSurface->Surface(SurfNum).IncSolMultiplier = GetSurfIncidentSolarMultiplier(state, SurfNum);
+        }
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
+            state.dataSurface->SurfSkySolarInc(SurfNum) =
+                state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
             if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
-                GndReflSolarRad = GndSolarRadInc *
+                GndReflSolarRad = GndSolarRadInc * SurfIncSolarMultiplier *
                                   state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsReflAvg;
                 Surface(SurfNum).GndReflSolarRad = GndReflSolarRad;
             } else {
-                GndReflSolarRad = state.dataEnvrn->GndSolarRad;
+                GndReflSolarRad = state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier;
             }
             state.dataSurface->SurfGndSolarInc(SurfNum) = GndReflSolarRad * Surface(SurfNum).ViewFactorGround;
             state.dataSurface->SurfWinSkyGndSolarInc(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
@@ -2692,6 +2702,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             Array1D<Real64>::size_type lSP = state.dataSurface->SurfReflFacBmToBmSolObs.index(state.dataGlobal->PreviousHour, 1) - 1;
             // For Complex Fenestrations:
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
 
                 Real64 GndSurfReflectance = 0.0;
                 if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
@@ -2701,8 +2712,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     GndSurfReflectance = state.dataEnvrn->GndReflectance;
                 }
                 state.dataSurface->SurfWinSkyGndSolarInc(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
-                state.dataSurface->SurfWinBmGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * GndSurfReflectance *
+                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * GndSurfReflectance * state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
+                state.dataSurface->SurfWinBmGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
+                                                                   state.dataEnvrn->SOLCOS(3) * GndSurfReflectance *
                                                                    state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
                 state.dataSurface->SurfBmToBmReflFacObs(SurfNum) =
                     state.dataGlobal->WeightNow * state.dataSurface->SurfReflFacBmToBmSolObs[lSH + SurfNum] +
@@ -2714,13 +2726,14 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     state.dataGlobal->WeightNow * state.dataSurface->SurfReflFacBmToDiffSolGnd[lSH + SurfNum] +
                     state.dataGlobal->WeightPreviousHour * state.dataSurface->SurfReflFacBmToDiffSolGnd[lSP + SurfNum];
                 // TH2 CR 9056
-                state.dataSurface->SurfSkySolarInc(SurfNum) += state.dataEnvrn->BeamSolarRad * (state.dataSurface->SurfBmToBmReflFacObs(SurfNum) +
-                                                                                                state.dataSurface->SurfBmToDiffReflFacObs(SurfNum)) +
-                                                               state.dataEnvrn->DifSolarRad * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
+                state.dataSurface->SurfSkySolarInc(SurfNum) +=
+                    state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
+                        (state.dataSurface->SurfBmToBmReflFacObs(SurfNum) + state.dataSurface->SurfBmToDiffReflFacObs(SurfNum)) +
+                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
                 state.dataSurface->SurfGndSolarInc(SurfNum) =
-                    state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * GndSurfReflectance *
+                    state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataEnvrn->SOLCOS(3) * GndSurfReflectance *
                         state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum) +
-                    state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
+                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * GndSurfReflectance * state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
                 state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum) = state.dataSurface->SurfReflFacSkySolGnd(SurfNum);
             }
         }
@@ -2831,21 +2844,23 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 // Cosine of incidence angle and solar incident on outside of surface, for reporting
                 Real64 CosInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
                 state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = CosInc;
+                Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
                 // Incident direct (unreflected) beam
                 state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) =
-                    state.dataEnvrn->BeamSolarRad *
+                    state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
                     state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) * CosInc;
                 // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
                 state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
+                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
                 // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
                 state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
                 // Incident diffuse solar from beam-to-diffuse reflection from ground
-                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) *
-                                                                              GndSurfReflectance * state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
+                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
+                                                                              state.dataEnvrn->SOLCOS(3) * GndSurfReflectance *
+                                                                              state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
                 // Incident diffuse solar from sky diffuse reflection from ground
                 state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * GndSurfReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
                 // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                 // in SkySolarInc.
                 state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
@@ -2857,9 +2872,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
         Array1D<Real64> currBeamSolar(state.dataSurface->TotSurfaces); // Local variable for BeamSolarRad
 
         for (int SurfNum : state.dataSurface->AllExtSolarSurfaceList) {
-
+            Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
             // Regular surface
-            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad;
+            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
             // Cosine of incidence angle and solar incident on outside of surface, for reporting
             state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) =
                 state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
@@ -2879,16 +2894,17 @@ void InitSolarHeatGains(EnergyPlusData &state)
             }
             // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
             state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) =
-                state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
+                state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
             // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
             state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum);
             // Incident diffuse solar from beam-to-diffuse reflection from ground
-            state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
-                state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * GndSurfReflectance * state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
+            state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
+                                                                          state.dataEnvrn->SOLCOS(3) * GndSurfReflectance *
+                                                                          state.dataSurface->SurfBmToDiffReflFacGnd(SurfNum);
 
             // Incident diffuse solar from sky diffuse reflection from ground
             state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                state.dataEnvrn->DifSolarRad * GndSurfReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
+                state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * GndSurfReflectance * state.dataSurface->SurfSkyDiffReflFacGnd(SurfNum);
             // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
             // in SkySolarInc.
             // SurfQRadSWOutIncident(SurfNum) = SurfQRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
@@ -2900,13 +2916,13 @@ void InitSolarHeatGains(EnergyPlusData &state)
             if (state.dataSurface->CalcSolRefl) {
                 // Incident beam solar from beam-to-beam (specular) reflection from obstructions
                 state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) =
-                    state.dataSurface->SurfBmToBmReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
+                    state.dataSurface->SurfBmToBmReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
                 // Incident diffuse solar from beam-to-diffuse reflection from obstructions
                 state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) =
-                    state.dataSurface->SurfBmToDiffReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
+                    state.dataSurface->SurfBmToDiffReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
                 // Incident diffuse solar from sky diffuse reflection from obstructions
                 state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs(SurfNum) =
-                    state.dataEnvrn->DifSolarRad * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
+                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSurface->SurfReflFacSkySolObs(SurfNum);
                 // TH2 CR 9056: Add reflections from obstructions to the total incident
                 state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) += state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) +
                                                                      state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs(SurfNum) +
@@ -2923,10 +2939,13 @@ void InitSolarHeatGains(EnergyPlusData &state)
             Real64 ConInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2);
 
             state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = ConInc;
-            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarBeam) /
+            Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
+            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
+                                     TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarBeam) /
                                      state.dataConstruction->Construct(ConstrNum).TransDiff;
 
-            state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) *
+            state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier *
+                                                          state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) *
                                                           TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarAniso) /
                                                           state.dataConstruction->Construct(ConstrNum).TransDiff;
 
@@ -2943,8 +2962,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
             // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
             state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = state.dataSurface->SurfSkySolarInc(SurfNum);
             state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) =
-                state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
-                state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
+                (state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
+                 state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum));
         }
 
         for (int ShelfNum = 1; ShelfNum <= (int)state.dataDaylightingDevicesData->Shelf.size(); ++ShelfNum) {
@@ -2952,15 +2971,16 @@ void InitSolarHeatGains(EnergyPlusData &state)
             int OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
             state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) =
                 state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
-            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad;
+            Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
+            currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
             // Shelf diffuse solar radiation
-            Real64 ShelfSolarRad = (state.dataEnvrn->BeamSolarRad *
+            Real64 ShelfSolarRad = (state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
                                         state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, OutShelfSurf) *
                                         state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, OutShelfSurf) +
-                                    state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
+                                    state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                                    state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
-            Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad;
+            Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier;
             if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
                 GndReflSolarRad = state.dataSurface->Surface(SurfNum).GndReflSolarRad;
             }
@@ -2976,11 +2996,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
             int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 int const ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+                Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
                 if (Surface(SurfNum).ExtSolar) {
                     Real64 AbsExt =
                         state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum); // Absorptivity of outer most layer (or movable insulation if present)
                     state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) =
-                        state.dataSurface->SurfOpaqAO(SurfNum) * state.dataEnvrn->BeamSolarRad +
+                        state.dataSurface->SurfOpaqAO(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier +
                         AbsExt * (state.dataSurface->SurfSkySolarInc(SurfNum) + state.dataSurface->SurfGndSolarInc(SurfNum));
                 }
                 if (ConstrNum > 0) {
@@ -2993,14 +3014,16 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 InShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf; // Inside daylighting shelf present if > 0
                             }
                             state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +=
-                                state.dataSurface->SurfOpaqAI(SurfNum) * state.dataEnvrn->BeamSolarRad;
+                                state.dataSurface->SurfOpaqAI(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
                             if (InShelfSurf > 0) { // Inside daylighting shelf
                                 // Shelf surface area is divided by 2 because only one side sees beam (Area was multiplied by 2 during init)
                                 state.dataHeatBalSurf->SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) =
-                                    state.dataSurface->SurfOpaqAI(SurfNum) * state.dataEnvrn->BeamSolarRad * (0.5 * Surface(SurfNum).Area);
+                                    state.dataSurface->SurfOpaqAI(SurfNum) * state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
+                                    (0.5 * Surface(SurfNum).Area);
                             } else { // Regular surface
-                                state.dataHeatBalSurf->SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) =
-                                    state.dataSurface->SurfOpaqAI(SurfNum) * state.dataEnvrn->BeamSolarRad * Surface(SurfNum).Area;
+                                state.dataHeatBalSurf->SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) = state.dataSurface->SurfOpaqAI(SurfNum) *
+                                                                                                 state.dataEnvrn->BeamSolarRad *
+                                                                                                 SurfIncSolarMultiplier * Surface(SurfNum).Area;
                             }
                         }
                     } else {
@@ -3277,9 +3300,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
                         Real64 FracSunLit = 0.0;        // Fraction of window sunlit this time step
                         Real64 BeamFaceInc;             // Beam solar incident window plane this time step (W/m2)
                         Real64 DifSolarFaceInc;         // Diffuse solar incident on window plane this time step (W/m2)
+                        Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
                         if (FrArea > 0.0 || DivArea > 0.0) {
                             FracSunLit = state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum);
-                            BeamFaceInc = state.dataEnvrn->BeamSolarRad *
+                            BeamFaceInc = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
                                           state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) *
                                           CosInc;
                             DifSolarFaceInc = SkySolarInc + GndSolarInc;
@@ -3310,11 +3334,11 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             Real64 TransDiffGl = 0.0;           // Diffuse solar transmittance
                             if (FrProjOut > 0.0 || FrProjIn > 0.0) {
                                 Real64 BeamFrHorFaceInc =
-                                    state.dataEnvrn->BeamSolarRad * CosIncAngHorProj *
+                                    state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngHorProj *
                                     (Surface(SurfNum).Width - state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth) * FracSunLit /
                                     FrArea;
                                 Real64 BeamFrVertFaceInc =
-                                    state.dataEnvrn->BeamSolarRad * CosIncAngVertProj *
+                                    state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngVertProj *
                                     (Surface(SurfNum).Height - state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivWidth) * FracSunLit /
                                     FrArea;
                                 // Beam solar on outside of frame
@@ -3338,7 +3362,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             FrIncSolarOut += DifSolarFaceInc * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrOut(SurfNum));
                             state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum) = FrIncSolarOut * state.dataSurface->SurfWinFrameSolAbsorp(SurfNum);
                             // Add diffuse from beam reflected from window outside reveal surfaces
-                            state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum) += state.dataEnvrn->BeamSolarRad *
+                            state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum) += state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
                                                                                   state.dataSurface->SurfWinOutsRevealDiffOntoFrame(SurfNum) *
                                                                                   state.dataSurface->SurfWinFrameSolAbsorp(SurfNum);
 
@@ -3346,7 +3370,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             FrIncSolarIn += DifSolarFaceInc * TransDiffGl * 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum);
                             state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) = FrIncSolarIn * state.dataSurface->SurfWinFrameSolAbsorp(SurfNum);
                             // Add diffuse from beam reflected from window inside reveal surfaces
-                            state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) += state.dataEnvrn->BeamSolarRad *
+                            state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) += state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
                                                                                  state.dataSurface->SurfWinInsRevealDiffOntoFrame(SurfNum) *
                                                                                  state.dataSurface->SurfWinFrameSolAbsorp(SurfNum);
                         }
@@ -3384,11 +3408,11 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             Real64 BeamDivVertFaceInc = 0.0; // Beam solar on divider's vertical outside projection faces (W/m2)
                             // Beam incident on horizontal and vertical projection faces of divider if no exterior shading
                             if (DivProjOut > 0.0 && !ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
-                                BeamDivHorFaceInc = state.dataEnvrn->BeamSolarRad * CosIncAngHorProj *
+                                BeamDivHorFaceInc = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngHorProj *
                                                     state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivProjOut *
                                                     (Surface(SurfNum).Width - state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth) *
                                                     FracSunLit / DivArea;
-                                BeamDivVertFaceInc = state.dataEnvrn->BeamSolarRad * CosIncAngVertProj *
+                                BeamDivVertFaceInc = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngVertProj *
                                                      state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivProjOut *
                                                      (Surface(SurfNum).Height - state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivWidth) *
                                                      FracSunLit / DivArea;
@@ -3420,13 +3444,15 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     // BeamDivHorFaceIncIn - Beam solar on divider's horizontal inside projection faces (W/m2)
                                     // BeamDivVertFaceIncIn - Beam solar on divider's vertical inside projection faces (W/m2)
                                     Real64 BeamDivHorFaceIncIn =
-                                        state.dataEnvrn->BeamSolarRad * CosIncAngHorProj * state.dataSurface->FrameDivider(FrDivNum).HorDividers *
-                                        DivProjIn * (Surface(SurfNum).Width - state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth) *
-                                        FracSunLit / DivArea;
+                                        state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngHorProj *
+                                        state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivProjIn *
+                                        (Surface(SurfNum).Width - state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth) * FracSunLit /
+                                        DivArea;
                                     Real64 BeamDivVertFaceIncIn =
-                                        state.dataEnvrn->BeamSolarRad * CosIncAngVertProj * state.dataSurface->FrameDivider(FrDivNum).VertDividers *
-                                        DivProjIn * (Surface(SurfNum).Height - state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivWidth) *
-                                        FracSunLit / DivArea;
+                                        state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * CosIncAngVertProj *
+                                        state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivProjIn *
+                                        (Surface(SurfNum).Height - state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivWidth) * FracSunLit /
+                                        DivArea;
                                     DivIncSolarInBm = TransGl * (BeamDivHorFaceIncIn + BeamDivVertFaceIncIn);
                                     DivIncSolarInDif = TransDiffGl * DifSolarFaceInc * state.dataSurface->SurfWinProjCorrDivIn(SurfNum);
                                 }
@@ -5454,14 +5480,14 @@ void CalcThermalResilience(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Heat Index",
                                 OutputProcessor::Unit::C,
-                                state.dataHeatBalFanSys->ZoneHeatIndex(ZoneNum),
+                                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 state.dataHeatBal->Zone(ZoneNum).Name);
             SetupOutputVariable(state,
                                 "Zone Humidity Index",
                                 OutputProcessor::Unit::None,
-                                state.dataHeatBalFanSys->ZoneHumidex(ZoneNum),
+                                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidex,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 state.dataHeatBal->Zone(ZoneNum).Name);
@@ -5508,7 +5534,7 @@ void CalcThermalResilience(EnergyPlusData &state)
                 }
             }
             HI = (HI - 32.0) * (5.0 / 9.0);
-            state.dataHeatBalFanSys->ZoneHeatIndex(ZoneNum) = HI;
+            state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex = HI;
         }
     }
     if (state.dataHeatBalSurfMgr->reportVarHumidex || state.dataOutRptTab->displayThermalResilienceSummary) {
@@ -5519,7 +5545,7 @@ void CalcThermalResilience(EnergyPlusData &state)
             Real64 const e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
             Real64 const h = 5.0 / 9.0 * (e - 10.0);
             Real64 const Humidex = ZoneT + h;
-            state.dataHeatBalFanSys->ZoneHumidex(ZoneNum) = Humidex;
+            state.dataHeatBal->Resilience(ZoneNum).ZoneHumidex = Humidex;
         }
     }
 }
@@ -5527,9 +5553,28 @@ void CalcThermalResilience(EnergyPlusData &state)
 void ReportThermalResilience(EnergyPlusData &state)
 {
 
-    int HINoBins = 5;      // Heat Index range - number of bins
-    int HumidexNoBins = 5; // Humidex range - number of bins
-    int SETNoBins = 4;     // SET report column numbers
+    int HINoBins = 5;                     // Heat Index range - number of bins
+    int HumidexNoBins = 5;                // Humidex range - number of bins
+    int SETNoBins = 5;                    // SET report column numbers
+    int ColdHourOfSafetyNoBins = 5;       // Cold Stress Hour of Safety number of columns
+    int HeatHourOfSafetyNoBins = 5;       // Heat Stress Hour of Safety number of columns
+    int UnmetDegreeHourNoBins = 6;        // Unmet Degree Hour number of columns
+    int DiscomfortWtExceedHourNoBins = 4; // Unmet Degree Hour number of columns
+
+    Array1D_bool reportPeriodFlags;
+    if (state.dataWeatherManager->TotReportPers > 0) {
+        reportPeriodFlags.dimension(state.dataWeatherManager->TotThermalReportPers, false);
+        General::findReportPeriodIdx(
+            state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
+    }
+
+    auto &ort(state.dataOutRptTab);
+    for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+        if (reportPeriodFlags(i)) {
+            int curResMeterNumber = ort->meterNumTotalsBEPS(1);
+            state.dataWeatherManager->ThermalReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+        }
+    }
 
     if (state.dataHeatBalSurfMgr->reportThermalResilienceFirstTime) {
         if (state.dataHeatBal->TotPeople == 0) state.dataHeatBalSurfMgr->hasPierceSET = false;
@@ -5539,14 +5584,29 @@ void ReportThermalResilience(EnergyPlusData &state)
             }
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            state.dataHeatBalFanSys->ZoneHeatIndexHourBins(ZoneNum).assign(HINoBins, 0.0);
-            state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum).assign(HINoBins, 0.0);
-            state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
-            state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum).assign(HumidexNoBins, 0.0);
-            if (state.dataHeatBalSurfMgr->hasPierceSET) {
-                state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum).assign(SETNoBins, 0.0);
-                state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum).assign(SETNoBins, 0.0);
+            // the whole period
+            // user specified reporting period
+            for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+                state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, i).assign(HumidexNoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, i).assign(HumidexNoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, i).assign(HumidexNoBins, 0.0);
+                if (state.dataHeatBalSurfMgr->hasPierceSET) {
+                    state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(ZoneNum, i).assign(SETNoBins, 0.0);
+                    state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(ZoneNum, i).assign(SETNoBins, 0.0);
+                }
+                state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, i).assign(ColdHourOfSafetyNoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, i).assign(HeatHourOfSafetyNoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, i).assign(UnmetDegreeHourNoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, i).assign(DiscomfortWtExceedHourNoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, i).assign(DiscomfortWtExceedHourNoBins, 0.0);
             }
+            state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod = 0.0;
+            state.dataHeatBalFanSys->highSETLongestHoursRepPeriod = 0.0;
+            state.dataHeatBalFanSys->lowSETLongestStartRepPeriod = 0.0;
+            state.dataHeatBalFanSys->highSETLongestStartRepPeriod = 0.0;
         }
         state.dataHeatBalSurfMgr->lowSETLongestHours.assign(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalSurfMgr->highSETLongestHours.assign(state.dataGlobal->NumOfZones, 0.0);
@@ -5557,121 +5617,519 @@ void ReportThermalResilience(EnergyPlusData &state)
 
     // Count hours only during weather simulation periods
     if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
+        // use default value if there are no user inputs
+        Real64 ColdTempThresh = 15.56;
+        Real64 HeatTempThresh = 30.0;
         // Trace current time step Zone Pierce SET; NaN if no occupant or SET not calculated
         // Record last time step SET to trace SET unmet duration;
+
+        Real64 valueNotInit = -999.0;
+        Real64 nearThreshold = 1.0;
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            state.dataHeatBal->Resilience(ZoneNum).PierceSET = valueNotInit;
+            state.dataHeatBal->Resilience(ZoneNum).PMV = valueNotInit;
+        }
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
-            state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                           GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
-            state.dataHeatBalFanSys->ZoneOccPierceSETLastStep(ZoneNum) = state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum);
-            if (state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) > 0) {
-                if (state.dataHeatBal->People(iPeople).Pierce) {
-                    state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum) = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
-                } else {
-                    state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum) = -1;
-                }
+            state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
+                                                                GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+            state.dataHeatBal->Resilience(ZoneNum).ZonePierceSETLastStep = state.dataHeatBal->Resilience(ZoneNum).ZonePierceSET;
+            if (state.dataHeatBal->People(iPeople).Pierce) {
+                state.dataHeatBal->Resilience(ZoneNum).ZonePierceSET = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
             } else {
-                state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum) = -1;
+                state.dataHeatBal->Resilience(ZoneNum).ZonePierceSET = -1;
+            }
+
+            Real64 NumOcc = state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc;
+            Real64 Temperature = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
+            bool &CrossedColdThresh = state.dataHeatBal->Resilience(ZoneNum).CrossedColdThresh;
+            if (Temperature > ColdTempThresh) { // safe
+                if (!CrossedColdThresh) {
+                    // compute the number of hours before threshold is reached
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneColdHourOfSafetyBins[0] += state.dataGlobal->TimeStepZone;
+                }
+            } else { // danger
+                // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
+                state.dataHeatBal->Resilience(ZoneNum).ZoneColdHourOfSafetyBins[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneColdHourOfSafetyBins[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneColdHourOfSafetyBins[4] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                // first time crossing threshold
+                if (!CrossedColdThresh) {
+                    // compute the time when the zone crosses the threshold temperature
+                    int encodedMonDayHrMin;
+                    General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                               state.dataEnvrn->Month,
+                                               state.dataEnvrn->DayOfMonth,
+                                               state.dataGlobal->HourOfDay,
+                                               state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                    // fixme: not sure how to aggregate by zone
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneColdHourOfSafetyBins[1] = encodedMonDayHrMin;
+                    CrossedColdThresh = true;
+                }
+            }
+            HeatTempThresh = state.dataHeatBal->People(iPeople).HeatStressTempThresh;
+            bool &CrossedHeatThresh = state.dataHeatBal->Resilience(ZoneNum).CrossedHeatThresh;
+            if (Temperature < HeatTempThresh) { // safe
+                if (!CrossedHeatThresh) {
+                    // compute the number of hours before threshold is reached
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneHeatHourOfSafetyBins[0] += state.dataGlobal->TimeStepZone;
+                }
+            } else { // danger
+                // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatHourOfSafetyBins[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatHourOfSafetyBins[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatHourOfSafetyBins[4] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                // first time crossing threshold
+                if (!CrossedHeatThresh) {
+                    // compute the time when the zone crosses the threshold temperature
+                    int encodedMonDayHrMin;
+                    General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                               state.dataEnvrn->Month,
+                                               state.dataEnvrn->DayOfMonth,
+                                               state.dataGlobal->HourOfDay,
+                                               state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneHeatHourOfSafetyBins[1] = encodedMonDayHrMin;
+                    CrossedHeatThresh = true;
+                }
+            }
+
+            Real64 VeryHotPMVThresh = 3.0;
+            Real64 WarmPMVThresh = 0.7;
+            Real64 CoolPMVThresh = -0.7;
+            Real64 VeryColdPMVThresh = -3.0;
+            Real64 PMV = state.dataThermalComforts->ThermalComfortData(iPeople).FangerPMV;
+            if (PMV < VeryColdPMVThresh) {
+                state.dataHeatBal->Resilience(ZoneNum).ZoneDiscomfortWtExceedOccuHourBins[0] +=
+                    (VeryColdPMVThresh - PMV) * NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneDiscomfortWtExceedOccupiedHourBins[0] +=
+                    (VeryColdPMVThresh - PMV) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+            }
+            if (PMV < CoolPMVThresh) {
+                state.dataHeatBal->Resilience(ZoneNum).ZoneDiscomfortWtExceedOccuHourBins[1] +=
+                    (CoolPMVThresh - PMV) * NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneDiscomfortWtExceedOccupiedHourBins[1] +=
+                    (CoolPMVThresh - PMV) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+            }
+            if (PMV > WarmPMVThresh) {
+                state.dataHeatBal->Resilience(ZoneNum).ZoneDiscomfortWtExceedOccuHourBins[2] +=
+                    (PMV - WarmPMVThresh) * NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneDiscomfortWtExceedOccupiedHourBins[2] +=
+                    (PMV - WarmPMVThresh) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+            }
+            if (PMV > VeryHotPMVThresh) {
+                state.dataHeatBal->Resilience(ZoneNum).ZoneDiscomfortWtExceedOccuHourBins[3] +=
+                    (PMV - VeryHotPMVThresh) * NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneDiscomfortWtExceedOccupiedHourBins[3] +=
+                    (PMV - VeryHotPMVThresh) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+            }
+
+            // check whether PierceSET changed for people in a zone
+            if (state.dataHeatBal->Resilience(ZoneNum).PierceSET < valueNotInit + nearThreshold) {
+                state.dataHeatBal->Resilience(ZoneNum).PierceSET = state.dataHeatBal->Resilience(ZoneNum).ZonePierceSET;
+            } else {
+                if (state.dataHeatBal->Resilience(ZoneNum).PierceSET != state.dataHeatBal->Resilience(ZoneNum).ZonePierceSET) {
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   fmt::format("Zone {} has multiple people objects with different PierceSet.", ZoneNum),
+                                                   state.dataHeatBalFanSys->PierceSETerrorIndex);
+                }
+            }
+
+            // check whether PierceSET, PMV, etc. changed for different people in a zone
+            if (state.dataHeatBal->Resilience(ZoneNum).PMV < valueNotInit + nearThreshold) {
+                state.dataHeatBal->Resilience(ZoneNum).PMV = PMV;
+            } else {
+                if (state.dataHeatBal->Resilience(ZoneNum).PMV != PMV) {
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   fmt::format("Zone {} has multiple people objects with different PMV.", ZoneNum),
+                                                   state.dataHeatBalFanSys->PMVerrorIndex);
+                }
+            }
+
+            for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+                if (reportPeriodFlags(i)) {
+                    int ReportPeriodIdx = i;
+                    ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
+                    bool &CrossedColdThreshRepPeriod = state.dataHeatBalFanSys->CrossedColdThreshRepPeriod(ZoneNum, ReportPeriodIdx);
+                    if (Temperature > ColdTempThresh) { // safe
+                        if (!CrossedColdThreshRepPeriod) {
+                            // compute the number of hours before threshold is reached
+                            state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                        }
+                    } else { // danger
+                        // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
+                        state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                        // first time crossing threshold
+                        if (!CrossedColdThreshRepPeriod) {
+                            // compute the time when the zone crosses the threshold temperature
+                            int encodedMonDayHrMin;
+                            General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                       state.dataEnvrn->Month,
+                                                       state.dataEnvrn->DayOfMonth,
+                                                       state.dataGlobal->HourOfDay,
+                                                       state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                            // fixme: not sure how to aggregate by zone
+                            state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] = encodedMonDayHrMin;
+                            CrossedColdThreshRepPeriod = true;
+                        }
+                    }
+                    HeatTempThresh = state.dataHeatBal->People(iPeople).HeatStressTempThresh;
+                    bool &CrossedHeatThreshRepPeriod = state.dataHeatBalFanSys->CrossedHeatThreshRepPeriod(ZoneNum, ReportPeriodIdx);
+                    if (Temperature < HeatTempThresh) { // safe
+                        if (!CrossedHeatThreshRepPeriod) {
+                            // compute the number of hours before threshold is reached
+                            state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                        }
+                    } else { // danger
+                        // compute the total number of hours when the zone temperature falls in the dangerous range throughout the reporting period
+                        state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                        // first time crossing threshold
+                        if (!CrossedHeatThreshRepPeriod) {
+                            // compute the time when the zone crosses the threshold temperature
+                            int encodedMonDayHrMin;
+                            General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                       state.dataEnvrn->Month,
+                                                       state.dataEnvrn->DayOfMonth,
+                                                       state.dataGlobal->HourOfDay,
+                                                       state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                            state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] = encodedMonDayHrMin;
+                            CrossedHeatThreshRepPeriod = true;
+                        }
+                    }
+
+                    Real64 VeryHotPMVThresh = 3.0;
+                    Real64 WarmPMVThresh = 0.7;
+                    Real64 CoolPMVThresh = -0.7;
+                    Real64 VeryColdPMVThresh = -3.0;
+                    Real64 PMV = state.dataThermalComforts->ThermalComfortData(iPeople).FangerPMV;
+                    if (PMV < VeryColdPMVThresh) {
+                        state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            (VeryColdPMVThresh - PMV) * NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            (VeryColdPMVThresh - PMV) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    }
+                    if (PMV < CoolPMVThresh) {
+                        state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            (CoolPMVThresh - PMV) * NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            (CoolPMVThresh - PMV) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    }
+                    if (PMV > WarmPMVThresh) {
+                        state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            (PMV - WarmPMVThresh) * NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            (PMV - WarmPMVThresh) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    }
+                    if (PMV > VeryHotPMVThresh) {
+                        state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            (PMV - VeryHotPMVThresh) * NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            (PMV - VeryHotPMVThresh) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    }
+                }
             }
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            Real64 HI = state.dataHeatBalFanSys->ZoneHeatIndex(ZoneNum);
-            Real64 Humidex = state.dataHeatBalFanSys->ZoneHumidex(ZoneNum);
+            Real64 HI = state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex;
+            Real64 Humidex = state.dataHeatBal->Resilience(ZoneNum).ZoneHumidex;
 
-            int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
+            Real64 NumOcc = state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc;
             if (HI <= 26.7) {
-                state.dataHeatBalFanSys->ZoneHeatIndexHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexHourBins[0] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccuHourBins[0] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccupiedHourBins[0] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else if (HI > 26.7 && HI <= 32.2) {
-                state.dataHeatBalFanSys->ZoneHeatIndexHourBins(ZoneNum)[1] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum)[1] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexHourBins[1] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccuHourBins[1] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccupiedHourBins[1] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else if (HI > 32.2 && HI <= 39.4) {
-                state.dataHeatBalFanSys->ZoneHeatIndexHourBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum)[2] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexHourBins[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccuHourBins[2] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccupiedHourBins[2] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else if (HI > 39.4 && HI <= 51.7) {
-                state.dataHeatBalFanSys->ZoneHeatIndexHourBins(ZoneNum)[3] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexHourBins[3] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccuHourBins[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccupiedHourBins[3] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else {
-                state.dataHeatBalFanSys->ZoneHeatIndexHourBins(ZoneNum)[4] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(ZoneNum)[4] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexHourBins[4] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccuHourBins[4] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndexOccupiedHourBins[4] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             }
 
             if (Humidex <= 29) {
-                state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexHourBins[0] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccuHourBins[0] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccupiedHourBins[0] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else if (Humidex > 29 && Humidex <= 40) {
-                state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum)[1] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum)[1] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexHourBins[1] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccuHourBins[1] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccupiedHourBins[1] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else if (Humidex > 40 && Humidex <= 45) {
-                state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum)[2] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexHourBins[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccuHourBins[2] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccupiedHourBins[2] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else if (Humidex > 45 && Humidex <= 50) {
-                state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum)[3] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexHourBins[3] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccuHourBins[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccupiedHourBins[3] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else {
-                state.dataHeatBalFanSys->ZoneHumidexHourBins(ZoneNum)[4] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneHumidexOccuHourBins(ZoneNum)[4] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexHourBins[4] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccuHourBins[4] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneHumidexOccupiedHourBins[4] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+            }
+
+            Real64 Temperature = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+            Real64 CoolingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
+            Real64 HeatingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
+
+            if ((CoolingSetpoint > 0) && (Temperature > CoolingSetpoint)) {
+                state.dataHeatBal->Resilience(ZoneNum).ZoneUnmetDegreeHourBins[0] += (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneUnmetDegreeHourBins[1] +=
+                    NumOcc * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneUnmetDegreeHourBins[2] +=
+                    (NumOcc > 0) * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+            }
+            if ((HeatingSetpoint > 0) && (Temperature < HeatingSetpoint)) {
+                state.dataHeatBal->Resilience(ZoneNum).ZoneUnmetDegreeHourBins[3] += (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneUnmetDegreeHourBins[4] +=
+                    NumOcc * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneUnmetDegreeHourBins[5] +=
+                    (NumOcc > 0) * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
             }
 
             if (state.dataHeatBalSurfMgr->hasPierceSET) {
                 int encodedMonDayHrMin;
-                if (NumOcc > 0) {
-                    Real64 PierceSET = state.dataHeatBalFanSys->ZoneOccPierceSET(ZoneNum);
-                    Real64 PierceSETLast = state.dataHeatBalFanSys->ZoneOccPierceSETLastStep(ZoneNum);
+                Real64 PierceSET = state.dataHeatBal->Resilience(ZoneNum).ZonePierceSET;
+                Real64 PierceSETLast = state.dataHeatBal->Resilience(ZoneNum).ZonePierceSETLastStep;
 
-                    if (PierceSET <= 12.2) {
-                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[0] += (12.2 - PierceSET) * state.dataGlobal->TimeStepZone;
-                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[1] += (12.2 - PierceSET) * NumOcc * state.dataGlobal->TimeStepZone;
-                        // Reset duration when last step is out of range.
-                        if (PierceSETLast == -1 || PierceSETLast > 12.2) {
-                            General::EncodeMonDayHrMin(encodedMonDayHrMin,
-                                                       state.dataEnvrn->Month,
-                                                       state.dataEnvrn->DayOfMonth,
-                                                       state.dataGlobal->HourOfDay,
-                                                       state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
-                            state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] = 0;
-                            state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
-                        }
-                        // Keep the longest duration record.
-                        state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
-                        if (state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2]) {
-                            state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2] = state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1];
-                            state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1];
-                        }
-                    } else if (PierceSET > 30) {
-                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[0] += (PierceSET - 30) * state.dataGlobal->TimeStepZone;
-                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[1] += (PierceSET - 30) * NumOcc * state.dataGlobal->TimeStepZone;
-                        if (PierceSETLast == -1 || PierceSETLast <= 30) {
-                            General::EncodeMonDayHrMin(encodedMonDayHrMin,
-                                                       state.dataEnvrn->Month,
-                                                       state.dataEnvrn->DayOfMonth,
-                                                       state.dataGlobal->HourOfDay,
-                                                       state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
-                            state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] = 0;
-                            state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
-                        }
-                        state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
-                        if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[2]) {
-                            state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[2] = state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1];
-                            state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1];
-                        }
+                if (PierceSET <= 12.2) {
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneLowSETHours[0] += (12.2 - PierceSET) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneLowSETHours[1] += (12.2 - PierceSET) * NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneLowSETHours[2] += (12.2 - PierceSET) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    // Reset duration when last step is out of range.
+                    if (PierceSETLast == -1 || PierceSETLast > 12.2) {
+                        General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                   state.dataEnvrn->Month,
+                                                   state.dataEnvrn->DayOfMonth,
+                                                   state.dataGlobal->HourOfDay,
+                                                   state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                        state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] = 0;
+                        state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
                     }
-                } else {
-                    // No occupants: record the last time step duration if longer than the record.
-                    if (state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2]) {
-                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[2] = state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1];
-                        state.dataHeatBalFanSys->ZoneLowSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1];
+                    // Keep the longest duration record.
+                    state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
+                    if (state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] > state.dataHeatBal->Resilience(ZoneNum).ZoneLowSETHours[3] &&
+                        state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc > 0) {
+                        state.dataHeatBal->Resilience(ZoneNum).ZoneLowSETHours[3] = state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1];
+                        state.dataHeatBal->Resilience(ZoneNum).ZoneLowSETHours[4] = state.dataHeatBalSurfMgr->lowSETLongestStart[ZoneNum - 1];
                     }
-                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[2]) {
-                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[2] = state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1];
-                        state.dataHeatBalFanSys->ZoneHighSETHours(ZoneNum)[3] = state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1];
+                } else if (PierceSET > 30) {
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneHighSETHours[0] += (PierceSET - 30) * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneHighSETHours[1] += (PierceSET - 30) * NumOcc * state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->Resilience(ZoneNum).ZoneHighSETHours[2] += (PierceSET - 30) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    if (PierceSETLast == -1 || PierceSETLast <= 30) {
+                        General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                   state.dataEnvrn->Month,
+                                                   state.dataEnvrn->DayOfMonth,
+                                                   state.dataGlobal->HourOfDay,
+                                                   state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                        state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] = 0;
+                        state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
                     }
+                    state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] += state.dataGlobal->TimeStepZone;
+                    if (state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] > state.dataHeatBal->Resilience(ZoneNum).ZoneHighSETHours[3] &&
+                        state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc > 0) {
+                        state.dataHeatBal->Resilience(ZoneNum).ZoneHighSETHours[3] = state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1];
+                        state.dataHeatBal->Resilience(ZoneNum).ZoneHighSETHours[4] = state.dataHeatBalSurfMgr->highSETLongestStart[ZoneNum - 1];
+                    }
+                }
+
+                if (state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc == 0) {
                     state.dataHeatBalSurfMgr->lowSETLongestHours[ZoneNum - 1] = 0;
                     state.dataHeatBalSurfMgr->highSETLongestHours[ZoneNum - 1] = 0;
                 }
             }
-        }
-    } // loop over zones
+
+            for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+                if (reportPeriodFlags(i)) {
+                    int ReportPeriodIdx = i;
+
+                    if (HI <= 26.7) {
+                        state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else if (HI > 26.7 && HI <= 32.2) {
+                        state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else if (HI > 32.2 && HI <= 39.4) {
+                        state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else if (HI > 39.4 && HI <= 51.7) {
+                        state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else {
+                        state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    }
+
+                    if (Humidex <= 29) {
+                        state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else if (Humidex > 29 && Humidex <= 40) {
+                        state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else if (Humidex > 40 && Humidex <= 45) {
+                        state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else if (Humidex > 45 && Humidex <= 50) {
+                        state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else {
+                        state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    }
+
+                    if (state.dataHeatBalSurfMgr->hasPierceSET) {
+                        int encodedMonDayHrMin;
+                        Real64 PierceSET = state.dataHeatBal->Resilience(ZoneNum).ZonePierceSET;
+                        Real64 PierceSETLast = state.dataHeatBal->Resilience(ZoneNum).ZonePierceSETLastStep;
+                        if (PierceSET <= 12.2) {
+                            state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                                (12.2 - PierceSET) * state.dataGlobal->TimeStepZone;
+                            state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                                (12.2 - PierceSET) * NumOcc * state.dataGlobal->TimeStepZone;
+                            state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                                (12.2 - PierceSET) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                            // Reset duration when last step is out of range
+                            if (PierceSETLast == -1 || PierceSETLast > 12.2) {
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                           state.dataEnvrn->Month,
+                                                           state.dataEnvrn->DayOfMonth,
+                                                           state.dataGlobal->HourOfDay,
+                                                           state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                                state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
+                                state.dataHeatBalFanSys->lowSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx) = encodedMonDayHrMin;
+                            } else if (General::isReportPeriodBeginning(state, ReportPeriodIdx)) { // or when it is the start of the period
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                           state.dataEnvrn->Month,
+                                                           state.dataEnvrn->DayOfMonth,
+                                                           state.dataGlobal->HourOfDay,
+                                                           state.dataGlobal->TimeStepZone * state.dataGlobal->TimeStep * 60);
+                                state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
+                                state.dataHeatBalFanSys->highSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx) = encodedMonDayHrMin;
+                            }
+                            // Keep the longest duration record.
+                            state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) += state.dataGlobal->TimeStepZone;
+                            if (state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) >
+                                    state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[3] &&
+                                state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc > 0) {
+                                state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[3] =
+                                    state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx);
+                                state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[4] =
+                                    state.dataHeatBalFanSys->lowSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx);
+                            }
+                        } else if (PierceSET > 30) {
+                            state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                                (PierceSET - 30) * state.dataGlobal->TimeStepZone;
+                            state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                                (PierceSET - 30) * NumOcc * state.dataGlobal->TimeStepZone;
+                            state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                                (PierceSET - 30) * (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                            // Reset duration when last step is out of range.
+                            if (PierceSETLast == -1 || PierceSETLast <= 30) {
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                           state.dataEnvrn->Month,
+                                                           state.dataEnvrn->DayOfMonth,
+                                                           state.dataGlobal->HourOfDay,
+                                                           state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
+                                state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
+                                state.dataHeatBalFanSys->highSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx) = encodedMonDayHrMin;
+                            } else if (General::isReportPeriodBeginning(state, ReportPeriodIdx)) { // or when it is the start of the period
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin,
+                                                           state.dataEnvrn->Month,
+                                                           state.dataEnvrn->DayOfMonth,
+                                                           state.dataGlobal->HourOfDay,
+                                                           state.dataGlobal->TimeStepZone * state.dataGlobal->TimeStep * 60);
+                                state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
+                                state.dataHeatBalFanSys->highSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx) = encodedMonDayHrMin;
+                            }
+                            state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) += state.dataGlobal->TimeStepZone;
+                            if (state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) >
+                                    state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[3] &&
+                                state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc > 0) {
+                                state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[3] =
+                                    state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx);
+                                state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(ZoneNum, ReportPeriodIdx)[4] =
+                                    state.dataHeatBalFanSys->highSETLongestStartRepPeriod(ZoneNum, ReportPeriodIdx);
+                            }
+                        }
+                        if (state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc == 0) {
+                            state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
+                            state.dataHeatBalFanSys->highSETLongestHoursRepPeriod(ZoneNum, ReportPeriodIdx) = 0;
+                        }
+                    }
+
+                    Real64 Temperature = state.dataHeatBalFanSys->ZTAV(ZoneNum);
+                    Real64 CoolingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
+                    Real64 HeatingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
+
+                    if ((CoolingSetpoint > 0) && (Temperature > CoolingSetpoint)) {
+                        state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            NumOcc * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            (NumOcc > 0) * (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
+                    }
+                    if ((HeatingSetpoint > 0) && (Temperature < HeatingSetpoint)) {
+                        state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[4] +=
+                            NumOcc * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[5] +=
+                            (NumOcc > 0) * (HeatingSetpoint - Temperature) * state.dataGlobal->TimeStepZone;
+                    }
+                }
+            }
+        } // loop over zones
+    }
 }
 
 void ReportCO2Resilience(EnergyPlusData &state)
@@ -5679,8 +6137,11 @@ void ReportCO2Resilience(EnergyPlusData &state)
     int NoBins = 3;
     if (state.dataHeatBalSurfMgr->reportCO2ResilienceFirstTime) {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            state.dataHeatBalFanSys->ZoneCO2LevelHourBins(ZoneNum).assign(NoBins, 0.0);
-            state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
+            for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+                state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
+            }
         }
         state.dataHeatBalSurfMgr->reportCO2ResilienceFirstTime = false;
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
@@ -5698,22 +6159,65 @@ void ReportCO2Resilience(EnergyPlusData &state)
     if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
-            state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                           GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+            state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
+                                                                GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
+
+        Array1D_bool reportPeriodFlags;
+        if (state.dataWeatherManager->TotReportPers > 0) {
+            reportPeriodFlags.dimension(state.dataWeatherManager->TotCO2ReportPers, false);
+            General::findReportPeriodIdx(
+                state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
+        }
+
+        auto &ort(state.dataOutRptTab);
+        for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+            if (reportPeriodFlags(i)) {
+                int curResMeterNumber = ort->meterNumTotalsBEPS(1);
+                state.dataWeatherManager->CO2ReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+            }
+        }
+
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 ZoneAirCO2 = state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum);
 
-            int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
+            Real64 NumOcc = state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc;
             if (ZoneAirCO2 <= 1000) {
-                state.dataHeatBalFanSys->ZoneCO2LevelHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelHourBins[0] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccuHourBins[0] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccupiedHourBins[0] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else if (ZoneAirCO2 > 1000 && ZoneAirCO2 <= 5000) {
-                state.dataHeatBalFanSys->ZoneCO2LevelHourBins(ZoneNum)[1] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins(ZoneNum)[1] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelHourBins[1] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccuHourBins[1] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccupiedHourBins[1] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else {
-                state.dataHeatBalFanSys->ZoneCO2LevelHourBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins(ZoneNum)[2] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelHourBins[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccuHourBins[2] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccupiedHourBins[2] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+            }
+            for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+                if (reportPeriodFlags(i)) {
+                    int ReportPeriodIdx = i;
+                    if (ZoneAirCO2 <= 1000) {
+                        state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else if (ZoneAirCO2 > 1000 && ZoneAirCO2 <= 5000) {
+                        state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else {
+                        state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    }
+                }
             }
         }
     } // loop over zones
@@ -5724,8 +6228,11 @@ void ReportVisualResilience(EnergyPlusData &state)
     int NoBins = 4;
     if (state.dataHeatBalSurfMgr->reportVisualResilienceFirstTime) {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum).assign(NoBins, 0.0);
-            state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
+            for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+                state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
+                state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
+            }
         }
         state.dataHeatBalSurfMgr->reportVisualResilienceFirstTime = false;
         if ((int)state.dataDaylightingData->daylightControl.size() == 0) {
@@ -5743,8 +6250,8 @@ void ReportVisualResilience(EnergyPlusData &state)
     if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
-            state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                           GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+            state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
+                                                                GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
         // Accumulate across daylighting controls first
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -5764,25 +6271,75 @@ void ReportVisualResilience(EnergyPlusData &state)
                 }
             }
         }
+
+        Array1D_bool reportPeriodFlags;
+        if (state.dataWeatherManager->TotReportPers > 0) {
+            reportPeriodFlags.dimension(state.dataWeatherManager->TotVisualReportPers, false);
+            General::findReportPeriodIdx(
+                state, state.dataWeatherManager->VisualReportPeriodInput, state.dataWeatherManager->TotVisualReportPers, reportPeriodFlags);
+        }
+
+        auto &ort(state.dataOutRptTab);
+        for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+            if (reportPeriodFlags(i)) {
+                int curResMeterNumber = ort->meterNumTotalsBEPS(1);
+                state.dataWeatherManager->VisualReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+            }
+        }
+
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
             // Now divide by total reference points to get average
             Real64 avgZoneIllum =
                 state.dataDaylightingData->ZoneDaylight(ZoneNum).zoneAvgIllumSum / state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts;
 
-            int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
+            Real64 NumOcc = state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc;
             if (avgZoneIllum <= 100) {
-                state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelHourBins[0] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccuHourBins[0] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccupiedHourBins[0] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else if (avgZoneIllum > 100 && avgZoneIllum <= 300) {
-                state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[1] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[1] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelHourBins[1] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccuHourBins[1] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccupiedHourBins[1] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else if (avgZoneIllum > 300 && avgZoneIllum <= 500) {
-                state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[2] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelHourBins[2] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccuHourBins[2] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccupiedHourBins[2] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             } else {
-                state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[3] += state.dataGlobal->TimeStepZone;
-                state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelHourBins[3] += state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccuHourBins[3] += NumOcc * state.dataGlobal->TimeStepZone;
+                state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccupiedHourBins[3] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+            }
+            for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+                if (reportPeriodFlags(i)) {
+                    int ReportPeriodIdx = i;
+                    if (avgZoneIllum <= 100) {
+                        state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else if (avgZoneIllum > 100 && avgZoneIllum <= 300) {
+                        state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[1] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else if (avgZoneIllum > 300 && avgZoneIllum <= 500) {
+                        state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[2] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    } else {
+                        state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] += state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            NumOcc * state.dataGlobal->TimeStepZone;
+                        state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[3] +=
+                            (NumOcc > 0) * state.dataGlobal->TimeStepZone;
+                    }
+                }
             }
         }
     } // loop over zones
@@ -8928,6 +9485,20 @@ void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)
             if (Surface(jSurf).Class == SurfaceClass::TDD_Dome) continue;            // Skip tubular daylighting device domes
             state.dataOutRptTab->ITABSFseq(state.dataSize->CurOverallSimDay, TimeStepInDay, jSurf) = state.dataHeatBalSurf->SurfAbsThermalInt(jSurf);
         }
+    }
+}
+
+Real64 GetSurfIncidentSolarMultiplier(EnergyPlusData &state, int SurfNum)
+{
+    if (state.dataSurface->Surface(SurfNum).hasIncSolMultiplier) {
+        if (state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr > 0) {
+            return GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr) *
+                   state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
+        } else {
+            return state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
+        }
+    } else {
+        return 1.0;
     }
 }
 

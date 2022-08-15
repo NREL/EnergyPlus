@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #include "WCETarcog.hpp"
 
@@ -198,6 +199,8 @@ namespace HeatBalanceSurfaceManager {
     void CalcExteriorVentedCavity(EnergyPlusData &state, int SurfNum); // index of surface
 
     void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
+
+    Real64 GetSurfIncidentSolarMultiplier(EnergyPlusData &state, int SurfNum);
 
     void InitSurfacePropertyViewFactors(EnergyPlusData &state);
 
