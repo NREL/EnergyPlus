@@ -1248,48 +1248,6 @@ namespace OutputReportPredefined {
         s->pdchLeedSchStPt11pmWednesday = newPreDefColumn(state, s->pdstLeedSchedSetPts, "11pm First Wednesday [C]");
         s->pdchLeedSchStPt11pmWedCnt = newPreDefColumn(state, s->pdstLeedSchedSetPts, "Days with Same 11pm Value");
 
-        s->pdrThermalResilience = newPreDefReport(state, "ThermalResilienceSummary", "ThermR", "Annual Thermal Resilience Summary");
-
-        s->pdstHIHours = newPreDefSubTable(state, s->pdrThermalResilience, "Heat Index Hours");
-        s->pdchHIHourSafe = newPreDefColumn(state, s->pdstHIHours, "Safe (≤ 26.7°C) [hr]");
-        s->pdchHIHourCaution = newPreDefColumn(state, s->pdstHIHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
-        s->pdchHIHourExtremeCaution = newPreDefColumn(state, s->pdstHIHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
-        s->pdchHIHourDanger = newPreDefColumn(state, s->pdstHIHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
-        s->pdchHIHourExtremeDanger = newPreDefColumn(state, s->pdstHIHours, "Extreme Danger (> 51.7°C) [hr]");
-
-        s->pdstHIOccuHours = newPreDefSubTable(state, s->pdrThermalResilience, "Heat Index OccupantHours");
-        s->pdchHIOccuHourSafe = newPreDefColumn(state, s->pdstHIOccuHours, "Safe (≤ 26.7°C) [hr]");
-        s->pdchHIOccuHourCaution = newPreDefColumn(state, s->pdstHIOccuHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
-        s->pdchHIOccuHourExtremeCaution = newPreDefColumn(state, s->pdstHIOccuHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
-        s->pdchHIOccuHourDanger = newPreDefColumn(state, s->pdstHIOccuHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
-        s->pdchHIOccuHourExtremeDanger = newPreDefColumn(state, s->pdstHIOccuHours, "Extreme Danger (> 51.7°C) [hr]");
-
-        s->pdstHumidexHours = newPreDefSubTable(state, s->pdrThermalResilience, "Humidex Hours");
-        s->pdchHumidexHourLittle = newPreDefColumn(state, s->pdstHumidexHours, "Little to no Discomfort (≤ 29) [hr]");
-        s->pdchHumidexHourSome = newPreDefColumn(state, s->pdstHumidexHours, "Some Discomfort (> 29, ≤ 40) [hr]");
-        s->pdchHumidexHourGreat = newPreDefColumn(state, s->pdstHumidexHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
-        s->pdchHumidexHourDanger = newPreDefColumn(state, s->pdstHumidexHours, "Dangerous (> 45, ≤ 50) [hr]");
-        s->pdchHumidexHourStroke = newPreDefColumn(state, s->pdstHumidexHours, "Heat Stroke Quite Possible (> 50) [hr]");
-
-        s->pdstHumidexOccuHours = newPreDefSubTable(state, s->pdrThermalResilience, "Humidex OccupantHours");
-        s->pdchHumidexOccuHourLittle = newPreDefColumn(state, s->pdstHumidexOccuHours, "Little to no Discomfort (≤ 29) [hr]");
-        s->pdchHumidexOccuHourSome = newPreDefColumn(state, s->pdstHumidexOccuHours, "Some Discomfort (> 29, ≤ 40) [hr]");
-        s->pdchHumidexOccuHourGreat = newPreDefColumn(state, s->pdstHumidexOccuHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
-        s->pdchHumidexOccuHourDanger = newPreDefColumn(state, s->pdstHumidexOccuHours, "Dangerous (> 45, ≤ 50) [hr]");
-        s->pdchHumidexOccuHourStroke = newPreDefColumn(state, s->pdstHumidexOccuHours, "Heat Stroke Quite Possible (> 50) [hr]");
-
-        s->pdstHeatingSETHours = newPreDefSubTable(state, s->pdrThermalResilience, "Heating SET Hours");
-        s->pdchHeatingSETHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Hours (°C)");
-        s->pdchHeatingSETOccuHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C OccupantHours (°C)");
-        s->pdchHeatingSETUnmetDuration = newPreDefColumn(state, s->pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration [hr]");
-        s->pdchHeatingSETUnmetTime = newPreDefColumn(state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration");
-
-        s->pdstCoolingSETHours = newPreDefSubTable(state, s->pdrThermalResilience, "Cooling SET Hours");
-        s->pdchCoolingSETHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Hours (°C)");
-        s->pdchCoolingSETOccuHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C OccupantHours (°C)");
-        s->pdchCoolingSETUnmetDuration = newPreDefColumn(state, s->pdstCoolingSETHours, "Longest SET > 30°C Duration [hr]");
-        s->pdchCoolingSETUnmetTime = newPreDefColumn(state, s->pdstCoolingSETHours, "Start Time of the Longest SET > 30°C Duration");
-
         s->pdrCO2Resilience = newPreDefReport(state, "CO2ResilienceSummary", "CO2R", "Annual CO2 Resilience Summary");
 
         s->pdstCO2Hours = newPreDefSubTable(state, s->pdrCO2Resilience, "CO2 Level Hours");
@@ -1301,6 +1259,11 @@ namespace OutputReportPredefined {
         s->pdchCO2OccuHourSafe = newPreDefColumn(state, s->pdstCO2OccuHours, "Safe (<= 1000 ppm) [hr]");
         s->pdchCO2OccuHourCaution = newPreDefColumn(state, s->pdstCO2OccuHours, "Caution (> 1000, <= 5000 ppm) [hr]");
         s->pdchCO2OccuHourHazard = newPreDefColumn(state, s->pdstCO2OccuHours, "Hazard (> 5000 ppm) [hr]");
+
+        s->pdstCO2OccupiedHours = newPreDefSubTable(state, s->pdrCO2Resilience, "CO2 Level OccupiedHours");
+        s->pdchCO2OccupiedHourSafe = newPreDefColumn(state, s->pdstCO2OccupiedHours, "Safe (<= 1000 ppm) [hr]");
+        s->pdchCO2OccupiedHourCaution = newPreDefColumn(state, s->pdstCO2OccupiedHours, "Caution (> 1000, <= 5000 ppm) [hr]");
+        s->pdchCO2OccupiedHourHazard = newPreDefColumn(state, s->pdstCO2OccupiedHours, "Hazard (> 5000 ppm) [hr]");
 
         s->pdrVisualResilience = newPreDefReport(state, "VisualResilienceSummary", "VisualR", "Annual Visual Resilience Summary");
 
@@ -1315,6 +1278,12 @@ namespace OutputReportPredefined {
         s->pdchIllumOccuHourDim = newPreDefColumn(state, s->pdstIllumOccuHours, "Dim (> 100, <= 300 lux) [hr]");
         s->pdchIllumOccuHourAdequate = newPreDefColumn(state, s->pdstIllumOccuHours, "Adequate (> 300, <= 500 lux) [hr]");
         s->pdchIllumOccuHourBright = newPreDefColumn(state, s->pdstIllumOccuHours, "Bright (>500 lux) [hr]");
+
+        s->pdstIllumOccupiedHours = newPreDefSubTable(state, s->pdrVisualResilience, "Illuminance Level OccupiedHours");
+        s->pdchIllumOccupiedHourDark = newPreDefColumn(state, s->pdstIllumOccupiedHours, "A Bit Dark (<= 100 lux) [hr]");
+        s->pdchIllumOccupiedHourDim = newPreDefColumn(state, s->pdstIllumOccupiedHours, "Dim (> 100, <= 300 lux) [hr]");
+        s->pdchIllumOccupiedHourAdequate = newPreDefColumn(state, s->pdstIllumOccupiedHours, "Adequate (> 300, <= 500 lux) [hr]");
+        s->pdchIllumOccupiedHourBright = newPreDefColumn(state, s->pdstIllumOccupiedHours, "Bright (>500 lux) [hr]");
     }
 
     void PreDefTableEntry(

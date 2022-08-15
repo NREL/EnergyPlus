@@ -486,11 +486,24 @@ namespace InternalHeatGains {
                         thisPeople.UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
                     }
 
-                    if (NumNumber == 6 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
+                    if (NumNumber >= 6 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
                         thisPeople.CO2RateFactor = IHGNumbers(6);
                     } else {
                         thisPeople.CO2RateFactor = 3.82e-8; // m3/s-W
                     }
+
+                    if (NumNumber >= 7 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
+                        thisPeople.ColdStressTempThresh = IHGNumbers(7);
+                    } else {
+                        thisPeople.ColdStressTempThresh = 15.56; // degree C
+                    }
+
+                    if (NumNumber == 8 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
+                        thisPeople.HeatStressTempThresh = IHGNumbers(8);
+                    } else {
+                        thisPeople.HeatStressTempThresh = 30.0; // degree C
+                    }
+
                     if (thisPeople.CO2RateFactor < 0.0) {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", {} < 0.0, value ={:.2R}",
