@@ -947,6 +947,47 @@ namespace DataHeatBalance {
             ExteriorEnergyUse::ExteriorFuelUsage::Invalid; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
     };
 
+    // ITE Equipment Environmental Class Data
+    // MODULE PARAMETER DEFINITIONS:
+    enum class ITEClass
+    {
+        Invalid = -1,
+        None, // (0)
+        A1,   // (1)
+        A2,   // (2)
+        A3,   // (3)
+        A4,   // (4)
+        B,    // (5)
+        C,    // (6)
+        H1,   // (7)
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(ITEClass::Num)> ITEClassNamesUC = {"NONE", "A1", "A2", "A3", "A4", "B", "C", "H1"};
+
+    enum class ITEInletConnection
+    {
+        Invalid = -1,
+        AdjustedSupply,
+        ZoneAirNode,
+        RoomAirModel,
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(ITEInletConnection::Num)> ITEInletConnectionNamesUC = {
+        "ADJUSTEDSUPPLY", "ZONEAIRNODE", "ROOMAIRMODEL"};
+
+    enum class PERptVars
+    {
+        CPU = 0,       // ITE CPU Electric Power/Energy
+        Fan,           // ITE Fan Electric Power/Energy
+        UPS,           // ITE UPS Electric Power/Energy
+        CPUAtDesign,   // ITE CPU Electric Power/Energy at Design Inlet Conditions
+        FanAtDesign,   // ITE Fan Electric Power/Energy at Design Inlet Conditions
+        UPSGainToZone, // ITE UPS Heat Gain to Zone Power(Rate)/Energy - convective gain
+        ConGainToZone, // ITE Total Heat Gain to Zone Power(Rate)/Energy - convective gain - includes heat gain from UPS, plus CPU and Fans if
+                       // room air model not used
+        Num
+    };
+
     struct ITEquipData // IT Equipment
     {
         // Members
@@ -965,51 +1006,38 @@ namespace DataHeatBalance {
         Real64 DesignFanPower = 0.0;               // Design fan power input [W]
         Real64 DesignCPUPower = 0.0;               // Design CPU power input [W]
         Real64 DesignAirVolFlowRate = 0.0;         // Design air volume flow rate [m3/s]
-        int Class = 0;                             // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6)
+        ITEClass Class = ITEClass::None;           // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
         int AirFlowFLTCurve = 0;                   // Index for airflow function of CPULoadFrac (x) and TAirIn (y) curve
         int CPUPowerFLTCurve = 0;                  // Index for CPU power function of CPULoadFrac (x) and TAirIn (y) curve
         int FanPowerFFCurve = 0;                   // Index for fan power function of flow fraction curve
-        int AirConnectionType = 0;                 // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
-        int InletRoomAirNodeNum = 0;               // Room air model node number for air inlet
-        int OutletRoomAirNodeNum = 0;              // Room air model node number for air outlet
-        int SupplyAirNodeNum = 0;                  // Node number for supply air inlet
-        Real64 DesignRecircFrac = 0.0;             // Design recirculation fraction (0.0-0.5)
-        int RecircFLTCurve = 0;                    // Index for recirculation function of CPULoadFrac (x) and TSupply (y) curve
-        Real64 DesignUPSEfficiency = 0.0;          // Design power supply efficiency (>0.0 - 1.0)
-        int UPSEfficFPLRCurve = 0;                 // Index for recirculation function of part load ratio
-        Real64 UPSLossToZoneFrac = 0.0;            // Fraction of UPS power loss to zone (0.0 - 1.0); remainder is lost
-        std::string EndUseSubcategoryCPU;          // User defined name for the end use category for the CPU
-        std::string EndUseSubcategoryFan;          // User defined name for the end use category for the Fans
-        std::string EndUseSubcategoryUPS;          // User defined name for the end use category for the power supply
-        bool EMSCPUPowerOverrideOn = false;        // EMS actuating CPU power if .TRUE.
-        Real64 EMSCPUPower = 0.0;                  // Value EMS is directing to use for override of CPU power [W]
-        bool EMSFanPowerOverrideOn = false;        // EMS actuating Fan power if .TRUE.
-        Real64 EMSFanPower = 0.0;                  // Value EMS is directing to use for override of Fan power [W]
-        bool EMSUPSPowerOverrideOn = false;        // EMS actuating UPS power if .TRUE.
-        Real64 EMSUPSPower = 0.0;                  // Value EMS is directing to use for override of UPS power [W]
-        Real64 SupplyApproachTemp = 0.0;           // The difference of the IT inlet temperature from the AHU supply air temperature
-        int SupplyApproachTempSch = 0;             // The difference schedule of the IT inlet temperature from the AHU supply air temperature
-        Real64 ReturnApproachTemp = 0.0;           // The difference of the unit outlet temperature from the well mixed zone temperature
-        int ReturnApproachTempSch = 0;             // The difference schedule of the unit outlet temperature from the well mixed zone temperature
-        int zoneEqIndex = 0;                       // index in zone equipment data structure for the zone this IT equipment is in
+        ITEInletConnection AirConnectionType = ITEInletConnection::AdjustedSupply; // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
+        int InletRoomAirNodeNum = 0;                                               // Room air model node number for air inlet
+        int OutletRoomAirNodeNum = 0;                                              // Room air model node number for air outlet
+        int SupplyAirNodeNum = 0;                                                  // Node number for supply air inlet
+        Real64 DesignRecircFrac = 0.0;                                             // Design recirculation fraction (0.0-0.5)
+        int RecircFLTCurve = 0;             // Index for recirculation function of CPULoadFrac (x) and TSupply (y) curve
+        Real64 DesignUPSEfficiency = 0.0;   // Design power supply efficiency (>0.0 - 1.0)
+        int UPSEfficFPLRCurve = 0;          // Index for recirculation function of part load ratio
+        Real64 UPSLossToZoneFrac = 0.0;     // Fraction of UPS power loss to zone (0.0 - 1.0); remainder is lost
+        std::string EndUseSubcategoryCPU;   // User defined name for the end use category for the CPU
+        std::string EndUseSubcategoryFan;   // User defined name for the end use category for the Fans
+        std::string EndUseSubcategoryUPS;   // User defined name for the end use category for the power supply
+        bool EMSCPUPowerOverrideOn = false; // EMS actuating CPU power if .TRUE.
+        Real64 EMSCPUPower = 0.0;           // Value EMS is directing to use for override of CPU power [W]
+        bool EMSFanPowerOverrideOn = false; // EMS actuating Fan power if .TRUE.
+        Real64 EMSFanPower = 0.0;           // Value EMS is directing to use for override of Fan power [W]
+        bool EMSUPSPowerOverrideOn = false; // EMS actuating UPS power if .TRUE.
+        Real64 EMSUPSPower = 0.0;           // Value EMS is directing to use for override of UPS power [W]
+        Real64 SupplyApproachTemp = 0.0;    // The difference of the IT inlet temperature from the AHU supply air temperature
+        int SupplyApproachTempSch = 0;      // The difference schedule of the IT inlet temperature from the AHU supply air temperature
+        Real64 ReturnApproachTemp = 0.0;    // The difference of the unit outlet temperature from the well mixed zone temperature
+        int ReturnApproachTempSch = 0;      // The difference schedule of the unit outlet temperature from the well mixed zone temperature
+        int zoneEqIndex = 0;                // index in zone equipment data structure for the zone this IT equipment is in
 
         // Report variables
-        Real64 CPUPower = 0.0;          // ITE CPU Electric Power [W]
-        Real64 FanPower = 0.0;          // ITE Fan Electric Power [W]
-        Real64 UPSPower = 0.0;          // ITE UPS Electric Power [W]
-        Real64 CPUPowerAtDesign = 0.0;  // ITE CPU Electric Power at Design Inlet Conditions [W]
-        Real64 FanPowerAtDesign = 0.0;  // ITE Fan Electric Power at Design Inlet Conditions [W]
-        Real64 UPSGainRateToZone = 0.0; // ITE UPS Heat Gain to Zone Rate [W] - convective gain
-        Real64 ConGainRateToZone = 0.0; // ITE Total Heat Gain to Zone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if
-                                        // room air model not used
-        Real64 CPUConsumption = 0.0;    // ITE CPU Electric Energy [J]
-        Real64 FanConsumption = 0.0;    // ITE Fan Electric Energy [J]
-        Real64 UPSConsumption = 0.0;    // ITE UPS Electric Energy [J]
-        Real64 CPUEnergyAtDesign = 0.0; // ITE CPU Electric Energy at Design Inlet Conditions [J]
-        Real64 FanEnergyAtDesign = 0.0; // ITE Fan Electric Energy at Design Inlet Conditions [J]
-        Real64 UPSGainEnergyToZone = 0.0; // ITE UPS Heat Gain to Zone Energy [J] - convective gain
-        Real64 ConGainEnergyToZone = 0.0; // ITE Total Heat Gain to Zone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans
-                                          // if room air model not used
+        std::array<Real64, (int)PERptVars::Num> PowerRpt;
+        std::array<Real64, (int)PERptVars::Num> EnergyRpt;
+
         Real64 AirVolFlowStdDensity = 0.0; // Air volume flow rate at standard density [m3/s]
         Real64 AirVolFlowCurDensity = 0.0; // Air volume flow rate at current density [m3/s]
         Real64 AirMassFlow = 0.0;          // Air mass flow rate [kg/s]
@@ -1868,22 +1896,8 @@ namespace DataHeatBalance {
         Real64 OtherLostRate = 0.0;
         Real64 OtherTotGainRate = 0.0;
         // IT Equipment
-        Real64 ITEqCPUPower = 0.0;          // Zone ITE CPU Electric Power [W]
-        Real64 ITEqFanPower = 0.0;          // Zone ITE Fan Electric Power [W]
-        Real64 ITEqUPSPower = 0.0;          // Zone ITE UPS Electric Power [W]
-        Real64 ITEqCPUPowerAtDesign = 0.0;  // Zone ITE CPU Electric Power at Design Inlet Conditions [W]
-        Real64 ITEqFanPowerAtDesign = 0.0;  // Zone ITE Fan Electric Power at Design Inlet Conditions [W]
-        Real64 ITEqUPSGainRateToZone = 0.0; // Zone ITE UPS Heat Gain to Zone Rate [W] - convective gain
-        Real64 ITEqConGainRateToZone = 0.0; // Zone ITE Total Heat Gain toZone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and
-                                            // Fans if room air model not used
-        Real64 ITEqCPUConsumption = 0.0;    // Zone ITE CPU Electric Energy [J]
-        Real64 ITEqFanConsumption = 0.0;    // Zone ITE Fan Electric Energy [J]
-        Real64 ITEqUPSConsumption = 0.0;    // Zone ITE UPS Electric Energy [J]
-        Real64 ITEqCPUEnergyAtDesign = 0.0; // Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
-        Real64 ITEqFanEnergyAtDesign = 0.0; // Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
-        Real64 ITEqUPSGainEnergyToZone = 0.0;  // Zone ITE UPS Heat Gain to Zone Energy [J] - convective gain
-        Real64 ITEqConGainEnergyToZone = 0.0;  // Zone ITE Total Heat Gain toZone Energy [J] - convective gain - includes heat gain from UPS, plus CPU
-                                               // and Fans if room air model not used
+        std::array<Real64, (int)PERptVars::Num> PowerRpt;
+        std::array<Real64, (int)PERptVars::Num> EnergyRpt;
         Real64 ITEqAirVolFlowStdDensity = 0.0; // Zone Air volume flow rate at standard density [m3/s]
         Real64 ITEqAirMassFlow = 0.0;          // Zone Air mass flow rate [kg/s]
         Real64 ITEqSHI = 0.0;                  // Zone Supply Heat Index []
