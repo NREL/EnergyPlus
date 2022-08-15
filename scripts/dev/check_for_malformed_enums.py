@@ -111,6 +111,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
             "IdfParser.hh:Token",
             "OutputProcessor.hh:ReportingFrequency",
             "HVACInterfaceManager.cc:UpdateType",
+            "DataHeatBalance.hh:PERptVars",
         ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tMissing 'Invalid' at position 0\n"
