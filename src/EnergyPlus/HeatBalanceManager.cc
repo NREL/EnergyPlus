@@ -5211,7 +5211,8 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                 ShowContinueError(
-                    state, "...each SurfaceProperty:IncidentSolarMultiplier name must not duplicate other SurfaceProperty:IncidentSolarMultiplier name");
+                    state,
+                    "...each SurfaceProperty:IncidentSolarMultiplier name must not duplicate other SurfaceProperty:IncidentSolarMultiplier name");
                 continue;
             }
 
@@ -5242,16 +5243,14 @@ namespace HeatBalanceManager {
             auto const &Constr = state.dataConstruction->Construct(ConstrNum);
             int MaterNum = Constr.LayerPoint(Constr.TotLayers);
             auto const &Mat = state.dataMaterial->Material(MaterNum);
-            bool withNoncompatibleShades = (Mat.Group == DataHeatBalance::MaterialGroup::Shade ||
-                                            Mat.Group == DataHeatBalance::MaterialGroup::WindowBlind ||
-                                            Mat.Group == DataHeatBalance::MaterialGroup::Screen ||
-                                            Mat.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
-                                            Mat.Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
-                                            Mat.Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
-                                            Mat.Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
-                                            Mat.Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
-                                            Mat.Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer ||
-                                            Surf.HasShadeControl);
+            bool withNoncompatibleShades =
+                (Mat.Group == DataHeatBalance::MaterialGroup::Shade || Mat.Group == DataHeatBalance::MaterialGroup::WindowBlind ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::Screen || Mat.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer || Surf.HasShadeControl);
             if (withNoncompatibleShades) {
                 ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
                 ErrorsFound = true;

@@ -690,26 +690,26 @@ namespace DataSurfaces {
         int BaseSurf;       // "Base surface" for this surface. Applies mainly to subsurfaces in which case it points back to the base surface number.
                             // Equals 0 for detached shading. BaseSurf equals surface number for all other surfaces.
         int NumSubSurfaces; // Number of subsurfaces this surface has (doors/windows)
-        std::string ZoneName;          // User supplied name of the Zone
-        int Zone;                      // Interior environment or zone the surface is a part of
-                                       // Note that though attached shading surfaces are part of a zone, this
-                                       // value is 0 there to facilitate using them as detached surfaces (more accurate shading.
-        int spaceNum;                  // Space the surface is part of
-        std::string ExtBoundCondName;  // Name for the Outside Environment Object
-        int ExtBoundCond;              // For an "interzone" surface, this is the adjacent surface number.
-                                       // for an internal/adiabatic surface this is the current surface number.
-                                       // Otherwise, 0=external environment, -1=ground,
-                                       // -2=other side coefficients (OSC--won't always use CTFs)
-                                       // -3=other side conditions model
-                                       // During input, interim values of UnreconciledZoneSurface ("Surface") and
-                                       // UnenteredAdjacentZoneSurface ("Zone") are used until reconciled.
-        bool ExtSolar;                 // True if the "outside" of the surface is exposed to solar
-        bool ExtWind;                  // True if the "outside" of the surface is exposed to wind Heat transfer coefficients
-        bool hasIncSolMultiplier;      // Whether the surface has a incident solar multiplier
-        Real64 IncSolMultiplier;       // Incident solar multiplier, overwritten by user input in SurfaceProperty:IncidentSolarMultiplier
-        Real64 ViewFactorGround;       // View factor to the ground from the exterior of the surface for diffuse solar radiation
-        Real64 ViewFactorSky;          // View factor to the sky from the exterior of the surface for diffuse solar radiation
-        Real64 ViewFactorGroundIR;     // View factor to the ground and shadowing surfaces from the exterior of the surface for IR radiation
+        std::string ZoneName;         // User supplied name of the Zone
+        int Zone;                     // Interior environment or zone the surface is a part of
+                                      // Note that though attached shading surfaces are part of a zone, this
+                                      // value is 0 there to facilitate using them as detached surfaces (more accurate shading.
+        int spaceNum;                 // Space the surface is part of
+        std::string ExtBoundCondName; // Name for the Outside Environment Object
+        int ExtBoundCond;             // For an "interzone" surface, this is the adjacent surface number.
+                                      // for an internal/adiabatic surface this is the current surface number.
+                                      // Otherwise, 0=external environment, -1=ground,
+                                      // -2=other side coefficients (OSC--won't always use CTFs)
+                                      // -3=other side conditions model
+                                      // During input, interim values of UnreconciledZoneSurface ("Surface") and
+                                      // UnenteredAdjacentZoneSurface ("Zone") are used until reconciled.
+        bool ExtSolar;                // True if the "outside" of the surface is exposed to solar
+        bool ExtWind;                 // True if the "outside" of the surface is exposed to wind Heat transfer coefficients
+        bool hasIncSolMultiplier;     // Whether the surface has a incident solar multiplier
+        Real64 IncSolMultiplier;      // Incident solar multiplier, overwritten by user input in SurfaceProperty:IncidentSolarMultiplier
+        Real64 ViewFactorGround;      // View factor to the ground from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorSky;         // View factor to the sky from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorGroundIR;    // View factor to the ground and shadowing surfaces from the exterior of the surface for IR radiation
         Real64 ViewFactorSkyIR; // View factor to the sky from the exterior of the surface for IR radiation Special/optional other side coefficients
                                 // (OSC)
         int OSCPtr;             // Pointer to OSC data structure
