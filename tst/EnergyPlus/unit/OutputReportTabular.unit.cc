@@ -10037,6 +10037,57 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_W
     EXPECT_FALSE(has_err_output(true));
 }
 
+TEST_F(EnergyPlusFixture, MovingAvgAtMaxTime_test)
+{
+    int numItem = 12;
+    Array1D<Real64> inputData;
+    Array1D<Real64> saveData;
+    inputData.allocate(numItem);
+    saveData.allocate(numItem);
+    for (int i = 1; i <= numItem; i++) {
+        inputData(i) = (Real64)i * i;
+    }
+    saveData = inputData;
+
+    // Test MovingAvgAtMaxTime function
+    state->dataSize->NumTimeStepsInAvg = 3;
+    int timeOfMax = 1;
+    Real64 maxResult = OutputReportTabular::MovingAvgAtMaxTime(*state, inputData, numItem, timeOfMax);
+    EXPECT_NEAR(maxResult, (inputData(timeOfMax) + inputData(numItem) + inputData(numItem - 1)) / state->dataSize->NumTimeStepsInAvg, 1E-9);
+    for (int i = 1; i <= numItem; i++) {
+        ASSERT_EQ(saveData(i), inputData(i)); // original data has not changed
+    }
+    maxResult = OutputReportTabular::MovingAvgAtMaxTime2(*state, inputData, numItem, timeOfMax);
+    EXPECT_NEAR(maxResult, (inputData(timeOfMax) + inputData(numItem) + inputData(numItem - 1)) / state->dataSize->NumTimeStepsInAvg, 1E-9);
+    for (int i = 1; i <= numItem; i++) {
+        ASSERT_EQ(saveData(i), inputData(i)); // original data has not changed
+    }
+
+    timeOfMax = 5;
+    maxResult = OutputReportTabular::MovingAvgAtMaxTime(*state, inputData, numItem, timeOfMax);
+    EXPECT_NEAR(maxResult, (inputData(timeOfMax) + inputData(timeOfMax - 1) + inputData(timeOfMax - 2)) / state->dataSize->NumTimeStepsInAvg, 1E-9);
+    for (int i = 1; i <= numItem; i++) {
+        ASSERT_EQ(saveData(i), inputData(i)); // original data has not changed
+    }
+    maxResult = OutputReportTabular::MovingAvgAtMaxTime2(*state, inputData, numItem, timeOfMax);
+    EXPECT_NEAR(maxResult, (inputData(timeOfMax) + inputData(timeOfMax - 1) + inputData(timeOfMax - 2)) / state->dataSize->NumTimeStepsInAvg, 1E-9);
+    for (int i = 1; i <= numItem; i++) {
+        ASSERT_EQ(saveData(i), inputData(i)); // original data has not changed
+    }
+
+    timeOfMax = 12;
+    maxResult = OutputReportTabular::MovingAvgAtMaxTime(*state, inputData, numItem, timeOfMax);
+    EXPECT_NEAR(maxResult, (inputData(timeOfMax) + inputData(timeOfMax - 1) + inputData(timeOfMax - 2)) / state->dataSize->NumTimeStepsInAvg, 1E-9);
+    for (int i = 1; i <= numItem; i++) {
+        ASSERT_EQ(saveData(i), inputData(i)); // original data has not changed
+    }
+    maxResult = OutputReportTabular::MovingAvgAtMaxTime2(*state, inputData, numItem, timeOfMax);
+    EXPECT_NEAR(maxResult, (inputData(timeOfMax) + inputData(timeOfMax - 1) + inputData(timeOfMax - 2)) / state->dataSize->NumTimeStepsInAvg, 1E-9);
+    for (int i = 1; i <= numItem; i++) {
+        ASSERT_EQ(saveData(i), inputData(i)); // original data has not changed
+    }
+}
+
 TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
 {
     // Test for #8921

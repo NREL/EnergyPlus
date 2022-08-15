@@ -14871,6 +14871,15 @@ Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq,
     return AvgData(maxTimeStep);
 }
 
+Real64 MovingAvgAtMaxTime2(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int const numTimeSteps, int const maxTimeStep)
+{
+    Array1D<Real64> AvgData; // sequence data after averaging
+    AvgData.allocate(numTimeSteps);
+    AvgData = dataSeq * 1.0;
+    General::MovingAvg2(AvgData, state.dataSize->NumTimeStepsInAvg);
+    return AvgData(maxTimeStep);
+}
+
 // set the load summary table cells based on the load sequences using moving averages to smooth out
 void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                     Array2D<Real64> &resultCells,
@@ -15033,6 +15042,8 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             seqData = surfDelaySeq(_, kSurf);
             MovingAvg(seqData, NumOfTimeStepInDay, state.dataSize->NumTimeStepsInAvg, AvgData);
             singleSurfDelay = AvgData(timeOfMax);
+            General::MovingAvg2(seqData, state.dataSize->NumTimeStepsInAvg);
+            singleSurfDelay = seqData(timeOfMax);
             switch (state.dataSurface->Surface(kSurf).Class) {
             case SurfaceClass::Wall: {
                 switch (curExtBoundCond) {

@@ -710,6 +710,8 @@ namespace OutputReportTabular {
 
     Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int numTimeSteps, int maxTimeStep);
 
+    Real64 MovingAvgAtMaxTime2(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int numTimeSteps, int maxTimeStep);
+
     void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                         Array2D<Real64> &resultCells,
                                         Array2D_bool &resultCellsUsed,

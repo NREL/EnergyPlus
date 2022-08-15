@@ -406,76 +406,29 @@ TEST_F(EnergyPlusFixture, General_MovingAvg)
 {
     int numItem = 12;
     Array1D<Real64> inputData;
-    Array1D<Real64> outputData;
-    inputData.allocate(numItem);
-    outputData.allocate(numItem);
-    for (int i = 1; i <= numItem; i++) {
-        inputData(i) = (Real64)i * i;
-    }
-    outputData = 0.0;
-
-    int avgWindowWidth = 1;
-    MovingAvg(inputData, numItem, avgWindowWidth, outputData);
-    for (int i = 1; i <= numItem; i++) {
-        ASSERT_EQ(outputData(i), inputData(i));
-    }
-
-    avgWindowWidth = 2;
-    MovingAvg(inputData, numItem, avgWindowWidth, outputData);
-    ASSERT_EQ(outputData(1), (inputData(1) + inputData(numItem)) / 2);
-    for (int j = 2; j <= numItem; j++) {
-        ASSERT_EQ(outputData(j), (inputData(j) + inputData(j - 1)) / 2);
-    }
-}
-
-TEST_F(EnergyPlusFixture, General_MovingAvg_SpeedTest)
-{
-    int numItem = 12;
-    Array1D<Real64> inputData;
     Array1D<Real64> saveData;
-    Array1D<Real64> outputData;
     inputData.allocate(numItem);
     saveData.allocate(numItem);
-    outputData.allocate(numItem);
     for (int i = 1; i <= numItem; i++) {
         inputData(i) = (Real64)i * i;
     }
     saveData = inputData;
-    outputData = 0.0;
 
     int avgWindowWidth = 1;
-    MovingAvg(inputData, numItem, avgWindowWidth, outputData);
-    for (int i = 1; i <= numItem; i++) {
-        ASSERT_EQ(outputData(i), inputData(i));
-    }
     MovingAvg2(inputData, avgWindowWidth);
     for (int i = 1; i <= numItem; i++) {
-        ASSERT_EQ(outputData(i), inputData(i));
+        ASSERT_EQ(saveData(i), inputData(i)); // averaged data has not changed since window = 1
     }
 
     avgWindowWidth = 2;
-    MovingAvg(inputData, numItem, avgWindowWidth, outputData);
-    ASSERT_EQ(outputData(1), (inputData(1) + inputData(numItem)) / 2);
-    for (int j = 2; j <= numItem; j++) {
-        ASSERT_EQ(outputData(j), (inputData(j) + inputData(j - 1)) / 2);
-    }
-
     MovingAvg2(inputData, avgWindowWidth);
-    ASSERT_EQ(inputData(1), (saveData(1) + saveData(numItem)) / 2);
+    ASSERT_EQ(inputData(1), (saveData(1) + saveData(numItem)) / avgWindowWidth);
     for (int j = 2; j <= numItem; j++) {
-        ASSERT_EQ(inputData(j), (saveData(j) + saveData(j - 1)) / 2);
+        ASSERT_EQ(inputData(j), (saveData(j) + saveData(j - 1)) / avgWindowWidth);
     }
-    inputData = saveData;
+    inputData = saveData; // reset for next test
 
     avgWindowWidth = 4;
-    MovingAvg(inputData, numItem, avgWindowWidth, outputData);
-    EXPECT_NEAR(outputData(1), (inputData(1) + inputData(12) + inputData(11) + inputData(10)) / avgWindowWidth, 1E-9);
-    EXPECT_NEAR(outputData(2), (inputData(2) + inputData(1) + inputData(12) + inputData(11)) / avgWindowWidth, 1E-9);
-    EXPECT_NEAR(outputData(3), (inputData(3) + inputData(2) + inputData(1) + inputData(12)) / avgWindowWidth, 1E-9);
-    for (int j = 4; j <= numItem; j++) {
-        EXPECT_NEAR(outputData(j), (inputData(j) + inputData(j - 1) + inputData(j - 2) + inputData(j - 3)) / avgWindowWidth, 1E-9);
-    }
-
     MovingAvg2(inputData, avgWindowWidth);
     EXPECT_NEAR(inputData(1), (saveData(1) + saveData(12) + saveData(11) + saveData(10)) / avgWindowWidth, 1E-9);
     EXPECT_NEAR(inputData(2), (saveData(2) + saveData(1) + saveData(12) + saveData(11)) / avgWindowWidth, 1E-9);

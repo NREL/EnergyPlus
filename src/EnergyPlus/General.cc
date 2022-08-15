@@ -400,7 +400,7 @@ void MovingAvg(Array1A<Real64> const DataIn, // input data that needs smoothing
 
 void MovingAvg2(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
-    if (NumItemsInAvg == 1) return; // no need to average/smooth
+    if (NumItemsInAvg <= 1) return; // no need to average/smooth
 
     Array1D<Real64> TempData(DataIn.size() + NumItemsInAvg - 1); // scratch array with end original elements appended to beginning of temp array
 
