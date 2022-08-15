@@ -4895,6 +4895,78 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     EXPECT_NEAR(1.666667, state->dataHeatBal->SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_IncSolarMultiplier)
+{
+    //    test the incident solar multiplier application
+    state->dataSurface->TotSurfaces = 1;
+    state->dataViewFactor->NumOfSolarEnclosures = 1;
+    int totSurf = state->dataSurface->TotSurfaces;
+    state->dataHeatBal->TotConstructs = 1;
+    int totConstructs = state->dataHeatBal->TotConstructs;
+    state->dataSurface->Surface.allocate(totSurf);
+    state->dataConstruction->Construct.allocate(totConstructs);
+    state->dataGlobal->TimeStepZoneSec = 900;
+    state->dataGlobal->NumOfTimeStepInHour = 6;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+
+    int SurfNum = 1;
+    state->dataSurface->Surface(SurfNum).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(SurfNum).hasIncSolMultiplier = true;
+    state->dataSurface->Surface(SurfNum).ExtSolar = true;
+    state->dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
+    state->dataSurface->SurfIncSolMultiplier.allocate(totSurf);
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).Name = "testing window surface";
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).SurfaceIdx = SurfNum;
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr = 0;
+
+    state->dataSurface->Surface(SurfNum).Area = 100.0;
+
+    WindowManager::initWindowModel(*state);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, SurfNum);
+    state->dataGlobal->numSpaces = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataGlobal->numSpaces);
+    auto &thisEnclosure(state->dataViewFactor->EnclSolInfo(1));
+    thisEnclosure.Name = "test enclosure";
+    thisEnclosure.SurfacePtr.dimension(1, 0);
+    thisEnclosure.SurfacePtr(1) = 1;
+
+    int ConstrNum = 1;
+    state->dataSurface->Surface(SurfNum).Construction = ConstrNum;
+    state->dataSurface->SurfActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
+    state->dataConstruction->Construct(ConstrNum).TransDiff = 0.1;
+    state->dataConstruction->Construct(ConstrNum).TransSolBeamCoef = 0.1;
+    state->dataConstruction->Construct(ConstrNum).TransSolBeamCoef = 0.2;
+
+    state->dataSurface->SurfaceWindow.allocate(totSurf);
+    state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(state->dataGlobal->HourOfDay) = 999.0;
+    state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(state->dataGlobal->HourOfDay) = 888.0;
+
+    SolarShading::AllocateModuleArrays(*state);
+    state->dataHeatBal->SurfSunlitFrac = 1.0;
+    state->dataHeatBal->SurfCosIncAng = 1.0;
+    SurfaceGeometry::AllocateSurfaceArrays(*state);
+
+    state->dataSolarShading->SurfWinTransBmSolar(1) = 0.8;
+    state->dataSurface->Surface(1).ViewFactorGround = 1.0;
+    state->dataSurface->SurfWinShadingFlag(1) = DataSurfaces::WinShadingType::NoShade;
+
+    state->dataEnvrn->SunIsUp = true;
+    state->dataEnvrn->BeamSolarRad = 0.1;
+    state->dataEnvrn->GndSolarRad = 0.2;
+    state->dataEnvrn->DifSolarRad = 0.3;
+
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = 0.5;
+    HeatBalanceSurfaceManager::InitSolarHeatGains(*state);
+    Real64 transmittedSolarHalf = state->dataSurface->SurfWinTransSolar(1);
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = 1.0;
+    HeatBalanceSurfaceManager::InitSolarHeatGains(*state);
+    Real64 transmittedSolarWhole = state->dataSurface->SurfWinTransSolar(1);
+    EXPECT_EQ(transmittedSolarWhole * 0.5, transmittedSolarHalf);
+}
+
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWindow)
 {
 
