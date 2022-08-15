@@ -2665,23 +2665,25 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
     state->dataSurface->WindowShadingControl.allocate(2);
     state->dataDaylightingData->ZoneDaylight.allocate(1);
 
-    state->dataSurface->Surface(1).Name = "Surface1";
-    state->dataSurface->Surface(2).Name = "Surface2";
-    state->dataSurface->Surface(1).Zone = 1;
-    state->dataSurface->Surface(2).Zone = 1;
-    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
-    state->dataSurface->Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
-    state->dataSurface->Surface(1).windowShadingControlList.push_back(1);
-    state->dataSurface->Surface(2).windowShadingControlList.push_back(2);
-    state->dataSurface->Surface(1).HasShadeControl = true;
-    state->dataSurface->Surface(2).HasShadeControl = true;
+    auto &surf1 = state->dataSurface->Surface(1);
+    auto &surf2 = state->dataSurface->Surface(2);
+    surf1.Name = "Surface1";
+    surf2.Name = "Surface2";
+    surf1.Zone = 1;
+    surf2.Zone = 1;
+    surf1.Class = DataSurfaces::SurfaceClass::Window;
+    surf2.Class = DataSurfaces::SurfaceClass::Window;
+    surf1.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    surf2.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    surf1.windowShadingControlList.push_back(1);
+    surf2.windowShadingControlList.push_back(2);
+    surf1.HasShadeControl = true;
+    surf2.HasShadeControl = true;
 
     state->dataSurface->SurfWinHasShadeOrBlindLayer(1) = false;
     state->dataSurface->SurfWinHasShadeOrBlindLayer(2) = false;
-    state->dataSurface->Surface(1).activeShadedConstruction = 1;
-    state->dataSurface->Surface(2).activeShadedConstruction = 1;
+    surf1.activeShadedConstruction = 1;
+    surf2.activeShadedConstruction = 1;
 
     state->dataConstruction->Construct(1).Name = "Construction1";
 
@@ -2698,10 +2700,8 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
 
     int SurfNum = 2;
     state->dataSurface->TotSurfaces = SurfNum;
-    state->dataSurface->Surface(1).activeWindowShadingControl =
-        state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
-    state->dataSurface->Surface(2).activeWindowShadingControl =
-        state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
+    surf1.activeWindowShadingControl = surf1.windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
+    surf2.activeWindowShadingControl = surf2.windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
