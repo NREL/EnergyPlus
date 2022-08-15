@@ -404,8 +404,8 @@ void MovingAvg2(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 
     Array1D<Real64> TempData(DataIn.size() + NumItemsInAvg - 1); // scratch array with end original elements appended to beginning of temp array
 
-    for (int i = DataIn.size() + NumItemsInAvg; i > NumItemsInAvg; --i) {
-        TempData(i) = DataIn(i - NumItemsInAvg); // load original data into top end of TempData
+    for (int i = TempData.size(); i > NumItemsInAvg; --i) {
+        TempData(i) = DataIn(i - NumItemsInAvg); // load original data into top end of TempData, end element not needed
     }
     for (int i = 0; i < NumItemsInAvg; ++i) {
         TempData(NumItemsInAvg - i) = DataIn(DataIn.size() - i); // load top end of original data into bottom end of TempData
