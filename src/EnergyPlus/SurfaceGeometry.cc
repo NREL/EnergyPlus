@@ -1651,93 +1651,91 @@ namespace SurfaceGeometry {
                             state.dataSurface->AllSurfaceListReportOrder.push_back(SubSurfNum);
                         }
                     }
+                }
 
-                    // Internal mass goes next
-                    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                // Internal mass goes next
+                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
-                        if (SurfaceTmpClassMoved(SurfNum)) continue;
-                        if (!UtilityRoutines::SameString(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName,
-                                                         state.dataHeatBal->Zone(ZoneNum).Name))
-                            continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::IntMass) continue;
-                        ++MovedSurfs;
-                        state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
-                        oldToNewSurfNums(SurfNum) = MovedSurfs;
-                        SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
-                        // Store list of moved surface numbers in reporting order
-                        state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
-                    }
+                    if (SurfaceTmpClassMoved(SurfNum)) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum != spaceNum) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::IntMass) continue;
+                    ++MovedSurfs;
+                    state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+                    oldToNewSurfNums(SurfNum) = MovedSurfs;
+                    SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
+                    // Store list of moved surface numbers in reporting order
+                    state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
+                }
 
-                    // Opaque door goes next
-                    for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
+                // Opaque door goes next
+                for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
 
-                        if (SurfaceTmpClassMoved(SubSurfNum)) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Door) continue;
+                    if (SurfaceTmpClassMoved(SubSurfNum)) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Door) continue;
 
-                        ++MovedSurfs;
-                        state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
-                        oldToNewSurfNums(SubSurfNum) = MovedSurfs;
-                        SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                    }
+                    ++MovedSurfs;
+                    state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                    oldToNewSurfNums(SubSurfNum) = MovedSurfs;
+                    SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
+                }
 
-                    // The exterior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
-                    for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
+                // The exterior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
+                for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
 
-                        if (SurfaceTmpClassMoved(SubSurfNum)) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).ExtBoundCond > 0) continue; // Exterior window
-                        if ((state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) &&
-                            (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor))
-                            continue;
+                    if (SurfaceTmpClassMoved(SubSurfNum)) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).ExtBoundCond > 0) continue; // Exterior window
+                    if ((state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) &&
+                        (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor))
+                        continue;
 
-                        ++MovedSurfs;
-                        state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
-                        oldToNewSurfNums(SubSurfNum) = MovedSurfs;
-                        SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                    }
+                    ++MovedSurfs;
+                    state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                    oldToNewSurfNums(SubSurfNum) = MovedSurfs;
+                    SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
+                }
 
-                    // The interior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
-                    for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
+                // The interior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
+                for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
 
-                        if (SurfaceTmpClassMoved(SubSurfNum)) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).ExtBoundCond <= 0) continue;
-                        if ((state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) &&
-                            (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor))
-                            continue;
+                    if (SurfaceTmpClassMoved(SubSurfNum)) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).ExtBoundCond <= 0) continue;
+                    if ((state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) &&
+                        (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor))
+                        continue;
 
-                        ++MovedSurfs;
-                        state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
-                        oldToNewSurfNums(SubSurfNum) = MovedSurfs;
-                        SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                    }
+                    ++MovedSurfs;
+                    state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                    oldToNewSurfNums(SubSurfNum) = MovedSurfs;
+                    SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
+                }
 
-                    // The SurfaceClass::TDD_Diffuser (OriginalClass = Window) goes next
-                    for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
+                // The SurfaceClass::TDD_Diffuser (OriginalClass = Window) goes next
+                for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
 
-                        if (SurfaceTmpClassMoved(SubSurfNum)) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Diffuser) continue;
+                    if (SurfaceTmpClassMoved(SubSurfNum)) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Diffuser) continue;
 
-                        ++MovedSurfs;
-                        state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
-                        oldToNewSurfNums(SubSurfNum) = MovedSurfs;
-                        SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                    }
+                    ++MovedSurfs;
+                    state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                    oldToNewSurfNums(SubSurfNum) = MovedSurfs;
+                    SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
+                }
 
-                    // Last but not least, SurfaceClass::TDD_Dome
-                    for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
+                // Last but not least, SurfaceClass::TDD_Dome
+                for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
 
-                        if (SurfaceTmpClassMoved(SubSurfNum)) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Dome) continue;
+                    if (SurfaceTmpClassMoved(SubSurfNum)) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).spaceNum != spaceNum) continue;
+                    if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Dome) continue;
 
-                        ++MovedSurfs;
-                        state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
-                        oldToNewSurfNums(SubSurfNum) = MovedSurfs;
-                        SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                    }
+                    ++MovedSurfs;
+                    state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                    oldToNewSurfNums(SubSurfNum) = MovedSurfs;
+                    SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
                 }
             }
         }
