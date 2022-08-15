@@ -1493,6 +1493,6 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
     EXPECT_EQ(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);      // expects zero
     EXPECT_EQ(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0);     // expects zero
     // expects non-zero peak heating load
-    EXPECT_NEAR(state->dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
-    EXPECT_NEAR(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
+    EXPECT_NEAR(state->dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.424, 0.01);
+    EXPECT_NEAR(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.424, 0.01);
 }

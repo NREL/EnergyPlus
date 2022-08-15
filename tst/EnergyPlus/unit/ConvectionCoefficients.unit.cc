@@ -3597,3 +3597,64 @@ TEST_F(ConvectionCoefficientsFixture, RoofGeometryInformation)
         EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
     }
 }
+
+TEST_F(ConvectionCoefficientsFixture, testTARPNaturalConvectionAlgorithm)
+{
+
+    Real64 surfT;
+    Real64 ambT;
+    Real64 cosTilt;
+    Real64 expectedResult;
+    Real64 actualResult;
+    constexpr Real64 allowableTolerance = 0.00001;
+
+    // Test 1a: cosTilt zero, positive delta T--surface is vertical (should use "reduced" convection correlation, vertical correlation would
+    // return 1.31)
+    surfT = 1.0;
+    ambT = 0.0;
+    cosTilt = 0.0;
+    expectedResult = 1.309696;
+    actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
+    EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+
+    // Test 1b: cosTilt zero, negative delta T--surface is vertical (should use "reduced" convection correlation, vertical correlation would
+    // return 1.31)
+    surfT = -1.0;
+    ambT = 0.0;
+    cosTilt = 0.0;
+    expectedResult = 1.309696;
+    actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
+    EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+
+    // Test 2a: cosTilt positive, negative delta T--use "reduced" convection correlation
+    surfT = -1.0;
+    ambT = 0.0;
+    cosTilt = 0.01;
+    expectedResult = 1.30029;
+    actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
+    EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+
+    // Test 2b: cosTilt negative, positive delta T--use "reduced" convection correlation
+    surfT = 1.0;
+    ambT = 0.0;
+    cosTilt = -0.01;
+    expectedResult = 1.30029;
+    actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
+    EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+
+    // Test 3a: cosTilt negative, negative delta T--use "enhanced" convection correlation
+    surfT = -1.0;
+    ambT = 0.0;
+    cosTilt = -0.01;
+    expectedResult = 1.31184;
+    actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
+    EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+
+    // Test 3b: cosTilt positive, positive delta T--use "enhanced" convection correlation
+    surfT = 1.0;
+    ambT = 0.0;
+    cosTilt = 0.01;
+    expectedResult = 1.31184;
+    actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
+    EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+}

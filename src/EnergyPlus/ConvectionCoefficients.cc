@@ -3149,16 +3149,17 @@ Real64 CalcASHRAETARPNatural(Real64 const Tsurf, Real64 const Tamb, Real64 const
 
     // Set HConvIn using the proper correlation based on DeltaTemp and Surface (Cosine Tilt)
 
-    if ((DeltaTemp == 0.0) || (cosTilt == 0.0)) { // Vertical Surface
+    // Eliminated this part of the IF because cosTilt almost never exactly 0.0 and both correlations provide the same answer when cosTilt is zero.
+    // CalcASHRAEVerticalWall is used elsewhere so there was no need to eliminate it.
+    // if ((DeltaTemp == 0.0) || (cosTilt == 0.0)) { // Vertical Surface
+    //    return CalcASHRAEVerticalWall(DeltaTemp);
 
-        return CalcASHRAEVerticalWall(DeltaTemp);
-
-    } else if (((DeltaTemp < 0.0) && (cosTilt < 0.0)) || ((DeltaTemp > 0.0) && (cosTilt > 0.0))) { // Enhanced Convection
+    if (((DeltaTemp < 0.0) && (cosTilt < 0.0)) || ((DeltaTemp > 0.0) && (cosTilt > 0.0))) { // Enhanced Convection
 
         return CalcWaltonUnstableHorizontalOrTilt(DeltaTemp, cosTilt);
 
-    } else // if (((DeltaTemp > 0.0) && (cosTilt < 0.0)) || ((DeltaTemp < 0.0) && (cosTilt > 0.0)))
-    {      // Reduced Convection
+    } else // if (((DeltaTemp > 0.0) && (cosTilt <= 0.0)) || ((DeltaTemp < 0.0) && (cosTilt >= 0.0)))
+    {      // Reduced Convection or Vertical Wall
 
         return CalcWaltonStableHorizontalOrTilt(DeltaTemp, cosTilt);
 

@@ -792,19 +792,27 @@ Separate from the above model structure, there are also other comprehensive algo
 
 The comprehensive natural convection model, accessed using the keyword ``TARP,'' correlates the convective heat transfer coefficient to the surface orientation and the difference between the surface and zone air temperatures (where DT = Surface Temperature - Air Temperature).~ The algorithm is taken directly from Walton (1983).~ Walton derived his algorithm from ASHRAE literature which can now be found for example in the ASHRAE Handbook (HoF 2001), Table 5 on p.~3.12, which gives equations for natural convection heat transfer coefficients in the turbulent range for large, vertical plates and for large, horizontal plates facing upward when heated (or downward when cooled).~~ A note in the text also gives an approximation for large, horizontal plates facing downward when heated (or upward when cooled) recommending that it should be half of the facing upward value.~ Walton adds a curve fit as a function of the cosine of the tilt angle to provide intermediate values between vertical and horizontal.~ The curve fit values at the extremes match the ASHRAE values very well.
 
-For no temperature difference OR a vertical surface the following correlation is used:
+For no temperature difference OR a vertical surface, the TARP algorithm used:
 
-\(h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (90)
+\begin{equation}
+h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}
+\end{equation}
 
-For ($\Delta$T \textless{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textgreater{} 0.0 AND an downward facing surface) an enhanced convection correlation is used:
+Typically, a vertical surface would have a cosine of the tilt angle that yields zero.  However, with numerical round-off, a zero cosine is unlikely.  Rather than apply a computationally expensive absolute value check against a small number frequently throughout a run, EnergyPlus chooses to simply treat the vertical surface like reduced convection shown below.  The result for h is essentially the same for the reduced convection and vertical surface correlation when the cosine of the tilt is zero. It also does the same for a temperature difference of zero since again the result is the same for both (both yield a zero value for h).
 
-\(h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.238 - \left| {\cos \Sigma } \right|}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (91)
+For ($\Delta$T \textless{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textgreater{} 0.0 AND an downward facing surface), an enhanced convection correlation is used:
+
+\begin{equation}
+h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.238 - \left| {\cos \Sigma } \right|}}
+\end{equation}
 
 where $\Sigma$ is the surface tilt angle.
 
-For ($\Delta$T \textgreater{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textless{} 0.0 AND an downward facing surface) a reduced convection correlation is used:
+For ($\Delta$T \textgreater{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textless{} 0.0 AND an downward facing surface) or a vertical surface, a reduced convection correlation is used:
 
-\(h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (92)
+\begin{equation}
+h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}
+\end{equation}
 
 where $\Sigma$ is the surface tilt angle.
 

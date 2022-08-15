@@ -233,13 +233,13 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     HcUCSDDV(*state, 1, 0.5);
 
-    EXPECT_NEAR(1.889346, state->dataRoomAirMod->DVHcIn(1), 0.0001);
-    EXPECT_NEAR(1.650496, state->dataRoomAirMod->DVHcIn(2), 0.0001);
-    EXPECT_NEAR(1.889346, state->dataRoomAirMod->DVHcIn(3), 0.0001);
-    EXPECT_NEAR(379.614212, state->dataDispVentMgr->HAT_OC, 0.0001);
-    EXPECT_NEAR(16.504965, state->dataDispVentMgr->HA_OC, 0.0001);
-    EXPECT_NEAR(869.099591, state->dataDispVentMgr->HAT_MX, 0.0001);
-    EXPECT_NEAR(37.786938, state->dataDispVentMgr->HA_MX, 0.0001);
+    EXPECT_NEAR(1.888909, state->dataRoomAirMod->DVHcIn(1), 0.0001);
+    EXPECT_NEAR(1.650114, state->dataRoomAirMod->DVHcIn(2), 0.0001);
+    EXPECT_NEAR(1.888909, state->dataRoomAirMod->DVHcIn(3), 0.0001);
+    EXPECT_NEAR(379.526145, state->dataDispVentMgr->HAT_OC, 0.0001);
+    EXPECT_NEAR(16.501137, state->dataDispVentMgr->HA_OC, 0.0001);
+    EXPECT_NEAR(868.897968, state->dataDispVentMgr->HAT_MX, 0.0001);
+    EXPECT_NEAR(37.778173, state->dataDispVentMgr->HA_MX, 0.0001);
 
     state->dataRoomAirMod->IsZoneDV.deallocate();
     state->dataSurface->Surface.deallocate();
