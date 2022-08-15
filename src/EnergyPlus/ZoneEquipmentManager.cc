@@ -1839,131 +1839,52 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
         // average some of the zone sequences to reduce peakiness
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolFlowSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolFlowSeq = state.dataZoneEquipmentManager->AvgData;
+            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolFlowSeq, state.dataSize->NumTimeStepsInAvg);
         }
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolLoadSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolLoadSeq = state.dataZoneEquipmentManager->AvgData;
+            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolLoadSeq, state.dataSize->NumTimeStepsInAvg);
         }
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatFlowSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatFlowSeq = state.dataZoneEquipmentManager->AvgData;
+            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatFlowSeq, state.dataSize->NumTimeStepsInAvg);
         }
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatLoadSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatLoadSeq = state.dataZoneEquipmentManager->AvgData;
+            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatLoadSeq, state.dataSize->NumTimeStepsInAvg);
         }
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
             MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneRetTempSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneRetTempSeq =
-                state.dataZoneEquipmentManager->AvgData;
+                      state.dataSize->NumTimeStepsInAvg);
         }
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
             MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneRetTempSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneRetTempSeq =
-                state.dataZoneEquipmentManager->AvgData;
+                      state.dataSize->NumTimeStepsInAvg);
         }
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
             MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASHeatAddSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASHeatAddSeq = state.dataZoneEquipmentManager->AvgData;
+                      state.dataSize->NumTimeStepsInAvg);
         }
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASLatAddSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASLatAddSeq = state.dataZoneEquipmentManager->AvgData;
+            MovingAvg(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASLatAddSeq, state.dataSize->NumTimeStepsInAvg);
         }
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             auto &calcZoneSizing(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum));
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             if (calcZoneSizing.zoneLatentSizing) {
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                MovingAvg(calcZoneSizing.LatentHeatLoadSeq,
-                          state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                          state.dataSize->NumTimeStepsInAvg,
-                          state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.LatentHeatLoadSeq = state.dataZoneEquipmentManager->AvgData;
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                MovingAvg(calcZoneSizing.LatentHeatFlowSeq,
-                          state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                          state.dataSize->NumTimeStepsInAvg,
-                          state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.LatentHeatFlowSeq = state.dataZoneEquipmentManager->AvgData;
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                MovingAvg(calcZoneSizing.LatentCoolLoadSeq,
-                          state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                          state.dataSize->NumTimeStepsInAvg,
-                          state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.LatentCoolLoadSeq = state.dataZoneEquipmentManager->AvgData;
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                MovingAvg(calcZoneSizing.LatentCoolFlowSeq,
-                          state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                          state.dataSize->NumTimeStepsInAvg,
-                          state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.LatentCoolFlowSeq = state.dataZoneEquipmentManager->AvgData;
+                MovingAvg(calcZoneSizing.LatentHeatLoadSeq, state.dataSize->NumTimeStepsInAvg);
+                MovingAvg(calcZoneSizing.LatentHeatFlowSeq, state.dataSize->NumTimeStepsInAvg);
+                MovingAvg(calcZoneSizing.LatentCoolLoadSeq, state.dataSize->NumTimeStepsInAvg);
+                MovingAvg(calcZoneSizing.LatentCoolFlowSeq, state.dataSize->NumTimeStepsInAvg);
             }
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            MovingAvg(calcZoneSizing.CoolLatentLoadNoDOASSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.CoolLatentLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            MovingAvg(calcZoneSizing.HeatLatentLoadNoDOASSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.HeatLatentLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            MovingAvg(calcZoneSizing.CoolLoadNoDOASSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.CoolLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            MovingAvg(calcZoneSizing.HeatLoadNoDOASSeq,
-                      state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                      state.dataSize->NumTimeStepsInAvg,
-                      state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.HeatLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
+            MovingAvg(calcZoneSizing.CoolLatentLoadNoDOASSeq, state.dataSize->NumTimeStepsInAvg);
+            MovingAvg(calcZoneSizing.HeatLatentLoadNoDOASSeq, state.dataSize->NumTimeStepsInAvg);
+            MovingAvg(calcZoneSizing.CoolLoadNoDOASSeq, state.dataSize->NumTimeStepsInAvg);
+            MovingAvg(calcZoneSizing.HeatLoadNoDOASSeq, state.dataSize->NumTimeStepsInAvg);
         }
 
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {

@@ -415,13 +415,13 @@ TEST_F(EnergyPlusFixture, General_MovingAvg)
     saveData = inputData;
 
     int avgWindowWidth = 1;
-    MovingAvg2(inputData, avgWindowWidth);
+    MovingAvg(inputData, avgWindowWidth);
     for (int i = 1; i <= numItem; i++) {
         ASSERT_EQ(saveData(i), inputData(i)); // averaged data has not changed since window = 1
     }
 
     avgWindowWidth = 2;
-    MovingAvg2(inputData, avgWindowWidth);
+    MovingAvg(inputData, avgWindowWidth);
     ASSERT_EQ(inputData(1), (saveData(1) + saveData(numItem)) / avgWindowWidth);
     for (int j = 2; j <= numItem; j++) {
         ASSERT_EQ(inputData(j), (saveData(j) + saveData(j - 1)) / avgWindowWidth);
@@ -429,7 +429,7 @@ TEST_F(EnergyPlusFixture, General_MovingAvg)
     inputData = saveData; // reset for next test
 
     avgWindowWidth = 4;
-    MovingAvg2(inputData, avgWindowWidth);
+    MovingAvg(inputData, avgWindowWidth);
     EXPECT_NEAR(inputData(1), (saveData(1) + saveData(12) + saveData(11) + saveData(10)) / avgWindowWidth, 1E-9);
     EXPECT_NEAR(inputData(2), (saveData(2) + saveData(1) + saveData(12) + saveData(11)) / avgWindowWidth, 1E-9);
     EXPECT_NEAR(inputData(3), (saveData(3) + saveData(2) + saveData(1) + saveData(12)) / avgWindowWidth, 1E-9);

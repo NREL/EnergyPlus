@@ -14860,26 +14860,6 @@ void GetDelaySequences(EnergyPlusData &state,
     } // if desDaySelected != 0
 }
 
-// Used to construct the tabular output for a single cell in the component load summary reports based on moving average
-Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int const numTimeSteps, int const maxTimeStep)
-{
-    using General::MovingAvg;
-    Array1D<Real64> AvgData; // sequence data after averaging
-    AvgData.allocate(numTimeSteps);
-    AvgData = 0.;
-    MovingAvg(dataSeq * 1.0, numTimeSteps, state.dataSize->NumTimeStepsInAvg, AvgData);
-    return AvgData(maxTimeStep);
-}
-
-Real64 MovingAvgAtMaxTime2(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int const numTimeSteps, int const maxTimeStep)
-{
-    Array1D<Real64> AvgData; // sequence data after averaging
-    AvgData.allocate(numTimeSteps);
-    AvgData = dataSeq * 1.0;
-    General::MovingAvg2(AvgData, state.dataSize->NumTimeStepsInAvg);
-    return AvgData(maxTimeStep);
-}
-
 // set the load summary table cells based on the load sequences using moving averages to smooth out
 void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                     Array2D<Real64> &resultCells,
@@ -14896,96 +14876,100 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                     Array3D<Real64> const &feneCondInstantSeq,
                                     Array2D<Real64> const &surfDelaySeq)
 {
-    using DataSurfaces::ExternalEnvironment;
-    using DataSurfaces::Ground;
-    using DataSurfaces::GroundFCfactorMethod;
-    using DataSurfaces::KivaFoundation;
-    using DataSurfaces::OtherSideCoefCalcExt;
-    using DataSurfaces::OtherSideCoefNoCalcExt;
-    using DataSurfaces::OtherSideCondModeledExt;
-    using DataSurfaces::SurfaceClass;
-    using General::MovingAvg;
-
-    Array1D<Real64> seqData;     // raw data sequence that has not been averaged yet
-    Array1D<Real64> AvgData;     // sequence data after averaging
+    Array1D<Real64> AvgData;     // sequence data to be averaging
     Array1D<Real64> delayOpaque; // hold values for report for delayed opaque
-    int curExtBoundCond;
-    Real64 singleSurfDelay;
-    auto &ort(state.dataOutRptTab);
-    auto &Zone(state.dataHeatBal->Zone);
-
-    int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
     resultCells = 0.;
     resCellsUsd = false;
     delayOpaque.allocate(LoadCompRow::GrdTot);
-    delayOpaque = 0.;
-    AvgData.allocate(NumOfTimeStepInDay);
-    AvgData = 0.;
+    AvgData.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
 
     if (desDaySelected != 0 && timeOfMax != 0) {
 
         // PEOPLE
-        resultCells(LoadCompCol::SensInst, LoadCompRow::People) =
-            MovingAvgAtMaxTime(state, ort->peopleInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->peopleInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::People) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::People) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::People) =
-            MovingAvgAtMaxTime(state, ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->peopleLatentSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::Latent, LoadCompRow::People) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::People) = true;
-        resultCells(LoadCompCol::SensDelay, LoadCompRow::People) = MovingAvgAtMaxTime(state, peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        AvgData = peopleDelaySeq(_);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::People) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::People) = true;
 
         // LIGHTS
-        resultCells(LoadCompCol::SensInst, LoadCompRow::Lights) =
-            MovingAvgAtMaxTime(state, ort->lightInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->lightInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::Lights) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Lights) = true;
-        resultCells(LoadCompCol::SensRA, LoadCompRow::Lights) =
-            MovingAvgAtMaxTime(state, ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->lightRetAirSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensRA, LoadCompRow::Lights) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensRA, LoadCompRow::Lights) = true;
-        resultCells(LoadCompCol::SensDelay, LoadCompRow::Lights) = MovingAvgAtMaxTime(state, lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        AvgData = lightDelaySeq(_);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::Lights) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::Lights) = true;
 
         // EQUIPMENT
-        resultCells(LoadCompCol::SensInst, LoadCompRow::Equip) =
-            MovingAvgAtMaxTime(state, ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->equipInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::Equip) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Equip) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::Equip) =
-            MovingAvgAtMaxTime(state, ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->equipLatentSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::Latent, LoadCompRow::Equip) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::Equip) = true;
-        resultCells(LoadCompCol::SensDelay, LoadCompRow::Equip) = MovingAvgAtMaxTime(state, equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        AvgData = equipDelaySeq(_);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::Equip) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::Equip) = true;
 
         // REFRIGERATION EQUIPMENT
-        resultCells(LoadCompCol::SensInst, LoadCompRow::Refrig) =
-            MovingAvgAtMaxTime(state, ort->refrigInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->refrigInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::Refrig) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Refrig) = true;
-        resultCells(LoadCompCol::SensRA, LoadCompRow::Refrig) =
-            MovingAvgAtMaxTime(state, ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->refrigRetAirSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensRA, LoadCompRow::Refrig) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensRA, LoadCompRow::Refrig) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::Refrig) =
-            MovingAvgAtMaxTime(state, ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->refrigLatentSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::Latent, LoadCompRow::Refrig) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::Refrig) = true;
 
         // WATER USE EQUIPMENT
-        resultCells(LoadCompCol::SensInst, LoadCompRow::WaterUse) =
-            MovingAvgAtMaxTime(state, ort->waterUseInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->waterUseInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::WaterUse) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::WaterUse) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::WaterUse) =
-            MovingAvgAtMaxTime(state, ort->waterUseLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->waterUseLatentSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::Latent, LoadCompRow::WaterUse) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::WaterUse) = true;
 
         // HVAC EQUIPMENT LOSSES
-        resultCells(LoadCompCol::SensInst, LoadCompRow::HvacLoss) =
-            MovingAvgAtMaxTime(state, ort->hvacLossInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->hvacLossInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::HvacLoss) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::HvacLoss) = true;
-        resultCells(LoadCompCol::SensDelay, LoadCompRow::HvacLoss) = MovingAvgAtMaxTime(state, hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        AvgData = hvacLossDelaySeq(_);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::HvacLoss) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::HvacLoss) = true;
 
         // POWER GENERATION EQUIPMENT
-        resultCells(LoadCompCol::SensInst, LoadCompRow::PowerGen) =
-            MovingAvgAtMaxTime(state, ort->powerGenInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->powerGenInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::PowerGen) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::PowerGen) = true;
-        resultCells(LoadCompCol::SensDelay, LoadCompRow::PowerGen) = MovingAvgAtMaxTime(state, powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        AvgData = powerGenDelaySeq(_);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::PowerGen) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::PowerGen) = true;
 
         // DOAS
@@ -14995,69 +14979,76 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::DOAS) = true;
 
         // INFILTRATION
-        resultCells(LoadCompCol::SensInst, LoadCompRow::Infil) =
-            MovingAvgAtMaxTime(state, ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->infilInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::Infil) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Infil) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::Infil) =
-            MovingAvgAtMaxTime(state, ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->infilLatentSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::Latent, LoadCompRow::Infil) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::Infil) = true;
 
         // ZONE VENTILATION
-        resultCells(LoadCompCol::SensInst, LoadCompRow::ZoneVent) =
-            MovingAvgAtMaxTime(state, ort->zoneVentInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->zoneVentInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::ZoneVent) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::ZoneVent) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::ZoneVent) =
-            MovingAvgAtMaxTime(state, ort->zoneVentLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->zoneVentLatentSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::Latent, LoadCompRow::ZoneVent) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::ZoneVent) = true;
 
         // INTERZONE MIXING
-        resultCells(LoadCompCol::SensInst, LoadCompRow::IntZonMix) =
-            MovingAvgAtMaxTime(state, ort->interZoneMixInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->interZoneMixInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::IntZonMix) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::IntZonMix) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::IntZonMix) =
-            MovingAvgAtMaxTime(state, ort->interZoneMixLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = state.dataOutRptTab->interZoneMixLatentSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::Latent, LoadCompRow::IntZonMix) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::IntZonMix) = true;
 
         // FENESTRATION CONDUCTION
-        resultCells(LoadCompCol::SensInst, LoadCompRow::FeneCond) =
-            MovingAvgAtMaxTime(state, feneCondInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        AvgData = feneCondInstantSeq(desDaySelected, _, zoneIndex);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensInst, LoadCompRow::FeneCond) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::FeneCond) = true;
 
         // FENESTRATION SOLAR
-        resultCells(LoadCompCol::SensDelay, LoadCompRow::FeneSolr) = MovingAvgAtMaxTime(state, feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        AvgData = feneSolarDelaySeq(_);
+        General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::FeneSolr) = AvgData(timeOfMax);
         resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::FeneSolr) = true;
 
         // opaque surfaces - must combine individual surfaces by class and other side conditions
         delayOpaque = 0.0;
-        for (int kSurf = Zone(zoneIndex).HTSurfaceFirst; kSurf <= Zone(zoneIndex).HTSurfaceLast; ++kSurf) {
+        for (int kSurf = state.dataHeatBal->Zone(zoneIndex).HTSurfaceFirst; kSurf <= state.dataHeatBal->Zone(zoneIndex).HTSurfaceLast; ++kSurf) {
 
-            curExtBoundCond = state.dataSurface->Surface(kSurf).ExtBoundCond;
+            int curExtBoundCond = state.dataSurface->Surface(kSurf).ExtBoundCond;
             // if exterior is other side coefficients using ground preprocessor terms then
             // set it to ground instead of other side coefficients
-            if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
+            if (curExtBoundCond == DataSurfaces::OtherSideCoefNoCalcExt || curExtBoundCond == DataSurfaces::OtherSideCoefCalcExt) {
                 if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
-                    curExtBoundCond = Ground;
+                    curExtBoundCond = DataSurfaces::Ground;
                 }
             }
-            seqData = surfDelaySeq(_, kSurf);
-            MovingAvg(seqData, NumOfTimeStepInDay, state.dataSize->NumTimeStepsInAvg, AvgData);
-            singleSurfDelay = AvgData(timeOfMax);
-            General::MovingAvg2(seqData, state.dataSize->NumTimeStepsInAvg);
-            singleSurfDelay = seqData(timeOfMax);
+            AvgData = surfDelaySeq(_, kSurf);
+            General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+            Real64 singleSurfDelay = AvgData(timeOfMax);
             switch (state.dataSurface->Surface(kSurf).Class) {
-            case SurfaceClass::Wall: {
+            case DataSurfaces::SurfaceClass::Wall: {
                 switch (curExtBoundCond) {
-                case ExternalEnvironment: {
+                case DataSurfaces::ExternalEnvironment: {
                     delayOpaque(LoadCompRow::ExtWall) += singleSurfDelay;
                 } break;
-                case Ground:
-                case GroundFCfactorMethod:
-                case KivaFoundation: {
+                case DataSurfaces::Ground:
+                case DataSurfaces::GroundFCfactorMethod:
+                case DataSurfaces::KivaFoundation: {
                     delayOpaque(LoadCompRow::GrdWall) += singleSurfDelay;
                 } break;
-                case OtherSideCoefNoCalcExt:
-                case OtherSideCoefCalcExt:
-                case OtherSideCondModeledExt: {
+                case DataSurfaces::OtherSideCoefNoCalcExt:
+                case DataSurfaces::OtherSideCoefCalcExt:
+                case DataSurfaces::OtherSideCondModeledExt: {
                     delayOpaque(LoadCompRow::OtherWall) += singleSurfDelay;
                 } break;
                 default: { // interzone
@@ -15065,19 +15056,19 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                 } break;
                 }
             } break;
-            case SurfaceClass::Floor: {
+            case DataSurfaces::SurfaceClass::Floor: {
                 switch (curExtBoundCond) {
-                case ExternalEnvironment: {
+                case DataSurfaces::ExternalEnvironment: {
                     delayOpaque(LoadCompRow::ExtFlr) += singleSurfDelay;
                 } break;
-                case Ground:
-                case GroundFCfactorMethod:
-                case KivaFoundation: {
+                case DataSurfaces::Ground:
+                case DataSurfaces::GroundFCfactorMethod:
+                case DataSurfaces::KivaFoundation: {
                     delayOpaque(LoadCompRow::GrdFlr) += singleSurfDelay;
                 } break;
-                case OtherSideCoefNoCalcExt:
-                case OtherSideCoefCalcExt:
-                case OtherSideCondModeledExt: {
+                case DataSurfaces::OtherSideCoefNoCalcExt:
+                case DataSurfaces::OtherSideCoefCalcExt:
+                case DataSurfaces::OtherSideCondModeledExt: {
                     delayOpaque(LoadCompRow::OtherFlr) += singleSurfDelay;
                 } break;
                 default: { // interzone
@@ -15085,17 +15076,17 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                 } break;
                 }
             } break;
-            case SurfaceClass::Roof: {
+            case DataSurfaces::SurfaceClass::Roof: {
                 switch (curExtBoundCond) {
-                case ExternalEnvironment: {
+                case DataSurfaces::ExternalEnvironment: {
                     delayOpaque(LoadCompRow::Roof) += singleSurfDelay;
                 } break;
-                case Ground:
-                case GroundFCfactorMethod:
-                case KivaFoundation:
-                case OtherSideCoefNoCalcExt:
-                case OtherSideCoefCalcExt:
-                case OtherSideCondModeledExt: {
+                case DataSurfaces::Ground:
+                case DataSurfaces::GroundFCfactorMethod:
+                case DataSurfaces::KivaFoundation:
+                case DataSurfaces::OtherSideCoefNoCalcExt:
+                case DataSurfaces::OtherSideCoefCalcExt:
+                case DataSurfaces::OtherSideCondModeledExt: {
                     delayOpaque(LoadCompRow::OtherRoof) += singleSurfDelay;
                 } break;
                 default: { // interzone
@@ -15103,7 +15094,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                 } break;
                 }
             } break;
-            case SurfaceClass::Door: {
+            case DataSurfaces::SurfaceClass::Door: {
                 delayOpaque(LoadCompRow::OpqDoor) += singleSurfDelay;
             } break;
             default:

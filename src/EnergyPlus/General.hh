@@ -329,13 +329,7 @@ namespace General {
 
     std::string &strip_trailing_zeros(std::string &InputString);
 
-    void MovingAvg(Array1A<Real64> DataIn,      // input data that needs smoothing
-                   int NumDataItems,            // number of values in DataIn
-                   int NumItemsInAvg,           // number of items in the averaging window
-                   Array1A<Real64> SmoothedData // output data after smoothing
-    );
-
-    void MovingAvg2(Array1D<Real64> &DataIn, int const NumItemsInAvg);
+    void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg);
 
     void ProcessDateString(EnergyPlusData &state,
                            std::string const &String,
