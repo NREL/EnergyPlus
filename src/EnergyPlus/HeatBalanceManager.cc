@@ -327,6 +327,8 @@ namespace HeatBalanceManager {
 
         GetBuildingData(state, ErrorsFound); // Read building data from input file
 
+        GetIncidentSolarMultiplier(state, ErrorsFound);
+
         // Added SV 6/26/2013 to load scheduled surface gains
         GetScheduledSurfaceGains(state, ErrorsFound);
 
@@ -5173,6 +5175,100 @@ namespace HeatBalanceManager {
 
         // Now get Space data after Zones are set up, because Space is optional, Zones are not
         GetSpaceData(state, ErrorsFound);
+    }
+
+    void GetIncidentSolarMultiplier(EnergyPlusData &state, bool &ErrorsFound)
+    {
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        cCurrentModuleObject = "SurfaceProperty:IncidentSolarMultiplier";
+
+        static constexpr std::string_view RoutineName("GetIncidentSolarMultiplier: ");
+
+        state.dataSurface->TotSurfIncSolMultiplier = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+        if (state.dataSurface->TotSurfIncSolMultiplier <= 0) return;
+
+        if (!allocated(state.dataSurface->SurfIncSolMultiplier)) {
+            // could be extended to interior surfaces later
+            state.dataSurface->SurfIncSolMultiplier.allocate(state.dataSurface->TotSurfaces);
+        }
+
+        int NumAlpha;
+        int NumNumeric;
+        int IOStat;
+        for (int Loop = 1; Loop <= state.dataSurface->TotSurfIncSolMultiplier; ++Loop) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumeric,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                ShowContinueError(
+                    state,
+                    "...each SurfaceProperty:IncidentSolarMultiplier name must not duplicate other SurfaceProperty:IncidentSolarMultiplier name");
+                continue;
+            }
+
+            // Assign surface number
+            int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
+            if (SurfNum == 0) {
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + " has been found.");
+                ShowContinueError(state,
+                                  state.dataIPShortCut->cAlphaFieldNames(1) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                      "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
+                ErrorsFound = true;
+                continue;
+            }
+            auto &Surf = state.dataSurface->Surface(SurfNum);
+            if (Surf.Class != DataSurfaces::SurfaceClass::Window) {
+                ShowSevereError(state, "IncidentSolarMultiplier defined for non-window surfaces");
+                ErrorsFound = true;
+                continue;
+            }
+            if (Surf.ExtBoundCond != DataSurfaces::ExternalEnvironment) {
+                ShowSevereError(state, "IncidentSolarMultiplier defined for interior surfaces");
+                ErrorsFound = true;
+                continue;
+            }
+            int ConstrNum = Surf.Construction;
+            auto const &Constr = state.dataConstruction->Construct(ConstrNum);
+            int MaterNum = Constr.LayerPoint(Constr.TotLayers);
+            auto const &Mat = state.dataMaterial->Material(MaterNum);
+            bool withNoncompatibleShades =
+                (Mat.Group == DataHeatBalance::MaterialGroup::Shade || Mat.Group == DataHeatBalance::MaterialGroup::WindowBlind ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::Screen || Mat.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer || Surf.HasShadeControl);
+            if (withNoncompatibleShades) {
+                ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
+                ErrorsFound = true;
+                continue;
+            }
+            int ScheduleIdx = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+            // Schedule not found but schedule field is not empty, user had the wrong schedule name
+            if (ScheduleIdx == 0 && !(state.dataIPShortCut->cAlphaArgs(2).empty())) {
+                ShowSevereError(state, "Invalid Incident Solar Multiplier Schedule Name in SurfaceProperty:IncidentSolarMultiplier");
+                continue;
+            }
+            Surf.hasIncSolMultiplier = true;
+            auto &SurfIncSolMult = state.dataSurface->SurfIncSolMultiplier(SurfNum);
+            SurfIncSolMult.Name = state.dataIPShortCut->cAlphaArgs(1);
+            SurfIncSolMult.SurfaceIdx = SurfNum;
+            SurfIncSolMult.Scaler = state.dataIPShortCut->rNumericArgs(1);
+            SurfIncSolMult.SchedPtr = ScheduleIdx;
+        }
     }
 
     void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound) // Error flag indicator (true if errors found)
