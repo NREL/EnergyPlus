@@ -589,10 +589,12 @@ namespace HeatBalFiniteDiffManager {
 
         for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             // Need to skip window constructions, IRT, air wall and construction not in use.
+            // Need to also skip constructions for surfaces that do not use CondFD.
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
             if (state.dataConstruction->Construct(ConstrNum).TypeIsIRT) continue;
             if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
             if (!state.dataConstruction->Construct(ConstrNum).IsUsed) continue;
+            if (!findAnySurfacesUsingConstructionAndCondFD(state, ConstrNum)) continue;
 
             ConstructFD(ConstrNum).Name.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
             ConstructFD(ConstrNum).Thickness.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
@@ -1314,6 +1316,7 @@ namespace HeatBalFiniteDiffManager {
                 if (state.dataConstruction->Construct(ThisNum).TypeIsIRT) continue;
                 if (state.dataConstruction->Construct(ThisNum).TypeIsAirBoundary) continue;
                 if (!state.dataConstruction->Construct(ThisNum).IsUsed) continue;
+                if (!findAnySurfacesUsingConstructionAndCondFD(state, ThisNum)) continue;
 
                 static constexpr std::string_view Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
                 print(state.files.eio,
@@ -2624,6 +2627,17 @@ namespace HeatBalFiniteDiffManager {
             state.dataHeatBalFiniteDiffMgr->SurfaceFD(surfaceIndex).PhaseChangeState(finiteDifferenceLayerIndex));
         updatedDensity = materialDefinition.phaseChange->getDensity(temperaturePrevious);
         updatedThermalConductivity = materialDefinition.phaseChange->getConductivity(temperatureUpdated);
+    }
+
+    bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData &state, int constructionNum)
+    {
+        for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
+            auto &thisSurface = state.dataSurface->Surface(surfNum);
+            if (thisSurface.Construction == constructionNum) {
+                if (thisSurface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) return true;
+            }
+        }
+        return false;
     }
 
 } // namespace HeatBalFiniteDiffManager
