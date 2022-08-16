@@ -16044,7 +16044,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
     AvgData.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
 
     if (desDaySelected != 0 && timeOfMax != 0) {
-
+        // Don't update/average original array data
         // PEOPLE
         AvgData = state.dataOutRptTab->peopleInstantSeq(desDaySelected, _, zoneIndex);
         General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);

@@ -276,9 +276,7 @@ void GetAirPathData(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr const char *RoutineName("GetAirPathData: ");
 
-    auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
     auto &OutsideAirSys(state.dataAirLoop->OutsideAirSys);
-    auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
 
     // SUBROUTINE LOCAL VARIABLE DEFINITIONS
@@ -403,10 +401,10 @@ void GetAirPathData(EnergyPlusData &state)
     NumPrimaryAirSys = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
     TestUniqueNodes.allocate(NumPrimaryAirSys * 4); // used to look at specific nodes that must be unique, fields A6-A9
 
-    PrimaryAirSystems.allocate(NumPrimaryAirSys);                  // allocate the primary air sys data array
-    AirToZoneNodeInfo.allocate(NumPrimaryAirSys);                  // allocate the array that stores the air sys / zone equp connection data
-    state.dataAirLoop->AirLoopZoneInfo.allocate(NumPrimaryAirSys); // allocate array that has cleaner list of zones attached to air loop
-    state.dataAirLoop->AirToOANodeInfo.allocate(NumPrimaryAirSys); // allocate the array that stores the OA node connections (reporting)
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(NumPrimaryAirSys); // allocate the primary air sys data array
+    state.dataAirLoop->AirToZoneNodeInfo.allocate(NumPrimaryAirSys);        // allocate the array that stores the air sys / zone equp connection data
+    state.dataAirLoop->AirLoopZoneInfo.allocate(NumPrimaryAirSys);          // allocate array that has cleaner list of zones attached to air loop
+    state.dataAirLoop->AirToOANodeInfo.allocate(NumPrimaryAirSys);          // allocate the array that stores the OA node connections (reporting)
     PackagedUnit.allocate(NumPrimaryAirSys);
     AirLoopControlInfo.allocate(NumPrimaryAirSys);
     state.dataAirLoop->AirLoopFlow.allocate(NumPrimaryAirSys);
@@ -425,16 +423,18 @@ void GetAirPathData(EnergyPlusData &state)
 
     // Loop through the primary air systems and obtain the data for each system
     for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
+        auto &primaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems(AirSysNum);
+        auto &airLoopZoneInfo = state.dataAirLoop->AirToZoneNodeInfo(AirSysNum);
         NumOASysControllers = 0;
         NumOASysSimpControllers = 0;
         OASysContListNum = 0;
         PackagedUnit(AirSysNum) = false;
-        PrimaryAirSystems(AirSysNum).OASysExists = false; // init Outside Air system connection data to none
-        PrimaryAirSystems(AirSysNum).isAllOA = false;
-        PrimaryAirSystems(AirSysNum).OASysInletNodeNum = 0;
-        PrimaryAirSystems(AirSysNum).OASysOutletNodeNum = 0;
-        PrimaryAirSystems(AirSysNum).NumOAHeatCoils = 0;
-        PrimaryAirSystems(AirSysNum).NumOACoolCoils = 0;
+        primaryAirSystems.OASysExists = false; // init Outside Air system connection data to none
+        primaryAirSystems.isAllOA = false;
+        primaryAirSystems.OASysInletNodeNum = 0;
+        primaryAirSystems.OASysOutletNodeNum = 0;
+        primaryAirSystems.NumOAHeatCoils = 0;
+        primaryAirSystems.NumOACoolCoils = 0;
         AirLoopControlInfo(AirSysNum).FanOpMode = DataHVACGlobals::ContFanCycCoil; // initialize to constant fan mode for all air loops
         state.dataAirLoop->AirLoopFlow(AirSysNum).FanPLR = 1.0;                    // initialize to 1 for all air loops
 
@@ -457,8 +457,8 @@ void GetAirPathData(EnergyPlusData &state)
         // Data needed to simulate the system goes into PrimaryAirSystem.
         // Data connecting the air system to the zone equipment goes into AirToZoneNodeInfo (in DataLoopNode).
         UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
-        PrimaryAirSystems(AirSysNum).Name = Alphas(1);
-        AirToZoneNodeInfo(AirSysNum).AirLoopName = Alphas(1);
+        primaryAirSystems.Name = Alphas(1);
+        airLoopZoneInfo.AirLoopName = Alphas(1);
         if (NumAlphas < 9) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", insufficient information.");
             ShowContinueError(state, "...Have supplied less than 9 alpha fields.");
@@ -471,38 +471,38 @@ void GetAirPathData(EnergyPlusData &state)
             ErrorsFound = true;
             continue;
         }
-        PrimaryAirSystems(AirSysNum).DesignVolFlowRate = Numbers(1);
+        primaryAirSystems.DesignVolFlowRate = Numbers(1);
         if (!lNumericBlanks(2)) {
-            PrimaryAirSystems(AirSysNum).DesignReturnFlowFraction = Numbers(2);
+            primaryAirSystems.DesignReturnFlowFraction = Numbers(2);
         }
         // Only allow one return air node (at the loop level)
-        AirToZoneNodeInfo(AirSysNum).NumReturnNodes = 1;
+        airLoopZoneInfo.NumReturnNodes = 1;
         // Allocate the return air node arrays
-        AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum.allocate(AirToZoneNodeInfo(AirSysNum).NumReturnNodes);
-        AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum.allocate(AirToZoneNodeInfo(AirSysNum).NumReturnNodes);
+        airLoopZoneInfo.AirLoopReturnNodeNum.allocate(airLoopZoneInfo.NumReturnNodes);
+        airLoopZoneInfo.ZoneEquipReturnNodeNum.allocate(airLoopZoneInfo.NumReturnNodes);
         // fill the return air node arrays with node numbers
-        AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(1) = GetOnlySingleNode(state,
-                                                                                 Alphas(6),
-                                                                                 ErrorsFound,
-                                                                                 DataLoopNode::ConnectionObjectType::AirLoopHVAC,
-                                                                                 Alphas(1),
-                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::ConnectionType::Inlet,
-                                                                                 NodeInputManager::CompFluidStream::Primary,
-                                                                                 ObjectIsParent);
+        airLoopZoneInfo.AirLoopReturnNodeNum(1) = GetOnlySingleNode(state,
+                                                                    Alphas(6),
+                                                                    ErrorsFound,
+                                                                    DataLoopNode::ConnectionObjectType::AirLoopHVAC,
+                                                                    Alphas(1),
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::ConnectionType::Inlet,
+                                                                    NodeInputManager::CompFluidStream::Primary,
+                                                                    ObjectIsParent);
         if (!lAlphaBlanks(7)) {
-            AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(state,
-                                                                                       Alphas(7),
-                                                                                       ErrorsFound,
-                                                                                       DataLoopNode::ConnectionObjectType::AirLoopHVAC,
-                                                                                       Alphas(1),
-                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::ConnectionType::Outlet,
-                                                                                       NodeInputManager::CompFluidStream::Primary,
-                                                                                       ObjectIsParent);
+            airLoopZoneInfo.ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(state,
+                                                                          Alphas(7),
+                                                                          ErrorsFound,
+                                                                          DataLoopNode::ConnectionObjectType::AirLoopHVAC,
+                                                                          Alphas(1),
+                                                                          DataLoopNode::NodeFluidType::Air,
+                                                                          DataLoopNode::ConnectionType::Outlet,
+                                                                          NodeInputManager::CompFluidStream::Primary,
+                                                                          ObjectIsParent);
         } else {
             // If no return path, set this to zero to trigger special handling when calling UpdateHVACInterface
-            AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = 0;
+            airLoopZoneInfo.ZoneEquipReturnNodeNum(1) = 0;
         }
 
         // work on unique nodes
@@ -575,23 +575,22 @@ void GetAirPathData(EnergyPlusData &state)
         // this test depends on the controlled zone input having been "gotten"
         test = 0;
         for (count = 1; count <= state.dataZoneEquip->NumReturnAirPaths; ++count) {
-            if (state.dataZoneEquip->ReturnAirPath(count).OutletNodeNum == AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1)) {
+            if (state.dataZoneEquip->ReturnAirPath(count).OutletNodeNum == airLoopZoneInfo.ZoneEquipReturnNodeNum(1)) {
                 test = state.dataZoneEquip->ReturnAirPath(count).OutletNodeNum;
                 break;
             }
         }
-        if ((test == 0) && (AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0)) { // there, see if it's in the controlled zone info
+        if ((test == 0) && (airLoopZoneInfo.NumReturnNodes > 0)) { // there, see if it's in the controlled zone info
             for (count = 1; count <= state.dataGlobal->NumOfZones; ++count) {
                 for (int retNode = 1; retNode <= state.dataZoneEquip->ZoneEquipConfig(count).NumReturnNodes; ++retNode) {
-                    if (state.dataZoneEquip->ZoneEquipConfig(count).ReturnNode(retNode) != AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1))
-                        continue;
+                    if (state.dataZoneEquip->ZoneEquipConfig(count).ReturnNode(retNode) != airLoopZoneInfo.ZoneEquipReturnNodeNum(1)) continue;
                     test = count;
                     break;
                 }
                 if (test == count) break;
             }
         }
-        if ((test == 0) && (AirToZoneNodeInfo(AirSysNum).NumReturnNodes > 0) && !lAlphaBlanks(7)) {
+        if ((test == 0) && (airLoopZoneInfo.NumReturnNodes > 0) && !lAlphaBlanks(7)) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid.");
             ShowContinueError(state, cAlphaFields(7) + " (Return Air Path or ZoneHVAC:EquipmentConnections) not valid = \"" + Alphas(7) + "\".");
             ErrorsFound = true;
@@ -605,7 +604,7 @@ void GetAirPathData(EnergyPlusData &state)
                     ErrInList,
                     DataLoopNode::NodeFluidType::Air,
                     DataLoopNode::ConnectionObjectType::AirLoopHVAC,
-                    PrimaryAirSystems(AirSysNum).Name,
+                    primaryAirSystems.Name,
                     DataLoopNode::ConnectionType::Inlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
@@ -616,25 +615,24 @@ void GetAirPathData(EnergyPlusData &state)
         }
         // Allow at most 3 supply nodes (for a 3 deck system)
         if (NumNodes > 3) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", too many nodes.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", too many nodes.");
             ShowContinueError(state, "Only 1st 3 Nodes will be used from " + cAlphaFields(8) + "=\"" + Alphas(8) + "\".");
             ErrorsFound = true;
         }
         if (NumNodes == 0) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", too few nodes.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", too few nodes.");
             ShowContinueError(state, "There must be at least 1 supply node in the system.");
             ErrorsFound = true;
         }
-        AirToZoneNodeInfo(AirSysNum).NumSupplyNodes = NumNodes;
+        airLoopZoneInfo.NumSupplyNodes = NumNodes;
         // Allocate the supply node arrays in AirToZoneNodeInfo
-        AirToZoneNodeInfo(AirSysNum).ZoneEquipSupplyNodeNum.allocate(AirToZoneNodeInfo(AirSysNum).NumSupplyNodes);
-        AirToZoneNodeInfo(AirSysNum).AirLoopSupplyNodeNum.allocate(AirToZoneNodeInfo(AirSysNum).NumSupplyNodes);
-        AirToZoneNodeInfo(AirSysNum).SupplyDuctType.allocate(AirToZoneNodeInfo(AirSysNum).NumSupplyNodes);
+        airLoopZoneInfo.ZoneEquipSupplyNodeNum.allocate(airLoopZoneInfo.NumSupplyNodes);
+        airLoopZoneInfo.AirLoopSupplyNodeNum.allocate(airLoopZoneInfo.NumSupplyNodes);
+        airLoopZoneInfo.SupplyDuctType.allocate(airLoopZoneInfo.NumSupplyNodes);
         // Fill the supply node arrays with node numbers
-        for (I = 1; I <= AirToZoneNodeInfo(AirSysNum).NumSupplyNodes; ++I) {
-            AirToZoneNodeInfo(AirSysNum).ZoneEquipSupplyNodeNum(I) = NodeNums(I);
-            AirToZoneNodeInfo(AirSysNum).SupplyDuctType(I) = 0;
+        for (I = 1; I <= airLoopZoneInfo.NumSupplyNodes; ++I) {
+            airLoopZoneInfo.ZoneEquipSupplyNodeNum(I) = NodeNums(I);
+            airLoopZoneInfo.SupplyDuctType(I) = 0;
         }
         ErrInList = false;
         GetNodeNums(state,
@@ -644,7 +642,7 @@ void GetAirPathData(EnergyPlusData &state)
                     ErrInList,
                     DataLoopNode::NodeFluidType::Air,
                     DataLoopNode::ConnectionObjectType::AirLoopHVAC,
-                    PrimaryAirSystems(AirSysNum).Name,
+                    primaryAirSystems.Name,
                     DataLoopNode::ConnectionType::Outlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
@@ -653,44 +651,42 @@ void GetAirPathData(EnergyPlusData &state)
         if (ErrInList) {
             ErrorsFound = true;
         }
-        if (NumNodes != AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) {
+        if (NumNodes != airLoopZoneInfo.NumSupplyNodes) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", node mismatch.");
             ShowContinueError(state,
                               format("...number of air system exit nodes [{}] must match number of zone equip inlet nodes [{}].",
                                      NumNodes,
-                                     AirToZoneNodeInfo(AirSysNum).NumSupplyNodes));
+                                     airLoopZoneInfo.NumSupplyNodes));
             ErrorsFound = true;
         }
-        for (I = 1; I <= AirToZoneNodeInfo(AirSysNum).NumSupplyNodes; ++I) {
-            AirToZoneNodeInfo(AirSysNum).AirLoopSupplyNodeNum(I) = NodeNums(I);
+        for (I = 1; I <= airLoopZoneInfo.NumSupplyNodes; ++I) {
+            airLoopZoneInfo.AirLoopSupplyNodeNum(I) = NodeNums(I);
         }
-        AirToZoneNodeInfo(AirSysNum).NumZonesCooled = 0;
-        AirToZoneNodeInfo(AirSysNum).NumZonesHeated = 0;
+        airLoopZoneInfo.NumZonesCooled = 0;
+        airLoopZoneInfo.NumZonesHeated = 0;
         // Branch, Controller, Availability Manager and Connector List Names to access later
         ControllerListName = Alphas(2);
         BranchListName = Alphas(4);
         AvailManagerListName = Alphas(3);
         ConnectorListName = Alphas(5);
-        PrimaryAirSystems(AirSysNum).NumBranches = NumBranchesInBranchList(state, BranchListName);
-        if (PrimaryAirSystems(AirSysNum).NumBranches == 0) {
-            ShowSevereError(
-                state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", insufficient information.");
+        primaryAirSystems.NumBranches = NumBranchesInBranchList(state, BranchListName);
+        if (primaryAirSystems.NumBranches == 0) {
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", insufficient information.");
             ShowContinueError(state, "...there must be at least 1 branch specified.");
             ErrorsFound = true;
         }
-        BranchNames.allocate(PrimaryAirSystems(AirSysNum).NumBranches);
+        BranchNames.allocate(primaryAirSystems.NumBranches);
         BranchNames = "";
         // get the branch lists
-        GetBranchList(state, PrimaryAirSystems(AirSysNum).Name, BranchListName, PrimaryAirSystems(AirSysNum).NumBranches, BranchNames, "Air");
-        PrimaryAirSystems(AirSysNum).Branch.allocate(PrimaryAirSystems(AirSysNum).NumBranches);
+        GetBranchList(state, primaryAirSystems.Name, BranchListName, primaryAirSystems.NumBranches, BranchNames, "Air");
+        primaryAirSystems.Branch.allocate(primaryAirSystems.NumBranches);
         // Cycle through all of the branches and set up the branch data
-        for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Name = BranchNames(BranchNum);
+        for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
+            primaryAirSystems.Branch(BranchNum).Name = BranchNames(BranchNum);
             NumCompsOnBranch = NumCompsInBranch(state, BranchNames(BranchNum));
             if (NumCompsOnBranch <= 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
-                                    "\", insufficient information.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", insufficient information.");
                 ShowContinueError(state, "...Branch=\"" + BranchNames(BranchNum) + "\", no components on branch.");
                 ErrorsFound = true;
                 continue;
@@ -703,7 +699,7 @@ void GetAirPathData(EnergyPlusData &state)
             OutletNodeNumbers.dimension(NumCompsOnBranch, 0);
 
             GetBranchData(state,
-                          PrimaryAirSystems(AirSysNum).Name,
+                          primaryAirSystems.Name,
                           BranchNames(BranchNum),
                           PressCurveType,
                           PressCurveIndex,
@@ -715,75 +711,73 @@ void GetAirPathData(EnergyPlusData &state)
                           OutletNodeNames,
                           OutletNodeNumbers,
                           ErrorsFound); // Placeholders for plant branch pressure data (not used in air loops)
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp.allocate(NumCompsOnBranch);
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents = NumCompsOnBranch;
+            primaryAirSystems.Branch(BranchNum).Comp.allocate(NumCompsOnBranch);
+            primaryAirSystems.Branch(BranchNum).TotalComponents = NumCompsOnBranch;
 
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalNodes = NumCompsOnBranch + 1;
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNum.allocate(NumCompsOnBranch + 1);
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNum(1) = InletNodeNumbers(1);
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).DuctType = Main;
+            primaryAirSystems.Branch(BranchNum).TotalNodes = NumCompsOnBranch + 1;
+            primaryAirSystems.Branch(BranchNum).NodeNum.allocate(NumCompsOnBranch + 1);
+            primaryAirSystems.Branch(BranchNum).NodeNum(1) = InletNodeNumbers(1);
+            primaryAirSystems.Branch(BranchNum).DuctType = Main;
 
             // If first node is an outdoor air node, then consider this to have a simple OA system (many places check for this)
             if (OutAirNodeManager::CheckOutAirNodeNumber(state, InletNodeNumbers(1))) {
-                PrimaryAirSystems(AirSysNum).OASysExists = true;
-                PrimaryAirSystems(AirSysNum).isAllOA = true;
-                PrimaryAirSystems(AirSysNum).OASysInletNodeNum = InletNodeNumbers(1);
-                PrimaryAirSystems(AirSysNum).OASysOutletNodeNum = InletNodeNumbers(1);
-                PrimaryAirSystems(AirSysNum).OAMixOAInNodeNum = InletNodeNumbers(1);
+                primaryAirSystems.OASysExists = true;
+                primaryAirSystems.isAllOA = true;
+                primaryAirSystems.OASysInletNodeNum = InletNodeNumbers(1);
+                primaryAirSystems.OASysOutletNodeNum = InletNodeNumbers(1);
+                primaryAirSystems.OAMixOAInNodeNum = InletNodeNumbers(1);
                 state.dataAirLoop->AirToOANodeInfo(AirSysNum).OASysExists = true;
                 state.dataAirLoop->AirToOANodeInfo(AirSysNum).OASysInletNodeNum = InletNodeNumbers(1);
                 state.dataAirLoop->AirToOANodeInfo(AirSysNum).OASysOutletNodeNum = InletNodeNumbers(1);
             }
-            for (CompNum = 1; CompNum <= PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+            for (CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
 
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf = CompTypes(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name = CompNames(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex = 0;
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).NodeNameIn = InletNodeNames(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).NodeNumIn = InletNodeNumbers(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).NodeNameOut = OutletNodeNames(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).NodeNumOut = OutletNodeNumbers(CompNum);
-                PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNum(CompNum + 1) = OutletNodeNumbers(CompNum);
+                primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf = CompTypes(CompNum);
+                primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name = CompNames(CompNum);
+                primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompIndex = 0;
+                primaryAirSystems.Branch(BranchNum).Comp(CompNum).NodeNameIn = InletNodeNames(CompNum);
+                primaryAirSystems.Branch(BranchNum).Comp(CompNum).NodeNumIn = InletNodeNumbers(CompNum);
+                primaryAirSystems.Branch(BranchNum).Comp(CompNum).NodeNameOut = OutletNodeNames(CompNum);
+                primaryAirSystems.Branch(BranchNum).Comp(CompNum).NodeNumOut = OutletNodeNumbers(CompNum);
+                primaryAirSystems.Branch(BranchNum).NodeNum(CompNum + 1) = OutletNodeNumbers(CompNum);
 
                 // Check for Outside Air system; if there, store its connection node numbers to primary air system
                 if (UtilityRoutines::SameString(CompTypes(CompNum), "AirLoopHVAC:OutdoorAirSystem")) {
-                    if (PrimaryAirSystems(AirSysNum).OASysExists) {
+                    if (primaryAirSystems.OASysExists) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name +
                                             "\", too many outdoor air systems.");
                         ShowContinueError(state, "Only one AirLoopHVAC:OutdoorAirSystem allowed.");
                         ErrorsFound = true;
                         continue;
                     }
-                    PrimaryAirSystems(AirSysNum).OASysExists = true;
-                    PrimaryAirSystems(AirSysNum).OASysInletNodeNum = InletNodeNumbers(CompNum);
-                    PrimaryAirSystems(AirSysNum).OASysOutletNodeNum = OutletNodeNumbers(CompNum);
+                    primaryAirSystems.OASysExists = true;
+                    primaryAirSystems.OASysInletNodeNum = InletNodeNumbers(CompNum);
+                    primaryAirSystems.OASysOutletNodeNum = OutletNodeNumbers(CompNum);
                     state.dataAirLoop->AirToOANodeInfo(AirSysNum).OASysExists = true;
                     state.dataAirLoop->AirToOANodeInfo(AirSysNum).OASysInletNodeNum = InletNodeNumbers(CompNum);
                     state.dataAirLoop->AirToOANodeInfo(AirSysNum).OASysOutletNodeNum = OutletNodeNumbers(CompNum);
                     OANum = GetOASystemNumber(state, CompNames(CompNum));
                     if (OANum > 0) {
                         NumOASysSimpControllers = GetOASysNumSimpControllers(state, OANum);
-                        PrimaryAirSystems(AirSysNum).NumOAHeatCoils = GetOASysNumHeatingCoils(state, OANum);
-                        PrimaryAirSystems(AirSysNum).NumOACoolCoils = GetOASysNumCoolingCoils(state, OANum);
-                        PrimaryAirSystems(AirSysNum).NumOAHXs = GetOASysNumHXs(state, OANum);
+                        primaryAirSystems.NumOAHeatCoils = GetOASysNumHeatingCoils(state, OANum);
+                        primaryAirSystems.NumOACoolCoils = GetOASysNumCoolingCoils(state, OANum);
+                        primaryAirSystems.NumOAHXs = GetOASysNumHXs(state, OANum);
                         OASysContListNum = GetOASysControllerListIndex(state, OANum);
                         OAMixNum = FindOAMixerMatchForOASystem(state, OANum);
                         if (OAMixNum > 0) {
-                            PrimaryAirSystems(AirSysNum).OAMixOAInNodeNum = GetOAMixerInletNodeNumber(state, OAMixNum);
+                            primaryAirSystems.OAMixOAInNodeNum = GetOAMixerInletNodeNumber(state, OAMixNum);
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
-                                                "\", item not found.");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", item not found.");
                             ShowContinueError(state, "OutdoorAir:Mixer for AirLoopHVAC:OutdoorAirSystem=\"" + CompNames(CompNum) + "\" not found.");
                             ErrorsFound = true;
                         }
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
-                                            "\", item not found.");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", item not found.");
                         ShowContinueError(state, "AirLoopHVAC:OutdoorAirSystem=\"" + CompNames(CompNum) + "\" not found.");
-                        ShowContinueError(state, "  referenced in Branch=\"" + PrimaryAirSystems(AirSysNum).Branch(BranchNum).Name + "\".");
+                        ShowContinueError(state, "  referenced in Branch=\"" + primaryAirSystems.Branch(BranchNum).Name + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -818,9 +812,9 @@ void GetAirPathData(EnergyPlusData &state)
 
             } // end of component loop
 
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).ControlType = "";
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumIn = InletNodeNumbers(1);
-            PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumOut = OutletNodeNumbers(NumCompsOnBranch);
+            primaryAirSystems.Branch(BranchNum).ControlType = "";
+            primaryAirSystems.Branch(BranchNum).NodeNumIn = InletNodeNumbers(1);
+            primaryAirSystems.Branch(BranchNum).NodeNumOut = OutletNodeNumbers(NumCompsOnBranch);
 
             CompTypes.deallocate();
             CompNames.deallocate();
@@ -834,46 +828,43 @@ void GetAirPathData(EnergyPlusData &state)
         BranchNames.deallocate();
 
         // find and store the primary air system outlet branch reference numbers
-        PrimaryAirSystems(AirSysNum).NumOutletBranches = AirToZoneNodeInfo(AirSysNum).NumSupplyNodes;
+        primaryAirSystems.NumOutletBranches = airLoopZoneInfo.NumSupplyNodes;
         for (OutBranchNum = 1; OutBranchNum <= 3; ++OutBranchNum) {
-            PrimaryAirSystems(AirSysNum).OutletBranchNum[OutBranchNum - 1] = 0;
-            if (OutBranchNum > PrimaryAirSystems(AirSysNum).NumOutletBranches) break;
-            MatchNodeName(OutBranchNum) = state.dataLoopNodes->NodeID(AirToZoneNodeInfo(AirSysNum).AirLoopSupplyNodeNum(OutBranchNum));
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
-                if (AirToZoneNodeInfo(AirSysNum).AirLoopSupplyNodeNum(OutBranchNum) == PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumOut) {
-                    PrimaryAirSystems(AirSysNum).OutletBranchNum[OutBranchNum - 1] = BranchNum;
+            primaryAirSystems.OutletBranchNum[OutBranchNum - 1] = 0;
+            if (OutBranchNum > primaryAirSystems.NumOutletBranches) break;
+            MatchNodeName(OutBranchNum) = state.dataLoopNodes->NodeID(airLoopZoneInfo.AirLoopSupplyNodeNum(OutBranchNum));
+            for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
+                if (airLoopZoneInfo.AirLoopSupplyNodeNum(OutBranchNum) == primaryAirSystems.Branch(BranchNum).NodeNumOut) {
+                    primaryAirSystems.OutletBranchNum[OutBranchNum - 1] = BranchNum;
                 }
             }
         }
         //  Check for errors
-        for (OutBranchNum = 1; OutBranchNum <= PrimaryAirSystems(AirSysNum).NumOutletBranches; ++OutBranchNum) {
-            if (PrimaryAirSystems(AirSysNum).OutletBranchNum[OutBranchNum - 1] != 0) continue;
-            ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", branch in error.");
+        for (OutBranchNum = 1; OutBranchNum <= primaryAirSystems.NumOutletBranches; ++OutBranchNum) {
+            if (primaryAirSystems.OutletBranchNum[OutBranchNum - 1] != 0) continue;
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", branch in error.");
             ShowContinueError(state, "Probable missing or misspelled node referenced in the branch(es):");
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
-                ShowContinueError(state, "Possible Error in Branch Object=\"" + PrimaryAirSystems(AirSysNum).Branch(BranchNum).Name + "\".");
+            for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
+                ShowContinueError(state, "Possible Error in Branch Object=\"" + primaryAirSystems.Branch(BranchNum).Name + "\".");
             }
             ShowContinueError(state, "...looking to match to Node=\"" + MatchNodeName(OutBranchNum) + "\".");
             ErrorsFound = true;
         }
 
         // find and store the primary air system inlet branch numbers
-        PrimaryAirSystems(AirSysNum).NumInletBranches = AirToZoneNodeInfo(AirSysNum).NumReturnNodes;
-        for (InBranchNum = 1; InBranchNum <= PrimaryAirSystems(AirSysNum).NumInletBranches; ++InBranchNum) {
-            PrimaryAirSystems(AirSysNum).InletBranchNum[InBranchNum - 1] = 0;
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
-                if (AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(InBranchNum) == PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumIn) {
-                    PrimaryAirSystems(AirSysNum).InletBranchNum[InBranchNum - 1] = BranchNum;
+        primaryAirSystems.NumInletBranches = airLoopZoneInfo.NumReturnNodes;
+        for (InBranchNum = 1; InBranchNum <= primaryAirSystems.NumInletBranches; ++InBranchNum) {
+            primaryAirSystems.InletBranchNum[InBranchNum - 1] = 0;
+            for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
+                if (airLoopZoneInfo.AirLoopReturnNodeNum(InBranchNum) == primaryAirSystems.Branch(BranchNum).NodeNumIn) {
+                    primaryAirSystems.InletBranchNum[InBranchNum - 1] = BranchNum;
                 }
             }
-            if (PrimaryAirSystems(AirSysNum).InletBranchNum[InBranchNum - 1] == 0) {
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", connection to zone.");
+            if (primaryAirSystems.InletBranchNum[InBranchNum - 1] == 0) {
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", connection to zone.");
                 ShowContinueError(state, "No Connection found for Return Air from Zone");
                 ShowContinueError(state,
-                                  "Expected node name =\"" +
-                                      state.dataLoopNodes->NodeID(AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(InBranchNum)) + "\".");
+                                  "Expected node name =\"" + state.dataLoopNodes->NodeID(airLoopZoneInfo.AirLoopReturnNodeNum(InBranchNum)) + "\".");
                 ErrorsFound = true;
             }
         }
@@ -895,8 +886,8 @@ void GetAirPathData(EnergyPlusData &state)
                     MixerExists = true;
                 }
             } else {
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\", connector list object.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", connector list object.");
                 ShowContinueError(state, "ConnectorList object=\"" + ConnectorListName + "\" not found in input.");
             }
             errFlag = false;
@@ -912,41 +903,41 @@ void GetAirPathData(EnergyPlusData &state)
             NodeNames.allocate(NumAlphas);
             NodeNumbers.allocate(NumAlphas);
             GetLoopSplitter(state,
-                            PrimaryAirSystems(AirSysNum).Name,
+                            primaryAirSystems.Name,
                             ConnectorListName,
-                            PrimaryAirSystems(AirSysNum).Splitter.Name,
-                            PrimaryAirSystems(AirSysNum).Splitter.Exists,
-                            PrimaryAirSystems(AirSysNum).Splitter.NodeNameIn,
-                            PrimaryAirSystems(AirSysNum).Splitter.NodeNumIn,
-                            PrimaryAirSystems(AirSysNum).Splitter.TotalOutletNodes,
+                            primaryAirSystems.Splitter.Name,
+                            primaryAirSystems.Splitter.Exists,
+                            primaryAirSystems.Splitter.NodeNameIn,
+                            primaryAirSystems.Splitter.NodeNumIn,
+                            primaryAirSystems.Splitter.TotalOutletNodes,
                             NodeNames,
                             NodeNumbers,
                             ErrorsFound);
 
-            PrimaryAirSystems(AirSysNum).Splitter.NodeNameOut.allocate(PrimaryAirSystems(AirSysNum).Splitter.TotalOutletNodes);
-            PrimaryAirSystems(AirSysNum).Splitter.NodeNumOut.allocate(PrimaryAirSystems(AirSysNum).Splitter.TotalOutletNodes);
-            PrimaryAirSystems(AirSysNum).Splitter.BranchNumOut.allocate(PrimaryAirSystems(AirSysNum).Splitter.TotalOutletNodes);
+            primaryAirSystems.Splitter.NodeNameOut.allocate(primaryAirSystems.Splitter.TotalOutletNodes);
+            primaryAirSystems.Splitter.NodeNumOut.allocate(primaryAirSystems.Splitter.TotalOutletNodes);
+            primaryAirSystems.Splitter.BranchNumOut.allocate(primaryAirSystems.Splitter.TotalOutletNodes);
 
-            for (NodeNum = 1; NodeNum <= PrimaryAirSystems(AirSysNum).Splitter.TotalOutletNodes; ++NodeNum) {
+            for (NodeNum = 1; NodeNum <= primaryAirSystems.Splitter.TotalOutletNodes; ++NodeNum) {
 
-                PrimaryAirSystems(AirSysNum).Splitter.NodeNameOut(NodeNum) = NodeNames(NodeNum);
-                PrimaryAirSystems(AirSysNum).Splitter.NodeNumOut(NodeNum) = NodeNumbers(NodeNum);
+                primaryAirSystems.Splitter.NodeNameOut(NodeNum) = NodeNames(NodeNum);
+                primaryAirSystems.Splitter.NodeNumOut(NodeNum) = NodeNumbers(NodeNum);
 
-                PrimaryAirSystems(AirSysNum).Splitter.BranchNumOut(NodeNum) = 0;
-                for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
+                primaryAirSystems.Splitter.BranchNumOut(NodeNum) = 0;
+                for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
 
-                    if (PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumIn == PrimaryAirSystems(AirSysNum).Splitter.NodeNumOut(NodeNum)) {
-                        PrimaryAirSystems(AirSysNum).Splitter.BranchNumOut(NodeNum) = BranchNum;
+                    if (primaryAirSystems.Branch(BranchNum).NodeNumIn == primaryAirSystems.Splitter.NodeNumOut(NodeNum)) {
+                        primaryAirSystems.Splitter.BranchNumOut(NodeNum) = BranchNum;
                         break;
                     }
                 }
             }
 
-            PrimaryAirSystems(AirSysNum).Splitter.BranchNumIn = 0;
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
+            primaryAirSystems.Splitter.BranchNumIn = 0;
+            for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
 
-                if (PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumOut == PrimaryAirSystems(AirSysNum).Splitter.NodeNumIn) {
-                    PrimaryAirSystems(AirSysNum).Splitter.BranchNumIn = BranchNum;
+                if (primaryAirSystems.Branch(BranchNum).NodeNumOut == primaryAirSystems.Splitter.NodeNumIn) {
+                    primaryAirSystems.Splitter.BranchNumIn = BranchNum;
                     break;
                 }
             }
@@ -957,14 +948,14 @@ void GetAirPathData(EnergyPlusData &state)
             }
 
         } else {
-            PrimaryAirSystems(AirSysNum).Splitter.Exists = false;
-            PrimaryAirSystems(AirSysNum).Splitter.NodeNumIn = 0;
-            PrimaryAirSystems(AirSysNum).Splitter.BranchNumIn = 0;
-            PrimaryAirSystems(AirSysNum).Splitter.NodeNameIn = "";
-            PrimaryAirSystems(AirSysNum).Splitter.TotalOutletNodes = 0;
-            PrimaryAirSystems(AirSysNum).Splitter.NodeNumOut.allocate(0);
-            PrimaryAirSystems(AirSysNum).Splitter.BranchNumOut.allocate(0);
-            PrimaryAirSystems(AirSysNum).Splitter.NodeNameOut.allocate(0);
+            primaryAirSystems.Splitter.Exists = false;
+            primaryAirSystems.Splitter.NodeNumIn = 0;
+            primaryAirSystems.Splitter.BranchNumIn = 0;
+            primaryAirSystems.Splitter.NodeNameIn = "";
+            primaryAirSystems.Splitter.TotalOutletNodes = 0;
+            primaryAirSystems.Splitter.NodeNumOut.allocate(0);
+            primaryAirSystems.Splitter.BranchNumOut.allocate(0);
+            primaryAirSystems.Splitter.NodeNameOut.allocate(0);
         }
 
         // If there is a MIXER, get its data
@@ -973,41 +964,41 @@ void GetAirPathData(EnergyPlusData &state)
             NodeNames.allocate(NumAlphas);
             NodeNumbers.allocate(NumAlphas);
             GetLoopMixer(state,
-                         PrimaryAirSystems(AirSysNum).Name,
+                         primaryAirSystems.Name,
                          ConnectorListName,
-                         PrimaryAirSystems(AirSysNum).Mixer.Name,
-                         PrimaryAirSystems(AirSysNum).Mixer.Exists,
-                         PrimaryAirSystems(AirSysNum).Mixer.NodeNameOut,
-                         PrimaryAirSystems(AirSysNum).Mixer.NodeNumOut,
-                         PrimaryAirSystems(AirSysNum).Mixer.TotalInletNodes,
+                         primaryAirSystems.Mixer.Name,
+                         primaryAirSystems.Mixer.Exists,
+                         primaryAirSystems.Mixer.NodeNameOut,
+                         primaryAirSystems.Mixer.NodeNumOut,
+                         primaryAirSystems.Mixer.TotalInletNodes,
                          NodeNames,
                          NodeNumbers,
                          ErrorsFound);
 
-            PrimaryAirSystems(AirSysNum).Mixer.NodeNameIn.allocate(PrimaryAirSystems(AirSysNum).Mixer.TotalInletNodes);
-            PrimaryAirSystems(AirSysNum).Mixer.NodeNumIn.allocate(PrimaryAirSystems(AirSysNum).Mixer.TotalInletNodes);
-            PrimaryAirSystems(AirSysNum).Mixer.BranchNumIn.allocate(PrimaryAirSystems(AirSysNum).Mixer.TotalInletNodes);
+            primaryAirSystems.Mixer.NodeNameIn.allocate(primaryAirSystems.Mixer.TotalInletNodes);
+            primaryAirSystems.Mixer.NodeNumIn.allocate(primaryAirSystems.Mixer.TotalInletNodes);
+            primaryAirSystems.Mixer.BranchNumIn.allocate(primaryAirSystems.Mixer.TotalInletNodes);
 
-            for (NodeNum = 1; NodeNum <= PrimaryAirSystems(AirSysNum).Mixer.TotalInletNodes; ++NodeNum) {
+            for (NodeNum = 1; NodeNum <= primaryAirSystems.Mixer.TotalInletNodes; ++NodeNum) {
 
-                PrimaryAirSystems(AirSysNum).Mixer.NodeNameIn(NodeNum) = NodeNames(NodeNum);
-                PrimaryAirSystems(AirSysNum).Mixer.NodeNumIn(NodeNum) = NodeNumbers(NodeNum);
+                primaryAirSystems.Mixer.NodeNameIn(NodeNum) = NodeNames(NodeNum);
+                primaryAirSystems.Mixer.NodeNumIn(NodeNum) = NodeNumbers(NodeNum);
 
-                PrimaryAirSystems(AirSysNum).Mixer.BranchNumIn(NodeNum) = 0;
-                for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
+                primaryAirSystems.Mixer.BranchNumIn(NodeNum) = 0;
+                for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
 
-                    if (PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumIn == PrimaryAirSystems(AirSysNum).Mixer.NodeNumIn(NodeNum)) {
-                        PrimaryAirSystems(AirSysNum).Mixer.BranchNumIn(NodeNum) = BranchNum;
+                    if (primaryAirSystems.Branch(BranchNum).NodeNumIn == primaryAirSystems.Mixer.NodeNumIn(NodeNum)) {
+                        primaryAirSystems.Mixer.BranchNumIn(NodeNum) = BranchNum;
                         break;
                     }
                 }
             }
 
-            PrimaryAirSystems(AirSysNum).Mixer.BranchNumOut = 0;
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
+            primaryAirSystems.Mixer.BranchNumOut = 0;
+            for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
 
-                if (PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNumIn == PrimaryAirSystems(AirSysNum).Mixer.NodeNumOut) {
-                    PrimaryAirSystems(AirSysNum).Mixer.BranchNumOut = BranchNum;
+                if (primaryAirSystems.Branch(BranchNum).NodeNumIn == primaryAirSystems.Mixer.NodeNumOut) {
+                    primaryAirSystems.Mixer.BranchNumOut = BranchNum;
                     break;
                 }
             }
@@ -1018,14 +1009,14 @@ void GetAirPathData(EnergyPlusData &state)
             }
 
         } else {
-            PrimaryAirSystems(AirSysNum).Mixer.Exists = false;
-            PrimaryAirSystems(AirSysNum).Mixer.NodeNumOut = 0;
-            PrimaryAirSystems(AirSysNum).Mixer.BranchNumOut = 0;
-            PrimaryAirSystems(AirSysNum).Mixer.NodeNameOut = "";
-            PrimaryAirSystems(AirSysNum).Mixer.TotalInletNodes = 0;
-            PrimaryAirSystems(AirSysNum).Mixer.NodeNumIn.allocate(0);
-            PrimaryAirSystems(AirSysNum).Mixer.BranchNumIn.allocate(0);
-            PrimaryAirSystems(AirSysNum).Mixer.NodeNameIn.allocate(0);
+            primaryAirSystems.Mixer.Exists = false;
+            primaryAirSystems.Mixer.NodeNumOut = 0;
+            primaryAirSystems.Mixer.BranchNumOut = 0;
+            primaryAirSystems.Mixer.NodeNameOut = "";
+            primaryAirSystems.Mixer.TotalInletNodes = 0;
+            primaryAirSystems.Mixer.NodeNumIn.allocate(0);
+            primaryAirSystems.Mixer.BranchNumIn.allocate(0);
+            primaryAirSystems.Mixer.NodeNameIn.allocate(0);
         }
 
         NumControllers = 0;
@@ -1038,33 +1029,32 @@ void GetAirPathData(EnergyPlusData &state)
                 // Check the current controller list and if it matches input names
                 NumControllers = (NumAlphas - 1) / 2; // Subtract off the controller list name first
                 // store all the controller data
-                PrimaryAirSystems(AirSysNum).NumControllers = NumControllers + NumOASysSimpControllers;
-                PrimaryAirSystems(AirSysNum).ControllerName.allocate(NumControllers + NumOASysSimpControllers);
-                PrimaryAirSystems(AirSysNum).ControllerType.allocate(NumControllers + NumOASysSimpControllers);
-                PrimaryAirSystems(AirSysNum).ControllerIndex.allocate(NumControllers + NumOASysSimpControllers);
-                PrimaryAirSystems(AirSysNum).ControllerIndex = 0;
-                PrimaryAirSystems(AirSysNum).ControlConverged.allocate(NumControllers + NumOASysSimpControllers);
-                PrimaryAirSystems(AirSysNum).CanBeLockedOutByEcono.allocate(NumControllers + NumOASysSimpControllers);
+                primaryAirSystems.NumControllers = NumControllers + NumOASysSimpControllers;
+                primaryAirSystems.ControllerName.allocate(NumControllers + NumOASysSimpControllers);
+                primaryAirSystems.ControllerType.allocate(NumControllers + NumOASysSimpControllers);
+                primaryAirSystems.ControllerIndex.allocate(NumControllers + NumOASysSimpControllers);
+                primaryAirSystems.ControllerIndex = 0;
+                primaryAirSystems.ControlConverged.allocate(NumControllers + NumOASysSimpControllers);
+                primaryAirSystems.CanBeLockedOutByEcono.allocate(NumControllers + NumOASysSimpControllers);
                 for (ControllerNum = NumOASysSimpControllers + 1; ControllerNum <= NumOASysSimpControllers + NumControllers; ++ControllerNum) {
                     ControllerName = Alphas((ControllerNum - NumOASysSimpControllers) * 2 + 1);
                     ControllerType = Alphas((ControllerNum - NumOASysSimpControllers) * 2);
-                    PrimaryAirSystems(AirSysNum).ControllerName(ControllerNum) = ControllerName;
-                    PrimaryAirSystems(AirSysNum).ControllerType(ControllerNum) = ControllerType;
+                    primaryAirSystems.ControllerName(ControllerNum) = ControllerName;
+                    primaryAirSystems.ControllerType(ControllerNum) = ControllerType;
                     IsNotOK = false;
                     ValidateComponent(state, ControllerType, ControllerName, IsNotOK, CurrentModuleObject);
                     if (IsNotOK) {
                         ShowContinueError(state,
-                                          std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
+                                          std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name +
                                               "\", for ControllerList=\"" + ControllerListName + "\".");
                         ErrorsFound = true;
                     }
-                    PrimaryAirSystems(AirSysNum).ControlConverged(ControllerNum) = false;
-                    PrimaryAirSystems(AirSysNum).CanBeLockedOutByEcono(ControllerNum) = false;
+                    primaryAirSystems.ControlConverged(ControllerNum) = false;
+                    primaryAirSystems.CanBeLockedOutByEcono(ControllerNum) = false;
                 } // End of ControllerListNum Loop
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name +
-                                    "\", controller list object.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\", controller list object.");
                 ShowContinueError(state, "ControllerList object=\"" + ControllerListName + "\" not found in input.");
                 ErrorsFound = true;
             }
@@ -1074,15 +1064,15 @@ void GetAirPathData(EnergyPlusData &state)
                 state, "AirLoopHVAC:ControllerList", OASysContListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
             // allocate air primary system controller lists if not already done
             if (NumControllers == 0) {
-                PrimaryAirSystems(AirSysNum).NumControllers = NumOASysSimpControllers;
-                PrimaryAirSystems(AirSysNum).ControllerName.allocate(NumOASysSimpControllers);
-                PrimaryAirSystems(AirSysNum).ControllerType.allocate(NumOASysSimpControllers);
-                PrimaryAirSystems(AirSysNum).ControllerIndex.allocate(NumOASysSimpControllers);
-                PrimaryAirSystems(AirSysNum).ControllerIndex = 0;
-                PrimaryAirSystems(AirSysNum).ControlConverged.allocate(NumOASysSimpControllers);
-                PrimaryAirSystems(AirSysNum).CanBeLockedOutByEcono.allocate(NumOASysSimpControllers);
-                PrimaryAirSystems(AirSysNum).ControlConverged = false;
-                PrimaryAirSystems(AirSysNum).CanBeLockedOutByEcono = false;
+                primaryAirSystems.NumControllers = NumOASysSimpControllers;
+                primaryAirSystems.ControllerName.allocate(NumOASysSimpControllers);
+                primaryAirSystems.ControllerType.allocate(NumOASysSimpControllers);
+                primaryAirSystems.ControllerIndex.allocate(NumOASysSimpControllers);
+                primaryAirSystems.ControllerIndex = 0;
+                primaryAirSystems.ControlConverged.allocate(NumOASysSimpControllers);
+                primaryAirSystems.CanBeLockedOutByEcono.allocate(NumOASysSimpControllers);
+                primaryAirSystems.ControlConverged = false;
+                primaryAirSystems.CanBeLockedOutByEcono = false;
             }
             // loop over the OA Sys controllers and move them up to the primary air system controller lists
             OASysControllerNum = 0;
@@ -1092,10 +1082,10 @@ void GetAirPathData(EnergyPlusData &state)
                 ControllerType = Alphas(ControllerNum * 2);
                 if (!UtilityRoutines::SameString(ControllerType, "Controller:OutdoorAir")) {
                     ++OASysControllerNum;
-                    PrimaryAirSystems(AirSysNum).ControllerName(OASysControllerNum) = ControllerName;
-                    PrimaryAirSystems(AirSysNum).ControllerType(OASysControllerNum) = ControllerType;
-                    PrimaryAirSystems(AirSysNum).ControlConverged(OASysControllerNum) = false;
-                    PrimaryAirSystems(AirSysNum).CanBeLockedOutByEcono(OASysControllerNum) = true;
+                    primaryAirSystems.ControllerName(OASysControllerNum) = ControllerName;
+                    primaryAirSystems.ControllerType(OASysControllerNum) = ControllerType;
+                    primaryAirSystems.ControlConverged(OASysControllerNum) = false;
+                    primaryAirSystems.CanBeLockedOutByEcono(OASysControllerNum) = true;
                     GetControllerActuatorNodeNum(state, ControllerName, ActuatorNodeNum, errFlag);
 
                     bool nonLockoutCoilFound = false;
@@ -1116,17 +1106,17 @@ void GetAirPathData(EnergyPlusData &state)
                         //         OA system controller list. The CanBeLockedOutByEcono should only be set for OA coils
                         //         First get the OA controller actuator node and then compare to the air loop coil water inlet node
                         //         If these node numbers match, the coil is in the main air loop and the lockout flag should be reset to FALSE
-                        for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
-                            for (CompNum = 1; CompNum <= PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                if (UtilityRoutines::SameString(PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                        for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
+                                if (UtilityRoutines::SameString(primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                 "AirloopHVAC:OutdoorAirSystem"))
                                     continue;
-                                CompType = PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf;
+                                CompType = primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf;
                                 if (UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry") ||
                                     UtilityRoutines::SameString(CompType, "Coil:Heating:Water") ||
                                     UtilityRoutines::SameString(CompType, "Coil:Cooling:Water")) {
-                                    WaterCoilNodeNum = GetCoilWaterInletNode(
-                                        state, CompType, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, ErrorsFound);
+                                    WaterCoilNodeNum =
+                                        GetCoilWaterInletNode(state, CompType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, ErrorsFound);
                                     if (WaterCoilNodeNum == ActuatorNodeNum) {
                                         nonLockoutCoilFound = true;
                                         break;
@@ -1136,28 +1126,27 @@ void GetAirPathData(EnergyPlusData &state)
                         }
                     }
                     if (nonLockoutCoilFound) {
-                        PrimaryAirSystems(AirSysNum).CanBeLockedOutByEcono(OASysControllerNum) = false;
+                        primaryAirSystems.CanBeLockedOutByEcono(OASysControllerNum) = false;
                     }
                 }
             }
         }
         if (NumControllers + NumOASysSimpControllers == 0) {
             if (!PackagedUnit(AirSysNum)) {
-                ShowWarningError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + PrimaryAirSystems(AirSysNum).Name + "\" has no Controllers.");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + primaryAirSystems.Name + "\" has no Controllers.");
             }
-            PrimaryAirSystems(AirSysNum).NumControllers = 0;
-            PrimaryAirSystems(AirSysNum).ControllerName.allocate(0);
-            PrimaryAirSystems(AirSysNum).ControllerType.allocate(0);
-            PrimaryAirSystems(AirSysNum).ControlConverged.allocate(0);
-            PrimaryAirSystems(AirSysNum).CanBeLockedOutByEcono.allocate(0);
+            primaryAirSystems.NumControllers = 0;
+            primaryAirSystems.ControllerName.allocate(0);
+            primaryAirSystems.ControllerType.allocate(0);
+            primaryAirSystems.ControlConverged.allocate(0);
+            primaryAirSystems.CanBeLockedOutByEcono.allocate(0);
         }
 
         errFlag = false;
         GetAirLoopAvailabilityManager(state, AvailManagerListName, AirSysNum, NumPrimaryAirSys, errFlag);
 
         if (errFlag) {
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PrimaryAirSystems(AirSysNum).Name);
+            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + primaryAirSystems.Name);
             ErrorsFound = true;
         }
 
@@ -1172,169 +1161,157 @@ void GetAirPathData(EnergyPlusData &state)
 
     TestUniqueNodes.deallocate();
     for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
-        for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
-            for (CompNum = 1; CompNum <= PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+        auto &primaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems(AirSysNum);
+        for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
+            for (CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
 
                 {
-                    auto const componentType(uppercased(PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf));
+                    auto const componentType(uppercased(primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf));
 
                     if (componentType == "AIRLOOPHVAC:OUTDOORAIRSYSTEM") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::OAMixer_Num;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::OAMixer_Num;
 
                         // Fan Types for the air sys simulation
                     } else if (componentType == "FAN:CONSTANTVOLUME") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_Simple_CV;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_Simple_CV;
 
                     } else if (componentType == "FAN:VARIABLEVOLUME") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_Simple_VAV;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_Simple_VAV;
 
                     } else if (componentType == "FAN:SYSTEMMODEL") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_System_Object;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_System_Object;
                         // Construct fan object
-                        if (HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
+                        if (HVACFan::getFanObjectVectorIndex(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
                             state.dataHVACFan->fanObjs.emplace_back(
-                                new HVACFan::FanSystem(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
+                                new HVACFan::FanSystem(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name));
                         }
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
-                            HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompIndex =
+                            HVACFan::getFanObjectVectorIndex(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name) +
                             1; // + 1 for shift from zero-based vector to 1-based compIndex
-                        state.dataHVACFan
-                            ->fanObjs[HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
+                        state.dataHVACFan->fanObjs[HVACFan::getFanObjectVectorIndex(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name)]
                             ->AirPathFlag = true;
                     } else if (componentType == "FAN:COMPONENTMODEL") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_ComponentModel;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_ComponentModel;
 
                         // Coil Types for the air sys simulation
                         //        HX Assisted coils are not allowed on a branch at this time
                         //        CASE('COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED')
                         //          PrimaryAirSystem(AirSysNum)%Branch(BranchNum)%Comp(CompNum)%CompType_Num=DXCoil_CoolingHXAsst
                     } else if (componentType == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::WaterCoil_CoolingHXAsst;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::WaterCoil_CoolingHXAsst;
                     } else if (componentType == "COIL:HEATING:WATER") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::WaterCoil_SimpleHeat;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::WaterCoil_SimpleHeat;
                     } else if (componentType == "COIL:HEATING:STEAM") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::SteamCoil_AirHeat;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::SteamCoil_AirHeat;
                     } else if (componentType == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::WaterCoil_DetailedCool;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::WaterCoil_DetailedCool;
                     } else if (componentType == "COIL:COOLING:WATER") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::WaterCoil_Cooling;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::WaterCoil_Cooling;
                     } else if (componentType == "COIL:HEATING:ELECTRIC") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Coil_ElectricHeat;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Coil_ElectricHeat;
                     } else if (componentType == "COIL:HEATING:FUEL") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Coil_GasHeat;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Coil_GasHeat;
 
                         // Heat reclaim
                     } else if (componentType == "COIL:HEATING:DESUPERHEATER") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Coil_DeSuperHeat;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Coil_DeSuperHeat;
 
                     } else if (componentType == "COILSYSTEM:COOLING:DX") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::DXSystem;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::DXSystem;
                     } else if (componentType == "COILSYSTEM:HEATING:DX") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::DXHeatPumpSystem;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::DXHeatPumpSystem;
                     } else if (componentType == "COIL:USERDEFINED") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::CoilUserDefined;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::CoilUserDefined;
                     } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::UnitarySystemModel;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::UnitarySystemModel;
                         UnitarySystems::UnitarySys thisSys;
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
-                            thisSys.factory(state,
-                                            DataHVACGlobals::UnitarySys_AnyCoilType,
-                                            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
-                                            false,
-                                            0);
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer = thisSys.factory(
+                            state, DataHVACGlobals::UnitarySys_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
                     } else if (componentType == "COILSYSTEM:COOLING:WATER") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::CoilSystemWater;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::CoilSystemWater;
                         UnitarySystems::UnitarySys thisSys;
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
-                            thisSys.factory(state,
-                                            DataHVACGlobals::UnitarySys_AnyCoilType,
-                                            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
-                                            false,
-                                            0);
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer = thisSys.factory(
+                            state, DataHVACGlobals::UnitarySys_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatOnly;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatCool;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatCool;
                     } else if (componentType == "AIRLOOPHVAC:UNITARYHEATONLY") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatOnly;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARYHEATCOOL") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatCool;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatCool;
                     } else if (componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatCool;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatCool;
                     } else if (componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatCool;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatCool;
 
                     } else if (componentType == "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::UnitarySystem_BypassVAVSys;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::UnitarySystem_BypassVAVSys;
 
                         // Humidifier Types for the air system simulation
                     } else if (componentType == "HUMIDIFIER:STEAM:ELECTRIC") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Humidifier;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Humidifier;
 
                     } else if (componentType == "HUMIDIFIER:STEAM:GAS") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Humidifier;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Humidifier;
 
                         // Evap Cooler Types for the air system simulation
                     } else if (componentType == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
                     } else if (componentType == "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
                     } else if (componentType == "EVAPORATIVECOOLER:INDIRECT:WETCOIL") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
                     } else if (componentType == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
                     } else if (componentType == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::EvapCooler;
 
                         // Desiccant Dehumidifier Types for the air system simulation
                     } else if (componentType == "DEHUMIDIFIER:DESICCANT:NOFANS") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Desiccant;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Desiccant;
                     } else if (componentType == "DEHUMIDIFIER:DESICCANT:SYSTEM") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Desiccant;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Desiccant;
 
                         // Heat recovery
                     } else if (componentType == "HEATEXCHANGER:AIRTOAIR:FLATPLATE") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::HeatXchngr;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::HeatXchngr;
 
                     } else if (componentType == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::HeatXchngr;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::HeatXchngr;
 
                     } else if (componentType == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::HeatXchngr;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::HeatXchngr;
 
                         // Ducts
                     } else if (componentType == "DUCT") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Duct;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Duct;
 
                     } else if (componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::UnitarySystem_MSHeatPump;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::UnitarySystem_MSHeatPump;
 
                     } else if (componentType == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW") {
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::ZoneVRFasAirLoopEquip;
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::ZoneVRFasAirLoopEquip;
 
                     } else if (componentType == "FAN:ONOFF" || componentType == "COIL:COOLING:DX:SINGLESPEED" ||
                                componentType == "COIL:HEATING:DX:SINGLESPEED" || componentType == "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ||
                                componentType == "COIL:COOLING:DX:MULTISPEED" || componentType == "COIL:HEATING:DX:MULTISPEED") {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + PrimaryAirSystems(AirSysNum).Name + "\".");
-                        ShowContinueError(state,
-                                          "..Invalid Air Loop Component Type = \"" +
-                                              PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf + "\".");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + primaryAirSystems.Name + "\".");
                         ShowContinueError(
-                            state, "..Air Loop Component Name = \"" + PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name + "\".");
-                        ShowContinueError(state, "..reference Branch = \"" + PrimaryAirSystems(AirSysNum).Branch(BranchNum).Name + "\".");
+                            state, "..Invalid Air Loop Component Type = \"" + primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf + "\".");
+                        ShowContinueError(state, "..Air Loop Component Name = \"" + primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name + "\".");
+                        ShowContinueError(state, "..reference Branch = \"" + primaryAirSystems.Branch(BranchNum).Name + "\".");
                         ShowContinueError(state,
                                           "...This component may only be referenced by a parent component such as "
                                           "AirLoopHVAC:Unitary:Furnace:HeatCool or similar.");
                         ErrorsFound = true;
 
                     } else {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + PrimaryAirSystems(AirSysNum).Name + "\".");
-                        ShowContinueError(state,
-                                          "..Invalid Air Loop Component Type = \"" +
-                                              PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf + "\".");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + primaryAirSystems.Name + "\".");
                         ShowContinueError(
-                            state, "..Air Loop Component Name = \"" + PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name + "\".");
-                        ShowContinueError(state, "..reference Branch = \"" + PrimaryAirSystems(AirSysNum).Branch(BranchNum).Name + "\".");
+                            state, "..Invalid Air Loop Component Type = \"" + primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf + "\".");
+                        ShowContinueError(state, "..Air Loop Component Name = \"" + primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name + "\".");
+                        ShowContinueError(state, "..reference Branch = \"" + primaryAirSystems.Branch(BranchNum).Name + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -1345,21 +1322,22 @@ void GetAirPathData(EnergyPlusData &state)
     // check that actuator nodes are matched by a water coil inlet node
 
     for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
-        for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
-            for (CompNum = 1; CompNum <= PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                CompType_Num = PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
+        auto &primaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems(AirSysNum);
+        for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
+            for (CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
+                CompType_Num = primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num;
                 if (CompType_Num == CompType::WaterCoil_DetailedCool || CompType_Num == CompType::WaterCoil_SimpleHeat ||
                     CompType_Num == CompType::WaterCoil_Cooling) {
                     WaterCoilNodeNum = GetCoilWaterInletNode(state,
-                                                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                             primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf,
+                                                             primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name,
                                                              ErrorsFound);
                     CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
                     if (NodeNotFound) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name + "\", invalid actuator.");
+                                            primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name + "\", invalid actuator.");
                         ShowContinueError(state,
                                           "...this coil requires a water coil controller and the inlet node of a water coil must also be an "
                                           "actuator node of a water coil controller.");
@@ -1404,7 +1382,7 @@ void GetAirPathData(EnergyPlusData &state)
                             state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).AvailStatus,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Average,
-                            PrimaryAirSystems(AirSysNum).Name);
+                            state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Name);
     }
 
     if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") > 0) {
@@ -4159,7 +4137,6 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
     auto &NumAirTerminalUnits(state.dataSize->NumAirTerminalUnits);
     auto &SysSizInput(state.dataSize->SysSizInput);
     auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
-    auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
     auto &NumPrimaryAirSys(state.dataHVACGlobal->NumPrimaryAirSys);
     // have moved a large number of std 62.1 variables to DataSizing.hh so they can be used outside of this routine
 
@@ -4206,565 +4183,483 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
     SysSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, NumPrimaryAirSys);
     FinalSysSizing.allocate(NumPrimaryAirSys);
     CalcSysSizing.allocate(NumPrimaryAirSys);
-    SysSizPeakDDNum.allocate(NumPrimaryAirSys);
+    state.dataSize->SysSizPeakDDNum.allocate(NumPrimaryAirSys);
 
     for (int DesDayEnvrnNum = 1; DesDayEnvrnNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayEnvrnNum) {
         for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-
-            SysSizing(DesDayEnvrnNum, AirLoopNum).AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
-            int SysSizNum = UtilityRoutines::FindItemInList(
-                SysSizing(DesDayEnvrnNum, AirLoopNum).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
+            auto &sysSizing = SysSizing(DesDayEnvrnNum, AirLoopNum);
+            sysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
+            int SysSizNum = UtilityRoutines::FindItemInList(sysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum > 0) { // move data from system sizing input
-                SysSizing(DesDayEnvrnNum, AirLoopNum).LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).SysAirMinFlowRatWasAutoSized = SysSizInput(SysSizNum).SysAirMinFlowRatWasAutoSized;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).PreheatTemp = SysSizInput(SysSizNum).PreheatTemp;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).PreheatHumRat = SysSizInput(SysSizNum).PreheatHumRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).PrecoolTemp = SysSizInput(SysSizNum).PrecoolTemp;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).PrecoolHumRat = SysSizInput(SysSizNum).PrecoolHumRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolSupTemp = SysSizInput(SysSizNum).CoolSupTemp;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).HeatSupTemp = SysSizInput(SysSizNum).HeatSupTemp;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolSupHumRat = SysSizInput(SysSizNum).CoolSupHumRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).HeatSupHumRat = SysSizInput(SysSizNum).HeatSupHumRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).SizingOption = SysSizInput(SysSizNum).SizingOption;
+                sysSizing.LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
+                sysSizing.CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
+                sysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
+                sysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
+                sysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
+                sysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(SysSizNum).SysAirMinFlowRatWasAutoSized;
+                sysSizing.PreheatTemp = SysSizInput(SysSizNum).PreheatTemp;
+                sysSizing.PreheatHumRat = SysSizInput(SysSizNum).PreheatHumRat;
+                sysSizing.PrecoolTemp = SysSizInput(SysSizNum).PrecoolTemp;
+                sysSizing.PrecoolHumRat = SysSizInput(SysSizNum).PrecoolHumRat;
+                sysSizing.CoolSupTemp = SysSizInput(SysSizNum).CoolSupTemp;
+                sysSizing.HeatSupTemp = SysSizInput(SysSizNum).HeatSupTemp;
+                sysSizing.CoolSupHumRat = SysSizInput(SysSizNum).CoolSupHumRat;
+                sysSizing.HeatSupHumRat = SysSizInput(SysSizNum).HeatSupHumRat;
+                sysSizing.SizingOption = SysSizInput(SysSizNum).SizingOption;
                 if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                    SysSizing(DesDayEnvrnNum, AirLoopNum).CoolOAOption = AllOA;
-                    SysSizing(DesDayEnvrnNum, AirLoopNum).HeatOAOption = AllOA;
+                    sysSizing.CoolOAOption = AllOA;
+                    sysSizing.HeatOAOption = AllOA;
                 } else {
-                    SysSizing(DesDayEnvrnNum, AirLoopNum).CoolOAOption = SysSizInput(SysSizNum).CoolOAOption;
-                    SysSizing(DesDayEnvrnNum, AirLoopNum).HeatOAOption = SysSizInput(SysSizNum).HeatOAOption;
+                    sysSizing.CoolOAOption = SysSizInput(SysSizNum).CoolOAOption;
+                    sysSizing.HeatOAOption = SysSizInput(SysSizNum).HeatOAOption;
                 }
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolAirDesMethod = SysSizInput(SysSizNum).CoolAirDesMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).HeatAirDesMethod = SysSizInput(SysSizNum).HeatAirDesMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).ScaleCoolSAFMethod = SysSizInput(SysSizNum).ScaleCoolSAFMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).ScaleHeatSAFMethod = SysSizInput(SysSizNum).ScaleHeatSAFMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolingCapMethod = SysSizInput(SysSizNum).CoolingCapMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).HeatingCapMethod = SysSizInput(SysSizNum).HeatingCapMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
+                sysSizing.CoolAirDesMethod = SysSizInput(SysSizNum).CoolAirDesMethod;
+                sysSizing.HeatAirDesMethod = SysSizInput(SysSizNum).HeatAirDesMethod;
+                sysSizing.ScaleCoolSAFMethod = SysSizInput(SysSizNum).ScaleCoolSAFMethod;
+                sysSizing.ScaleHeatSAFMethod = SysSizInput(SysSizNum).ScaleHeatSAFMethod;
+                sysSizing.CoolingCapMethod = SysSizInput(SysSizNum).CoolingCapMethod;
+                sysSizing.HeatingCapMethod = SysSizInput(SysSizNum).HeatingCapMethod;
+                sysSizing.InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
+                sysSizing.InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
+                sysSizing.MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
+                sysSizing.OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
 
             } else { // Set missing inputs to the first
-                SysSizing(DesDayEnvrnNum, AirLoopNum).LoadSizeType = SysSizInput(1).LoadSizeType;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolingPeakLoadType = SysSizInput(1).CoolingPeakLoadType;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolCapControl = SysSizInput(1).CoolCapControl;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).SysAirMinFlowRatWasAutoSized = SysSizInput(1).SysAirMinFlowRatWasAutoSized;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).PreheatTemp = SysSizInput(1).PreheatTemp;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).PreheatHumRat = SysSizInput(1).PreheatHumRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).PrecoolTemp = SysSizInput(1).PrecoolTemp;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).PrecoolHumRat = SysSizInput(1).PrecoolHumRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolSupTemp = SysSizInput(1).CoolSupTemp;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).HeatSupTemp = SysSizInput(1).HeatSupTemp;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolSupHumRat = SysSizInput(1).CoolSupHumRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).HeatSupHumRat = SysSizInput(1).HeatSupHumRat;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).SizingOption = SysSizInput(1).SizingOption;
+                sysSizing.LoadSizeType = SysSizInput(1).LoadSizeType;
+                sysSizing.CoolingPeakLoadType = SysSizInput(1).CoolingPeakLoadType;
+                sysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
+                sysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
+                sysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
+                sysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(1).SysAirMinFlowRatWasAutoSized;
+                sysSizing.PreheatTemp = SysSizInput(1).PreheatTemp;
+                sysSizing.PreheatHumRat = SysSizInput(1).PreheatHumRat;
+                sysSizing.PrecoolTemp = SysSizInput(1).PrecoolTemp;
+                sysSizing.PrecoolHumRat = SysSizInput(1).PrecoolHumRat;
+                sysSizing.CoolSupTemp = SysSizInput(1).CoolSupTemp;
+                sysSizing.HeatSupTemp = SysSizInput(1).HeatSupTemp;
+                sysSizing.CoolSupHumRat = SysSizInput(1).CoolSupHumRat;
+                sysSizing.HeatSupHumRat = SysSizInput(1).HeatSupHumRat;
+                sysSizing.SizingOption = SysSizInput(1).SizingOption;
                 if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                    SysSizing(DesDayEnvrnNum, AirLoopNum).CoolOAOption = AllOA;
-                    SysSizing(DesDayEnvrnNum, AirLoopNum).HeatOAOption = AllOA;
+                    sysSizing.CoolOAOption = AllOA;
+                    sysSizing.HeatOAOption = AllOA;
                 } else {
-                    SysSizing(DesDayEnvrnNum, AirLoopNum).CoolOAOption = SysSizInput(1).CoolOAOption;
-                    SysSizing(DesDayEnvrnNum, AirLoopNum).HeatOAOption = SysSizInput(1).HeatOAOption;
+                    sysSizing.CoolOAOption = SysSizInput(1).CoolOAOption;
+                    sysSizing.HeatOAOption = SysSizInput(1).HeatOAOption;
                 }
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolAirDesMethod = SysSizInput(1).CoolAirDesMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).HeatAirDesMethod = SysSizInput(1).HeatAirDesMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).ScaleCoolSAFMethod = SysSizInput(1).ScaleCoolSAFMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).ScaleHeatSAFMethod = SysSizInput(1).ScaleHeatSAFMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).CoolingCapMethod = SysSizInput(1).CoolingCapMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).HeatingCapMethod = SysSizInput(1).HeatingCapMethod;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
-                SysSizing(DesDayEnvrnNum, AirLoopNum).OAAutoSized = SysSizInput(1).OAAutoSized;
+                sysSizing.CoolAirDesMethod = SysSizInput(1).CoolAirDesMethod;
+                sysSizing.HeatAirDesMethod = SysSizInput(1).HeatAirDesMethod;
+                sysSizing.ScaleCoolSAFMethod = SysSizInput(1).ScaleCoolSAFMethod;
+                sysSizing.ScaleHeatSAFMethod = SysSizInput(1).ScaleHeatSAFMethod;
+                sysSizing.CoolingCapMethod = SysSizInput(1).CoolingCapMethod;
+                sysSizing.HeatingCapMethod = SysSizInput(1).HeatingCapMethod;
+                sysSizing.InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
+                sysSizing.InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
+                sysSizing.MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
+                sysSizing.OAAutoSized = SysSizInput(1).OAAutoSized;
             }
-            SysSizing(DesDayEnvrnNum, AirLoopNum).HeatFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SumZoneHeatLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).CoolFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SumZoneCoolLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).CoolZoneAvgTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).HeatZoneAvgTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SensCoolCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).TotCoolCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).HeatCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).PreheatCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysCoolRetTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysCoolRetHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysHeatRetTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysHeatRetHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysCoolOutTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysCoolOutHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysHeatOutTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysHeatOutHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysDOASHeatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-            SysSizing(DesDayEnvrnNum, AirLoopNum).SysDOASLatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.HeatFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SumZoneHeatLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.CoolFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SumZoneCoolLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.CoolZoneAvgTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.HeatZoneAvgTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SensCoolCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.TotCoolCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.HeatCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.PreheatCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysCoolRetTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysCoolRetHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysHeatRetTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysHeatRetHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysCoolOutTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysCoolOutHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysHeatOutTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysHeatOutHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysDOASHeatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+            sysSizing.SysDOASLatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
         } // end the primary air system loop
     }
 
     for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
 
-        FinalSysSizing(AirLoopNum).AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
-        CalcSysSizing(AirLoopNum).AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
-        int SysSizNum =
-            UtilityRoutines::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        auto &finalSysSizing = FinalSysSizing(AirLoopNum);
+        auto &calcSysSizing = CalcSysSizing(AirLoopNum);
+        finalSysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
+        calcSysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
+        int SysSizNum = UtilityRoutines::FindItemInList(finalSysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum > 0) { // move data from system sizing input
-            FinalSysSizing(AirLoopNum).LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
-            FinalSysSizing(AirLoopNum).CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
-            FinalSysSizing(AirLoopNum).CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
-            FinalSysSizing(AirLoopNum).DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
-            FinalSysSizing(AirLoopNum).SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
-            FinalSysSizing(AirLoopNum).SysAirMinFlowRatWasAutoSized = SysSizInput(SysSizNum).SysAirMinFlowRatWasAutoSized;
-            FinalSysSizing(AirLoopNum).PreheatTemp = SysSizInput(SysSizNum).PreheatTemp;
-            FinalSysSizing(AirLoopNum).PreheatHumRat = SysSizInput(SysSizNum).PreheatHumRat;
-            FinalSysSizing(AirLoopNum).PrecoolTemp = SysSizInput(SysSizNum).PrecoolTemp;
-            FinalSysSizing(AirLoopNum).PrecoolHumRat = SysSizInput(SysSizNum).PrecoolHumRat;
-            FinalSysSizing(AirLoopNum).CoolSupTemp = SysSizInput(SysSizNum).CoolSupTemp;
-            FinalSysSizing(AirLoopNum).HeatSupTemp = SysSizInput(SysSizNum).HeatSupTemp;
-            FinalSysSizing(AirLoopNum).CoolSupHumRat = SysSizInput(SysSizNum).CoolSupHumRat;
-            FinalSysSizing(AirLoopNum).HeatSupHumRat = SysSizInput(SysSizNum).HeatSupHumRat;
-            FinalSysSizing(AirLoopNum).SizingOption = SysSizInput(SysSizNum).SizingOption;
+            finalSysSizing.LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
+            finalSysSizing.CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
+            finalSysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
+            finalSysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
+            finalSysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
+            finalSysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(SysSizNum).SysAirMinFlowRatWasAutoSized;
+            finalSysSizing.PreheatTemp = SysSizInput(SysSizNum).PreheatTemp;
+            finalSysSizing.PreheatHumRat = SysSizInput(SysSizNum).PreheatHumRat;
+            finalSysSizing.PrecoolTemp = SysSizInput(SysSizNum).PrecoolTemp;
+            finalSysSizing.PrecoolHumRat = SysSizInput(SysSizNum).PrecoolHumRat;
+            finalSysSizing.CoolSupTemp = SysSizInput(SysSizNum).CoolSupTemp;
+            finalSysSizing.HeatSupTemp = SysSizInput(SysSizNum).HeatSupTemp;
+            finalSysSizing.CoolSupHumRat = SysSizInput(SysSizNum).CoolSupHumRat;
+            finalSysSizing.HeatSupHumRat = SysSizInput(SysSizNum).HeatSupHumRat;
+            finalSysSizing.SizingOption = SysSizInput(SysSizNum).SizingOption;
             if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                FinalSysSizing(AirLoopNum).CoolOAOption = AllOA;
-                FinalSysSizing(AirLoopNum).HeatOAOption = AllOA;
+                finalSysSizing.CoolOAOption = AllOA;
+                finalSysSizing.HeatOAOption = AllOA;
             } else {
-                FinalSysSizing(AirLoopNum).CoolOAOption = SysSizInput(SysSizNum).CoolOAOption;
-                FinalSysSizing(AirLoopNum).HeatOAOption = SysSizInput(SysSizNum).HeatOAOption;
+                finalSysSizing.CoolOAOption = SysSizInput(SysSizNum).CoolOAOption;
+                finalSysSizing.HeatOAOption = SysSizInput(SysSizNum).HeatOAOption;
             }
-            FinalSysSizing(AirLoopNum).CoolAirDesMethod = SysSizInput(SysSizNum).CoolAirDesMethod;
-            FinalSysSizing(AirLoopNum).HeatAirDesMethod = SysSizInput(SysSizNum).HeatAirDesMethod;
-            FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = SysSizInput(SysSizNum).ScaleCoolSAFMethod;
-            FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = SysSizInput(SysSizNum).ScaleHeatSAFMethod;
-            FinalSysSizing(AirLoopNum).CoolingCapMethod = SysSizInput(SysSizNum).CoolingCapMethod;
-            FinalSysSizing(AirLoopNum).HeatingCapMethod = SysSizInput(SysSizNum).HeatingCapMethod;
+            finalSysSizing.CoolAirDesMethod = SysSizInput(SysSizNum).CoolAirDesMethod;
+            finalSysSizing.HeatAirDesMethod = SysSizInput(SysSizNum).HeatAirDesMethod;
+            finalSysSizing.ScaleCoolSAFMethod = SysSizInput(SysSizNum).ScaleCoolSAFMethod;
+            finalSysSizing.ScaleHeatSAFMethod = SysSizInput(SysSizNum).ScaleHeatSAFMethod;
+            finalSysSizing.CoolingCapMethod = SysSizInput(SysSizNum).CoolingCapMethod;
+            finalSysSizing.HeatingCapMethod = SysSizInput(SysSizNum).HeatingCapMethod;
 
-            FinalSysSizing(AirLoopNum).ScaledCoolingCapacity = SysSizInput(SysSizNum).ScaledCoolingCapacity;
-            FinalSysSizing(AirLoopNum).ScaledHeatingCapacity = SysSizInput(SysSizNum).ScaledHeatingCapacity;
+            finalSysSizing.ScaledCoolingCapacity = SysSizInput(SysSizNum).ScaledCoolingCapacity;
+            finalSysSizing.ScaledHeatingCapacity = SysSizInput(SysSizNum).ScaledHeatingCapacity;
 
-            FinalSysSizing(AirLoopNum).InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
-            FinalSysSizing(AirLoopNum).InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
-            FinalSysSizing(AirLoopNum).SystemOAMethod = SysSizInput(SysSizNum).SystemOAMethod;
-            FinalSysSizing(AirLoopNum).MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
-            FinalSysSizing(AirLoopNum).OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
+            finalSysSizing.InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
+            finalSysSizing.InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
+            finalSysSizing.SystemOAMethod = SysSizInput(SysSizNum).SystemOAMethod;
+            finalSysSizing.MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
+            finalSysSizing.OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
 
-            FinalSysSizing(AirLoopNum).FlowPerFloorAreaCooled = SysSizInput(SysSizNum).FlowPerFloorAreaCooled;
-            FinalSysSizing(AirLoopNum).FlowPerFloorAreaHeated = SysSizInput(SysSizNum).FlowPerFloorAreaHeated;
-            FinalSysSizing(AirLoopNum).FractionOfAutosizedCoolingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedCoolingAirflow;
-            FinalSysSizing(AirLoopNum).FractionOfAutosizedHeatingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedHeatingAirflow;
-            FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = SysSizInput(SysSizNum).FlowPerCoolingCapacity;
-            FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = SysSizInput(SysSizNum).FlowPerHeatingCapacity;
+            finalSysSizing.FlowPerFloorAreaCooled = SysSizInput(SysSizNum).FlowPerFloorAreaCooled;
+            finalSysSizing.FlowPerFloorAreaHeated = SysSizInput(SysSizNum).FlowPerFloorAreaHeated;
+            finalSysSizing.FractionOfAutosizedCoolingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedCoolingAirflow;
+            finalSysSizing.FractionOfAutosizedHeatingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedHeatingAirflow;
+            finalSysSizing.FlowPerCoolingCapacity = SysSizInput(SysSizNum).FlowPerCoolingCapacity;
+            finalSysSizing.FlowPerHeatingCapacity = SysSizInput(SysSizNum).FlowPerHeatingCapacity;
 
-            CalcSysSizing(AirLoopNum).LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
-            CalcSysSizing(AirLoopNum).CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
-            CalcSysSizing(AirLoopNum).CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
-            CalcSysSizing(AirLoopNum).DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
-            CalcSysSizing(AirLoopNum).SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
-            CalcSysSizing(AirLoopNum).SysAirMinFlowRatWasAutoSized = SysSizInput(SysSizNum).SysAirMinFlowRatWasAutoSized;
-            CalcSysSizing(AirLoopNum).PreheatTemp = SysSizInput(SysSizNum).PreheatTemp;
-            CalcSysSizing(AirLoopNum).PreheatHumRat = SysSizInput(SysSizNum).PreheatHumRat;
-            CalcSysSizing(AirLoopNum).PrecoolTemp = SysSizInput(SysSizNum).PrecoolTemp;
-            CalcSysSizing(AirLoopNum).PrecoolHumRat = SysSizInput(SysSizNum).PrecoolHumRat;
-            CalcSysSizing(AirLoopNum).CoolSupTemp = SysSizInput(SysSizNum).CoolSupTemp;
-            CalcSysSizing(AirLoopNum).HeatSupTemp = SysSizInput(SysSizNum).HeatSupTemp;
-            CalcSysSizing(AirLoopNum).CoolSupHumRat = SysSizInput(SysSizNum).CoolSupHumRat;
-            CalcSysSizing(AirLoopNum).HeatSupHumRat = SysSizInput(SysSizNum).HeatSupHumRat;
-            CalcSysSizing(AirLoopNum).SizingOption = SysSizInput(SysSizNum).SizingOption;
+            calcSysSizing.LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
+            calcSysSizing.CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
+            calcSysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
+            calcSysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
+            calcSysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
+            calcSysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(SysSizNum).SysAirMinFlowRatWasAutoSized;
+            calcSysSizing.PreheatTemp = SysSizInput(SysSizNum).PreheatTemp;
+            calcSysSizing.PreheatHumRat = SysSizInput(SysSizNum).PreheatHumRat;
+            calcSysSizing.PrecoolTemp = SysSizInput(SysSizNum).PrecoolTemp;
+            calcSysSizing.PrecoolHumRat = SysSizInput(SysSizNum).PrecoolHumRat;
+            calcSysSizing.CoolSupTemp = SysSizInput(SysSizNum).CoolSupTemp;
+            calcSysSizing.HeatSupTemp = SysSizInput(SysSizNum).HeatSupTemp;
+            calcSysSizing.CoolSupHumRat = SysSizInput(SysSizNum).CoolSupHumRat;
+            calcSysSizing.HeatSupHumRat = SysSizInput(SysSizNum).HeatSupHumRat;
+            calcSysSizing.SizingOption = SysSizInput(SysSizNum).SizingOption;
             if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                CalcSysSizing(AirLoopNum).CoolOAOption = AllOA;
-                CalcSysSizing(AirLoopNum).HeatOAOption = AllOA;
+                calcSysSizing.CoolOAOption = AllOA;
+                calcSysSizing.HeatOAOption = AllOA;
             } else {
-                CalcSysSizing(AirLoopNum).CoolOAOption = SysSizInput(SysSizNum).CoolOAOption;
-                CalcSysSizing(AirLoopNum).HeatOAOption = SysSizInput(SysSizNum).HeatOAOption;
+                calcSysSizing.CoolOAOption = SysSizInput(SysSizNum).CoolOAOption;
+                calcSysSizing.HeatOAOption = SysSizInput(SysSizNum).HeatOAOption;
             }
-            CalcSysSizing(AirLoopNum).CoolAirDesMethod = SysSizInput(SysSizNum).CoolAirDesMethod;
-            CalcSysSizing(AirLoopNum).HeatAirDesMethod = SysSizInput(SysSizNum).HeatAirDesMethod;
-            CalcSysSizing(AirLoopNum).ScaleCoolSAFMethod = SysSizInput(SysSizNum).ScaleCoolSAFMethod;
-            CalcSysSizing(AirLoopNum).ScaleHeatSAFMethod = SysSizInput(SysSizNum).ScaleHeatSAFMethod;
-            CalcSysSizing(AirLoopNum).CoolingCapMethod = SysSizInput(SysSizNum).CoolingCapMethod;
-            CalcSysSizing(AirLoopNum).HeatingCapMethod = SysSizInput(SysSizNum).HeatingCapMethod;
-            CalcSysSizing(AirLoopNum).ScaledCoolingCapacity = SysSizInput(SysSizNum).ScaledCoolingCapacity;
-            CalcSysSizing(AirLoopNum).ScaledHeatingCapacity = SysSizInput(SysSizNum).ScaledHeatingCapacity;
+            calcSysSizing.CoolAirDesMethod = SysSizInput(SysSizNum).CoolAirDesMethod;
+            calcSysSizing.HeatAirDesMethod = SysSizInput(SysSizNum).HeatAirDesMethod;
+            calcSysSizing.ScaleCoolSAFMethod = SysSizInput(SysSizNum).ScaleCoolSAFMethod;
+            calcSysSizing.ScaleHeatSAFMethod = SysSizInput(SysSizNum).ScaleHeatSAFMethod;
+            calcSysSizing.CoolingCapMethod = SysSizInput(SysSizNum).CoolingCapMethod;
+            calcSysSizing.HeatingCapMethod = SysSizInput(SysSizNum).HeatingCapMethod;
+            calcSysSizing.ScaledCoolingCapacity = SysSizInput(SysSizNum).ScaledCoolingCapacity;
+            calcSysSizing.ScaledHeatingCapacity = SysSizInput(SysSizNum).ScaledHeatingCapacity;
 
-            CalcSysSizing(AirLoopNum).InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
-            CalcSysSizing(AirLoopNum).InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
-            CalcSysSizing(AirLoopNum).SystemOAMethod = SysSizInput(SysSizNum).SystemOAMethod;
-            CalcSysSizing(AirLoopNum).MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
-            CalcSysSizing(AirLoopNum).OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
-            CalcSysSizing(AirLoopNum).FlowPerFloorAreaCooled = SysSizInput(SysSizNum).FlowPerFloorAreaCooled;
-            CalcSysSizing(AirLoopNum).FlowPerFloorAreaHeated = SysSizInput(SysSizNum).FlowPerFloorAreaHeated;
-            CalcSysSizing(AirLoopNum).FractionOfAutosizedCoolingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedCoolingAirflow;
-            CalcSysSizing(AirLoopNum).FractionOfAutosizedHeatingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedHeatingAirflow;
-            CalcSysSizing(AirLoopNum).FlowPerCoolingCapacity = SysSizInput(SysSizNum).FlowPerCoolingCapacity;
-            CalcSysSizing(AirLoopNum).FlowPerHeatingCapacity = SysSizInput(SysSizNum).FlowPerHeatingCapacity;
+            calcSysSizing.InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
+            calcSysSizing.InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
+            calcSysSizing.SystemOAMethod = SysSizInput(SysSizNum).SystemOAMethod;
+            calcSysSizing.MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
+            calcSysSizing.OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
+            calcSysSizing.FlowPerFloorAreaCooled = SysSizInput(SysSizNum).FlowPerFloorAreaCooled;
+            calcSysSizing.FlowPerFloorAreaHeated = SysSizInput(SysSizNum).FlowPerFloorAreaHeated;
+            calcSysSizing.FractionOfAutosizedCoolingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedCoolingAirflow;
+            calcSysSizing.FractionOfAutosizedHeatingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedHeatingAirflow;
+            calcSysSizing.FlowPerCoolingCapacity = SysSizInput(SysSizNum).FlowPerCoolingCapacity;
+            calcSysSizing.FlowPerHeatingCapacity = SysSizInput(SysSizNum).FlowPerHeatingCapacity;
 
         } else { // Set missing inputs to the first
             ShowWarningError(state,
-                             "SetUpSysSizingArrays: Sizing for System (HVACAirLoop)=\"" + FinalSysSizing(AirLoopNum).AirPriLoopName +
+                             "SetUpSysSizingArrays: Sizing for System (HVACAirLoop)=\"" + finalSysSizing.AirPriLoopName +
                                  "\" will use Sizing:System specifications listed for System=\"" + SysSizInput(1).AirPriLoopName + "\".");
-            FinalSysSizing(AirLoopNum).LoadSizeType = SysSizInput(1).LoadSizeType;
-            FinalSysSizing(AirLoopNum).CoolingPeakLoadType = SysSizInput(1).CoolingPeakLoadType;
-            FinalSysSizing(AirLoopNum).CoolCapControl = SysSizInput(1).CoolCapControl;
-            FinalSysSizing(AirLoopNum).DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
-            FinalSysSizing(AirLoopNum).SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
-            FinalSysSizing(AirLoopNum).SysAirMinFlowRatWasAutoSized = SysSizInput(1).SysAirMinFlowRatWasAutoSized;
-            FinalSysSizing(AirLoopNum).PreheatTemp = SysSizInput(1).PreheatTemp;
-            FinalSysSizing(AirLoopNum).PreheatHumRat = SysSizInput(1).PreheatHumRat;
-            FinalSysSizing(AirLoopNum).PrecoolTemp = SysSizInput(1).PrecoolTemp;
-            FinalSysSizing(AirLoopNum).PrecoolHumRat = SysSizInput(1).PrecoolHumRat;
-            FinalSysSizing(AirLoopNum).CoolSupTemp = SysSizInput(1).CoolSupTemp;
-            FinalSysSizing(AirLoopNum).HeatSupTemp = SysSizInput(1).HeatSupTemp;
-            FinalSysSizing(AirLoopNum).CoolSupHumRat = SysSizInput(1).CoolSupHumRat;
-            FinalSysSizing(AirLoopNum).HeatSupHumRat = SysSizInput(1).HeatSupHumRat;
-            FinalSysSizing(AirLoopNum).SizingOption = SysSizInput(1).SizingOption;
+            finalSysSizing.LoadSizeType = SysSizInput(1).LoadSizeType;
+            finalSysSizing.CoolingPeakLoadType = SysSizInput(1).CoolingPeakLoadType;
+            finalSysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
+            finalSysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
+            finalSysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
+            finalSysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(1).SysAirMinFlowRatWasAutoSized;
+            finalSysSizing.PreheatTemp = SysSizInput(1).PreheatTemp;
+            finalSysSizing.PreheatHumRat = SysSizInput(1).PreheatHumRat;
+            finalSysSizing.PrecoolTemp = SysSizInput(1).PrecoolTemp;
+            finalSysSizing.PrecoolHumRat = SysSizInput(1).PrecoolHumRat;
+            finalSysSizing.CoolSupTemp = SysSizInput(1).CoolSupTemp;
+            finalSysSizing.HeatSupTemp = SysSizInput(1).HeatSupTemp;
+            finalSysSizing.CoolSupHumRat = SysSizInput(1).CoolSupHumRat;
+            finalSysSizing.HeatSupHumRat = SysSizInput(1).HeatSupHumRat;
+            finalSysSizing.SizingOption = SysSizInput(1).SizingOption;
             if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                FinalSysSizing(AirLoopNum).CoolOAOption = AllOA;
-                FinalSysSizing(AirLoopNum).HeatOAOption = AllOA;
+                finalSysSizing.CoolOAOption = AllOA;
+                finalSysSizing.HeatOAOption = AllOA;
             } else {
-                FinalSysSizing(AirLoopNum).CoolOAOption = SysSizInput(1).CoolOAOption;
-                FinalSysSizing(AirLoopNum).HeatOAOption = SysSizInput(1).HeatOAOption;
+                finalSysSizing.CoolOAOption = SysSizInput(1).CoolOAOption;
+                finalSysSizing.HeatOAOption = SysSizInput(1).HeatOAOption;
             }
-            FinalSysSizing(AirLoopNum).CoolAirDesMethod = SysSizInput(1).CoolAirDesMethod;
-            FinalSysSizing(AirLoopNum).HeatAirDesMethod = SysSizInput(1).HeatAirDesMethod;
-            FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod = SysSizInput(1).ScaleCoolSAFMethod;
-            FinalSysSizing(AirLoopNum).ScaleHeatSAFMethod = SysSizInput(1).ScaleHeatSAFMethod;
-            FinalSysSizing(AirLoopNum).CoolingCapMethod = SysSizInput(1).CoolingCapMethod;
-            FinalSysSizing(AirLoopNum).HeatingCapMethod = SysSizInput(1).HeatingCapMethod;
-            FinalSysSizing(AirLoopNum).ScaledCoolingCapacity = SysSizInput(1).ScaledCoolingCapacity;
-            FinalSysSizing(AirLoopNum).ScaledHeatingCapacity = SysSizInput(1).ScaledHeatingCapacity;
+            finalSysSizing.CoolAirDesMethod = SysSizInput(1).CoolAirDesMethod;
+            finalSysSizing.HeatAirDesMethod = SysSizInput(1).HeatAirDesMethod;
+            finalSysSizing.ScaleCoolSAFMethod = SysSizInput(1).ScaleCoolSAFMethod;
+            finalSysSizing.ScaleHeatSAFMethod = SysSizInput(1).ScaleHeatSAFMethod;
+            finalSysSizing.CoolingCapMethod = SysSizInput(1).CoolingCapMethod;
+            finalSysSizing.HeatingCapMethod = SysSizInput(1).HeatingCapMethod;
+            finalSysSizing.ScaledCoolingCapacity = SysSizInput(1).ScaledCoolingCapacity;
+            finalSysSizing.ScaledHeatingCapacity = SysSizInput(1).ScaledHeatingCapacity;
 
-            FinalSysSizing(AirLoopNum).InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
-            FinalSysSizing(AirLoopNum).InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
-            FinalSysSizing(AirLoopNum).SystemOAMethod = SysSizInput(1).SystemOAMethod;
-            FinalSysSizing(AirLoopNum).MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
-            FinalSysSizing(AirLoopNum).OAAutoSized = SysSizInput(1).OAAutoSized;
+            finalSysSizing.InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
+            finalSysSizing.InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
+            finalSysSizing.SystemOAMethod = SysSizInput(1).SystemOAMethod;
+            finalSysSizing.MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
+            finalSysSizing.OAAutoSized = SysSizInput(1).OAAutoSized;
 
-            FinalSysSizing(AirLoopNum).FlowPerFloorAreaCooled = SysSizInput(1).FlowPerFloorAreaCooled;
-            FinalSysSizing(AirLoopNum).FlowPerFloorAreaHeated = SysSizInput(1).FlowPerFloorAreaHeated;
-            FinalSysSizing(AirLoopNum).FractionOfAutosizedCoolingAirflow = SysSizInput(1).FractionOfAutosizedCoolingAirflow;
-            FinalSysSizing(AirLoopNum).FractionOfAutosizedHeatingAirflow = SysSizInput(1).FractionOfAutosizedHeatingAirflow;
-            FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = SysSizInput(1).FlowPerCoolingCapacity;
-            FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
+            finalSysSizing.FlowPerFloorAreaCooled = SysSizInput(1).FlowPerFloorAreaCooled;
+            finalSysSizing.FlowPerFloorAreaHeated = SysSizInput(1).FlowPerFloorAreaHeated;
+            finalSysSizing.FractionOfAutosizedCoolingAirflow = SysSizInput(1).FractionOfAutosizedCoolingAirflow;
+            finalSysSizing.FractionOfAutosizedHeatingAirflow = SysSizInput(1).FractionOfAutosizedHeatingAirflow;
+            finalSysSizing.FlowPerCoolingCapacity = SysSizInput(1).FlowPerCoolingCapacity;
+            finalSysSizing.FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
 
-            CalcSysSizing(AirLoopNum).LoadSizeType = SysSizInput(1).LoadSizeType;
-            CalcSysSizing(AirLoopNum).CoolingPeakLoadType = SysSizInput(1).CoolingPeakLoadType;
-            CalcSysSizing(AirLoopNum).CoolCapControl = SysSizInput(1).CoolCapControl;
-            CalcSysSizing(AirLoopNum).DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
-            CalcSysSizing(AirLoopNum).SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
-            CalcSysSizing(AirLoopNum).SysAirMinFlowRatWasAutoSized = SysSizInput(1).SysAirMinFlowRatWasAutoSized;
-            CalcSysSizing(AirLoopNum).PreheatTemp = SysSizInput(1).PreheatTemp;
-            CalcSysSizing(AirLoopNum).PreheatHumRat = SysSizInput(1).PreheatHumRat;
-            CalcSysSizing(AirLoopNum).PrecoolTemp = SysSizInput(1).PrecoolTemp;
-            CalcSysSizing(AirLoopNum).PrecoolHumRat = SysSizInput(1).PrecoolHumRat;
-            CalcSysSizing(AirLoopNum).CoolSupTemp = SysSizInput(1).CoolSupTemp;
-            CalcSysSizing(AirLoopNum).HeatSupTemp = SysSizInput(1).HeatSupTemp;
-            CalcSysSizing(AirLoopNum).CoolSupHumRat = SysSizInput(1).CoolSupHumRat;
-            CalcSysSizing(AirLoopNum).HeatSupHumRat = SysSizInput(1).HeatSupHumRat;
-            CalcSysSizing(AirLoopNum).SizingOption = SysSizInput(1).SizingOption;
+            calcSysSizing.LoadSizeType = SysSizInput(1).LoadSizeType;
+            calcSysSizing.CoolingPeakLoadType = SysSizInput(1).CoolingPeakLoadType;
+            calcSysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
+            calcSysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
+            calcSysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
+            calcSysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(1).SysAirMinFlowRatWasAutoSized;
+            calcSysSizing.PreheatTemp = SysSizInput(1).PreheatTemp;
+            calcSysSizing.PreheatHumRat = SysSizInput(1).PreheatHumRat;
+            calcSysSizing.PrecoolTemp = SysSizInput(1).PrecoolTemp;
+            calcSysSizing.PrecoolHumRat = SysSizInput(1).PrecoolHumRat;
+            calcSysSizing.CoolSupTemp = SysSizInput(1).CoolSupTemp;
+            calcSysSizing.HeatSupTemp = SysSizInput(1).HeatSupTemp;
+            calcSysSizing.CoolSupHumRat = SysSizInput(1).CoolSupHumRat;
+            calcSysSizing.HeatSupHumRat = SysSizInput(1).HeatSupHumRat;
+            calcSysSizing.SizingOption = SysSizInput(1).SizingOption;
             if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                CalcSysSizing(AirLoopNum).CoolOAOption = AllOA;
-                CalcSysSizing(AirLoopNum).HeatOAOption = AllOA;
+                calcSysSizing.CoolOAOption = AllOA;
+                calcSysSizing.HeatOAOption = AllOA;
             } else {
-                CalcSysSizing(AirLoopNum).CoolOAOption = SysSizInput(1).CoolOAOption;
-                CalcSysSizing(AirLoopNum).HeatOAOption = SysSizInput(1).HeatOAOption;
+                calcSysSizing.CoolOAOption = SysSizInput(1).CoolOAOption;
+                calcSysSizing.HeatOAOption = SysSizInput(1).HeatOAOption;
             }
-            CalcSysSizing(AirLoopNum).CoolAirDesMethod = SysSizInput(1).CoolAirDesMethod;
-            CalcSysSizing(AirLoopNum).HeatAirDesMethod = SysSizInput(1).HeatAirDesMethod;
-            CalcSysSizing(AirLoopNum).ScaleCoolSAFMethod = SysSizInput(1).ScaleCoolSAFMethod;
-            CalcSysSizing(AirLoopNum).ScaleHeatSAFMethod = SysSizInput(1).ScaleHeatSAFMethod;
-            CalcSysSizing(AirLoopNum).CoolingCapMethod = SysSizInput(1).CoolingCapMethod;
-            CalcSysSizing(AirLoopNum).HeatingCapMethod = SysSizInput(1).HeatingCapMethod;
-            CalcSysSizing(AirLoopNum).ScaledCoolingCapacity = SysSizInput(1).ScaledCoolingCapacity;
-            CalcSysSizing(AirLoopNum).ScaledHeatingCapacity = SysSizInput(1).ScaledHeatingCapacity;
-            CalcSysSizing(AirLoopNum).InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
-            CalcSysSizing(AirLoopNum).InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
-            CalcSysSizing(AirLoopNum).SystemOAMethod = SysSizInput(1).SystemOAMethod;
-            CalcSysSizing(AirLoopNum).MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
-            CalcSysSizing(AirLoopNum).OAAutoSized = SysSizInput(1).OAAutoSized;
+            calcSysSizing.CoolAirDesMethod = SysSizInput(1).CoolAirDesMethod;
+            calcSysSizing.HeatAirDesMethod = SysSizInput(1).HeatAirDesMethod;
+            calcSysSizing.ScaleCoolSAFMethod = SysSizInput(1).ScaleCoolSAFMethod;
+            calcSysSizing.ScaleHeatSAFMethod = SysSizInput(1).ScaleHeatSAFMethod;
+            calcSysSizing.CoolingCapMethod = SysSizInput(1).CoolingCapMethod;
+            calcSysSizing.HeatingCapMethod = SysSizInput(1).HeatingCapMethod;
+            calcSysSizing.ScaledCoolingCapacity = SysSizInput(1).ScaledCoolingCapacity;
+            calcSysSizing.ScaledHeatingCapacity = SysSizInput(1).ScaledHeatingCapacity;
+            calcSysSizing.InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
+            calcSysSizing.InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
+            calcSysSizing.SystemOAMethod = SysSizInput(1).SystemOAMethod;
+            calcSysSizing.MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
+            calcSysSizing.OAAutoSized = SysSizInput(1).OAAutoSized;
 
-            CalcSysSizing(AirLoopNum).FlowPerFloorAreaCooled = SysSizInput(1).FlowPerFloorAreaCooled;
-            CalcSysSizing(AirLoopNum).FlowPerFloorAreaHeated = SysSizInput(1).FlowPerFloorAreaHeated;
-            CalcSysSizing(AirLoopNum).FractionOfAutosizedCoolingAirflow = SysSizInput(1).FractionOfAutosizedCoolingAirflow;
-            CalcSysSizing(AirLoopNum).FractionOfAutosizedHeatingAirflow = SysSizInput(1).FractionOfAutosizedHeatingAirflow;
-            CalcSysSizing(AirLoopNum).FlowPerCoolingCapacity = SysSizInput(1).FlowPerCoolingCapacity;
-            CalcSysSizing(AirLoopNum).FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
+            calcSysSizing.FlowPerFloorAreaCooled = SysSizInput(1).FlowPerFloorAreaCooled;
+            calcSysSizing.FlowPerFloorAreaHeated = SysSizInput(1).FlowPerFloorAreaHeated;
+            calcSysSizing.FractionOfAutosizedCoolingAirflow = SysSizInput(1).FractionOfAutosizedCoolingAirflow;
+            calcSysSizing.FractionOfAutosizedHeatingAirflow = SysSizInput(1).FractionOfAutosizedHeatingAirflow;
+            calcSysSizing.FlowPerCoolingCapacity = SysSizInput(1).FlowPerCoolingCapacity;
+            calcSysSizing.FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
         }
-        FinalSysSizing(AirLoopNum).HeatFlowSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SumZoneHeatLoadSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).CoolFlowSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SumZoneCoolLoadSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).CoolZoneAvgTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).HeatZoneAvgTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SensCoolCapSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).TotCoolCapSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).HeatCapSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).PreheatCapSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysCoolRetTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysCoolRetHumRatSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysHeatRetTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysHeatRetHumRatSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysCoolOutTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysCoolOutHumRatSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysHeatOutTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysHeatOutHumRatSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysDOASHeatAddSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).SysDOASLatAddSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        FinalSysSizing(AirLoopNum).HeatFlowSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SumZoneHeatLoadSeq = 0.0;
-        FinalSysSizing(AirLoopNum).CoolFlowSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SumZoneCoolLoadSeq = 0.0;
-        FinalSysSizing(AirLoopNum).CoolZoneAvgTempSeq = 0.0;
-        FinalSysSizing(AirLoopNum).HeatZoneAvgTempSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SensCoolCapSeq = 0.0;
-        FinalSysSizing(AirLoopNum).TotCoolCapSeq = 0.0;
-        FinalSysSizing(AirLoopNum).HeatCapSeq = 0.0;
-        FinalSysSizing(AirLoopNum).PreheatCapSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysCoolRetTempSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysCoolRetHumRatSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysHeatRetTempSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysHeatRetHumRatSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysCoolOutTempSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysCoolOutHumRatSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysHeatOutTempSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysHeatOutHumRatSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysDOASHeatAddSeq = 0.0;
-        FinalSysSizing(AirLoopNum).SysDOASLatAddSeq = 0.0;
-        FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled = 0.0;
-        FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopHeated = 0.0;
-        CalcSysSizing(AirLoopNum).HeatFlowSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SumZoneHeatLoadSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).CoolFlowSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SumZoneCoolLoadSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).CoolZoneAvgTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).HeatZoneAvgTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SensCoolCapSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).TotCoolCapSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).HeatCapSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).PreheatCapSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysCoolRetTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysCoolRetHumRatSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysHeatRetTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysHeatRetHumRatSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysCoolOutTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysCoolOutHumRatSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysHeatOutTempSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysHeatOutHumRatSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysDOASHeatAddSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).SysDOASLatAddSeq.allocate(state.dataSimAirServingZones->NumOfTimeStepInDay);
-        CalcSysSizing(AirLoopNum).HeatFlowSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SumZoneHeatLoadSeq = 0.0;
-        CalcSysSizing(AirLoopNum).CoolFlowSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SumZoneCoolLoadSeq = 0.0;
-        CalcSysSizing(AirLoopNum).CoolZoneAvgTempSeq = 0.0;
-        CalcSysSizing(AirLoopNum).HeatZoneAvgTempSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SensCoolCapSeq = 0.0;
-        CalcSysSizing(AirLoopNum).TotCoolCapSeq = 0.0;
-        CalcSysSizing(AirLoopNum).HeatCapSeq = 0.0;
-        CalcSysSizing(AirLoopNum).PreheatCapSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysCoolRetTempSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysCoolRetHumRatSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysHeatRetTempSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysHeatRetHumRatSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysCoolOutTempSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysCoolOutHumRatSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysHeatOutTempSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysHeatOutHumRatSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysDOASHeatAddSeq = 0.0;
-        CalcSysSizing(AirLoopNum).SysDOASLatAddSeq = 0.0;
-        CalcSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled = 0.0;
-        CalcSysSizing(AirLoopNum).FloorAreaOnAirLoopHeated = 0.0;
+        finalSysSizing.HeatFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SumZoneHeatLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.CoolFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SumZoneCoolLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.CoolZoneAvgTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.HeatZoneAvgTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SensCoolCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.TotCoolCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.HeatCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.PreheatCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysCoolRetTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysCoolRetHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysHeatRetTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysHeatRetHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysCoolOutTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysCoolOutHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysHeatOutTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysHeatOutHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysDOASHeatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.SysDOASLatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        finalSysSizing.FloorAreaOnAirLoopCooled = 0.0;
+        finalSysSizing.FloorAreaOnAirLoopHeated = 0.0;
+        calcSysSizing.HeatFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SumZoneHeatLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.CoolFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SumZoneCoolLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.CoolZoneAvgTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.HeatZoneAvgTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SensCoolCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.TotCoolCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.HeatCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.PreheatCapSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysCoolRetTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysCoolRetHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysHeatRetTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysHeatRetHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysCoolOutTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysCoolOutHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysHeatOutTempSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysHeatOutHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysDOASHeatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.SysDOASLatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
+        calcSysSizing.FloorAreaOnAirLoopCooled = 0.0;
+        calcSysSizing.FloorAreaOnAirLoopHeated = 0.0;
 
-        SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
-        SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
-        SysSizPeakDDNum(AirLoopNum).TimeStepAtCoolFlowPk.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
-        SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
-        SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk = 0;
-        SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk = 0;
-        SysSizPeakDDNum(AirLoopNum).TimeStepAtCoolFlowPk = 0;
-        SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk = 0;
+        auto &sysSizePeakDDNum = state.dataSize->SysSizPeakDDNum(AirLoopNum);
+        sysSizePeakDDNum.TimeStepAtSensCoolPk.dimension(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, 0);
+        sysSizePeakDDNum.TimeStepAtTotCoolPk.dimension(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, 0);
+        sysSizePeakDDNum.TimeStepAtCoolFlowPk.dimension(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, 0);
+        sysSizePeakDDNum.TimeStepAtHeatPk.dimension(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, 0);
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
             SetupEMSInternalVariable(state,
                                      "Intermediate Air System Main Supply Volume Flow Rate",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[m3/s]",
-                                     FinalSysSizing(AirLoopNum).DesMainVolFlow);
+                                     finalSysSizing.DesMainVolFlow);
             SetupEMSActuator(state,
                              "Sizing:System",
-                             FinalSysSizing(AirLoopNum).AirPriLoopName,
+                             finalSysSizing.AirPriLoopName,
                              "Main Supply Volume Flow Rate",
                              "[m3/s]",
-                             FinalSysSizing(AirLoopNum).EMSOverrideDesMainVolFlowOn,
-                             FinalSysSizing(AirLoopNum).EMSValueDesMainVolFlow);
+                             finalSysSizing.EMSOverrideDesMainVolFlowOn,
+                             finalSysSizing.EMSValueDesMainVolFlow);
 
             SetupEMSInternalVariable(state,
                                      "Intermediate Air System Coincident Peak Cooling Mass Flow Rate",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kg/s]",
-                                     FinalSysSizing(AirLoopNum).CoinCoolMassFlow);
+                                     finalSysSizing.CoinCoolMassFlow);
             SetupEMSActuator(state,
                              "Sizing:System",
-                             FinalSysSizing(AirLoopNum).AirPriLoopName,
+                             finalSysSizing.AirPriLoopName,
                              "Main Supply Coincident Peak Cooling Mass Flow Rate",
                              "[kg/s]",
-                             FinalSysSizing(AirLoopNum).EMSOverrideCoinCoolMassFlowOn,
-                             FinalSysSizing(AirLoopNum).EMSValueCoinCoolMassFlow);
+                             finalSysSizing.EMSOverrideCoinCoolMassFlowOn,
+                             finalSysSizing.EMSValueCoinCoolMassFlow);
 
             SetupEMSInternalVariable(state,
                                      "Intermediate Air System Coincident Peak Heating Mass Flow Rate",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kg/s]",
-                                     FinalSysSizing(AirLoopNum).CoinHeatMassFlow);
+                                     finalSysSizing.CoinHeatMassFlow);
             SetupEMSActuator(state,
                              "Sizing:System",
-                             FinalSysSizing(AirLoopNum).AirPriLoopName,
+                             finalSysSizing.AirPriLoopName,
                              "Main Supply Coincident Peak Heating Mass Flow Rate",
                              "[kg/s]",
-                             FinalSysSizing(AirLoopNum).EMSOverrideCoinHeatMassFlowOn,
-                             FinalSysSizing(AirLoopNum).EMSValueCoinHeatMassFlow);
+                             finalSysSizing.EMSOverrideCoinHeatMassFlowOn,
+                             finalSysSizing.EMSValueCoinHeatMassFlow);
 
             SetupEMSInternalVariable(state,
                                      "Intermediate Air System Noncoincident Peak Cooling Mass Flow Rate",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kg/s]",
-                                     FinalSysSizing(AirLoopNum).NonCoinCoolMassFlow);
+                                     finalSysSizing.NonCoinCoolMassFlow);
             SetupEMSActuator(state,
                              "Sizing:System",
-                             FinalSysSizing(AirLoopNum).AirPriLoopName,
+                             finalSysSizing.AirPriLoopName,
                              "Main Supply Noncoincident Peak Cooling Mass Flow Rate",
                              "[kg/s]",
-                             FinalSysSizing(AirLoopNum).EMSOverrideNonCoinCoolMassFlowOn,
-                             FinalSysSizing(AirLoopNum).EMSValueNonCoinCoolMassFlow);
+                             finalSysSizing.EMSOverrideNonCoinCoolMassFlowOn,
+                             finalSysSizing.EMSValueNonCoinCoolMassFlow);
             SetupEMSInternalVariable(state,
                                      "Intermediate Air System Noncoincident Peak Heating Mass Flow Rate",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kg/s]",
-                                     FinalSysSizing(AirLoopNum).NonCoinHeatMassFlow);
+                                     finalSysSizing.NonCoinHeatMassFlow);
             SetupEMSActuator(state,
                              "Sizing:System",
-                             FinalSysSizing(AirLoopNum).AirPriLoopName,
+                             finalSysSizing.AirPriLoopName,
                              "Main Supply Noncoincident Peak Heating Mass Flow Rate",
                              "[kg/s]",
-                             FinalSysSizing(AirLoopNum).EMSOverrideNonCoinHeatMassFlowOn,
-                             FinalSysSizing(AirLoopNum).EMSValueNonCoinHeatMassFlow);
+                             finalSysSizing.EMSOverrideNonCoinHeatMassFlowOn,
+                             finalSysSizing.EMSValueNonCoinHeatMassFlow);
 
-            SetupEMSInternalVariable(state,
-                                     "Intermediate Air System Heating Volume Flow Rate",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[m3/s]",
-                                     FinalSysSizing(AirLoopNum).DesHeatVolFlow);
+            SetupEMSInternalVariable(
+                state, "Intermediate Air System Heating Volume Flow Rate", finalSysSizing.AirPriLoopName, "[m3/s]", finalSysSizing.DesHeatVolFlow);
             SetupEMSActuator(state,
                              "Sizing:System",
-                             FinalSysSizing(AirLoopNum).AirPriLoopName,
+                             finalSysSizing.AirPriLoopName,
                              "Main Heating Volume Flow Rate",
                              "[m3/s]",
-                             FinalSysSizing(AirLoopNum).EMSOverrideDesHeatVolFlowOn,
-                             FinalSysSizing(AirLoopNum).EMSValueDesHeatVolFlow);
+                             finalSysSizing.EMSOverrideDesHeatVolFlowOn,
+                             finalSysSizing.EMSValueDesHeatVolFlow);
 
-            SetupEMSInternalVariable(state,
-                                     "Intermediate Air System Cooling Volume Flow Rate",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[m3/s]",
-                                     FinalSysSizing(AirLoopNum).DesCoolVolFlow);
+            SetupEMSInternalVariable(
+                state, "Intermediate Air System Cooling Volume Flow Rate", finalSysSizing.AirPriLoopName, "[m3/s]", finalSysSizing.DesCoolVolFlow);
             SetupEMSActuator(state,
                              "Sizing:System",
-                             FinalSysSizing(AirLoopNum).AirPriLoopName,
+                             finalSysSizing.AirPriLoopName,
                              "Main Cooling Volume Flow Rate",
                              "[m3/s]",
-                             FinalSysSizing(AirLoopNum).EMSOverrideDesCoolVolFlowOn,
-                             FinalSysSizing(AirLoopNum).EMSValueDesCoolVolFlow);
+                             finalSysSizing.EMSOverrideDesCoolVolFlowOn,
+                             finalSysSizing.EMSValueDesCoolVolFlow);
             // internal variables useful for sizing air system component models
-            SetupEMSInternalVariable(state,
-                                     "Air System Cooling Design Sensible Capacity",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[W]",
-                                     FinalSysSizing(AirLoopNum).SensCoolCap);
-            SetupEMSInternalVariable(state,
-                                     "Air System Cooling Design Total Capacity",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[W]",
-                                     FinalSysSizing(AirLoopNum).TotCoolCap);
-            SetupEMSInternalVariable(state,
-                                     "Air System Heating Design Sensible Capacity",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[W]",
-                                     FinalSysSizing(AirLoopNum).HeatCap);
-            SetupEMSInternalVariable(state,
-                                     "Air System Preheating Design Sensible Capacity",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[W]",
-                                     FinalSysSizing(AirLoopNum).PreheatCap);
+            SetupEMSInternalVariable(
+                state, "Air System Cooling Design Sensible Capacity", finalSysSizing.AirPriLoopName, "[W]", finalSysSizing.SensCoolCap);
+            SetupEMSInternalVariable(
+                state, "Air System Cooling Design Total Capacity", finalSysSizing.AirPriLoopName, "[W]", finalSysSizing.TotCoolCap);
+            SetupEMSInternalVariable(
+                state, "Air System Heating Design Sensible Capacity", finalSysSizing.AirPriLoopName, "[W]", finalSysSizing.HeatCap);
+            SetupEMSInternalVariable(
+                state, "Air System Preheating Design Sensible Capacity", finalSysSizing.AirPriLoopName, "[W]", finalSysSizing.PreheatCap);
 
-            SetupEMSInternalVariable(state,
-                                     "Air System Outdoor Air Design Volume Flow Rate",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[m3/s]",
-                                     FinalSysSizing(AirLoopNum).DesOutAirVolFlow);
+            SetupEMSInternalVariable(
+                state, "Air System Outdoor Air Design Volume Flow Rate", finalSysSizing.AirPriLoopName, "[m3/s]", finalSysSizing.DesOutAirVolFlow);
 
-            SetupEMSInternalVariable(state,
-                                     "Air System Cooling Design Mixed Air Temperature",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[C]",
-                                     FinalSysSizing(AirLoopNum).MixTempAtCoolPeak);
+            SetupEMSInternalVariable(
+                state, "Air System Cooling Design Mixed Air Temperature", finalSysSizing.AirPriLoopName, "[C]", finalSysSizing.MixTempAtCoolPeak);
             SetupEMSInternalVariable(state,
                                      "Air System Cooling Design Mixed Air Humidity Ratio",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kgWater/kgDryAir]",
-                                     FinalSysSizing(AirLoopNum).MixHumRatAtCoolPeak);
-            SetupEMSInternalVariable(state,
-                                     "Air System Cooling Design Return Air Temperature",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[C]",
-                                     FinalSysSizing(AirLoopNum).RetTempAtCoolPeak);
+                                     finalSysSizing.MixHumRatAtCoolPeak);
+            SetupEMSInternalVariable(
+                state, "Air System Cooling Design Return Air Temperature", finalSysSizing.AirPriLoopName, "[C]", finalSysSizing.RetTempAtCoolPeak);
             SetupEMSInternalVariable(state,
                                      "Air System Cooling Design Return Air Humidity Ratio",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kgWater/kgDryAir]",
-                                     FinalSysSizing(AirLoopNum).RetHumRatAtCoolPeak);
-            SetupEMSInternalVariable(state,
-                                     "Air System Cooling Design Outdoor Air Temperature",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[C]",
-                                     FinalSysSizing(AirLoopNum).OutTempAtCoolPeak);
+                                     finalSysSizing.RetHumRatAtCoolPeak);
+            SetupEMSInternalVariable(
+                state, "Air System Cooling Design Outdoor Air Temperature", finalSysSizing.AirPriLoopName, "[C]", finalSysSizing.OutTempAtCoolPeak);
             SetupEMSInternalVariable(state,
                                      "Air System Cooling Design Outdoor Air Humidity Ratio",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kgWater/kgDryAir]",
-                                     FinalSysSizing(AirLoopNum).OutHumRatAtCoolPeak);
+                                     finalSysSizing.OutHumRatAtCoolPeak);
 
-            SetupEMSInternalVariable(state,
-                                     "Air System Heating Design Mixed Air Temperature",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[C]",
-                                     FinalSysSizing(AirLoopNum).HeatMixTemp);
+            SetupEMSInternalVariable(
+                state, "Air System Heating Design Mixed Air Temperature", finalSysSizing.AirPriLoopName, "[C]", finalSysSizing.HeatMixTemp);
             SetupEMSInternalVariable(state,
                                      "Air System Heating Design Mixed Air Humidity Ratio",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kgWater/kgDryAir]",
-                                     FinalSysSizing(AirLoopNum).HeatMixHumRat);
-            SetupEMSInternalVariable(state,
-                                     "Air System Heating Design Return Air Temperature",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[C]",
-                                     FinalSysSizing(AirLoopNum).HeatRetTemp);
+                                     finalSysSizing.HeatMixHumRat);
+            SetupEMSInternalVariable(
+                state, "Air System Heating Design Return Air Temperature", finalSysSizing.AirPriLoopName, "[C]", finalSysSizing.HeatRetTemp);
             SetupEMSInternalVariable(state,
                                      "Air System Heating Design Return Air Humidity Ratio",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kgWater/kgDryAir]",
-                                     FinalSysSizing(AirLoopNum).HeatRetHumRat);
-            SetupEMSInternalVariable(state,
-                                     "Air System Heating Design Outdoor Air Temperature",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                     "[C]",
-                                     FinalSysSizing(AirLoopNum).HeatOutTemp);
+                                     finalSysSizing.HeatRetHumRat);
+            SetupEMSInternalVariable(
+                state, "Air System Heating Design Outdoor Air Temperature", finalSysSizing.AirPriLoopName, "[C]", finalSysSizing.HeatOutTemp);
             SetupEMSInternalVariable(state,
                                      "Air System Heating Design Outdoor Air Humidity Ratio",
-                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                     finalSysSizing.AirPriLoopName,
                                      "[kgWater/kgDryAir]",
-                                     FinalSysSizing(AirLoopNum).HeatOutHumRat);
+                                     finalSysSizing.HeatOutHumRat);
         }
 
     } // end the primary air system loop
@@ -4785,103 +4680,94 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
     Real64 SysOAUnc;                 // uncorrected system OA summing up people and area based OA for all zones for VRP
     Real64 ZoneOAUnc;                // uncorrected zone OA summing up people and area based OA for each zone
 
-    auto &CalcSysSizing(state.dataSize->CalcSysSizing);
-    auto &TermUnitSizing(state.dataSize->TermUnitSizing);
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &TermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing);
-    auto &SysSizInput(state.dataSize->SysSizInput);
-    auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
-
     // begin system OA calcs, this is the first pass, std 62.1 calcs are redone after adjustments and zone units are set up
-
     // call refactored routine for Pz, Ps and D
     SizingManager::DetermineSystemPopulationDiversity(state);
 
     // If the system design minimum outside air flow rate is autosized, calculate it from the zone data
     // Note that all TermUnitFinalZoneSizing values have already been scaled by air terminal sizing factors
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+        auto &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
+        auto &airToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum);
         MinOAFlow = 0.0;
         SysOAUnc = 0.0;
         ClgSupplyAirAdjustFactor = 1.0;
         HtgSupplyAirAdjustFactor = 1.0;
         int SysSizNum =
-            UtilityRoutines::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
+            UtilityRoutines::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
-        if (FinalSysSizing(AirLoopNum).OAAutoSized) {
-            int NumZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+        if (finalSysSizing.OAAutoSized) {
+            int NumZonesCooled = airToZoneNodeInfo.NumZonesCooled;
 
             // people related code removed, see SizingManager::DetermineSystemPopulationDiversity
 
             for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) {
-                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                int TermUnitSizingIndex = airToZoneNodeInfo.TermUnitCoolSizingIndex(ZonesCooledNum);
                 if (TermUnitSizingIndex == 0) {
                     ShowSevereError(state,
-                                    "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + AirToZoneNodeInfo(AirLoopNum).AirLoopName +
-                                        ", Zone =" + state.dataHeatBal->Zone(AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledNum)).Name);
+                                    "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + airToZoneNodeInfo.AirLoopName +
+                                        ", Zone =" + state.dataHeatBal->Zone(airToZoneNodeInfo.CoolCtrlZoneNums(ZonesCooledNum)).Name);
                     ShowFatalError(state, "This is a defect. Please report this issue.");
                 }
+                auto &termUnitSizing = state.dataSize->TermUnitSizing(TermUnitSizingIndex);
+                auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex);
                 if (SysSizNum > 0) {
-                    ZoneOAUnc = TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople +
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex)
-                                    .TotalOAFromArea; // should not have diversity at this point (no should have diversity in Vou if VRP)
-                    if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) { // ZoneSum Method
+                    ZoneOAUnc =
+                        termUnitFinalZoneSizing.TotalOAFromPeople +
+                        termUnitFinalZoneSizing.TotalOAFromArea; // should not have diversity at this point (no should have diversity in Vou if VRP)
+                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) { // ZoneSum Method
                         SysOAUnc += ZoneOAUnc;
-                    } else if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP ||
-                               SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // Ventilation Rate Procedure
-                        SysOAUnc += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople * state.dataSize->DBySys(AirLoopNum) +
-                                    TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // apply D to people term
+                    } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP ||
+                               state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // Ventilation Rate Procedure
+                        SysOAUnc += termUnitFinalZoneSizing.TotalOAFromPeople * state.dataSize->DBySys(AirLoopNum) +
+                                    termUnitFinalZoneSizing.TotalOAFromArea; // apply D to people term
                     }
-                    state.dataSize->SumRpxPzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople;
-                    state.dataSize->SumRaxAzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
+                    state.dataSize->SumRpxPzBySys(AirLoopNum) += termUnitFinalZoneSizing.TotalOAFromPeople;
+                    state.dataSize->SumRaxAzBySys(AirLoopNum) += termUnitFinalZoneSizing.TotalOAFromArea;
 
                     // save for Standard 62 tabular report
                     state.dataSize->VbzByZone(TermUnitSizingIndex) = ZoneOAUnc; // fixed now, previously RHS already had Ez factored in.
                     // Save Std 62.1 cooling ventilation required by zone
-                    if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling > 0.0) {
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone =
-                            ZoneOAUnc / TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
+                    if (termUnitFinalZoneSizing.ZoneADEffCooling > 0.0) {
+                        termUnitFinalZoneSizing.VozClgByZone = ZoneOAUnc / termUnitFinalZoneSizing.ZoneADEffCooling;
                     } else {
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone = ZoneOAUnc;
+                        termUnitFinalZoneSizing.VozClgByZone = ZoneOAUnc;
                     }
 
-                    if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) { // ZoneSum Method
-                        MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA;
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow > 0.0) {
-                            ZoneOAFracCooling = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone /
-                                                TermUnitFinalZoneSizing(TermUnitSizingIndex)
-                                                    .DesCoolVolFlow; // calculate anyway for use with zone OA max fraction below
+                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) { // ZoneSum Method
+                        MinOAFlow += termUnitFinalZoneSizing.MinOA;
+                        if (termUnitFinalZoneSizing.DesCoolVolFlow > 0.0) {
+                            ZoneOAFracCooling = termUnitFinalZoneSizing.VozClgByZone /
+                                                termUnitFinalZoneSizing.DesCoolVolFlow; // calculate anyway for use with zone OA max fraction below
                         } else {
                             ZoneOAFracCooling = 0.0;
                         }
-                    } else if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP ||
-                               SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // Ventilation Rate Procedure
+                    } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP ||
+                               state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // Ventilation Rate Procedure
                         // CR 8872 - check to see if uncorrected OA is calculated to be greater than 0
                         if (!(ZoneOAUnc > 0.0)) {
-                            ShowSevereError(
-                                state, "Sizing:System - The system outdoor air method is set to VRP in " + FinalSysSizing(AirLoopNum).AirPriLoopName);
-                            ShowContinueError(state,
-                                              "But zone \"" + TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName +
-                                                  "\" associated with system does not have OA flow/person");
+                            ShowSevereError(state, "Sizing:System - The system outdoor air method is set to VRP in " + finalSysSizing.AirPriLoopName);
+                            ShowContinueError(
+                                state, "But zone \"" + termUnitFinalZoneSizing.ZoneName + "\" associated with system does not have OA flow/person");
                             ShowContinueError(state,
                                               "or flow/area values specified in DesignSpecification:OutdoorAir object associated with the zone");
                         }
 
                         // Save Std 62.1 cooling ventilation required by zone
-                        MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone; // Don't include D
+                        MinOAFlow += termUnitFinalZoneSizing.VozClgByZone; // Don't include D
 
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow > 0.0) {
-                            if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0 ||
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin <= 0) {
+                        if (termUnitFinalZoneSizing.DesCoolVolFlow > 0.0) {
+                            if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0 || termUnitFinalZoneSizing.DesCoolVolFlowMin <= 0) {
                                 // multi-path system or VAV Minimum not defined
-                                ZoneOAFracCooling = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone /
-                                                    TermUnitFinalZoneSizing(TermUnitSizingIndex)
-                                                        .DesCoolVolFlow; // this should be based on final atu flows, not sizing design
+                                ZoneOAFracCooling =
+                                    termUnitFinalZoneSizing.VozClgByZone /
+                                    termUnitFinalZoneSizing.DesCoolVolFlow; // this should be based on final atu flows, not sizing design
 
                             } else {
                                 // Single path; Use VAV Minimum as the Vpz in the Zp = Voz / Vpz equations
-                                ZoneOAFracCooling = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone /
-                                                    TermUnitFinalZoneSizing(TermUnitSizingIndex)
-                                                        .DesCoolVolFlowMin; // this should be based on final atu flows, not sizing design
+                                ZoneOAFracCooling =
+                                    termUnitFinalZoneSizing.VozClgByZone /
+                                    termUnitFinalZoneSizing.DesCoolVolFlowMin; // this should be based on final atu flows, not sizing design
                             }
                         } else {
                             ZoneOAFracCooling = 0.0;
@@ -4889,33 +4775,30 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                     } else { // error
                     }
                 } else { // ZoneSum Method
-                    MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA;
+                    MinOAFlow += termUnitFinalZoneSizing.MinOA;
                     ZoneOAFracCooling = 0.0;
                 }
 
                 // Calc maximum zone OA fraction and supply air adjustment factor based on
                 // user entered max allowed OA fraction
-                if (FinalSysSizing(AirLoopNum).MaxZoneOAFraction > 0 && ZoneOAFracCooling > FinalSysSizing(AirLoopNum).MaxZoneOAFraction) {
-                    if (FinalSysSizing(AirLoopNum).CoolAirDesMethod == FromDDCalc) { // DesignDay Method
-                        ClgSupplyAirAdjustFactor = ZoneOAFracCooling / FinalSysSizing(AirLoopNum).MaxZoneOAFraction;
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0 ||
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin <= 0) {
+                if (finalSysSizing.MaxZoneOAFraction > 0 && ZoneOAFracCooling > finalSysSizing.MaxZoneOAFraction) {
+                    if (finalSysSizing.CoolAirDesMethod == FromDDCalc) { // DesignDay Method
+                        ClgSupplyAirAdjustFactor = ZoneOAFracCooling / finalSysSizing.MaxZoneOAFraction;
+                        if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0 || termUnitFinalZoneSizing.DesCoolVolFlowMin <= 0) {
                             // multi-path system or VAV Minimum not defined
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow *= ClgSupplyAirAdjustFactor;
+                            termUnitFinalZoneSizing.DesCoolVolFlow *= ClgSupplyAirAdjustFactor;
                         } else {
                             // Single path; Use VAV Minimum as the Vpz in the Zp = Voz / Vpz equations
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin *=
+                            termUnitFinalZoneSizing.DesCoolVolFlowMin *=
                                 ClgSupplyAirAdjustFactor; // from code inspection value set here is used above, before being set.
 
                             // Don't allow the design cooling airflow to be less than the VAV minimum airflow
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow =
-                                max(TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow,
-                                    TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin);
+                            termUnitFinalZoneSizing.DesCoolVolFlow =
+                                max(termUnitFinalZoneSizing.DesCoolVolFlow, termUnitFinalZoneSizing.DesCoolVolFlowMin);
                         }
                         // Don't allow the design terminal airflow to be less than the design cooling airflow
-                        TermUnitSizing(TermUnitSizingIndex).AirVolFlow =
-                            max(TermUnitSizing(TermUnitSizingIndex).AirVolFlow, TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow);
-                        ZoneOAFracCooling = FinalSysSizing(AirLoopNum).MaxZoneOAFraction;
+                        termUnitSizing.AirVolFlow = max(termUnitSizing.AirVolFlow, termUnitFinalZoneSizing.DesCoolVolFlow);
+                        ZoneOAFracCooling = finalSysSizing.MaxZoneOAFraction;
                     } else {
                         ClgSupplyAirAdjustFactor = 1.0;
                     }
@@ -4926,11 +4809,11 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                 ZoneSA = 0.0;
                 ZonePA = 0.0;
                 state.dataSimAirServingZones->EpSSOA = 1.0;
-                if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0) { // multi-path system
+                if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0) { // multi-path system
                     // Vpz: "Primary" supply air from main air handler served by an oa mixer
-                    ZonePA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow;
+                    ZonePA = termUnitFinalZoneSizing.DesCoolVolFlow;
                     // Vdz: "Discharge" supply air delivered to zone by terminal unit
-                    ZoneSA = max(TermUnitSizing(TermUnitSizingIndex).AirVolFlow, ZonePA);
+                    ZoneSA = max(termUnitSizing.AirVolFlow, ZonePA);
 
                     // For re-circulation systems, Vpz used to determine Zpz is the design terminal airflow
                     // Std 62.1-2010, section 6.2.5.1: "Vpz (used to determin Zpz) is the primary airflow rate
@@ -4940,19 +4823,18 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
 
                 } else { // single path system
                     // Vdz: "Discharge" supply air delivered to zone by terminal unit
-                    ZonePA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow;
+                    ZonePA = termUnitFinalZoneSizing.DesCoolVolFlow;
                     // Vpz: "Primary" supply air from main air handler served by an oa mixer
-                    ZoneSA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow;
+                    ZoneSA = termUnitFinalZoneSizing.DesCoolVolFlow;
 
                     // Save VpzMin in case this is a single path VAV system.
                     // Std 62.1-2010, section 6.2.5.1: "For VAV-system design purposes, Vpz is the lowest zone primary
                     // airflow value expected at the design condition analyzed."
                     state.dataSize->VpzMinClgByZone(TermUnitSizingIndex) =
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin; // this may be getting used before it gets filled ??
+                        termUnitFinalZoneSizing.DesCoolVolFlowMin; // this may be getting used before it gets filled ??
 
                     // In case for some reason the VAV minimum has not been defined, use the design primary airflow
-                    if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin <= 0)
-                        state.dataSize->VpzMinClgByZone(TermUnitSizingIndex) = ZonePA;
+                    if (termUnitFinalZoneSizing.DesCoolVolFlowMin <= 0) state.dataSize->VpzMinClgByZone(TermUnitSizingIndex) = ZonePA;
                 }
 
                 // save zone discharge supply airflow
@@ -4963,79 +4845,80 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                 state.dataSize->VpzClgSumBySys(AirLoopNum) += ZonePA;
 
                 // Fraction of required zone ventilation to minimum primary airflow expected at condition analyzed
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone = 0.0;
+                termUnitFinalZoneSizing.ZpzClgByZone = 0.0;
                 if (state.dataSize->VpzMinClgByZone(TermUnitSizingIndex) > 0) {
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone =
-                        min(1.0, TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone / state.dataSize->VpzMinClgByZone(TermUnitSizingIndex));
+                    termUnitFinalZoneSizing.ZpzClgByZone =
+                        min(1.0, termUnitFinalZoneSizing.VozClgByZone / state.dataSize->VpzMinClgByZone(TermUnitSizingIndex));
                 }
 
                 // calc zone primary air fraction
                 if (ZoneSA > 0.0) state.dataSimAirServingZones->EpSSOA = ZonePA / ZoneSA;
                 if (state.dataSimAirServingZones->EpSSOA > 1.0) state.dataSimAirServingZones->EpSSOA = 1.0;
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction = state.dataSimAirServingZones->EpSSOA;
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneOAFracCooling = ZoneOAFracCooling;
+                termUnitFinalZoneSizing.ZonePrimaryAirFraction = state.dataSimAirServingZones->EpSSOA;
+                termUnitFinalZoneSizing.ZoneOAFracCooling = ZoneOAFracCooling;
 
                 // determined cooled zone floor area in an airloop
-                FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalZoneFloorArea;
+                finalSysSizing.FloorAreaOnAirLoopCooled += termUnitFinalZoneSizing.TotalZoneFloorArea;
 
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).SupplyAirAdjustFactor = max(ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor);
+                termUnitFinalZoneSizing.SupplyAirAdjustFactor = max(ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor);
             }
 
-            int NumZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+            int NumZonesHeated = airToZoneNodeInfo.NumZonesHeated;
             if (NumZonesHeated > 0) {
                 for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) {
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                    int TermUnitSizingIndex = airToZoneNodeInfo.TermUnitHeatSizingIndex(ZonesHeatedNum);
                     if (TermUnitSizingIndex == 0) {
-                        ShowSevereError(
-                            state,
-                            "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + AirToZoneNodeInfo(AirLoopNum).AirLoopName +
-                                ", Zone =" + state.dataHeatBal->Zone(AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedNum)).Name);
+                        ShowSevereError(state,
+                                        "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + airToZoneNodeInfo.AirLoopName +
+                                            ", Zone =" + state.dataHeatBal->Zone(airToZoneNodeInfo.HeatCtrlZoneNums(ZonesHeatedNum)).Name);
                         ShowFatalError(state, "This is a defect. Please report this issue.");
                     }
+                    auto &termUnitSizing = state.dataSize->TermUnitSizing(TermUnitSizingIndex);
+                    auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex);
                     int MatchingCooledZoneNum =
-                        General::FindNumberInList(TermUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, NumZonesCooled);
+                        General::FindNumberInList(TermUnitSizingIndex, airToZoneNodeInfo.TermUnitCoolSizingIndex, NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
                         if (SysSizNum > 0) {
-                            ZoneOAUnc = TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople +
-                                        TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // should not have diversity at this point
-                            if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) {              // ZoneSum Method
+                            ZoneOAUnc = termUnitFinalZoneSizing.TotalOAFromPeople +
+                                        termUnitFinalZoneSizing.TotalOAFromArea;                         // should not have diversity at this point
+                            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) { // ZoneSum Method
                                 SysOAUnc += ZoneOAUnc;
-                            } else if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP ||
-                                       SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // Ventilation Rate and Simplified Procedure
-                                SysOAUnc += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople * state.dataSize->DBySys(AirLoopNum) +
-                                            TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // apply D to people term
+                            } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP ||
+                                       state.dataSize->SysSizInput(SysSizNum).SystemOAMethod ==
+                                           SOAM_SP) { // Ventilation Rate and Simplified Procedure
+                                SysOAUnc += termUnitFinalZoneSizing.TotalOAFromPeople * state.dataSize->DBySys(AirLoopNum) +
+                                            termUnitFinalZoneSizing.TotalOAFromArea; // apply D to people term
                             }
-                            state.dataSize->SumRpxPzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople;
-                            state.dataSize->SumRaxAzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
+                            state.dataSize->SumRpxPzBySys(AirLoopNum) += termUnitFinalZoneSizing.TotalOAFromPeople;
+                            state.dataSize->SumRaxAzBySys(AirLoopNum) += termUnitFinalZoneSizing.TotalOAFromArea;
                             // save for Standard 62 tabular report
                             state.dataSize->VbzByZone(TermUnitSizingIndex) = ZoneOAUnc; // fixed now, previously RHS already had Ez factored in.
                             // Save Std 62.1 heating ventilation required by zone
-                            if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating > 0.0) {
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone =
-                                    ZoneOAUnc / TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                            if (termUnitFinalZoneSizing.ZoneADEffHeating > 0.0) {
+                                termUnitFinalZoneSizing.VozHtgByZone = ZoneOAUnc / termUnitFinalZoneSizing.ZoneADEffHeating;
                             } else {
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone = ZoneOAUnc;
+                                termUnitFinalZoneSizing.VozHtgByZone = ZoneOAUnc;
                             }
 
-                            if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) { // ZoneSum Method
-                                MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA;
-                                if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow > 0.0) {
-                                    ZoneOAFracHeating = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone /
-                                                        TermUnitFinalZoneSizing(TermUnitSizingIndex)
-                                                            .DesHeatVolFlow; // calculate anyway for use with zone OA max fraction below
+                            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) { // ZoneSum Method
+                                MinOAFlow += termUnitFinalZoneSizing.MinOA;
+                                if (termUnitFinalZoneSizing.DesHeatVolFlow > 0.0) {
+                                    ZoneOAFracHeating =
+                                        termUnitFinalZoneSizing.VozHtgByZone /
+                                        termUnitFinalZoneSizing.DesHeatVolFlow; // calculate anyway for use with zone OA max fraction below
                                 } else {
                                     ZoneOAFracHeating = 0.0;
                                 }
 
-                            } else if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP ||
-                                       SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // Ventilation Rate and Simplified Procedure
+                            } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP ||
+                                       state.dataSize->SysSizInput(SysSizNum).SystemOAMethod ==
+                                           SOAM_SP) { // Ventilation Rate and Simplified Procedure
                                 // CR 8872 - check to see if uncorrected OA is calculated to be greater than 0
                                 if (!(ZoneOAUnc > 0.0)) {
-                                    ShowSevereError(state,
-                                                    "Sizing:System - The system outdoor air method is set to VRP in " +
-                                                        FinalSysSizing(AirLoopNum).AirPriLoopName);
+                                    ShowSevereError(
+                                        state, "Sizing:System - The system outdoor air method is set to VRP in " + finalSysSizing.AirPriLoopName);
                                     ShowContinueError(state,
-                                                      "But zone \"" + TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName +
+                                                      "But zone \"" + termUnitFinalZoneSizing.ZoneName +
                                                           "\" associated with system does not have OA flow/person");
                                     ShowContinueError(state,
                                                       "or flow/area values specified in DesignSpecification:OutdoorAir object associated "
@@ -5043,17 +4926,15 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                                 }
 
                                 // Save Std 62.1 heating ventilation required by zone
-                                MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone; // Don't include D
+                                MinOAFlow += termUnitFinalZoneSizing.VozHtgByZone; // Don't include D
 
-                                if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow > 0.0) {
-                                    if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0) { // multi-path system
+                                if (termUnitFinalZoneSizing.DesHeatVolFlow > 0.0) {
+                                    if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0) { // multi-path system
                                         // multi-path system
-                                        ZoneOAFracHeating = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone /
-                                                            TermUnitSizing(TermUnitSizingIndex).AirVolFlow;
+                                        ZoneOAFracHeating = termUnitFinalZoneSizing.VozHtgByZone / termUnitSizing.AirVolFlow;
                                     } else {
                                         // Single path system
-                                        ZoneOAFracHeating = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone /
-                                                            TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
+                                        ZoneOAFracHeating = termUnitFinalZoneSizing.VozHtgByZone / termUnitFinalZoneSizing.DesHeatVolFlow;
                                     }
                                 } else {
                                     ZoneOAFracHeating = 0.0;
@@ -5061,7 +4942,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                             } else { // would be error
                             }
                         } else { // ZoneSum Method
-                            MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA;
+                            MinOAFlow += termUnitFinalZoneSizing.MinOA;
                             ZoneOAFracHeating = 0.0;
                         }
                     } else { // matching cooled zone > 0
@@ -5073,21 +4954,19 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
 
                     // Calc maximum zone OA fraction and supply air adjustment factor based
                     // on user entered max allowed OA fraction
-                    if (FinalSysSizing(AirLoopNum).MaxZoneOAFraction > 0 && ZoneOAFracHeating > FinalSysSizing(AirLoopNum).MaxZoneOAFraction) {
-                        if (FinalSysSizing(AirLoopNum).CoolAirDesMethod == FromDDCalc) { // DesignDay Method
-                            HtgSupplyAirAdjustFactor = ZoneOAFracHeating / FinalSysSizing(AirLoopNum).MaxZoneOAFraction;
-                            if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0 ||
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin <= 0) {
+                    if (finalSysSizing.MaxZoneOAFraction > 0 && ZoneOAFracHeating > finalSysSizing.MaxZoneOAFraction) {
+                        if (finalSysSizing.CoolAirDesMethod == FromDDCalc) { // DesignDay Method
+                            HtgSupplyAirAdjustFactor = ZoneOAFracHeating / finalSysSizing.MaxZoneOAFraction;
+                            if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0 || termUnitFinalZoneSizing.DesCoolVolFlowMin <= 0) {
                                 // multi-path system or VAV Heating airflow max not defined
-                                TermUnitSizing(TermUnitSizingIndex).AirVolFlow *= HtgSupplyAirAdjustFactor;
+                                termUnitSizing.AirVolFlow *= HtgSupplyAirAdjustFactor;
                             } else {
                                 // Single path; Use VAV Heating airflow max as the Vpz in the Zp = Voz / Vpz equations
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow *= HtgSupplyAirAdjustFactor;
+                                termUnitFinalZoneSizing.DesHeatVolFlow *= HtgSupplyAirAdjustFactor;
                                 // Don't allow the design terminal airflow to be less than the design heating airflow
-                                TermUnitSizing(TermUnitSizingIndex).AirVolFlow =
-                                    max(TermUnitSizing(TermUnitSizingIndex).AirVolFlow, TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow);
+                                termUnitSizing.AirVolFlow = max(termUnitSizing.AirVolFlow, termUnitFinalZoneSizing.DesHeatVolFlow);
                             }
-                            ZoneOAFracHeating = FinalSysSizing(AirLoopNum).MaxZoneOAFraction;
+                            ZoneOAFracHeating = finalSysSizing.MaxZoneOAFraction;
                         } else {
                             HtgSupplyAirAdjustFactor = 1.0;
                         }
@@ -5098,11 +4977,11 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                     ZoneSA = 0.0;
                     ZonePA = 0.0;
                     state.dataSimAirServingZones->EpSSOA = 1.0;
-                    if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0) { // multi-path system
+                    if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0) { // multi-path system
                         // Vpz: "Primary" supply air from main air handler served by an oa mixer
-                        ZonePA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
+                        ZonePA = termUnitFinalZoneSizing.DesHeatVolFlow;
                         // Vdz: "Discharge" supply air delivered to zone by terminal unit
-                        ZoneSA = max(TermUnitSizing(TermUnitSizingIndex).AirVolFlow, ZonePA);
+                        ZoneSA = max(termUnitSizing.AirVolFlow, ZonePA);
 
                         // For re-circulation systems, Vpz used to determine Zpz is the design terminal airflow
                         // Std 62.1-2010, section 6.2.5.1: "Vpz (used to determin Zpz) is the primary airflow rate
@@ -5111,8 +4990,8 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
 
                     } else { // single path system
 
-                        ZonePA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
-                        ZoneSA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
+                        ZonePA = termUnitFinalZoneSizing.DesHeatVolFlow;
+                        ZoneSA = termUnitFinalZoneSizing.DesHeatVolFlow;
 
                         // We do not use the cooling VAV min for heating because the VAV-box heating maximum may be larger.
                         state.dataSize->VpzMinHtgByZone(TermUnitSizingIndex) = ZoneSA;
@@ -5126,56 +5005,54 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                     state.dataSize->VpzHtgSumBySys(AirLoopNum) += ZonePA;
 
                     // Fraction of required zone ventilation to minimum primary airflow expected at condition analyzed
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone = 0.0;
+                    termUnitFinalZoneSizing.ZpzHtgByZone = 0.0;
                     if (state.dataSize->VpzMinHtgByZone(TermUnitSizingIndex) > 0) {
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone = min(
-                            1.0, TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone / state.dataSize->VpzMinHtgByZone(TermUnitSizingIndex));
+                        termUnitFinalZoneSizing.ZpzHtgByZone =
+                            min(1.0, termUnitFinalZoneSizing.VozHtgByZone / state.dataSize->VpzMinHtgByZone(TermUnitSizingIndex));
                     }
 
                     // calc zone primary air fraction
                     if (ZoneSA > 0.0) state.dataSimAirServingZones->EpSSOA = ZonePA / ZoneSA;
                     if (state.dataSimAirServingZones->EpSSOA > 1.0) state.dataSimAirServingZones->EpSSOA = 1.0;
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg = state.dataSimAirServingZones->EpSSOA;
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneOAFracHeating = ZoneOAFracHeating;
+                    termUnitFinalZoneSizing.ZonePrimaryAirFractionHtg = state.dataSimAirServingZones->EpSSOA;
+                    termUnitFinalZoneSizing.ZoneOAFracHeating = ZoneOAFracHeating;
 
                     // determined heated zone floor area in an airloop
-                    FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopHeated += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalZoneFloorArea;
+                    finalSysSizing.FloorAreaOnAirLoopHeated += termUnitFinalZoneSizing.TotalZoneFloorArea;
 
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).SupplyAirAdjustFactor = max(ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor);
+                    termUnitFinalZoneSizing.SupplyAirAdjustFactor = max(ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor);
 
                 } // end for loop of heated zones
 
             } else { // getting heating flow based values for Std 62.1 report for single path systems
                 ZoneOAFracHeating = 0.0;
                 for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum) {
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
+                    int TermUnitSizingIndex = airToZoneNodeInfo.TermUnitCoolSizingIndex(ZonesHeatedNum);
                     if (TermUnitSizingIndex == 0) {
-                        ShowSevereError(
-                            state,
-                            "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + AirToZoneNodeInfo(AirLoopNum).AirLoopName +
-                                ", Zone =" + state.dataHeatBal->Zone(AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedNum)).Name);
+                        ShowSevereError(state,
+                                        "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + airToZoneNodeInfo.AirLoopName +
+                                            ", Zone =" + state.dataHeatBal->Zone(airToZoneNodeInfo.CoolCtrlZoneNums(ZonesHeatedNum)).Name);
                         ShowFatalError(state, "This is a defect. Please report this issue.");
                     }
-
+                    auto &termUnitSizing = state.dataSize->TermUnitSizing(TermUnitSizingIndex);
+                    auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex);
                     // Save Std 62.1 heating ventilation required by zone
-                    if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating > 0.0) {
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone =
-                            state.dataSize->VbzByZone(TermUnitSizingIndex) / TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                    if (termUnitFinalZoneSizing.ZoneADEffHeating > 0.0) {
+                        termUnitFinalZoneSizing.VozHtgByZone =
+                            state.dataSize->VbzByZone(TermUnitSizingIndex) / termUnitFinalZoneSizing.ZoneADEffHeating;
                     } else {
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone = state.dataSize->VbzByZone(TermUnitSizingIndex);
+                        termUnitFinalZoneSizing.VozHtgByZone = state.dataSize->VbzByZone(TermUnitSizingIndex);
                     }
 
-                    if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow > 0.0) {
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0) { // multi-path system
+                    if (termUnitFinalZoneSizing.DesHeatVolFlow > 0.0) {
+                        if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0) { // multi-path system
                             // multi-path system
-                            if (TermUnitSizing(TermUnitSizingIndex).AirVolFlow != 0) {
-                                ZoneOAFracHeating =
-                                    TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone / TermUnitSizing(TermUnitSizingIndex).AirVolFlow;
+                            if (termUnitSizing.AirVolFlow != 0) {
+                                ZoneOAFracHeating = termUnitFinalZoneSizing.VozHtgByZone / termUnitSizing.AirVolFlow;
                             }
                         } else {
                             // Single path system
-                            ZoneOAFracHeating = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone /
-                                                TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
+                            ZoneOAFracHeating = termUnitFinalZoneSizing.VozHtgByZone / termUnitFinalZoneSizing.DesHeatVolFlow;
                         }
                     } else {
                         ZoneOAFracHeating = 0.0;
@@ -5183,25 +5060,23 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
 
                     // Calc maximum zone OA fraction and supply air adjustment factor based
                     // on user entered max allowed OA fraction - a TRACE feature
-                    if (FinalSysSizing(AirLoopNum).MaxZoneOAFraction > 0 && ZoneOAFracHeating > FinalSysSizing(AirLoopNum).MaxZoneOAFraction) {
-                        if (FinalSysSizing(AirLoopNum).HeatAirDesMethod == FromDDCalc) { // DesignDay Method
-                            HtgSupplyAirAdjustFactor = ZoneOAFracHeating / FinalSysSizing(AirLoopNum).MaxZoneOAFraction;
-                            if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0 ||
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin <= 0) {
+                    if (finalSysSizing.MaxZoneOAFraction > 0 && ZoneOAFracHeating > finalSysSizing.MaxZoneOAFraction) {
+                        if (finalSysSizing.HeatAirDesMethod == FromDDCalc) { // DesignDay Method
+                            HtgSupplyAirAdjustFactor = ZoneOAFracHeating / finalSysSizing.MaxZoneOAFraction;
+                            if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0 || termUnitFinalZoneSizing.DesCoolVolFlowMin <= 0) {
                                 // multi-path system or VAV Heating airflow max not defined
-                                TermUnitSizing(TermUnitSizingIndex).AirVolFlow *= HtgSupplyAirAdjustFactor;
+                                termUnitSizing.AirVolFlow *= HtgSupplyAirAdjustFactor;
                             } else {
                                 // Single path; Use VAV Heating airflow max as the Vpz in the Zp = Voz / Vpz equations
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow *= HtgSupplyAirAdjustFactor;
+                                termUnitFinalZoneSizing.DesHeatVolFlow *= HtgSupplyAirAdjustFactor;
                                 // Don't allow the design terminal airflow to be less than the design heating airflow
-                                TermUnitSizing(TermUnitSizingIndex).AirVolFlow =
-                                    max(TermUnitSizing(TermUnitSizingIndex).AirVolFlow, TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow);
+                                termUnitSizing.AirVolFlow = max(termUnitSizing.AirVolFlow, termUnitFinalZoneSizing.DesHeatVolFlow);
                             }
-                            ZoneOAFracHeating = FinalSysSizing(AirLoopNum).MaxZoneOAFraction;
+                            ZoneOAFracHeating = finalSysSizing.MaxZoneOAFraction;
                         }
                     }
-                    ZonePA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
-                    ZoneSA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
+                    ZonePA = termUnitFinalZoneSizing.DesHeatVolFlow;
+                    ZoneSA = termUnitFinalZoneSizing.DesHeatVolFlow;
                     // save Vdz zone discharge airflow for standard 62.1 report
                     state.dataSize->VdzHtgByZone(TermUnitSizingIndex) = ZoneSA;
                     // save Vpz zone primary airflow for standard 62.1 report
@@ -5212,35 +5087,33 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                     state.dataSize->VpzMinHtgByZone(TermUnitSizingIndex) = ZoneSA;
 
                     // Fraction of required zone ventilation to minimum primary airflow expected at condition analyzed
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone = 0.0;
+                    termUnitFinalZoneSizing.ZpzHtgByZone = 0.0;
                     if (state.dataSize->VpzMinHtgByZone(TermUnitSizingIndex) > 0) {
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone =
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone / state.dataSize->VpzMinHtgByZone(TermUnitSizingIndex);
+                        termUnitFinalZoneSizing.ZpzHtgByZone =
+                            termUnitFinalZoneSizing.VozHtgByZone / state.dataSize->VpzMinHtgByZone(TermUnitSizingIndex);
                     }
 
                     // calc zone primary air fraction
                     state.dataSimAirServingZones->EpSSOA = 1.0;
                     if (ZoneSA > 0.0) state.dataSimAirServingZones->EpSSOA = ZonePA / ZoneSA;
                     if (state.dataSimAirServingZones->EpSSOA > 1.0) state.dataSimAirServingZones->EpSSOA = 1.0;
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg = state.dataSimAirServingZones->EpSSOA;
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneOAFracHeating = ZoneOAFracHeating;
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).SupplyAirAdjustFactor = max(ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor);
+                    termUnitFinalZoneSizing.ZonePrimaryAirFractionHtg = state.dataSimAirServingZones->EpSSOA;
+                    termUnitFinalZoneSizing.ZoneOAFracHeating = ZoneOAFracHeating;
+                    termUnitFinalZoneSizing.SupplyAirAdjustFactor = max(ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor);
 
                 } // end for loop over cooled zones (for htg calcs though)
-                // CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).SupplyAirAdjustFactor = TermUnitFinalZoneSizing( TermUnitSizingIndex
-                // ).SupplyAirAdjustFactor;
-                FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopHeated = FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
+                finalSysSizing.FloorAreaOnAirLoopHeated = finalSysSizing.FloorAreaOnAirLoopCooled;
             }
 
-            FinalSysSizing(AirLoopNum).SysUncOA = SysOAUnc;
-            CalcSysSizing(AirLoopNum).SysUncOA = SysOAUnc;
+            finalSysSizing.SysUncOA = SysOAUnc;
+            state.dataSize->CalcSysSizing(AirLoopNum).SysUncOA = SysOAUnc;
             state.dataSize->VouBySys(AirLoopNum) = SysOAUnc;
 
-            FinalSysSizing(AirLoopNum).DesOutAirVolFlow = MinOAFlow;
-            CalcSysSizing(AirLoopNum).DesOutAirVolFlow = MinOAFlow;
+            finalSysSizing.DesOutAirVolFlow = MinOAFlow;
+            state.dataSize->CalcSysSizing(AirLoopNum).DesOutAirVolFlow = MinOAFlow;
 
             for (int DesDayEnvrnNum = 1; DesDayEnvrnNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayEnvrnNum) {
-                state.dataSize->SysSizing(DesDayEnvrnNum, AirLoopNum).DesOutAirVolFlow = FinalSysSizing(AirLoopNum).DesOutAirVolFlow;
+                state.dataSize->SysSizing(DesDayEnvrnNum, AirLoopNum).DesOutAirVolFlow = finalSysSizing.DesOutAirVolFlow;
             }
         }
     }
@@ -5256,8 +5129,6 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   February 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Update the result variables of the zone sizing calculation
@@ -5330,50 +5201,36 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
     Real64 termunitsizingtemp;     // (1.0+termunitsizing(ctrlzone)%inducrat)
     Real64 VozClg(0.0);            // corrected (for ventilation efficiency) zone outside air flow rate [m3/s]
 
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &TermUnitSizing(state.dataSize->TermUnitSizing);
-    auto &CalcSysSizing(state.dataSize->CalcSysSizing);
-    auto &TermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing);
-    auto &NumAirTerminalUnits(state.dataSize->NumAirTerminalUnits);
-    auto &ZoneSizing(state.dataSize->ZoneSizing);
-    auto &CurOverallSimDay(state.dataSize->CurOverallSimDay);
-    auto &SysSizing(state.dataSize->SysSizing);
-    auto &SizingFileColSep(state.dataSize->SizingFileColSep);
-    auto &CalcZoneSizing(state.dataSize->CalcZoneSizing);
-    auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
-    auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
-    auto &NumPrimaryAirSys(state.dataHVACGlobal->NumPrimaryAirSys);
-
     numOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
     // allocate scratch arrays
     if (!allocated(state.dataSize->SensCoolCapTemp)) {
-        state.dataSize->SensCoolCapTemp.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->TotCoolCapTemp.dimension(NumPrimaryAirSys, 0.0);
+        state.dataSize->SensCoolCapTemp.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 0.0);
+        state.dataSize->TotCoolCapTemp.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 0.0);
     }
 
     // allocate arrays used to store values for standard 62.1 tabular report
     if (!allocated(state.dataSize->FaByZoneCool)) {
-        state.dataSize->FaByZoneCool.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->FaByZoneHeat.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->FbByZoneCool.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->FbByZoneHeat.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->FcByZoneCool.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->FcByZoneHeat.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSimAirServingZones->EvBySysCool.dimension(NumPrimaryAirSys, 1.0);
-        state.dataSimAirServingZones->EvBySysHeat.dimension(NumPrimaryAirSys, 1.0);
-        state.dataSize->XsBySysCool.dimension(NumPrimaryAirSys, 1.0);
-        state.dataSize->XsBySysHeat.dimension(NumPrimaryAirSys, 1.0);
-        state.dataSize->EvzByZoneCool.dimension(NumAirTerminalUnits, 1.0);
-        state.dataSize->EvzByZoneCoolPrev.dimension(NumAirTerminalUnits, 1.0);
-        state.dataSize->EvzByZoneHeat.dimension(NumAirTerminalUnits, 1.0);
-        state.dataSize->EvzByZoneHeatPrev.dimension(NumAirTerminalUnits, 1.0);
-        state.dataSize->EvzMinBySysCool.dimension(NumPrimaryAirSys, 1.0);
-        state.dataSize->EvzMinBySysHeat.dimension(NumPrimaryAirSys, 1.0);
-        state.dataSize->VotClgBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->VotHtgBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->VozSumClgBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->VozSumHtgBySys.dimension(NumPrimaryAirSys, 0.0);
+        state.dataSize->FaByZoneCool.dimension(state.dataSize->NumAirTerminalUnits, 0.0);
+        state.dataSize->FaByZoneHeat.dimension(state.dataSize->NumAirTerminalUnits, 0.0);
+        state.dataSize->FbByZoneCool.dimension(state.dataSize->NumAirTerminalUnits, 0.0);
+        state.dataSize->FbByZoneHeat.dimension(state.dataSize->NumAirTerminalUnits, 0.0);
+        state.dataSize->FcByZoneCool.dimension(state.dataSize->NumAirTerminalUnits, 0.0);
+        state.dataSize->FcByZoneHeat.dimension(state.dataSize->NumAirTerminalUnits, 0.0);
+        state.dataSimAirServingZones->EvBySysCool.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 1.0);
+        state.dataSimAirServingZones->EvBySysHeat.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 1.0);
+        state.dataSize->XsBySysCool.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 1.0);
+        state.dataSize->XsBySysHeat.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 1.0);
+        state.dataSize->EvzByZoneCool.dimension(state.dataSize->NumAirTerminalUnits, 1.0);
+        state.dataSize->EvzByZoneCoolPrev.dimension(state.dataSize->NumAirTerminalUnits, 1.0);
+        state.dataSize->EvzByZoneHeat.dimension(state.dataSize->NumAirTerminalUnits, 1.0);
+        state.dataSize->EvzByZoneHeatPrev.dimension(state.dataSize->NumAirTerminalUnits, 1.0);
+        state.dataSize->EvzMinBySysCool.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 1.0);
+        state.dataSize->EvzMinBySysHeat.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 1.0);
+        state.dataSize->VotClgBySys.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 0.0);
+        state.dataSize->VotHtgBySys.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 0.0);
+        state.dataSize->VozSumClgBySys.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 0.0);
+        state.dataSize->VozSumHtgBySys.dimension(state.dataHVACGlobal->NumPrimaryAirSys, 0.0);
     }
 
     switch (CallIndicator) {
@@ -5381,67 +5238,60 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
         // Correct the zone return temperature in ZoneSizing for the case of induction units. The calc in
         // ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-            if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+            auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
+            auto &zoneSizing = state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
+            if (!zoneEquipConfig.IsControlled) continue;
             // Use first non-zero airdistunit for now
             int TermUnitSizingIndex = 0;
-            for (int InletNode = 1; InletNode <= state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++InletNode) {
-                TermUnitSizingIndex = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(InletNode).TermUnitSizingIndex;
+            for (int InletNode = 1; InletNode <= zoneEquipConfig.NumInletNodes; ++InletNode) {
+                TermUnitSizingIndex = zoneEquipConfig.AirDistUnitCool(InletNode).TermUnitSizingIndex;
                 if (TermUnitSizingIndex == 0) continue;
-                termunitsizingtemp = (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                termunitsizingtemp = (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                 termunitsizingtempfrac = (1.0 / termunitsizingtemp);
                 if (TermUnitSizingIndex > 0) break;
             }
             if (TermUnitSizingIndex == 0) continue; // Skip this if there are no terminal units
-            RetTempRise =
-                ZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtCoolPeak - ZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak;
+            RetTempRise = zoneSizing.ZoneRetTempAtCoolPeak - zoneSizing.ZoneTempAtCoolPeak;
             if (RetTempRise > 0.01) {
-                // avoid possible compiler bug
-                //          ZoneSizing(CtrlZoneNum,CurOverallSimDay)%ZoneRetTempAtCoolPeak = &
-                //            ZoneSizing(CtrlZoneNum,CurOverallSimDay)%ZoneTempAtCoolPeak + RetTempRise * &
-                //           (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-                ZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtCoolPeak =
-                    ZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak + RetTempRise * termunitsizingtempfrac;
+                zoneSizing.ZoneRetTempAtCoolPeak = zoneSizing.ZoneTempAtCoolPeak + RetTempRise * termunitsizingtempfrac;
             }
-            RetTempRise =
-                ZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtHeatPeak - ZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneTempAtHeatPeak;
+            RetTempRise = zoneSizing.ZoneRetTempAtHeatPeak - zoneSizing.ZoneTempAtHeatPeak;
             if (RetTempRise > 0.01) {
-                // avoid possible compiler bug
-                //          ZoneSizing(CtrlZoneNum,CurOverallSimDay)%ZoneRetTempAtHeatPeak = &
-                //            ZoneSizing(CtrlZoneNum,CurOverallSimDay)%ZoneTempAtHeatPeak + RetTempRise * &
-                //            (1./(1.+TermUnitSizing(CtrlZoneNum)%InducRat))
-                ZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtHeatPeak =
-                    ZoneSizing(CurOverallSimDay, CtrlZoneNum).ZoneTempAtHeatPeak + RetTempRise * termunitsizingtempfrac;
+                zoneSizing.ZoneRetTempAtHeatPeak = zoneSizing.ZoneTempAtHeatPeak + RetTempRise * termunitsizingtempfrac;
             }
         }
 
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // start of begin day loop over primary air systems
-
-            int NumZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
-            int NumZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
-            SysSizing(CurOverallSimDay, AirLoopNum).CoolDesDay = state.dataEnvrn->EnvironmentName;
-            SysSizing(CurOverallSimDay, AirLoopNum).HeatDesDay = state.dataEnvrn->EnvironmentName;
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // start of begin day loop over primary air systems
+            auto &airToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum);
+            int NumZonesCooled = airToZoneNodeInfo.NumZonesCooled;
+            int NumZonesHeated = airToZoneNodeInfo.NumZonesHeated;
+            state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).CoolDesDay = state.dataEnvrn->EnvironmentName;
+            state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).HeatDesDay = state.dataEnvrn->EnvironmentName;
             state.dataSize->SensCoolCapTemp(AirLoopNum) = 0.0;
             state.dataSize->TotCoolCapTemp(AirLoopNum) = 0.0;
 
             for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
-                int CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledNum);
-                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
-                Real64 adjCoolMassFlow = TermUnitSizing(TermUnitSizingIndex)
-                                             .applyTermUnitSizingCoolFlow(ZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolMassFlow,
-                                                                          ZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolMassFlowNoOA);
-                SysSizing(CurOverallSimDay, AirLoopNum).NonCoinCoolMassFlow += adjCoolMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                if (SysSizing(CurOverallSimDay, AirLoopNum).LoadSizeType == DataSizing::Latent && !state.dataSize->FinalZoneSizing.empty()) {
-                    if (!state.dataSize->FinalZoneSizing(CtrlZoneNum).zoneLatentSizing && CurOverallSimDay == 1) {
+                int CtrlZoneNum = airToZoneNodeInfo.CoolCtrlZoneNums(ZonesCooledNum);
+                int TermUnitSizingIndex = airToZoneNodeInfo.TermUnitCoolSizingIndex(ZonesCooledNum);
+                Real64 adjCoolMassFlow =
+                    state.dataSize->TermUnitSizing(TermUnitSizingIndex)
+                        .applyTermUnitSizingCoolFlow(state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesCoolMassFlow,
+                                                     state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesCoolMassFlowNoOA);
+                state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).NonCoinCoolMassFlow +=
+                    adjCoolMassFlow / (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
+                if (state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).LoadSizeType == DataSizing::Latent &&
+                    !state.dataSize->FinalZoneSizing.empty()) {
+                    if (!state.dataSize->FinalZoneSizing(CtrlZoneNum).zoneLatentSizing && state.dataSize->CurOverallSimDay == 1) {
                         ShowWarningError(state,
                                          format("Latent Sizing for AirLoop = {} requires latent sizing in Sizing:Zone object for Zone = {}",
-                                                AirToZoneNodeInfo(AirLoopNum).AirLoopName,
+                                                airToZoneNodeInfo.AirLoopName,
                                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName));
                     }
                 } else if (!state.dataSize->FinalZoneSizing.empty()) { // not latent sizing for air loop
-                    if (state.dataSize->FinalZoneSizing(CtrlZoneNum).zoneLatentSizing && CurOverallSimDay == 1) {
+                    if (state.dataSize->FinalZoneSizing(CtrlZoneNum).zoneLatentSizing && state.dataSize->CurOverallSimDay == 1) {
                         ShowWarningError(state,
                                          format("Sizing for AirLoop = {} includes latent sizing in Sizing:Zone object for Zone = {}",
-                                                AirToZoneNodeInfo(AirLoopNum).AirLoopName,
+                                                airToZoneNodeInfo.AirLoopName,
                                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName));
                     }
                 }
@@ -5449,23 +5299,25 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
             if (NumZonesHeated > 0) {                                                              // if there are zones supplied with central hot air
                 for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over heated zones
-                    int CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedNum);
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
-                    Real64 adjHeatMassFlow = TermUnitSizing(TermUnitSizingIndex)
-                                                 .applyTermUnitSizingHeatFlow(ZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatMassFlow,
-                                                                              ZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatMassFlowNoOA);
-                    SysSizing(CurOverallSimDay, AirLoopNum).NonCoinHeatMassFlow +=
-                        adjHeatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                    int CtrlZoneNum = airToZoneNodeInfo.HeatCtrlZoneNums(ZonesHeatedNum);
+                    int TermUnitSizingIndex = airToZoneNodeInfo.TermUnitHeatSizingIndex(ZonesHeatedNum);
+                    Real64 adjHeatMassFlow = state.dataSize->TermUnitSizing(TermUnitSizingIndex)
+                                                 .applyTermUnitSizingHeatFlow(
+                                                     state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesHeatMassFlow,
+                                                     state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesHeatMassFlowNoOA);
+                    state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).NonCoinHeatMassFlow +=
+                        adjHeatMassFlow / (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                 }                                                                                  // end of loop over heated zones
             } else {                                                                               // otherwise use cool supply zones
                 for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
-                    int CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledNum);
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
-                    Real64 adjHeatMassFlow = TermUnitSizing(TermUnitSizingIndex)
-                                                 .applyTermUnitSizingHeatFlow(ZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatMassFlow,
-                                                                              ZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatMassFlowNoOA);
-                    SysSizing(CurOverallSimDay, AirLoopNum).NonCoinHeatMassFlow +=
-                        adjHeatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                    int CtrlZoneNum = airToZoneNodeInfo.CoolCtrlZoneNums(ZonesCooledNum);
+                    int TermUnitSizingIndex = airToZoneNodeInfo.TermUnitCoolSizingIndex(ZonesCooledNum);
+                    Real64 adjHeatMassFlow = state.dataSize->TermUnitSizing(TermUnitSizingIndex)
+                                                 .applyTermUnitSizingHeatFlow(
+                                                     state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesHeatMassFlow,
+                                                     state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesHeatMassFlowNoOA);
+                    state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).NonCoinHeatMassFlow +=
+                        adjHeatMassFlow / (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                 } // end of loop over cooled zones
             }     // End of heat / cool zone if - else
 
@@ -5485,33 +5337,26 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             for (int InletNode = 1; InletNode <= state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++InletNode) {
                 TermUnitSizingIndex = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(InletNode).TermUnitSizingIndex;
                 if (TermUnitSizingIndex == 0) continue;
-                termunitsizingtemp = (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                termunitsizingtemp = (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                 termunitsizingtempfrac = (1.0 / termunitsizingtemp);
                 if (TermUnitSizingIndex > 0) break;
             }
             if (TermUnitSizingIndex == 0) continue; // Skip this if there are no terminal units
-            RetTempRise = ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneRetTempSeq(TimeStepInDay) -
-                          ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepInDay);
+            auto &zoneSizing = state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
+            RetTempRise = zoneSizing.CoolZoneRetTempSeq(TimeStepInDay) - zoneSizing.CoolZoneTempSeq(TimeStepInDay);
             if (RetTempRise > 0.01) {
-                // avoid possible compiler bug
-                //          ZoneSizing(CtrlZoneNum,CurOverallSimDay)%CoolZoneRetTempSeq(TimeStepInDay) = &
-                //            ZoneSizing(CtrlZoneNum,CurOverallSimDay)%CoolZoneTempSeq(TimeStepInDay) + RetTempRise * &
-                //           (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-                ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneRetTempSeq(TimeStepInDay) =
-                    ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepInDay) + RetTempRise * termunitsizingtempfrac;
+                zoneSizing.CoolZoneRetTempSeq(TimeStepInDay) = zoneSizing.CoolZoneTempSeq(TimeStepInDay) + RetTempRise * termunitsizingtempfrac;
             }
-            RetTempRise = ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneRetTempSeq(TimeStepInDay) -
-                          ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay);
+            RetTempRise = zoneSizing.HeatZoneRetTempSeq(TimeStepInDay) - zoneSizing.HeatZoneTempSeq(TimeStepInDay);
             if (RetTempRise > 0.01) {
-                ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneRetTempSeq(TimeStepInDay) =
-                    ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) + RetTempRise * termunitsizingtempfrac;
+                zoneSizing.HeatZoneRetTempSeq(TimeStepInDay) = zoneSizing.HeatZoneTempSeq(TimeStepInDay) + RetTempRise * termunitsizingtempfrac;
             }
         }
+        // start of zone time step loop over primary air systems
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
 
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // start of zone time step loop over primary air systems
-
-            int NumZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
-            int NumZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+            int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+            int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
 
             SysCoolRetTemp = 0.0;
             OutAirFrac = 0.0;
@@ -5527,58 +5372,49 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             Real64 SysLatCoolHumRat = 0.0;
 
             for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over zones cooled by central system
-                int CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledNum);
-                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledNum);
+                int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                auto &termUnitSizing = state.dataSize->TermUnitSizing(TermUnitSizingIndex);
+                auto &zoneSizing = state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
                 // sum up the system mass flow rate for this time step
-                Real64 adjCoolFlowSeq = TermUnitSizing(TermUnitSizingIndex)
-                                            .applyTermUnitSizingCoolFlow(ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolFlowSeq(TimeStepInDay),
-                                                                         ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolFlowSeqNoOA(TimeStepInDay));
-                SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) +=
-                    adjCoolFlowSeq / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                Real64 adjCoolFlowSeq =
+                    termUnitSizing.applyTermUnitSizingCoolFlow(zoneSizing.CoolFlowSeq(TimeStepInDay), zoneSizing.CoolFlowSeqNoOA(TimeStepInDay));
+                state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) +=
+                    adjCoolFlowSeq / (1.0 + termUnitSizing.InducRat);
                 // sum up the zone cooling load to be met by this system for this time step
-                SysSizing(CurOverallSimDay, AirLoopNum).SumZoneCoolLoadSeq(TimeStepInDay) +=
-                    ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolLoadSeq(TimeStepInDay);
+                state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).SumZoneCoolLoadSeq(TimeStepInDay) +=
+                    zoneSizing.CoolLoadSeq(TimeStepInDay);
                 // calculate the return air temperature for this time step
-                SysCoolRetTemp += ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneRetTempSeq(TimeStepInDay) *
-                                  ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolFlowSeq(TimeStepInDay) /
-                                  (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                SysCoolRetHumRat += ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneHumRatSeq(TimeStepInDay) *
-                                    ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolFlowSeq(TimeStepInDay) /
-                                    (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                SysCoolZoneAvgTemp += ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepInDay) *
-                                      ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolFlowSeq(TimeStepInDay) /
-                                      (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                SysDOASHeatAdd += ZoneSizing(CurOverallSimDay, CtrlZoneNum).DOASHeatAddSeq(TimeStepInDay) *
-                                  ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolFlowSeq(TimeStepInDay) /
-                                  (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                SysDOASLatAdd += ZoneSizing(CurOverallSimDay, CtrlZoneNum).DOASLatAddSeq(TimeStepInDay) *
-                                 ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolFlowSeq(TimeStepInDay) /
-                                 (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                SysLatCoolHumRat += ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDesHumRat *
-                                    ZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolFlowSeq(TimeStepInDay) /
-                                    (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                SysCoolRetTemp +=
+                    zoneSizing.CoolZoneRetTempSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                SysCoolRetHumRat +=
+                    zoneSizing.CoolZoneHumRatSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                SysCoolZoneAvgTemp +=
+                    zoneSizing.CoolZoneTempSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                SysDOASHeatAdd += zoneSizing.DOASHeatAddSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                SysDOASLatAdd += zoneSizing.DOASLatAddSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                SysLatCoolHumRat += zoneSizing.CoolDesHumRat * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
             } // end of loop over zones cooled by central system
             // Get peak system cooling load with coincident
-            auto &sysSizing = SysSizing(CurOverallSimDay, AirLoopNum);
+            auto &sysSizing = state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum);
             if (sysSizing.SysDesCoolLoad < sysSizing.SumZoneCoolLoadSeq(TimeStepInDay)) {
                 sysSizing.SysDesCoolLoad = sysSizing.SumZoneCoolLoadSeq(TimeStepInDay);
                 sysSizing.SysCoolLoadTimeStepPk = TimeStepInDay;
             }
             // check that there is system mass flow
-            if (SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) > 0.0) {
+            if (sysSizing.CoolFlowSeq(TimeStepInDay) > 0.0) {
                 // complete return air temp calc
-                SysLatCoolHumRat /= SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
-                SysCoolRetTemp /= SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
-                SysCoolRetHumRat /= SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
-                SysCoolZoneAvgTemp /= SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
-                SysSizing(CurOverallSimDay, AirLoopNum).SysCoolRetTempSeq(TimeStepInDay) = SysCoolRetTemp;
-                SysSizing(CurOverallSimDay, AirLoopNum).SysCoolRetHumRatSeq(TimeStepInDay) = SysCoolRetHumRat;
-                SysSizing(CurOverallSimDay, AirLoopNum).CoolZoneAvgTempSeq(TimeStepInDay) = SysCoolZoneAvgTemp;
+                SysLatCoolHumRat /= sysSizing.CoolFlowSeq(TimeStepInDay);
+                SysCoolRetTemp /= sysSizing.CoolFlowSeq(TimeStepInDay);
+                SysCoolRetHumRat /= sysSizing.CoolFlowSeq(TimeStepInDay);
+                SysCoolZoneAvgTemp /= sysSizing.CoolFlowSeq(TimeStepInDay);
+                sysSizing.SysCoolRetTempSeq(TimeStepInDay) = SysCoolRetTemp;
+                sysSizing.SysCoolRetHumRatSeq(TimeStepInDay) = SysCoolRetHumRat;
+                sysSizing.CoolZoneAvgTempSeq(TimeStepInDay) = SysCoolZoneAvgTemp;
                 // calculate the outside air fraction for this time step
                 RhoAir = state.dataEnvrn->StdRhoAir;
-                if (SysSizing(CurOverallSimDay, AirLoopNum).CoolOAOption == MinOA) {
-                    OutAirFrac = RhoAir * SysSizing(CurOverallSimDay, AirLoopNum).DesOutAirVolFlow /
-                                 SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
+                if (sysSizing.CoolOAOption == MinOA) {
+                    OutAirFrac = RhoAir * sysSizing.DesOutAirVolFlow / sysSizing.CoolFlowSeq(TimeStepInDay);
                     OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                 } else {
                     OutAirFrac = 1.0;
@@ -5586,82 +5422,79 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 // now calculate the mixed air temperature
                 SysCoolMixTemp = state.dataEnvrn->OutDryBulbTemp * OutAirFrac + SysCoolRetTemp * (1.0 - OutAirFrac);
                 SysCoolMixHumRat = state.dataEnvrn->OutHumRat * OutAirFrac + SysCoolRetHumRat * (1.0 - OutAirFrac);
-                SysSizing(CurOverallSimDay, AirLoopNum).SysCoolOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
-                SysSizing(CurOverallSimDay, AirLoopNum).SysCoolOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
+                sysSizing.SysCoolOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
+                sysSizing.SysCoolOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
                 // adjust supply air humidity ratio to meet latent load
-                if (SysSizing(CurOverallSimDay, AirLoopNum).LoadSizeType == DataSizing::Latent) {
+                if (sysSizing.LoadSizeType == DataSizing::Latent) {
                     if (state.dataHeatBal->isAnyLatentLoad) {
-                        SysSizing(CurOverallSimDay, AirLoopNum).CoolSupHumRat =
-                            std::min(SysLatCoolHumRat, SysSizing(CurOverallSimDay, AirLoopNum).CoolSupHumRat);
-                        FinalSysSizing(AirLoopNum).CoolSupHumRat = SysSizing(CurOverallSimDay, AirLoopNum).CoolSupHumRat;
+                        sysSizing.CoolSupHumRat = std::min(SysLatCoolHumRat, sysSizing.CoolSupHumRat);
+                        state.dataSize->FinalSysSizing(AirLoopNum).CoolSupHumRat = sysSizing.CoolSupHumRat;
                     } else {
                         // switch back to sensible load if all latent zone loads are smaller than sensible load
-                        SysSizing(CurOverallSimDay, AirLoopNum).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
-                        FinalSysSizing(AirLoopNum).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
+                        sysSizing.CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
+                        state.dataSize->FinalSysSizing(AirLoopNum).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
                     }
                 }
                 // From the mixed air temp, system design supply air temp, and the mass flow rate
                 // calculate the system sensible cooling capacity
-                SysSensCoolCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
-                                 SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) *
-                                 (SysCoolMixTemp - SysSizing(CurOverallSimDay, AirLoopNum).CoolSupTemp);
+                SysSensCoolCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * sysSizing.CoolFlowSeq(TimeStepInDay) *
+                                 (SysCoolMixTemp - sysSizing.CoolSupTemp);
                 SysSensCoolCap = max(0.0, SysSensCoolCap);
                 // calculate the system total cooling capacity
-                SysTotCoolCap = SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) *
-                                (PsyHFnTdbW(SysCoolMixTemp, SysCoolMixHumRat) - PsyHFnTdbW(SysSizing(CurOverallSimDay, AirLoopNum).CoolSupTemp,
-                                                                                           SysSizing(CurOverallSimDay, AirLoopNum).CoolSupHumRat));
+                SysTotCoolCap = sysSizing.CoolFlowSeq(TimeStepInDay) *
+                                (PsyHFnTdbW(SysCoolMixTemp, SysCoolMixHumRat) - PsyHFnTdbW(sysSizing.CoolSupTemp, sysSizing.CoolSupHumRat));
                 SysTotCoolCap = max(0.0, SysTotCoolCap);
                 // Save the sens cool cap for this time step
-                SysSizing(CurOverallSimDay, AirLoopNum).SensCoolCapSeq(TimeStepInDay) = SysSensCoolCap;
+                sysSizing.SensCoolCapSeq(TimeStepInDay) = SysSensCoolCap;
                 // Save the tot cool cap for this time step
-                SysSizing(CurOverallSimDay, AirLoopNum).TotCoolCapSeq(TimeStepInDay) = SysTotCoolCap;
+                sysSizing.TotCoolCapSeq(TimeStepInDay) = SysTotCoolCap;
                 // Save the DOAS flows
-                SysSizing(CurOverallSimDay, AirLoopNum).SysDOASHeatAddSeq(TimeStepInDay) = SysDOASHeatAdd;
-                SysSizing(CurOverallSimDay, AirLoopNum).SysDOASLatAddSeq(TimeStepInDay) = SysDOASLatAdd;
+                sysSizing.SysDOASHeatAddSeq(TimeStepInDay) = SysDOASHeatAdd;
+                sysSizing.SysDOASLatAddSeq(TimeStepInDay) = SysDOASLatAdd;
             } // end of system mass flow check
 
             // get the maximum system sensible cooling capacity
             if (SysSensCoolCap > state.dataSize->SensCoolCapTemp(AirLoopNum)) {
-                SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(CurOverallSimDay) = TimeStepInDay;
+                state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(state.dataSize->CurOverallSimDay) = TimeStepInDay;
                 state.dataSize->SensCoolCapTemp(AirLoopNum) = SysSensCoolCap;
-                if (SysSizing(CurOverallSimDay, AirLoopNum).CoolingPeakLoadType == SensibleCoolingLoad) {
-                    SysSizing(CurOverallSimDay, AirLoopNum).SensCoolCap = SysSensCoolCap;
-                    SysSizing(CurOverallSimDay, AirLoopNum).TotCoolCap = SysTotCoolCap;
-                    SysSizing(CurOverallSimDay, AirLoopNum).MixTempAtCoolPeak = SysCoolMixTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).MixHumRatAtCoolPeak = SysCoolMixHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).RetTempAtCoolPeak = SysCoolRetTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).RetHumRatAtCoolPeak = SysCoolRetHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).OutTempAtCoolPeak = state.dataEnvrn->OutDryBulbTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).OutHumRatAtCoolPeak = state.dataEnvrn->OutHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).MassFlowAtCoolPeak = SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
+                if (sysSizing.CoolingPeakLoadType == SensibleCoolingLoad) {
+                    sysSizing.SensCoolCap = SysSensCoolCap;
+                    sysSizing.TotCoolCap = SysTotCoolCap;
+                    sysSizing.MixTempAtCoolPeak = SysCoolMixTemp;
+                    sysSizing.MixHumRatAtCoolPeak = SysCoolMixHumRat;
+                    sysSizing.RetTempAtCoolPeak = SysCoolRetTemp;
+                    sysSizing.RetHumRatAtCoolPeak = SysCoolRetHumRat;
+                    sysSizing.OutTempAtCoolPeak = state.dataEnvrn->OutDryBulbTemp;
+                    sysSizing.OutHumRatAtCoolPeak = state.dataEnvrn->OutHumRat;
+                    sysSizing.MassFlowAtCoolPeak = sysSizing.CoolFlowSeq(TimeStepInDay);
                 }
             }
             // get the maximum system total cooling capacity
             if (SysTotCoolCap > state.dataSize->TotCoolCapTemp(AirLoopNum)) {
-                SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk(CurOverallSimDay) = TimeStepInDay;
+                state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk(state.dataSize->CurOverallSimDay) = TimeStepInDay;
                 state.dataSize->TotCoolCapTemp(AirLoopNum) = SysTotCoolCap;
-                if (SysSizing(CurOverallSimDay, AirLoopNum).CoolingPeakLoadType == TotalCoolingLoad) {
-                    SysSizing(CurOverallSimDay, AirLoopNum).SensCoolCap = SysSensCoolCap;
-                    SysSizing(CurOverallSimDay, AirLoopNum).TotCoolCap = SysTotCoolCap;
-                    SysSizing(CurOverallSimDay, AirLoopNum).MixTempAtCoolPeak = SysCoolMixTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).MixHumRatAtCoolPeak = SysCoolMixHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).RetTempAtCoolPeak = SysCoolRetTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).RetHumRatAtCoolPeak = SysCoolRetHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).OutTempAtCoolPeak = state.dataEnvrn->OutDryBulbTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).OutHumRatAtCoolPeak = state.dataEnvrn->OutHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).MassFlowAtCoolPeak = SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
+                if (sysSizing.CoolingPeakLoadType == TotalCoolingLoad) {
+                    sysSizing.SensCoolCap = SysSensCoolCap;
+                    sysSizing.TotCoolCap = SysTotCoolCap;
+                    sysSizing.MixTempAtCoolPeak = SysCoolMixTemp;
+                    sysSizing.MixHumRatAtCoolPeak = SysCoolMixHumRat;
+                    sysSizing.RetTempAtCoolPeak = SysCoolRetTemp;
+                    sysSizing.RetHumRatAtCoolPeak = SysCoolRetHumRat;
+                    sysSizing.OutTempAtCoolPeak = state.dataEnvrn->OutDryBulbTemp;
+                    sysSizing.OutHumRatAtCoolPeak = state.dataEnvrn->OutHumRat;
+                    sysSizing.MassFlowAtCoolPeak = sysSizing.CoolFlowSeq(TimeStepInDay);
                 }
-                SysSizing(CurOverallSimDay, AirLoopNum).SysCoolCoinSpaceSens = 0.0;
-                for (int zonesCoolLoop = 1; zonesCoolLoop <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zonesCoolLoop) {
-                    int zoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(zonesCoolLoop);
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysCoolCoinSpaceSens +=
-                        CalcZoneSizing(CurOverallSimDay, zoneNum).CoolLoadSeq(TimeStepInDay);
+                sysSizing.SysCoolCoinSpaceSens = 0.0;
+                for (int zonesCoolLoop = 1; zonesCoolLoop <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zonesCoolLoop) {
+                    int zoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(zonesCoolLoop);
+                    sysSizing.SysCoolCoinSpaceSens +=
+                        state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, zoneNum).CoolLoadSeq(TimeStepInDay);
                 }
             }
             // get the maximum cooling mass flow rate
-            if (SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) > SysSizing(CurOverallSimDay, AirLoopNum).CoinCoolMassFlow) {
-                SysSizing(CurOverallSimDay, AirLoopNum).CoinCoolMassFlow = SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
-                SysSizPeakDDNum(AirLoopNum).TimeStepAtCoolFlowPk(CurOverallSimDay) = TimeStepInDay;
+            if (sysSizing.CoolFlowSeq(TimeStepInDay) > sysSizing.CoinCoolMassFlow) {
+                sysSizing.CoinCoolMassFlow = sysSizing.CoolFlowSeq(TimeStepInDay);
+                state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtCoolFlowPk(state.dataSize->CurOverallSimDay) = TimeStepInDay;
             }
             SysHeatRetTemp = 0.0;
             OutAirFrac = 0.0;
@@ -5673,28 +5506,23 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             if (NumZonesHeated > 0) { // IF there are centrally heated zones
 
                 for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over the heated zones
-                    int CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedNum);
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedNum);
+                    int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                    auto &termUnitSizing = state.dataSize->TermUnitSizing(TermUnitSizingIndex);
+                    auto &zoneSizing = state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
                     // sum up the heating mass flow rate for this time step
                     Real64 adjHeatFlowSeq =
-                        TermUnitSizing(TermUnitSizingIndex)
-                            .applyTermUnitSizingHeatFlow(ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay),
-                                                         ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeqNoOA(TimeStepInDay));
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) +=
-                        adjHeatFlowSeq / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                        termUnitSizing.applyTermUnitSizingHeatFlow(zoneSizing.HeatFlowSeq(TimeStepInDay), zoneSizing.HeatFlowSeqNoOA(TimeStepInDay));
+                    sysSizing.HeatFlowSeq(TimeStepInDay) += adjHeatFlowSeq / (1.0 + termUnitSizing.InducRat);
                     // sum up the zone heating load to be met by this system for this time step
-                    SysSizing(CurOverallSimDay, AirLoopNum).SumZoneHeatLoadSeq(TimeStepInDay) +=
-                        ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatLoadSeq(TimeStepInDay) / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                    sysSizing.SumZoneHeatLoadSeq(TimeStepInDay) += zoneSizing.HeatLoadSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
                     // calculate the return air temperature for this time step
-                    SysHeatRetTemp += ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneRetTempSeq(TimeStepInDay) *
-                                      ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay) /
-                                      (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    SysHeatRetHumRat += ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepInDay) *
-                                        ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay) /
-                                        (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    SysHeatZoneAvgTemp += ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) *
-                                          ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay) /
-                                          (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                    SysHeatRetTemp +=
+                        zoneSizing.HeatZoneRetTempSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                    SysHeatRetHumRat +=
+                        zoneSizing.HeatZoneHumRatSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                    SysHeatZoneAvgTemp +=
+                        zoneSizing.HeatZoneTempSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
                 } // end heated zones loop
                 // Get peak system heating load with coincident
                 if (abs(sysSizing.SysDesHeatLoad) > abs(sysSizing.SumZoneHeatLoadSeq(TimeStepInDay))) {
@@ -5702,19 +5530,18 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     sysSizing.SysHeatLoadTimeStepPk = TimeStepInDay;
                 }
                 // check that the system flow rate is nonzero
-                if (SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) > 0.0) {
+                if (sysSizing.HeatFlowSeq(TimeStepInDay) > 0.0) {
                     // complete return air temp calc
-                    SysHeatRetTemp /= SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay);
-                    SysHeatRetHumRat /= SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay);
-                    SysHeatZoneAvgTemp /= SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay);
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatRetTempSeq(TimeStepInDay) = SysHeatRetTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatRetHumRatSeq(TimeStepInDay) = SysHeatRetHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatZoneAvgTempSeq(TimeStepInDay) = SysHeatZoneAvgTemp;
+                    SysHeatRetTemp /= sysSizing.HeatFlowSeq(TimeStepInDay);
+                    SysHeatRetHumRat /= sysSizing.HeatFlowSeq(TimeStepInDay);
+                    SysHeatZoneAvgTemp /= sysSizing.HeatFlowSeq(TimeStepInDay);
+                    sysSizing.SysHeatRetTempSeq(TimeStepInDay) = SysHeatRetTemp;
+                    sysSizing.SysHeatRetHumRatSeq(TimeStepInDay) = SysHeatRetHumRat;
+                    sysSizing.HeatZoneAvgTempSeq(TimeStepInDay) = SysHeatZoneAvgTemp;
                     // calculate the outside air fraction for this time step
                     RhoAir = state.dataEnvrn->StdRhoAir;
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).HeatOAOption == MinOA) {
-                        OutAirFrac = RhoAir * SysSizing(CurOverallSimDay, AirLoopNum).DesOutAirVolFlow /
-                                     SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay);
+                    if (sysSizing.HeatOAOption == MinOA) {
+                        OutAirFrac = RhoAir * sysSizing.DesOutAirVolFlow / sysSizing.HeatFlowSeq(TimeStepInDay);
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
                         OutAirFrac = 1.0;
@@ -5722,92 +5549,85 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     // calculate the mixed air temperature
                     SysHeatMixTemp = state.dataEnvrn->OutDryBulbTemp * OutAirFrac + SysHeatRetTemp * (1.0 - OutAirFrac);
                     SysHeatMixHumRat = state.dataEnvrn->OutHumRat * OutAirFrac + SysHeatRetHumRat * (1.0 - OutAirFrac);
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
+                    sysSizing.SysHeatOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
+                    sysSizing.SysHeatOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
                     // From the mixed air temp, heating supply air temp, and mass flow rate calculate the system heating capacity
-                    SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
-                                 SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) *
-                                 (SysSizing(CurOverallSimDay, AirLoopNum).HeatSupTemp - SysHeatMixTemp);
+                    SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * sysSizing.HeatFlowSeq(TimeStepInDay) *
+                                 (sysSizing.HeatSupTemp - SysHeatMixTemp);
                     SysHeatCap = max(0.0, SysHeatCap);
                     // save the system heating capacity for the time step
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatCapSeq(TimeStepInDay) = SysHeatCap;
+                    sysSizing.HeatCapSeq(TimeStepInDay) = SysHeatCap;
                 } // end system flow rate IF
 
                 // Get the maximum system heating capacity
-                if (SysHeatCap > SysSizing(CurOverallSimDay, AirLoopNum).HeatCap) {
-                    SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(CurOverallSimDay) = TimeStepInDay;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatCap = SysHeatCap;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatMixTemp = SysHeatMixTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatMixHumRat = SysHeatMixHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatRetTemp = SysHeatRetTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatRetHumRat = SysHeatRetHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatOutHumRat = state.dataEnvrn->OutHumRat;
+                if (SysHeatCap > sysSizing.HeatCap) {
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(state.dataSize->CurOverallSimDay) = TimeStepInDay;
+                    sysSizing.HeatCap = SysHeatCap;
+                    sysSizing.HeatMixTemp = SysHeatMixTemp;
+                    sysSizing.HeatMixHumRat = SysHeatMixHumRat;
+                    sysSizing.HeatRetTemp = SysHeatRetTemp;
+                    sysSizing.HeatRetHumRat = SysHeatRetHumRat;
+                    sysSizing.HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
+                    sysSizing.HeatOutHumRat = state.dataEnvrn->OutHumRat;
                     // save time of system coincident heating coil peak
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatCoilTimeStepPk = TimeStepInDay;
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatCoinSpaceSens = 0.0;
-                    if (AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
-                        for (int zonesHeatLoop = 1; zonesHeatLoop <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zonesHeatLoop) {
-                            int zoneNum = AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(zonesHeatLoop);
-                            SysSizing(CurOverallSimDay, AirLoopNum).SysHeatCoinSpaceSens +=
-                                CalcZoneSizing(CurOverallSimDay, zoneNum).HeatLoadSeq(TimeStepInDay);
+                    sysSizing.SysHeatCoilTimeStepPk = TimeStepInDay;
+                    sysSizing.SysHeatCoinSpaceSens = 0.0;
+                    if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
+                        for (int zonesHeatLoop = 1; zonesHeatLoop <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+                             ++zonesHeatLoop) {
+                            int zoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(zonesHeatLoop);
+                            sysSizing.SysHeatCoinSpaceSens +=
+                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, zoneNum).HeatLoadSeq(TimeStepInDay);
                         }
                     }
                 }
                 //! save time of system coincident heating airflow peak
-                if (SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) > SysSizing(CurOverallSimDay, AirLoopNum).CoinHeatMassFlow) {
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatAirTimeStepPk = TimeStepInDay;
+                if (sysSizing.HeatFlowSeq(TimeStepInDay) > sysSizing.CoinHeatMassFlow) {
+                    sysSizing.SysHeatAirTimeStepPk = TimeStepInDay;
                 }
 
                 // Get the maximum system heating flow rate
-                SysSizing(CurOverallSimDay, AirLoopNum).CoinHeatMassFlow =
-                    max(SysSizing(CurOverallSimDay, AirLoopNum).CoinHeatMassFlow, SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay));
+                sysSizing.CoinHeatMassFlow = max(sysSizing.CoinHeatMassFlow, sysSizing.HeatFlowSeq(TimeStepInDay));
 
             } else { // No centrally heated zones: use cooled zones
 
                 for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over the cooled zones
-                    int CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledNum);
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledNum);
+                    auto &termUnitSizing =
+                        state.dataSize->TermUnitSizing(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum));
+                    auto &zoneSizing = state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
                     // sum up the heating mass flow rate for this time step
                     Real64 adjHeatFlowSeq =
-                        TermUnitSizing(TermUnitSizingIndex)
-                            .applyTermUnitSizingHeatFlow(ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay),
-                                                         ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeqNoOA(TimeStepInDay));
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) +=
-                        adjHeatFlowSeq / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                        termUnitSizing.applyTermUnitSizingHeatFlow(zoneSizing.HeatFlowSeq(TimeStepInDay), zoneSizing.HeatFlowSeqNoOA(TimeStepInDay));
+                    sysSizing.HeatFlowSeq(TimeStepInDay) += adjHeatFlowSeq / (1.0 + termUnitSizing.InducRat);
                     // sum up the zone heating load to be met by this system for this time step
-                    SysSizing(CurOverallSimDay, AirLoopNum).SumZoneHeatLoadSeq(TimeStepInDay) +=
-                        ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatLoadSeq(TimeStepInDay) / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                    sysSizing.SumZoneHeatLoadSeq(TimeStepInDay) += zoneSizing.HeatLoadSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
                     // calculate the return air temperature for this time step
-                    SysHeatRetTemp += ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneRetTempSeq(TimeStepInDay) *
-                                      ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay) /
-                                      (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    SysHeatRetHumRat += ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepInDay) *
-                                        ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay) /
-                                        (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    SysHeatZoneAvgTemp += ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) *
-                                          ZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatFlowSeq(TimeStepInDay) /
-                                          (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                    SysHeatRetTemp +=
+                        zoneSizing.HeatZoneRetTempSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                    SysHeatRetHumRat +=
+                        zoneSizing.HeatZoneHumRatSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                    SysHeatZoneAvgTemp +=
+                        zoneSizing.HeatZoneTempSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
                 } // end of cooled zones loop
                 // Get peak system heating load with coincident
-                if (abs(sysSizing.SysDesHeatLoad) < abs(sysSizing.SumZoneHeatLoadSeq(TimeStepInDay))) {
+                if (fabs(sysSizing.SysDesHeatLoad) < fabs(sysSizing.SumZoneHeatLoadSeq(TimeStepInDay))) {
                     sysSizing.SysDesHeatLoad = sysSizing.SumZoneHeatLoadSeq(TimeStepInDay);
                     sysSizing.SysHeatLoadTimeStepPk = TimeStepInDay;
                 }
 
-                if (SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) > 0.0) {
+                if (sysSizing.HeatFlowSeq(TimeStepInDay) > 0.0) {
                     // complete return air temp calc
-                    SysHeatRetTemp /= SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay);
-                    SysHeatRetHumRat /= SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay);
-                    SysHeatZoneAvgTemp /= SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay);
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatRetTempSeq(TimeStepInDay) = SysHeatRetTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatRetHumRatSeq(TimeStepInDay) = SysHeatRetHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatZoneAvgTempSeq(TimeStepInDay) = SysHeatZoneAvgTemp;
+                    SysHeatRetTemp /= sysSizing.HeatFlowSeq(TimeStepInDay);
+                    SysHeatRetHumRat /= sysSizing.HeatFlowSeq(TimeStepInDay);
+                    SysHeatZoneAvgTemp /= sysSizing.HeatFlowSeq(TimeStepInDay);
+                    sysSizing.SysHeatRetTempSeq(TimeStepInDay) = SysHeatRetTemp;
+                    sysSizing.SysHeatRetHumRatSeq(TimeStepInDay) = SysHeatRetHumRat;
+                    sysSizing.HeatZoneAvgTempSeq(TimeStepInDay) = SysHeatZoneAvgTemp;
                     // calculate the outside air fraction for this time step
                     RhoAir = state.dataEnvrn->StdRhoAir;
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).HeatOAOption == MinOA) {
-                        OutAirFrac = RhoAir * SysSizing(CurOverallSimDay, AirLoopNum).DesOutAirVolFlow /
-                                     SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay);
+                    if (sysSizing.HeatOAOption == MinOA) {
+                        OutAirFrac = RhoAir * sysSizing.DesOutAirVolFlow / sysSizing.HeatFlowSeq(TimeStepInDay);
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
                         OutAirFrac = 1.0;
@@ -5815,44 +5635,42 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     // calculate the mixed air temperature
                     SysHeatMixTemp = state.dataEnvrn->OutDryBulbTemp * OutAirFrac + SysHeatRetTemp * (1.0 - OutAirFrac);
                     SysHeatMixHumRat = state.dataEnvrn->OutHumRat * OutAirFrac + SysHeatRetHumRat * (1.0 - OutAirFrac);
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
+                    sysSizing.SysHeatOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
+                    sysSizing.SysHeatOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
                     // From the mixed air temp, heating supply air temp, and mass flow rate calculate the system heating capacity
-                    SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
-                                 SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) *
-                                 (SysSizing(CurOverallSimDay, AirLoopNum).HeatSupTemp - SysHeatMixTemp);
+                    SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * sysSizing.HeatFlowSeq(TimeStepInDay) *
+                                 (sysSizing.HeatSupTemp - SysHeatMixTemp);
                     SysHeatCap = max(0.0, SysHeatCap);
                     // save the system heating capacity for the time step
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatCapSeq(TimeStepInDay) = SysHeatCap;
+                    sysSizing.HeatCapSeq(TimeStepInDay) = SysHeatCap;
                 } // end system flow rate IF
 
                 // Get the maximum system heating capacity
-                if (SysHeatCap > SysSizing(CurOverallSimDay, AirLoopNum).HeatCap) {
-                    SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(CurOverallSimDay) = TimeStepInDay;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatCap = SysHeatCap;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatMixTemp = SysHeatMixTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatMixHumRat = SysHeatMixHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatRetTemp = SysHeatRetTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatRetHumRat = SysHeatRetHumRat;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatOutHumRat = state.dataEnvrn->OutHumRat;
+                if (SysHeatCap > sysSizing.HeatCap) {
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(state.dataSize->CurOverallSimDay) = TimeStepInDay;
+                    sysSizing.HeatCap = SysHeatCap;
+                    sysSizing.HeatMixTemp = SysHeatMixTemp;
+                    sysSizing.HeatMixHumRat = SysHeatMixHumRat;
+                    sysSizing.HeatRetTemp = SysHeatRetTemp;
+                    sysSizing.HeatRetHumRat = SysHeatRetHumRat;
+                    sysSizing.HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
+                    sysSizing.HeatOutHumRat = state.dataEnvrn->OutHumRat;
                     // save time of system coincident heating coil peak
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatCoilTimeStepPk = TimeStepInDay;
+                    sysSizing.SysHeatCoilTimeStepPk = TimeStepInDay;
 
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatCoinSpaceSens = 0.0;
-                    for (int zonesCoolLoop = 1; zonesCoolLoop <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zonesCoolLoop) {
-                        int zoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(zonesCoolLoop);
-                        SysSizing(CurOverallSimDay, AirLoopNum).SysHeatCoinSpaceSens +=
-                            CalcZoneSizing(CurOverallSimDay, zoneNum).HeatLoadSeq(TimeStepInDay);
+                    sysSizing.SysHeatCoinSpaceSens = 0.0;
+                    for (int zonesCoolLoop = 1; zonesCoolLoop <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zonesCoolLoop) {
+                        int zoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(zonesCoolLoop);
+                        sysSizing.SysHeatCoinSpaceSens +=
+                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, zoneNum).HeatLoadSeq(TimeStepInDay);
                     }
                 } // Get the maximum system heating flow rate
                 // save time of system coincident heating airflow peak
-                if (SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) > SysSizing(CurOverallSimDay, AirLoopNum).CoinHeatMassFlow) {
-                    SysSizing(CurOverallSimDay, AirLoopNum).SysHeatAirTimeStepPk = TimeStepInDay;
+                if (sysSizing.HeatFlowSeq(TimeStepInDay) > sysSizing.CoinHeatMassFlow) {
+                    sysSizing.SysHeatAirTimeStepPk = TimeStepInDay;
                 }
 
-                SysSizing(CurOverallSimDay, AirLoopNum).CoinHeatMassFlow =
-                    max(SysSizing(CurOverallSimDay, AirLoopNum).CoinHeatMassFlow, SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay));
+                sysSizing.CoinHeatMassFlow = max(sysSizing.CoinHeatMassFlow, sysSizing.HeatFlowSeq(TimeStepInDay));
             }
 
         } // end of loop over primary air systems
@@ -5862,78 +5680,81 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
         // Get design flows
         SysCoolingEv = 1.0;
         SysHeatingEv = 1.0;
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+            auto &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
+            int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+            int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+            auto &sysSizing = state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum);
 
-            int NumZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
-            int NumZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
-
-            switch (SysSizing(CurOverallSimDay, AirLoopNum).SizingOption) {
+            switch (sysSizing.SizingOption) {
             case Coincident: {
-                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_ZoneSum) {
-                    SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow =
-                        SysSizing(CurOverallSimDay, AirLoopNum).CoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
-                    SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow =
-                        SysSizing(CurOverallSimDay, AirLoopNum).CoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
-                    state.dataSize->VotClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).SysUncOA;
-                    state.dataSize->VotHtgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).SysUncOA;
+                if (finalSysSizing.SystemOAMethod == SOAM_ZoneSum) {
+                    sysSizing.DesCoolVolFlow = sysSizing.CoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
+                    sysSizing.DesHeatVolFlow = sysSizing.CoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
+                    state.dataSize->VotClgBySys(AirLoopNum) = finalSysSizing.SysUncOA;
+                    state.dataSize->VotHtgBySys(AirLoopNum) = finalSysSizing.SysUncOA;
                     for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) {
-                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling < state.dataSize->EvzMinBySysCool(AirLoopNum))
-                            state.dataSize->EvzMinBySysCool(AirLoopNum) = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating < state.dataSize->EvzMinBySysHeat(AirLoopNum))
-                            state.dataSize->EvzMinBySysHeat(AirLoopNum) = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                        int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                        if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling <
+                            state.dataSize->EvzMinBySysCool(AirLoopNum))
+                            state.dataSize->EvzMinBySysCool(AirLoopNum) =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
+                        if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating <
+                            state.dataSize->EvzMinBySysHeat(AirLoopNum))
+                            state.dataSize->EvzMinBySysHeat(AirLoopNum) =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
                     }
                     for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) {
-                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling < state.dataSize->EvzMinBySysCool(AirLoopNum))
-                            state.dataSize->EvzMinBySysCool(AirLoopNum) = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating < state.dataSize->EvzMinBySysHeat(AirLoopNum))
-                            state.dataSize->EvzMinBySysHeat(AirLoopNum) = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                        int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                        if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling <
+                            state.dataSize->EvzMinBySysCool(AirLoopNum))
+                            state.dataSize->EvzMinBySysCool(AirLoopNum) =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
+                        if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating <
+                            state.dataSize->EvzMinBySysHeat(AirLoopNum))
+                            state.dataSize->EvzMinBySysHeat(AirLoopNum) =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
                     }
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                        state.dataSize->XsBySysCool(AirLoopNum) =
-                            min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow);
+                    if (sysSizing.DesCoolVolFlow > 0) {
+                        state.dataSize->XsBySysCool(AirLoopNum) = min(1.0, finalSysSizing.SysUncOA / sysSizing.DesCoolVolFlow);
                     } else {
                         state.dataSize->XsBySysCool(AirLoopNum) = 0.0;
                     }
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
-                        state.dataSize->XsBySysHeat(AirLoopNum) =
-                            min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow);
+                    if (sysSizing.DesHeatVolFlow > 0) {
+                        state.dataSize->XsBySysHeat(AirLoopNum) = min(1.0, finalSysSizing.SysUncOA / sysSizing.DesHeatVolFlow);
                     } else {
                         state.dataSize->XsBySysHeat(AirLoopNum) = 0.0;
                     }
-                } else if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP ||
-                           FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) { // Ventilation Rate and Simplified Procedure
+                } else if (finalSysSizing.SystemOAMethod == SOAM_VRP ||
+                           finalSysSizing.SystemOAMethod == SOAM_SP) { // Ventilation Rate and Simplified Procedure
                     // cooling
-                    SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow =
-                        SysSizing(CurOverallSimDay, AirLoopNum).CoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                        OutAirFrac =
-                            SysSizing(CurOverallSimDay, AirLoopNum).DesOutAirVolFlow / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow;
+                    sysSizing.DesCoolVolFlow = sysSizing.CoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
+                    if (sysSizing.DesCoolVolFlow > 0) {
+                        OutAirFrac = sysSizing.DesOutAirVolFlow / sysSizing.DesCoolVolFlow;
                     } else {
                         OutAirFrac = 0.0;
                     }
                     OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                        state.dataSimAirServingZones->Xs =
-                            min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow);
+                    if (sysSizing.DesCoolVolFlow > 0) {
+                        state.dataSimAirServingZones->Xs = min(1.0, finalSysSizing.SysUncOA / sysSizing.DesCoolVolFlow);
                     } else {
                         state.dataSimAirServingZones->Xs = 0.0;
                     }
-                    if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                        int numZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+                    if (finalSysSizing.OAAutoSized && sysSizing.DesCoolVolFlow > 0) {
+                        int numZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                         state.dataSimAirServingZones->MinCoolingEvz = 1.0;
                         state.dataSize->VozSumClgBySys(AirLoopNum) = 0.0;
                         for (int ZonesCooledNum = 1; ZonesCooledNum <= numZonesCooled; ++ZonesCooledNum) {
-                            int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                            int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
 
                             // Zone air secondary recirculation fraction
-                            state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                            state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction;
-                            state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
-                            state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
-                            VozClg = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
-                            if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                            state.dataSimAirServingZones->Er =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                            state.dataSimAirServingZones->Ep = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction;
+                            state.dataSimAirServingZones->ZoneOAFrac = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
+                            state.dataSimAirServingZones->ZoneEz = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
+                            VozClg = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
+                            if (finalSysSizing.SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
                                 if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                     state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                 } else {
@@ -5977,14 +5798,14 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                     state.dataSize->EvzByZoneCool(TermUnitSizingIndex); // Save previous EvzByZoneCool
                                 state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = SysCoolingEv;
                             }
-                            state.dataSize->VozSumClgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
+                            state.dataSize->VozSumClgBySys(AirLoopNum) += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
                         }
 
                         if (state.dataSimAirServingZones->MinCoolingEvz > 0) {
                             // (However, I don't think people diversity can be done correctly in E+ Sizing so assuming D=1 in this
                             // equation
                             // Vou = Diversity*(Rp*Pz) + Ra*Az
-                            state.dataSimAirServingZones->Vou = FinalSysSizing(AirLoopNum).SysUncOA;
+                            state.dataSimAirServingZones->Vou = finalSysSizing.SysUncOA;
                             state.dataSimAirServingZones->Vot = state.dataSimAirServingZones->Vou / state.dataSimAirServingZones->MinCoolingEvz;
                             if (state.dataSimAirServingZones->Vot > state.dataSize->VotClgBySys(AirLoopNum)) {
                                 // This might be the cooling design day so only update if Vot is larger than the previous
@@ -5994,7 +5815,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                             } else {
                                 // Restore EvzByZoneCool() since it was reset by the current (but not highest Vot) design day
                                 for (int ZonesCooledNum = 1; ZonesCooledNum <= numZonesCooled; ++ZonesCooledNum) {
-                                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                                    int TermUnitSizingIndex =
+                                        state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
                                     state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = state.dataSize->EvzByZoneCoolPrev(TermUnitSizingIndex);
                                 }
                             }
@@ -6002,62 +5824,62 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     }
 
                     // heating
-                    SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow =
-                        SysSizing(CurOverallSimDay, AirLoopNum).CoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
-                        OutAirFrac =
-                            SysSizing(CurOverallSimDay, AirLoopNum).DesOutAirVolFlow / SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow;
+                    sysSizing.DesHeatVolFlow = sysSizing.CoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
+                    if (sysSizing.DesHeatVolFlow > 0) {
+                        OutAirFrac = sysSizing.DesOutAirVolFlow / sysSizing.DesHeatVolFlow;
                     } else {
                         OutAirFrac = 0.0;
                     }
                     OutAirFrac = min(1.0, max(0.0, OutAirFrac));
 
                     // This is a bit of a cludge. If the design zone heating airflows were increased due to
-                    // the MaxZoneOaFraction, then the SysSizing(AirLoopNum,CurOverallSimDay)%DesHeatVolFlow
+                    // the MaxZoneOaFraction, then the SysSizing(AirLoopNum,state.dataSize->CurOverallSimDay)%DesHeatVolFlow
                     // variable will be out of sync with the
-                    if (FinalSysSizing(AirLoopNum).MaxZoneOAFraction > 0 && FinalSysSizing(AirLoopNum).HeatAirDesMethod == FromDDCalc) {
+                    if (finalSysSizing.MaxZoneOAFraction > 0 && finalSysSizing.HeatAirDesMethod == FromDDCalc) {
                         SysHtgPeakAirflow = 0.0;
                         if (NumZonesHeated > 0) {
                             for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) {
-                                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
-                                SysHtgPeakAirflow += TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
+                                int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                                SysHtgPeakAirflow += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
                             }
                         } else {
                             for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum) {
-                                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
-                                SysHtgPeakAirflow += TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
+                                int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
+                                SysHtgPeakAirflow += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
                             }
                         }
                     } else {
-                        SysHtgPeakAirflow = SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow;
+                        SysHtgPeakAirflow = sysSizing.DesHeatVolFlow;
                     }
 
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
-                        // SysSizing(AirLoopNum,CurOverallSimDay)%DesHeatVolFlow may be out of sync with
+                    if (sysSizing.DesHeatVolFlow > 0) {
+                        // SysSizing(AirLoopNum,state.dataSize->CurOverallSimDay)%DesHeatVolFlow may be out of sync with
                         // FinalZoneSizing(CtrlZoneNum)%DesHeatVolFlow
-                        state.dataSimAirServingZones->Xs =
-                            min(1.0,
-                                FinalSysSizing(AirLoopNum).SysUncOA / max(SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow, SysHtgPeakAirflow));
+                        state.dataSimAirServingZones->Xs = min(1.0, finalSysSizing.SysUncOA / max(sysSizing.DesHeatVolFlow, SysHtgPeakAirflow));
                     } else {
                         state.dataSimAirServingZones->Xs = 0.0;
                     }
 
-                    if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
-                        int numZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+                    if (finalSysSizing.OAAutoSized && sysSizing.DesHeatVolFlow > 0) {
+                        int numZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
                         state.dataSimAirServingZones->MinHeatingEvz = 1.0;
                         state.dataSize->VozSumHtgBySys(AirLoopNum) = 0.0;
                         if (numZonesHeated > 0) {
                             for (int ZonesHeatedNum = 1; ZonesHeatedNum <= numZonesHeated; ++ZonesHeatedNum) {
-                                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
-                                MatchingCooledZoneNum =
-                                    FindNumberInList(TermUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, NumZonesCooled);
+                                int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                                MatchingCooledZoneNum = FindNumberInList(
+                                    TermUnitSizingIndex, state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, NumZonesCooled);
                                 if (MatchingCooledZoneNum == 0) {
                                     // Zone air secondary recirculation fraction
-                                    state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                    state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
-                                    state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
-                                    state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                    if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                                    state.dataSimAirServingZones->Er =
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                    state.dataSimAirServingZones->Ep =
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
+                                    state.dataSimAirServingZones->ZoneOAFrac =
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
+                                    state.dataSimAirServingZones->ZoneEz =
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                                    if (finalSysSizing.SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
                                         if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                             state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                         } else {
@@ -6099,18 +5921,21 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                             state.dataSize->EvzByZoneHeat(TermUnitSizingIndex); // Save previous EvzByZoneHeat
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = SysHeatingEv;
                                     }
-                                    state.dataSize->VozSumHtgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
+                                    state.dataSize->VozSumHtgBySys(AirLoopNum) +=
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
                                 }
                             }
                         } else {
                             for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum) {
-                                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
+                                int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
                                 // Zone air secondary recirculation fraction
-                                state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
-                                state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
-                                state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                                state.dataSimAirServingZones->Er =
+                                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                state.dataSimAirServingZones->Ep =
+                                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
+                                state.dataSimAirServingZones->ZoneOAFrac = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
+                                state.dataSimAirServingZones->ZoneEz = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                                if (finalSysSizing.SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
                                     if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                     } else {
@@ -6151,7 +5976,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                     state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex) =
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex); // Save previous EvzByZoneHeat
                                     state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = SysHeatingEv;
-                                    state.dataSize->VozSumHtgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
+                                    state.dataSize->VozSumHtgBySys(AirLoopNum) +=
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
                                 }
                             }
                         }
@@ -6161,7 +5987,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                             // (However, I don't think people diversity can be done correctly in E+ Sizing so assuming D=1 in this
                             // equation
                             // Vou = Diversity*(Rp*Pz) + Ra*Az
-                            state.dataSimAirServingZones->Vou = FinalSysSizing(AirLoopNum).SysUncOA;
+                            state.dataSimAirServingZones->Vou = finalSysSizing.SysUncOA;
                             state.dataSimAirServingZones->Vot = state.dataSimAirServingZones->Vou / state.dataSimAirServingZones->MinHeatingEvz;
                             if (state.dataSimAirServingZones->Vot > state.dataSize->VotHtgBySys(AirLoopNum)) {
                                 // This might be the cooling design day so only update if Vot is larger than the previous
@@ -6173,12 +5999,14 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                 // This kludge is probably because inside EndDay block and code gets called for each design day.
                                 if (numZonesHeated > 0) {
                                     for (int ZonesHeatedNum = 1; ZonesHeatedNum <= numZonesHeated; ++ZonesHeatedNum) {
-                                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                                        int TermUnitSizingIndex =
+                                            state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex);
                                     }
                                 } else {
                                     for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum) {
-                                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
+                                        int TermUnitSizingIndex =
+                                            state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex);
                                     }
                                 }
@@ -6187,77 +6015,78 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     }
                 } else { // error
                 }
-                SysSizing(CurOverallSimDay, AirLoopNum).DesMainVolFlow =
-                    max(SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow, SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow);
+                sysSizing.DesMainVolFlow = max(sysSizing.DesCoolVolFlow, sysSizing.DesHeatVolFlow);
                 // this should also be as least as big as is needed for Vot
             } break;
             case NonCoincident: {
-                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_ZoneSum) {
-                    SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow =
-                        SysSizing(CurOverallSimDay, AirLoopNum).NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
-                    SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow =
-                        SysSizing(CurOverallSimDay, AirLoopNum).NonCoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
-                    state.dataSize->VotClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).SysUncOA;
-                    state.dataSize->VotHtgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).SysUncOA;
+                if (finalSysSizing.SystemOAMethod == SOAM_ZoneSum) {
+                    sysSizing.DesCoolVolFlow = sysSizing.NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
+                    sysSizing.DesHeatVolFlow = sysSizing.NonCoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
+                    state.dataSize->VotClgBySys(AirLoopNum) = finalSysSizing.SysUncOA;
+                    state.dataSize->VotHtgBySys(AirLoopNum) = finalSysSizing.SysUncOA;
                     for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) {
-                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling < state.dataSize->EvzMinBySysCool(AirLoopNum))
-                            state.dataSize->EvzMinBySysCool(AirLoopNum) = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating < state.dataSize->EvzMinBySysHeat(AirLoopNum))
-                            state.dataSize->EvzMinBySysHeat(AirLoopNum) = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                        int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                        if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling <
+                            state.dataSize->EvzMinBySysCool(AirLoopNum))
+                            state.dataSize->EvzMinBySysCool(AirLoopNum) =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
+                        if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating <
+                            state.dataSize->EvzMinBySysHeat(AirLoopNum))
+                            state.dataSize->EvzMinBySysHeat(AirLoopNum) =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
                     }
                     for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) {
-                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling < state.dataSize->EvzMinBySysCool(AirLoopNum))
-                            state.dataSize->EvzMinBySysCool(AirLoopNum) = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating < state.dataSize->EvzMinBySysHeat(AirLoopNum))
-                            state.dataSize->EvzMinBySysHeat(AirLoopNum) = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                        int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                        if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling <
+                            state.dataSize->EvzMinBySysCool(AirLoopNum))
+                            state.dataSize->EvzMinBySysCool(AirLoopNum) =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
+                        if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating <
+                            state.dataSize->EvzMinBySysHeat(AirLoopNum))
+                            state.dataSize->EvzMinBySysHeat(AirLoopNum) =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
                     }
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                        state.dataSize->XsBySysCool(AirLoopNum) =
-                            min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow);
+                    if (sysSizing.DesCoolVolFlow > 0) {
+                        state.dataSize->XsBySysCool(AirLoopNum) = min(1.0, finalSysSizing.SysUncOA / sysSizing.DesCoolVolFlow);
                     } else {
                         state.dataSize->XsBySysCool(AirLoopNum) = 0.0;
                     }
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
-                        state.dataSize->XsBySysHeat(AirLoopNum) =
-                            min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow);
+                    if (sysSizing.DesHeatVolFlow > 0) {
+                        state.dataSize->XsBySysHeat(AirLoopNum) = min(1.0, finalSysSizing.SysUncOA / sysSizing.DesHeatVolFlow);
                     } else {
                         state.dataSize->XsBySysHeat(AirLoopNum) = 0.0;
                     }
-                } else if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP ||
-                           FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) { // Ventilation Rate and Simplified Procedure
+                } else if (finalSysSizing.SystemOAMethod == SOAM_VRP ||
+                           finalSysSizing.SystemOAMethod == SOAM_SP) { // Ventilation Rate and Simplified Procedure
                     // cooling
-                    SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow =
-                        SysSizing(CurOverallSimDay, AirLoopNum).NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                        OutAirFrac =
-                            SysSizing(CurOverallSimDay, AirLoopNum).DesOutAirVolFlow / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow;
+                    sysSizing.DesCoolVolFlow = sysSizing.NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
+                    if (sysSizing.DesCoolVolFlow > 0) {
+                        OutAirFrac = sysSizing.DesOutAirVolFlow / sysSizing.DesCoolVolFlow;
                     } else {
                         OutAirFrac = 0.0;
                     }
                     OutAirFrac = min(1.0, max(0.0, OutAirFrac));
 
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                        state.dataSimAirServingZones->Xs =
-                            min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow);
+                    if (sysSizing.DesCoolVolFlow > 0) {
+                        state.dataSimAirServingZones->Xs = min(1.0, finalSysSizing.SysUncOA / sysSizing.DesCoolVolFlow);
                     } else {
                         state.dataSimAirServingZones->Xs = 0.0;
                     }
-                    if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                        int numZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+                    if (finalSysSizing.OAAutoSized && sysSizing.DesCoolVolFlow > 0) {
+                        int numZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                         state.dataSimAirServingZones->MinCoolingEvz = 1.0;
                         state.dataSize->VozSumClgBySys(AirLoopNum) = 0.0;
                         for (int ZonesCooledNum = 1; ZonesCooledNum <= numZonesCooled; ++ZonesCooledNum) {
-                            int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                            int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
 
                             // Zone air secondary recirculation fraction
-                            state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                            state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction;
-                            state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
-                            state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
-                            VozClg = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
-                            if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                            state.dataSimAirServingZones->Er =
+                                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                            state.dataSimAirServingZones->Ep = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction;
+                            state.dataSimAirServingZones->ZoneOAFrac = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
+                            state.dataSimAirServingZones->ZoneEz = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
+                            VozClg = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
+                            if (finalSysSizing.SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
                                 if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                     state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                 } else {
@@ -6298,9 +6127,10 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                     state.dataSimAirServingZones->MinCoolingEvz = SysCoolingEv;
                                 state.dataSize->EvzByZoneCoolPrev(TermUnitSizingIndex) = state.dataSize->EvzByZoneCool(TermUnitSizingIndex);
                                 state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = SysCoolingEv;
-                                state.dataSize->VozSumClgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
+                                state.dataSize->VozSumClgBySys(AirLoopNum) +=
+                                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
                             }
-                            state.dataSize->VozSumClgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
+                            state.dataSize->VozSumClgBySys(AirLoopNum) += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
                         }
 
                         if (state.dataSimAirServingZones->MinCoolingEvz > 0) {
@@ -6308,7 +6138,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                             // (However, I don't think people diversity can be done correctly in E+ Sizing so assuming D=1 in this
                             // equation
                             // Vou = Diversity*(Rp*Pz) + Ra*Az
-                            state.dataSimAirServingZones->Vou = FinalSysSizing(AirLoopNum).SysUncOA;
+                            state.dataSimAirServingZones->Vou = finalSysSizing.SysUncOA;
                             state.dataSimAirServingZones->Vot = state.dataSimAirServingZones->Vou / state.dataSimAirServingZones->MinCoolingEvz;
                             if (state.dataSimAirServingZones->Vot > state.dataSize->VotClgBySys(AirLoopNum)) {
                                 // This might be the cooling design day so only update if Vot is larger than the previous
@@ -6318,7 +6148,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                             } else {
                                 // Restore EvzByZoneCool() since it was reset by the current (but not highest Vot) design day
                                 for (int ZonesCooledNum = 1; ZonesCooledNum <= numZonesCooled; ++ZonesCooledNum) {
-                                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                                    int TermUnitSizingIndex =
+                                        state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
                                     state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = state.dataSize->EvzByZoneCoolPrev(TermUnitSizingIndex);
                                 }
                             }
@@ -6326,38 +6157,39 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     }
 
                     // heating
-                    SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow =
-                        SysSizing(CurOverallSimDay, AirLoopNum).NonCoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
-                        OutAirFrac =
-                            SysSizing(CurOverallSimDay, AirLoopNum).DesOutAirVolFlow / SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow;
+                    sysSizing.DesHeatVolFlow = sysSizing.NonCoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
+                    if (sysSizing.DesHeatVolFlow > 0) {
+                        OutAirFrac = sysSizing.DesOutAirVolFlow / sysSizing.DesHeatVolFlow;
                     } else {
                         OutAirFrac = 0.0;
                     }
                     OutAirFrac = min(1.0, max(0.0, OutAirFrac));
 
-                    if (SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
-                        state.dataSimAirServingZones->Xs =
-                            min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow);
+                    if (sysSizing.DesHeatVolFlow > 0) {
+                        state.dataSimAirServingZones->Xs = min(1.0, finalSysSizing.SysUncOA / sysSizing.DesHeatVolFlow);
                     } else {
                         state.dataSimAirServingZones->Xs = 0.0;
                     }
-                    if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
-                        int numZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+                    if (finalSysSizing.OAAutoSized && sysSizing.DesHeatVolFlow > 0) {
+                        int numZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
                         state.dataSimAirServingZones->MinHeatingEvz = 1.0;
                         state.dataSize->VozSumHtgBySys(AirLoopNum) = 0.0;
                         if (numZonesHeated > 0) {
                             for (int ZonesHeatedNum = 1; ZonesHeatedNum <= numZonesHeated; ++ZonesHeatedNum) {
-                                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
-                                MatchingCooledZoneNum =
-                                    FindNumberInList(TermUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, NumZonesCooled);
+                                int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                                MatchingCooledZoneNum = FindNumberInList(
+                                    TermUnitSizingIndex, state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, NumZonesCooled);
                                 if (MatchingCooledZoneNum == 0) {
                                     // Zone air secondary recirculation fraction
-                                    state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                    state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
-                                    state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
-                                    state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                    if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                                    state.dataSimAirServingZones->Er =
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                    state.dataSimAirServingZones->Ep =
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
+                                    state.dataSimAirServingZones->ZoneOAFrac =
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
+                                    state.dataSimAirServingZones->ZoneEz =
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                                    if (finalSysSizing.SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
                                         if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                             state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                         } else {
@@ -6391,27 +6223,31 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                         }
                                     }
                                 }
-                                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
-                                    state.dataSize->VozSumHtgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
+                                if (finalSysSizing.SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                                    state.dataSize->VozSumHtgBySys(AirLoopNum) +=
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
                                 } else {
                                     if (SysHeatingEv < state.dataSimAirServingZones->MinHeatingEvz)
                                         state.dataSimAirServingZones->MinHeatingEvz = SysHeatingEv;
                                     state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex) =
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex); // Save previous EvzByZoneHeat
                                     state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = SysHeatingEv;
-                                    state.dataSize->VozSumHtgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
+                                    state.dataSize->VozSumHtgBySys(AirLoopNum) +=
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
                                 }
                             }
                         } else {
-                            int numZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+                            int numZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                             for (int ZonesHeatedNum = 1; ZonesHeatedNum <= numZonesCooled; ++ZonesHeatedNum) {
-                                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
+                                int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
                                 // Zone air secondary recirculation fraction
-                                state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
-                                state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
-                                state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                                state.dataSimAirServingZones->Er =
+                                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                state.dataSimAirServingZones->Ep =
+                                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
+                                state.dataSimAirServingZones->ZoneOAFrac = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
+                                state.dataSimAirServingZones->ZoneEz = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                                if (finalSysSizing.SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
                                     if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                                         state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                                     } else {
@@ -6449,7 +6285,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex); // Save previous EvzByZoneHeat
                                     state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = SysHeatingEv;
                                 }
-                                state.dataSize->VozSumHtgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
+                                state.dataSize->VozSumHtgBySys(AirLoopNum) +=
+                                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone;
                             }
                         }
 
@@ -6458,7 +6295,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                             // (However, I don't think people diversity can be done correctly in E+ Sizing so assuming D=1 in this
                             // equation
                             // Vou = Diversity*(Rp*Pz) + Ra*Az
-                            state.dataSimAirServingZones->Vou = FinalSysSizing(AirLoopNum).SysUncOA;
+                            state.dataSimAirServingZones->Vou = finalSysSizing.SysUncOA;
                             state.dataSimAirServingZones->Vot = state.dataSimAirServingZones->Vou / state.dataSimAirServingZones->MinHeatingEvz;
                             if (state.dataSimAirServingZones->Vot > state.dataSize->VotHtgBySys(AirLoopNum)) {
                                 // This might be the cooling design day so only update if Vot is larger than the previous
@@ -6470,12 +6307,14 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                 // This kludge is probably because inside EndDay block and code gets called for each design day.
                                 if (numZonesHeated > 0) {
                                     for (int ZonesHeatedNum = 1; ZonesHeatedNum <= numZonesHeated; ++ZonesHeatedNum) {
-                                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                                        int TermUnitSizingIndex =
+                                            state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex);
                                     }
                                 } else {
                                     for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum) {
-                                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
+                                        int TermUnitSizingIndex =
+                                            state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
                                         state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex);
                                     }
                                 }
@@ -6485,8 +6324,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 } else { // error
                 }
 
-                SysSizing(CurOverallSimDay, AirLoopNum).DesMainVolFlow =
-                    max(SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow, SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow);
+                sysSizing.DesMainVolFlow = max(sysSizing.DesCoolVolFlow, sysSizing.DesHeatVolFlow);
                 // this should also be as least as big as is needed for Vot
             } break;
             default:
@@ -6495,27 +6333,26 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
             // If the ventilation was autosized using the ASHRAE VRP method, then the design zone and system ventilation values
             // must be based on the larger of the cooling or heating OA
-            if (FinalSysSizing(AirLoopNum).OAAutoSized &&
-                (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP || FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP)) {
+            if (finalSysSizing.OAAutoSized && (finalSysSizing.SystemOAMethod == SOAM_VRP || finalSysSizing.SystemOAMethod == SOAM_SP)) {
                 Real64 VotMax = max(state.dataSize->VotClgBySys(AirLoopNum), state.dataSize->VotHtgBySys(AirLoopNum));
 
                 // Reset the system level ventilation to the larger of the system-level cooling or heating Vot
-                FinalSysSizing(AirLoopNum).DesOutAirVolFlow = VotMax;
-                CalcSysSizing(AirLoopNum).DesOutAirVolFlow = VotMax;
+                finalSysSizing.DesOutAirVolFlow = VotMax;
+                state.dataSize->CalcSysSizing(AirLoopNum).DesOutAirVolFlow = VotMax;
 
                 // Reset the zone level ventilation to the larger of the zone-level cooling or heating Voz
                 // Loop through cooled zones and heated zones - ok if there's overlap
                 for (int zoneNum = 1; zoneNum <= NumZonesCooled; ++zoneNum) {
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
-                    Real64 VozMax =
-                        max(TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone, TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone);
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA = VozMax;
+                    int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                    Real64 VozMax = max(state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone,
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone);
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA = VozMax;
                 }
                 for (int zoneNum = 1; zoneNum <= NumZonesHeated; ++zoneNum) {
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
-                    Real64 VozMax =
-                        max(TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone, TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone);
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA = VozMax;
+                    int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                    Real64 VozMax = max(state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone,
+                                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone);
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA = VozMax;
                 }
             }
         }
@@ -6531,57 +6368,59 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             for (int InletNode = 1; InletNode <= state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++InletNode) {
                 TermUnitSizingIndex = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(InletNode).TermUnitSizingIndex;
                 if (TermUnitSizingIndex == 0) continue;
-                termunitsizingtemp = (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                termunitsizingtemp = (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                 termunitsizingtempfrac = (1.0 / termunitsizingtemp);
                 if (TermUnitSizingIndex > 0) break;
             }
             if (TermUnitSizingIndex == 0) continue; // Skip this if there are no terminal units
-            RetTempRise =
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtCoolPeak - TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneTempAtCoolPeak;
+            RetTempRise = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtCoolPeak -
+                          state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneTempAtCoolPeak;
             if (RetTempRise > 0.01) {
                 // avoid possible compiler bug
                 //          FinalZoneSizing(CtrlZoneNum)%ZoneRetTempAtCoolPeak = &
                 //            FinalZoneSizing(CtrlZoneNum)%ZoneTempAtCoolPeak + RetTempRise * &
                 //           (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtCoolPeak =
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneTempAtCoolPeak + RetTempRise * termunitsizingtempfrac;
+                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtCoolPeak =
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneTempAtCoolPeak + RetTempRise * termunitsizingtempfrac;
             }
-            RetTempRise =
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtHeatPeak - TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneTempAtHeatPeak;
+            RetTempRise = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtHeatPeak -
+                          state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneTempAtHeatPeak;
             if (RetTempRise > 0.01) {
                 // avoid possible compiler bug
                 //          FinalZoneSizing(CtrlZoneNum)%ZoneRetTempAtHeatPeak = &
                 //            FinalZoneSizing(CtrlZoneNum)%ZoneTempAtHeatPeak + RetTempRise * &
                 //            (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtHeatPeak =
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneTempAtHeatPeak + RetTempRise * termunitsizingtempfrac;
+                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtHeatPeak =
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneTempAtHeatPeak + RetTempRise * termunitsizingtempfrac;
             }
             for (TimeStepIndex = 1; TimeStepIndex <= numOfTimeStepInDay; ++TimeStepIndex) {
-                RetTempRise = TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolZoneRetTempSeq(TimeStepIndex) -
-                              TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolZoneTempSeq(TimeStepIndex);
+                RetTempRise = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolZoneRetTempSeq(TimeStepIndex) -
+                              state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolZoneTempSeq(TimeStepIndex);
                 if (RetTempRise > 0.01) {
                     // avoid possible compiler bug
                     //            FinalZoneSizing(CtrlZoneNum)%CoolZoneRetTempSeq(TimeStepIndex) = &
                     //              FinalZoneSizing(CtrlZoneNum)%CoolZoneTempSeq(TimeStepIndex) + RetTempRise * &
                     //             (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolZoneRetTempSeq(TimeStepIndex) =
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolZoneTempSeq(TimeStepIndex) + RetTempRise * termunitsizingtempfrac;
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolZoneRetTempSeq(TimeStepIndex) =
+                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolZoneTempSeq(TimeStepIndex) +
+                        RetTempRise * termunitsizingtempfrac;
                 }
-                RetTempRise = TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatZoneRetTempSeq(TimeStepIndex) -
-                              TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatZoneTempSeq(TimeStepIndex);
+                RetTempRise = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatZoneRetTempSeq(TimeStepIndex) -
+                              state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatZoneTempSeq(TimeStepIndex);
                 if (RetTempRise > 0.01) {
                     // avoid possible compiler bug
                     //            FinalZoneSizing(CtrlZoneNum)%HeatZoneRetTempSeq(TimeStepIndex) = &
                     //              FinalZoneSizing(CtrlZoneNum)%HeatZoneTempSeq(TimeStepIndex) + RetTempRise * &
                     //             (1.0d0/(1.0d0+TermUnitSizing(CtrlZoneNum)%InducRat))
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatZoneRetTempSeq(TimeStepIndex) =
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatZoneTempSeq(TimeStepIndex) + RetTempRise * termunitsizingtempfrac;
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatZoneRetTempSeq(TimeStepIndex) =
+                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatZoneTempSeq(TimeStepIndex) +
+                        RetTempRise * termunitsizingtempfrac;
                 }
             }
         }
 
         // Get final design flows
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             state.dataSize->SensCoolCapTemp(AirLoopNum) = 0.0;
             state.dataSize->TotCoolCapTemp(AirLoopNum) = 0.0;
 
@@ -6589,120 +6428,121 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             // cooling flow rates and associated data
 
             for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
-
-                if (SysSizing(DDNum, AirLoopNum).SensCoolCap > state.dataSize->SensCoolCapTemp(AirLoopNum)) {
-                    SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD = DDNum;
-                    SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
-                    state.dataSize->SensCoolCapTemp(AirLoopNum) = SysSizing(DDNum, AirLoopNum).SensCoolCap;
-                    if (SysSizing(DDNum, AirLoopNum).CoolingPeakLoadType == SensibleCoolingLoad) {
-                        CalcSysSizing(AirLoopNum).DesCoolVolFlow = SysSizing(DDNum, AirLoopNum).DesCoolVolFlow;
-                        CalcSysSizing(AirLoopNum).CoolDesDay = SysSizing(DDNum, AirLoopNum).CoolDesDay;
-                        // CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow;
-                        CalcSysSizing(AirLoopNum).MassFlowAtCoolPeak = SysSizing(DDNum, AirLoopNum).MassFlowAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).SensCoolCap = SysSizing(DDNum, AirLoopNum).SensCoolCap;
-                        CalcSysSizing(AirLoopNum).TotCoolCap = SysSizing(DDNum, AirLoopNum).TotCoolCap;
-                        CalcSysSizing(AirLoopNum).CoolFlowSeq = SysSizing(DDNum, AirLoopNum).CoolFlowSeq;
-                        CalcSysSizing(AirLoopNum).SumZoneCoolLoadSeq = SysSizing(DDNum, AirLoopNum).SumZoneCoolLoadSeq;
-                        CalcSysSizing(AirLoopNum).CoolZoneAvgTempSeq = SysSizing(DDNum, AirLoopNum).CoolZoneAvgTempSeq;
-                        CalcSysSizing(AirLoopNum).SensCoolCapSeq = SysSizing(DDNum, AirLoopNum).SensCoolCapSeq;
-                        CalcSysSizing(AirLoopNum).TotCoolCapSeq = SysSizing(DDNum, AirLoopNum).TotCoolCapSeq;
-                        CalcSysSizing(AirLoopNum).MixTempAtCoolPeak = SysSizing(DDNum, AirLoopNum).MixTempAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).RetTempAtCoolPeak = SysSizing(DDNum, AirLoopNum).RetTempAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).MixHumRatAtCoolPeak = SysSizing(DDNum, AirLoopNum).MixHumRatAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).RetHumRatAtCoolPeak = SysSizing(DDNum, AirLoopNum).RetHumRatAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).OutTempAtCoolPeak = SysSizing(DDNum, AirLoopNum).OutTempAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).OutHumRatAtCoolPeak = SysSizing(DDNum, AirLoopNum).OutHumRatAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).SysCoolRetTempSeq = SysSizing(DDNum, AirLoopNum).SysCoolRetTempSeq;
-                        CalcSysSizing(AirLoopNum).SysCoolRetHumRatSeq = SysSizing(DDNum, AirLoopNum).SysCoolRetHumRatSeq;
-                        CalcSysSizing(AirLoopNum).SysCoolOutTempSeq = SysSizing(DDNum, AirLoopNum).SysCoolOutTempSeq;
-                        CalcSysSizing(AirLoopNum).SysCoolOutHumRatSeq = SysSizing(DDNum, AirLoopNum).SysCoolOutHumRatSeq;
-                        CalcSysSizing(AirLoopNum).SysDOASHeatAddSeq = SysSizing(DDNum, AirLoopNum).SysDOASHeatAddSeq;
-                        CalcSysSizing(AirLoopNum).SysDOASLatAddSeq = SysSizing(DDNum, AirLoopNum).SysDOASLatAddSeq;
-                        CalcSysSizing(AirLoopNum).SysCoolCoinSpaceSens = SysSizing(DDNum, AirLoopNum).SysCoolCoinSpaceSens;
-                        CalcSysSizing(AirLoopNum).SysDesCoolLoad = SysSizing(DDNum, AirLoopNum).SysDesCoolLoad;
-                        CalcSysSizing(AirLoopNum).SysCoolLoadTimeStepPk = SysSizing(DDNum, AirLoopNum).SysCoolLoadTimeStepPk;
+                auto &sysSizing = state.dataSize->SysSizing(DDNum, AirLoopNum);
+                if (sysSizing.SensCoolCap > state.dataSize->SensCoolCapTemp(AirLoopNum)) {
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD = DDNum;
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
+                    state.dataSize->SensCoolCapTemp(AirLoopNum) = sysSizing.SensCoolCap;
+                    if (sysSizing.CoolingPeakLoadType == SensibleCoolingLoad) {
+                        state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow = sysSizing.DesCoolVolFlow;
+                        state.dataSize->CalcSysSizing(AirLoopNum).CoolDesDay = sysSizing.CoolDesDay;
+                        // state.dataSize->CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow;
+                        state.dataSize->CalcSysSizing(AirLoopNum).MassFlowAtCoolPeak = sysSizing.MassFlowAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SensCoolCap = sysSizing.SensCoolCap;
+                        state.dataSize->CalcSysSizing(AirLoopNum).TotCoolCap = sysSizing.TotCoolCap;
+                        state.dataSize->CalcSysSizing(AirLoopNum).CoolFlowSeq = sysSizing.CoolFlowSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SumZoneCoolLoadSeq = sysSizing.SumZoneCoolLoadSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).CoolZoneAvgTempSeq = sysSizing.CoolZoneAvgTempSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SensCoolCapSeq = sysSizing.SensCoolCapSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).TotCoolCapSeq = sysSizing.TotCoolCapSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).MixTempAtCoolPeak = sysSizing.MixTempAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).RetTempAtCoolPeak = sysSizing.RetTempAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).MixHumRatAtCoolPeak = sysSizing.MixHumRatAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).RetHumRatAtCoolPeak = sysSizing.RetHumRatAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).OutTempAtCoolPeak = sysSizing.OutTempAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).OutHumRatAtCoolPeak = sysSizing.OutHumRatAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolRetTempSeq = sysSizing.SysCoolRetTempSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolRetHumRatSeq = sysSizing.SysCoolRetHumRatSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolOutTempSeq = sysSizing.SysCoolOutTempSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolOutHumRatSeq = sysSizing.SysCoolOutHumRatSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysDOASHeatAddSeq = sysSizing.SysDOASHeatAddSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysDOASLatAddSeq = sysSizing.SysDOASLatAddSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolCoinSpaceSens = sysSizing.SysCoolCoinSpaceSens;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysDesCoolLoad = sysSizing.SysDesCoolLoad;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolLoadTimeStepPk = sysSizing.SysCoolLoadTimeStepPk;
                     }
                 }
 
-                if (SysSizing(DDNum, AirLoopNum).TotCoolCap > state.dataSize->TotCoolCapTemp(AirLoopNum)) {
-                    SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD = DDNum;
-                    SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
-                    state.dataSize->TotCoolCapTemp(AirLoopNum) = SysSizing(DDNum, AirLoopNum).TotCoolCap;
-                    if (SysSizing(DDNum, AirLoopNum).CoolingPeakLoadType == TotalCoolingLoad) {
-                        CalcSysSizing(AirLoopNum).DesCoolVolFlow = SysSizing(DDNum, AirLoopNum).DesCoolVolFlow;
-                        CalcSysSizing(AirLoopNum).CoolDesDay = SysSizing(DDNum, AirLoopNum).CoolDesDay;
-                        // CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow;
-                        CalcSysSizing(AirLoopNum).MassFlowAtCoolPeak = SysSizing(DDNum, AirLoopNum).MassFlowAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).SensCoolCap = SysSizing(DDNum, AirLoopNum).SensCoolCap;
-                        CalcSysSizing(AirLoopNum).TotCoolCap = SysSizing(DDNum, AirLoopNum).TotCoolCap;
-                        CalcSysSizing(AirLoopNum).CoolFlowSeq = SysSizing(DDNum, AirLoopNum).CoolFlowSeq;
-                        CalcSysSizing(AirLoopNum).SumZoneCoolLoadSeq = SysSizing(DDNum, AirLoopNum).SumZoneCoolLoadSeq;
-                        CalcSysSizing(AirLoopNum).CoolZoneAvgTempSeq = SysSizing(DDNum, AirLoopNum).CoolZoneAvgTempSeq;
-                        CalcSysSizing(AirLoopNum).SensCoolCapSeq = SysSizing(DDNum, AirLoopNum).SensCoolCapSeq;
-                        CalcSysSizing(AirLoopNum).TotCoolCapSeq = SysSizing(DDNum, AirLoopNum).TotCoolCapSeq;
-                        CalcSysSizing(AirLoopNum).MixTempAtCoolPeak = SysSizing(DDNum, AirLoopNum).MixTempAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).RetTempAtCoolPeak = SysSizing(DDNum, AirLoopNum).RetTempAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).MixHumRatAtCoolPeak = SysSizing(DDNum, AirLoopNum).MixHumRatAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).RetHumRatAtCoolPeak = SysSizing(DDNum, AirLoopNum).RetHumRatAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).OutTempAtCoolPeak = SysSizing(DDNum, AirLoopNum).OutTempAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).OutHumRatAtCoolPeak = SysSizing(DDNum, AirLoopNum).OutHumRatAtCoolPeak;
-                        CalcSysSizing(AirLoopNum).SysCoolRetTempSeq = SysSizing(DDNum, AirLoopNum).SysCoolRetTempSeq;
-                        CalcSysSizing(AirLoopNum).SysCoolRetHumRatSeq = SysSizing(DDNum, AirLoopNum).SysCoolRetHumRatSeq;
-                        CalcSysSizing(AirLoopNum).SysCoolOutTempSeq = SysSizing(DDNum, AirLoopNum).SysCoolOutTempSeq;
-                        CalcSysSizing(AirLoopNum).SysCoolOutHumRatSeq = SysSizing(DDNum, AirLoopNum).SysCoolOutHumRatSeq;
-                        CalcSysSizing(AirLoopNum).SysDOASHeatAddSeq = SysSizing(DDNum, AirLoopNum).SysDOASHeatAddSeq;
-                        CalcSysSizing(AirLoopNum).SysDOASLatAddSeq = SysSizing(DDNum, AirLoopNum).SysDOASLatAddSeq;
+                if (sysSizing.TotCoolCap > state.dataSize->TotCoolCapTemp(AirLoopNum)) {
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD = DDNum;
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
+                    state.dataSize->TotCoolCapTemp(AirLoopNum) = sysSizing.TotCoolCap;
+                    if (sysSizing.CoolingPeakLoadType == TotalCoolingLoad) {
+                        state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow = sysSizing.DesCoolVolFlow;
+                        state.dataSize->CalcSysSizing(AirLoopNum).CoolDesDay = sysSizing.CoolDesDay;
+                        // state.dataSize->CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow;
+                        state.dataSize->CalcSysSizing(AirLoopNum).MassFlowAtCoolPeak = sysSizing.MassFlowAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SensCoolCap = sysSizing.SensCoolCap;
+                        state.dataSize->CalcSysSizing(AirLoopNum).TotCoolCap = sysSizing.TotCoolCap;
+                        state.dataSize->CalcSysSizing(AirLoopNum).CoolFlowSeq = sysSizing.CoolFlowSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SumZoneCoolLoadSeq = sysSizing.SumZoneCoolLoadSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).CoolZoneAvgTempSeq = sysSizing.CoolZoneAvgTempSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SensCoolCapSeq = sysSizing.SensCoolCapSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).TotCoolCapSeq = sysSizing.TotCoolCapSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).MixTempAtCoolPeak = sysSizing.MixTempAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).RetTempAtCoolPeak = sysSizing.RetTempAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).MixHumRatAtCoolPeak = sysSizing.MixHumRatAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).RetHumRatAtCoolPeak = sysSizing.RetHumRatAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).OutTempAtCoolPeak = sysSizing.OutTempAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).OutHumRatAtCoolPeak = sysSizing.OutHumRatAtCoolPeak;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolRetTempSeq = sysSizing.SysCoolRetTempSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolRetHumRatSeq = sysSizing.SysCoolRetHumRatSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolOutTempSeq = sysSizing.SysCoolOutTempSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolOutHumRatSeq = sysSizing.SysCoolOutHumRatSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysDOASHeatAddSeq = sysSizing.SysDOASHeatAddSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysDOASLatAddSeq = sysSizing.SysDOASLatAddSeq;
                     }
-                    CalcSysSizing(AirLoopNum).SysCoolCoinSpaceSens = SysSizing(DDNum, AirLoopNum).SysCoolCoinSpaceSens;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysCoolCoinSpaceSens = sysSizing.SysCoolCoinSpaceSens;
                 }
 
-                if (SysSizing(DDNum, AirLoopNum).CoinCoolMassFlow > CalcSysSizing(AirLoopNum).CoinCoolMassFlow) {
-                    CalcSysSizing(AirLoopNum).CoinCoolMassFlow = SysSizing(DDNum, AirLoopNum).CoinCoolMassFlow;
-                    SysSizPeakDDNum(AirLoopNum).CoolFlowPeakDD = DDNum;
-                    SysSizPeakDDNum(AirLoopNum).cCoolFlowPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
+                if (sysSizing.CoinCoolMassFlow > state.dataSize->CalcSysSizing(AirLoopNum).CoinCoolMassFlow) {
+                    state.dataSize->CalcSysSizing(AirLoopNum).CoinCoolMassFlow = sysSizing.CoinCoolMassFlow;
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).CoolFlowPeakDD = DDNum;
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).cCoolFlowPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                 }
 
-                if (SysSizing(DDNum, AirLoopNum).HeatCap > CalcSysSizing(AirLoopNum).HeatCap) {
-                    SysSizPeakDDNum(AirLoopNum).HeatPeakDD = DDNum;
-                    SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
-                    CalcSysSizing(AirLoopNum).DesHeatVolFlow = SysSizing(DDNum, AirLoopNum).DesHeatVolFlow;
-                    CalcSysSizing(AirLoopNum).HeatDesDay = SysSizing(DDNum, AirLoopNum).HeatDesDay;
-                    CalcSysSizing(AirLoopNum).CoinHeatMassFlow = SysSizing(DDNum, AirLoopNum).CoinHeatMassFlow;
-                    CalcSysSizing(AirLoopNum).HeatCap = SysSizing(DDNum, AirLoopNum).HeatCap;
-                    CalcSysSizing(AirLoopNum).PreheatCap = SysSizing(DDNum, AirLoopNum).PreheatCap;
-                    CalcSysSizing(AirLoopNum).HeatFlowSeq = SysSizing(DDNum, AirLoopNum).HeatFlowSeq;
-                    CalcSysSizing(AirLoopNum).SumZoneHeatLoadSeq = SysSizing(DDNum, AirLoopNum).SumZoneHeatLoadSeq;
-                    CalcSysSizing(AirLoopNum).HeatCapSeq = SysSizing(DDNum, AirLoopNum).HeatCapSeq;
-                    CalcSysSizing(AirLoopNum).HeatZoneAvgTempSeq = SysSizing(DDNum, AirLoopNum).HeatZoneAvgTempSeq;
-                    CalcSysSizing(AirLoopNum).PreheatCapSeq = SysSizing(DDNum, AirLoopNum).PreheatCapSeq;
-                    CalcSysSizing(AirLoopNum).HeatMixTemp = SysSizing(DDNum, AirLoopNum).HeatMixTemp;
-                    CalcSysSizing(AirLoopNum).HeatRetTemp = SysSizing(DDNum, AirLoopNum).HeatRetTemp;
-                    CalcSysSizing(AirLoopNum).HeatMixHumRat = SysSizing(DDNum, AirLoopNum).HeatMixHumRat;
-                    CalcSysSizing(AirLoopNum).HeatRetHumRat = SysSizing(DDNum, AirLoopNum).HeatRetHumRat;
-                    CalcSysSizing(AirLoopNum).HeatOutTemp = SysSizing(DDNum, AirLoopNum).HeatOutTemp;
-                    CalcSysSizing(AirLoopNum).HeatOutHumRat = SysSizing(DDNum, AirLoopNum).HeatOutHumRat;
-                    CalcSysSizing(AirLoopNum).SysHeatRetTempSeq = SysSizing(DDNum, AirLoopNum).SysHeatRetTempSeq;
-                    CalcSysSizing(AirLoopNum).SysHeatRetHumRatSeq = SysSizing(DDNum, AirLoopNum).SysHeatRetHumRatSeq;
-                    CalcSysSizing(AirLoopNum).SysHeatOutTempSeq = SysSizing(DDNum, AirLoopNum).SysHeatOutTempSeq;
-                    CalcSysSizing(AirLoopNum).SysHeatOutHumRatSeq = SysSizing(DDNum, AirLoopNum).SysHeatOutHumRatSeq;
+                if (sysSizing.HeatCap > state.dataSize->CalcSysSizing(AirLoopNum).HeatCap) {
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).HeatPeakDD = DDNum;
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
+                    state.dataSize->CalcSysSizing(AirLoopNum).DesHeatVolFlow = sysSizing.DesHeatVolFlow;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatDesDay = sysSizing.HeatDesDay;
+                    state.dataSize->CalcSysSizing(AirLoopNum).CoinHeatMassFlow = sysSizing.CoinHeatMassFlow;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatCap = sysSizing.HeatCap;
+                    state.dataSize->CalcSysSizing(AirLoopNum).PreheatCap = sysSizing.PreheatCap;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatFlowSeq = sysSizing.HeatFlowSeq;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SumZoneHeatLoadSeq = sysSizing.SumZoneHeatLoadSeq;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatCapSeq = sysSizing.HeatCapSeq;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatZoneAvgTempSeq = sysSizing.HeatZoneAvgTempSeq;
+                    state.dataSize->CalcSysSizing(AirLoopNum).PreheatCapSeq = sysSizing.PreheatCapSeq;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatMixTemp = sysSizing.HeatMixTemp;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatRetTemp = sysSizing.HeatRetTemp;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatMixHumRat = sysSizing.HeatMixHumRat;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatRetHumRat = sysSizing.HeatRetHumRat;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatOutTemp = sysSizing.HeatOutTemp;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatOutHumRat = sysSizing.HeatOutHumRat;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysHeatRetTempSeq = sysSizing.SysHeatRetTempSeq;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysHeatRetHumRatSeq = sysSizing.SysHeatRetHumRatSeq;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysHeatOutTempSeq = sysSizing.SysHeatOutTempSeq;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysHeatOutHumRatSeq = sysSizing.SysHeatOutHumRatSeq;
 
-                    CalcSysSizing(AirLoopNum).SysHeatCoilTimeStepPk = SysSizing(DDNum, AirLoopNum).SysHeatCoilTimeStepPk;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysHeatCoilTimeStepPk = sysSizing.SysHeatCoilTimeStepPk;
 
-                    CalcSysSizing(AirLoopNum).SysHeatAirTimeStepPk = SysSizing(DDNum, AirLoopNum).SysHeatAirTimeStepPk;
-                    CalcSysSizing(AirLoopNum).HeatDDNum = DDNum;
-                    CalcSysSizing(AirLoopNum).SysHeatCoinSpaceSens = SysSizing(DDNum, AirLoopNum).SysHeatCoinSpaceSens;
-                    CalcSysSizing(AirLoopNum).SysDesHeatLoad = SysSizing(DDNum, AirLoopNum).SysDesHeatLoad;
-                    CalcSysSizing(AirLoopNum).SysHeatLoadTimeStepPk = SysSizing(DDNum, AirLoopNum).SysHeatLoadTimeStepPk;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysHeatAirTimeStepPk = sysSizing.SysHeatAirTimeStepPk;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatDDNum = DDNum;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysHeatCoinSpaceSens = sysSizing.SysHeatCoinSpaceSens;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysDesHeatLoad = sysSizing.SysDesHeatLoad;
+                    state.dataSize->CalcSysSizing(AirLoopNum).SysHeatLoadTimeStepPk = sysSizing.SysHeatLoadTimeStepPk;
                 }
             }
 
-            CalcSysSizing(AirLoopNum).DesMainVolFlow = max(CalcSysSizing(AirLoopNum).DesCoolVolFlow, CalcSysSizing(AirLoopNum).DesHeatVolFlow);
+            state.dataSize->CalcSysSizing(AirLoopNum).DesMainVolFlow =
+                max(state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow, state.dataSize->CalcSysSizing(AirLoopNum).DesHeatVolFlow);
 
             // For noncoincident sizing, find the max heat and cool mass flow for each zone over all the
             // design days. Then calculate the associated heating and cooling capacities.
 
-            int NumZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
-            int NumZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+            int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+            int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
             SysCoolRetTemp = 0.0;
             OutAirFrac = 0.0;
             SysCoolMixTemp = 0.0;
@@ -6718,48 +6558,50 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             SysCoolOutHumRat = 0.0;
 
             for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
-                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                auto &termUnitSizing = state.dataSize->TermUnitSizing(TermUnitSizingIndex);
                 // save the system cooling supply air temp
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInTempTU = CalcSysSizing(AirLoopNum).CoolSupTemp;
+                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInTempTU =
+                    state.dataSize->CalcSysSizing(AirLoopNum).CoolSupTemp;
                 // save the system cooling supply air hum rat
-                TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInHumRatTU = CalcSysSizing(AirLoopNum).CoolSupHumRat;
-                if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolMassFlow <= 0.0) continue;
-                Real64 coolMassFlow = TermUnitFinalZoneSizing(TermUnitSizingIndex)
-                                          .DesCoolMassFlow; // already scaled for term unit sizing in UpdateTermUnitFinalZoneSizing
-                CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow += coolMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                SysCoolRetTemp += TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtCoolPeak * coolMassFlow /
-                                  (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                SysCoolRetHumRat += TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneHumRatAtCoolPeak * coolMassFlow /
-                                    (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                CoolDDNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolDDNum;
-                CoolTimeStepNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtCoolMax;
-                OutAirTemp += state.dataSize->DesDayWeath(CoolDDNum).Temp(CoolTimeStepNum) * coolMassFlow /
-                              (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                OutAirHumRat += state.dataSize->DesDayWeath(CoolDDNum).HumRat(CoolTimeStepNum) * coolMassFlow /
-                                (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolCoilInHumRatTU =
+                    state.dataSize->CalcSysSizing(AirLoopNum).CoolSupHumRat;
+                if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolMassFlow <= 0.0) continue;
+                Real64 coolMassFlow = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex)
+                                          .DesCoolMassFlow; // already scaled for term unit sizing in Updatestate.dataSize->TermUnitFinalZoneSizing
+                state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow += coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                SysCoolRetTemp += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtCoolPeak * coolMassFlow /
+                                  (1.0 + termUnitSizing.InducRat);
+                SysCoolRetHumRat += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneHumRatAtCoolPeak * coolMassFlow /
+                                    (1.0 + termUnitSizing.InducRat);
+                CoolDDNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolDDNum;
+                CoolTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtCoolMax;
+                OutAirTemp += state.dataSize->DesDayWeath(CoolDDNum).Temp(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                OutAirHumRat += state.dataSize->DesDayWeath(CoolDDNum).HumRat(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
             }
-            if (CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow > 0.0) {
-                SysCoolRetTemp /= CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
-                SysCoolRetHumRat /= CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
-                OutAirTemp /= CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
-                OutAirHumRat /= CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
+            if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow > 0.0) {
+                SysCoolRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
+                SysCoolRetHumRat /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
+                OutAirTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
+                OutAirHumRat /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
                 SysCoolOutTemp = OutAirTemp;
                 SysCoolOutHumRat = OutAirHumRat;
                 RhoAir = state.dataEnvrn->StdRhoAir;
-                if (CalcSysSizing(AirLoopNum).CoolOAOption == MinOA) {
-                    OutAirFrac = RhoAir * CalcSysSizing(AirLoopNum).DesOutAirVolFlow / CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
+                if (state.dataSize->CalcSysSizing(AirLoopNum).CoolOAOption == MinOA) {
+                    OutAirFrac = RhoAir * state.dataSize->CalcSysSizing(AirLoopNum).DesOutAirVolFlow /
+                                 state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
                     OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                 } else {
                     OutAirFrac = 1.0;
                 }
                 SysCoolMixTemp = OutAirTemp * OutAirFrac + SysCoolRetTemp * (1.0 - OutAirFrac);
                 SysCoolMixHumRat = OutAirHumRat * OutAirFrac + SysCoolRetHumRat * (1.0 - OutAirFrac);
-                SysSensCoolCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow *
-                                 (SysCoolMixTemp - CalcSysSizing(AirLoopNum).CoolSupTemp);
+                SysSensCoolCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow *
+                                 (SysCoolMixTemp - state.dataSize->CalcSysSizing(AirLoopNum).CoolSupTemp);
                 SysSensCoolCap = max(0.0, SysSensCoolCap);
-                SysTotCoolCap = CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow *
-                                (PsyHFnTdbW(SysCoolMixTemp, SysCoolMixHumRat) -
-                                 PsyHFnTdbW(CalcSysSizing(AirLoopNum).CoolSupTemp, CalcSysSizing(AirLoopNum).CoolSupHumRat));
+                SysTotCoolCap = state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow *
+                                (PsyHFnTdbW(SysCoolMixTemp, SysCoolMixHumRat) - PsyHFnTdbW(state.dataSize->CalcSysSizing(AirLoopNum).CoolSupTemp,
+                                                                                           state.dataSize->CalcSysSizing(AirLoopNum).CoolSupHumRat));
                 SysTotCoolCap = max(0.0, SysTotCoolCap);
             }
 
@@ -6779,126 +6621,135 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             if (NumZonesHeated > 0) { // IF there are centrally heated zones
 
                 for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over the heated zones
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                    int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                    auto &termUnitSizing = state.dataSize->TermUnitSizing(TermUnitSizingIndex);
                     // save the system heating supply air temp
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInTempTU = CalcSysSizing(AirLoopNum).HeatSupTemp;
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInTempTU =
+                        state.dataSize->CalcSysSizing(AirLoopNum).HeatSupTemp;
                     // save the system heating supply air hum rat
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInHumRatTU = CalcSysSizing(AirLoopNum).HeatSupHumRat;
-                    if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatMassFlow <= 0.0) continue;
-                    Real64 heatMassFlow = TermUnitFinalZoneSizing(TermUnitSizingIndex)
-                                              .DesHeatMassFlow; // already scaled for term unit sizing in UpdateTermUnitFinalZoneSizing
-                    CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow += heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    SysHeatRetTemp += TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtHeatPeak * heatMassFlow /
-                                      (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    SysHeatRetHumRat += TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneHumRatAtHeatPeak * heatMassFlow /
-                                        (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    HeatDDNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
-                    HeatTimeStepNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
-                    OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow /
-                                  (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow /
-                                    (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInHumRatTU =
+                        state.dataSize->CalcSysSizing(AirLoopNum).HeatSupHumRat;
+                    if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatMassFlow <= 0.0) continue;
+                    Real64 heatMassFlow =
+                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex)
+                            .DesHeatMassFlow; // already scaled for term unit sizing in Updatestate.dataSize->TermUnitFinalZoneSizing
+                    state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow += heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    SysHeatRetTemp += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtHeatPeak * heatMassFlow /
+                                      (1.0 + termUnitSizing.InducRat);
+                    SysHeatRetHumRat += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneHumRatAtHeatPeak * heatMassFlow /
+                                        (1.0 + termUnitSizing.InducRat);
+                    HeatDDNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
+                    HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
+                    OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
                 }
-                if (CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
-                    SysHeatRetTemp /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
-                    SysHeatRetHumRat /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
-                    OutAirTemp /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
-                    OutAirHumRat /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
+                    SysHeatRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                    SysHeatRetHumRat /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                    OutAirTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                    OutAirHumRat /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
                     SysHeatOutTemp = OutAirTemp;
                     SysHeatOutHumRat = OutAirHumRat;
                     RhoAir = state.dataEnvrn->StdRhoAir;
-                    if (CalcSysSizing(AirLoopNum).HeatOAOption == MinOA) {
-                        OutAirFrac = RhoAir * CalcSysSizing(AirLoopNum).DesOutAirVolFlow / CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                    if (state.dataSize->CalcSysSizing(AirLoopNum).HeatOAOption == MinOA) {
+                        OutAirFrac = RhoAir * state.dataSize->CalcSysSizing(AirLoopNum).DesOutAirVolFlow /
+                                     state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
                         OutAirFrac = 1.0;
                     }
                     SysHeatMixTemp = OutAirTemp * OutAirFrac + SysHeatRetTemp * (1.0 - OutAirFrac);
                     SysHeatMixHumRat = OutAirHumRat * OutAirFrac + SysHeatRetHumRat * (1.0 - OutAirFrac);
-                    SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow *
-                                 (CalcSysSizing(AirLoopNum).HeatSupTemp - SysHeatMixTemp);
+                    SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow *
+                                 (state.dataSize->CalcSysSizing(AirLoopNum).HeatSupTemp - SysHeatMixTemp);
                     SysHeatCap = max(0.0, SysHeatCap);
                 }
 
             } else { // No centrally heated zones: use cooled zones
 
                 for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over the cooled zones
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                    int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                    auto &termUnitSizing = state.dataSize->TermUnitSizing(TermUnitSizingIndex);
                     // save the system heating supply air temp
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInTempTU = CalcSysSizing(AirLoopNum).HeatSupTemp;
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInTempTU =
+                        state.dataSize->CalcSysSizing(AirLoopNum).HeatSupTemp;
                     // save the system heating supply air hum rat
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInHumRatTU = CalcSysSizing(AirLoopNum).HeatSupHumRat;
-                    if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatMassFlow <= 0.0) continue;
-                    Real64 heatMassFlow = TermUnitFinalZoneSizing(TermUnitSizingIndex)
-                                              .DesHeatMassFlow; // already scaled for term unit sizing in UpdateTermUnitFinalZoneSizing
-                    CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow += heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    SysHeatRetTemp += TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtHeatPeak * heatMassFlow /
-                                      (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    SysHeatRetHumRat += TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneHumRatAtHeatPeak * heatMassFlow /
-                                        (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    HeatDDNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
-                    HeatTimeStepNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
-                    OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow /
-                                  (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
-                    OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow /
-                                    (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInHumRatTU =
+                        state.dataSize->CalcSysSizing(AirLoopNum).HeatSupHumRat;
+                    if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatMassFlow <= 0.0) continue;
+                    Real64 heatMassFlow =
+                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex)
+                            .DesHeatMassFlow; // already scaled for term unit sizing in Updatestate.dataSize->TermUnitFinalZoneSizing
+                    state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow += heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    SysHeatRetTemp += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneRetTempAtHeatPeak * heatMassFlow /
+                                      (1.0 + termUnitSizing.InducRat);
+                    SysHeatRetHumRat += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneHumRatAtHeatPeak * heatMassFlow /
+                                        (1.0 + termUnitSizing.InducRat);
+                    HeatDDNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
+                    HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
+                    OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
                 }
-                if (CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
-                    SysHeatRetTemp /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
-                    SysHeatRetHumRat /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
-                    OutAirTemp /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
-                    OutAirHumRat /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
+                    SysHeatRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                    SysHeatRetHumRat /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                    OutAirTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                    OutAirHumRat /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
                     SysHeatOutTemp = OutAirTemp;
                     SysHeatOutHumRat = OutAirHumRat;
                     RhoAir = state.dataEnvrn->StdRhoAir;
-                    if (CalcSysSizing(AirLoopNum).HeatOAOption == MinOA) {
-                        OutAirFrac = RhoAir * CalcSysSizing(AirLoopNum).DesOutAirVolFlow / CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
+                    if (state.dataSize->CalcSysSizing(AirLoopNum).HeatOAOption == MinOA) {
+                        OutAirFrac = RhoAir * state.dataSize->CalcSysSizing(AirLoopNum).DesOutAirVolFlow /
+                                     state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
                         OutAirFrac = 1.0;
                     }
                     SysHeatMixTemp = OutAirTemp * OutAirFrac + SysHeatRetTemp * (1.0 - OutAirFrac);
                     SysHeatMixHumRat = OutAirHumRat * OutAirFrac + SysHeatRetHumRat * (1.0 - OutAirFrac);
-                    SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow *
-                                 (CalcSysSizing(AirLoopNum).HeatSupTemp - SysHeatMixTemp);
+                    SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow *
+                                 (state.dataSize->CalcSysSizing(AirLoopNum).HeatSupTemp - SysHeatMixTemp);
                     SysHeatCap = max(0.0, SysHeatCap);
                 }
             }
 
             // move the noncoincident results into the system sizing array
-            if (CalcSysSizing(AirLoopNum).SizingOption == NonCoincident) {
+            if (state.dataSize->CalcSysSizing(AirLoopNum).SizingOption == NonCoincident) {
                 // But first check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
-                if (!(FinalSysSizing(AirLoopNum).CoolOAOption == 1 && SysSensCoolCap <= 0.0)) { // CoolOAOption = Yes 100% OA
-                    CalcSysSizing(AirLoopNum).SensCoolCap = SysSensCoolCap;
-                    CalcSysSizing(AirLoopNum).TotCoolCap = SysTotCoolCap;
-                    CalcSysSizing(AirLoopNum).MixTempAtCoolPeak = SysCoolMixTemp;
-                    CalcSysSizing(AirLoopNum).RetTempAtCoolPeak = SysCoolRetTemp;
-                    CalcSysSizing(AirLoopNum).MixHumRatAtCoolPeak = SysCoolMixHumRat;
-                    CalcSysSizing(AirLoopNum).RetHumRatAtCoolPeak = SysCoolRetHumRat;
-                    CalcSysSizing(AirLoopNum).OutTempAtCoolPeak = SysCoolOutTemp;
-                    CalcSysSizing(AirLoopNum).OutHumRatAtCoolPeak = SysCoolOutHumRat;
+                if (!(state.dataSize->FinalSysSizing(AirLoopNum).CoolOAOption == 1 && SysSensCoolCap <= 0.0)) { // CoolOAOption = Yes 100% OA
+                    state.dataSize->CalcSysSizing(AirLoopNum).SensCoolCap = SysSensCoolCap;
+                    state.dataSize->CalcSysSizing(AirLoopNum).TotCoolCap = SysTotCoolCap;
+                    state.dataSize->CalcSysSizing(AirLoopNum).MixTempAtCoolPeak = SysCoolMixTemp;
+                    state.dataSize->CalcSysSizing(AirLoopNum).RetTempAtCoolPeak = SysCoolRetTemp;
+                    state.dataSize->CalcSysSizing(AirLoopNum).MixHumRatAtCoolPeak = SysCoolMixHumRat;
+                    state.dataSize->CalcSysSizing(AirLoopNum).RetHumRatAtCoolPeak = SysCoolRetHumRat;
+                    state.dataSize->CalcSysSizing(AirLoopNum).OutTempAtCoolPeak = SysCoolOutTemp;
+                    state.dataSize->CalcSysSizing(AirLoopNum).OutHumRatAtCoolPeak = SysCoolOutHumRat;
                 }
                 // check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
                 // why is this < 0.0 ? SysHeatCap cannot be < 0 ?? this code will always get executed
-                if (!(FinalSysSizing(AirLoopNum).HeatOAOption == 1 && SysHeatCap < 0.0)) { // HeatOAOption = Yes 100% OA
-                    CalcSysSizing(AirLoopNum).HeatCap = SysHeatCap;
-                    CalcSysSizing(AirLoopNum).HeatMixTemp = SysHeatMixTemp;
-                    CalcSysSizing(AirLoopNum).HeatRetTemp = SysHeatRetTemp;
-                    CalcSysSizing(AirLoopNum).HeatMixHumRat = SysHeatMixHumRat;
-                    CalcSysSizing(AirLoopNum).HeatRetHumRat = SysHeatRetHumRat;
-                    CalcSysSizing(AirLoopNum).HeatOutTemp = SysHeatOutTemp;
-                    CalcSysSizing(AirLoopNum).HeatOutHumRat = SysHeatOutHumRat;
+                if (!(state.dataSize->FinalSysSizing(AirLoopNum).HeatOAOption == 1 && SysHeatCap < 0.0)) { // HeatOAOption = Yes 100% OA
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatCap = SysHeatCap;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatMixTemp = SysHeatMixTemp;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatRetTemp = SysHeatRetTemp;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatMixHumRat = SysHeatMixHumRat;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatRetHumRat = SysHeatRetHumRat;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatOutTemp = SysHeatOutTemp;
+                    state.dataSize->CalcSysSizing(AirLoopNum).HeatOutHumRat = SysHeatOutHumRat;
                 }
-                CalcSysSizing(AirLoopNum).DesCoolVolFlow = CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
-                CalcSysSizing(AirLoopNum).DesHeatVolFlow = CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
-                CalcSysSizing(AirLoopNum).DesMainVolFlow = max(CalcSysSizing(AirLoopNum).DesCoolVolFlow, CalcSysSizing(AirLoopNum).DesHeatVolFlow);
+                state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow =
+                    state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
+                state.dataSize->CalcSysSizing(AirLoopNum).DesHeatVolFlow =
+                    state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
+                state.dataSize->CalcSysSizing(AirLoopNum).DesMainVolFlow =
+                    max(state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow, state.dataSize->CalcSysSizing(AirLoopNum).DesHeatVolFlow);
             }
         }
 
         // Move final system design data (calculated from zone data) to user design array
-        for (std::size_t i = 0; i < FinalSysSizing.size(); ++i) {
-            auto &z(FinalSysSizing[i]);
-            auto &c(CalcSysSizing[i]);
+        for (std::size_t i = 0; i < state.dataSize->FinalSysSizing.size(); ++i) {
+            auto &z(state.dataSize->FinalSysSizing[i]);
+            auto &c(state.dataSize->CalcSysSizing[i]);
             z.CoolDesDay = c.CoolDesDay;
             z.HeatDesDay = c.HeatDesDay;
             z.CoinCoolMassFlow = c.CoinCoolMassFlow;
@@ -6936,73 +6787,76 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             z.SysHeatLoadTimeStepPk = c.SysHeatLoadTimeStepPk;
         }
 
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+            auto &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
+            auto &calcSysSizing = state.dataSize->CalcSysSizing(AirLoopNum);
             for (TimeStepIndex = 1; TimeStepIndex <= numOfTimeStepInDay; ++TimeStepIndex) {
-                FinalSysSizing(AirLoopNum).HeatFlowSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).HeatFlowSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).CoolFlowSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).CoolFlowSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SumZoneCoolLoadSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SumZoneCoolLoadSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SumZoneHeatLoadSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SumZoneHeatLoadSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).CoolZoneAvgTempSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).CoolZoneAvgTempSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).HeatZoneAvgTempSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).HeatZoneAvgTempSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SensCoolCapSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SensCoolCapSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).TotCoolCapSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).TotCoolCapSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).HeatCapSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).HeatCapSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).PreheatCapSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).PreheatCapSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysCoolRetTempSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysCoolRetTempSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysCoolRetHumRatSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysCoolRetHumRatSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysHeatRetTempSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysHeatRetTempSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysHeatRetHumRatSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysHeatRetHumRatSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysCoolOutTempSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysCoolOutTempSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysCoolOutHumRatSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysCoolOutHumRatSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysHeatOutTempSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysHeatOutTempSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysHeatOutHumRatSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysHeatOutHumRatSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysDOASHeatAddSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysDOASHeatAddSeq(TimeStepIndex);
-                FinalSysSizing(AirLoopNum).SysDOASLatAddSeq(TimeStepIndex) = CalcSysSizing(AirLoopNum).SysDOASLatAddSeq(TimeStepIndex);
+                finalSysSizing.HeatFlowSeq(TimeStepIndex) = calcSysSizing.HeatFlowSeq(TimeStepIndex);
+                finalSysSizing.CoolFlowSeq(TimeStepIndex) = calcSysSizing.CoolFlowSeq(TimeStepIndex);
+                finalSysSizing.SumZoneCoolLoadSeq(TimeStepIndex) = calcSysSizing.SumZoneCoolLoadSeq(TimeStepIndex);
+                finalSysSizing.SumZoneHeatLoadSeq(TimeStepIndex) = calcSysSizing.SumZoneHeatLoadSeq(TimeStepIndex);
+                finalSysSizing.CoolZoneAvgTempSeq(TimeStepIndex) = calcSysSizing.CoolZoneAvgTempSeq(TimeStepIndex);
+                finalSysSizing.HeatZoneAvgTempSeq(TimeStepIndex) = calcSysSizing.HeatZoneAvgTempSeq(TimeStepIndex);
+                finalSysSizing.SensCoolCapSeq(TimeStepIndex) = calcSysSizing.SensCoolCapSeq(TimeStepIndex);
+                finalSysSizing.TotCoolCapSeq(TimeStepIndex) = calcSysSizing.TotCoolCapSeq(TimeStepIndex);
+                finalSysSizing.HeatCapSeq(TimeStepIndex) = calcSysSizing.HeatCapSeq(TimeStepIndex);
+                finalSysSizing.PreheatCapSeq(TimeStepIndex) = calcSysSizing.PreheatCapSeq(TimeStepIndex);
+                finalSysSizing.SysCoolRetTempSeq(TimeStepIndex) = calcSysSizing.SysCoolRetTempSeq(TimeStepIndex);
+                finalSysSizing.SysCoolRetHumRatSeq(TimeStepIndex) = calcSysSizing.SysCoolRetHumRatSeq(TimeStepIndex);
+                finalSysSizing.SysHeatRetTempSeq(TimeStepIndex) = calcSysSizing.SysHeatRetTempSeq(TimeStepIndex);
+                finalSysSizing.SysHeatRetHumRatSeq(TimeStepIndex) = calcSysSizing.SysHeatRetHumRatSeq(TimeStepIndex);
+                finalSysSizing.SysCoolOutTempSeq(TimeStepIndex) = calcSysSizing.SysCoolOutTempSeq(TimeStepIndex);
+                finalSysSizing.SysCoolOutHumRatSeq(TimeStepIndex) = calcSysSizing.SysCoolOutHumRatSeq(TimeStepIndex);
+                finalSysSizing.SysHeatOutTempSeq(TimeStepIndex) = calcSysSizing.SysHeatOutTempSeq(TimeStepIndex);
+                finalSysSizing.SysHeatOutHumRatSeq(TimeStepIndex) = calcSysSizing.SysHeatOutHumRatSeq(TimeStepIndex);
+                finalSysSizing.SysDOASHeatAddSeq(TimeStepIndex) = calcSysSizing.SysDOASHeatAddSeq(TimeStepIndex);
+                finalSysSizing.SysDOASLatAddSeq(TimeStepIndex) = calcSysSizing.SysDOASLatAddSeq(TimeStepIndex);
             }
         }
 
         // Check for user input design system flow rates. Set the sizing ratios.
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+            auto &calcSysSizing = state.dataSize->CalcSysSizing(AirLoopNum);
+            auto &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
             // adjust system sizing flow rates for scalable flows
             UpdateSysSizingForScalableInputs(state, AirLoopNum);
 
-            int NumZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
-            int NumZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+            int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+            int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
             RhoAir = state.dataEnvrn->StdRhoAir;
             SysCoolSizingRat = 0.0;
-            if (CalcSysSizing(AirLoopNum).InpDesCoolAirFlow > 0.0 && CalcSysSizing(AirLoopNum).DesCoolVolFlow > 0.0 &&
-                (CalcSysSizing(AirLoopNum).CoolAirDesMethod == InpDesAirFlow || CalcSysSizing(AirLoopNum).ScaleCoolSAFMethod == FlowPerFloorArea ||
-                 CalcSysSizing(AirLoopNum).ScaleCoolSAFMethod == FractionOfAutosizedCoolingAirflow ||
-                 CalcSysSizing(AirLoopNum).ScaleCoolSAFMethod == FlowPerCoolingCapacity)) {
-                SysCoolSizingRat = CalcSysSizing(AirLoopNum).InpDesCoolAirFlow / CalcSysSizing(AirLoopNum).DesCoolVolFlow;
+            if (calcSysSizing.InpDesCoolAirFlow > 0.0 && calcSysSizing.DesCoolVolFlow > 0.0 &&
+                (calcSysSizing.CoolAirDesMethod == InpDesAirFlow || calcSysSizing.ScaleCoolSAFMethod == FlowPerFloorArea ||
+                 calcSysSizing.ScaleCoolSAFMethod == FractionOfAutosizedCoolingAirflow ||
+                 calcSysSizing.ScaleCoolSAFMethod == FlowPerCoolingCapacity)) {
+                SysCoolSizingRat = calcSysSizing.InpDesCoolAirFlow / calcSysSizing.DesCoolVolFlow;
             } else {
                 SysCoolSizingRat = 1.0;
             }
 
             SysHeatSizingRat = 0.0;
-            if (CalcSysSizing(AirLoopNum).InpDesHeatAirFlow > 0.0 && CalcSysSizing(AirLoopNum).DesHeatVolFlow > 0.0 &&
-                (CalcSysSizing(AirLoopNum).HeatAirDesMethod == InpDesAirFlow || CalcSysSizing(AirLoopNum).ScaleHeatSAFMethod == FlowPerFloorArea ||
-                 CalcSysSizing(AirLoopNum).ScaleHeatSAFMethod == FractionOfAutosizedHeatingAirflow ||
-                 CalcSysSizing(AirLoopNum).ScaleHeatSAFMethod == FractionOfAutosizedCoolingAirflow ||
-                 CalcSysSizing(AirLoopNum).ScaleHeatSAFMethod == FlowPerHeatingCapacity)) {
-                SysHeatSizingRat = CalcSysSizing(AirLoopNum).InpDesHeatAirFlow / CalcSysSizing(AirLoopNum).DesHeatVolFlow;
+            if (calcSysSizing.InpDesHeatAirFlow > 0.0 && calcSysSizing.DesHeatVolFlow > 0.0 &&
+                (calcSysSizing.HeatAirDesMethod == InpDesAirFlow || calcSysSizing.ScaleHeatSAFMethod == FlowPerFloorArea ||
+                 calcSysSizing.ScaleHeatSAFMethod == FractionOfAutosizedHeatingAirflow ||
+                 calcSysSizing.ScaleHeatSAFMethod == FractionOfAutosizedCoolingAirflow ||
+                 calcSysSizing.ScaleHeatSAFMethod == FlowPerHeatingCapacity)) {
+                SysHeatSizingRat = calcSysSizing.InpDesHeatAirFlow / calcSysSizing.DesHeatVolFlow;
             } else {
                 SysHeatSizingRat = 1.0;
             }
 
-            if (CalcSysSizing(AirLoopNum).LoadSizeType == Ventilation && SysCoolSizingRat == 1.0) {
-                if (CalcSysSizing(AirLoopNum).DesCoolVolFlow > 0.0) {
-                    SysCoolSizingRat = CalcSysSizing(AirLoopNum).DesOutAirVolFlow / CalcSysSizing(AirLoopNum).DesCoolVolFlow;
-                    state.dataSize->VotClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesOutAirVolFlow;
+            if (calcSysSizing.LoadSizeType == Ventilation && SysCoolSizingRat == 1.0) {
+                if (calcSysSizing.DesCoolVolFlow > 0.0) {
+                    SysCoolSizingRat = calcSysSizing.DesOutAirVolFlow / calcSysSizing.DesCoolVolFlow;
+                    state.dataSize->VotClgBySys(AirLoopNum) = finalSysSizing.DesOutAirVolFlow;
                 } else {
                     SysCoolSizingRat = 1.0;
                 }
             }
-            if (CalcSysSizing(AirLoopNum).LoadSizeType == Ventilation && SysHeatSizingRat == 1.0) {
-                if (CalcSysSizing(AirLoopNum).DesHeatVolFlow > 0.0) {
-                    SysHeatSizingRat = CalcSysSizing(AirLoopNum).DesOutAirVolFlow / CalcSysSizing(AirLoopNum).DesHeatVolFlow;
-                    state.dataSize->VotHtgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesOutAirVolFlow;
+            if (calcSysSizing.LoadSizeType == Ventilation && SysHeatSizingRat == 1.0) {
+                if (calcSysSizing.DesHeatVolFlow > 0.0) {
+                    SysHeatSizingRat = calcSysSizing.DesOutAirVolFlow / calcSysSizing.DesHeatVolFlow;
+                    state.dataSize->VotHtgBySys(AirLoopNum) = finalSysSizing.DesOutAirVolFlow;
                 } else {
                     SysHeatSizingRat = 1.0;
                 }
@@ -7011,210 +6865,197 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             // Calculate the new user modified system design quantities
             if (std::abs(SysCoolSizingRat - 1.0) > 0.00001) {
 
-                FinalSysSizing(AirLoopNum).CoinCoolMassFlow = SysCoolSizingRat * CalcSysSizing(AirLoopNum).CoinCoolMassFlow;
-                FinalSysSizing(AirLoopNum).NonCoinCoolMassFlow = SysCoolSizingRat * CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
-                FinalSysSizing(AirLoopNum).DesCoolVolFlow = SysCoolSizingRat * CalcSysSizing(AirLoopNum).DesCoolVolFlow;
-                FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = SysCoolSizingRat * CalcSysSizing(AirLoopNum).MassFlowAtCoolPeak;
+                finalSysSizing.CoinCoolMassFlow = SysCoolSizingRat * calcSysSizing.CoinCoolMassFlow;
+                finalSysSizing.NonCoinCoolMassFlow = SysCoolSizingRat * calcSysSizing.NonCoinCoolMassFlow;
+                finalSysSizing.DesCoolVolFlow = SysCoolSizingRat * calcSysSizing.DesCoolVolFlow;
+                finalSysSizing.MassFlowAtCoolPeak = SysCoolSizingRat * calcSysSizing.MassFlowAtCoolPeak;
 
-                if (FinalSysSizing(AirLoopNum).DesCoolVolFlow > 0.0) {
+                if (finalSysSizing.DesCoolVolFlow > 0.0) {
 
                     for (TimeStepIndex = 1; TimeStepIndex <= numOfTimeStepInDay; ++TimeStepIndex) {
 
-                        if (CalcSysSizing(AirLoopNum).CoolFlowSeq(TimeStepIndex) > 0.0) {
+                        if (calcSysSizing.CoolFlowSeq(TimeStepIndex) > 0.0) {
 
-                            FinalSysSizing(AirLoopNum).CoolFlowSeq(TimeStepIndex) =
-                                SysCoolSizingRat * CalcSysSizing(AirLoopNum).CoolFlowSeq(TimeStepIndex);
-                            if (FinalSysSizing(AirLoopNum).CoolOAOption == MinOA) {
-                                OutAirFrac =
-                                    RhoAir * FinalSysSizing(AirLoopNum).DesOutAirVolFlow / FinalSysSizing(AirLoopNum).CoolFlowSeq(TimeStepIndex);
+                            finalSysSizing.CoolFlowSeq(TimeStepIndex) = SysCoolSizingRat * calcSysSizing.CoolFlowSeq(TimeStepIndex);
+                            if (finalSysSizing.CoolOAOption == MinOA) {
+                                OutAirFrac = RhoAir * finalSysSizing.DesOutAirVolFlow / finalSysSizing.CoolFlowSeq(TimeStepIndex);
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                             } else {
                                 OutAirFrac = 1.0;
                             }
-                            SysCoolMixTemp = FinalSysSizing(AirLoopNum).SysCoolOutTempSeq(TimeStepIndex) * OutAirFrac +
-                                             FinalSysSizing(AirLoopNum).SysCoolRetTempSeq(TimeStepIndex) * (1.0 - OutAirFrac);
-                            SysCoolMixHumRat = FinalSysSizing(AirLoopNum).SysCoolOutHumRatSeq(TimeStepIndex) * OutAirFrac +
-                                               FinalSysSizing(AirLoopNum).SysCoolRetHumRatSeq(TimeStepIndex) * (1.0 - OutAirFrac);
-                            SysSensCoolCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
-                                             FinalSysSizing(AirLoopNum).CoolFlowSeq(TimeStepIndex) *
-                                             (SysCoolMixTemp - FinalSysSizing(AirLoopNum).CoolSupTemp);
+                            SysCoolMixTemp = finalSysSizing.SysCoolOutTempSeq(TimeStepIndex) * OutAirFrac +
+                                             finalSysSizing.SysCoolRetTempSeq(TimeStepIndex) * (1.0 - OutAirFrac);
+                            SysCoolMixHumRat = finalSysSizing.SysCoolOutHumRatSeq(TimeStepIndex) * OutAirFrac +
+                                               finalSysSizing.SysCoolRetHumRatSeq(TimeStepIndex) * (1.0 - OutAirFrac);
+                            SysSensCoolCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * finalSysSizing.CoolFlowSeq(TimeStepIndex) *
+                                             (SysCoolMixTemp - finalSysSizing.CoolSupTemp);
                             SysSensCoolCap = max(0.0, SysSensCoolCap);
-                            SysTotCoolCap = FinalSysSizing(AirLoopNum).CoolFlowSeq(TimeStepIndex) *
-                                            (PsyHFnTdbW(SysCoolMixTemp, SysCoolMixHumRat) -
-                                             PsyHFnTdbW(FinalSysSizing(AirLoopNum).CoolSupTemp, FinalSysSizing(AirLoopNum).CoolSupHumRat));
+                            SysTotCoolCap =
+                                finalSysSizing.CoolFlowSeq(TimeStepIndex) *
+                                (PsyHFnTdbW(SysCoolMixTemp, SysCoolMixHumRat) - PsyHFnTdbW(finalSysSizing.CoolSupTemp, finalSysSizing.CoolSupHumRat));
                             SysTotCoolCap = max(0.0, SysTotCoolCap);
-                            FinalSysSizing(AirLoopNum).SensCoolCapSeq(TimeStepIndex) = SysSensCoolCap;
-                            FinalSysSizing(AirLoopNum).TotCoolCapSeq(TimeStepIndex) = SysTotCoolCap;
+                            finalSysSizing.SensCoolCapSeq(TimeStepIndex) = SysSensCoolCap;
+                            finalSysSizing.TotCoolCapSeq(TimeStepIndex) = SysTotCoolCap;
                         }
                     }
 
-                    if (FinalSysSizing(AirLoopNum).CoolOAOption == MinOA) {
-                        OutAirFrac = FinalSysSizing(AirLoopNum).DesOutAirVolFlow / FinalSysSizing(AirLoopNum).DesCoolVolFlow;
+                    if (finalSysSizing.CoolOAOption == MinOA) {
+                        OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesCoolVolFlow;
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
                         OutAirFrac = 1.0;
                     }
-                    FinalSysSizing(AirLoopNum).MixTempAtCoolPeak =
-                        FinalSysSizing(AirLoopNum).OutTempAtCoolPeak * OutAirFrac + FinalSysSizing(AirLoopNum).RetTempAtCoolPeak * (1.0 - OutAirFrac);
-                    FinalSysSizing(AirLoopNum).MixHumRatAtCoolPeak = FinalSysSizing(AirLoopNum).OutHumRatAtCoolPeak * OutAirFrac +
-                                                                     FinalSysSizing(AirLoopNum).RetHumRatAtCoolPeak * (1.0 - OutAirFrac);
-                    FinalSysSizing(AirLoopNum).SensCoolCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * RhoAir *
-                                                             FinalSysSizing(AirLoopNum).DesCoolVolFlow *
-                                                             (FinalSysSizing(AirLoopNum).MixTempAtCoolPeak - FinalSysSizing(AirLoopNum).CoolSupTemp);
-                    FinalSysSizing(AirLoopNum).SensCoolCap = max(0.0, FinalSysSizing(AirLoopNum).SensCoolCap);
-                    FinalSysSizing(AirLoopNum).TotCoolCap =
-                        RhoAir * FinalSysSizing(AirLoopNum).DesCoolVolFlow *
-                        (PsyHFnTdbW(FinalSysSizing(AirLoopNum).MixTempAtCoolPeak, FinalSysSizing(AirLoopNum).MixHumRatAtCoolPeak) -
-                         PsyHFnTdbW(FinalSysSizing(AirLoopNum).CoolSupTemp, FinalSysSizing(AirLoopNum).CoolSupHumRat));
-                    FinalSysSizing(AirLoopNum).TotCoolCap = max(0.0, FinalSysSizing(AirLoopNum).TotCoolCap);
+                    finalSysSizing.MixTempAtCoolPeak =
+                        finalSysSizing.OutTempAtCoolPeak * OutAirFrac + finalSysSizing.RetTempAtCoolPeak * (1.0 - OutAirFrac);
+                    finalSysSizing.MixHumRatAtCoolPeak =
+                        finalSysSizing.OutHumRatAtCoolPeak * OutAirFrac + finalSysSizing.RetHumRatAtCoolPeak * (1.0 - OutAirFrac);
+                    finalSysSizing.SensCoolCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * RhoAir * finalSysSizing.DesCoolVolFlow *
+                                                 (finalSysSizing.MixTempAtCoolPeak - finalSysSizing.CoolSupTemp);
+                    finalSysSizing.SensCoolCap = max(0.0, finalSysSizing.SensCoolCap);
+                    finalSysSizing.TotCoolCap = RhoAir * finalSysSizing.DesCoolVolFlow *
+                                                (PsyHFnTdbW(finalSysSizing.MixTempAtCoolPeak, finalSysSizing.MixHumRatAtCoolPeak) -
+                                                 PsyHFnTdbW(finalSysSizing.CoolSupTemp, finalSysSizing.CoolSupHumRat));
+                    finalSysSizing.TotCoolCap = max(0.0, finalSysSizing.TotCoolCap);
                 }
 
                 // take account of the user input system flow rates and alter the zone flow rates to match
                 for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) {
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
-                    if ((SysCoolSizingRat != 1.0) && (FinalSysSizing(AirLoopNum).LoadSizeType == Ventilation) &&
-                        (TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0)) {
+                    int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                    if ((SysCoolSizingRat != 1.0) && (finalSysSizing.LoadSizeType == Ventilation) &&
+                        (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0)) {
                         // size on ventilation load
-                        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0) {
-                            ZoneOARatio =
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA /
-                                max(TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow, TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA);
-                            ZoneOARatio *= (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                        if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0) {
+                            ZoneOARatio = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA /
+                                          max(state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow,
+                                              state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA);
+                            ZoneOARatio *= (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                         } else {
                             ZoneOARatio = 0.0;
                         }
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneCooling(ZoneOARatio);
-                    } else if ((SysCoolSizingRat > 1.0) || (SysCoolSizingRat < 1.0 && FinalSysSizing(AirLoopNum).SizingOption == NonCoincident)) {
+                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneCooling(ZoneOARatio);
+                    } else if ((SysCoolSizingRat > 1.0) || (SysCoolSizingRat < 1.0 && finalSysSizing.SizingOption == NonCoincident)) {
                         // size on user input system design flows
-                        TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneCooling(SysCoolSizingRat);
+                        state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneCooling(SysCoolSizingRat);
                     }
                 }
             }
 
             if (std::abs(SysHeatSizingRat - 1.0) > 0.00001) {
 
-                FinalSysSizing(AirLoopNum).CoinHeatMassFlow = SysHeatSizingRat * CalcSysSizing(AirLoopNum).CoinHeatMassFlow;
-                FinalSysSizing(AirLoopNum).NonCoinHeatMassFlow = SysHeatSizingRat * CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
-                FinalSysSizing(AirLoopNum).DesHeatVolFlow = SysHeatSizingRat * CalcSysSizing(AirLoopNum).DesHeatVolFlow;
+                finalSysSizing.CoinHeatMassFlow = SysHeatSizingRat * calcSysSizing.CoinHeatMassFlow;
+                finalSysSizing.NonCoinHeatMassFlow = SysHeatSizingRat * calcSysSizing.NonCoinHeatMassFlow;
+                finalSysSizing.DesHeatVolFlow = SysHeatSizingRat * calcSysSizing.DesHeatVolFlow;
 
-                if (FinalSysSizing(AirLoopNum).DesHeatVolFlow > 0.0) {
+                if (finalSysSizing.DesHeatVolFlow > 0.0) {
 
                     for (TimeStepIndex = 1; TimeStepIndex <= numOfTimeStepInDay; ++TimeStepIndex) {
 
-                        if (CalcSysSizing(AirLoopNum).HeatFlowSeq(TimeStepIndex) > 0.0) {
+                        if (calcSysSizing.HeatFlowSeq(TimeStepIndex) > 0.0) {
 
-                            FinalSysSizing(AirLoopNum).HeatFlowSeq(TimeStepIndex) =
-                                SysHeatSizingRat * CalcSysSizing(AirLoopNum).HeatFlowSeq(TimeStepIndex);
-                            if (FinalSysSizing(AirLoopNum).HeatOAOption == MinOA) {
-                                OutAirFrac =
-                                    RhoAir * FinalSysSizing(AirLoopNum).DesOutAirVolFlow / FinalSysSizing(AirLoopNum).HeatFlowSeq(TimeStepIndex);
+                            finalSysSizing.HeatFlowSeq(TimeStepIndex) = SysHeatSizingRat * calcSysSizing.HeatFlowSeq(TimeStepIndex);
+                            if (finalSysSizing.HeatOAOption == MinOA) {
+                                OutAirFrac = RhoAir * finalSysSizing.DesOutAirVolFlow / finalSysSizing.HeatFlowSeq(TimeStepIndex);
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                             } else {
                                 OutAirFrac = 1.0;
                             }
-                            SysHeatMixTemp = FinalSysSizing(AirLoopNum).SysHeatOutTempSeq(TimeStepIndex) * OutAirFrac +
-                                             FinalSysSizing(AirLoopNum).SysHeatRetTempSeq(TimeStepIndex) * (1.0 - OutAirFrac);
-                            SysHeatMixHumRat = FinalSysSizing(AirLoopNum).SysHeatOutHumRatSeq(TimeStepIndex) * OutAirFrac +
-                                               FinalSysSizing(AirLoopNum).SysHeatRetHumRatSeq(TimeStepIndex) * (1.0 - OutAirFrac);
-                            SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * FinalSysSizing(AirLoopNum).HeatFlowSeq(TimeStepIndex) *
-                                         (FinalSysSizing(AirLoopNum).HeatSupTemp - SysHeatMixTemp);
+                            SysHeatMixTemp = finalSysSizing.SysHeatOutTempSeq(TimeStepIndex) * OutAirFrac +
+                                             finalSysSizing.SysHeatRetTempSeq(TimeStepIndex) * (1.0 - OutAirFrac);
+                            SysHeatMixHumRat = finalSysSizing.SysHeatOutHumRatSeq(TimeStepIndex) * OutAirFrac +
+                                               finalSysSizing.SysHeatRetHumRatSeq(TimeStepIndex) * (1.0 - OutAirFrac);
+                            SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * finalSysSizing.HeatFlowSeq(TimeStepIndex) *
+                                         (finalSysSizing.HeatSupTemp - SysHeatMixTemp);
                             SysHeatCap = max(0.0, SysHeatCap);
-                            FinalSysSizing(AirLoopNum).HeatCapSeq(TimeStepIndex) = SysHeatCap;
+                            finalSysSizing.HeatCapSeq(TimeStepIndex) = SysHeatCap;
                         }
                     }
 
-                    if (FinalSysSizing(AirLoopNum).HeatOAOption == MinOA) {
-                        OutAirFrac = FinalSysSizing(AirLoopNum).DesOutAirVolFlow / FinalSysSizing(AirLoopNum).DesHeatVolFlow;
+                    if (finalSysSizing.HeatOAOption == MinOA) {
+                        OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesHeatVolFlow;
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
                         OutAirFrac = 1.0;
                     }
-                    FinalSysSizing(AirLoopNum).HeatMixTemp =
-                        FinalSysSizing(AirLoopNum).HeatOutTemp * OutAirFrac + FinalSysSizing(AirLoopNum).HeatRetTemp * (1.0 - OutAirFrac);
-                    FinalSysSizing(AirLoopNum).HeatMixHumRat =
-                        FinalSysSizing(AirLoopNum).HeatOutHumRat * OutAirFrac + FinalSysSizing(AirLoopNum).HeatRetHumRat * (1.0 - OutAirFrac);
-                    FinalSysSizing(AirLoopNum).HeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * RhoAir *
-                                                         FinalSysSizing(AirLoopNum).DesHeatVolFlow *
-                                                         (FinalSysSizing(AirLoopNum).HeatSupTemp - FinalSysSizing(AirLoopNum).HeatMixTemp);
-                    FinalSysSizing(AirLoopNum).HeatCap = max(0.0, FinalSysSizing(AirLoopNum).HeatCap);
+                    finalSysSizing.HeatMixTemp = finalSysSizing.HeatOutTemp * OutAirFrac + finalSysSizing.HeatRetTemp * (1.0 - OutAirFrac);
+                    finalSysSizing.HeatMixHumRat = finalSysSizing.HeatOutHumRat * OutAirFrac + finalSysSizing.HeatRetHumRat * (1.0 - OutAirFrac);
+                    finalSysSizing.HeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * RhoAir * finalSysSizing.DesHeatVolFlow *
+                                             (finalSysSizing.HeatSupTemp - finalSysSizing.HeatMixTemp);
+                    finalSysSizing.HeatCap = max(0.0, finalSysSizing.HeatCap);
                 }
                 // take account of the user input system flow rates and alter the zone flow rates to match (for terminal unit sizing)
                 if (NumZonesHeated > 0) {                                                              // IF there are centrally heated zones
                     for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over the heated zones
-                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
-                        if ((SysHeatSizingRat != 1.0) && (FinalSysSizing(AirLoopNum).LoadSizeType == Ventilation) &&
-                            (TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0)) {
+                        int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                        auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex);
+                        if ((SysHeatSizingRat != 1.0) && (finalSysSizing.LoadSizeType == Ventilation) && (termUnitFinalZoneSizing.MinOA > 0.0)) {
                             // size on ventilation load
-                            if (TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0) {
-                                ZoneOARatio = TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA /
-                                              max(TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow,
-                                                  TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA);
-                                ZoneOARatio *= (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                            if (termUnitFinalZoneSizing.MinOA > 0.0) {
+                                ZoneOARatio =
+                                    termUnitFinalZoneSizing.MinOA / max(termUnitFinalZoneSizing.DesHeatVolFlow, termUnitFinalZoneSizing.MinOA);
+                                ZoneOARatio *= (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                             } else {
                                 ZoneOARatio = 0.0;
                             }
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneHeating(ZoneOARatio);
-                        } else if ((SysHeatSizingRat > 1.0) || (SysHeatSizingRat < 1.0 && FinalSysSizing(AirLoopNum).SizingOption == NonCoincident)) {
+                            termUnitFinalZoneSizing.scaleZoneHeating(ZoneOARatio);
+                        } else if ((SysHeatSizingRat > 1.0) || (SysHeatSizingRat < 1.0 && finalSysSizing.SizingOption == NonCoincident)) {
                             // size on user input system design flows
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneHeating(SysHeatSizingRat);
+                            termUnitFinalZoneSizing.scaleZoneHeating(SysHeatSizingRat);
                         }
                     }
                 } else {                                                                               // No centrally heated zones: use cooled zones
                     for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over the cooled zones
-                        int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
-                        if ((SysHeatSizingRat != 1.0) && (FinalSysSizing(AirLoopNum).LoadSizeType == Ventilation) &&
-                            (TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA <= 0.0)) {
+                        int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                        auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex);
+                        if ((SysHeatSizingRat != 1.0) && (finalSysSizing.LoadSizeType == Ventilation) && (termUnitFinalZoneSizing.MinOA <= 0.0)) {
                             ShowWarningError(state,
-                                             "FinalSystemSizing: AirLoop=\"" + AirToZoneNodeInfo(AirLoopNum).AirLoopName +
+                                             "FinalSystemSizing: AirLoop=\"" + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName +
                                                  "\", Requested sizing on Ventilation,");
-                            ShowContinueError(
-                                state, "but Zone has no design OA Flow. Zone=\"" + TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName + "\".");
+                            ShowContinueError(state, "but Zone has no design OA Flow. Zone=\"" + termUnitFinalZoneSizing.ZoneName + "\".");
                         }
-                        if ((SysHeatSizingRat != 1.0) && (FinalSysSizing(AirLoopNum).LoadSizeType == Ventilation) &&
-                            (TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0)) {
+                        if ((SysHeatSizingRat != 1.0) && (finalSysSizing.LoadSizeType == Ventilation) && (termUnitFinalZoneSizing.MinOA > 0.0)) {
                             // size on ventilation load
-                            if (TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0) {
-                                ZoneOARatio = TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA /
-                                              max(TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow,
-                                                  TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA);
-                                ZoneOARatio *= (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                            if (termUnitFinalZoneSizing.MinOA > 0.0) {
+                                ZoneOARatio =
+                                    termUnitFinalZoneSizing.MinOA / max(termUnitFinalZoneSizing.DesHeatVolFlow, termUnitFinalZoneSizing.MinOA);
+                                ZoneOARatio *= (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                             } else {
                                 ZoneOARatio = 0.0;
                             }
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneHeating(ZoneOARatio);
-                        } else if ((SysHeatSizingRat != 1.0) && (FinalSysSizing(AirLoopNum).LoadSizeType == Ventilation) &&
-                                   (TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0)) {
+                            termUnitFinalZoneSizing.scaleZoneHeating(ZoneOARatio);
+                        } else if ((SysHeatSizingRat != 1.0) && (finalSysSizing.LoadSizeType == Ventilation) &&
+                                   (termUnitFinalZoneSizing.MinOA > 0.0)) {
                             // size on user input system design flows
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneHeating(SysHeatSizingRat);
+                            termUnitFinalZoneSizing.scaleZoneHeating(SysHeatSizingRat);
                         }
                     }
                 }
             }
 
-            FinalSysSizing(AirLoopNum).DesMainVolFlow = max(FinalSysSizing(AirLoopNum).DesCoolVolFlow, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
+            finalSysSizing.DesMainVolFlow = max(finalSysSizing.DesCoolVolFlow, finalSysSizing.DesHeatVolFlow);
 
             // loop over the zones cooled by this system and sum up the min cooling flow rates to get the
             // min system cooling flow rate
             for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) {
-                int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
-                FinalSysSizing(AirLoopNum).DesCoolVolFlowMin += TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin;
+                int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
+                finalSysSizing.DesCoolVolFlowMin += state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin;
             }
-            if (FinalSysSizing(AirLoopNum).DesCoolVolFlowMin <= 0.0) {
-                FinalSysSizing(AirLoopNum).DesCoolVolFlowMin = FinalSysSizing(AirLoopNum).DesOutAirVolFlow;
+            if (finalSysSizing.DesCoolVolFlowMin <= 0.0) {
+                finalSysSizing.DesCoolVolFlowMin = finalSysSizing.DesOutAirVolFlow;
             }
         }
 
         // Specify the heating supply air Temp/HumRat for different system configurations
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
 
-            int NumZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+            int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
 
             if (NumZonesHeated > 0) { // IF there are centrally heated zones
                 for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) {
-                    int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
+                    int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
 
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInTempTU = GetHeatingSATempForSizing(state, AirLoopNum);
-                    TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing(state, AirLoopNum);
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInTempTU = GetHeatingSATempForSizing(state, AirLoopNum);
+                    state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatCoilInHumRatTU =
+                        GetHeatingSATempHumRatForSizing(state, AirLoopNum);
                 }
             }
         }
@@ -7225,72 +7066,58 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
         // EMS override point
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-                if (FinalSysSizing(AirLoopNum).EMSOverrideCoinCoolMassFlowOn)
-                    FinalSysSizing(AirLoopNum).CoinCoolMassFlow = FinalSysSizing(AirLoopNum).EMSValueCoinCoolMassFlow;
-                if (FinalSysSizing(AirLoopNum).EMSOverrideCoinHeatMassFlowOn)
-                    FinalSysSizing(AirLoopNum).CoinHeatMassFlow = FinalSysSizing(AirLoopNum).EMSValueCoinHeatMassFlow;
-                if (FinalSysSizing(AirLoopNum).EMSOverrideNonCoinCoolMassFlowOn)
-                    FinalSysSizing(AirLoopNum).NonCoinCoolMassFlow = FinalSysSizing(AirLoopNum).EMSValueNonCoinCoolMassFlow;
-                if (FinalSysSizing(AirLoopNum).EMSOverrideNonCoinHeatMassFlowOn)
-                    FinalSysSizing(AirLoopNum).NonCoinHeatMassFlow = FinalSysSizing(AirLoopNum).EMSValueNonCoinHeatMassFlow;
-                if (FinalSysSizing(AirLoopNum).EMSOverrideDesMainVolFlowOn)
-                    FinalSysSizing(AirLoopNum).DesMainVolFlow = FinalSysSizing(AirLoopNum).EMSValueDesMainVolFlow;
-                if (FinalSysSizing(AirLoopNum).EMSOverrideDesHeatVolFlowOn)
-                    FinalSysSizing(AirLoopNum).DesHeatVolFlow = FinalSysSizing(AirLoopNum).EMSValueDesHeatVolFlow;
-                if (FinalSysSizing(AirLoopNum).EMSOverrideDesCoolVolFlowOn)
-                    FinalSysSizing(AirLoopNum).DesCoolVolFlow = FinalSysSizing(AirLoopNum).EMSValueDesCoolVolFlow;
+            for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+                auto &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
+                if (finalSysSizing.EMSOverrideCoinCoolMassFlowOn) finalSysSizing.CoinCoolMassFlow = finalSysSizing.EMSValueCoinCoolMassFlow;
+                if (finalSysSizing.EMSOverrideCoinHeatMassFlowOn) finalSysSizing.CoinHeatMassFlow = finalSysSizing.EMSValueCoinHeatMassFlow;
+                if (finalSysSizing.EMSOverrideNonCoinCoolMassFlowOn) finalSysSizing.NonCoinCoolMassFlow = finalSysSizing.EMSValueNonCoinCoolMassFlow;
+                if (finalSysSizing.EMSOverrideNonCoinHeatMassFlowOn) finalSysSizing.NonCoinHeatMassFlow = finalSysSizing.EMSValueNonCoinHeatMassFlow;
+                if (finalSysSizing.EMSOverrideDesMainVolFlowOn) finalSysSizing.DesMainVolFlow = finalSysSizing.EMSValueDesMainVolFlow;
+                if (finalSysSizing.EMSOverrideDesHeatVolFlowOn) finalSysSizing.DesHeatVolFlow = finalSysSizing.EMSValueDesHeatVolFlow;
+                if (finalSysSizing.EMSOverrideDesCoolVolFlowOn) finalSysSizing.DesCoolVolFlow = finalSysSizing.EMSValueDesCoolVolFlow;
 
             } // over NumPrimaryAirSys
         }
 
         // determine if main design is from cooling or heating
-        for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            if (FinalSysSizing(AirLoopNum).DesMainVolFlow == FinalSysSizing(AirLoopNum).DesCoolVolFlow) {
-                FinalSysSizing(AirLoopNum).sysSizeCoolingDominant = true;
-            } else if (FinalSysSizing(AirLoopNum).DesMainVolFlow == FinalSysSizing(AirLoopNum).DesHeatVolFlow) {
-                FinalSysSizing(AirLoopNum).sysSizeHeatingDominant = true;
+        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+            if (state.dataSize->FinalSysSizing(AirLoopNum).DesMainVolFlow == state.dataSize->FinalSysSizing(AirLoopNum).DesCoolVolFlow) {
+                state.dataSize->FinalSysSizing(AirLoopNum).sysSizeCoolingDominant = true;
+            } else if (state.dataSize->FinalSysSizing(AirLoopNum).DesMainVolFlow == state.dataSize->FinalSysSizing(AirLoopNum).DesHeatVolFlow) {
+                state.dataSize->FinalSysSizing(AirLoopNum).sysSizeHeatingDominant = true;
             }
         }
 
         // write out the sys design calc results
 
         print(state.files.ssz, "Time");
-        // static ObjexxFCL::gio::Fmt SSizeFmt11("(A1,A,A,A1,A,A,A1,A,A,A1,A,A)");
-        // for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
-        //     { IOFlags flags; flags.ADVANCE( "No" ); ObjexxFCL::gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep
-        //     <<
-        // CalcSysSizing( I ).AirPriLoopName << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName <<
-        // ":Des Cool Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Heat Cap [W]" <<
-        // SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Sens Cool Cap [W]"; }
-        // }
-        for (I = 1; I <= NumPrimaryAirSys; ++I) {
+        for (I = 1; I <= state.dataHVACGlobal->NumPrimaryAirSys; ++I) {
             for (J = 1; J <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++J) {
                 constexpr const char *SSizeFmt12("{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}");
                 print(state.files.ssz,
                       SSizeFmt12,
-                      SizingFileColSep,
-                      CalcSysSizing(I).AirPriLoopName,
+                      state.dataSize->SizingFileColSep,
+                      state.dataSize->CalcSysSizing(I).AirPriLoopName,
                       ":DesPer",
                       J,
                       ":Des Heat Mass Flow [kg/s]",
-                      SizingFileColSep,
-                      CalcSysSizing(I).AirPriLoopName,
+                      state.dataSize->SizingFileColSep,
+                      state.dataSize->CalcSysSizing(I).AirPriLoopName,
                       ":DesPer",
                       J,
                       ":Des Heat Cap [W]",
-                      SizingFileColSep,
-                      CalcSysSizing(I).AirPriLoopName,
+                      state.dataSize->SizingFileColSep,
+                      state.dataSize->CalcSysSizing(I).AirPriLoopName,
                       ":DesPer",
                       J,
                       ":Des Cool Mass Flow [kg/s]",
-                      SizingFileColSep,
-                      CalcSysSizing(I).AirPriLoopName,
+                      state.dataSize->SizingFileColSep,
+                      state.dataSize->CalcSysSizing(I).AirPriLoopName,
                       ":DesPer",
                       J,
                       ":Des Sens Cool Cap [W]",
-                      SizingFileColSep,
-                      CalcSysSizing(I).AirPriLoopName,
+                      state.dataSize->SizingFileColSep,
+                      state.dataSize->CalcSysSizing(I).AirPriLoopName,
                       ":DesPer",
                       J,
                       ":Des Tot Cool Cap [W]");
@@ -7312,22 +7139,22 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 }
                 constexpr const char *SSizeFmt20("{:02}:{:02}:00");
                 print(state.files.ssz, SSizeFmt20, HourPrint, Minutes);
-                for (I = 1; I <= NumPrimaryAirSys; ++I) {
+                for (I = 1; I <= state.dataHVACGlobal->NumPrimaryAirSys; ++I) {
                     for (J = 1; J <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++J) {
                         constexpr const char *SSizeFmt22("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
 
                         print(state.files.ssz,
                               SSizeFmt22,
-                              SizingFileColSep,
-                              SysSizing(J, I).HeatFlowSeq(TimeStepIndex),
-                              SizingFileColSep,
-                              SysSizing(J, I).HeatCapSeq(TimeStepIndex),
-                              SizingFileColSep,
-                              SysSizing(J, I).CoolFlowSeq(TimeStepIndex),
-                              SizingFileColSep,
-                              SysSizing(J, I).SensCoolCapSeq(TimeStepIndex),
-                              SizingFileColSep,
-                              SysSizing(J, I).TotCoolCapSeq(TimeStepIndex));
+                              state.dataSize->SizingFileColSep,
+                              state.dataSize->SysSizing(J, I).HeatFlowSeq(TimeStepIndex),
+                              state.dataSize->SizingFileColSep,
+                              state.dataSize->SysSizing(J, I).HeatCapSeq(TimeStepIndex),
+                              state.dataSize->SizingFileColSep,
+                              state.dataSize->SysSizing(J, I).CoolFlowSeq(TimeStepIndex),
+                              state.dataSize->SizingFileColSep,
+                              state.dataSize->SysSizing(J, I).SensCoolCapSeq(TimeStepIndex),
+                              state.dataSize->SizingFileColSep,
+                              state.dataSize->SysSizing(J, I).TotCoolCapSeq(TimeStepIndex));
                     }
                 }
                 print(state.files.ssz, "\n");
@@ -7336,32 +7163,32 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
         constexpr const char *SSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
         print(state.files.ssz, "Coinc Peak   ");
-        for (I = 1; I <= NumPrimaryAirSys; ++I) {
+        for (I = 1; I <= state.dataHVACGlobal->NumPrimaryAirSys; ++I) {
             print(state.files.ssz,
                   SSizeFmt31,
-                  SizingFileColSep,
-                  CalcSysSizing(I).CoinHeatMassFlow,
-                  SizingFileColSep,
-                  CalcSysSizing(I).CoinCoolMassFlow,
-                  SizingFileColSep,
-                  CalcSysSizing(I).HeatCap,
-                  SizingFileColSep,
-                  CalcSysSizing(I).SensCoolCap);
+                  state.dataSize->SizingFileColSep,
+                  state.dataSize->CalcSysSizing(I).CoinHeatMassFlow,
+                  state.dataSize->SizingFileColSep,
+                  state.dataSize->CalcSysSizing(I).CoinCoolMassFlow,
+                  state.dataSize->SizingFileColSep,
+                  state.dataSize->CalcSysSizing(I).HeatCap,
+                  state.dataSize->SizingFileColSep,
+                  state.dataSize->CalcSysSizing(I).SensCoolCap);
         }
         print(state.files.ssz, "\n");
 
         print(state.files.ssz, "NonCoinc Peak");
-        for (I = 1; I <= NumPrimaryAirSys; ++I) {
+        for (I = 1; I <= state.dataHVACGlobal->NumPrimaryAirSys; ++I) {
             print(state.files.ssz,
                   SSizeFmt31,
-                  SizingFileColSep,
-                  CalcSysSizing(I).NonCoinHeatMassFlow,
-                  SizingFileColSep,
-                  CalcSysSizing(I).NonCoinCoolMassFlow,
-                  SizingFileColSep,
-                  CalcSysSizing(I).HeatCap,
-                  SizingFileColSep,
-                  CalcSysSizing(I).SensCoolCap);
+                  state.dataSize->SizingFileColSep,
+                  state.dataSize->CalcSysSizing(I).NonCoinHeatMassFlow,
+                  state.dataSize->SizingFileColSep,
+                  state.dataSize->CalcSysSizing(I).NonCoinCoolMassFlow,
+                  state.dataSize->SizingFileColSep,
+                  state.dataSize->CalcSysSizing(I).HeatCap,
+                  state.dataSize->SizingFileColSep,
+                  state.dataSize->CalcSysSizing(I).SensCoolCap);
         }
         print(state.files.ssz, "\n");
         // have moved a big section to later in calling order, write predefined standard 62.1 report data
@@ -7895,8 +7722,6 @@ void LimitZoneVentEff(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   November 2015
-    //       MODIFIED
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Check that system ventilation eff is not less than input minimum system ventilation efficiency.
@@ -7907,62 +7732,36 @@ void LimitZoneVentEff(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Ventilation Rate Procedure for single pass system
 
-    // Using/Aliasing
-    using namespace OutputReportPredefined;
+    auto &TUFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex);
 
-    auto &TermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing);
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 ZoneOAFrac(0.0);  // ratio of Voz to available zone supply air flow
-    Real64 AvailSAFlow(0.0); // available zone supply air flow [m3/s]
-
-    if (SystemCoolingEv < TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneVentilationEff) {
-        // reset ZoneOAFrac
-        ZoneOAFrac = 1.0 + Xs - TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneVentilationEff;
-        // reset AvailSAFlow (which in this case is minimum cooling supply air flow rate)
-        AvailSAFlow = Voz / ZoneOAFrac;
-        // save ZoneOAFrac
-        TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone = ZoneOAFrac;
-        // save new (increased) minimum flow rate
-        TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin = AvailSAFlow;
-        // make sure the max flow rate is >= the new minimum flow rate
-        TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow = max(AvailSAFlow, TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow);
-        // set the system ventilation efficiency to the user specified minimum
-        SystemCoolingEv = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneVentilationEff;
+    if (SystemCoolingEv < TUFinalZoneSizing.ZoneVentilationEff) {
+        Real64 ZoneOAFrac = 1.0 + Xs - TUFinalZoneSizing.ZoneVentilationEff; // ratio of Voz to available zone supply air flow
+        Real64 AvailSAFlow = Voz / ZoneOAFrac;             // reset AvailSAFlow (which in this case is minimum cooling supply air flow rate)
+        TUFinalZoneSizing.ZpzClgByZone = ZoneOAFrac;       // save ZoneOAFrac
+        TUFinalZoneSizing.DesCoolVolFlowMin = AvailSAFlow; // save new (increased) minimum flow rate
+        TUFinalZoneSizing.DesCoolVolFlow = max(AvailSAFlow, TUFinalZoneSizing.DesCoolVolFlow); // make sure max flow is >= the new minimum flow rate
+        SystemCoolingEv = TUFinalZoneSizing.ZoneVentilationEff; // set the system ventilation efficiency to the user specified minimum
 
         // Vpz: "Primary" supply air from main air handler served by an oa mixer
-        Real64 VpzClgByZone = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow;
+        Real64 VpzClgByZone = TUFinalZoneSizing.DesCoolVolFlow;
 
         // Vdz: "Discharge" supply air delivered to zone by terminal unit
         Real64 VdzClgByZone = 0.0;
         // Taken from similar section in SetUpSysSizingArrays
-        if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0) { // multi-path system
+        if (TUFinalZoneSizing.ZoneSecondaryRecirculation > 0.0) { // multi-path system
             VdzClgByZone = max(state.dataSize->TermUnitSizing(TermUnitSizingIndex).AirVolFlow, VpzClgByZone);
         } else { // single path system
-            VdzClgByZone = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow;
+            VdzClgByZone = TUFinalZoneSizing.DesCoolVolFlow;
         }
 
         // Update VRP table entries:
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchS62zcdVpz,
-                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
-                         VpzClgByZone,
-                         4); // Vpz
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchS62zcdVdz,
-                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
-                         VdzClgByZone,
-                         4); // Vdz
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchS62zcdVpzmin,
-                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
-                         TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin,
-                         4); // Vpz-min
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchS62zcdZpz,
-                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
-                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone,
-                         3); // Zpz = Voz/Vpz        }
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVpz, TUFinalZoneSizing.ZoneName, VpzClgByZone, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVdz, TUFinalZoneSizing.ZoneName, VdzClgByZone, 4);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchS62zcdVpzmin, TUFinalZoneSizing.ZoneName, TUFinalZoneSizing.DesCoolVolFlowMin, 4);
+        // Zpz = Voz/Vpz
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchS62zcdZpz, TUFinalZoneSizing.ZoneName, TUFinalZoneSizing.ZpzClgByZone, 3);
     }
 }
 
