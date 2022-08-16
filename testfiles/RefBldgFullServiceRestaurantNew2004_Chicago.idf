@@ -1378,14 +1378,14 @@
 
   ZoneMixing,
     Kitchen Exhaust Fanmixing_0,  !- Name
-    Kitchen,                 !- Zone Name
+    Kitchen,                 !- Zone or Space Name
     HVACOperationSchd,       !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     1.828,                   !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Dining,                  !- Source Zone Name
+    Dining,                  !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
 ! ***HVAC EQUIPMENT***
