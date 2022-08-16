@@ -182,14 +182,14 @@
 
   ZoneMixing,
     whole house fan mix,     !- Name
-    attic - unvented,        !- Zone Name
+    attic - unvented,        !- Zone or Space Name
     Always On Continuous,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0,                       !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    living space;            !- Source Zone Name
+    living space;            !- Source Zone or Space Name
 
   Schedule:Constant,Always On Continuous,Fractional 1,1;
 
