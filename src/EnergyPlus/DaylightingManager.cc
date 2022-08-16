@@ -6818,24 +6818,22 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     // loop over windows to do luminance based control
     int count = 0;
     for (std::size_t igroup = 1; igroup <= thisDaylightControl.ShadeDeployOrderExtWins.size(); igroup++) {
-        std::vector<int> const &listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
-        for (const auto IWin : listOfExtWin) {
+        for (int const IWin : thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1]) {
             ++count;
+            ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
+            WindowShadingControlType shCtrlType = state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType;
+            if (!((shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffMidNight) ||
+                  (shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffSunset) ||
+                  (shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffNextMorning))) continue;
             // need to map back to the original order of the "loop" to not change all the other data structures
             int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
             if (loop > 0) {
-                ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
-                if (!state.dataSurface->Surface(IWin).HasShadeControl) continue;
                 WinShadingType currentFlag = state.dataSurface->SurfWinShadingFlag(IWin);
                 WinShadingType ShType = state.dataSurface->WindowShadingControl(ICtrl).ShadingType;
-                WindowShadingControlType shCtrlType = state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType;
-                if (((shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffMidNight) ||
-                     (shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffSunset) ||
-                     (shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffNextMorning)) &&
-                    ((currentFlag == WinShadingType::IntShadeConditionallyOff) || (currentFlag == WinShadingType::GlassConditionallyLightened) ||
+                if ((currentFlag == WinShadingType::IntShadeConditionallyOff) || (currentFlag == WinShadingType::GlassConditionallyLightened) ||
                      (currentFlag == WinShadingType::ExtShadeConditionallyOff) || (currentFlag == WinShadingType::IntBlindConditionallyOff) ||
                      (currentFlag == WinShadingType::ExtBlindConditionallyOff) || (currentFlag == WinShadingType::BGShadeConditionallyOff) ||
-                     (currentFlag == WinShadingType::BGBlindConditionallyOff))) {
+                     (currentFlag == WinShadingType::BGBlindConditionallyOff)) {
                     if (thisDaylightControl.SourceLumFromWinAtRefPt(loop, 1, 1) > state.dataSurface->WindowShadingControl(ICtrl).SetPoint2) {
                         // shade on if luminance of this window is above setpoint
                         state.dataSurface->SurfWinShadingFlag(IWin) = ShType;

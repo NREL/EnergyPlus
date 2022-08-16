@@ -9594,8 +9594,8 @@ namespace SurfaceGeometry {
                                                        });
 
         int constexpr NumValidWindowShadingControlTypes(static_cast<int>(WindowShadingControlType::Num) - 1);
-        static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
-                                                                    {"ALWAYSON",
+        constexpr std::array<std::string_view, static_cast<int>(NumValidWindowShadingControlTypes)> cValidWindowShadingControlTypes = {
+                                                                    "ALWAYSON",
                                                                      "ALWAYSOFF",
                                                                      "ONIFSCHEDULEALLOWS",
                                                                      "ONIFHIGHSOLARONWINDOW",
@@ -9618,7 +9618,7 @@ namespace SurfaceGeometry {
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR",
                                                                      "ONIFHIGHLUMINANCEORHIGHSOLARTILLMIDNIGHT",
                                                                      "ONIFHIGHLUMINANCEORHIGHSOLARTILLSUNSET",
-                                                                     "ONIFHIGHLUMINANCEORHIGHSOLARTILLNEXTMORNING"});
+                                                                     "ONIFHIGHLUMINANCEORHIGHSOLARTILLNEXTMORNING"};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;          // IO Status when calling get input subroutine
@@ -9857,8 +9857,8 @@ namespace SurfaceGeometry {
                                      ControlType + "\"");
             }
 
-            // Error if illegal control type
-            Found = UtilityRoutines::FindItemInList(ControlType, cValidWindowShadingControlTypes, NumValidWindowShadingControlTypes);
+            // Error if illegal control type, +1 to match index of WindowShadingControlType
+            Found = getEnumerationValue(cValidWindowShadingControlTypes, ControlType) + 1;
             if (Found == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
