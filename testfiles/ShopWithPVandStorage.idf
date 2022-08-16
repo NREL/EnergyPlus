@@ -3099,6 +3099,7 @@
     2.7835,                  !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_1:Sys_OA-ZN_1_FLR_1_SEC_1:SysCoolCNode,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_1:SysCoolC-ZN_1_FLR_1_SEC_1:SysHeatCNode,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_1:SysCoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -3376,6 +3377,7 @@
     2.7835,                  !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_2:Sys_OA-ZN_1_FLR_1_SEC_2:SysCoolCNode,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_2:SysCoolC-ZN_1_FLR_1_SEC_2:SysHeatCNode,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_2:SysCoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -3653,6 +3655,7 @@
     2.7835,                  !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_3:Sys_OA-ZN_1_FLR_1_SEC_3:SysCoolCNode,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_3:SysCoolC-ZN_1_FLR_1_SEC_3:SysHeatCNode,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_3:SysCoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -3930,6 +3933,7 @@
     2.7835,                  !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_4:Sys_OA-ZN_1_FLR_1_SEC_4:SysCoolCNode,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_4:SysCoolC-ZN_1_FLR_1_SEC_4:SysHeatCNode,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_4:SysCoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -4207,6 +4211,7 @@
     2.7835,                  !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_5:Sys_OA-ZN_1_FLR_1_SEC_5:SysCoolCNode,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_5:SysCoolC-ZN_1_FLR_1_SEC_5:SysHeatCNode,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_5:SysCoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name

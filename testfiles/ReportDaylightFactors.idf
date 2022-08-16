@@ -4894,6 +4894,7 @@
     3.76818961220759,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     VAV_1_OA-VAV_1_CoolCNode,!- Air Inlet Node Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Air Outlet Node Name
     CoolCStandard10Ton_CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -4910,6 +4911,7 @@
     3.86224168896602,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     VAV_2_OA-VAV_2_CoolCNode,!- Air Inlet Node Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Air Outlet Node Name
     CoolCStandard10Ton_CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -4926,6 +4928,7 @@
     3.80599741748884,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     VAV_3_OA-VAV_3_CoolCNode,!- Air Inlet Node Name
     VAV_3_CoolC-VAV_3_HeatCNode,  !- Air Outlet Node Name
     CoolCStandard10Ton_CapFT,!- Total Cooling Capacity Function of Temperature Curve Name

@@ -3365,6 +3365,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     1.16,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -3760,6 +3761,7 @@
     2.75,                    !- Gross Rated Heating COP {W/W}
     0.5,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Heat Pump 1 Cooling Coil Outlet,  !- Air Inlet Node Name
     Heat Pump 1 Heating Coil Outlet,  !- Air Outlet Node Name
     Heat Pump 1 HP Heating Coil Cap-FT,  !- Heating Capacity Function of Temperature Curve Name
@@ -3851,6 +3853,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     0.5,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Heat Pump 1 Supply Fan Outlet,  !- Air Inlet Node Name
     Heat Pump 1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Heat Pump 1 Cool Coil Cap-FT,  !- Total Cooling Capacity Function of Temperature Curve Name

@@ -14227,6 +14227,7 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjFld('Rated COP', base + usCoolCoilCOPOff,' ')
     CALL AddToObjStr('Rated Air Flow Rate {m3/s}', 'autosize')
     CALL AddToObjStr('Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}','')
+    CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
     CALL AddToObjFld('Air Inlet Node Name', base + usAirHandlerNameOff, TRIM(coolCoilInlet))
     CALL AddToObjFld('Air Outlet Node Name', base + usAirHandlerNameOff, TRIM(coolCoilOutlet))
     CALL AddToObjFld('Total Cooling Capacity Function of Temperature Curve Name',   &
@@ -15000,6 +15001,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjFld('Rated COP', base + uhpsHPHeatCoilCOPOff,'')
   CALL AddToObjStr('Rated Air Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Rated Evaporator Fan Power Per Volume Flow Rate','')
+  CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
   CALL AddToObjFld('Air Inlet Node Name', base + uhpsAirHandlerNameOff,' Cooling Coil Outlet')
   CALL AddToObjFld('Air Outlet Node Name', base + uhpsAirHandlerNameOff,' Heating Coil Outlet')
   CALL AddToObjFld('Total Heating Capacity Function of Temperature Curve Name',   &
@@ -15154,6 +15156,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjFld('Rated COP', base + uhpsCoolCoilCOPOff,' ')
   CALL AddToObjStr('Rated Air Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}','')
+  CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
   CALL AddToObjFld('Air Inlet Node Name', base + uhpsAirHandlerNameOff, TRIM(coolCoilInlet))
   CALL AddToObjFld('Air Outlet Node Name', base + uhpsAirHandlerNameOff, TRIM(coolCoilOutlet))
   CALL AddToObjFld('Total Cooling Capacity Function of Temperature Curve Name',   &
@@ -16207,6 +16210,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Rated COP', base + ussCoolCoilCOPOff,' ')
       CALL AddToObjStr('Rated Air Flow Rate {m3/s}', 'autosize')
       CALL AddToObjStr('Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}','')
+      CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
       CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Air Outlet Node Name',base + ussAirHandlerNameOff, TRIM(coolCoilUnitOutlet))
       CALL AddToObjFld('Total Cooling Capacity Function of Temperature Curve Name',   &
@@ -16771,6 +16775,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Rated COP', base + ussCoolCoilCOPOff, '')
       CALL AddToObjStr('Rated Air Flow Rate', 'autosize')
       CALL AddToObjStr('Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}','')
+      CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
       CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff,' HX Supply Outlet Node')
       CALL AddToObjFld('Air Outlet Node Name', base + ussAirHandlerNameOff,' Cooling Coil Outlet Node')
       CALL AddToObjFld('Total Cooling Capacity Function of Temperature Curve Name',   &
@@ -16900,6 +16905,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Speed 1 Gross Rated Cooling COP {W/W}', base + ussCoolCoilCOPOff,' ')
       CALL AddToObjStr('Speed 1 Rated Air Flow Rate {m3/s}','autosize')
       CALL AddToObjStr('Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
+      CALL AddToObjStr('Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
       CALL AddToObjFld('Speed 1 Total Cooling Capacity Function of Temperature Curve Name',   &
          base + ussAirHandlerNameOff,' Cool Coil Cap-FT')
       CALL AddToObjFld('Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name',   &
@@ -16931,6 +16937,7 @@ DO iSys = 1, numCompactSysUnitarySystem
           CALL AddToObjFld('Speed '//TRIM(iSpdChar)//' Gross Rated Cooling COP {W/W}', base + ussCoolCoilCOPOff,' ')
           CALL AddToObjStr('Speed '//TRIM(iSpdChar)//' Rated Air Flow Rate {m3/s}','autosize')
           CALL AddToObjStr('Speed '//TRIM(iSpdChar)//' Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
+          CALL AddToObjStr('Speed '//TRIM(iSpdChar)//' 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
           CALL AddToObjFld('Speed '//TRIM(iSpdChar)//' Total Cooling Capacity Function of Temperature Curve Name',   &
              base + ussAirHandlerNameOff,' Cool Coil Cap-FT')
           CALL AddToObjFld('Speed '//TRIM(iSpdChar)//' Total Cooling Capacity Function of Flow Fraction Curve Name',   &
@@ -17315,6 +17322,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Rated COP', base + ussHPHeatCoilCOPOff,'')
     CALL AddToObjStr('Rated Air Flow Rate {m3/s}', 'autosize')
     CALL AddToObjStr('Rated Evaporator Fan Power Per Volume Flow Rate','')
+    CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
     CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(heatCoilInlet))
     CALL AddToObjFld('Air Outlet Node Name', base + ussAirHandlerNameOff, TRIM(heatCoilOutlet))
     CALL AddToObjFld('Total Heating Capacity Function of Temperature Curve Name',   &
@@ -17430,6 +17438,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Speed 1 Gross Rated Heating COP {W/W}', base + ussHPHeatCoilCOPOff,' ')
     CALL AddToObjStr('Speed 1 Rated Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}','')
+    CALL AddToObjStr('Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
     CALL AddToObjFld('Speed 1 Heating Capacity Function of Temperature Curve Name',   &
         base + ussAirHandlerNameOff,' Heat Coil Cap-FT')
     CALL AddToObjFld('Speed 1 Heating Capacity Function of Flow Fraction Curve Name',   &
@@ -17454,6 +17463,7 @@ DO iSys = 1, numCompactSysUnitarySystem
         CALL AddToObjFld('Speed '//TRIM(iSpdChar)//' Gross Rated Heating COP {W/W}', base + ussHPHeatCoilCOPOff,' ')
         CALL AddToObjStr('Speed '//TRIM(iSpdChar)//' Rated Air Flow Rate {m3/s}','autosize')
         CALL AddToObjStr('Speed '//TRIM(iSpdChar)//' Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}','')
+        CALL AddToObjStr('Speed '//TRIM(iSpdChar)//' 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
         CALL AddToObjFld('Speed '//TRIM(iSpdChar)//' Heating Capacity Function of Temperature Curve Name',   &
             base + ussAirHandlerNameOff,' Heat Coil Cap-FT')
         CALL AddToObjFld('Speed '//TRIM(iSpdChar)//' Heating Capacity Function of Flow Fraction Curve Name',   &
@@ -25089,6 +25099,7 @@ IF (.NOT. isBaseboardNone) THEN
   !CALL AddToObjFld('Rated Air Volume Flow Rate {m3/s}', base + ptaczSupplyCoolFlowRateOff,'')
   CALL AddToObjStr('Rated Air Volume Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}','')
+  CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
   IF (isDrawThru) THEN
     CALL AddToObjFld('Air Inlet Node Name', base + ptaczNameOff,' PTAC Mixed Air Outlet')
   ELSE
@@ -25705,6 +25716,7 @@ DO iZone = 1, numCompactPTHP
   !CALL AddToObjFld('Rated Air Volume Flow Rate {m3/s}', base + pthpzSupplyCoolFlowRateOff,'')
   CALL AddToObjStr('Rated Air Volume Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}','')
+  CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
   IF (isDrawThru) THEN
     CALL AddToObjFld('Air Inlet Node Name', base + pthpzNameOff,' PTHP Mixed Air Outlet')
   ELSE
@@ -25797,6 +25809,7 @@ DO iZone = 1, numCompactPTHP
   !CALL AddToObjFld('Rated Air Volume Flow Rate {m3/s}', base + pthpzSupplyHeatFlowRateOff,'')
   CALL AddToObjStr('Rated Air Volume Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Rated Evaporator Fan Power Per Volume Flow Rate','')
+  CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
   CALL AddToObjFld('Air Inlet Node Name', base + pthpzNameOff,' PTHP Cooling Coil Outlet')
   CALL AddToObjFld('Air Outlet Node Name', base + pthpzNameOff,' PTHP Heating Coil Outlet')
   CALL AddToObjFld('Total heating capacity modifier curve (function of temperature)',   &
@@ -32259,6 +32272,7 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjFld('Rated COP', base + doasCoolCoilCOPOff, '')
       CALL AddToObjStr('Rated Air Flow Rate', 'autosize')
       CALL AddToObjStr('Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}','')
+      CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}','')
       CALL AddToObjFld('Air Inlet Node Name', base + doasNameOff,' HX Supply Outlet Node')
       CALL AddToObjFld('Air Outlet Node Name', base + doasNameOff,' Cooling Coil Outlet Node')
       CALL AddToObjFld('Total Cooling Capacity Function of Temperature Curve Name',   &

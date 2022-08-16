@@ -5516,6 +5516,7 @@
     2.96014,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_1:1_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_1:1 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_1:1_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -5800,6 +5801,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_2:2_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_2:2 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_2:2_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6084,6 +6086,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_3:3_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_3:3 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_3:3_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6368,6 +6371,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_4:4_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_4:4 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_4:4_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6652,6 +6656,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_5:5_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_5:5 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_5:5_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6936,6 +6941,7 @@
     2.96014,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_6:6_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_6:6 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_6:6_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7220,6 +7226,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_7:7_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_7:7 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_7:7_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7504,6 +7511,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_8:8_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_8:8 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_8:8_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7788,6 +7796,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_9:9_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_9:9 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_9:9_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -8072,6 +8081,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_10:10_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     PSZ-AC_10:10 Supply Equipment Outlet Node,  !- Air Outlet Node Name
     PSZ-AC_10:10_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name

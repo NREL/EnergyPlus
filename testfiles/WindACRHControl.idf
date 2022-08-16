@@ -1802,6 +1802,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.6,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Zone1WindACFanOutletNode,!- Air Inlet Node Name
     Zone1WindACAirOutletNode,!- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1818,6 +1819,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.6,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Zone2WindACFanOutletNode,!- Air Inlet Node Name
     Zone2WindACAirOutletNode,!- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1834,6 +1836,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.6,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Zone3WindACOAMixerOutletNode,  !- Air Inlet Node Name
     Zone3WindACDXOutletNode, !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name

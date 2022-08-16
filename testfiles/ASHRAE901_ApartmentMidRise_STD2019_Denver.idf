@@ -11438,6 +11438,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split GSW Heating Coil Outlet,  !- Air Inlet Node Name
     Split GSW Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11466,6 +11467,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split GNW Heating Coil Outlet,  !- Air Inlet Node Name
     Split GNW Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11494,6 +11496,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split Office Heating Coil Outlet,  !- Air Inlet Node Name
     Split Office Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11522,6 +11525,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split GNE Heating Coil Outlet,  !- Air Inlet Node Name
     Split GNE Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11550,6 +11554,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split GN1 Heating Coil Outlet,  !- Air Inlet Node Name
     Split GN1 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11578,6 +11583,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split GN2 Heating Coil Outlet,  !- Air Inlet Node Name
     Split GN2 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11606,6 +11612,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split GS1 Heating Coil Outlet,  !- Air Inlet Node Name
     Split GS1 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11634,6 +11641,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split GS2 Heating Coil Outlet,  !- Air Inlet Node Name
     Split GS2 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11662,6 +11670,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split MSW Heating Coil Outlet,  !- Air Inlet Node Name
     Split MSW Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11690,6 +11699,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split MNW Heating Coil Outlet,  !- Air Inlet Node Name
     Split MNW Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11718,6 +11728,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split MSE Heating Coil Outlet,  !- Air Inlet Node Name
     Split MSE Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11746,6 +11757,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split MNE Heating Coil Outlet,  !- Air Inlet Node Name
     Split MNE Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11774,6 +11786,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split MN1 Heating Coil Outlet,  !- Air Inlet Node Name
     Split MN1 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11802,6 +11815,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split MN2 Heating Coil Outlet,  !- Air Inlet Node Name
     Split MN2 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11830,6 +11844,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split MS1 Heating Coil Outlet,  !- Air Inlet Node Name
     Split MS1 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11858,6 +11873,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split MS2 Heating Coil Outlet,  !- Air Inlet Node Name
     Split MS2 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11886,6 +11902,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split TSW Heating Coil Outlet,  !- Air Inlet Node Name
     Split TSW Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11914,6 +11931,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split TNW Heating Coil Outlet,  !- Air Inlet Node Name
     Split TNW Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11942,6 +11960,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split TSE Heating Coil Outlet,  !- Air Inlet Node Name
     Split TSE Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11970,6 +11989,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split TNE Heating Coil Outlet,  !- Air Inlet Node Name
     Split TNE Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11998,6 +12018,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split TN1 Heating Coil Outlet,  !- Air Inlet Node Name
     Split TN1 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -12026,6 +12047,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split TN2 Heating Coil Outlet,  !- Air Inlet Node Name
     Split TN2 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -12054,6 +12076,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split TS1 Heating Coil Outlet,  !- Air Inlet Node Name
     Split TS1 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -12082,6 +12105,7 @@
     4.11713235489972,        !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Split TS2 Heating Coil Outlet,  !- Air Inlet Node Name
     Split TS2 Air Loop Outlet,  !- Air Outlet Node Name
     Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name

@@ -2339,6 +2339,7 @@
     4.49,                    !- Gross Rated Cooling COP {W/W}
     1.00,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Air Loop Inlet Node,     !- Air Inlet Node Name
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     CentralACCoolCapFT,      !- Total Cooling Capacity Function of Temperature Curve Name

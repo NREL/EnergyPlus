@@ -10874,6 +10874,7 @@
     4.03878394144749,        !- Gross Rated Cooling COP {W/W}
     0.744166728437762,       !- Rated Air Flow Rate {m3/s}
     773.3912012006,          !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     central ac and furnace unitary system Fan - Cooling Coil Node,  !- Air Inlet Node Name
     central ac and furnace unitary system Cooling Coil - Heating Coil Node,  !- Air Outlet Node Name
     Cool-Cap-fT1,            !- Total Cooling Capacity Function of Temperature Curve Name
