@@ -8943,40 +8943,42 @@ namespace SurfaceGeometry {
         if (numberOfHeatTransferAlgosUsed > 1) {
             int ExtSurfNum;
             for (Item = 1; Item <= state.dataSurface->TotSurfaces; ++Item) {
-                if (state.dataSurface->Surface(Item).ExtBoundCond > 0) {
-                    if ((state.dataSurface->Surface(Item).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Invalid) ||
-                        (state.dataSurface->Surface(Item).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::None))
+                auto &surf = state.dataSurface->Surface(Item);
+                if (surf.ExtBoundCond > 0) {
+                    if ((surf.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Invalid) ||
+                        (surf.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::None))
                         continue;
-                    ExtSurfNum = state.dataSurface->Surface(Item).ExtBoundCond;
-                    if (state.dataSurface->Surface(Item).HeatTransferAlgorithm != state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm) {
+                    ExtSurfNum = surf.ExtBoundCond;
+                    auto &extSurf = state.dataSurface->Surface(ExtSurfNum);
+                    if (surf.HeatTransferAlgorithm != extSurf.HeatTransferAlgorithm) {
                         ShowWarningError(state,
                                          "An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in "
                                          "both constructions should be same.");
                         ShowContinueError(
                             state,
-                            "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(Item).Name + ", is " +
+                            format("The HeatTransferAlgorithm of Surface: {}, is {}", surf.Name,
                                 std::string(
-                                    DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]));
+                                    DataSurfaces::HeatTransAlgoStrs[static_cast<int>(surf.HeatTransferAlgorithm)])));
                         ShowContinueError(
                             state,
-                            "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(ExtSurfNum).Name + ", is " +
+                            format("The HeatTransferAlgorithm of Surface: {}, is {}", extSurf.Name,
                                 std::string(
-                                    DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm)]));
-                        if (state.dataSurface->Surface(Item).HeatTransferAlgorithm > state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm) {
+                                    DataSurfaces::HeatTransAlgoStrs[static_cast<int>(extSurf.HeatTransferAlgorithm)])));
+                        if (surf.HeatTransferAlgorithm > extSurf.HeatTransferAlgorithm) {
                             ShowContinueError(
                                 state,
-                                "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(ExtSurfNum).Name + ", is assigned to " +
+                                format(
+                                    "The HeatTransferAlgorithm of Surface: {}, is assigned to {}. Simulation continues.",
+                                    extSurf.Name,
                                     std::string(
-                                        DataSurfaces::HeatTransAlgoStrs[static_cast<int>(state.dataSurface->Surface(Item).HeatTransferAlgorithm)]) +
-                                    ". Simulation continues.");
-                            state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm = state.dataSurface->Surface(Item).HeatTransferAlgorithm;
+                                        DataSurfaces::HeatTransAlgoStrs[static_cast<int>(surf.HeatTransferAlgorithm)])));
+                            extSurf.HeatTransferAlgorithm = surf.HeatTransferAlgorithm;
                         } else {
                             ShowContinueError(state,
-                                              "The HeatTransferAlgorithm of Surface: " + state.dataSurface->Surface(Item).Name + ", is assigned to " +
+                                              format("The HeatTransferAlgorithm of Surface: {}, is assigned to {}. Simulation continues.",  surf.Name,
                                                   std::string(DataSurfaces::HeatTransAlgoStrs[static_cast<int>(
-                                                      state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm)]) +
-                                                  ". Simulation continues.");
-                            state.dataSurface->Surface(Item).HeatTransferAlgorithm = state.dataSurface->Surface(ExtSurfNum).HeatTransferAlgorithm;
+                                                      extSurf.HeatTransferAlgorithm)])));
+                            surf.HeatTransferAlgorithm = extSurf.HeatTransferAlgorithm;
                         }
                     }
                 }
