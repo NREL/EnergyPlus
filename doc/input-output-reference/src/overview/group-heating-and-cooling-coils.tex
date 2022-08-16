@@ -7009,6 +7009,18 @@ This numeric field contains the gross rated sensible capacity of the heat pump i
 
 This numeric field contains the rated cooling coefficient of performance of the heat pump.
 
+\paragraph{Field: Rated Entering Water Temperature}\label{field-rated-entering-water-temperature}
+
+This numeric field contains the entering water temperature at which the coil capacity, COP and power are rated at. As such, the coil's COP should be entered at this temperature. If left blank, 30 degrees C is used (rating temperature for water loop water-to-air heat pumps in ISO-13256-1-1998).
+
+\paragraph{Field: Rated Entering Air Dry-Bulb Temperature}\label{field-rated-entering-air-dry-bulb-temperature}
+
+This numeric field contains the entering air dry-bulb temperature at which the coil capacity, COP and power are rated at. As such, the coil's COP should be entered at this temperature. If left blank, 27 degrees C is used (rated temperature for water loop water-to-air heat pumps in ISO-13256-1-1998).
+
+\paragraph{Field: Rated Entering Air Wet-Bulb Temperature}\label{field-rated-entering-air-wet-bulb-temperature}
+
+This numeric field contains the entering air wet-bulb temperature at which the coil capacity, COP and power are rated at. As such, the coil's COP should be entered at this temperature. If left blank, 19 degrees C is used (rated temperature for water loop water-to-air heat pumps in ISO-13256-1-1998).
+
 \paragraph{Field: Total Cooling Capacity Curve Name}\label{field-total-cooling-capacity-curve-name}
 
 This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump total cooling capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
@@ -7938,6 +7950,18 @@ This numeric field contains the gross heating capacity of the heat pump at the r
 \paragraph{Field: Gross Rated Heating COP}\label{field-gross-rated-heating-cop-1}
 
 This numeric field contains the gross rated heating coefficient of performance of the heat pump. The gross rated COP of the heat pump should not account for the effect of supply air fan heat.
+
+\paragraph{Field: Rated Entering Water Temperature}\label{field-rated-entering-water-temperature-1}
+
+This numeric field contains the entering water temperature at which the coil capacity, COP and power are rated at. As such, the coil's COP should be entered at this temperature. If left blank, 20 degrees C is used (rating temperature for water loop water-to-air heat pumps in ISO-13256-1-1998).
+
+\paragraph{Field: Rated Entering Air Dry-Bulb Temperature}\label{field-rated-entering-air-dry-bulb-temperature-1}
+
+This numeric field contains the entering air dry-bulb temperature at which the coil capacity, COP and power are rated at. As such, the coil's COP should be entered at this temperature. If left blank, 20 degrees C is used (rated temperature for water loop water-to-air heat pumps in ISO-13256-1-1998).
+
+\paragraph{Field: Ratio of Rated Heating Capacity to Rated Cooling Capacity}\label{field-rated-heating-capacity-to-rated-cooling-capacity}
+
+This numeric field contains the ratio of rated heating capacity to the rayed cooling capacity. It is used to determine the autosized rated heating capacity from the rated cooling capacity. It is also used to determine the autosized rated cooling capacity when peak heating loads are dominating during sizing calculations. If both this object's and its associated cooling coil's capacity are provided by the user, this field not used. Typical value for this field depends on the application in which the coils are used. Here are some suggested values 1.23 for water loop applications, 0.89 for ground water applications, and 0.76 for ground loop applications (source: 2021 AHRI directory).
 
 \paragraph{Field: Heating Capacity Curve Name}\label{field-heating-capacity-curve-name}
 
