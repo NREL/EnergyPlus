@@ -1795,6 +1795,175 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     ASSERT_FALSE(state->dataEnvrn->IsRain);
 }
 
+TEST_F(EnergyPlusFixture, WeatherManager_GetReportPeriodData)
+{
+
+    std::string const idf_objects = delimited_string({"Output:Table:ReportPeriod,",
+                                                      "ThermalResilienceReportTimeWinter,  !- field Name,",
+                                                      "ThermalResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "8,                            !- Begin Hour of Day",
+                                                      "    ,                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "3,                            !- End Day of Month",
+                                                      "18;                           !- End Hour of Day"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    state->dataWeatherManager->TotReportPers = 1;
+
+    GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).startYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).startMonth, 1);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).startDay, 1);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).startHour, 8);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).endYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).endMonth, 1);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).endDay, 3);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(1).endHour, 18);
+}
+
+TEST_F(EnergyPlusFixture, WeatherManager_CopyReportPeriodObject)
+{
+    int nReportPeriod = 2;
+    state->dataWeatherManager->ReportPeriodInput.allocate(nReportPeriod);
+
+    state->dataWeatherManager->ReportPeriodInput(1).title = "test period 1";
+    state->dataWeatherManager->ReportPeriodInput(1).reportName = "empty report 1";
+    state->dataWeatherManager->ReportPeriodInput(1).startYear = 0;
+    state->dataWeatherManager->ReportPeriodInput(1).startMonth = 3;
+    state->dataWeatherManager->ReportPeriodInput(1).startDay = 5;
+    state->dataWeatherManager->ReportPeriodInput(1).startHour = 8;
+    state->dataWeatherManager->ReportPeriodInput(1).startJulianDate =
+        WeatherManager::computeJulianDate(state->dataWeatherManager->ReportPeriodInput(1).startYear,
+                                          state->dataWeatherManager->ReportPeriodInput(1).startMonth,
+                                          state->dataWeatherManager->ReportPeriodInput(1).startDay);
+    state->dataWeatherManager->ReportPeriodInput(1).endYear = 0;
+    state->dataWeatherManager->ReportPeriodInput(1).endMonth = 3;
+    state->dataWeatherManager->ReportPeriodInput(1).endDay = 10;
+    state->dataWeatherManager->ReportPeriodInput(1).endHour = 8;
+    state->dataWeatherManager->ReportPeriodInput(1).endJulianDate =
+        WeatherManager::computeJulianDate(state->dataWeatherManager->ReportPeriodInput(1).endYear,
+                                          state->dataWeatherManager->ReportPeriodInput(1).endMonth,
+                                          state->dataWeatherManager->ReportPeriodInput(1).endDay);
+
+    state->dataWeatherManager->ReportPeriodInput(2).title = "test period 2";
+    state->dataWeatherManager->ReportPeriodInput(2).reportName = "empty report 2";
+    state->dataWeatherManager->ReportPeriodInput(2).startYear = 0;
+    state->dataWeatherManager->ReportPeriodInput(2).startMonth = 6;
+    state->dataWeatherManager->ReportPeriodInput(2).startDay = 6;
+    state->dataWeatherManager->ReportPeriodInput(2).startHour = 8;
+    state->dataWeatherManager->ReportPeriodInput(2).startJulianDate =
+        WeatherManager::computeJulianDate(state->dataWeatherManager->ReportPeriodInput(2).startYear,
+                                          state->dataWeatherManager->ReportPeriodInput(2).startMonth,
+                                          state->dataWeatherManager->ReportPeriodInput(2).startDay);
+    state->dataWeatherManager->ReportPeriodInput(2).endYear = 0;
+    state->dataWeatherManager->ReportPeriodInput(2).endMonth = 7;
+    state->dataWeatherManager->ReportPeriodInput(2).endDay = 7;
+    state->dataWeatherManager->ReportPeriodInput(2).endHour = 8;
+    state->dataWeatherManager->ReportPeriodInput(2).endJulianDate =
+        WeatherManager::computeJulianDate(state->dataWeatherManager->ReportPeriodInput(2).endYear,
+                                          state->dataWeatherManager->ReportPeriodInput(2).endMonth,
+                                          state->dataWeatherManager->ReportPeriodInput(2).endDay);
+
+    CopyReportPeriodObject(state->dataWeatherManager->ReportPeriodInput, 1, state->dataWeatherManager->ReportPeriodInput, 2);
+
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).title, state->dataWeatherManager->ReportPeriodInput(1).title);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).reportName, state->dataWeatherManager->ReportPeriodInput(1).reportName);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).startYear, state->dataWeatherManager->ReportPeriodInput(1).startYear);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).startMonth, state->dataWeatherManager->ReportPeriodInput(1).startMonth);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).startDay, state->dataWeatherManager->ReportPeriodInput(1).startDay);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).startHour, state->dataWeatherManager->ReportPeriodInput(1).startHour);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).startJulianDate, state->dataWeatherManager->ReportPeriodInput(1).startJulianDate);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).endYear, state->dataWeatherManager->ReportPeriodInput(1).endYear);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).endMonth, state->dataWeatherManager->ReportPeriodInput(1).endMonth);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).endDay, state->dataWeatherManager->ReportPeriodInput(1).endDay);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).endHour, state->dataWeatherManager->ReportPeriodInput(1).endHour);
+    EXPECT_EQ(state->dataWeatherManager->ReportPeriodInput(2).endJulianDate, state->dataWeatherManager->ReportPeriodInput(1).endJulianDate);
+}
+
+TEST_F(EnergyPlusFixture, WeatherManager_GroupReportPeriodByType)
+{
+    std::string const idf_objects = delimited_string({"Output:Table:ReportPeriod,",
+                                                      "ThermalResilienceReportTimeWinter,  !- field Name,",
+                                                      "ThermalResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "8,                            !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "3,                            !- End Day of Month",
+                                                      "18;                           !- End Hour of Day",
+
+                                                      "Output:Table:ReportPeriod,",
+                                                      "CO2ResilienceReportTimeWinter,  !- field Name,",
+                                                      "CO2ResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "2,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "8,                            !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "2,                            !- End Month",
+                                                      "5,                            !- End Day of Month",
+                                                      "18;                           !- End Hour of Day",
+
+                                                      "Output:Table:ReportPeriod,",
+                                                      "ThermalResilienceReportTimeWinter,  !- field Name,",
+                                                      "ThermalResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "7,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "9,                            !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "8,                            !- End Month",
+                                                      "5,                            !- End Day of Month",
+                                                      "10;                           !- End Hour of Day"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    state->dataWeatherManager->TotReportPers = 3;
+    GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
+
+    state->dataWeatherManager->TotThermalReportPers = 0;
+    state->dataWeatherManager->TotCO2ReportPers = 0;
+    state->dataWeatherManager->TotVisualReportPers = 0;
+    GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+
+    EXPECT_EQ(state->dataWeatherManager->TotThermalReportPers, 2);
+    EXPECT_EQ(state->dataWeatherManager->TotCO2ReportPers, 1);
+    EXPECT_EQ(state->dataWeatherManager->TotVisualReportPers, 0);
+
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(1).startYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(1).startMonth, 1);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(1).startDay, 1);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(1).startHour, 8);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(1).endYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(1).endMonth, 1);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(1).endDay, 3);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(1).endHour, 18);
+
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(2).startYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(2).startMonth, 7);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(2).startDay, 1);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(2).startHour, 9);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(2).endYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(2).endMonth, 8);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(2).endDay, 5);
+    EXPECT_EQ(state->dataWeatherManager->ThermalReportPeriodInput(2).endHour, 10);
+
+    EXPECT_EQ(state->dataWeatherManager->CO2ReportPeriodInput(1).startYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->CO2ReportPeriodInput(1).startMonth, 2);
+    EXPECT_EQ(state->dataWeatherManager->CO2ReportPeriodInput(1).startDay, 1);
+    EXPECT_EQ(state->dataWeatherManager->CO2ReportPeriodInput(1).startHour, 8);
+    EXPECT_EQ(state->dataWeatherManager->CO2ReportPeriodInput(1).endYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->CO2ReportPeriodInput(1).endMonth, 2);
+    EXPECT_EQ(state->dataWeatherManager->CO2ReportPeriodInput(1).endDay, 5);
+    EXPECT_EQ(state->dataWeatherManager->CO2ReportPeriodInput(1).endHour, 18);
+}
+
 TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_OK)
 {
 
