@@ -2687,16 +2687,18 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
 
     state->dataConstruction->Construct(1).Name = "Construction1";
 
-    state->dataSurface->WindowShadingControl(1).Name = "WindowShadingControl1";
-    state->dataSurface->WindowShadingControl(2).Name = "WindowShadingControl2";
-    state->dataSurface->WindowShadingControl(1).ShadingType = DataSurfaces::WinShadingType::IntShade;
-    state->dataSurface->WindowShadingControl(2).ShadingType = DataSurfaces::WinShadingType::ExtShade;
-    state->dataSurface->WindowShadingControl(1).ShadingControlType = DataSurfaces::WindowShadingControlType::HiLumin_HiSolar_OffMidNight;
-    state->dataSurface->WindowShadingControl(2).ShadingControlType = DataSurfaces::WindowShadingControlType::HiLumin_HiSolar_OffNextMorning;
-    state->dataSurface->WindowShadingControl(1).SetPoint = 9400;
-    state->dataSurface->WindowShadingControl(2).SetPoint = 94.64;
-    state->dataSurface->WindowShadingControl(1).SetPoint2 = 2000;
-    state->dataSurface->WindowShadingControl(2).SetPoint2 = 2000;
+    auto &shCtrl1 = state->dataSurface->WindowShadingControl(1);
+    auto &shCtrl2 = state->dataSurface->WindowShadingControl(2);
+    shCtrl1.Name = "WindowShadingControl1";
+    shCtrl2.Name = "WindowShadingControl2";
+    shCtrl1.ShadingType = DataSurfaces::WinShadingType::IntShade;
+    shCtrl2.ShadingType = DataSurfaces::WinShadingType::ExtShade;
+    shCtrl1.ShadingControlType = DataSurfaces::WindowShadingControlType::HiLumin_HiSolar_OffMidNight;
+    shCtrl2.ShadingControlType = DataSurfaces::WindowShadingControlType::HiLumin_HiSolar_OffNextMorning;
+    shCtrl1.SetPoint = 9400;
+    shCtrl2.SetPoint = 94.64;
+    shCtrl1.SetPoint2 = 2000;
+    shCtrl2.SetPoint2 = 2000;
 
     int SurfNum = 2;
     state->dataSurface->TotSurfaces = SurfNum;
