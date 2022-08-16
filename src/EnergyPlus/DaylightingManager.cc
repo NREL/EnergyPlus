@@ -6824,16 +6824,17 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             WindowShadingControlType shCtrlType = state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType;
             if (!((shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffMidNight) ||
                   (shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffSunset) ||
-                  (shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffNextMorning))) continue;
+                  (shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffNextMorning)))
+                continue;
             // need to map back to the original order of the "loop" to not change all the other data structures
             int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
             if (loop > 0) {
                 WinShadingType currentFlag = state.dataSurface->SurfWinShadingFlag(IWin);
                 WinShadingType ShType = state.dataSurface->WindowShadingControl(ICtrl).ShadingType;
                 if ((currentFlag == WinShadingType::IntShadeConditionallyOff) || (currentFlag == WinShadingType::GlassConditionallyLightened) ||
-                     (currentFlag == WinShadingType::ExtShadeConditionallyOff) || (currentFlag == WinShadingType::IntBlindConditionallyOff) ||
-                     (currentFlag == WinShadingType::ExtBlindConditionallyOff) || (currentFlag == WinShadingType::BGShadeConditionallyOff) ||
-                     (currentFlag == WinShadingType::BGBlindConditionallyOff)) {
+                    (currentFlag == WinShadingType::ExtShadeConditionallyOff) || (currentFlag == WinShadingType::IntBlindConditionallyOff) ||
+                    (currentFlag == WinShadingType::ExtBlindConditionallyOff) || (currentFlag == WinShadingType::BGShadeConditionallyOff) ||
+                    (currentFlag == WinShadingType::BGBlindConditionallyOff)) {
                     if (thisDaylightControl.SourceLumFromWinAtRefPt(loop, 1, 1) > state.dataSurface->WindowShadingControl(ICtrl).SetPoint2) {
                         // shade on if luminance of this window is above setpoint
                         state.dataSurface->SurfWinShadingFlag(IWin) = ShType;
