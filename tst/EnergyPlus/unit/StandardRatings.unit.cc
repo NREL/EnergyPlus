@@ -1019,17 +1019,14 @@ TEST_F(EnergyPlusFixture, MultiSpeedHeatingCoil_HSPFValueTest_2Speed)
     ASSERT_TRUE(HSPF != 0.0);
     ASSERT_TRUE(NetHeatingCapRatedHighTemp != 0.0);
     ASSERT_TRUE(NetHeatingCapRatedLowTemp != 0.0);
-    EXPECT_NEAR(1.8604449198065671, HSPF, 0.01); // 1.8378611856963720 at 934.3 W/(m3/s)
+    EXPECT_NEAR(1.8604449198065671, HSPF, 0.01);                       // 1.8378611856963720 at 934.3 W/(m3/s)
     EXPECT_NEAR(14723.494682539813, NetHeatingCapRatedHighTemp, 0.01); // 14830.540291374517 at 934.3 W/(m3/s)
-    EXPECT_NEAR(8814.4702147982516, NetHeatingCapRatedLowTemp, 0.01); // 8921.5158236329553 at 934.3 W/(m3/s)
-    EXPECT_NEAR(6.35, HSPF * StandardRatings::ConvFromSIToIP, 0.01); // //6.3481015667753340 at 773.3 W/(m3/s)
-    
-    auto b = HSPF2_2023; // 1.5713994077636240
-    auto c = HSPF2_2023 * StandardRatings::ConvFromSIToIP; //5.3618373413018050
+    EXPECT_NEAR(8814.4702147982516, NetHeatingCapRatedLowTemp, 0.01);  // 8921.5158236329553 at 934.3 W/(m3/s)
+    EXPECT_NEAR(6.35, HSPF * StandardRatings::ConvFromSIToIP, 0.01);   // //6.3481015667753340 at 773.3 W/(m3/s)
 
-    ASSERT_TRUE(HSPF2_2023 != 0.0); // 1.6064633535795425
+    ASSERT_TRUE(HSPF2_2023 != 0.0);                      // 1.6064633535795425
     ASSERT_TRUE(NetHeatingCapRatedHighTemp_2023 != 0.0); // 14830.540291374517
-    ASSERT_TRUE(NetHeatingCapRatedLowTemp_2023 != 0.0); // 6974.9677431654618
+    ASSERT_TRUE(NetHeatingCapRatedLowTemp_2023 != 0.0);  // 6974.9677431654618
 
     ASSERT_TRUE(HSPF != HSPF2_2023);
 }

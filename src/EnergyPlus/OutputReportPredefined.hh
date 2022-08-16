@@ -272,7 +272,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXCoolCoilSEERStandardIP = 0; // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
     int pdchDXCoolCoilEERIP = 0;          // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
     int pdchDXCoolCoilIEERIP = 0;         // IEER value in IP unit at AHRI std. 340/360 conditions
- 
+
     // DX Cooling Coil SEER2 subtable | AHRI std. 210/240 2023 conditions
     int pdstDXCoolCoil_2023 = 0;
     int pdchDXCoolCoilType_2023 = 0;        // DX cooling coil type

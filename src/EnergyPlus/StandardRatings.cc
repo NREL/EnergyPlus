@@ -1,5 +1,4 @@
 // EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2657,11 +2656,8 @@ namespace StandardRatings {
         Array1D<Real64> P_F_Low(nsp);                         // Outdoor Unit electric power at F1 test condition | p_F_Low
         Array1D<Real64> P_E_Int(nsp);                         // Outdoor Unit electric power at Eint (Ev) test conditon | p_E_Int
 
-        Real64 PartLoadRatio_2023(0.0); // compressor cycling ratio between successive speeds, [-]
         Real64 PartLoadFactorUser_2023(
             0.0); // part-load factor based on user-input PLF curve and C_D value that accounts for the cyclic degradation, [-]
-        Real64 PartLoadFactorStandard_2023(
-            0.0); // part-load factorn that accounts for the cyclic degradation from AHRI standard 210/240 default PLF curve and C_D value, [-]
 
         Real64 NetCoolingCapWeighted_2023(0.0);         // net tot cooling cap weighted by the fraction of the binned cooling hours [W]
         Real64 TotCoolingElecPowerWeighted_2023(0.0);   // net total cooling electric power input weighted by the fraction of the temperature bins
@@ -2672,11 +2668,7 @@ namespace StandardRatings {
         Real64 BuildingCoolingLoad_2023(0.0);    // Building space cooling load corresponding to an outdoor bin temperature [W]
         Real64 NetTotCoolCapBinned_2023(0.0);    // Net tot cooling cap corresponding to an outdoor bin temperature [W]
         Real64 TotCoolElecPowerBinned_2023(0.0); // Total cooling electric power corresponding to an outdoor bin temperature [W]
-        Real64 TotCoolElecPowerBinnedDefault_2023(
-            0.0); // Total cooling electric power corresponding to an outdoor bin temperature from AHRI 201/240 default PLF curve and C_D value, [W]
-        Real64 LoadFactor2023(0.0); // "on" time for last stage at the desired reduced capacity, (dimensionless)
 
-        int BinNum;                                   // bin number counter
         int spnum;                                    // compressor speed number
         Array1D<Real64> TotCapFlowModFac(nsp);        // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
         Array1D<Real64> EIRFlowModFac(nsp);           // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
@@ -3399,9 +3391,8 @@ namespace StandardRatings {
         Real64 NetHeatingCapRatedHighTemp_2023(0.0);
         Real64 NetHeatingCapRatedLowTemp_2023(0.0);
 
-        int BinNum2023;     // bin number counter
-        int spnum;          // compressor speed number
-        int StandardDHRNum; // Integer counter for standardized DHRs
+        int BinNum2023; // bin number counter
+        int spnum;      // compressor speed number
 
         Array1D<Real64> FanPowerPerEvapAirFlowRate_2023(nsp); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
 
@@ -3433,24 +3424,13 @@ namespace StandardRatings {
         Real64 EIRTempModFacH4Full(0.0);    // EIR modifier (function of entering wetbulb, outside drybulb) at H4 Full Test[-]
 
         Real64 OATempCompressorOff(0.0); // Minimum outdoor air temperature to turn the commpressor off
-        Real64 PartLoadRatio(0.0);       // compressor cycling ratio between successive speeds, [-]
-        Real64 PartLoadFraction(0.0);    // part-load fraction that account for the cyclic degradation, [-]
 
         Real64 NetHeatingCapWeighted(0.0);       // net total heating cap weighted by the fraction of the binned cooling hours [W]
         Real64 TotHeatingElecPowerWeighted(0.0); // net total heat pump and resistance heating electric Energy input weighted by
         // the fraction of the binned cooling hours
-        Real64 BuildingHeatingLoad2023(0.0);  // Building space heating load corresponding to an outdoor bin temperature [W]
-        Real64 NetTotHeatCapBinned(0.0);      // Net tot heatinging cap corresponding to an outdoor bin temperature [W]
-        Real64 TotHeatElecPowerBinnedHP(0.0); // Total Heat Pump heating electric power consumption at outdoor bin temp [W]
-        Real64 TotHeatElecPowerBinnedRH(0.0); // Total Resistance heating electric power consumption at outdoor bin temp [W]
 
-        Real64 LoadFactor;               // Fractional "on" time for last stage at the desired reduced capacity, (dimensionless)
-        Real64 LowTempCutOutFactor(0.0); // Factor which corresponds to compressor operation depending on outdoor temperature
-
-        Real64 n(0.0);                            // Fractional bin hours for the heating season  [-]
-        Real64 f_def(1.0);                        // Demand Defrost Credit, A factor to adjust HSPF if coil has demand defrost control  [-]
-        Real64 DesignHeatingRequirement2023(0.0); // The amount of heating required to maintain a given indoor temperature
-        // at a particular outdoor design temperature.  [W]
+        Real64 n(0.0);     // Fractional bin hours for the heating season  [-]
+        Real64 f_def(1.0); // Demand Defrost Credit, A factor to adjust HSPF if coil has demand defrost control  [-]
 
         NetHeatingCapWeighted = 0.0;
         TotHeatingElecPowerWeighted = 0.0;

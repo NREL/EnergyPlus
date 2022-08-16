@@ -14935,7 +14935,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     Real64 constexpr AirMassFlowRatioRated(1.0); // AHRI test is at the design flow rate
     // and hence AirMassFlowRatio is 1.0
 
-    Real64 constexpr DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
+    Real64 constexpr DefaultFanPowerPerEvapAirFlowRate(773.3);      // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
     Real64 constexpr DefaultFanPowerPerEvapAirFlowRateSEER2(934.4); // 441 W/1000 scfm or 934.4 W/(m3/s). The AHRI standard
     // specifies a nominal/default fan electric power consumption per rated air
     // volume flow rate to account for indoor fan electric power consumption
@@ -15095,6 +15095,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
 
     } else {
         FanPowerPerEvapAirFlowRate = DefaultFanPowerPerEvapAirFlowRate;
+        FanPowerPerEvapAirFlowRateSEER2 = DefaultFanPowerPerEvapAirFlowRateSEER2;
         FanPowerCorrection = DefaultFanPowerPerEvapAirFlowRate * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(1);
         FanHeatCorrection = DefaultFanPowerPerEvapAirFlowRate * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(1);
         TotCapFlowModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatioRated);

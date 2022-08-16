@@ -356,10 +356,6 @@ namespace OutputReportPredefined {
         s->pdchDXCoolCoilSEER2StandardIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER2 Standard [Btu/W-h]");
         s->pdchDXCoolCoilIEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "IEER2 [Btu/W-h]");
 
-
-
-
-
         // for DX Cooling Coil ASHRAE 127-12 Report
         s->pdstDXCoolCoil2 = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report");
         s->pdchDXCoolCoilType = newPreDefColumn(state, s->pdstDXCoolCoil2, "DX Cooling Coil Type");
@@ -386,9 +382,6 @@ namespace OutputReportPredefined {
         s->pdchDXHeatCoilLowCap_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Low Temperature Heating (net) Rating Capacity [W]");
         s->pdchDXHeatCoilHSPF2IP_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "HSPF2 [Btu/W-h]");
         s->pdchDXHeatCoilRegionNum_2023 = newPreDefColumn(state, s->pdstDXHeatCoil_2023, "Region Number");
-
-
-
 
         s->pdstHeatCoil = newPreDefSubTable(state, s->pdrEquip, "Heating Coils");
 
