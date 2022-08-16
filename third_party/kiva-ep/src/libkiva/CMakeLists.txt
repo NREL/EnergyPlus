@@ -182,7 +182,7 @@ target_include_directories(libkiva PUBLIC
 target_compile_options(libkiva PRIVATE
   $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
   $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-  -Wall -Wextra -Wpedantic >
+  -Wall -Wextra -Wpedantic -Werror>
 )
 target_compile_features(libkiva PUBLIC cxx_std_17) # Should be PRIVATE once boost is cleaned out of public API
 
