@@ -379,16 +379,16 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
         }
 
         if (!lAlphaFieldBlanks(9)) {
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    cAlphaArgs(9),
-                                                    ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::HeatExchangerFluidToFluid,
-                                                    cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::ConnectionType::Sensor,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum = NodeInputManager::GetOnlySingleNode(
+                state,
+                cAlphaArgs(9),
+                ErrorsFound,
+                DataLoopNode::ConnectionObjectType::HeatExchangerFluidToFluid,
+                cAlphaArgs(1),
+                DataLoopNode::NodeFluidType::Water,
+                DataLoopNode::ConnectionType::Sensor,
+                NodeInputManager::CompFluidStream::Primary, // TODO: check if this should be Secondary since the setpoint node is for Loop Supply Side
+                DataLoopNode::ObjectIsNotParent);
             // check that node actually has setpoints on it
             if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode == ControlType::HeatingSetPointModulated) ||
                 (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode == ControlType::HeatingSetPointOnOff) ||
@@ -652,10 +652,6 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::HeatingSetPointModulated;
         } else if (UtilityRoutines::SameString(cAlphaArgs(7), "HeatingSetpointOnOff")) {
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::HeatingSetPointOnOff;
-        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "DualDeadbandSetpointModulated")) {
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::DualDeadBandSetPointModulated;
-        } else if (UtilityRoutines::SameString(cAlphaArgs(7), "DualDeadbandSetpointOnOff")) {
-            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode = ControlType::DualDeadBandSetPointOnOff;
         } else {
             ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
             ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
@@ -698,43 +694,11 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                         }
                     }
                 }
-            } else if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode == ControlType::DualDeadBandSetPointModulated) ||
-                       (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode == ControlType::DualDeadBandSetPointOnOff)) {
-                if ((state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPointHi ==
-                     DataLoopNode::SensedNodeFlagValue) ||
-                    (state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPointLo ==
-                     DataLoopNode::SensedNodeFlagValue)) {
-                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        ShowSevereError(state, std::string{RoutineName} + " Missing dual temperature setpoints for node = " + cAlphaArgs(8));
-                        ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                        ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
-                        ErrorsFound = true;
-                    } else {
-                        // need call to EMS to check node
-                        bool NodeEMSSetPointMissing = false;
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                                                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                    EMSManager::SPControlType::TemperatureMinSetPoint,
-                                                                    NodeEMSSetPointMissing);
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                                                    state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                    EMSManager::SPControlType::TemperatureMaxSetPoint,
-                                                                    NodeEMSSetPointMissing);
-                        if (NodeEMSSetPointMissing) {
-                            ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(8));
-                            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                            ShowContinueError(state, "Use a setpoint manager or EMS actuators to place a dual temperature setpoints on the node");
-                            ErrorsFound = true;
-                        }
-                    }
-                }
             }
         } else {
             // need to name a setpoint node if using a setpoint type control mode
             if ((state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode == ControlType::HeatingSetPointModulated) ||
-                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode == ControlType::HeatingSetPointOnOff) ||
-                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode == ControlType::DualDeadBandSetPointModulated) ||
-                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode == ControlType::DualDeadBandSetPointOnOff)) {
+                (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).controlMode == ControlType::HeatingSetPointOnOff)) {
                 ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(8));
                 ErrorsFound = true;
@@ -922,19 +886,24 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                this->DemandSideLoop.outletNodeNum);
 
         } else if (this->Type == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
+            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp = 100.0;
+            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Press = 101325.0;
             Real64 rhoSteam = FluidProperties::GetSatDensityRefrig(state,
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                   DataGlobalConstants::InitConvTemp,
+                                                                   state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp,
                                                                    1.0,
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                    RoutineNameSTWNoColon);
 
             Real64 StartEnthSteam = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                          DataGlobalConstants::InitConvTemp,
+                                                                          state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp,
                                                                           1.0,
                                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                           RoutineNameSTWNoColon);
+            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Enthalpy = StartEnthSteam;
+            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Quality = 1.0;
+            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).HumRat = 0.0;
 
             this->DemandSideLoop.MassFlowRateMax = rhoSteam * this->DemandSideLoop.DesignVolumeFlowRate;
 
@@ -1000,14 +969,17 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
     // the UA is sized for an effectiveness of 1.0 using sizing temps
     // the capacity uses the full HX model
 
-    // in the case of steam to water heat exchanger, Loop Supply Side is Water loop and Loop Demand Side is Steam loop
-
     std::string RoutineName("SizeFluidHeatExchanger");
     std::string CurrentModuleObject("HeatExchanger:FluidToFluid");
+    std::string LoopDemand = "Loop Demand ";
+    std::string LoopSupply = "Loop Supply ";
 
+    // In the case of steam to water heat exchanger, Loop Supply Side is Water and Loop Demand Side is Steam
     if (this->Type == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
         RoutineName = "SizeSteamToWaterHeatExchanger";
         CurrentModuleObject = "HeatExchanger:SteamToWater";
+        std::string LoopDemand = "Steam ";
+        std::string LoopSupply = "Water ";
     }
 
     // first deal with Loop Supply Side
@@ -1027,14 +999,14 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
                 BaseSizer::reportSizerOutput(state,
                                              CurrentModuleObject,
                                              this->Name,
-                                             "Loop Supply Side Design Fluid Flow Rate [m3/s]",
+                                             LoopSupply + "Side Design Fluid Flow Rate [m3/s]",
                                              this->SupplySideLoop.DesignVolumeFlowRate);
             }
             if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                 BaseSizer::reportSizerOutput(state,
                                              CurrentModuleObject,
                                              this->Name,
-                                             "Initial Loop Supply Side Design Fluid Flow Rate [m3/s]",
+                                             "Initial " + LoopSupply + "Side Design Fluid Flow Rate[m3 / s] ",
                                              this->SupplySideLoop.DesignVolumeFlowRate);
             }
         } else {
@@ -1082,15 +1054,19 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
                                                                                state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                                RoutineName);
                 Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-
                 Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(state,
                                                                            state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                                            TempSteamIn,
                                                                            1.0,
                                                                            state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                            RoutineName);
-
-                tmpDmdSideDesignVolFlowRate = tmpDesCap / (SteamDensity * LatentHeatSteam);
+                Real64 CpWaterSubcool = FluidProperties::GetSatSpecificHeatRefrig(state,
+                                                                                  state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
+                                                                                  TempSteamIn,
+                                                                                  0.0,
+                                                                                  state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+                                                                                  RoutineName);
+                tmpDmdSideDesignVolFlowRate = tmpDesCap / (SteamDensity * (LatentHeatSteam + CpWaterSubcool * this->DegOfSubcooling));
             }
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
         } else {
@@ -1099,13 +1075,13 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
         }
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
             BaseSizer::reportSizerOutput(
-                state, CurrentModuleObject, this->Name, "Loop Demand Side Design Fluid Flow Rate [m3/s]", this->DemandSideLoop.DesignVolumeFlowRate);
+                state, CurrentModuleObject, this->Name, LoopDemand + "Side Design Fluid Flow Rate [m3/s]", this->DemandSideLoop.DesignVolumeFlowRate);
         }
         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
             BaseSizer::reportSizerOutput(state,
                                          CurrentModuleObject,
                                          this->Name,
-                                         "Initial Loop Demand Side Design Fluid Flow Rate [m3/s]",
+                                         "Initial " + LoopDemand + "Side Design Fluid Flow Rate [m3/s]",
                                          this->DemandSideLoop.DesignVolumeFlowRate);
         }
     }
@@ -1892,7 +1868,7 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, Real64 My
         } break;
 
         case ControlType::OperationSchemeModulated: {
-            if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
+            if (MyLoad >= DataHVACGlobals::SmallLoad) { // If the load is significant (grater than 1) and positive, it will attempt to provide heating
                 Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
                 if (DeltaTHeating > this->TempControlTol) { // can do heating so turn on
                     mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
@@ -1937,7 +1913,7 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, Real64 My
         } break;
 
         case ControlType::OperationSchemeOnOff: {
-            if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
+            if (MyLoad >= DataHVACGlobals::SmallLoad) { // If the load is significant (grater than 1) and positive, it will attempt to provide heating
                 Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
                 if (DeltaTHeating > this->TempControlTol) { // can do heating so turn on
                     mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
@@ -2318,22 +2294,20 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
 
     Real64 MinCapRate = SupSideMdot * WaterLoopInletCp;
     // The heat capacity rate of a fluid during a phase-change process must approach infinity since the temperature change is practically zero.
-    // Therefore, C_min/C_max = 0, and the noncondensing fluid is the minimum fluid.
+    // Therefore, C_min/C_max = 0, and the noncondensing fluid (water) is the minimum fluid.
 
     if (MinCapRate > 0.0) {
 
         Real64 NTU = this->UA / MinCapRate;
         Real64 ExpCheckValue = -NTU;
-        if (ExpCheckValue > DataPrecisionGlobals::EXP_UpperLimit) {
-            if (-NTU >= DataPrecisionGlobals::EXP_LowerLimit) {
-                this->Effectiveness = 1.0 - std::exp(-NTU);
-                this->Effectiveness = min(1.0, this->Effectiveness);
-            } else {
-                this->Effectiveness = 1.0;
-            }
+        if (ExpCheckValue < DataPrecisionGlobals::EXP_LowerLimit) {
+            this->Effectiveness = min(1.0, (1.0 - std::exp(-NTU)));
         } else {
-            this->Effectiveness = 1.0 - std::exp(-NTU);
-            this->Effectiveness = min(1.0, this->Effectiveness);
+            if (ExpCheckValue > DataPrecisionGlobals::EXP_UpperLimit) {
+                this->Effectiveness = 1.0;
+            } else {
+                this->Effectiveness = min(1.0, std::abs(1.0 - std::exp(-NTU)));
+            }
         }
     } else { // no capacity
         this->Effectiveness = 0.0;
@@ -2367,8 +2341,10 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
     this->SupplySideLoop.InletTemp = WaterLoopInletTemp;
     this->SupplySideLoop.InletMassFlowRate = SupSideMdot;
     this->DemandSideLoop.InletTemp = SteamLoopInletTemp;
+    this->DemandSideLoop.InletQuality = 1.0;
     this->DemandSideLoop.InletMassFlowRate = SteamMdot;
     this->DemandSideLoop.OutletTemp = SteamLoopInletTemp;
+    this->DemandSideLoop.OutletQuality = 0.0;
 
     state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Temp = this->DemandSideLoop.OutletTemp;
     state.dataLoopNodes->Node(this->SupplySideLoop.outletNodeNum).Temp = this->SupplySideLoop.OutletTemp;
@@ -2623,7 +2599,6 @@ Real64 HeatExchangerStruct::demandSideFlowResidual(EnergyPlusData &state,
 
 void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 {
-
     static constexpr std::string_view RoutineName("InitFluidHeatExchanger: ");
 
     if (this->MyOneTimeFlag) {

@@ -264,10 +264,18 @@ HeatExchanger:SteamToWater,
         \note Lower limit on inlet temperatures, heat exchanger will not operate if either inlet is below this limit
         \type real
         \units C
-   N7 ; \field Operation Maximum Temperature Limit
+   N7 , \field Operation Maximum Temperature Limit
         \note Upper limit on inlet temperatures, heat exchanger will not operate if either inlet is above this limit
         \type real
         \units C
+   N8 , \field Degree of SubCooling
+        \units C
+        \minimum 1.0
+        \maximum 5.0
+   N9 ; \field Degree of Loop SubCooling
+        \units C
+        \minimum 10.0
+        \default 20.0
 ```
 
 ## Engineering Reference ##
