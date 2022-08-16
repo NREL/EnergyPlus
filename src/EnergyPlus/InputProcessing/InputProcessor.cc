@@ -1931,7 +1931,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string extension_key;
-    state.dataOutput->OutputVariablesForSimulation.reserve(1024);
+    // state.dataOutput->OutputVariablesForSimulation.reserve(1024);
     state.dataOutput->MaxConsideredOutputVariables = 10000;
 
     // Output Variable
@@ -2482,12 +2482,12 @@ void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, s
 
     auto const found = state.dataOutput->OutputVariablesForSimulation.find(VarName);
     if (found == state.dataOutput->OutputVariablesForSimulation.end()) {
-        std::unordered_map<std::string,
-                           DataOutputs::OutputReportingVariables,
-                           UtilityRoutines::case_insensitive_hasher,
-                           UtilityRoutines::case_insensitive_comparator>
+        std::map<std::string,
+                 DataOutputs::OutputReportingVariables,
+                 // UtilityRoutines::case_insensitive_hasher,
+                 UtilityRoutines::case_insensitive_comparator>
             data;
-        data.reserve(32);
+        // data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));
         state.dataOutput->OutputVariablesForSimulation.emplace(VarName, std::move(data));
     } else {

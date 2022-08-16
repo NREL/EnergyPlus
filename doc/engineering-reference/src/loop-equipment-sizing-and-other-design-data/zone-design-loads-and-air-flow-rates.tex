@@ -4,7 +4,7 @@
 
 There is no single best way to establish design HVAC flow rates and size HVAC equipment. Different building designs, climates, and HVAC systems will impose varying constraints on the designer. The method used to size an HVAC system in a hot, moist climate such as Miami will be different than the method used for a building in Albuquerque. The type of building is also relevant - a simple watts per square foot loads estimate could be adequate for a building containing a network server farm while a detailed, dynamic loads simulation would be necessary for a passive solar building. In the end the designer's experience and engineering judgement will play an important role in any sizing calculation.
 
-HVAC equipment sizing begins with the calculation of space heating and cooling loads. A space cooling (heating) load is defined as the rate at which heat must be removed (added) to a space to maintain a constant temperature. The current industry standard method for calculating space loads is the \emph{heat balance method} {[}ASHRAE Fundamentals (2001), page 29.1; Pedersen et al., (1997); Pedersen (2001). Since EnergyPlus is a heat balance based simulation program it is straightforward for the program to use this method for calculating zone loads.
+HVAC equipment sizing begins with the calculation of space heating and cooling sensible and/or latent loads. A space cooling (heating) sensible load is defined as the rate at which heat must be removed (added) to a space to maintain a constant zone temperature. A space cooling (heating) latent load is defined as the rate at which moisture must be removed (added) to a space to maintain a constant zone moisture/humidity ratio/relative humidity level. The current industry standard method for calculating space loads is the \emph{heat balance method} {[}ASHRAE Fundamentals (2001), page 29.1; Pedersen et al., (1997); Pedersen (2001). Since EnergyPlus is a heat balance based simulation program it is straightforward for the program to use this method for calculating zone loads.
 
 \subsection{Zone Design Data Arrays}\label{zone-design-data-arrays}
 
@@ -39,18 +39,28 @@ Name & Description \tabularnewline
 \endhead
 
 Select data from ZoneSizingInput &  \tabularnewline
-DesHeatMassFlow & the zone design heating air mass flow rate in [kg/s] \tabularnewline
-DesCoolMassFlow & the zone design cooling air mass flow rate in [kg/s] \tabularnewline
-DesHeatLoad & the zone design heating load in [W] \tabularnewline
-DesCoolLoad & the zone design cooling load in [W] \tabularnewline
+DesHeatMassFlow & the zone design sensible heating air mass flow rate in [kg/s] \tabularnewline
+DesCoolMassFlow & the zone design sensible cooling air mass flow rate in [kg/s] \tabularnewline
+DesLatentHeatMassFlow & the zone design latent heating air mass flow rate in [kg/s] \tabularnewline
+DesLatentCoolMassFlow & the zone design latent cooling air mass flow rate in [kg/s] \tabularnewline
+DesHeatLoad & the zone design sensible heating load in [W] \tabularnewline
+DesCoolLoad & the zone design sensible cooling load in [W] \tabularnewline
+DesHeatLoad & the zone design latent heating load in [W] \tabularnewline
+DesCoolLoad & the zone design latent cooling load in [W] \tabularnewline
 DesHeatDens & the zone design heating air density [kg/m  ] \tabularnewline
 DesCoolDens & the zone design cooling air density [kg/m  ] \tabularnewline
-DesHeatVolFlow & the zone design heating air volume flow rate [m\(^{3}\)/s] \tabularnewline
-DesCoolVolFlow & the zone design cooling air volume flow rate [m\(^{3}\)/s] \tabularnewline
-DesHeatCoilInTemp & zone heating coil design air inlet temperature [C] \tabularnewline
-DesCoolCoilInTemp & zone cooling coil design air inlet temperature [C] \tabularnewline
-DesHeatCoilInHumRat & the zone heating coil design air inlet humidity ratio [kg/kg] \tabularnewline
-DesCoolCoilInHumRat & the zone cooling coil design air inlet humidity ratio [kg/kg] \tabularnewline
+DesHeatVolFlow & the zone design sensible heating air volume flow rate [m\(^{3}\)/s] \tabularnewline
+DesCoolVolFlow & the zone design sensible cooling air volume flow rate [m\(^{3}\)/s] \tabularnewline
+DesLatentHeatVolFlow & the zone design latent heating air volume flow rate [m\(^{3}\)/s] \tabularnewline
+DesLatentCoolVolFlow & the zone design latent cooling air volume flow rate [m\(^{3}\)/s] \tabularnewline
+DesHeatCoilInTemp & zone sensible heating coil design air inlet temperature [C] \tabularnewline
+DesCoolCoilInTemp & zone sensible cooling coil design air inlet temperature [C] \tabularnewline
+DesLatentHeatCoilInTemp & zone latent heating coil design air inlet temperature [C] \tabularnewline
+DesLatentCoolCoilInTemp & zone latent cooling coil design air inlet temperature [C] \tabularnewline
+DesHeatCoilInHumRat & the zone sensible heating coil design air inlet humidity ratio [kg/kg] \tabularnewline
+DesCoolCoilInHumRat & the zone sensible cooling coil design air inlet humidity ratio [kg/kg] \tabularnewline
+DesHeatCoilInHumRat & the zone latent heating coil design air inlet humidity ratio [kg/kg] \tabularnewline
+DesCoolCoilInHumRat & the zone latent cooling coil design air inlet humidity ratio [kg/kg] \tabularnewline
 HeatMassFlow & current zone heating air mass flow rate at the HVAC time step [kg/s] \tabularnewline
 CoolMassFlow & current zone cooling air mass flow rate at the HVAC time step [kg/s] \tabularnewline
 HeatLoad & Current zone heating load [W] \tabularnewline
@@ -61,21 +71,31 @@ CoolZoneTemp & Current zone temperature during cooling [C] \tabularnewline
 CoolZoneRetTemp & current zone return temperature during cooling [C] \tabularnewline
 HeatZoneHumRat & Current zone humidity ratio during heating [C] \tabularnewline
 CoolZoneHumRat & Current zone humidity ratio during cooling [C] \tabularnewline
-ZoneTempAtHeatPeak & zone temperature at maximum heating [C] \tabularnewline
-ZoneRetTempAtHeatPeak & zone return temperature at maximum heating [C] \tabularnewline
+ZoneTempAtHeatPeak & zone temperature at maximum sensible heating [C] \tabularnewline
+ZoneRetTempAtHeatPeak & zone return temperature at maximum sensible heating [C] \tabularnewline
+ZoneRetTempAtLatentHeatPeak & zone return temperature at maximum latent heating [C] \tabularnewline
 ZoneTempAtCoolPeak & zone temperature at maximum cooling [C] \tabularnewline
-ZoneRetTempAtCoolPeak & zone return temperature at maximum cooling [C] \tabularnewline
+ZoneRetTempAtCoolPeak & zone return temperature at maximum sensible cooling [C] \tabularnewline
+ZoneRetTempAtLatentCoolPeak & zone return temperature at maximum latent cooling [C] \tabularnewline
 ZoneHumRatAtHeatPeak & zone humidity ratio at maximum heating [kg/kg] \tabularnewline
 ZoneHumRatAtCoolPeak & zone humidity ratio at maximum cooling [kg/kg] \tabularnewline
-TimeStepNumAtHeatMax & zone time step number (in the day) at the heating peak \tabularnewline
-TimeStepNumAtCoolMax & zone time step number (in the day) at the cooling peak \tabularnewline
-HeatDDNum & design day index of design day causing heating peak \tabularnewline
-CoolDDNum & design day index of design day causing cooling peak \tabularnewline
+TimeStepNumAtHeatMax & zone time step number (in the day) at the sensible heating peak \tabularnewline
+TimeStepNumAtCoolMax & zone time step number (in the day) at the sensible cooling peak \tabularnewline
+TimeStepNumAtLatentHeatMax & zone time step number (in the day) at the latent heating peak \tabularnewline
+TimeStepNumAtLatentCoolMax & zone time step number (in the day) at the latent cooling peak \tabularnewline
+HeatDDNum & design day index of design day causing sensible heating peak \tabularnewline
+CoolDDNum & design day index of design day causing sensible cooling peak \tabularnewline
+LatentHeatDDNum & design day index of design day causing latent heating peak \tabularnewline
+LatentCoolDDNum & design day index of design day causing latent cooling peak \tabularnewline
 MinOA & design minimum outside air [m\(^{3}\)/s] \tabularnewline
-HeatFlowSeq(i) & daily sequence of zone heating air mass flow rates (zone time step) [kg/s] \tabularnewline
-CoolFlowSeq(i) & daily sequence of zone cooling air mass flow rates (zone time step) [kg/s] \tabularnewline
-HeatLoadSeq(i) & daily sequence of zone heating loads (zone time step) [W] \tabularnewline
-CoolLoadSeq(i) & daily sequence of zone cooling loads (zone time step) [W] \tabularnewline
+HeatFlowSeq(i) & daily sequence of zone sensible heating air mass flow rates (zone time step) [kg/s] \tabularnewline
+CoolFlowSeq(i) & daily sequence of zone sensible cooling air mass flow rates (zone time step) [kg/s] \tabularnewline
+LatentHeatFlowSeq(i) & daily sequence of zone sensible heating air mass flow rates (zone time step) [kg/s] \tabularnewline
+LatentCoolFlowSeq(i) & daily sequence of zone sensible cooling air mass flow rates (zone time step) [kg/s] \tabularnewline
+HeatLoadSeq(i) & daily sequence of zone sensible heating loads (zone time step) [W] \tabularnewline
+CoolLoadSeq(i) & daily sequence of zone sensible cooling loads (zone time step) [W] \tabularnewline
+LatentHeatLoadSeq(i) & daily sequence of zone latent heating loads (zone time step) [W] \tabularnewline
+LatentCoolLoadSeq(i) & daily sequence of zone latent cooling loads (zone time step) [W] \tabularnewline
 HeatZoneTempSeq(i) & daily sequence of zone temperatures (heating, zone time step) [C] \tabularnewline
 HeatZoneRetTempSeq(i) & daily sequence of zone return temperatures (heating, zone time step) [C] \tabularnewline
 CooltZoneTempSeq(i) & daily sequence of zone temperatures (cooling, zone time step) [C] \tabularnewline
@@ -87,13 +107,13 @@ CoolZoneHumRatSeq(i) & daily sequence of zone humidity ratios (cooling, zone tim
 
 \subsection{Zone Design Load Calculation}\label{zone-design-load-calculation}
 
-As described in the preceding section, the Sizing Manager initiates the zone design calculation by looping over all of the design days and calling the Heat Balance Manager for each zone time-step in each design day. The Heat Balance manager then causes the HVAC Manager to be called in a manner identical to a normal simulation. The \emph{ZoneSizingCalc} set to \emph{true} signals the HVAC Manager to ignore the actual HVAC system and instead calculate the design zone loads and air flow rates using an ideal zonal system.
+As described in the preceding section, the Sizing Manager initiates the zone design calculation by looping over all of the design days and calling the Heat Balance Manager for each zone time-step in each design day. The Heat Balance manager then causes the HVAC Manager to be called in a manner identical to a normal simulation. The \emph{ZoneSizingCalc} set to \emph{true} signals the HVAC Manager to ignore the actual HVAC system and instead calculate the design sensible and latent zone loads and air flow rates using an ideal zonal system.
 
 In module \emph{HVACManager}, subroutine \emph{ManageHVAC} calls \emph{SimHVAC}. \emph{SimHVAC} checks \emph{ZoneSizingCalc}. If it is \emph{true}, \emph{SimHVAC} calls \emph{ManageZoneEquipment} and returns, rather than simulating the actual system. In turn \emph{ManageZoneEquipment} checks if \emph{ZoneSizingCalc} is \emph{true}; if it is it calls \emph{SizeZoneEquipment} rather than \emph{SimZoneEquipment}.
 
-\emph{SizeZoneEquipment} assumes that each controlled zone is served by an ideal air conditioning unit. This unit supplies heating or cooling air at a fixed, user input temperature and humidity (specified in the Sizing:Zone objects). The units have infinite capacity: the flow rate can be any amount.
+\emph{SizeZoneEquipment} assumes that each controlled zone is served by an ideal air conditioning unit. This unit supplies sensible and latent (if latent sizing is requeted) heating or cooling air at a fixed, user input temperature and humidity (specified in the Sizing:Zone objects). The units have infinite capacity: the flow rate can be any amount. Zone humidity is controlled at a constant level when latent sizing is requested, otherwise zone humidity is allowed to float. The sensible and latent loads and air mass flow rates are saved and reported to \emph{eplusout.zsz}. 
 
-Before the ideal zone load is calculated, the function checks whether the user wants to account for the heat gain or loss caused by the ventilation air from a Dedicated Outdoor Air System (DOAS). If the user has selected \emph{Account For Dedicated Outdoor Air = Yes} the function performs an ideal DOAS calculation. The DOAS supply temperature is set according to the user's choice of 1 of 3 possible control strategies: \emph{NeutralSupplyAir}, \emph{NeutralDehumidifiedSupplyAir}, or \emph{ColdSupplyAir}. The different strategies are:
+Before the ideal zone load is calculated, the function checks whether the user wants to account for the heat gain or loss caused by the ventilation air from a Dedicated Outdoor Air System (DOAS). If the user has selected \emph{Account For Dedicated Outdoor Air = Yes} the function performs an ideal DOAS calculation. The DOAS supply temperature is set according to the user's choice of 1 of 3 possible control strategies: \emph{NeutralSupplyAir}, \emph{NeutralDehumidifiedSupplyAir}, or \emph{ColdSupplyAir}. This value is saved and reported to \emph{eplusout.zsz}. The different strategies are:
 
 \begin{itemize}
 \item
@@ -110,7 +130,13 @@ With the DOAS supply temperature set and the air mass flow rate set to the minim
 {\dot Q_{doa}} = {c_{p,air}}{\dot m_{vent,min}}({T_{sup}} - {T_z})
 \end{equation}
 
-\emph{UpdateSystemOutputRequired} is then invoked to adjust the load to be met by the ideal zone system.
+\emph{UpdateSystemOutputRequired} is then invoked to adjust the load to be met by the ideal zone system. 
+
+When latent sizing is requested sensible and latent loads provided by the DOAS are updated. Latent load units are kgw per second.
+
+\begin{equation}
+{\dot Q_{doa, moisture}} = {\dot m_{vent,min}}({w_{sup}} - {w_z})
+\end{equation}
 
 The ideal loads calculation steps are as follows.
 
@@ -126,6 +152,12 @@ The ideal loads calculation steps are as follows.
 {\dot m_{sys}} = {Q_{sys}}/({C_{p,air}} \cdot ({T_{in}} - {T_z}))
 \end{equation}
 
+Similar calculations are performed when latent sizing is requested where a zone latent mass flow rate is calculated.
+
+\begin{equation}
+{\dot m_{sys, latent}} = {Q_{sys, latent}}/({w_{in}} - {w_z})
+\end{equation}
+
 If the system is not active, the mass flow rate is set to zero and the system output is left at zero.
 
 \begin{enumerate}
@@ -133,12 +165,12 @@ If the system is not active, the mass flow rate is set to zero and the system ou
 \setcounter{enumi}{2}
 \tightlist
 \item
-  The results for each zone are stored in the zone sizing data arrays.
+  The results for each zone are stored in the zone sizing data arrays. See comma separated variable file named \emph{eplusout.zsz}.
 \end{enumerate}
 
 \subsection{Updating and Adjusting the Zone Results}\label{updating-and-adjusting-the-zone-results}
 
-The results from \emph{SizeZoneEquipment} are at the system time-step and are for all design days. These results then need to be summed or averaged over the zone time-step, peak values calculated for each design day, a heating \& a cooling load sequence chosen for each zone from all the design day results, possible further smoothing of results done, zone coil loads calculated, and user sizing multipliers or user specified design flows taken into account. These tasks are accomplished by the subroutine \emph{UpdateZoneSizing}. It is called at the start of each design day (\emph{CallIndicator = BeginDay}), at the zone time-step (\emph{CallIndicator = DuringDay}), at the end of the design day (\emph{CallIndicator = EndDay}) and at the end of the zone design calculation (\emph{CallIndicator = EndZoneSizingCalc}).
+The results from \emph{SizeZoneEquipment} are at the system time-step and are for all design days. These results then need to be summed or averaged over the zone time-step, peak values calculated for each design day, a sensible and latent (when latent sizing is requested) heating \& a cooling load sequence chosen for each zone from all the design day results, possible further smoothing of results done, zone coil loads calculated, and user sizing multipliers or user specified design flows taken into account. These tasks are accomplished by the subroutine \emph{UpdateZoneSizing}. It is called at the start of each design day (\emph{CallIndicator = BeginDay}), at the zone time-step (\emph{CallIndicator = DuringDay}), at the end of the design day (\emph{CallIndicator = EndDay}) and at the end of the zone design calculation (\emph{CallIndicator = EndZoneSizingCalc}).
 
 \subsubsection{BeginDay}\label{beginday-000}
 
@@ -165,25 +197,36 @@ The calculated and stored sequences are summed or averaged over the zone time-st
 {\setlength\itemindent{25pt} \item \emph{HeatLoadSeq} }
 {\setlength\itemindent{25pt} \item \emph{CoolZoneRetTempSeq} }
 {\setlength\itemindent{25pt} \item \emph{HeatZoneRetTempSeq} }
+{\setlength\itemindent{25pt} \item \emph{DOASHeatAddSeq} }
+{\setlength\itemindent{25pt} \item \emph{DOASLatSeq} }
+{\setlength\itemindent{25pt} \item \emph{LatentHeatLoadSeq} }
+{\setlength\itemindent{25pt} \item \emph{LatentHeatFlowSeq} }
+{\setlength\itemindent{25pt} \item \emph{LatentCoolLoadSeq} }
+{\setlength\itemindent{25pt} \item \emph{LatentCoolFlowSeq} }
+{\setlength\itemindent{25pt} \item \emph{CoolLatentLoadNoDOASSeq} }
+{\setlength\itemindent{25pt} \item \emph{HeatLatentLoadNoDOASSeq} }
+{\setlength\itemindent{25pt} \item \emph{CoolLoadNoDOASSeq} }
+{\setlength\itemindent{25pt} \item \emph{HeatLoadNoDOASSeq} }
 \end{enumerate}
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
 \setcounter{enumi}{1}
 \item
-  The peak heating and cooling loads and mass \& volume flow rates are extracted from each set of design sequences.
+  The peak sensible and latent (when latent sizing is requested) heating and cooling loads and mass \& volume flow rates are extracted from each set of design sequences.
 \item
   Using the time of the peak and the design outside air fraction the design zone heating and cooling coil inlet temperatures and humidity ratios are calculated.
 \item
   For each zone, looking at the results for all of the design days, the design days that cause the peak heating and peak cooling for that zone are chosen and the corresponding design sequences and peak loads and flow rates are saved in the CalcFinalZoneSizing array. This finishes the calculated - unmodified by the user - portion of the zone design calculation.
 \end{enumerate}
 
+When latent sizing is requested the zone latent loads are either used (when latent only sizing is requested) or compared to the zone sensible loads. If the zone latent load is greater than the zone sensible load the latent zone sizing information is used for the simulation.
 \subsubsection{EndZoneSizingCalc}\label{endzonesizingcalc}
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
 \item
-  Write out onto a comma-separated file the calculated design sequences for each zone: \emph{HeatLoadSeq}, \emph{CoolLoadSeq}, \emph{HeatFlowSeq}, \emph{CoolFlowSeq} and the corresponding peaks and volumetric flow peaks.
+  Write out onto a comma-separated file the calculated design sequences for each zone: \emph{HeatLoadSeq}, \emph{CoolLoadSeq}, \emph{HeatFlowSeq}, \emph{CoolFlowSeq}, \emph{LatentHeatLoadSeq}, \emph{LatentCoolLoadSeq}, \emph{LatentHeatFlowSeq}, \emph{LatentCoolFlowSeq}, \emph{HeatLoadNoDOASSeq}, \emph{CoolLoadNoDOASSeq}, \emph{HeatLatentLoadNoDOASSeq}, \emph{CoolLatentLoadSeq}, \emph{HeatZoneTempSeq}, \emph{HeatZoneRHSeq}, \emph{CoolZoneTempSeq}, \emph{CoolZoneRHSeq} and the corresponding peaks and volumetric flow peaks.
 \item
   The data in \emph{CalcZoneSizing} and \emph{CalcFinalZoneSizing} is moved to \emph{ZoneSizing} and \emph{FinalZoneSizing}. The user modifications to the calculated sizing will be applied to and stored in \emph{ZoneSizing} and \emph{FinalZoneSizing}.
 \item

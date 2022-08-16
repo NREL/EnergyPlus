@@ -453,12 +453,12 @@
 
   People,
     SPACE1-1 PEOPLE,         !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -547,7 +547,7 @@
 
   Lights,
     SPACE1-1 Lights,         !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     284,                     !- Lighting Level {W}
@@ -561,7 +561,7 @@
 
   ElectricEquipment,
     SPACE1-1_MiscPlug_Equip, !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     207.7352,                !- Design Level {W}
@@ -743,10 +743,10 @@
 
   Curve:QuadLinear,
     TotCoolCapCurve,         !- Name
-    -9.149069561,            !- Coefficient1 Constant
-    10.87814026,             !- Coefficient2 w
-    -1.718780157,            !- Coefficient3 x
-    0.746414818,             !- Coefficient4 y
+    -9.32564313298629,       !- Coefficient1 Constant
+    11.088084240584,         !- Coefficient2 w
+    -1.75195196204063,       !- Coefficient3 x
+    0.760820340847872,       !- Coefficient4 y
     0.0,                     !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
@@ -761,10 +761,10 @@
 
   Curve:QuadLinear,
     CoolPowCurve,            !- Name
-    -3.205409884,            !- Coefficient1 Constant
-    -0.976409399,            !- Coefficient2 w
-    3.97892546,              !- Coefficient3 x
-    0.938181818,             !- Coefficient4 y
+    -3.25323327026219,       !- Coefficient1 Constant
+    -0.990977022339372,      !- Coefficient2 w
+    4.03828937789764,        !- Coefficient3 x
+    0.952179101682919,       !- Coefficient4 y
     0.0,                     !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
@@ -779,10 +779,10 @@
 
   Curve:QuadLinear,
     HeatCapCurve,            !- Name
-    -1.361311959,            !- Coefficient1 Constant
-    -2.471798046,            !- Coefficient2 w
-    4.173164514,             !- Coefficient3 x
-    0.640757401,             !- Coefficient4 y
+    -1.30782327125798,       !- Coefficient1 Constant
+    -2.37467612404102,       !- Coefficient2 w
+    4.00919247797279,        !- Coefficient3 x
+    0.615580752610271,       !- Coefficient4 y
     0.0,                     !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
@@ -797,10 +797,10 @@
 
   Curve:QuadLinear,
     HeatPowCurve,            !- Name
-    -2.176941116,            !- Coefficient1 Constant
-    0.832114286,             !- Coefficient2 w
-    1.570743399,             !- Coefficient3 x
-    0.690793651,             !- Coefficient4 y
+    -2.17352461285805,       !- Coefficient1 Constant
+    0.830808361346509,       !- Coefficient2 w
+    1.5682782658283,         !- Coefficient3 x
+    0.689709515714146,       !- Coefficient4 y
     0.0,                     !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
@@ -815,11 +815,11 @@
 
   Curve:QuintLinear,
     CoolSensCapCurve,        !- Name
-    -5.462690012,            !- Coefficient1 Constant
-    17.95968138,             !- Coefficient2 v
-    -11.87818402,            !- Coefficient3 w
-    -0.980163419,            !- Coefficient4 x
-    0.767285761,             !- Coefficient5 y
+    -5.26562830117273,       !- Coefficient1 Constant
+    17.3118017582604,        !- Coefficient2 v
+    -11.4496890368762,       !- Coefficient3 w
+    -0.944804890543481,      !- Coefficient4 x
+    0.739606605780884,       !- Coefficient5 y
     0.0,                     !- Coefficient6 z
     -100,                    !- Minimum Value of v
     100,                     !- Maximum Value of v
@@ -845,6 +845,9 @@
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
     5.12,                    !- Gross Rated Cooling COP {W/W}
+    30.0,                    !- Rated Entering Water Temperature {C}
+    27.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                    !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -861,6 +864,9 @@
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Heating Capacity {W}
     4.75,                    !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
 

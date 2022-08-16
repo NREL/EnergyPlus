@@ -182,14 +182,14 @@
 
   ZoneMixing,
     whole house fan mix,     !- Name
-    attic - unvented,        !- Zone Name
+    attic - unvented,        !- Zone or Space Name
     Always On Continuous,    !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0,                       !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    living space;            !- Source Zone Name
+    living space;            !- Source Zone or Space Name
 
   Schedule:Constant,Always On Continuous,Fractional 1,1;
 
@@ -349,7 +349,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_RetCondToRP equip,  !- Name
     None,                    !- Fuel Type
-    central ac and furnace airloop ret air zone,  !- Zone or ZoneList Name
+    central ac and furnace airloop ret air zone,  !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -364,7 +364,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_RetLatLkToRP equip,  !- Name
     None,                    !- Fuel Type
-    central ac and furnace airloop ret air zone,  !- Zone or ZoneList Name
+    central ac and furnace airloop ret air zone,  !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -379,7 +379,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_RetSensLkToRP equip,  !- Name
     None,                    !- Fuel Type
-    central ac and furnace airloop ret air zone,  !- Zone or ZoneList Name
+    central ac and furnace airloop ret air zone,  !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -710,24 +710,24 @@
     furniture mass living space living,  !- Name
     furniture construction living space,  !- Construction Name
     living space,            !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    125.419104;              !- Extended Field
+    ,                        !- Space or SpaceList Name
+    125.419104;              !- Surface Area {m2}
 
   InternalMass,
     living space Living Partition,  !- Name
     PartitionWallConstruction,  !- Construction Name
     living space,            !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    125.419104;              !- Extended Field
+    ,                        !- Space or SpaceList Name
+    125.419104;              !- Surface Area {m2}
 
   People,
     occupants,               !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     occupants schedule,      !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     3,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.314170909090909,       !- Fraction Radiant
     0.563030303030303,       !- Sensible Heat Fraction
     occupants activity schedule,  !- Activity Level Schedule Name
@@ -737,7 +737,7 @@
 
   Lights,
     interior lighting,       !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     lighting schedule,       !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     237.287858616023,        !- Lighting Level {W}
@@ -1800,7 +1800,7 @@
 
   ElectricEquipment,
     clothes dryer,           !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     clothes dryer schedule,  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     80533.1207326169,        !- Design Level {W}
@@ -1813,7 +1813,7 @@
 
   ElectricEquipment,
     clothes washer,          !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     clothes washer schedule, !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     19448.4454267132,        !- Design Level {W}
@@ -1826,7 +1826,7 @@
 
   ElectricEquipment,
     cooking range,           !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     cooking range,           !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     201.330571702405,        !- Design Level {W}
@@ -1839,7 +1839,7 @@
 
   ElectricEquipment,
     dishwasher,              !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     dishwasher schedule,     !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     9828.32941160075,        !- Design Level {W}
@@ -1852,7 +1852,7 @@
 
   ElectricEquipment,
     fridge,                  !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     fridge,                  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     97.4834259275168,        !- Design Level {W}
@@ -1865,7 +1865,7 @@
 
   ElectricEquipment,
     mech vent house fan,     !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -1878,7 +1878,7 @@
 
   ElectricEquipment,
     mech vent house fan cfis,!- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -1891,7 +1891,7 @@
 
   ElectricEquipment,
     misc plug loads,         !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     misc plug loads schedule,!- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     224.435610249806,        !- Design Level {W}
@@ -1904,7 +1904,7 @@
 
   ElectricEquipment,
     misc tv,                 !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     misc tv schedule,        !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     274.705334312761,        !- Design Level {W}
@@ -1917,7 +1917,7 @@
 
   ElectricEquipment,
     whole house fan,         !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -1931,7 +1931,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_RetCondToDZ equip,  !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -1946,7 +1946,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_SupCondToDZ equip,  !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -1961,7 +1961,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_SupCondToLv equip,  !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -1976,7 +1976,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_SupLatLkToDZ equip,  !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -1991,7 +1991,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_SupLatLkToLv equip,  !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -2006,7 +2006,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_SupSensLkToDZ equip,  !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -2021,7 +2021,7 @@
   OtherEquipment,
     central_ac_and_furnace_airloop_0_SupSensLkToLv equip,  !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -2036,7 +2036,7 @@
   OtherEquipment,
     mech vent house fan latent load equip,  !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -2051,7 +2051,7 @@
   OtherEquipment,
     mech vent house fan sensible load equip,  !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -2066,7 +2066,7 @@
   OtherEquipment,
     water heater EC adjustment,  !- Name
     Electricity,             !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0.01,                    !- Design Level {W}
@@ -2081,7 +2081,7 @@
   OtherEquipment,
     water latent,            !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     dhw fixtures schedule,   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     5740.21365641083,        !- Design Level {W}
@@ -2096,7 +2096,7 @@
   OtherEquipment,
     water sensible,          !- Name
     None,                    !- Fuel Type
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     dhw fixtures schedule,   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     -5657.22261559525,       !- Design Level {W}
@@ -2110,7 +2110,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     infil flow,              !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0,                       !- Design Flow Rate {m3/s}
@@ -2124,7 +2124,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     natural vent flow,       !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0,                       !- Design Flow Rate {m3/s}
@@ -2138,7 +2138,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     whole house fan flow,    !- Name
-    living space,            !- Zone or ZoneList Name
+    living space,            !- Zone or ZoneList or Space or SpaceList Name
     Always On Discrete,      !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0,                       !- Design Flow Rate {m3/s}
