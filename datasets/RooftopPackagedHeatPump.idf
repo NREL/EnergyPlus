@@ -93,7 +93,7 @@
     3.8,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     JCI J05XP Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -193,7 +193,7 @@
     3.2,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     JCI J05XP Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -314,7 +314,7 @@
     3.8,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     JCI J10XP Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -414,7 +414,7 @@
     3.2,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     JCI J10XP Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -534,7 +534,7 @@
     3.34,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier 50TFQ006 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -634,7 +634,7 @@
     2.92,                    !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier 50TFQ006 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -754,7 +754,7 @@
     3.41,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier 50HJQ012 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -854,7 +854,7 @@
     3.54,                    !- Gross Rated Heating COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier 50HJQ012 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -974,7 +974,7 @@
     4.05,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier 50EZ060 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1074,7 +1074,7 @@
     4.5,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier 50EZ060 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -1395,7 +1395,7 @@
     3.69,                    !- Gross Rated Heating COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox LHA120H Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -1706,7 +1706,7 @@
     3.6,                     !- Gross Rated Heating COP {W/W}
     3.54,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox LHA240H Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -1817,7 +1817,7 @@
     4.1,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox THA060S2 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1917,7 +1917,7 @@
     4.2,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox THA060S2 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -2228,7 +2228,7 @@
     3.53,                    !- Gross Rated Heating COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox THA120S Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -2339,7 +2339,7 @@
     385,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox KHA060S4 Cooling CapFTemp,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2439,7 +2439,7 @@
     4.1,                     !- Gross Rated Heating COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox KHA060S4 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -2750,7 +2750,7 @@
     3.68,                    !- Gross Rated Heating COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox KHA120S4 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
@@ -3061,7 +3061,7 @@
     3.78,                    !- Gross Rated Heating COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
     ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-	,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox KHA240S4 Heating CapFTemp,  !- Heating Capacity Function of Temperature Curve Name
