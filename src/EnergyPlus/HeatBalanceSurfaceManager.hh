@@ -200,6 +200,8 @@ namespace HeatBalanceSurfaceManager {
 
     void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
 
+    Real64 GetSurfIncidentSolarMultiplier(EnergyPlusData &state, int SurfNum);
+
     void InitSurfacePropertyViewFactors(EnergyPlusData &state);
 
     void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state);

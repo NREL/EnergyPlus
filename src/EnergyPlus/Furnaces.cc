@@ -6540,6 +6540,7 @@ namespace Furnaces {
         int Iter;                 // iteration count
         Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
         int IHPCoilIndex(0);      // refer to cooling or heating coil in IHP
+        Real64 dummy(0.0);
         bool anyRan;
         ManageEMS(state, EMSManager::EMSCallFrom::UnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
 
@@ -6592,6 +6593,21 @@ namespace Furnaces {
                                   CompressorOperation::Off,
                                   0.0,
                                   FirstHVACIteration); // CoolPartLoadRatio
+            if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple) {
+                SimWatertoAirHPSimple(state,
+                                      BlankString,
+                                      state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
+                                      state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand,
+                                      dummy,
+                                      0.0,
+                                      0.0,
+                                      state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
+                                      state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
+                                      state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                      CompressorOperation::Off,
+                                      0.0,
+                                      FirstHVACIteration);
+            }
         } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit ||
                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
             if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
@@ -6820,7 +6836,14 @@ namespace Furnaces {
 
                     CheckSysSizing(
                         state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = state.dataSize->DXCoolCap;
+
+                    if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple) {
+                        state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity =
+                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex)
+                                .RatedCapHeat;
+                    } else {
+                        state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = state.dataSize->DXCoolCap;
+                    }
 
                 } else {
 

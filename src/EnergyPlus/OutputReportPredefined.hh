@@ -284,6 +284,18 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXCoolCoilNetCapSID = 0;  // Standard Rated (Net) Cooling Capacity [W], Test D
     int pdchDXCoolCoilElecPowerD = 0; // Standard Rated Electric Power [W], Test D
 
+    // Water-to-Air HP report
+    int pdstWAHP = 0;
+    int pdchWAHPType = 0;
+    int pdchWAHPRatedCapAtRatedCdts = 0;
+    int pdchWAHPRatedSensCapAtRatedCdts = 0;
+    int pdchWAHPRatedPowerAtRatedCdts = 0;
+    int pdchWAHPRatedCOPAtRatedCdts = 0;
+    int pdchWAHPRatedAirDBT = 0;
+    int pdchWAHPRatedAirWBT = 0;
+    int pdchWAHPRatedWtrT = 0;
+    int pdchWAHPDD = 0;
+
     // VAV DX Cooling Ratings Details
     int pdstVAVDXCoolCoil = 0; // details for Packaged VAV rating under AHRI 340/360
     int pdchVAVDXCoolCoilType = 0;
