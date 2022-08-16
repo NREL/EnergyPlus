@@ -319,7 +319,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             thisChiller.AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                         ambient_temp_outdoor_node,
                                                                                         ErrorsFound,
-                                                                                        DataLoopNode::ConnectionObjectType::WaterHeaterMixed,
+                                                                                        DataLoopNode::ConnectionObjectType::ChillerElectricASHRAE205,
                                                                                         thisChiller.Name,
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::ConnectionType::OutsideAirReference,
@@ -451,8 +451,9 @@ ASHRAE205ChillerSpecs *ASHRAE205ChillerSpecs::factory(EnergyPlusData &state, std
     return nullptr;                                                                                                // LCOV_EXCL_LINE
 }
 
-void ASHRAE205ChillerSpecs::oneTimeInit(EnergyPlusData &state)
+void ASHRAE205ChillerSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
+    // This function is called from GetPlantInput
     // Locate the chillers on the plant loops for later usage
     bool errFlag{false};
     PlantUtilities::ScanPlantLoopsForObject(
@@ -1644,7 +1645,7 @@ void ASHRAE205ChillerSpecs::getDesignCapacities(
                                              this->TempRefEvapOut + DataGlobalConstants::KelvinConv,
                                              this->CondVolFlowRate,
                                              this->TempRefCondIn + DataGlobalConstants::KelvinConv,
-                                             this->MaxSequenceNumber)
+                                             this->MinSequenceNumber)
                       .net_evaporator_capacity;
         MaxLoad = this->RefCap;
         OptLoad = MaxLoad;

@@ -149,8 +149,8 @@ namespace ChillerElectricASHRAE205 {
                     Real64 MyLoad, // current load
                     bool RunFlag   // TRUE if chiller operating
                     ) override;
-
-        void oneTimeInit(EnergyPlusData &state) override;
+        
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
 } // namespace ChillerElectricASHRAE205
