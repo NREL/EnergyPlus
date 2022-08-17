@@ -1131,7 +1131,7 @@ namespace StandardRatings {
             SEER2_User = StandarRatingResults["SEER2_User"];
             SEER2_Standard = StandarRatingResults["SEER2_Standard"];
             EER_2023 = StandarRatingResults["EER_2023"];
-            IEER_2023 = StandarRatingResults["IEER_2023"];
+            // IEER_2023 = StandarRatingResults["IEER_2023"];
 
             // Writes the net rated cooling capacity, SEER, SEER Default, EER and IEER values to the EIO file and standard tabular output tables
             ReportDXCoilRating(state,
@@ -2285,17 +2285,17 @@ namespace StandardRatings {
             StandarRatingResults["IEER"] = IEER;
             StandarRatingResults["NetCoolingCapRated"] = NetCoolingCapRated;
 
-            // IEER2 Calculations
-            std::tie(IEER_2023, NetCoolingCapRated2023) = IEERSingleSpeedCooling(state,
-                                                                                 CapFTempCurveIndex,
-                                                                                 RatedTotalCapacity,
-                                                                                 TotCapFlowModFac,
-                                                                                 FanPowerPerEvapAirFlowRate_2023,
-                                                                                 RatedAirVolFlowRate,
-                                                                                 EIRFTempCurveIndex,
-                                                                                 RatedCOP,
-                                                                                 EIRFlowModFac);
-            StandarRatingResults["IEER_2023"] = IEER_2023;
+            // IEER2 Calculations are deprecated in AHRI 2023 Std.
+            // std::tie(IEER_2023, NetCoolingCapRated2023) = IEERSingleSpeedCooling(state,
+            //                                                                     CapFTempCurveIndex,
+            //                                                                     RatedTotalCapacity,
+            //                                                                     TotCapFlowModFac,
+            //                                                                     FanPowerPerEvapAirFlowRate_2023,
+            //                                                                     RatedAirVolFlowRate,
+            //                                                                     EIRFTempCurveIndex,
+            //                                                                     RatedCOP,
+            //                                                                     EIRFlowModFac);
+            // StandarRatingResults["IEER_2023"] = IEER_2023;
             StandarRatingResults["NetCoolingCapRated2023"] = NetCoolingCapRated2023;
 
         } else {
@@ -4112,15 +4112,15 @@ namespace StandardRatings {
                     print(state.files.eio,
                           "{}",
                           "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                          "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard {Btu/W-h}, "
+                          "Cooling Capacity {W}, Standard Rated Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard {Btu/W-h}, "
                           "IEER2 "
                           "{Btu/W-h}\n");
                     MyCoolOneTimeFlag = false;
                 }
 
                 static constexpr std::string_view Format_991_(
-                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
-                print(state.files.eio, Format_991_, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
+                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {}\n");
+                print(state.files.eio, Format_991_, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, ' ');
 
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, CompName, CompType);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI_2023, CompName, CoolCapVal, 1);
@@ -4130,13 +4130,14 @@ namespace StandardRatings {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP_2023, CompName, EERValueIP, 2);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023, CompName, SEERUserIP, 2);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, SEERStandardIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, IEERValueIP, 2);
+                // PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, IEERValueIP, 2);
                 addFootNoteSubTable(
                     state,
                     state.dataOutRptPredefined->pdstDXCoolCoil_2023,
                     "ANSI/AHRI ratings account for supply air fan heat and electric power. "
                     "SEER2 User is calculated using user-input PLF curve and cooling coefficient of degradation whereas SEER2 Standard "
-                    "is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.");
+                    "is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation. "
+                    "IEER Calculation was removed from the 2023 Version of the Standard.");
             }
             break;
         }

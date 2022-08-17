@@ -350,7 +350,7 @@ namespace OutputReportPredefined {
         s->pdchDXCoolCoilType_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "DX Cooling Coil Type");
         s->pdchDXCoolCoilNetCapSI_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net Cooling Capacity [W]");
 
-        s->pdchDXCoolCoilCOP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net COP [W/W]");
+        s->pdchDXCoolCoilCOP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net COP2 [W/W]");
         s->pdchDXCoolCoilEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "EER2 [Btu/W-h]");
         s->pdchDXCoolCoilSEER2UserIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER2 User [Btu/W-h]");
         s->pdchDXCoolCoilSEER2StandardIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER2 Standard [Btu/W-h]");
