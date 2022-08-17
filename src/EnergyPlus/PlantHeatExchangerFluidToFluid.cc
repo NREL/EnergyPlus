@@ -886,8 +886,13 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                this->DemandSideLoop.outletNodeNum);
 
         } else if (this->Type == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
-            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp = 100.0;
-            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Press = 101325.0;
+            Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(state,
+                                                                                state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
+                                                                                DataEnvironment::StdPressureSeaLevel,
+                                                                                state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+                                                                                RoutineNameSTWNoColon);
+            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp = TempWaterAtmPress;
+            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Press = DataEnvironment::StdPressureSeaLevel;
             Real64 rhoSteam = FluidProperties::GetSatDensityRefrig(state,
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                                    state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp,
@@ -2334,16 +2339,27 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                    RoutineName);
     Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-    Real64 SteamMdot = std::abs(this->HeatTransferRate / LatentHeatSteam);
+    Real64 CpWaterSubcool = FluidProperties::GetSatSpecificHeatRefrig(state,
+                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
+                                                                      SteamLoopInletTemp,
+                                                                      0.0,
+                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+                                                                      RoutineName);
+    Real64 SteamMdot = std::abs(this->HeatTransferRate / (LatentHeatSteam + CpWaterSubcool * this->DegOfSubcooling));
     PlantUtilities::SetComponentFlowRate(
         state, SteamMdot, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
 
+    Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(state,
+                                                                        state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
+                                                                        DataEnvironment::StdPressureSeaLevel,
+                                                                        state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+                                                                        RoutineName);
     this->SupplySideLoop.InletTemp = WaterLoopInletTemp;
     this->SupplySideLoop.InletMassFlowRate = SupSideMdot;
     this->DemandSideLoop.InletTemp = SteamLoopInletTemp;
     this->DemandSideLoop.InletQuality = 1.0;
     this->DemandSideLoop.InletMassFlowRate = SteamMdot;
-    this->DemandSideLoop.OutletTemp = SteamLoopInletTemp;
+    this->DemandSideLoop.OutletTemp = TempWaterAtmPress - this->LoopSubcoolReturn;
     this->DemandSideLoop.OutletQuality = 0.0;
 
     state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Temp = this->DemandSideLoop.OutletTemp;
@@ -2561,7 +2577,13 @@ void HeatExchangerStruct::findSteamLoopFlow(EnergyPlusData &state, Real64 Target
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                    RoutineName);
     Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-    Real64 TargetSteamMdot = std::abs(TargetHeatTransferRate) / LatentHeatSteam;
+    Real64 CpWaterSubcool = FluidProperties::GetSatSpecificHeatRefrig(state,
+                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
+                                                                      SteamInletTemp,
+                                                                      0.0,
+                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+                                                                      RoutineName);
+    Real64 TargetSteamMdot = std::abs(TargetHeatTransferRate) / (LatentHeatSteam + CpWaterSubcool * this->DegOfSubcooling);
 
     // mass flow rate of steam
     PlantUtilities::SetComponentFlowRate(
