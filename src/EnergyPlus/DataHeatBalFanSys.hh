@@ -90,7 +90,7 @@ namespace DataHeatBalFanSys {
         int DualPMVErrIndex = 0; // Dual PMV setpoint error index
     };
 
-    struct AirBalanceTemperatures
+    struct ZoneSpaceHeatBalanceData
     {
         // Zone air drybulb conditions variables
         Real64 XMAT = ZoneInitialTemp; // Temporary zone/space temperature to test convergence
@@ -106,10 +106,7 @@ namespace DataHeatBalFanSys {
         Real64 ZoneTMX = ZoneInitialTemp; // Temporary zone/space temperature to test convergence in Exact and Euler method
         Real64 ZoneTM2 = ZoneInitialTemp; // Temporary zone/space temperature at timestep t-2 in Exact and Euler method
         Real64 ZoneT1 = 0.0;              // Zone/space temperature at the previous time step used in Exact and Euler method
-    };
 
-    struct AirBalanceHumidities
-    {
         // Zone Air moisture conditions variables
         Real64 WZoneTimeMinus1 = 0.0;   // Humidity ratio history terms for 3rd order derivative
         Real64 WZoneTimeMinus2 = 0.0;   // Time Minus 2 Zone Time Steps Term
@@ -294,8 +291,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     int PMVerrorIndex = 0;
 
     EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
-    EPVector<DataHeatBalFanSys::AirBalanceTemperatures> heatBalAirTemperatures;
-    EPVector<DataHeatBalFanSys::AirBalanceHumidities> heatBalAirHumidities;
+    EPVector<DataHeatBalFanSys::ZoneSpaceHeatBalanceData> zoneHeatBalance;
 
     void clear_state() override
     {

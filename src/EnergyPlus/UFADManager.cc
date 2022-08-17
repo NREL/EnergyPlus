@@ -1362,7 +1362,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
 
         for (Ctd = 1; Ctd <= 3; ++Ctd) {
             Real64 TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
-            Real64 const thisZoneT1 = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum).ZoneT1;
+            Real64 const thisZoneT1 = state.dataHeatBalFanSys->zoneHeatBalance(ZoneNum).ZoneT1;
             // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
             Real64 TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
@@ -1914,7 +1914,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
         HeightFrac * CeilingHeight < state.dataUFADManager->ThickOccupiedSubzoneMin) {
         MIXFLAG = true;
         HeightFrac = 0.0;
-        Real64 const thisZoneT1 = state.dataHeatBalFanSys->heatBalAirTemperatures(ZoneNum).ZoneT1;
+        Real64 const thisZoneT1 = state.dataHeatBalFanSys->zoneHeatBalance(ZoneNum).ZoneT1;
 
         state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
