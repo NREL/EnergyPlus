@@ -1,0 +1,42 @@
+ -EnergyPlus Weather Converter V7.2.0.007
+ Statistics for USA_IL_Chicago-OHare.Intl.AP.725300_TMY3
+ Location -- Chicago Ohare Intl Ap IL USA  
+      {N 41° 58'} {W  87° 55'} {GMT -6.0 Hours}
+ Elevation --   201m above sea level
+ Standard Pressure at Elevation --  98934Pa
+ Data Source -- TMY3
+
+ WMO Station 725300
+
+ - Displaying Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
+ - ASHRAE design conditions are carefully generated from a period of record 
+ - (typically 30 years) to be representative of that location and to be suitable
+ - for use in heating/cooling load calculations.
+
+    	Design Stat	ColdestMonth	DB996	DB990	DP996	HR_DP996	DB_DP996	DP990	HR_DP990	DB_DP990	WS004c	DB_WS004c	WS010c	DB_WS010c	WS_DB996	WD_DB996	
+    	Units	{}	{°C}	{°C}	{°C}	{}	{°C}	{°C}	{}	{°C}	{m/s}	{°C}	{m/s}	{°C}	{m/s}	{deg}	
+    	Heating	1	-20	-16.6	-25.7	0.4	-19.2	-22.1	0.5	-15.7	12.4	-3.5	11.4	-3.2	4.9	270
+
+    	Design Stat	HottestMonth	DBR	DB004	WB_DB004	DB010	WB_DB010	DB020	WB_DB020	WB004	DB_WB004	WB010	DB_WB010	WB020	DB_WB020	WS_DB004	WD_DB004	DP004	HR_DP004	DB_DP004	DP010	HR_DP010	DB_DP010	DP020	HR_DP020	DB_DP020	EN004	DB_EN004	EN010	DB_EN010	EN020	DB_EN020	#Hrs_8-4_&_DB-12.8/20.6	
+    	Units	{}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{m/s}	{deg}	{°C}	{}	{°C}	{°C}	{}	{°C}	{°C}	{}	{°C}	{kJ/kg}	{°C}	{kJ/kg}	{°C}	{kJ/kg}	{°C}	{}	
+    	Cooling	7	10.5	33.3	23.7	31.6	23	30.1	22.1	25.5	31.2	24.5	29.6	23.5	28.1	5.2	230	23.8	19.2	28.9	22.9	18	27.7	21.9	17	26.5	79.2	31.4	75.1	29.6	70.9	28.2	617
+
+    	Design Stat	WS010	WS025	WS050	WBmax	DBmin_mean	DBmax_mean	DBmin_stddev	DBmax_stddev	DBmin05years	DBmax05years	DBmin10years	DBmax10years	DBmin20years	DBmax20years	DBmin50years	DBmax50years
+    	Units	{m/s}	{m/s}	{m/s}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}	{°C}
+    	Extremes	11.1	9.4	8.6	28.5	-23.7	35.9	4.5	1.9	-27	37.3	-29.6	38.4	-32.2	39.5	-35.5	40.9
+
+ - Displaying Monthly Design Conditions "Climate Design Data 2009 ASHRAE Handbook"
+ - Monthly Optical Sky Depth Beam (taub) and Diffuse (taud)
+ 	                        	Jan	Feb	Mar	Apr	May	Jun	Jul	Aug	Sep	Oct	Nov	Dec	
+ 	             taub (beam)	0.302	0.343	0.390	0.417	0.438	0.458	0.455	0.452	0.412	0.365	0.337	0.307	
+ 	          taud (diffuse)	2.364	2.149	2.030	1.998	1.999	2.001	2.050	2.048	2.146	2.259	2.303	2.388	
+
+ 	                    taub	= Clear Sky Optical Depth for Beam Irradiance
+ 	                    taud	= Clear Sky Optical Depth for Diffuse Irradiance
+
+ - Monthly Solar Irradiance Wh/m² (noon on 21st of month)
+ 	               ib (beam)	  843	  849	  847	  851	  841	  822	  820	  810	  817	  817	  787	  803	
+ 	            id (diffuse)	   92	  127	  156	  171	  174	  174	  164	  160	  137	  112	   96	   85	
+
+ 	                      ib	= Clear Sky Noon Beam Normal Irradiance on 21st Day
+ 	                      id	= Clear Sky Noon Diffuse Horizontal Irradiance on 21st Day

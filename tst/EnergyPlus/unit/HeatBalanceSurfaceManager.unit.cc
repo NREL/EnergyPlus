@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -68,6 +69,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -79,6 +81,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -140,8 +143,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) = 1.0;
     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = 1.0;
     state->dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) = 0.0;
-    state->dataSurface->SurfHasSurroundingSurfProperties(SurfNum) = 0;
     state->dataSurface->SurfMaterialMovInsulExt(SurfNum) = 1;
+    state->dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty = false;
 
     state->dataSurface->SurfOutDryBulbTemp = 0;
     state->dataEnvrn->SkyTemp = 23.0;
@@ -331,7 +334,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
 
     state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(1).HeatTransSurf = true;
-    state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::CTF;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
     state->dataSurface->Surface(1).ExtBoundCond = 1;
     state->dataSurface->Surface(1).Construction = 1;
     state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
@@ -736,9 +739,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -803,9 +804,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
         state->dataHeatBalSurf->SurfOutsideTempHist(1)(loop) = 20.0;
     }
-    state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
-    state->dataSurface->SurfTAirRef(2) = DataSurfaces::AdjacentAirTemp;
-    state->dataSurface->SurfTAirRef(3) = DataSurfaces::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
 
     // with supply air
     CalcHeatBalanceInsideSurf(*state);
@@ -838,6 +839,556 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBal->ZoneWinHeatGain.deallocate();
     state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.deallocate();
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurfKiva)
+{
+
+    // Create Kiva foundation and set parameters
+    Kiva::Foundation fnd;
+
+    fnd.reductionStrategy = Kiva::Foundation::RS_AP;
+
+    Kiva::Material concrete(1.95, 2400.0, 900.0);
+
+    Kiva::Layer tempLayer;
+    tempLayer.thickness = 0.10;
+    tempLayer.material = concrete;
+
+    fnd.slab.interior.emissivity = 0.8;
+    fnd.slab.layers.push_back(tempLayer);
+
+    tempLayer.thickness = 0.2;
+    tempLayer.material = concrete;
+
+    fnd.wall.layers.push_back(tempLayer);
+
+    fnd.wall.heightAboveGrade = 0.1;
+    fnd.wall.depthBelowSlab = 0.2;
+    fnd.wall.interior.emissivity = 0.8;
+    fnd.wall.exterior.emissivity = 0.8;
+    fnd.wall.interior.absorptivity = 0.8;
+    fnd.wall.exterior.absorptivity = 0.8;
+
+    fnd.foundationDepth = 0.0;
+    fnd.numericalScheme = Kiva::Foundation::NS_ADI;
+
+    fnd.polygon.outer().push_back(Kiva::Point(-6.0, -6.0));
+    fnd.polygon.outer().push_back(Kiva::Point(-6.0, 6.0));
+    fnd.polygon.outer().push_back(Kiva::Point(6.0, 6.0));
+    fnd.polygon.outer().push_back(Kiva::Point(6.0, -6.0));
+
+    // Create Kiva weather data
+    HeatBalanceKivaManager::KivaWeatherData kivaweather;
+    kivaweather.annualAverageDrybulbTemp = 10.0;
+    kivaweather.intervalsPerHour = 1;
+    kivaweather.dryBulb = {10.0};
+    kivaweather.windSpeed = {0.0};
+    kivaweather.skyEmissivity = {0.0};
+
+    HeatBalanceKivaManager::KivaManager km;
+
+    std::string const idf_objects = delimited_string({
+        "Material,",
+        "  1/2IN Gypsum,            !- Name",
+        "  Smooth,                  !- Roughness",
+        "  0.0127,                  !- Thickness {m}",
+        "  0.1600,                  !- Conductivity {W/m-K}",
+        "  784.9000,                !- Density {kg/m3}",
+        "  830.0000,                !- Specific Heat {J/kg-K}",
+        "  0.9000,                  !- Thermal Absorptance",
+        "  0.9200,                  !- Solar Absorptance",
+        "  0.9200;                  !- Visible Absorptance",
+        " ",
+        "Material,",
+        "  MAT-CC05 4 HW CONCRETE,  !- Name",
+        "  Rough,                   !- Roughness",
+        "  0.1016,                  !- Thickness {m}",
+        "  1.3110,                  !- Conductivity {W/m-K}",
+        "  2240.0000,               !- Density {kg/m3}",
+        "  836.8000,                !- Specific Heat {J/kg-K}",
+        "  0.9000,                  !- Thermal Absorptance",
+        "  0.7000,                  !- Solar Absorptance",
+        "  0.7000;                  !- Visible Absorptance",
+        " ",
+        "Material:NoMass,",
+        "  CP02 CARPET PAD,         !- Name",
+        "  VeryRough,               !- Roughness",
+        "  0.2165,                  !- Thermal Resistance {m2-K/W}",
+        "  0.9000,                  !- Thermal Absorptance",
+        "  0.7000,                  !- Solar Absorptance",
+        "  0.8000;                  !- Visible Absorptance",
+        " ",
+        "Material,",
+        "  Std AC02,                !- Name",
+        "  MediumSmooth,            !- Roughness",
+        "  1.2700000E-02,           !- Thickness {m}",
+        "  5.7000000E-02,           !- Conductivity {W/m-K}",
+        "  288.0000,                !- Density {kg/m3}",
+        "  1339.000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.7000000,               !- Solar Absorptance",
+        "  0.2000000;               !- Visible Absorptance",
+        " ",
+        "Construction,",
+        "  int-walls,               !- Name",
+        "  1/2IN Gypsum,            !- Outside Layer",
+        "  1/2IN Gypsum;            !- Layer 2",
+        " ",
+        "Construction,",
+        "  INT-FLOOR-TOPSIDE,       !- Name",
+        "  MAT-CC05 4 HW CONCRETE,  !- Outside Layer",
+        "  CP02 CARPET PAD;         !- Layer 2",
+        " ",
+        "Construction,",
+        "  DropCeiling,             !- Name",
+        "  Std AC02;                !- Outside Layer",
+        " ",
+        "Zone,",
+        "  Core_bottom,             !- Name",
+        "  0.0000,                  !- Direction of Relative North {deg}",
+        "  0.0000,                  !- X Origin {m}",
+        "  0.0000,                  !- Y Origin {m}",
+        "  0.0000,                  !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  ,                        !- Ceiling Height {m}",
+        "  ,                        !- Volume {m3}",
+        "  autocalculate,           !- Floor Area {m2}",
+        "  ,                        !- Zone Inside Convection Algorithm",
+        "  ,                        !- Zone Outside Convection Algorithm",
+        "  Yes;                     !- Part of Total Floor Area",
+        " ",
+        "BuildingSurface:Detailed,",
+        "  Core_bot_ZN_5_Ceiling,   !- Name",
+        "  Ceiling,                 !- Surface Type",
+        "  DropCeiling,             !- Construction Name",
+        "  Core_bottom,             !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Adiabatic,               !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  AutoCalculate,           !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  4.5732,44.1650,2.7440,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  4.5732,4.5732,2.7440,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  68.5340,4.5732,2.7440,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  68.5340,44.1650,2.7440;  !- X,Y,Z ==> Vertex 4 {m}",
+        " ",
+        "BuildingSurface:Detailed,",
+        "  Core_bot_ZN_5_Floor,     !- Name",
+        "  Floor,                   !- Surface Type",
+        "  INT-FLOOR-TOPSIDE,       !- Construction Name",
+        "  Core_bottom,             !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Adiabatic,               !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  AutoCalculate,           !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  68.5340,44.1650,0.0000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  68.5340,4.5732,0.0000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  4.5732,4.5732,0.0000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  4.5732,44.1650,0.0000;  !- X,Y,Z ==> Vertex 4 {m}",
+        " ",
+        "BuildingSurface:Detailed,",
+        "  Core_bot_ZN_5_Wall_East, !- Name",
+        "  Wall,                    !- Surface Type",
+        "  int-walls,               !- Construction Name",
+        "  Core_bottom,             !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Adiabatic,               !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  AutoCalculate,           !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  68.5340,4.5732,2.7440,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  68.5340,4.5732,0.0000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  68.5340,44.1650,0.0000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  68.5340,44.1650,2.7440;  !- X,Y,Z ==> Vertex 4 {m}",
+        " ",
+        "BuildingSurface:Detailed,",
+        "  Core_bot_ZN_5_Wall_North,!- Name",
+        "  Wall,                    !- Surface Type",
+        "  int-walls,               !- Construction Name",
+        "  Core_bottom,             !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Adiabatic,               !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  AutoCalculate,           !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  68.5340,44.1650,2.7440,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  68.5340,44.1650,0.0000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  4.5732,44.1650,0.0000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  4.5732,44.1650,2.7440;  !- X,Y,Z ==> Vertex 4 {m}",
+        " ",
+        "BuildingSurface:Detailed,",
+        "  Core_bot_ZN_5_Wall_South,!- Name",
+        "  Wall,                    !- Surface Type",
+        "  int-walls,               !- Construction Name",
+        "  Core_bottom,             !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Adiabatic,               !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  AutoCalculate,           !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  4.5732,4.5732,2.7440,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  4.5732,4.5732,0.0000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  68.5340,4.5732,0.0000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  68.5340,4.5732,2.7440;  !- X,Y,Z ==> Vertex 4 {m}",
+        " ",
+        "BuildingSurface:Detailed,",
+        "  Core_bot_ZN_5_Wall_West, !- Name",
+        "  Wall,                    !- Surface Type",
+        "  int-walls,               !- Construction Name",
+        "  Core_bottom,             !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Adiabatic,               !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  AutoCalculate,           !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  4.5732,44.1650,2.7440,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  4.5732,44.1650,0.0000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  4.5732,4.5732,0.0000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  4.5732,4.5732,2.7440;  !- X,Y,Z ==> Vertex 4 {m}",
+        " ",
+        "People,",
+        "  Core_bottom People,      !- Name",
+        "  Core_bottom,             !- Zone or ZoneList Name",
+        "  Core_bottom Occupancy,   !- Number of People Schedule Name",
+        "  People,                  !- Number of People Calculation Method",
+        "  4,                       !- Number of People",
+        "  ,                        !- People per Zone Floor Area",
+        "  ,                        !- Zone Floor Area per Person",
+        "  0.9,                     !- Fraction Radiant",
+        "  0.1,                     !- Sensible Heat Fraction",
+        "  Core_bottom Activity,    !- Activity Level Schedule Name",
+        "  3.82e-08,                !- Carbon Dioxide Generation Rate",
+
+        "  Yes,                     !- Enable ASHRAE 55 Comfort Warnings",
+        "  ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "  ,                        !- Surface NameAngle Factor List Name",
+        "  Work Eff Sched,          !- Work Efficiency Schedule Name",
+        "  ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
+        "  ,                        !- Clothing Insulation Calculation Method Schedule Name",
+        "  Clothing Schedule,       !- Clothing Insulation Schedule Name",
+        "  Air Velocity Schedule,   !- Air Velocity Schedule Name",
+        "  Fanger;                  !- Thermal Comfort Model 1 Type",
+        " ",
+        "Schedule:Compact,",
+        "  Core_bottom Occupancy,   !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: Alldays,            !- Field 2",
+        "  Until: 07:00,            !- Field 3",
+        "  0,                       !- Field 4",
+        "  Until: 21:00,            !- Field 13",
+        "  1,                       !- Field 14",
+        "  Until: 24:00,            !- Field 15",
+        "  0;                       !- Field 16",
+        " ",
+        "Schedule:Compact,",
+        "  Core_bottom Activity,    !- Name",
+        "  Activity Level,          !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: Alldays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  166;                     !- Field 4",
+        " ",
+        "Schedule:Compact,",
+        "  Work Eff Sched,          !- Name",
+        "  Dimensionless,           !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  0;                       !- Field 4",
+        " ",
+        "Schedule:Compact,",
+        "  Clothing Schedule,       !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  0.5;                     !- Field 4",
+        " ",
+        "Schedule:Compact,",
+        "  Air Velocity Schedule,   !- Name",
+        "  Velocity,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  0.129999995231628;       !- Field 4",
+        " ",
+        "ZoneControl:Thermostat,",
+        "  Core_bottom Thermostat,  !- Name",
+        "  Core_bottom,             !- Zone or ZoneList Name",
+        "  Dual Zone Control Type Sched,  !- Control Type Schedule Name",
+        "  ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "  Core_bottom DualSPSched; !- Control 1 Name",
+        " ",
+        "ZoneControl:Thermostat:ThermalComfort,",
+        "  Core_bottom Comfort,     !- Name",
+        "  Core_bottom,             !- Zone or ZoneList Name",
+        "  SpecificObject,          !- Averaging Method",
+        "  Core_bottom People,      !- Specific People Name",
+        "  0,                       !- Minimum DryBulb Temperature Setpoint",
+        "  50,                      !- Maximum DryBulb Temperature Setpoint",
+        "  Comfort Control,         !- Thermal Comfort Control Type Schedule Name",
+        "  ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating,    !- Thermal Comfort Control 1 Object Type",
+        "  Single Htg PMV,          !- Thermal Comfort Control 1 Name",
+        "  ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling,    !- Thermal Comfort Control 2 Object Type",
+        "  Single Cooling PMV;      !- Thermal Comfort Control 2 Name,",
+        " ",
+        "Schedule:Compact,",
+        "  Comfort Control,          !- Name",
+        "  Control Type,             !- Schedule Type Limits Name",
+        "  Through: 5/31,            !- Field 1",
+        "  For: AllDays,             !- Field 2",
+        "  Until: 24:00,             !- Field 3",
+        "  1,                        !- Field 4",
+        "  Through: 8/31,            !- Field 5",
+        "  For: AllDays,             !- Field 6",
+        "  Until: 24:00,             !- Field 7",
+        "  2,                        !- Field 8",
+        "  Through: 12/31,           !- Field 9",
+        "  For: AllDays,             !- Field 10",
+        "  Until: 24:00,             !- Field 11",
+        "  1;                        !- Field 12",
+        " ",
+        "THERMOSTATSETPOINT:THERMALCOMFORT:FANGER:SINGLEHEATING,",
+        "  Single Htg PMV,          !- Name",
+        "  Single Htg PMV;          !- Fanger Thermal Comfort Schedule Name",
+        " ",
+        "THERMOSTATSETPOINT:THERMALCOMFORT:FANGER:SINGLECOOLING,",
+        "  Single Cooling PMV,      !- Name",
+        "  Single Cooling PMV;      !- Fanger Thermal Comfort Schedule Name",
+        " ",
+        "Schedule:Constant,",
+        "  Dual Zone Control Type Sched,  !- Name",
+        "  Control Type,            !- Schedule Type Limits Name",
+        "  4;                       !- Field 1",
+        " ",
+        "ThermostatSetpoint:DualSetpoint,",
+        "  Core_bottom DualSPSched, !- Name",
+        "  HTGSETP_SCH,             !- Heating Setpoint Temperature Schedule Name",
+        "  CLGSETP_SCH;             !- Cooling Setpoint Temperature Schedule Name",
+        " ",
+        "Schedule:Constant,",
+        "  CLGSETP_SCH,             !- Name",
+        "  Temperature,             !- Schedule Type Limits Name",
+        "  24.0;                    !- Field 1",
+        " ",
+        "Schedule:Constant,",
+        "  HTGSETP_SCH,             !- Name",
+        "  Temperature,             !- Schedule Type Limits Name",
+        "  20.0;                    !- Field 1",
+        " ",
+        "Schedule:Compact,",
+        "  Single Htg PMV,          !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 6:00,             !- Field 3",
+        "  -0.5,                    !- Field 4",
+        "  Until: 23:00,            !- Field 5",
+        "  -0.2,                    !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  -0.5;                    !- Field 8",
+        " ",
+        "Schedule:Compact,",
+        "  Single Cooling PMV,      !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 6:00,             !- Field 3",
+        "  0.5,                     !- Field 4",
+        "  Until: 23:00,            !- Field 5",
+        "  0.2,                     !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  0.5;                     !- Field 8",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Fraction,                 !- Name",
+        "  0,                        !- Lower Limit Value",
+        "  1,                        !- Upper Limit Value",
+        "  Continuous,               !- Numeric Type",
+        "  Dimensionless;            !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Temperature,              !- Name",
+        "  -60,                      !- Lower Limit Value",
+        "  200,                      !- Upper Limit Value",
+        "  Continuous,               !- Numeric Type",
+        "  Temperature;              !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Control Type,             !- Name",
+        "  0,                        !- Lower Limit Value",
+        "  4,                        !- Upper Limit Value",
+        "  Discrete,                 !- Numeric Type",
+        "  Dimensionless;            !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  On/Off,                   !- Name",
+        "  0,                        !- Lower Limit Value",
+        "  1,                        !- Upper Limit Value",
+        "  Discrete,                 !- Numeric Type",
+        "  Dimensionless;            !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Any Number,               !- Name",
+        "  ,                         !- Lower Limit Value",
+        "  ,                         !- Upper Limit Value",
+        "  Continuous;               !- Numeric Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Velocity,                 !- Name",
+        "  ,                         !- Lower Limit Value",
+        "  ,                         !- Upper Limit Value",
+        "  Continuous,               !- Numeric Type",
+        "  Velocity;                 !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Activity Level,           !- Name",
+        "  0,                        !- Lower Limit Value",
+        "  ,                         !- Upper Limit Value",
+        "  Continuous,               !- Numeric Type",
+        "  ActivityLevel;            !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Dimensionless,            !- Name",
+        "  -1,                       !- Lower Limit Value",
+        "  1,                        !- Upper Limit Value",
+        "  Continuous;               !- Numeric Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false); // If errors detected in input
+    ASSERT_FALSE(ErrorsFound);
+
+    state->dataEnvrn->DayOfYear_Schedule = 1;      // must initialize this to get schedules initialized
+    state->dataEnvrn->DayOfWeek = 1;               // must initialize this to get schedules initialized
+    state->dataGlobal->HourOfDay = 1;              // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStep = 1;               // must initialize this to get schedules initialized
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/HeatBalanceKivaManagerOSkyTest.epw";
+    state->dataWeatherManager->WeatherFileExists = true;
+    HeatBalanceManager::GetHeatBalanceInput(*state);
+
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
+    EXPECT_TRUE(compare_err_stream(""));
+    EXPECT_FALSE(has_err_output(true));
+
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    std::vector<int> controlledZoneEquipConfigNums;
+    controlledZoneEquipConfigNums.push_back(1);
+    state->dataHeatBal->Zone(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataHeatBalFanSys->MAT.allocate(1); // Zone temperature C
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+
+    state->dataLoopNodes->Node.allocate(4);
+
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
+
+    // allocate surface level adj ratio data member
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
+
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(2).Temp = 20.0;
+    state->dataLoopNodes->Node(3).Temp = 20.0;
+    state->dataLoopNodes->Node(4).Temp = 20.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
+    state->dataMstBal->HConvInFD.allocate(6);
+    state->dataMstBal->RhoVaporAirIn.allocate(6);
+    state->dataMstBal->HMassConvInFD.allocate(6);
+
+    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = -0.1;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 0.1;
+
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->KickOffSimulation = true;
+    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
+    state->dataGlobal->TimeStepZoneSec = 900;
+
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
+    AllocateSurfaceHeatBalArrays(*state);
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+    SolarShading::AllocateModuleArrays(*state);
+    SolarShading::DetermineShadowingCombinations(*state);
+    for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
+        state->dataHeatBalSurf->SurfOutsideTempHist(1)(loop) = 20.0;
+    }
+    state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = DataSurfaces::ZoneSupplyAirTemp;
+
+    InitSurfaceHeatBalance(*state);
+
+    state->dataSurface->Surface(5).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::Kiva;
+    state->dataSurface->AllHTKivaSurfaceList = {5};
+    CalcHeatBalanceInsideSurf(*state);
+
+    ReportSurfaceHeatBalance(*state);
+
+    // Check that the inside face surface conduction = -(convection + radiation)
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfOpaqInsFaceCond(5), -21.7, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
@@ -1274,7 +1825,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
@@ -1353,9 +1903,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
         state->dataHeatBalSurf->SurfOutsideTempHist(1)(loop) = 20.0;
     }
-    state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
-    state->dataSurface->SurfTAirRef(2) = DataSurfaces::AdjacentAirTemp;
-    state->dataSurface->SurfTAirRef(3) = DataSurfaces::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
 
     OutAirNodeManager::InitOutAirNodes(*state);
 
@@ -1781,7 +2331,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    SrdSurfs:Living:East, !- Name",
         "    0.2,",
         "    ,",
-        "    ,",
+        "    0.2,",
         "    ,",
         "    SurroundingSurface1,",
         "    0.3,",
@@ -1791,10 +2341,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    Surrounding Temp Sch 1;",
 
         "  SurfaceProperty:SurroundingSurfaces,",
-        "    SrdSurfs:Living:South, !- Name",
+        "    SrdSurfs:Living:South,     !- Name",
         "    ,",
         "    ,",
-        "    ,",
+        "    0.25,",
         "    ,",
         "    SurroundingSurface1,",
         "    0.5,",
@@ -1854,7 +2404,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
@@ -1926,9 +2475,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
 
-    state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
-    state->dataSurface->SurfTAirRef(2) = DataSurfaces::AdjacentAirTemp;
-    state->dataSurface->SurfTAirRef(3) = DataSurfaces::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
+
+    InitSurfacePropertyViewFactors(*state);
 
     InitSurfaceHeatBalance(*state);
 
@@ -1999,7 +2550,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
 
     state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(1).HeatTransSurf = true;
-    state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::iHeatTransferModel::CTF;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
     state->dataSurface->Surface(1).ExtBoundCond = 1;
     state->dataSurface->Surface(1).Construction = 1;
 
@@ -2428,11 +2979,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -2506,9 +3055,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
         state->dataHeatBalSurf->SurfOutsideTempHist(1)(loop) = 20.0;
     }
-    state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
-    state->dataSurface->SurfTAirRef(2) = DataSurfaces::AdjacentAirTemp;
-    state->dataSurface->SurfTAirRef(3) = DataSurfaces::ZoneSupplyAirTemp;
+    state->dataSurface->SurfTAirRef(1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
 
     InitSurfaceHeatBalance(*state);
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
@@ -2662,29 +3211,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 {
-
     state->dataGlobal->NumOfZones = 1;
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
     state->dataOutRptTab->displayThermalResilienceSummary = true;
     state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZTAV.dimension(state->dataGlobal->NumOfZones, 0.0);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state->dataGlobal->NumOfZones, 0.0);
 
-    state->dataHeatBalFanSys->ZoneHeatIndex.dimension(state->dataGlobal->NumOfZones, 0.0);
-    state->dataHeatBalFanSys->ZoneHumidex.dimension(state->dataGlobal->NumOfZones, 0.0);
-    state->dataHeatBalFanSys->ZoneNumOcc.dimension(state->dataGlobal->NumOfZones, 0);
-    state->dataHeatBalFanSys->ZoneHeatIndexHourBins.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneHumidexHourBins.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBins.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneHumidexOccuHourBins.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.dimension(state->dataGlobal->NumOfZones, 28.0);
 
     state->dataHeatBal->TotPeople = 1;
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
@@ -2692,13 +3237,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataHeatBal->People(1).Pierce = true;
     state->dataHeatBal->People(1).NumberOfPeople = 2;
     state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
+    state->dataHeatBal->People(1).ColdStressTempThresh = 15.0;
+    state->dataHeatBal->People(1).HeatStressTempThresh = 29.5;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 27.5;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 15.0;
+
     state->dataScheduleMgr->Schedule.allocate(1);
 
     state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
-    state->dataHeatBalFanSys->ZoneOccPierceSET.dimension(state->dataGlobal->NumOfZones, 0);
-    state->dataHeatBalFanSys->ZoneOccPierceSETLastStep.dimension(state->dataGlobal->NumOfZones, 0);
-    state->dataHeatBalFanSys->ZoneLowSETHours.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneHighSETHours.allocate(state->dataGlobal->NumOfZones);
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 31;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
@@ -2706,11 +3252,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     // Heat Index Case 1: Zone T < 80 F;
     state->dataGlobal->HourOfDay = 1;
     state->dataHeatBalFanSys->ZTAV(1) = 25;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -4.0;
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
-    EXPECT_NEAR(25, state->dataHeatBalFanSys->ZoneHeatIndex(1), 0.5);
-    EXPECT_NEAR(28, state->dataHeatBalFanSys->ZoneHumidex(1), 1);
+    EXPECT_NEAR(25, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(28, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
 
     // Heat Index Case 2: Zone RH > 85, 80 < T < 87 F;
     state->dataGlobal->HourOfDay = 2;
@@ -2718,8 +3265,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
-    EXPECT_NEAR(31, state->dataHeatBalFanSys->ZoneHeatIndex(1), 0.5);
-    EXPECT_NEAR(39, state->dataHeatBalFanSys->ZoneHumidex(1), 1);
+    EXPECT_NEAR(31, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(39, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
 
     // Heat Index Case 3: < Zone RH > 85, 80 < T < 87 F;
     state->dataGlobal->HourOfDay = 3;
@@ -2727,8 +3274,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
-    EXPECT_NEAR(26, state->dataHeatBalFanSys->ZoneHeatIndex(1), 0.5);
-    EXPECT_NEAR(23, state->dataHeatBalFanSys->ZoneHumidex(1), 1);
+    EXPECT_NEAR(26, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(23, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
 
     // Heat Index Case 4: Rothfusz regression, other than the above conditions;
     state->dataGlobal->HourOfDay = 4;
@@ -2736,56 +3283,364 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
     CalcThermalResilience(*state);
     ReportThermalResilience(*state);
-    EXPECT_NEAR(33, state->dataHeatBalFanSys->ZoneHeatIndex(1), 0.5);
-    EXPECT_NEAR(38, state->dataHeatBalFanSys->ZoneHumidex(1), 1);
+    EXPECT_NEAR(33, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(38, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
 
     // Test categorization of the first 4 hours.
-    EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[0]); // Safe: Heat Index <= 80 °F (32.2 °C).
-    EXPECT_EQ(1, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[1]); // Caution: (80, 90 °F] / (26.7, 32.2 °C]
-    EXPECT_EQ(1, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[2]); // Extreme Caution (90, 105 °F] / (32.2, 40.6 °C]
-    EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHeatIndexHourBins(1)[3]);
-    EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBins(1)[0]); // # of People = 0
+    EXPECT_NEAR(2.0, state->dataHeatBal->Resilience(1).ZoneHeatIndexHourBins[0], 1e-8); // Safe: Heat Index <= 80 °F (26.7 °C).
+    EXPECT_NEAR(1.0, state->dataHeatBal->Resilience(1).ZoneHeatIndexHourBins[1], 1e-8); // Caution: (80, 90 °F] / (26.7, 32.2 °C]
+    EXPECT_NEAR(1.0, state->dataHeatBal->Resilience(1).ZoneHeatIndexHourBins[2], 1e-8); // Extreme Caution (90, 105 °F] / (32.2, 40.6 °C]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHeatIndexHourBins[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHeatIndexOccuHourBins[0], 1e-8);     // # of People = 0
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHeatIndexOccupiedHourBins[0], 1e-8); // # of People = 0
 
-    EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[0]);     // Humidex <= 29
-    EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneHumidexHourBins(1)[1]);     // Humidex (29, 40]
-    EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBins(1)[0]); // # of People = 0
+    EXPECT_NEAR(2.0, state->dataHeatBal->Resilience(1).ZoneHumidexHourBins[0], 1e-8);         // Humidex <= 29
+    EXPECT_NEAR(2.0, state->dataHeatBal->Resilience(1).ZoneHumidexHourBins[1], 1e-8);         // Humidex (29, 40]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHumidexOccuHourBins[0], 1e-8);     // # of People = 0
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHumidexOccupiedHourBins[0], 1e-8); // # of People = 0
 
-    // Test SET-hours calculation - No occupant
-    EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Hours
-    EXPECT_EQ(0, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1]); // SET OccupantHours
+    // SET Degree-Hr Test values
+    //    hour  PierceSET  OccuSchedule  TotalHighSet	HiSetOccuHour	HiSetOccupied	TotalLowSet	LowOccuHour Low Occupied
+    //    1     31         0	         1	        0	        0	        0	        0	    0
+    //    2     31         0	         2	        0	        0	        0	        0	    0
+    //    3     31         0	         3	        0	        0	        0	        0	    0
+    //    4     31         0	         4	        0	        0	        0	        0	    0
+    //    5     11.2       0.4           4	        0	        0	        1	        0.8	    1
+    //    6     11.2       0.4           4	        0	        0	        2	        1.6	    2
+    //    7     11.2       0.4           4	        0	        0	        3	        2.4	    3
+    //    8     32         1	         6	        4	        2	        3	        2.4	    3
+    //    9     32         1	         8	        8	        4	        3	        2.4	    3
+    //    10    32         1	         10	        12	        6	        3	        2.4	    3
+    //    11    25         1	         10	        12	        6	        3	        2.4	    3
+    //    12    25         1	         10	        12	        6	        3	        2.4	    3
+    //    13    11.2       0.4	         10	        12	        6	        4	        3.2	    4
+    //    14    11.2       0.4	         10	        12	        6	        5	        4	    5
+    //    15    11.2       0.4	         10	        12	        6	        6	        4.8	    6
+    //    16    11.2       0.4	         10	        12	        6	        7	        5.6	    7
+    //    17    11.2       0.4	         10	        12	        6	        8	        6.4	    8
+    //    18    11.2       0.4	         10	        12	        6	        9	        7.2	    9
+    //    19    11.2       0	         10	        12	        6	        10	        7.2	    9
+    //    20    11.2       0	         10	        12	        6	        11	        7.2	    9
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(4.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[3], 1e-8); // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hour of safety table data
+    //                  Cold                                          Heat
+    //    hour	ZTAV	HOS exceed-hr exceed-occuhour exceed occupied HOS exceed-hr exceed-occuhour exceed-occupied
+    //    1	25	1	0	 0	      0	              1	    0	     0	                  0
+    //    2	27	2	0	 0	      0	              2	    0	     0	                  0
+    //    3	27	3	0	 0	      0	              3	    0	     0	                  0
+    //    4	30	4	0	 0	      0	              3	    1	     0	                  0
+    //    5	31	5	0	 0	      0	              3	    2	     0.8	          1
+    //    6	31	6	0	 0	      0	              3	    3	     1.6	          2
+    //    7	31	7	0	 0	      0	              3	    4	     2.4	          3
+    //    8	28	8	0	 0	      0	              3	    4	     2.4	          3
+    //    9	28	9	0	 0	      0	              3	    4	     2.4	          3
+    //    10	28	10	0	 0	      0	              3	    4	     2.4	          3
+    //    11	31	11	0	 0	      0	              3	    5	     4.4	          4
+    //    12	31	12	0	 0	      0	              3	    6	     6.4	          5
+    //    13	30	13	0	 0	      0	              3	    7	     7.2	          6
+    //    14	30	14	0	 0	      0	              3	    8	     8	                  7
+    //    15	30	15	0	 0	      0	              3	    9	     8.8	          8
+    //    16	30	16	0	 0	      0	              3	    10	     9.6	          9
+    //    17	30	17	0	 0	      0	              3	    11	     10.4	          10
+    //    18	30	18	0	 0	      0	              3	    12	     11.2	          11
+    //    19	12	18	1	 0	      0	              3	    12	     11.2	          11
+    //    20	12	18	2	 0	      0	              3	    12	     11.2	          11
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(4.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(1.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    //    Unmet Degree Hour table data
+    //    cooling setpoint	27.5
+    //    heating setpoint	15
+    //    number of people	2
+    //
+    //                              Cooling unmet                         Heating unmet
+    //    hour  OccuSche  ZTAV      deg-hr  deg-occu-hr  deg-occupied-hr  deg-hr deg-occu-hr deg-occupied-hr
+    //    1	    0	      25	0	0	     0	              0	     0	         0
+    //    2	    0	      27	0	0	     0	              0	     0	         0
+    //    3	    0	      27	0	0	     0	              0	     0	         0
+    //    4	    0	      30	2.5	0	     0	              0	     0	         0
+    //    5	    0.4	      31	6	2.8	     3.5	      0	     0	         0
+    //    6	    0.4	      31	9.5	5.6	     7	              0	     0	         0
+    //    7	    0.4	      31	13	8.4	     10.5	      0	     0	         0
+    //    8	    1	      28	13.5	9.4	     11	              0	     0	         0
+    //    9	    1	      28	14	10.4	     11.5	      0	     0	         0
+    //    10    1	      28	14.5	11.4	     12	              0      0	         0
+    //    11    1	      31	18	18.4	     15.5	      0	     0	         0
+    //    12    1	      31	21.5	25.4	     19	              0	     0	         0
+    //    13    0.4	      30	24	27.4	     21.5	      0	     0	         0
+    //    14    0.4	      30	26.5	29.4	     24	              0	     0	         0
+    //    15    0.4	      30	29	31.4	     26.5	      0	     0	         0
+    //    16    0.4	      30	31.5	33.4	     29	              0	     0	         0
+    //    17    0.4	      30	34	35.4	     31.5	      0	     0	         0
+    //    18    0.4	      30	36.5	37.4	     34	              0	     0	         0
+    //    19    0	      12	36.5	37.4	     34	              3	     0	         0
+    //    20    0	      12	36.5	37.4	     34	              6	     0	         0
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(2.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8); // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance table data
+    //    VeryHotPMVThresh 	3
+    //    WarmPMVThresh 	0.7
+    //    CoolPMVThresh 	-0.7
+    //    VeryColdPMVThresh 	-3
+    //    num people	2
+    //                          Exceedance Occupant Hour         Exceedance Occupied Hour
+    //    hour	OccuSche  PMV	VeryCold cool   warm    VeryHot  VeryCold cool  warm    VeryHot
+    //    1	0	 -4	0	 0	0	0	 0	  0	0	0
+    //    2	0	-4	0	 0	0	0	 0	  0	0	0
+    //    3	0	-4	0	 0	0	0	 0	  0	0	0
+    //    4	0	-4	0	 0	0	0	 0	  0	0	0
+    //    5	0.4	-3.5	0.4	 2.24	0	0	 0.5	  2.8	0	0
+    //    6	0.4	-3.5	0.8	 4.48	0	0	 1	  5.6	0	0
+    //    7	0.4	-3.5	1.2	 6.72	0	0	 1.5	  8.4	0	0
+    //    8	1	-1.2	1.2	 7.72	0	0	 1.5	  8.9	0	0
+    //    9	1	-1.2	1.2	 8.72	0	0	 1.5	  9.4	0	0
+    //    10	1	-1.2	1.2	 9.72	0	0	 1.5	  9.9	0	0
+    //    11	1	0.5	1.2	 9.72	0	0	 1.5	  9.9	0	0
+    //    12	1	0.5	1.2	 9.72	0	0	 1.5	  9.9	0	0
+    //    13	0.4	1.2	1.2	 9.72	0.4	0	 1.5	  9.9	0.5	0
+    //    14	0.4	1.2	1.2	 9.72	0.8	0	 1.5	  9.9	1	0
+    //    15	0.4	1.2	1.2	 9.72	1.2	0	 1.5	  9.9	1.5	0
+    //    16	0.4	1.2	1.2	 9.72	1.6	0	 1.5	  9.9	2	0
+    //    17	0.4	1.2	1.2	 9.72	2	0	 1.5	  9.9	2.5	0
+    //    18	0.4	1.2	1.2	 9.72	2.4	0	 1.5	  9.9	3	0
+    //    19	0	1.2	1.2	 9.72	2.4	0	 1.5	  9.9	3	0
+    //    20	0	1.2	1.2	 9.72	2.4	0	 1.5	  9.9	3	0
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[1], 1e-8);     // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
-    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
+    state->dataHeatBalFanSys->ZTAV(1) = 31;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -3.5;
     for (int hour = 5; hour <= 7; hour++) {
         state->dataGlobal->HourOfDay = hour;
         //        CalcThermalResilience(*state);
         ReportThermalResilience(*state);
     }
     // Test SET-hours calculation - Heating unmet
-    EXPECT_EQ(3, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0]); // SET Hours = (12.2 - 11.2) * 3 Hours
-    EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneLowSETHours(1)[1]); // SET OccupantHours = (12.2 - 11.2) * 3 Hours * 2 OCC
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(4.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[3], 1e-8); // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(2.4, state->dataHeatBal->Resilience(1).ZoneLowSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(7.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(4.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(2.4, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(13.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(8.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8);  // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(10.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(6.72, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.5, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(8.4, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 32;
+    state->dataHeatBalFanSys->ZTAV(1) = 28;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -1.2;
     for (int hour = 8; hour <= 10; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportThermalResilience(*state);
     }
     // Test SET-hours calculation - Cooling unmet
-    EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]);  // SET Hours = (32 - 30) * 3 Hours
-    EXPECT_EQ(12, state->dataHeatBalFanSys->ZoneHighSETHours(1)[1]); // SET OccupantHours = (32 - 30) * 3 Hours * 2 OCC
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(10.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(12.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(6.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[3], 1e-8);  // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(2.4, state->dataHeatBal->Resilience(1).ZoneLowSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(10.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(4.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(2.4, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(14.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(11.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(12.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(9.72, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.5, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(9.9, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
+    state->dataHeatBalFanSys->ZTAV(1) = 31;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 0.5;
     for (int hour = 11; hour <= 12; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportThermalResilience(*state);
     }
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(10.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(12.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(6.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[3], 1e-8);  // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(2.4, state->dataHeatBal->Resilience(1).ZoneLowSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(12.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(6.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(6.4, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(5.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(21.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(25.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(19.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(9.72, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.5, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(9.9, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
+
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
+    state->dataHeatBalFanSys->ZTAV(1) = 30;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 1.2;
     for (int hour = 13; hour <= 18; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportThermalResilience(*state);
     }
+
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(10.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(12.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(6.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[3], 1e-8);  // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(9.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(7.2, state->dataHeatBal->Resilience(1).ZoneLowSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(9.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(6.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(18.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[0], 1e-8);  // Hours of safety
+    EXPECT_NEAR(12.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(11.2, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(11.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(36.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(37.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(34.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(9.72, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(2.4, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.5, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(9.9, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
+
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
-    for (int hour = 18; hour <= 20; hour++) {
+    state->dataHeatBalFanSys->ZTAV(1) = 12;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 1.2;
+    for (int hour = 19; hour <= 20; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportThermalResilience(*state);
     }
@@ -2793,28 +3648,60 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     // Test SET longest duration calculation
     // Cooling Unmet Duration: Hour 1 - 4 (no occupants), Hour 8 - 10;
     // Heating Unmet Duration: Hour 5 - 7, Hour 13 - 18, Hour 18 - 20 (no occupants);
-    EXPECT_EQ(9, state->dataHeatBalFanSys->ZoneLowSETHours(1)[0]);  // SET Hours = (12.2 - 11.2) * (3 + 6) Hours
-    EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneHighSETHours(1)[0]); // SET Hours = SET Hours = (32 - 30) * 3 Hours
-    EXPECT_EQ(6, state->dataHeatBalFanSys->ZoneLowSETHours(1)[2]);  // Longest Heating SET Unmet Duration
-    EXPECT_EQ(3, state->dataHeatBalFanSys->ZoneHighSETHours(1)[2]); //  Longest Cooling SET Unmet Duration
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(10.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(12.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(6.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHighSETHours[3], 1e-8);  // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(11.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(7.2, state->dataHeatBal->Resilience(1).ZoneLowSETHours[1], 1e-8);  // SET OccupantHours
+    EXPECT_NEAR(9.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(6.0, state->dataHeatBal->Resilience(1).ZoneLowSETHours[3], 1e-8);  // Longest SET ≤ 12.2°C Duration [hr]
 
-    state->dataHeatBalFanSys->ZoneCO2LevelHourBins.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBins.allocate(state->dataGlobal->NumOfZones);
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(18.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(2.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneColdHourOfSafetyBins[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[0], 1e-8);  // Hours of safety
+    EXPECT_NEAR(12.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(11.2, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(11.0, state->dataHeatBal->Resilience(1).ZoneHeatHourOfSafetyBins[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(36.5, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(37.4, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(34.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(6.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[4], 1e-8);  // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins[5], 1e-8);  // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(1.2, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(9.72, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(2.4, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccuHourBins[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.5, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(9.9, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBal->Resilience(1).ZoneDiscomfortWtExceedOccupiedHourBins[3], 1e-8); // Very-hot Exceedance OccupiedHours
+
     state->dataContaminantBalance->ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
     state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataOutRptTab->displayCO2ResilienceSummary = true;
     state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1100;
     ReportCO2Resilience(*state);
-    EXPECT_EQ(1, state->dataHeatBalFanSys->ZoneCO2LevelHourBins(1)[1]);
-    EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBins(1)[1]);
+    EXPECT_EQ(1, state->dataHeatBal->Resilience(1).ZoneCO2LevelHourBins[1]);
+    EXPECT_EQ(2, state->dataHeatBal->Resilience(1).ZoneCO2LevelOccuHourBins[1]);
+    EXPECT_EQ(1, state->dataHeatBal->Resilience(1).ZoneCO2LevelOccupiedHourBins[1]);
 
-    state->dataHeatBalFanSys->ZoneLightingLevelHourBins.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBins.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
-    state->dataDaylightingData->totDaylightingControls = state->dataGlobal->NumOfZones;
-    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    int totDaylightingControls = state->dataGlobal->NumOfZones;
+    state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
     state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
     state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
@@ -2826,8 +3713,843 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataOutRptTab->displayVisualResilienceSummary = true;
 
     ReportVisualResilience(*state);
-    EXPECT_EQ(1, state->dataHeatBalFanSys->ZoneLightingLevelHourBins(1)[2]);
-    EXPECT_EQ(2, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(1)[2]);
+    EXPECT_EQ(1, state->dataHeatBal->Resilience(1).ZoneLightingLevelHourBins[2]);
+    EXPECT_EQ(2, state->dataHeatBal->Resilience(1).ZoneLightingLevelOccuHourBins[2]);
+    EXPECT_EQ(1, state->dataHeatBal->Resilience(1).ZoneLightingLevelOccupiedHourBins[2]);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportRepPeriod)
+{
+    std::string const idf_objects = delimited_string({"Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_1,               !- field Name,",
+                                                      "ThermalResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "1,                            !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "10;                           !- End Hour of Day",
+
+                                                      "Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_2,               !- field Name,",
+                                                      "ThermalResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "13,                           !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "20;                           !- End Hour of Day"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    state->dataWeatherManager->TotReportPers = 2;
+
+    WeatherManager::GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
+    state->dataWeatherManager->TotThermalReportPers = 0;
+    state->dataWeatherManager->TotCO2ReportPers = 0;
+    state->dataWeatherManager->TotVisualReportPers = 0;
+    WeatherManager::GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+
+    EXPECT_EQ(state->dataWeatherManager->TotThermalReportPers, 2);
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+    state->dataOutRptTab->displayThermalResilienceSummary = true;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZTAV.dimension(state->dataGlobal->NumOfZones, 0.0);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state->dataGlobal->NumOfZones, 0.0);
+
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.dimension(state->dataGlobal->NumOfZones, 28.0);
+
+    state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                          state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                              state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                        state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                            state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                         state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                         state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                        state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                                   state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
+                                                                                       state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->CrossedColdThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->CrossedHeatThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->CrossedColdThreshRepPeriod = false;
+    state->dataHeatBalFanSys->CrossedHeatThreshRepPeriod = false;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.dimension(state->dataGlobal->NumOfZones, 28.0);
+
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).Pierce = true;
+    state->dataHeatBal->People(1).NumberOfPeople = 2;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
+    state->dataHeatBal->People(1).ColdStressTempThresh = 15.0;
+    state->dataHeatBal->People(1).HeatStressTempThresh = 29.5;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 27.5;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 15.0;
+
+    state->dataScheduleMgr->Schedule.allocate(1);
+
+    state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->lowSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->highSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->lowSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->highSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataThermalComforts->ThermalComfortData(1).PierceSET = 31;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
+
+    // ---------------------------------------------------------------------
+    // Report Period I start
+    // ---------------------------------------------------------------------
+    // Heat Index Case 1: Zone T < 80 F;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataHeatBalFanSys->ZTAV(1) = 25;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -4.0;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
+    CalcThermalResilience(*state);
+    ReportThermalResilience(*state);
+    EXPECT_NEAR(25, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(28, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
+
+    // Heat Index Case 2: Zone RH > 85, 80 < T < 87 F;
+    state->dataGlobal->HourOfDay = 2;
+    state->dataHeatBalFanSys->ZTAV(1) = 27;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
+    CalcThermalResilience(*state);
+    ReportThermalResilience(*state);
+    EXPECT_NEAR(31, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(39, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
+
+    // Heat Index Case 3: < Zone RH > 85, 80 < T < 87 F;
+    state->dataGlobal->HourOfDay = 3;
+    state->dataHeatBalFanSys->ZTAV(1) = 27;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
+    CalcThermalResilience(*state);
+    ReportThermalResilience(*state);
+    EXPECT_NEAR(26, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(23, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
+
+    // Heat Index Case 4: Rothfusz regression, other than the above conditions;
+    state->dataGlobal->HourOfDay = 4;
+    state->dataHeatBalFanSys->ZTAV(1) = 30;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
+    CalcThermalResilience(*state);
+    ReportThermalResilience(*state);
+    EXPECT_NEAR(33, state->dataHeatBal->Resilience(1).ZoneHeatIndex, 0.5);
+    EXPECT_NEAR(38, state->dataHeatBal->Resilience(1).ZoneHumidex, 1);
+
+    // Test categorization of the first 4 hours.
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[0], 1e-8); // Safe: Heat Index <= 80 °F (32.2 °C).
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[1], 1e-8); // Caution: (80, 90 °F] / (26.7, 32.2 °C]
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[2], 1e-8); // Extreme Caution (90, 105 °F] / (32.2, 40.6 °C]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(1, 1)[0], 1e-8);     // # of People = 0
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // # of People = 0
+
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(1, 1)[0], 1e-8);         // Humidex <= 29
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod(1, 1)[1], 1e-8);         // Humidex (29, 40]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod(1, 1)[0], 1e-8);     // # of People = 0
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // # of People = 0
+
+    // SET Degree-Hr Table Data: reporting period I
+    //    hour  PierceSET  OccuSchedule  TotalHighSet	HiSetOccuHour	HiSetOccupied	TotalLowSet	LowOccuHour Low Occupied
+    //    1     31         0	         1	        0	        0	        0	        0	    0
+    //    2     31         0	         2	        0	        0	        0	        0	    0
+    //    3     31         0	         3	        0	        0	        0	        0	    0
+    //    4     31         0	         4	        0	        0	        0	        0	    0
+    //    5     11.2       0.4           4	        0	        0	        1	        0.8	    1
+    //    6     11.2       0.4           4	        0	        0	        2	        1.6	    2
+    //    7     11.2       0.4           4	        0	        0	        3	        2.4	    3
+    //    8     32         1	         6	        4	        2	        3	        2.4	    3
+    //    9     32         1	         8	        8	        4	        3	        2.4	    3
+    //    10    32         1	         10	        12	        6	        3	        2.4	    3
+
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[3], 1e-8); // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hour of safety table data: reporting period I
+    //                  Cold                                          Heat
+    //    hour	ZTAV	HOS exceed-hr exceed-occuhour exceed occupied HOS exceed-hr exceed-occuhour exceed-occupied
+    //    1	25	1	0	 0	      0	              1	    0	     0	                  0
+    //    2	27	2	0	 0	      0	              2	    0	     0	                  0
+    //    3	27	3	0	 0	      0	              3	    0	     0	                  0
+    //    4	30	4	0	 0	      0	              3	    1	     0	                  0
+    //    5	31	5	0	 0	      0	              3	    2	     0.8	          1
+    //    6	31	6	0	 0	      0	              3	    3	     1.6	          2
+    //    7	31	7	0	 0	      0	              3	    4	     2.4	          3
+    //    8	28	8	0	 0	      0	              3	    4	     2.4	          3
+    //    9	28	9	0	 0	      0	              3	    4	     2.4	          3
+    //    10	28	10	0	 0	      0	              3	    4	     2.4	          3
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    //    Unmet Degree Hour table data: reporting period I
+    //    cooling setpoint	27.5
+    //    heating setpoint	15
+    //    number of people	2
+    //
+    //                              Cooling unmet                         Heating unmet
+    //    hour  OccuSche  ZTAV      deg-hr  deg-occu-hr  deg-occupied-hr  deg-hr deg-occu-hr deg-occupied-hr
+    //    1	    0	      25	0	0	     0	              0	     0	         0
+    //    2	    0	      27	0	0	     0	              0	     0	         0
+    //    3	    0	      27	0	0	     0	              0	     0	         0
+    //    4	    0	      30	2.5	0	     0	              0	     0	         0
+    //    5	    0.4	      31	6	2.8	     3.5	      0	     0	         0
+    //    6	    0.4	      31	9.5	5.6	     7	              0	     0	         0
+    //    7	    0.4	      31	13	8.4	     10.5	      0	     0	         0
+    //    8	    1	      28	13.5	9.4	     11	              0	     0	         0
+    //    9	    1	      28	14	10.4	     11.5	      0	     0	         0
+    //    10        1	      28	14.5	11.4	     12	              0      0	         0
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(2.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[3], 1e-8); // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance table data: reporting period I
+    //    VeryHotPMVThresh 	3
+    //    WarmPMVThresh 	0.7
+    //    CoolPMVThresh 	-0.7
+    //    VeryColdPMVThresh 	-3
+    //    num people	2
+    //                          Exceedance Occupant Hour         Exceedance Occupied Hour
+    //    hour	OccuSche  PMV	VeryCold cool   warm    VeryHot  VeryCold cool  warm    VeryHot
+    //    1	0	 -4	0	 0	0	0	 0	  0	0	0
+    //    2	0	-4	0	 0	0	0	 0	  0	0	0
+    //    3	0	-4	0	 0	0	0	 0	  0	0	0
+    //    4	0	-4	0	 0	0	0	 0	  0	0	0
+    //    5	0.4	-3.5	0.4	 2.24	0	0	 0.5	  2.8	0	0
+    //    6	0.4	-3.5	0.8	 4.48	0	0	 1	  5.6	0	0
+    //    7	0.4	-3.5	1.2	 6.72	0	0	 1.5	  8.4	0	0
+    //    8	1	-1.2	1.2	 7.72	0	0	 1.5	  8.9	0	0
+    //    9	1	-1.2	1.2	 8.72	0	0	 1.5	  9.4	0	0
+    //    10	1	-1.2	1.2	 9.72	0	0	 1.5	  9.9	0	0
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[1], 1e-8);     // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedHours
+
+    state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
+    state->dataHeatBalFanSys->ZTAV(1) = 31;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -3.5;
+    for (int hour = 5; hour <= 7; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        //        CalcThermalResilience(*state);
+        ReportThermalResilience(*state);
+    }
+    // Test SET-hours calculation - Heating unmet
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[3], 1e-8); // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(7.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(13.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        8.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(10.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(6.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(8.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedHours
+
+    state->dataThermalComforts->ThermalComfortData(1).PierceSET = 32;
+    state->dataHeatBalFanSys->ZTAV(1) = 28;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = -1.2;
+    for (int hour = 8; hour <= 10; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportThermalResilience(*state);
+    }
+    // Test SET-hours calculation - Cooling unmet
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[2], 1e-8);  // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 1)[3], 1e-8);  // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 1)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(10.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[2], 1e-8);  // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[3], 1e-8);  // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 1)[4], 1e-8);  // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 1)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(14.5, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        11.4, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 1)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(1.2, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(9.72, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[1], 1e-8);    // Cool Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 1)[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(1.5, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(9.9, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8); // Very-hot Exceedance OccupiedHours
+
+    // ---------------------------------------------------------------------
+    // Report Period I end
+    // ---------------------------------------------------------------------
+
+    state->dataThermalComforts->ThermalComfortData(1).PierceSET = 25;
+    state->dataHeatBalFanSys->ZTAV(1) = 31;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 0.5;
+    for (int hour = 11; hour <= 12; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportThermalResilience(*state);
+    }
+
+    // ---------------------------------------------------------------------
+    // Report Period II start
+    // ---------------------------------------------------------------------
+
+    state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
+    state->dataHeatBalFanSys->ZTAV(1) = 30;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 1.2;
+    for (int hour = 13; hour <= 18; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportThermalResilience(*state);
+    }
+
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 2)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 2)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 2)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 2)[3], 1e-8); // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 2)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(4.8, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 2)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 2)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 2)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 2)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 2)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 2)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 2)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 2)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 2)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(4.8, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 2)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 2)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(15.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        12.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(15.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[1], 1e-8);     // Cool Exceedance OccupantHours
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8); // Very-hot Exceedance OccupiedHours
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
+    state->dataHeatBalFanSys->ZTAV(1) = 12;
+    state->dataThermalComforts->ThermalComfortData(1).FangerPMV = 1.2;
+    for (int hour = 19; hour <= 20; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportThermalResilience(*state);
+    }
+
+    // Cooling SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 2)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 2)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 2)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod(1, 2)[3], 1e-8); // Longest SET > 30°C Duration [hr]
+    // Heating SET Degree-Hours
+    EXPECT_NEAR(8.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 2)[0], 1e-8); // SET Degree-Hours
+    EXPECT_NEAR(4.8, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 2)[1], 1e-8); // SET OccupantHours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 2)[2], 1e-8); // SET OccupiedHours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, 2)[3], 1e-8); // Longest SET ≤ 12.2°C Duration [hr]
+
+    // Hours of Safety for Cold Events
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 2)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 2)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 2)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod(1, 2)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+    // Hours of Safety for Heat Events
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 2)[0], 1e-8); // Hours of safety
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 2)[2], 1e-8); // Safe Temperature Exceedance Hours [hr]
+    EXPECT_NEAR(4.8, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 2)[3], 1e-8); // Safe Temperature Exceedance OccupantHours [hr]
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod(1, 2)[4], 1e-8); // Safe Temperature Exceedance OccupiedHours [hr]
+
+    // Unmet Degree-Hours
+    EXPECT_NEAR(15.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[0], 1e-8); // Cooling Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        12.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[1], 1e-8); // Cooling Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(15.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[2], 1e-8); // Cooling Setpoint Unmet Occupied Degree-Hours
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[3], 1e-8);  // Heating Setpoint Unmet Degree-Hours
+    EXPECT_NEAR(
+        0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[4], 1e-8); // Heating Setpoint Unmet Occupant-Weighted Degree-Hours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, 2)[5], 1e-8); // Heating Setpoint Unmet Occupied Degree-Hours
+
+    // Discomfort-weighted Exceedance OccupantHours and OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[0], 1e-8);     // Very-cold Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[1], 1e-8);     // Cool Exceedance OccupantHours
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[2], 1e-8);     // Warm Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(1, 2)[3], 1e-8);     // Very-hot Exceedance OccupantHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8); // Very-cold Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8); // Cool Exceedance OccupiedHours
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8); // Warm Exceedance OccupiedHours
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8); // Very-hot Exceedance OccupiedHours
+
+    // ---------------------------------------------------------------------
+    // Report Period II end
+    // ---------------------------------------------------------------------
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestCO2ResilienceReportRepPeriod)
+{
+    std::string const idf_objects = delimited_string({"Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_1,               !- field Name,",
+                                                      "CO2ResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "1,                            !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "10;                           !- End Hour of Day",
+
+                                                      "Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_2,               !- field Name,",
+                                                      "CO2ResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "13,                           !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "20;                           !- End Hour of Day"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    state->dataWeatherManager->TotReportPers = 2;
+
+    WeatherManager::GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
+    state->dataWeatherManager->TotThermalReportPers = 0;
+    state->dataWeatherManager->TotCO2ReportPers = 0;
+    state->dataWeatherManager->TotVisualReportPers = 0;
+    WeatherManager::GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+
+    EXPECT_EQ(state->dataWeatherManager->TotCO2ReportPers, 2);
+
+    state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotCO2ReportPers);
+    state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotCO2ReportPers);
+    state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotCO2ReportPers);
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
+
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 2;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
+
+    int NoBins = 3;
+
+    for (int i = 1; i <= state->dataWeatherManager->TotCO2ReportPers; i++) {
+        state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+        state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+        state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+    }
+
+    state->dataContaminantBalance->ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataOutRptTab->displayCO2ResilienceSummary = true;
+    state->dataScheduleMgr->Schedule.allocate(1);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 900;
+    for (int hour = 1; hour <= 4; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportCO2Resilience(*state);
+    }
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1100;
+    for (int hour = 5; hour <= 7; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportCO2Resilience(*state);
+    }
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 5500;
+    state->dataGlobal->HourOfDay = 8;
+    ReportCO2Resilience(*state);
+
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 2000;
+    for (int hour = 9; hour <= 10; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportCO2Resilience(*state);
+    }
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(5.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(6.4, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(2.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(5.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(1.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1500;
+    for (int hour = 13; hour <= 18; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportCO2Resilience(*state);
+    }
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(12.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRepPeriod)
+{
+    std::string const idf_objects = delimited_string({"Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_1,               !- field Name,",
+                                                      "VisualResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "1,                            !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "10;                           !- End Hour of Day",
+
+                                                      "Output:Table:ReportPeriod,",
+                                                      "ReportPeriod_2,               !- field Name,",
+                                                      "VisualResilienceSummary,     !- field Report Name,",
+                                                      ",                             !- Begin Year",
+                                                      "1,                            !- Begin Month",
+                                                      "1,                            !- Begin Day of Month",
+                                                      "13,                           !- Begin Hour of Day",
+                                                      ",                             !- End Year",
+                                                      "1,                            !- End Month",
+                                                      "1,                            !- End Day of Month",
+                                                      "20;                           !- End Hour of Day"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    state->dataWeatherManager->TotReportPers = 2;
+
+    WeatherManager::GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
+    state->dataWeatherManager->TotThermalReportPers = 0;
+    state->dataWeatherManager->TotCO2ReportPers = 0;
+    state->dataWeatherManager->TotVisualReportPers = 0;
+    WeatherManager::GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+
+    EXPECT_EQ(state->dataWeatherManager->TotVisualReportPers, 2);
+
+    state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotVisualReportPers);
+    state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotVisualReportPers);
+    state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotVisualReportPers);
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
+
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 2;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
+
+    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    int totDaylightingControls = state->dataGlobal->NumOfZones;
+    state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
+    state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
+    state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
+    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt.allocate(1);
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint.allocate(1);
+    state->dataDaylightingData->daylightControl(1).PowerReductionFactor = 0.5;
+    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1) = 300;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 400;
+    state->dataOutRptTab->displayVisualResilienceSummary = true;
+
+    int NoBins = 4;
+
+    for (int i = 1; i <= state->dataWeatherManager->TotVisualReportPers; i++) {
+        state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+        state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+        state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
+    }
+
+    state->dataOutRptTab->displayVisualResilienceSummary = true;
+    state->dataScheduleMgr->Schedule.allocate(1);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 250;
+    for (int hour = 1; hour <= 4; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 600;
+    for (int hour = 5; hour <= 7; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 70;
+    for (int hour = 8; hour <= 10; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(4.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(2.4, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 1)[3], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 600;
+    for (int hour = 13; hour <= 15; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[3], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8);
+
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 70;
+    for (int hour = 16; hour <= 18; hour++) {
+        state->dataGlobal->HourOfDay = hour;
+        ReportVisualResilience(*state);
+    }
+
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, 2)[3], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(6.0, state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, 2)[3], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[0], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[1], 1e-8);
+    EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[2], 1e-8);
+    EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
@@ -3171,6 +4893,78 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     state->dataEnvrn->SunIsUp = true;
     InitIntSolarDistribution(*state);
     EXPECT_NEAR(1.666667, state->dataHeatBal->SurfIntBmIncInsSurfIntensRep(1), 0.00001);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_IncSolarMultiplier)
+{
+    //    test the incident solar multiplier application
+    state->dataSurface->TotSurfaces = 1;
+    state->dataViewFactor->NumOfSolarEnclosures = 1;
+    int totSurf = state->dataSurface->TotSurfaces;
+    state->dataHeatBal->TotConstructs = 1;
+    int totConstructs = state->dataHeatBal->TotConstructs;
+    state->dataSurface->Surface.allocate(totSurf);
+    state->dataConstruction->Construct.allocate(totConstructs);
+    state->dataGlobal->TimeStepZoneSec = 900;
+    state->dataGlobal->NumOfTimeStepInHour = 6;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+
+    int SurfNum = 1;
+    state->dataSurface->Surface(SurfNum).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(SurfNum).hasIncSolMultiplier = true;
+    state->dataSurface->Surface(SurfNum).ExtSolar = true;
+    state->dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
+    state->dataSurface->SurfIncSolMultiplier.allocate(totSurf);
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).Name = "testing window surface";
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).SurfaceIdx = SurfNum;
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr = 0;
+
+    state->dataSurface->Surface(SurfNum).Area = 100.0;
+
+    WindowManager::initWindowModel(*state);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, SurfNum);
+    state->dataGlobal->numSpaces = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataGlobal->numSpaces);
+    auto &thisEnclosure(state->dataViewFactor->EnclSolInfo(1));
+    thisEnclosure.Name = "test enclosure";
+    thisEnclosure.SurfacePtr.dimension(1, 0);
+    thisEnclosure.SurfacePtr(1) = 1;
+
+    int ConstrNum = 1;
+    state->dataSurface->Surface(SurfNum).Construction = ConstrNum;
+    state->dataSurface->SurfActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
+    state->dataConstruction->Construct(ConstrNum).TransDiff = 0.1;
+    state->dataConstruction->Construct(ConstrNum).TransSolBeamCoef = 0.1;
+    state->dataConstruction->Construct(ConstrNum).TransSolBeamCoef = 0.2;
+
+    state->dataSurface->SurfaceWindow.allocate(totSurf);
+    state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(state->dataGlobal->HourOfDay) = 999.0;
+    state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(state->dataGlobal->HourOfDay) = 888.0;
+
+    SolarShading::AllocateModuleArrays(*state);
+    state->dataHeatBal->SurfSunlitFrac = 1.0;
+    state->dataHeatBal->SurfCosIncAng = 1.0;
+    SurfaceGeometry::AllocateSurfaceArrays(*state);
+
+    state->dataSolarShading->SurfWinTransBmSolar(1) = 0.8;
+    state->dataSurface->Surface(1).ViewFactorGround = 1.0;
+    state->dataSurface->SurfWinShadingFlag(1) = DataSurfaces::WinShadingType::NoShade;
+
+    state->dataEnvrn->SunIsUp = true;
+    state->dataEnvrn->BeamSolarRad = 0.1;
+    state->dataEnvrn->GndSolarRad = 0.2;
+    state->dataEnvrn->DifSolarRad = 0.3;
+
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = 0.5;
+    HeatBalanceSurfaceManager::InitSolarHeatGains(*state);
+    Real64 transmittedSolarHalf = state->dataSurface->SurfWinTransSolar(1);
+    state->dataSurface->SurfIncSolMultiplier(SurfNum).Scaler = 1.0;
+    HeatBalanceSurfaceManager::InitSolarHeatGains(*state);
+    Real64 transmittedSolarWhole = state->dataSurface->SurfWinTransSolar(1);
+    EXPECT_EQ(transmittedSolarWhole * 0.5, transmittedSolarHalf);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWindow)
@@ -4131,9 +5925,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Daylit Zone";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -4146,9 +5938,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Daylit Attic Zone";
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
     state->dataHeatBal->Zone(2).IsControlled = true;
-    state->dataHeatBal->Zone(2).ZoneEqNum = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
@@ -4216,4 +6006,2459 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(7), 0.1);
     EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(8), 0.1);
 }
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsInit)
+{
+
+    std::string const idf_objects = delimited_string({
+        "  Building,",
+        "    House with Local Air Nodes,  !- Name",
+        "    0,                       !- North Axis {deg}",
+        "    Suburbs,                 !- Terrain",
+        "    0.001,                   !- Loads Convergence Tolerance Value",
+        "    0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",
+        "    FullInteriorAndExterior, !- Solar Distribution",
+        "    25,                      !- Maximum Number of Warmup Days",
+        "    6;                       !- Minimum Number of Warmup Days",
+
+        "  Timestep,6;",
+
+        "  SurfaceConvectionAlgorithm:Inside,TARP;",
+
+        "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "  RunPeriod,",
+        "    WinterDay,               !- Name",
+        "    1,                       !- Begin Month",
+        "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    1,                       !- End Month",
+        "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+
+        "  RunPeriod,",
+        "    SummerDay,               !- Name",
+        "    7,                       !- Begin Month",
+        "    7,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    7,                       !- End Month",
+        "    7,                       !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    No;                      !- Use Weather File Snow Indicators",
+
+        "  Site:Location,",
+        "    CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "    41.78,                   !- Latitude {deg}",
+        "    -87.75,                  !- Longitude {deg}",
+        "    -6.00,                   !- Time Zone {hr}",
+        "    190.00;                  !- Elevation {m}",
+
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    4.9,                     !- Wind Speed {m/s}",
+        "    270,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    0.0;                     !- Sky Clearness",
+
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    31.5,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    5.3,                     !- Wind Speed {m/s}",
+        "    230,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.0;                     !- Sky Clearness",
+
+        "  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
+
+        "  Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    CB11,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2032000,               !- Thickness {m}",
+        "    1.048000,                !- Conductivity {W/m-K}",
+        "    1105.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    GP01,                    !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    1.2700000E-02,           !- Thickness {m}",
+        "    0.1600000,               !- Conductivity {W/m-K}",
+        "    801.0000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    IN02,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    9.0099998E-02,           !- Thickness {m}",
+        "    4.3000001E-02,           !- Conductivity {W/m-K}",
+        "    10.00000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    IN05,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.2458000,               !- Thickness {m}",
+        "    4.3000001E-02,           !- Conductivity {W/m-K}",
+        "    10.00000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    PW03,                    !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    1.2700000E-02,           !- Thickness {m}",
+        "    0.1150000,               !- Conductivity {W/m-K}",
+        "    545.0000,                !- Density {kg/m3}",
+        "    1213.000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7800000,               !- Solar Absorptance",
+        "    0.7800000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    CC03,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.1016000,               !- Thickness {m}",
+        "    1.310000,                !- Conductivity {W/m-K}",
+        "    2243.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    HF-A3,                   !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.5000000E-03,           !- Thickness {m}",
+        "    44.96960,                !- Conductivity {W/m-K}",
+        "    7689.000,                !- Density {kg/m3}",
+        "    418.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
+
+        "  Material:NoMass,",
+        "    AR02,                    !- Name",
+        "    VeryRough,               !- Roughness",
+        "    7.8000002E-02,           !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7000000,               !- Solar Absorptance",
+        "    0.7000000;               !- Visible Absorptance",
+
+        "  Material:NoMass,",
+        "    CP02,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.2170000,               !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Construction,",
+        "    EXTWALL:LIVING,          !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    GP01;                    !- Layer 3",
+
+        "  Construction,",
+        "    FLOOR:LIVING,            !- Name",
+        "    CC03,                    !- Outside Layer",
+        "    CP02;                    !- Layer 2",
+
+        "  Construction,",
+        "    ROOF,                    !- Name",
+        "    AR02,                    !- Outside Layer",
+        "    PW03;                    !- Layer 2",
+
+        "  Zone,",
+        "    LIVING ZONE,             !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World;                   !- Coordinate System",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:North,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    1,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:East,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    1,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    1,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:South,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:West,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Floor,            !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    FLOOR:LIVING,            !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Living:Floor,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Ceiling,          !- Name",
+        "    ROOF,                 !- Surface Type",
+        "    ROOF,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,1,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,0,1,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:Living:North,          !- Name",
+        "    Living:North,                 !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:Living:North,        !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:Living:North;        !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:Living:East,           !- Name",
+        "    Living:East,                  !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:Living:East,         !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:Living:East;         !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:Living:South,          !- Name",
+        "    Living:South,                 !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:Living:South,        !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:Living:South;        !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:Living:North, !- Name",
+        "    0.3,",
+        "    Sky Temp Sch,",
+        "    ,",
+        "    ,",
+        "    SurroundingSurface1,",
+        "    0.6,",
+        "    Surrounding Temp Sch 1;",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:Living:East, !- Name",
+        "    0.2,",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    SurroundingSurface1,",
+        "    0.3,",
+        "    Surrounding Temp Sch 1,",
+        "    SurroundingSurface2,",
+        "    0.3,",
+        "    Surrounding Temp Sch 1;",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:Living:South, !- Name",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    ,",
+        "    SurroundingSurface1,",
+        "    0.4,",
+        "    Surrounding Temp Sch 1;",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:Living:North,        !-Name",
+        "    GndSurfs NorthGrassArea,      !-Ground Surface 1 Name",
+        "    0.1,                          !-Ground Surface 1 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+        "    ;                             !-Ground Surface 1 Reflectance Schedule Name",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:Living:East,         !-Name",
+        "    GndSurfs EastGrassArea,       !-Ground Surface 1 Name",
+        "    ,                             !-Ground Surface 1 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+        "    ;                             !-Ground Surface 1 Reflectance Schedule Name",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:Living:South,        !-Name",
+        "    GndSurfs SouthGrassArea,      !-Ground Surface 1 Name",
+        "    ,                             !-Ground Surface 1 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+        "    ;                             !-Ground Surface 1 Reflectance Schedule Name",
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;                   !- Name",
+
+        "  Schedule:Compact,",
+        "    Surrounding Temp Sch 1,       !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Sky Temp Sch,                 !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Ground Temp Sch,              !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    ScheduleManager::ProcessScheduleInput(*state);
+
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
+    EXPECT_FALSE(has_err_output(true));
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+
+    auto &Surface_1 = state->dataSurface->Surface(1);
+    auto &Surface_2 = state->dataSurface->Surface(2);
+    auto &Surface_3 = state->dataSurface->Surface(3);
+
+    // test surface property sky and ground view factors inputs
+    int SrdSurfsNum = state->dataSurface->Surface(1).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty_1 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    SrdSurfsNum = state->dataSurface->Surface(2).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty_2 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    SrdSurfsNum = state->dataSurface->Surface(3).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty_3 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+
+    int GndSurfsNum = Surface_1.SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty_1 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+    GndSurfsNum = Surface_2.SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty_2 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+    GndSurfsNum = Surface_3.SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty_3 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+
+    // check surface property view factors get inputs
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_1.SkyViewFactor);
+    EXPECT_TRUE(SrdSurfsProperty_1.IsSkyViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty_1.GndSurfs(1).ViewFactor);
+    EXPECT_TRUE(GndSurfsProperty_1.IsGroundViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_2.SkyViewFactor);
+    EXPECT_TRUE(SrdSurfsProperty_2.IsSkyViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.0, GndSurfsProperty_2.GndSurfs(1).ViewFactor);
+    EXPECT_FALSE(GndSurfsProperty_2.IsGroundViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty_3.SkyViewFactor);
+    EXPECT_FALSE(SrdSurfsProperty_3.IsSkyViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.0, GndSurfsProperty_3.GndSurfs(1).ViewFactor);
+    EXPECT_FALSE(GndSurfsProperty_3.IsGroundViewFactorSet);
+    // check exterior surfaces default view factors
+    EXPECT_DOUBLE_EQ(0.5, Surface_1.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_1.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_2.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_2.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_3.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_3.ViewFactorGroundIR);
+
+    // reset sky and ground view factors
+    InitSurfacePropertyViewFactors(*state);
+    // test blank view factor fields flags reset to true
+    EXPECT_TRUE(GndSurfsProperty_2.IsGroundViewFactorSet);
+    EXPECT_TRUE(SrdSurfsProperty_3.IsSkyViewFactorSet);
+    EXPECT_TRUE(GndSurfsProperty_3.IsGroundViewFactorSet);
+
+    // test surface property sky and ground view factors reset
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_1.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty_1.GndSurfs(1).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_2.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.2, GndSurfsProperty_2.GndSurfs(1).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_3.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.3, GndSurfsProperty_3.GndSurfs(1).ViewFactor);
+    // test exterior surfaces sky and ground view factors reset
+    EXPECT_DOUBLE_EQ(0.3, Surface_1.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.1, Surface_1.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.2, Surface_2.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.2, Surface_2.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.3, Surface_3.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.3, Surface_3.ViewFactorGroundIR);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR)
+{
+
+    std::string const idf_objects = delimited_string({
+        "  Building,",
+        "    House with Local Air Nodes,  !- Name",
+        "    0,                       !- North Axis {deg}",
+        "    Suburbs,                 !- Terrain",
+        "    0.001,                   !- Loads Convergence Tolerance Value",
+        "    0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",
+        "    FullInteriorAndExterior, !- Solar Distribution",
+        "    25,                      !- Maximum Number of Warmup Days",
+        "    6;                       !- Minimum Number of Warmup Days",
+
+        "  Timestep,6;",
+
+        "  SurfaceConvectionAlgorithm:Inside,TARP;",
+
+        "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "  RunPeriod,",
+        "    WinterDay,               !- Name",
+        "    1,                       !- Begin Month",
+        "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    1,                       !- End Month",
+        "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+
+        "  RunPeriod,",
+        "    SummerDay,               !- Name",
+        "    7,                       !- Begin Month",
+        "    7,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    7,                       !- End Month",
+        "    7,                       !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    No;                      !- Use Weather File Snow Indicators",
+
+        "  Site:Location,",
+        "    CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "    41.78,                   !- Latitude {deg}",
+        "    -87.75,                  !- Longitude {deg}",
+        "    -6.00,                   !- Time Zone {hr}",
+        "    190.00;                  !- Elevation {m}",
+
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    4.9,                     !- Wind Speed {m/s}",
+        "    270,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    0.0;                     !- Sky Clearness",
+
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    31.5,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    5.3,                     !- Wind Speed {m/s}",
+        "    230,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.0;                     !- Sky Clearness",
+
+        "  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
+
+        "  Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    CB11,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2032000,               !- Thickness {m}",
+        "    1.048000,                !- Conductivity {W/m-K}",
+        "    1105.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    GP01,                    !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    1.2700000E-02,           !- Thickness {m}",
+        "    0.1600000,               !- Conductivity {W/m-K}",
+        "    801.0000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    IN02,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    9.0099998E-02,           !- Thickness {m}",
+        "    4.3000001E-02,           !- Conductivity {W/m-K}",
+        "    10.00000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    IN05,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.2458000,               !- Thickness {m}",
+        "    4.3000001E-02,           !- Conductivity {W/m-K}",
+        "    10.00000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    PW03,                    !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    1.2700000E-02,           !- Thickness {m}",
+        "    0.1150000,               !- Conductivity {W/m-K}",
+        "    545.0000,                !- Density {kg/m3}",
+        "    1213.000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7800000,               !- Solar Absorptance",
+        "    0.7800000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    CC03,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.1016000,               !- Thickness {m}",
+        "    1.310000,                !- Conductivity {W/m-K}",
+        "    2243.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    HF-A3,                   !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.5000000E-03,           !- Thickness {m}",
+        "    44.96960,                !- Conductivity {W/m-K}",
+        "    7689.000,                !- Density {kg/m3}",
+        "    418.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
+
+        "  Material:NoMass,",
+        "    AR02,                    !- Name",
+        "    VeryRough,               !- Roughness",
+        "    7.8000002E-02,           !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7000000,               !- Solar Absorptance",
+        "    0.7000000;               !- Visible Absorptance",
+
+        "  Material:NoMass,",
+        "    CP02,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.2170000,               !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Construction,",
+        "    EXTWALL:LIVING,          !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    GP01;                    !- Layer 3",
+
+        "  Construction,",
+        "    FLOOR:LIVING,            !- Name",
+        "    CC03,                    !- Outside Layer",
+        "    CP02;                    !- Layer 2",
+
+        "  Construction,",
+        "    ROOF,                    !- Name",
+        "    AR02,                    !- Outside Layer",
+        "    PW03;                    !- Layer 2",
+
+        "  Zone,",
+        "    LIVING ZONE,             !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World;                   !- Coordinate System",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:North,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    1,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:East,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    1,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    1,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:South,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:West,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Floor,            !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    FLOOR:LIVING,            !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Living:Floor,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Ceiling,          !- Name",
+        "    ROOF,                    !- Surface Type",
+        "    ROOF,                    !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,1,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,0,1,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:Living:North,          !- Name",
+        "    Living:North,                 !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:Living:North,        !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:Living:North;        !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:Living:East,           !- Name",
+        "    Living:East,                  !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:Living:East,         !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:Living:East;         !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:Living:South,          !- Name",
+        "    Living:South,                 !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:Living:South,        !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:Living:South;        !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:Living:North,        !- Name",
+        "    0.3,                          !- Sky View Factor",
+        "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+        "    ,                             !- Ground View Factor",
+        "    ,                             !- Ground Temperature Schedule Name",
+        "    SurroundingSurface1,          !- Surrounding Surface 1 Name",
+        "    0.2,                          !- Surrounding Surface 1 View Factor",
+        "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:Living:North,        !-Name",
+        "    GndSurfs GrassArea,           !-Ground Surface 1 Name",
+        "    0.2,                          !-Ground Surface 1 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+        "    ,                             !-Ground Surface 1 Reflectance Schedule Name",
+        "    GndSurfs ParkingArea,         !-Ground Surface 2 Name",
+        "    0.2,                          !-Ground Surface 2 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 2 Temperature Schedule Name",
+        "    ,                             !-Ground Surface 2 Reflectance Schedule Name",
+        "    GndSurfs LakeArea,            !-Ground Surface 3 Name",
+        "    0.1,                          !-Ground Surface 3 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 3 Temperature Schedule Name",
+        "    ;                             !-Ground Surface 3 Reflectance Schedule Name",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:Living:East,         !- Name",
+        "    0.2,                          !- Sky View Factor",
+        "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+        "    ,                             !- Ground View Factor",
+        "    ,                             !- Ground Temperature Schedule Name",
+        "    SurroundingSurface1,          !- Surrounding Surface 1 Name",
+        "    0.3,                          !- Surrounding Surface 1 View Factor",
+        "    Surrounding Temp Sch 1,       !- Surrounding Surface 1 Temperature Schedule Name",
+        "    SurroundingSurface1,          !- Surrounding Surface 2 Name",
+        "    0.3,                          !- Surrounding Surface 2 View Factor",
+        "    Surrounding Temp Sch 1;       !- Surrounding Surface 2 Temperature Schedule Name",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:Living:East,         !-Name",
+        "    GndSurfs EastGrassArea,       !-Ground Surface 1 Name",
+        "    0.2,                          !-Ground Surface 1 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+        "    ;                             !-Ground Surface 1 Reflectance Schedule Name",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:Living:South,        !- Name",
+        "    ,                             !- Sky View Factor",
+        "    ,                             !- Sky Temperature Schedule Name",
+        "    ,                             !- Ground View Factor",
+        "    ,                             !- Ground Temperature Schedule Name",
+        "    SurroundingSurface1,          !- Surrounding Surface 1 Name",
+        "    0.4,                          !- Surrounding Surface 1 View Factor",
+        "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:Living:South,        !-Name",
+        "    GndSurfs SouthGrassArea,      !-Ground Surface 1 Name",
+        "    ,                             !-Ground Surface 1 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+        "    ;                             !-Ground Surface 1 Reflectance Schedule Name",
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;                   !- Name",
+
+        "  Schedule:Compact,",
+        "    Surrounding Temp Sch 1,       !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Sky Temp Sch,                 !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Ground Temp Sch,              !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    ScheduleManager::ProcessScheduleInput(*state);
+
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
+    EXPECT_FALSE(has_err_output(true));
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    std::vector<int> controlledZoneEquipConfigNums;
+    controlledZoneEquipConfigNums.push_back(1);
+    state->dataHeatBal->Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    auto &zoneEquipConfig = state->dataZoneEquip->ZoneEquipConfig(1);
+
+    zoneEquipConfig.ZoneName = "LIVING ZONE";
+    zoneEquipConfig.NumInletNodes = 2;
+    zoneEquipConfig.InletNode.allocate(2);
+    zoneEquipConfig.InletNode(1) = 1;
+    zoneEquipConfig.InletNode(2) = 2;
+    zoneEquipConfig.NumReturnNodes = 1;
+    zoneEquipConfig.ReturnNode.allocate(1);
+    zoneEquipConfig.ReturnNode(1) = 3;
+    zoneEquipConfig.NumExhaustNodes = 1;
+    zoneEquipConfig.ExhaustNode.allocate(1);
+    zoneEquipConfig.ExhaustNode(1) = 4;
+    zoneEquipConfig.FixedReturnFlow.allocate(1);
+
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+
+    state->dataLoopNodes->Node.allocate(4);
+    auto &InletNode1 = state->dataLoopNodes->Node(1);
+    auto &InletNode2 = state->dataLoopNodes->Node(2);
+    auto &ExhaustNode = state->dataLoopNodes->Node(3);
+    auto &ReturnNode = state->dataLoopNodes->Node(4);
+
+    InletNode1.Temp = 20.0;
+    InletNode2.Temp = 20.0;
+    ReturnNode.Temp = 20.0;
+    ExhaustNode.Temp = 20.0;
+    InletNode1.MassFlowRate = 0.1;
+    InletNode2.MassFlowRate = 0.1;
+    ReturnNode.MassFlowRate = 0.1;
+    ExhaustNode.MassFlowRate = 0.1;
+
+    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
+    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
+
+    state->dataSurface->TotSurfaces = 6;
+    // set convective coefficient adjustment ratio to 1.0
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(state->dataSurface->TotSurfaces, 1.0);
+    state->dataMstBal->HConvInFD.allocate(state->dataSurface->TotSurfaces);
+    state->dataMstBal->RhoVaporAirIn.allocate(state->dataSurface->TotSurfaces);
+    state->dataMstBal->HMassConvInFD.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
+
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->KickOffSimulation = true;
+    state->dataGlobal->TimeStepZoneSec = 900;
+
+    AllocateSurfaceHeatBalArrays(*state);
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+    SolarShading::AllocateModuleArrays(*state);
+    SolarShading::DetermineShadowingCombinations(*state);
+
+    state->dataSurface->SurfTAirRef(1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
+
+    // default surface view factors
+    int SurfNum = UtilityRoutines::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
+    auto &Surface_Living_North = state->dataSurface->Surface(SurfNum);
+    SurfNum = UtilityRoutines::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
+    auto &Surface_Living_East = state->dataSurface->Surface(SurfNum);
+    SurfNum = UtilityRoutines::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
+    auto &Surface_Living_South = state->dataSurface->Surface(SurfNum);
+
+    // check exterior default surfaces sky and ground view factors
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_North.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_North.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_East.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_East.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_South.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_South.ViewFactorGroundIR);
+
+    // reset sky and ground view factors
+    InitSurfacePropertyViewFactors(*state);
+    // call to reset surface view factors
+    InitSurfaceHeatBalance(*state);
+    state->dataSurface->SurfAirSkyRadSplit.allocate(6);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 15.0; // Sky temp
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0; // Grd temp
+
+    for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
+        state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = 20; // Surf temp
+        state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22;         // Air temp
+        state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = -6;
+        state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;
+    }
+
+    // test reset of surface view factors are correct
+    EXPECT_DOUBLE_EQ(0.3, Surface_Living_North.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_North.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.2, Surface_Living_East.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.2, Surface_Living_East.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.3, Surface_Living_South.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.3, Surface_Living_South.ViewFactorGroundIR);
+
+    // calculate outside surface heat balance
+    CalcHeatBalanceOutsideSurf(*state);
+
+    // define expected result variables
+    Real64 result_LWRExchangeCoeff_surf1 = 0.0;
+    Real64 result_LWRExchangeCoeff_surf2 = 0.0;
+    Real64 result_LWRExchangeCoeff_surf3 = 0.0;
+    // set exterior surface and ground surface temperatures
+    Real64 surf_TK = 20.0 + DataGlobalConstants::KelvinConv;
+    Real64 grnd_TK = 22.0 + DataGlobalConstants::KelvinConv;
+    // calculate LWR exchange coefficent from exterior surface to ground
+    result_LWRExchangeCoeff_surf1 = DataGlobalConstants::StefanBoltzmann * 0.9 * 0.5 * (pow_4(surf_TK) - pow_4(grnd_TK)) / (surf_TK - grnd_TK);
+    result_LWRExchangeCoeff_surf2 = DataGlobalConstants::StefanBoltzmann * 0.9 * 0.2 * (pow_4(surf_TK) - pow_4(grnd_TK)) / (surf_TK - grnd_TK);
+    result_LWRExchangeCoeff_surf3 = DataGlobalConstants::StefanBoltzmann * 0.9 * 0.3 * (pow_4(surf_TK) - pow_4(grnd_TK)) / (surf_TK - grnd_TK);
+    // test LWR exchange coefficents b/n exterior wall and ground surfaces
+    EXPECT_DOUBLE_EQ(result_LWRExchangeCoeff_surf1, state->dataHeatBalSurf->SurfHGrdExt(1));
+    EXPECT_DOUBLE_EQ(result_LWRExchangeCoeff_surf2, state->dataHeatBalSurf->SurfHGrdExt(2));
+    EXPECT_DOUBLE_EQ(result_LWRExchangeCoeff_surf3, state->dataHeatBalSurf->SurfHGrdExt(3));
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
+{
+    bool ErrorsFound(false);
+    std::string const idf_objects =
+        delimited_string({"  Material,",
+                          "    Concrete Block,               !- Name",
+                          "    MediumRough,                  !- Roughness",
+                          "    0.1014984,                    !- Thickness {m}",
+                          "    0.3805070,                    !- Conductivity {W/m-K}",
+                          "    608.7016,                     !- Density {kg/m3}",
+                          "    836.8000;                     !- Specific Heat {J/kg-K}",
+
+                          "  Construction,",
+                          "    WallConstruction,             !- Name",
+                          "    Concrete Block;               !- Outside Layer",
+
+                          "  WindowMaterial:SimpleGlazingSystem,",
+                          "    WindowMaterial,               !- Name",
+                          "    5.778,                        !- U-Factor {W/m2-K}",
+                          "    0.819,                        !- Solar Heat Gain Coefficient",
+                          "    0.881;                        !- Visible Transmittance",
+
+                          "  Construction,",
+                          "    WindowConstruction,           !- Name",
+                          "    WindowMaterial;               !- Outside Layer",
+
+                          "  WindowProperty:FrameAndDivider,",
+                          "    WindowFrame,                  !- Name",
+                          "    0.05,                         !- Frame Width {m}",
+                          "    0.00,                         !- Frame Outside Projection {m}",
+                          "    0.00,                         !- Frame Inside Projection {m}",
+                          "    5.0,                          !- Frame Conductance {W/m2-K}",
+                          "    1.2,                          !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance",
+                          "    0.8,                          !- Frame Solar Absorptance",
+                          "    0.8,                          !- Frame Visible Absorptance",
+                          "    0.9,                          !- Frame Thermal Hemispherical Emissivity",
+                          "    DividedLite,                  !- Divider Type",
+                          "    0.02,                         !- Divider Width {m}",
+                          "    2,                            !- Number of Horizontal Dividers",
+                          "    2,                            !- Number of Vertical Dividers",
+                          "    0.00,                         !- Divider Outside Projection {m}",
+                          "    0.00,                         !- Divider Inside Projection {m}",
+                          "    5.0,                          !- Divider Conductance {W/m2-K}",
+                          "    1.2,                          !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance",
+                          "    0.8,                          !- Divider Solar Absorptance",
+                          "    0.8,                          !- Divider Visible Absorptance",
+                          "    0.9;                          !- Divider Thermal Hemispherical Emissivity",
+
+                          "  FenestrationSurface:Detailed,",
+                          "    FenestrationSurface,          !- Name",
+                          "    Window,                       !- Surface Type",
+                          "    WindowConstruction,           !- Construction Name",
+                          "    Wall,                         !- Building Surface Name",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    0.5000000,                    !- View Factor to Ground",
+                          "    WindowFrame,                  !- Frame and Divider Name",
+                          "    1.0,                          !- Multiplier",
+                          "    4,                            !- Number of Vertices",
+                          "    0.200000,0.0,9.900000,        !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.200000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 2 {m}",
+                          "    9.900000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 3 {m}",
+                          "    9.900000,0.0,9.900000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  SurfaceProperty:LocalEnvironment,",
+                          "    LocEnv:FenestrationSurface,   !- Name",
+                          "    FenestrationSurface,          !- Exterior Surface Name",
+                          "    ,                             !- External Shading Fraction Schedule Name",
+                          "    SrdSurfs:FenesSurface,        !- Surrounding Surfaces Object Name",
+                          "    ,                             !- Outdoor Air Node Name",
+                          "    GndSurfs:FenesSurface;        !- Ground Surfaces Object Name",
+
+                          "  SurfaceProperty:SurroundingSurfaces,",
+                          "    SrdSurfs:FenesSurface,        !- Name",
+                          "    0.5,                          !- Sky View Factor",
+                          "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+                          "    ,                             !- Ground View Factor",
+                          "    ,                             !- Ground Temperature Schedule Name",
+                          "    SrdSurfs:Surface 1,           !- Surrounding Surface 1 Name",
+                          "    0.1,                          !- Surrounding Surface 1 View Factor",
+                          "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
+
+                          "  SurfaceProperty:GroundSurfaces,",
+                          "    GndSurfs:FenesSurface,        !-Name",
+                          "    GndSurfs GrassArea,           !-Ground Surface 1 Name",
+                          "    0.2,                          !-Ground Surface 1 View Factor",
+                          "    GrassArea Ground Temp Sch,    !-Ground Surface 1 Temperature Schedule Name",
+                          "    ,                             !-Ground Surface 1 Reflectance Schedule Name",
+                          "    GndSurfs ParkingArea,         !-Ground Surface 2 Name",
+                          "    0.1,                          !-Ground Surface 2 View Factor",
+                          "    ParkingArea Ground Temp Sch,  !-Ground Surface 2 Temperature Schedule Name",
+                          "    ,                             !-Ground Surface 2 Reflectance Schedule Name",
+                          "    GndSurfs LakeArea,            !-Ground Surface 3 Name",
+                          "    0.1,                          !-Ground Surface 3 View Factor",
+                          "    LakeArea Ground Temp Sch,     !-Ground Surface 3 Temperature Schedule Name",
+                          "    ;                             !-Ground Surface 3 Reflectance Schedule Name",
+
+                          "  Schedule:Compact,",
+                          "    Surrounding Temp Sch 1,       !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 26.0;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    GrassArea Ground Temp Sch,    !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 25.0;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    ParkingArea Ground Temp Sch,  !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 28.0;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    LakeArea Ground Temp Sch,     !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 22.0;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    Sky Temp Sch,                 !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 20.0;           !- Field 3",
+
+                          "  ScheduleTypeLimits,",
+                          "    Temperature,             !- Name",
+                          "    -60,                     !- Lower Limit Value",
+                          "    200,                     !- Upper Limit Value",
+                          "    CONTINUOUS,              !- Numeric Type",
+                          "    Temperature;             !- Unit Type",
+
+                          "  BuildingSurface:Detailed,",
+                          "    Wall,                         !- Name",
+                          "    Wall,                         !- Surface Type",
+                          "    WallConstruction,             !- Construction Name",
+                          "    Zone,                         !- Zone Name",
+                          "    ,                             !- Space Name",
+                          "    Outdoors,                     !- Outside Boundary Condition",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    SunExposed,                   !- Sun Exposure",
+                          "    WindExposed,                  !- Wind Exposure",
+                          "    0.5000000,                    !- View Factor to Ground",
+                          "    4,                            !- Number of Vertices",
+                          "    0.0,0.000000,10.00000,        !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.0,0.000000,0.0,             !- X,Y,Z ==> Vertex 2 {m}",
+                          "    10.00000,0.0,0.0,             !- X,Y,Z ==> Vertex 3 {m}",
+                          "    10.00000,0.0,10.00000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  BuildingSurface:Detailed,"
+                          "    Floor,                        !- Name",
+                          "    Floor,                        !- Surface Type",
+                          "    WallConstruction,             !- Construction Name",
+                          "    Zone,                         !- Zone Name",
+                          "    ,                             !- Space Name",
+                          "    Outdoors,                     !- Outside Boundary Condition",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    NoSun,                        !- Sun Exposure",
+                          "    NoWind,                       !- Wind Exposure",
+                          "    1.0,                          !- View Factor to Ground",
+                          "    4,                            !- Number of Vertices",
+                          "    0.000000,0.000000,0,          !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.000000,10.000000,0,         !- X,Y,Z ==> Vertex 2 {m}",
+                          "    10.00000,10.000000,0,         !- X,Y,Z ==> Vertex 3 {m}",
+                          "    10.00000,0.000000,0;          !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  Zone,"
+                          "    Zone,                         !- Name",
+                          "    0,                            !- Direction of Relative North {deg}",
+                          "    6.000000,                     !- X Origin {m}",
+                          "    6.000000,                     !- Y Origin {m}",
+                          "    0,                            !- Z Origin {m}",
+                          "    1,                            !- Type",
+                          "    1,                            !- Multiplier",
+                          "    autocalculate,                !- Ceiling Height {m}",
+                          "    autocalculate;                !- Volume {m3}"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set global and environmental variables
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->HourOfDay = 15;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->OutBaroPress = 100000;
+
+    // update schedule values
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
+
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+    // test surface property object inputs
+    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
+    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
+    // set local derived data vars
+    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+    // check sky view factors
+    EXPECT_DOUBLE_EQ(0.5, SrdSurfsProperty.SkyViewFactor);
+    // check surrounding surfaces view factors
+    EXPECT_DOUBLE_EQ(0.1, SrdSurfsProperty.SurroundingSurfs(1).ViewFactor);
+    // check ground surfaces view factors
+    EXPECT_EQ("GNDSURFS GRASSAREA", GndSurfsProperty.GndSurfs(1).Name);
+    EXPECT_DOUBLE_EQ(0.2, GndSurfsProperty.GndSurfs(1).ViewFactor);
+    EXPECT_EQ("GNDSURFS PARKINGAREA", GndSurfsProperty.GndSurfs(2).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(2).ViewFactor);
+    EXPECT_EQ("GNDSURFS LAKEAREA", GndSurfsProperty.GndSurfs(3).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(3).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.4, GndSurfsProperty.SurfsViewFactorSum);
+
+    ScheduleManager::UpdateScheduleValues(*state);
+
+    // check ground temperature values
+    Real64 const Tgndsurf_grass = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(1).TempSchPtr);
+    Real64 const Tgndsurf_parking = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(2).TempSchPtr);
+    Real64 const Tgndsurf_lake = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(3).TempSchPtr);
+    EXPECT_DOUBLE_EQ(25.0, Tgndsurf_grass);
+    EXPECT_DOUBLE_EQ(28.0, Tgndsurf_parking);
+    EXPECT_DOUBLE_EQ(22.0, Tgndsurf_lake);
+
+    // test 1: surface viewing grass, parking and lake areas
+    // calculate ground surfaces average temperature
+    GetGroundSurfacesTemperatureAverage(*state);
+    Real64 dTK = DataGlobalConstants::KelvinConv;
+    Real64 results_gndSurfsAvgTemp = 0.0;
+    results_gndSurfsAvgTemp = root_4((0.2 * pow_4(25.0 + dTK) + 0.1 * pow_4(28.0 + dTK) + 0.1 * pow_4(22.0 + dTK)) / (0.2 + 0.1 + 0.1)) - dTK;
+    // check ground surfaces average temperature
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgTemp, GndSurfsProperty.SurfsTempAvg);
+
+    // test 2: surface viewing grass area only
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.4;
+    GndSurfsProperty.GndSurfs(2).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(3).ViewFactor = 0.0;
+    // calculate ground surfaces average temperature
+    GetGroundSurfacesTemperatureAverage(*state);
+    results_gndSurfsAvgTemp = 25.0;
+    // check grass area ground surface temperature
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgTemp, GndSurfsProperty.SurfsTempAvg);
+
+    // test 3: surface viewing parking area only
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(2).ViewFactor = 0.4;
+    GndSurfsProperty.GndSurfs(3).ViewFactor = 0.0;
+    // calculate ground surfaces average temperature
+    GetGroundSurfacesTemperatureAverage(*state);
+    results_gndSurfsAvgTemp = 28.0;
+    // check parking area ground surface temperature
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgTemp, GndSurfsProperty.SurfsTempAvg);
+
+    // test 4: surface viewing lake area only
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(2).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(3).ViewFactor = 0.4;
+    // calculate ground surfaces average temperature
+    GetGroundSurfacesTemperatureAverage(*state);
+    results_gndSurfsAvgTemp = 22.0;
+    // check lake area ground surface temperature
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgTemp, GndSurfsProperty.SurfsTempAvg);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageRefl)
+{
+    bool ErrorsFound(false);
+    std::string const idf_objects =
+        delimited_string({"  Material,",
+                          "    Concrete Block,               !- Name",
+                          "    MediumRough,                  !- Roughness",
+                          "    0.1014984,                    !- Thickness {m}",
+                          "    0.3805070,                    !- Conductivity {W/m-K}",
+                          "    608.7016,                     !- Density {kg/m3}",
+                          "    836.8000;                     !- Specific Heat {J/kg-K}",
+
+                          "  Construction,",
+                          "    WallConstruction,             !- Name",
+                          "    Concrete Block;               !- Outside Layer",
+
+                          "  WindowMaterial:SimpleGlazingSystem,",
+                          "    WindowMaterial,               !- Name",
+                          "    5.778,                        !- U-Factor {W/m2-K}",
+                          "    0.819,                        !- Solar Heat Gain Coefficient",
+                          "    0.881;                        !- Visible Transmittance",
+
+                          "  Construction,",
+                          "    WindowConstruction,           !- Name",
+                          "    WindowMaterial;               !- Outside Layer",
+
+                          "  WindowProperty:FrameAndDivider,",
+                          "    WindowFrame,                  !- Name",
+                          "    0.05,                         !- Frame Width {m}",
+                          "    0.00,                         !- Frame Outside Projection {m}",
+                          "    0.00,                         !- Frame Inside Projection {m}",
+                          "    5.0,                          !- Frame Conductance {W/m2-K}",
+                          "    1.2,                          !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance",
+                          "    0.8,                          !- Frame Solar Absorptance",
+                          "    0.8,                          !- Frame Visible Absorptance",
+                          "    0.9,                          !- Frame Thermal Hemispherical Emissivity",
+                          "    DividedLite,                  !- Divider Type",
+                          "    0.02,                         !- Divider Width {m}",
+                          "    2,                            !- Number of Horizontal Dividers",
+                          "    2,                            !- Number of Vertical Dividers",
+                          "    0.00,                         !- Divider Outside Projection {m}",
+                          "    0.00,                         !- Divider Inside Projection {m}",
+                          "    5.0,                          !- Divider Conductance {W/m2-K}",
+                          "    1.2,                          !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance",
+                          "    0.8,                          !- Divider Solar Absorptance",
+                          "    0.8,                          !- Divider Visible Absorptance",
+                          "    0.9;                          !- Divider Thermal Hemispherical Emissivity",
+
+                          "  FenestrationSurface:Detailed,",
+                          "    FenestrationSurface,          !- Name",
+                          "    Window,                       !- Surface Type",
+                          "    WindowConstruction,           !- Construction Name",
+                          "    Wall,                         !- Building Surface Name",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    0.5000000,                    !- View Factor to Ground",
+                          "    WindowFrame,                  !- Frame and Divider Name",
+                          "    1.0,                          !- Multiplier",
+                          "    4,                            !- Number of Vertices",
+                          "    0.200000,0.0,9.900000,        !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.200000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 2 {m}",
+                          "    9.900000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 3 {m}",
+                          "    9.900000,0.0,9.900000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  SurfaceProperty:LocalEnvironment,",
+                          "    LocEnv:FenestrationSurface,   !- Name",
+                          "    FenestrationSurface,          !- Exterior Surface Name",
+                          "    ,                             !- External Shading Fraction Schedule Name",
+                          "    SrdSurfs:FenesSurface,        !- Surrounding Surfaces Object Name",
+                          "    ,                             !- Outdoor Air Node Name",
+                          "    GndSurfs:FenesSurface;        !- Ground Surfaces Object Name",
+
+                          "  SurfaceProperty:SurroundingSurfaces,",
+                          "    SrdSurfs:FenesSurface,        !- Name",
+                          "    0.5,                          !- Sky View Factor",
+                          "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+                          "    ,                             !- Ground View Factor",
+                          "    ,                             !- Ground Temperature Schedule Name",
+                          "    SrdSurfs:Surface 1,           !- Surrounding Surface 1 Name",
+                          "    0.1,                          !- Surrounding Surface 1 View Factor",
+                          "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
+
+                          "  SurfaceProperty:GroundSurfaces,",
+                          "    GndSurfs:FenesSurface,        !-Name",
+                          "    GndSurfs GrassArea,           !-Ground Surface 1 Name",
+                          "    0.2,                          !-Ground Surface 1 View Factor",
+                          "    GrassArea Ground Temp Sch,    !-Ground Surface 1 Temperature Schedule Name",
+                          "    GrassArea Ground Refl Sch,    !-Ground Surface 1 Reflectance Schedule Name",
+                          "    GndSurfs ParkingArea,         !-Ground Surface 2 Name",
+                          "    0.1,                          !-Ground Surface 2 View Factor",
+                          "    ParkingArea Ground Temp Sch,  !-Ground Surface 2 Temperature Schedule Name",
+                          "    ParkingArea Ground Refl Sch,  !-Ground Surface 2 Reflectance Schedule Name",
+                          "    GndSurfs LakeArea,            !-Ground Surface 3 Name",
+                          "    0.1,                          !-Ground Surface 3 View Factor",
+                          "    LakeArea Ground Temp Sch,     !-Ground Surface 3 Temperature Schedule Name",
+                          "    LakeArea Ground Refl Sch;     !-Ground Surface 3 Reflectance Schedule Name",
+
+                          "  Schedule:Compact,",
+                          "    Surrounding Temp Sch 1,       !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 26.0;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    GrassArea Ground Temp Sch,    !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 25.0;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    ParkingArea Ground Temp Sch,  !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 28.0;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    LakeArea Ground Temp Sch,     !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 22.0;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    Sky Temp Sch,                 !- Name",
+                          "    Temperature,                  !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 20.0;           !- Field 3",
+
+                          "  ScheduleTypeLimits,",
+                          "    Temperature,                  !- Name",
+                          "    -60,                          !- Lower Limit Value",
+                          "    200,                          !- Upper Limit Value",
+                          "    CONTINUOUS,                   !- Numeric Type",
+                          "    Temperature;                  !- Unit Type",
+
+                          "  Schedule:Compact,",
+                          "    GrassArea Ground Refl Sch,    !- Name",
+                          "    Fraction,                     !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 0.25;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    ParkingArea Ground Refl Sch,  !- Name",
+                          "    Fraction,                     !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 0.50;           !- Field 3",
+
+                          "  Schedule:Compact,",
+                          "    LakeArea Ground Refl Sch,     !- Name",
+                          "    Fraction,                     !- Schedule Type Limits Name",
+                          "    Through: 12/31,               !- Field 1",
+                          "    For: AllDays,                 !- Field 2",
+                          "    Until: 24:00, 0.10;           !- Field 3",
+
+                          "  ScheduleTypeLimits,",
+                          "    Fraction,                     !- Name",
+                          "    0,                            !- Lower Limit Value",
+                          "    1,                            !- Upper Limit Value",
+                          "    CONTINUOUS;                   !- Numeric Type",
+
+                          "  BuildingSurface:Detailed,",
+                          "    Wall,                         !- Name",
+                          "    Wall,                         !- Surface Type",
+                          "    WallConstruction,             !- Construction Name",
+                          "    Zone,                         !- Zone Name",
+                          "    ,                             !- Space Name",
+                          "    Outdoors,                     !- Outside Boundary Condition",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    SunExposed,                   !- Sun Exposure",
+                          "    WindExposed,                  !- Wind Exposure",
+                          "    0.5000000,                    !- View Factor to Ground",
+                          "    4,                            !- Number of Vertices",
+                          "    0.0,0.000000,10.00000,        !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.0,0.000000,0.0,             !- X,Y,Z ==> Vertex 2 {m}",
+                          "    10.00000,0.0,0.0,             !- X,Y,Z ==> Vertex 3 {m}",
+                          "    10.00000,0.0,10.00000;        !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  BuildingSurface:Detailed,"
+                          "    Floor,                        !- Name",
+                          "    Floor,                        !- Surface Type",
+                          "    WallConstruction,             !- Construction Name",
+                          "    Zone,                         !- Zone Name",
+                          "    ,                             !- Space Name",
+                          "    Outdoors,                     !- Outside Boundary Condition",
+                          "    ,                             !- Outside Boundary Condition Object",
+                          "    NoSun,                        !- Sun Exposure",
+                          "    NoWind,                       !- Wind Exposure",
+                          "    1.0,                          !- View Factor to Ground",
+                          "    4,                            !- Number of Vertices",
+                          "    0.000000,0.000000,0,          !- X,Y,Z ==> Vertex 1 {m}",
+                          "    0.000000,10.000000,0,         !- X,Y,Z ==> Vertex 2 {m}",
+                          "    10.00000,10.000000,0,         !- X,Y,Z ==> Vertex 3 {m}",
+                          "    10.00000,0.000000,0;          !- X,Y,Z ==> Vertex 4 {m}",
+
+                          "  Zone,"
+                          "    Zone,                         !- Name",
+                          "    0,                            !- Direction of Relative North {deg}",
+                          "    6.000000,                     !- X Origin {m}",
+                          "    6.000000,                     !- Y Origin {m}",
+                          "    0,                            !- Z Origin {m}",
+                          "    1,                            !- Type",
+                          "    1,                            !- Multiplier",
+                          "    autocalculate,                !- Ceiling Height {m}",
+                          "    autocalculate;                !- Volume {m3}"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set global and environmental variables
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->HourOfDay = 15;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->OutBaroPress = 100000;
+
+    // update schedule values
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
+
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+    // test surface property object inputs
+    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
+    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
+    // set local derived data vars
+    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+    // check sky view factors
+    EXPECT_DOUBLE_EQ(0.5, SrdSurfsProperty.SkyViewFactor);
+    // check surrounding surfaces view factors
+    EXPECT_DOUBLE_EQ(0.1, SrdSurfsProperty.SurroundingSurfs(1).ViewFactor);
+    // check ground surfaces view factors
+    EXPECT_EQ("GNDSURFS GRASSAREA", GndSurfsProperty.GndSurfs(1).Name);
+    EXPECT_DOUBLE_EQ(0.2, GndSurfsProperty.GndSurfs(1).ViewFactor);
+    EXPECT_EQ("GNDSURFS PARKINGAREA", GndSurfsProperty.GndSurfs(2).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(2).ViewFactor);
+    EXPECT_EQ("GNDSURFS LAKEAREA", GndSurfsProperty.GndSurfs(3).Name);
+    EXPECT_DOUBLE_EQ(0.1, GndSurfsProperty.GndSurfs(3).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.4, GndSurfsProperty.SurfsViewFactorSum);
+
+    ScheduleManager::UpdateScheduleValues(*state);
+
+    // check ground temperature values
+    Real64 const Rgndsurf_grass = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(1).ReflSchPtr);
+    Real64 const Rgndsurf_parking = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(2).ReflSchPtr);
+    Real64 const Rgndsurf_lake = ScheduleManager::GetCurrentScheduleValue(*state, GndSurfsProperty.GndSurfs(3).ReflSchPtr);
+    EXPECT_DOUBLE_EQ(0.25, Rgndsurf_grass);
+    EXPECT_DOUBLE_EQ(0.5, Rgndsurf_parking);
+    EXPECT_DOUBLE_EQ(0.1, Rgndsurf_lake);
+
+    // test 1: surface viewing grass, parking and lake areas
+    // calculate ground surfaces average reflectance
+    GetGroundSurfacesReflectanceAverage(*state);
+    Real64 results_gndSurfsAvgRefl = 0.0;
+    results_gndSurfsAvgRefl = (0.2 * Rgndsurf_grass + 0.1 * Rgndsurf_parking + 0.1 * Rgndsurf_lake) / (0.2 + 0.1 + 0.1);
+    // check ground surfaces average reflectance
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgRefl, GndSurfsProperty.SurfsReflAvg);
+
+    // test 2: surface viewing grass area only
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.4;
+    GndSurfsProperty.GndSurfs(2).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(3).ViewFactor = 0.0;
+    // calculate ground surfaces average reflectance
+    GetGroundSurfacesReflectanceAverage(*state);
+    results_gndSurfsAvgRefl = 0.25;
+    // check grass area ground surface reflectance
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgRefl, GndSurfsProperty.SurfsReflAvg);
+
+    // test 3: surface viewing parking area only
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(2).ViewFactor = 0.4;
+    GndSurfsProperty.GndSurfs(3).ViewFactor = 0.0;
+    // calculate ground surfaces average reflectance
+    GetGroundSurfacesReflectanceAverage(*state);
+    results_gndSurfsAvgRefl = 0.50;
+    // check parking area ground surface reflectance
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgRefl, GndSurfsProperty.SurfsReflAvg);
+
+    // test 4: surface viewing lake area only
+    GndSurfsProperty.GndSurfs(1).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(2).ViewFactor = 0.0;
+    GndSurfsProperty.GndSurfs(3).ViewFactor = 0.4;
+    // calculate ground surfaces average reflectance
+    GetGroundSurfacesReflectanceAverage(*state);
+    results_gndSurfsAvgRefl = 0.10;
+    // check lake area ground surface reflectance
+    EXPECT_DOUBLE_EQ(results_gndSurfsAvgRefl, GndSurfsProperty.SurfsReflAvg);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsReset)
+{
+
+    std::string const idf_objects = delimited_string({
+        "  Building,",
+        "    House with Local Air Nodes,  !- Name",
+        "    0,                       !- North Axis {deg}",
+        "    Suburbs,                 !- Terrain",
+        "    0.001,                   !- Loads Convergence Tolerance Value",
+        "    0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}",
+        "    FullInteriorAndExterior, !- Solar Distribution",
+        "    25,                      !- Maximum Number of Warmup Days",
+        "    6;                       !- Minimum Number of Warmup Days",
+
+        "  Timestep,6;",
+
+        "  SurfaceConvectionAlgorithm:Inside,TARP;",
+
+        "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "  RunPeriod,",
+        "    WinterDay,               !- Name",
+        "    1,                       !- Begin Month",
+        "    14,                      !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    1,                       !- End Month",
+        "    14,                      !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    Yes,                     !- Use Weather File Holidays and Special Days",
+        "    Yes,                     !- Use Weather File Daylight Saving Period",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    Yes;                     !- Use Weather File Snow Indicators",
+
+        "  RunPeriod,",
+        "    SummerDay,               !- Name",
+        "    7,                       !- Begin Month",
+        "    7,                       !- Begin Day of Month",
+        "    ,                        !- Begin Year",
+        "    7,                       !- End Month",
+        "    7,                       !- End Day of Month",
+        "    ,                        !- End Year",
+        "    Tuesday,                 !- Day of Week for Start Day",
+        "    No,                      !- Apply Weekend Holiday Rule",
+        "    Yes,                     !- Use Weather File Rain Indicators",
+        "    No;                      !- Use Weather File Snow Indicators",
+
+        "  Site:Location,",
+        "    CHICAGO_IL_USA TMY2-94846,  !- Name",
+        "    41.78,                   !- Latitude {deg}",
+        "    -87.75,                  !- Longitude {deg}",
+        "    -6.00,                   !- Time Zone {hr}",
+        "    190.00;                  !- Elevation {m}",
+
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    4.9,                     !- Wind Speed {m/s}",
+        "    270,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    0.0;                     !- Sky Clearness",
+
+        "  SizingPeriod:DesignDay,",
+        "    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    31.5,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    99063.,                  !- Barometric Pressure {Pa}",
+        "    5.3,                     !- Wind Speed {m/s}",
+        "    230,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.0;                     !- Sky Clearness",
+
+        "  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
+
+        "  Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    CB11,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2032000,               !- Thickness {m}",
+        "    1.048000,                !- Conductivity {W/m-K}",
+        "    1105.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    GP01,                    !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    1.2700000E-02,           !- Thickness {m}",
+        "    0.1600000,               !- Conductivity {W/m-K}",
+        "    801.0000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    IN02,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    9.0099998E-02,           !- Thickness {m}",
+        "    4.3000001E-02,           !- Conductivity {W/m-K}",
+        "    10.00000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    IN05,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.2458000,               !- Thickness {m}",
+        "    4.3000001E-02,           !- Conductivity {W/m-K}",
+        "    10.00000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    PW03,                    !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    1.2700000E-02,           !- Thickness {m}",
+        "    0.1150000,               !- Conductivity {W/m-K}",
+        "    545.0000,                !- Density {kg/m3}",
+        "    1213.000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7800000,               !- Solar Absorptance",
+        "    0.7800000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    CC03,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.1016000,               !- Thickness {m}",
+        "    1.310000,                !- Conductivity {W/m-K}",
+        "    2243.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    HF-A3,                   !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.5000000E-03,           !- Thickness {m}",
+        "    44.96960,                !- Conductivity {W/m-K}",
+        "    7689.000,                !- Density {kg/m3}",
+        "    418.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
+
+        "  Material:NoMass,",
+        "    AR02,                    !- Name",
+        "    VeryRough,               !- Roughness",
+        "    7.8000002E-02,           !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7000000,               !- Solar Absorptance",
+        "    0.7000000;               !- Visible Absorptance",
+
+        "  Material:NoMass,",
+        "    CP02,                    !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.2170000,               !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Construction,",
+        "    EXTWALL:LIVING,          !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    GP01;                    !- Layer 3",
+
+        "  Construction,",
+        "    FLOOR:LIVING,            !- Name",
+        "    CC03,                    !- Outside Layer",
+        "    CP02;                    !- Layer 2",
+
+        "  Construction,",
+        "    ROOF,                    !- Name",
+        "    AR02,                    !- Outside Layer",
+        "    PW03;                    !- Layer 2",
+
+        "  Zone,",
+        "    LIVING ZONE,             !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World;                   !- Coordinate System",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:North,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    1,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:East,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    1,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    1,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:South,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:West,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL:LIVING,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Floor,            !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    FLOOR:LIVING,            !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Living:Floor,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,1,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,1,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Ceiling,          !- Name",
+        "    ROOF,                    !- Surface Type",
+        "    ROOF,                    !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,1,1,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,1,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    1,0,1,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    1,1,1;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:Living:North,          !- Name",
+        "    Living:North,                 !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:Living:North,        !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:Living:North;        !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:Living:East,           !- Name",
+        "    Living:East,                  !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:Living:East,         !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:Living:East;         !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:LocalEnvironment,",
+        "    LocEnv:Living:South,          !- Name",
+        "    Living:South,                 !- Exterior Surface Name",
+        "    ,                             !- External Shading Fraction Schedule Name",
+        "    SrdSurfs:Living:South,        !- Surrounding Surfaces Object Name",
+        "    ,                             !- Outdoor Air Node Name",
+        "    GndSurfs:Living:South;        !- Ground Surfaces Object Name",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:Living:North,        !- Name",
+        "    ,                             !- Sky View Factor",
+        "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+        "    ,                             !- Ground View Factor",
+        "    ,                             !- Ground Temperature Schedule Name",
+        "    SurroundingSurface1,          !- Surrounding Surface 1 Name",
+        "    0.2,                          !- Surrounding Surface 1 View Factor",
+        "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:Living:North,        !-Name",
+        "    GndSurfs NorthGrassArea,      !-Ground Surface 1 Name",
+        "    0.5,                          !-Ground Surface 1 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+        "    ;                             !-Ground Surface 1 Reflectance Schedule Name",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:Living:East,         !- Name",
+        "    0.2,                          !- Sky View Factor",
+        "    Sky Temp Sch,                 !- Sky Temperature Schedule Name",
+        "    ,                             !- Ground View Factor",
+        "    ,                             !- Ground Temperature Schedule Name",
+        "    SurroundingSurface1,          !- Surrounding Surface 1 Name",
+        "    0.3,                          !- Surrounding Surface 1 View Factor",
+        "    Surrounding Temp Sch 1,       !- Surrounding Surface 1 Temperature Schedule Name",
+        "    SurroundingSurface1,          !- Surrounding Surface 2 Name",
+        "    0.3,                          !- Surrounding Surface 2 View Factor",
+        "    Surrounding Temp Sch 1;       !- Surrounding Surface 2 Temperature Schedule Name",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:Living:East,         !-Name",
+        "    GndSurfs EastGrassArea,       !-Ground Surface 1 Name",
+        "    ,                             !-Ground Surface 1 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+        "    ;                             !-Ground Surface 1 Reflectance Schedule Name",
+
+        "  SurfaceProperty:SurroundingSurfaces,",
+        "    SrdSurfs:Living:South,        !- Name",
+        "    ,                             !- Sky View Factor",
+        "    ,                             !- Sky Temperature Schedule Name",
+        "    ,                             !- Ground View Factor",
+        "    ,                             !- Ground Temperature Schedule Name",
+        "    SurroundingSurface1,          !- Surrounding Surface 1 Name",
+        "    0.4,                          !- Surrounding Surface 1 View Factor",
+        "    Surrounding Temp Sch 1;       !- Surrounding Surface 1 Temperature Schedule Name",
+
+        "  SurfaceProperty:GroundSurfaces,",
+        "    GndSurfs:Living:South,        !-Name",
+        "    GndSurfs SouthGrassArea,      !-Ground Surface 1 Name",
+        "    ,                             !-Ground Surface 1 View Factor",
+        "    Ground Temp Sch,              !-Ground Surface 1 Temperature Schedule Name",
+        "    ;                             !-Ground Surface 1 Reflectance Schedule Name",
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;                   !- Name",
+
+        "  Schedule:Compact,",
+        "    Surrounding Temp Sch 1,       !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Sky Temp Sch,                 !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Ground Temp Sch,              !- Name",
+        "    Any Number,                   !- Schedule Type Limits Name",
+        "    Through: 12/31,               !- Field 1",
+        "    For: AllDays,                 !- Field 2",
+        "    Until: 24:00, 15.0;           !- Field 3",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    ScheduleManager::ProcessScheduleInput(*state);
+
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
+    EXPECT_FALSE(has_err_output(true));
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    std::vector<int> controlledZoneEquipConfigNums;
+    controlledZoneEquipConfigNums.push_back(1);
+    state->dataHeatBal->Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    auto &zoneEquipConfig = state->dataZoneEquip->ZoneEquipConfig(1);
+
+    zoneEquipConfig.ZoneName = "LIVING ZONE";
+    zoneEquipConfig.NumInletNodes = 2;
+    zoneEquipConfig.InletNode.allocate(2);
+    zoneEquipConfig.InletNode(1) = 1;
+    zoneEquipConfig.InletNode(2) = 2;
+    zoneEquipConfig.NumReturnNodes = 1;
+    zoneEquipConfig.ReturnNode.allocate(1);
+    zoneEquipConfig.ReturnNode(1) = 3;
+    zoneEquipConfig.NumExhaustNodes = 1;
+    zoneEquipConfig.ExhaustNode.allocate(1);
+    zoneEquipConfig.ExhaustNode(1) = 4;
+    zoneEquipConfig.FixedReturnFlow.allocate(1);
+
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+
+    state->dataLoopNodes->Node.allocate(4);
+    auto &InletNode1 = state->dataLoopNodes->Node(1);
+    auto &InletNode2 = state->dataLoopNodes->Node(2);
+    auto &ExhaustNode = state->dataLoopNodes->Node(3);
+    auto &ReturnNode = state->dataLoopNodes->Node(4);
+
+    InletNode1.Temp = 20.0;
+    InletNode2.Temp = 20.0;
+    ReturnNode.Temp = 20.0;
+    ExhaustNode.Temp = 20.0;
+    InletNode1.MassFlowRate = 0.1;
+    InletNode2.MassFlowRate = 0.1;
+    ReturnNode.MassFlowRate = 0.1;
+    ExhaustNode.MassFlowRate = 0.1;
+
+    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
+    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
+
+    state->dataSurface->TotSurfaces = 6;
+    // set convective coefficient adjustment ratio to 1.0
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(state->dataSurface->TotSurfaces, 1.0);
+    state->dataMstBal->HConvInFD.allocate(state->dataSurface->TotSurfaces);
+    state->dataMstBal->RhoVaporAirIn.allocate(state->dataSurface->TotSurfaces);
+    state->dataMstBal->HMassConvInFD.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
+
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->KickOffSimulation = true;
+    state->dataGlobal->TimeStepZoneSec = 900;
+
+    AllocateSurfaceHeatBalArrays(*state);
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+    SolarShading::AllocateModuleArrays(*state);
+    SolarShading::DetermineShadowingCombinations(*state);
+
+    state->dataSurface->SurfTAirRef(1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
+
+    // check default surface view factors
+    int SurfNum = UtilityRoutines::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
+    auto &Surface_Living_North = state->dataSurface->Surface(SurfNum);
+    SurfNum = UtilityRoutines::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
+    auto &Surface_Living_East = state->dataSurface->Surface(SurfNum);
+    SurfNum = UtilityRoutines::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
+    auto &Surface_Living_South = state->dataSurface->Surface(SurfNum);
+    // check exterior default surfaces sky and ground view factors
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_North.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_North.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_East.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_East.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_South.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_South.ViewFactorGroundIR);
+
+    // set local derived data vars
+    SurfNum = UtilityRoutines::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
+    int SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty_1 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    int GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty_1 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+    SurfNum = UtilityRoutines::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
+    SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty_2 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty_2 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+    SurfNum = UtilityRoutines::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
+    SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    auto &SrdSurfsProperty_3 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+    GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
+    auto &GndSurfsProperty_3 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
+
+    // check user input sky view factor is blank
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty_1.SkyViewFactor);
+    EXPECT_FALSE(SrdSurfsProperty_1.IsSkyViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_1.SurroundingSurfs(1).ViewFactor);
+    // check user input ground view factor is not blank
+    EXPECT_DOUBLE_EQ(0.5, GndSurfsProperty_1.GndSurfs(1).ViewFactor);
+    EXPECT_TRUE(GndSurfsProperty_1.IsGroundViewFactorSet);
+    // check user input sky view factor is NOT blank
+    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_2.SkyViewFactor);
+    EXPECT_TRUE(SrdSurfsProperty_2.IsSkyViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_2.SurroundingSurfs(1).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_2.SurroundingSurfs(2).ViewFactor);
+    // check user input ground view factor is blank
+    EXPECT_DOUBLE_EQ(0.0, GndSurfsProperty_2.GndSurfs(1).ViewFactor);
+    EXPECT_FALSE(GndSurfsProperty_2.IsGroundViewFactorSet);
+    // check user input sky and ground view factors are blank
+    EXPECT_DOUBLE_EQ(0.0, SrdSurfsProperty_3.SkyViewFactor);
+    EXPECT_FALSE(SrdSurfsProperty_3.IsSkyViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.4, SrdSurfsProperty_3.SurroundingSurfs(1).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.0, GndSurfsProperty_3.GndSurfs(1).ViewFactor);
+    EXPECT_FALSE(GndSurfsProperty_3.IsGroundViewFactorSet);
+
+    // reset sky and ground view factors
+    InitSurfacePropertyViewFactors(*state);
+    // test rest of user inputs blank view factors
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_1.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_1.SurroundingSurfs(1).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.5, GndSurfsProperty_1.GndSurfs(1).ViewFactor);
+    EXPECT_TRUE(GndSurfsProperty_1.IsGroundViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.2, SrdSurfsProperty_2.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_2.SurroundingSurfs(1).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_2.SurroundingSurfs(2).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.2, GndSurfsProperty_2.GndSurfs(1).ViewFactor);
+    EXPECT_TRUE(GndSurfsProperty_2.IsGroundViewFactorSet);
+    EXPECT_DOUBLE_EQ(0.3, SrdSurfsProperty_3.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.4, SrdSurfsProperty_3.SurroundingSurfs(1).ViewFactor);
+    EXPECT_DOUBLE_EQ(0.3, GndSurfsProperty_3.GndSurfs(1).ViewFactor);
+    EXPECT_TRUE(GndSurfsProperty_3.IsGroundViewFactorSet);
+    // test surface view factors reset are correct
+    EXPECT_DOUBLE_EQ(0.3, Surface_Living_North.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.5, Surface_Living_North.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.2, Surface_Living_East.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.2, Surface_Living_East.ViewFactorGroundIR);
+    EXPECT_DOUBLE_EQ(0.3, Surface_Living_South.ViewFactorSkyIR);
+    EXPECT_DOUBLE_EQ(0.3, Surface_Living_South.ViewFactorGroundIR);
+}
+
 } // namespace EnergyPlus

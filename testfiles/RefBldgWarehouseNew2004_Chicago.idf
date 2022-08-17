@@ -67,7 +67,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 3
 
-  Version,9.6;
+  Version,22.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -1242,12 +1242,12 @@
 
   People,
     Office People,           !- Name
-    Office,                  !- Zone or ZoneList Name
+    Office,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     5.0,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -1266,7 +1266,7 @@
 
   Lights,
     BulkStorage_Lights,      !- Name
-    BulkStorage,             !- Zone or ZoneList Name
+    BulkStorage,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1281,7 +1281,7 @@
 
   Lights,
     FineStorage_Lights,      !- Name
-    FineStorage,             !- Zone or ZoneList Name
+    FineStorage,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1296,7 +1296,7 @@
 
   Lights,
     Office_Lights,           !- Name
-    Office,                  !- Zone or ZoneList Name
+    Office,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1313,7 +1313,7 @@
 
   ElectricEquipment,
     BulkStorage_MiscPlug_Equip,  !- Name
-    BulkStorage,             !- Zone or ZoneList Name
+    BulkStorage,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1326,7 +1326,7 @@
 
   ElectricEquipment,
     Office_MiscPlug_Equip,   !- Name
-    Office,                  !- Zone or ZoneList Name
+    Office,                  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1350,7 +1350,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     BulkStorage_Infiltration,!- Name
-    BulkStorage,             !- Zone or ZoneList Name
+    BulkStorage,             !- Zone or ZoneList or Space or SpaceList Name
     ALWAYS_ON,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1364,7 +1364,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     FineStorage_Infiltration,!- Name
-    FineStorage,             !- Zone or ZoneList Name
+    FineStorage,             !- Zone or ZoneList or Space or SpaceList Name
     ALWAYS_ON,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1378,7 +1378,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office_Infiltration,     !- Name
-    Office,                  !- Zone or ZoneList Name
+    Office,                  !- Zone or ZoneList or Space or SpaceList Name
     ALWAYS_ON,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1396,22 +1396,22 @@
     BulkStorage Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     BulkStorage,             !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    6409.6813;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    6409.6813;               !- Surface Area {m2}
 
   InternalMass,
     FineStorage Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     FineStorage,             !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    2786.8199;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    2786.8199;               !- Surface Area {m2}
 
   InternalMass,
     Office Internal Mass,    !- Name
     InteriorFurnishings,     !- Construction Name
     Office,                  !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    473.7584;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    473.7584;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
 
@@ -1643,7 +1643,7 @@
 
   ZoneVentilation:DesignFlowRate,
     BulkStorage_Ventilation, !- Name
-    BulkStorage,             !- Zone or ZoneList Name
+    BulkStorage,             !- Zone or ZoneList or Space or SpaceList Name
     MinOA_Sched,             !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -3036,8 +3036,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     3.546,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     3.417E+02,               !- CO2 Emission Factor {g/MJ}
@@ -3080,8 +3078,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    37631000,                !- Energy per Unit Factor
     1.092,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     5.21E+01,                !- CO2 Emission Factor {g/MJ}

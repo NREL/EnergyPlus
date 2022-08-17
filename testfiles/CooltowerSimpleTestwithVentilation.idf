@@ -73,7 +73,7 @@
 !   Environmental Emissions:        None
 !   Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Building,
     BUILDING #1,             !- Name
@@ -2050,43 +2050,43 @@
 
   People,
     ZONE 1 People 1,         !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     Residence Occupancy,     !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     4.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Lvl   1;        !- Activity Level Schedule Name
 
   People,
     ZONE 2 People 1,         !- Name
-    ZONE 2,                  !- Zone or ZoneList Name
+    ZONE 2,                  !- Zone or ZoneList or Space or SpaceList Name
     Residence Occupancy,     !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     4.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Lvl   1;        !- Activity Level Schedule Name
 
   People,
     ZONE 3 People 1,         !- Name
-    ZONE 3,                  !- Zone or ZoneList Name
+    ZONE 3,                  !- Zone or ZoneList or Space or SpaceList Name
     Residence Occupancy,     !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     4.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Lvl   1;        !- Activity Level Schedule Name
 
   Lights,
     ZONE 1 Lights 1,         !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     Residence Lighting,      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     950.0000,                !- Lighting Level {W}
@@ -2100,7 +2100,7 @@
 
   Lights,
     ZONE 2 Lights 1,         !- Name
-    ZONE 2,                  !- Zone or ZoneList Name
+    ZONE 2,                  !- Zone or ZoneList or Space or SpaceList Name
     Residence Lighting,      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     950.0000,                !- Lighting Level {W}
@@ -2114,7 +2114,7 @@
 
   Lights,
     ZONE 3 Lights 1,         !- Name
-    ZONE 3,                  !- Zone or ZoneList Name
+    ZONE 3,                  !- Zone or ZoneList or Space or SpaceList Name
     Residence Lighting,      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     950.0000,                !- Lighting Level {W}
@@ -2128,7 +2128,7 @@
 
   ElectricEquipment,
     ZONE 1 ElecEq 1,         !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     Residence Lighting,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     480.0000,                !- Design Level {W}
@@ -2140,7 +2140,7 @@
 
   ElectricEquipment,
     ZONE 2 ElecEq 1,         !- Name
-    ZONE 2,                  !- Zone or ZoneList Name
+    ZONE 2,                  !- Zone or ZoneList or Space or SpaceList Name
     Residence Lighting,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     480.0000,                !- Design Level {W}
@@ -2152,7 +2152,7 @@
 
   ElectricEquipment,
     ZONE 3 ElecEq 1,         !- Name
-    ZONE 3,                  !- Zone or ZoneList Name
+    ZONE 3,                  !- Zone or ZoneList or Space or SpaceList Name
     Residence Lighting,      !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     480.0000,                !- Design Level {W}
@@ -2164,7 +2164,7 @@
 
   ZoneVentilation:DesignFlowRate,
     ZONE 1 Ventl 1,          !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     Constant,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     6.131944,                !- Design Flow Rate {m3/s}
@@ -2186,7 +2186,7 @@
 
   ZoneVentilation:DesignFlowRate,
     ZONE 2 Ventl 1,          !- Name
-    ZONE 2,                  !- Zone or ZoneList Name
+    ZONE 2,                  !- Zone or ZoneList or Space or SpaceList Name
     Constant,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     6.131944,                !- Design Flow Rate {m3/s}
@@ -2208,7 +2208,7 @@
 
   ZoneVentilation:DesignFlowRate,
     ZONE 3 Ventl 1,          !- Name
-    ZONE 3,                  !- Zone or ZoneList Name
+    ZONE 3,                  !- Zone or ZoneList or Space or SpaceList Name
     Constant,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     6.131944,                !- Design Flow Rate {m3/s}

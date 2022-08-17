@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,14 +60,15 @@ struct EnergyPlusData;
 
 enum class GroundTempObjType
 {
-    Unassigned = -1,
+    Invalid = -1,
     KusudaGroundTemp,
     FiniteDiffGroundTemp,
     SiteBuildingSurfaceGroundTemp,
     SiteShallowGroundTemp,
     SiteDeepGroundTemp,
     SiteFCFactorMethodGroundTemp,
-    XingGroundTemp
+    XingGroundTemp,
+    Num
 };
 
 // Base class
@@ -86,7 +87,7 @@ public:
     BaseGroundTempsModel &operator=(BaseGroundTempsModel &&) = delete;
 
     // Default Constructor
-    BaseGroundTempsModel() : objectType(GroundTempObjType::Unassigned), errorsFound(false)
+    BaseGroundTempsModel() : objectType(GroundTempObjType::Invalid), errorsFound(false)
     {
     }
 

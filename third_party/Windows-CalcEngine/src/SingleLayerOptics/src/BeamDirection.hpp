@@ -1,5 +1,4 @@
-#ifndef BEAMDIRECTION_H
-#define BEAMDIRECTION_H
+#pragma once
 
 #include <memory>
 
@@ -14,28 +13,28 @@ namespace SingleLayerOptics
     public:
         CBeamDirection();
         CBeamDirection(CBeamDirection const & t_BeamDirection);
-        CBeamDirection(const double t_Theta, const double t_Phi);
+        CBeamDirection(double t_Theta, double t_Phi);
 
-        double theta() const;
-        double phi() const;
-        double profileAngle() const;
+        [[nodiscard]] double theta() const;
+        [[nodiscard]] double phi() const;
+        [[nodiscard]] double profileAngle() const;
 
         CBeamDirection & operator=(const CBeamDirection & t_SphericalPoint);
         bool operator==(const CBeamDirection & t_SphericalPoint) const;
         bool operator!=(const CBeamDirection & t_SphericalPoint) const;
 
-        double distance(const double t_Theta, const double t_Phi) const;
+        [[nodiscard]] double distance(double t_Theta, double t_Phi) const;
 
-        double Altitude() const;
-        double Azimuth() const;
+        [[nodiscard]] double Altitude() const;
+        [[nodiscard]] double Azimuth() const;
+
+        [[nodiscard]] CBeamDirection rotate(double angle) const;
 
     private:
-        void updateProfileAngle(const double t_Theta, const double t_Phi);
+        void updateProfileAngle(double t_Theta, double t_Phi);
         double m_Theta;
         double m_Phi;
         double m_ProfileAngle;
     };
 
 }   // namespace SingleLayerOptics
-
-#endif

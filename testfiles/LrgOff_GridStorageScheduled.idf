@@ -38,7 +38,7 @@
 !
 ! Number of Zones: 19
 
-  Version,9.6;
+  Version,22.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -3257,12 +3257,12 @@
 
   People,
     Basement People,         !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    37.16,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    37.16,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3279,12 +3279,12 @@
 
   People,
     Core_bottom People,      !- Name
-    Core_bottom,             !- Zone or ZoneList Name
+    Core_bottom,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3301,12 +3301,12 @@
 
   People,
     Core_mid People,         !- Name
-    Core_mid,                !- Zone or ZoneList Name
+    Core_mid,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3323,12 +3323,12 @@
 
   People,
     Core_top People,         !- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3345,12 +3345,12 @@
 
   People,
     Perimeter_bot_ZN_1 People,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3367,12 +3367,12 @@
 
   People,
     Perimeter_bot_ZN_2 People,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3389,12 +3389,12 @@
 
   People,
     Perimeter_bot_ZN_3 People,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3411,12 +3411,12 @@
 
   People,
     Perimeter_bot_ZN_4 People,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3433,12 +3433,12 @@
 
   People,
     Perimeter_mid_ZN_1 People,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3455,12 +3455,12 @@
 
   People,
     Perimeter_mid_ZN_2 People,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3477,12 +3477,12 @@
 
   People,
     Perimeter_mid_ZN_3 People,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3499,12 +3499,12 @@
 
   People,
     Perimeter_mid_ZN_4 People,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3521,12 +3521,12 @@
 
   People,
     Perimeter_top_ZN_1 People,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3543,12 +3543,12 @@
 
   People,
     Perimeter_top_ZN_2 People,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3565,12 +3565,12 @@
 
   People,
     Perimeter_top_ZN_3 People,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3587,12 +3587,12 @@
 
   People,
     Perimeter_top_ZN_4 People,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3611,7 +3611,7 @@
 
   Lights,
     Basement_Lights,         !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3626,7 +3626,7 @@
 
   Lights,
     Core_bottom_Lights,      !- Name
-    Core_bottom,             !- Zone or ZoneList Name
+    Core_bottom,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3641,7 +3641,7 @@
 
   Lights,
     Core_mid_Lights,         !- Name
-    Core_mid,                !- Zone or ZoneList Name
+    Core_mid,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3656,7 +3656,7 @@
 
   Lights,
     Core_top_Lights,         !- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3671,7 +3671,7 @@
 
   Lights,
     Perimeter_bot_ZN_1_Lights,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3686,7 +3686,7 @@
 
   Lights,
     Perimeter_bot_ZN_2_Lights,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3701,7 +3701,7 @@
 
   Lights,
     Perimeter_bot_ZN_3_Lights,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3716,7 +3716,7 @@
 
   Lights,
     Perimeter_bot_ZN_4_Lights,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3731,7 +3731,7 @@
 
   Lights,
     Perimeter_mid_ZN_1_Lights,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3746,7 +3746,7 @@
 
   Lights,
     Perimeter_mid_ZN_2_Lights,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3761,7 +3761,7 @@
 
   Lights,
     Perimeter_mid_ZN_3_Lights,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3776,7 +3776,7 @@
 
   Lights,
     Perimeter_mid_ZN_4_Lights,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3791,7 +3791,7 @@
 
   Lights,
     Perimeter_top_ZN_1_Lights,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3806,7 +3806,7 @@
 
   Lights,
     Perimeter_top_ZN_2_Lights,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3821,7 +3821,7 @@
 
   Lights,
     Perimeter_top_ZN_3_Lights,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3836,7 +3836,7 @@
 
   Lights,
     Perimeter_top_ZN_4_Lights,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -3853,7 +3853,7 @@
 
   ElectricEquipment,
     Basement_PlugMisc_Equip, !- Name
-    Basement,                !- Zone or ZoneList Name
+    Basement,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3866,7 +3866,7 @@
 
   ElectricEquipment,
     Core_bottom_PlugMisc_Equip,  !- Name
-    Core_bottom,             !- Zone or ZoneList Name
+    Core_bottom,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3879,7 +3879,7 @@
 
   ElectricEquipment,
     Core_mid_PlugMisc_Equip, !- Name
-    Core_mid,                !- Zone or ZoneList Name
+    Core_mid,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3892,7 +3892,7 @@
 
   ElectricEquipment,
     Core_top_PlugMisc_Equip, !- Name
-    Core_top,                !- Zone or ZoneList Name
+    Core_top,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3905,7 +3905,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_1_PlugMisc_Equip,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3918,7 +3918,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_2_PlugMisc_Equip,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3931,7 +3931,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_3_PlugMisc_Equip,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3944,7 +3944,7 @@
 
   ElectricEquipment,
     Perimeter_bot_ZN_4_PlugMisc_Equip,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3957,7 +3957,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_1_PlugMisc_Equip,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3970,7 +3970,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_2_PlugMisc_Equip,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3983,7 +3983,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_3_PlugMisc_Equip,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -3996,7 +3996,7 @@
 
   ElectricEquipment,
     Perimeter_mid_ZN_4_PlugMisc_Equip,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -4009,7 +4009,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_1_PlugMisc_Equip,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -4022,7 +4022,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_2_PlugMisc_Equip,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -4035,7 +4035,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_3_PlugMisc_Equip,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -4048,7 +4048,7 @@
 
   ElectricEquipment,
     Perimeter_top_ZN_4_PlugMisc_Equip,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -4079,7 +4079,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     GroundFloor_Plenum_Infiltration,  !- Name
-    GroundFloor_Plenum,      !- Zone or ZoneList Name
+    GroundFloor_Plenum,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4093,7 +4093,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     MidFloor_Plenum_Infiltration,  !- Name
-    MidFloor_Plenum,         !- Zone or ZoneList Name
+    MidFloor_Plenum,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4107,7 +4107,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_1_Infiltration,  !- Name
-    Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4121,7 +4121,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_2_Infiltration,  !- Name
-    Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4135,7 +4135,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_3_Infiltration,  !- Name
-    Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4149,7 +4149,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_4_Infiltration,  !- Name
-    Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_bot_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4163,7 +4163,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_1_Infiltration,  !- Name
-    Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4177,7 +4177,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_2_Infiltration,  !- Name
-    Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4191,7 +4191,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_3_Infiltration,  !- Name
-    Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4205,7 +4205,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_4_Infiltration,  !- Name
-    Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_mid_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4219,7 +4219,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_1_Infiltration,  !- Name
-    Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_1,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4233,7 +4233,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_2_Infiltration,  !- Name
-    Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_2,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4247,7 +4247,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_3_Infiltration,  !- Name
-    Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_3,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4261,7 +4261,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_4_Infiltration,  !- Name
-    Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    Perimeter_top_ZN_4,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4275,7 +4275,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     TopFloor_Plenum_Infiltration,  !- Name
-    TopFloor_Plenum,         !- Zone or ZoneList Name
+    TopFloor_Plenum,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_QUARTER_ON_SCH,    !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4293,113 +4293,113 @@
     Basement Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Basement,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    7126.2120;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    7126.2120;               !- Surface Area {m2}
 
   InternalMass,
     Core_bottom Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Core_bottom,             !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    5064.6464;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    5064.6464;               !- Surface Area {m2}
 
   InternalMass,
     Core_mid Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Core_mid,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    5064.6464;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    5064.6464;               !- Surface Area {m2}
 
   InternalMass,
     Core_top Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Core_top,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    5064.6464;               !- Extended Field
+    ,                        !- Space or SpaceList Name
+    5064.6464;               !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8394;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8394;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8257;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8257;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8394;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8394;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8257;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8257;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_1,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8394;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8394;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_2,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_3,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    626.8257;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    626.8257;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_4,      !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    403.9503;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    403.9503;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,12 +63,14 @@ namespace DataDaylightingDevices {
     constexpr int MaxTZones(10);   // Maximum number of transition zones
     constexpr int NumOfAngles(19); // Number of data points on transmittance vs. angle curve
 
-    enum class iRadType
+    enum class RadType
     {
+        Invalid = -1,
         VisibleBeam,
         SolarBeam,
         SolarAniso,
-        SolarIso
+        SolarIso,
+        Num
     };
 
     struct TDDPipeData
@@ -76,41 +78,37 @@ namespace DataDaylightingDevices {
         // Members
         // Input variables
         std::string Name;            // Name of TDD pipe
-        int Dome;                    // Pointer to the dome object
-        int Diffuser;                // Pointer to the diffuser object
-        int Construction;            // Pointer to the construction object
-        Real64 Diameter;             // Pipe diameter
-        Real64 TotLength;            // Total length of pipe, including exterior
-        Real64 Reff;                 // Effective R value between TDD:DOME and TDD:DIFFUSER
-        int NumOfTZones;             // Number of transition zone
+        int Dome = 0;                // Pointer to the dome object
+        int Diffuser = 0;            // Pointer to the diffuser object
+        int Construction = 0;        // Pointer to the construction object
+        Real64 Diameter = 0.0;       // Pipe diameter
+        Real64 TotLength = 0.0;      // Total length of pipe, including exterior
+        Real64 Reff = 0.0;           // Effective R value between TDD:DOME and TDD:DIFFUSER
+        int NumOfTZones = 0;         // Number of transition zone
         Array1D_int TZone;           // Pointers to transition zones
         Array1D<Real64> TZoneLength; // Length of pipe in each transition zone
         // Calculated variables
-        Real64 AspectRatio;               // Aspect ratio, length / diameter
-        Real64 ReflectVis;                // Visible reflectance of surface
-        Real64 ReflectSol;                // Solar reflectance of surface
+        Real64 AspectRatio = 0.0;         // Aspect ratio, length / diameter
+        Real64 ReflectVis = 0.0;          // Visible reflectance of surface
+        Real64 ReflectSol = 0.0;          // Solar reflectance of surface
         Array1D<Real64> PipeTransVisBeam; // Table of beam visible transmittance vs. cosine angle
         Array1D<Real64> PipeTransSolBeam; // Table of beam solar transmittance vs. cosine angle
-        Real64 TransSolIso;               // Diffuse isotropic solar transmittance (constant)
-        Real64 TransSolHorizon;           // Diffuse horizon solar transmittance (constant)
-        Real64 ExtLength;                 // Exterior exposed length of pipe
+        Real64 TransSolIso = 0.0;         // Diffuse isotropic solar transmittance (constant)
+        Real64 TransSolHorizon = 0.0;     // Diffuse horizon solar transmittance (constant)
+        Real64 ExtLength = 0.0;           // Exterior exposed length of pipe
         Array1D<Real64> TZoneHeatGain;    // convection gain to transition zones
         // Report variables
-        Real64 TransmittedSolar;  // Solar transmitted by the TDD [W]
-        Real64 PipeAbsorbedSolar; // Solar absorbed in the walls of the pipe [W]
-        Real64 HeatGain;          // Solar heat gain [W]
-        Real64 HeatLoss;          // Solar heat loss [W]
-        Real64 TransVisBeam;      // TDD visible transmittance
-        Real64 TransSolBeam;      // TDD beam solar transmittance
-        Real64 TransVisDiff;      // TDD diffuse visible transmittance
-        Real64 TransSolDiff;      // TDD diffuse solar transmittance
+        Real64 TransmittedSolar = 0.0;  // Solar transmitted by the TDD [W]
+        Real64 PipeAbsorbedSolar = 0.0; // Solar absorbed in the walls of the pipe [W]
+        Real64 HeatGain = 0.0;          // Solar heat gain [W]
+        Real64 HeatLoss = 0.0;          // Solar heat loss [W]
+        Real64 TransVisBeam = 0.0;      // TDD visible transmittance
+        Real64 TransSolBeam = 0.0;      // TDD beam solar transmittance
+        Real64 TransVisDiff = 0.0;      // TDD diffuse visible transmittance
+        Real64 TransSolDiff = 0.0;      // TDD diffuse solar transmittance
 
         // Default Constructor
-        TDDPipeData()
-            : Dome(0), Diffuser(0), Construction(0), Diameter(0.0), TotLength(0.0), Reff(0.0), NumOfTZones(0), AspectRatio(0.0), ReflectVis(0.0),
-              ReflectSol(0.0), PipeTransVisBeam(DataDaylightingDevices::NumOfAngles, 0.0), PipeTransSolBeam(DataDaylightingDevices::NumOfAngles, 0.0),
-              TransSolIso(0.0), TransSolHorizon(0.0), ExtLength(0.0), TransmittedSolar(0.0), PipeAbsorbedSolar(0.0), HeatGain(0.0), HeatLoss(0.0),
-              TransVisBeam(0.0), TransSolBeam(0.0), TransVisDiff(0.0), TransSolDiff(0.0)
+        TDDPipeData() : PipeTransVisBeam(DataDaylightingDevices::NumOfAngles, 0.0), PipeTransSolBeam(DataDaylightingDevices::NumOfAngles, 0.0)
         {
         }
     };
@@ -119,39 +117,28 @@ namespace DataDaylightingDevices {
     {
         // Members
         // Input variables
-        std::string Name; // Name of daylighting shelf
-        int Window;       // Pointer to the window object
-        int InSurf;       // Pointer to the inside shelf heat transfer surface
-        int OutSurf;      // Pointer to the outside shelf attached shading surface
-        int Construction; // Pointer to the outside shelf construction object
+        std::string Name;     // Name of daylighting shelf
+        int Window = 0;       // Pointer to the window object
+        int InSurf = 0;       // Pointer to the inside shelf heat transfer surface
+        int OutSurf = 0;      // Pointer to the outside shelf attached shading surface
+        int Construction = 0; // Pointer to the outside shelf construction object
         // Calculated variables
-        Real64 OutReflectVis; // Outside shelf visible reflectance
-        Real64 OutReflectSol; // Outside shelf solar reflectance
-        Real64 ViewFactor;    // Outside shelf view factor to window
+        Real64 OutReflectVis = 0.0; // Outside shelf visible reflectance
+        Real64 OutReflectSol = 0.0; // Outside shelf solar reflectance
+        Real64 ViewFactor = 0.0;    // Outside shelf view factor to window
         // Report variables
-
-        // Default Constructor
-        ShelfData() : Window(0), InSurf(0), OutSurf(0), Construction(0), OutReflectVis(0.0), OutReflectSol(0.0), ViewFactor(0.0)
-        {
-        }
     };
 
 } // namespace DataDaylightingDevices
 
 struct DataDaylightingDevicesData : BaseGlobalStruct
 {
-
-    int NumOfTDDPipes = 0; // Number of TDD pipes in the input file
-    int NumOfShelf = 0;    // Number of daylighting shelves in the input file
     Array1D<DataDaylightingDevices::TDDPipeData> TDDPipe;
     Array1D<DataDaylightingDevices::ShelfData> Shelf;
 
     void clear_state() override
     {
-        this->NumOfTDDPipes = 0;
-        this->NumOfShelf = 0;
-        this->TDDPipe.deallocate();
-        this->Shelf.deallocate();
+        *this = DataDaylightingDevicesData();
     }
 };
 

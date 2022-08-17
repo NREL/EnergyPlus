@@ -75,8 +75,14 @@ The Envelope Summary report (key: EnvelopeSummary) produces a report that includ
 \item
   Opaque which includes all opaque surfaces and includes the name of the construction, reflectance, U-Factor, gross area, azimuth, tilt, cardinal direction.
 \item
-  Fenestration which includes all non-opaque surfaces and includes the name of the construction, areas (glass, frame, divider, single opening, multiplied openings), U-Factor, SHGC (the solar heat gain coefficient based on summer conditions), visible transmittance, conductance (frame, divider), indication of shade control, the name of the parent surface, azimuth, tilt, cardinal direction.
+  Exterior Fenestration which includes all non-opaque exterior surfaces and includes the name of the construction, areas (glass, frame, divider, single opening, multiplied openings), glass U-Factor, glass SHGC (the solar heat gain coefficient based on summer conditions), glass visible transmittance, NFRC Product Type, assembly U-Factor, assembly SHGC, assembly visible transmittance, conductance (frame, divider), indication of shade control, the name of the parent surface, azimuth, tilt, cardinal direction. 
+\item
+  Exterior Fenestration Shaded State has values shown for exterior fenestration that have a shaded state by using \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} the values of the u-factor, SHGC, and visible transmittance are shown for both the glass only and the full assembly when in the shaded state.
 \end{itemize}
+
+The assembly results include the effect of the frame and divider and are only produced when \hyperref[windowpropertyframeanddivider]{WindowProperty:FrameAndDivider} input object is used. In addition, the assembly columns are shown for most configurations but are not shown when using \hyperref[constructionwindowequivalentlayer]{Construction:WindowEquivalentLayer} or when using \hyperref[constructionwindowdatafile]{Construction:WindowDataFile} with a Window5DataFile.dat file. 
+
+Differences should still be expected between the results from EnergyPlus and the WINDOW program for the u-factor, SHGC, and visible transmittance, both glass and assembly. These differences are based on algorithmic differences between the two programs even though they do share some code in the Windows Calculation Engine, other portions of the algorithms differ. In addition, the reported values may not match the NFRC rated values seen on a label because of differences between the calculations in EnergyPlus and the exact NFRC rating procedures including grouping of products.
 
 \paragraph{Surface Shadowing Summary}\label{surface-shadowing-summary}
 
@@ -456,15 +462,38 @@ The Heat Emissions Report provides a summary of the building heat emission to th
 
 \paragraph{Thermal Resilience Summary}\label{ThermalResilienceSummary}
 
-The Thermal Resilience Summary provides the indoor thermal resilience metrics unmet hours and occupant$·$hours summary report. This includes the Heat Index Hours and OccupantHours, Humidex Hours and OccupantHours, Heating SET Hours and Cooling SET Hours reports. The Heating SET Hours and Cooling SET Hours are reported only when the Pierce model are chosen for thermal comfort calculations. To activate the Pierce SET calculation in EnergyPlus, users need to define the \textbf{People} and chose \textbf{Pierce} as the thermal comfort method.
+The Thermal Resilience Summary provides the indoor thermal resilience metrics
+unmet hours and occupant$·$hours summary report. This includes the Heat Index
+Hours, OccupantHours, and OccupiedHours, Humidex Hours, OccupantHours,
+OccupiedHours, Heating SET Degree-Hours, Cooling SET Degree-Hours reports, Hours
+of Safety for Cold Events, Hours of Safety for Heat Events, Unmet Degree-hours,
+and Discomfort-Weighted Exceedance OccupantHours and OccupiedHours. The Heating
+SET Degree-Hours and Cooling SET Degree-Hours are reported only when the Pierce
+model are chosen for thermal comfort calculations. To activate the Pierce SET
+calculation in EnergyPlus, users need to define the \textbf{People} and chose
+\textbf{Pierce} as the thermal comfort method.
 
 \paragraph{CO2 Resilience Summary}\label{CO2ResilienceSummary}
 
-The CO2 Resilience Summary provides the indoor CO2 level unmet hours and occupant$·$hours summary report for resilience. This includes the CO2 Level Hours and OccupantHours reports. To activate the $CO_2$ concentration calculation in EnergyPlus, the \textbf{ZoneAirContaminantBalance} object needs to be specified and with the field \textbf{Carbon Dioxide Concentration} set to Yes. Users can define a schedule of outdoor air $CO_2$ concentration in the field \textbf{Outdoor Carbon Dioxide Schedule Name}. $CO_2$ generation rate at the zone level can be specified using the \textbf{ZoneContaminantSourceAndSink:CarbonDioxide} object.
+The CO2 Resilience Summary provides the indoor CO2 level unmet hours,
+occupant$·$hours summary report for resilience. This includes the CO2 Level
+Hours, OccupantHours and OccupiedHours reports. To activate the $CO_2$
+concentration calculation in EnergyPlus, the \textbf{ZoneAirContaminantBalance}
+object needs to be specified and with the field \textbf{Carbon Dioxide
+  Concentration} set to Yes. Users can define a schedule of outdoor air $CO_2$
+concentration in the field \textbf{Outdoor Carbon Dioxide Schedule Name}. $CO_2$
+generation rate at the zone level can be specified using the
+\textbf{ZoneContaminantSourceAndSink:CarbonDioxide} object.
 
 \paragraph{Visual Resilience Summary}\label{VisualResilienceSummary}
 
-The Visual Resilience Summary provides the indoor illuminance level unmet hours and occupant$·$hours summary report for resilience. This includes the Illuminance Level Hours and OccupantHours reports. To activate the indoor illuminance calculation in EnergyPlus, users need to define the \textbf{Daylighting:Controls} and the \textbf{Daylighting:ReferencePoint} objects, even if no daylighting controls are actually implemented in the building simulation model.
+The Visual Resilience Summary provides the indoor illuminance level unmet hours
+and occupant$·$hours summary report for resilience. This includes the
+Illuminance Level Hours, OccupantHours, and OccupiedHours reports. To activate
+the indoor illuminance calculation in EnergyPlus, users need to define the
+\textbf{Daylighting:Controls} and the \textbf{Daylighting:ReferencePoint}
+objects, even if no daylighting controls are actually implemented in the
+building simulation model.
 
 \subsubsection{Predefined Monthly Summary Reports}\label{predefined-monthly-summary-reports}
 

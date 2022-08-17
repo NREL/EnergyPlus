@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -442,9 +442,9 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
         *state, RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
     ReportZoneHybridUnitaryAirConditioners(*state, 1);
 
-    SystemReports::ReportMaxVentilationLoads(*state);
+    SystemReports::ReportVentilationLoads(*state);
     // output results
-    Real64 zone_oa_mass_flow = state->dataSysRpts->ZoneOAMassFlow(1); // OA flow reported to the zone from the unitary hybrid system
+    Real64 zone_oa_mass_flow = state->dataSysRpts->ZoneVentRepVars(1).OAMassFlow; // OA flow reported to the zone from the unitary hybrid system
 
     // checks
     EXPECT_EQ(zone_oa_mass_flow, DesignMinVR); // reported zone OA flow matches unitary hybrid OA flow

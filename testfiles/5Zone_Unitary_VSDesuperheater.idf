@@ -74,7 +74,7 @@
 ! Compact Schedules:              Yes
 !
 ! HVAC:                           the system is a packaged VAV (DX cooling coil and gas heating coils).
-!                                 The input is fully autosized. The input uses Coil:Cooling:DX:VariableSpeed but with just one speed level.
+!                                 The input is fully autosized. The input uses Coil:Cooling:DX but with just one speed level.
 !                                 There is a supplemental heating coil using desuperheat from the cooling coil, for humidity
 !                                 Terminal units are set to provide a minimum amount of outdoor air based
 !                                 on occupancy and floor area.
@@ -84,7 +84,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX:VariableSpeed, Coil:Heating:Fuel, Coil:Heating:Desuperheater
+! Coils:                          Coil:Cooling:DX, Coil:Heating:Fuel, Coil:Heating:Desuperheater
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Building,
     Building,                !- Name
@@ -818,7 +818,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -832,19 +832,19 @@
 
   People,
     SPACE1-1 People 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -858,7 +858,7 @@
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1033,7 +1033,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1047,19 +1047,19 @@
 
   People,
     SPACE2-1 People 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1073,7 +1073,7 @@
 
   ElectricEquipment,
     SPACE2-1 ElecEq 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1213,7 +1213,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE3-1 Infil 1,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -1227,19 +1227,19 @@
 
   People,
     SPACE3-1 People 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE3-1 Lights 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1253,7 +1253,7 @@
 
   ElectricEquipment,
     SPACE3-1 ElecEq 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1408,7 +1408,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE4-1 Infil 1,        !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1422,19 +1422,19 @@
 
   People,
     SPACE4-1 People 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE4-1 Lights 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1448,7 +1448,7 @@
 
   ElectricEquipment,
     SPACE4-1 ElecEq 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1588,7 +1588,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.031089,                !- Design Flow Rate {m3/s}
@@ -1602,19 +1602,19 @@
 
   People,
     SPACE5-1 People 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     20,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE5-1 Lights 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1628,7 +1628,7 @@
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1976,                    !- Design Level {W}
@@ -2696,7 +2696,7 @@
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Main Heating Coil 1,     !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
-    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     Main Cooling Coil 1,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
@@ -2728,7 +2728,7 @@
     0.3,                     !- Heat Reclaim Recovery Efficiency
     Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
     VAV Sys 1 Outlet Node,   !- Air Outlet Node Name
-    Coil:Cooling:DX:VariableSpeed,  !- Heating Source Object Type
+    Coil:Cooling:DX,  !- Heating Source Object Type
     Main Cooling Coil 1,     !- Heating Source Name
     VAV Sys 1 Outlet Node,   !- Temperature Setpoint Node Name
     5.0;                     !- Parasitic Electric Load {W}
@@ -2771,38 +2771,64 @@
     Relief Air Outlet Node 1,!- Relief Air Stream Node Name
     VAV Sys 1 Inlet Node;    !- Return Air Stream Node Name
 
-  Coil:Cooling:DX:VariableSpeed,
+  Coil:Cooling:DX,
     Main Cooling Coil 1,     !- Name
-    Main Cooling Coil 1 Inlet Node,  !- Indoor Air Inlet Node Name
-    Main Heating Coil 1 Inlet Node,  !- Indoor Air Outlet Node Name
-    1.0,                     !- Number of Speeds {dimensionless}
-    1.0,                     !- Nominal Speed Level {dimensionless}
-    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
-    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
-    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
-    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
-    HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name
-    ,                        !- Condenser Air Inlet Node Name
-    AirCooled,               !- Condenser Type
-    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
-    0.0,                     !- Crankcase Heater Capacity {W}
-    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Supply Water Storage Tank Name
+    Main Cooling Coil 1 Inlet Node,  !- Evaporator Inlet Node Name
+    Main Heating Coil 1 Inlet Node,  !- Evaporator Outlet Node Name
+    ,                        !- Availability Schedule Name
+    ,                        !- Condenser Zone Name
+    Main Cooling Coil 1 Condenser Node,  !- Condenser Inlet Node Name
+    Main Cooling Coil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
+    Main Cooling Coil 1 Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
-    ,                        !- Basin Heater Capacity {W/K}
-    ,                        !- Basin Heater Setpoint Temperature {C}
-    ,                        !- Basin Heater Operating Schedule Name
-    36991.44197,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
-    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
-    3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
-    10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
-    HPCoolingCAPFTemp4,      !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
-    HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
-    HPCoolingEIRFTemp4,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
-    HPACFFF;                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
+
+  Coil:Cooling:DX:CurveFit:Performance,
+    Main Cooling Coil 1 Performance,  !- Name
+    0.0,                     !- Crankcase Heater Capacity
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+    ,                        !- Unit Internal Static Air Pressure
+    Discrete,                !- Capacity Control Method
+    ,                        !- Evaporative Condenser Basin Heater Capacity
+    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature
+    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
+    Main Cooling Coil 1 Operating Mode,  !- Base Operating Mode
+    ,                        !- Alternative Operating Mode 1
+    ;                        !- Alternative Operating Mode 2
+
+  Coil:Cooling:DX:CurveFit:OperatingMode,
+    Main Cooling Coil 1 Operating Mode,  !- Name
+    AutoSize, ! 36991.44,                !- Rated Gross Total Cooling Capacity
+    AutoSize, ! 3.776,                   !- Rated Evaporator Air Flow Rate
+    AutoSize, ! 10.62,                   !- Rated Condenser Air Flow Rate
+    ,                        !- Maximum Cycling Rate
+    0.0,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+    0.0,                     !- Latent Capacity Time Constant
+    0.0,                     !- Nominal Time for Condensate Removal to Begin
+    No,                      !- Apply Latent Degradation to Speeds Greater than 1
+    AirCooled,               !- Condenser Type
+    ,                        !- Nominal Evaporative Condenser Pump Power
+    1,                       !- Nominal Speed Number
+    Main Cooling Coil 1 Speed;  !- Speed 1 Name
+
+  Coil:Cooling:DX:CurveFit:Speed,
+    Main Cooling Coil 1 Speed,  !- Name
+    1.0,                     !- Gross Total Cooling Capacity Fraction
+    1.0,                     !- Evaporator Air Flow Rate Fraction
+    1.0,                     !- Condenser Air Flow Rate Fraction
+    0.75,                    !- Gross Sensible Heat Ratio
+    3.866,                   !- Gross Cooling COP
+    1.0,                     !- Active Fraction of Coil Face Area
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate
+    1.0,                     !- Evaporative Condenser Pump Power Fraction
+    ,                        !- Evaporative Condenser Effectiveness
+    HPCoolingCAPFTemp4,      !- Total Cooling Capacity Function of Temperature Curve Name
+    HPACFFF,                 !- Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPCoolingEIRFTemp4,      !- Energy Input Ratio Function of Temperature Curve Name
+    HPACFFF,                 !- Energy Input Ratio Function of Air Flow Fraction Curve Name
+    HPACCOOLPLFFPLR;         !- Energy Part Load Fraction Curve Name
 
   Curve:Quadratic,
     HPACCOOLPLFFPLR,         !- Name
@@ -2859,6 +2885,10 @@
 
   OutdoorAir:Node,
     Main Cooling Coil 1 Condenser Node,  !- Name
+    -1.0;                    !- Height Above Ground {m}
+
+  OutdoorAir:Node,
+    Main Cooling Coil 1 Condenser Outlet Node,  !- Name
     -1.0;                    !- Height Above Ground {m}
 
   Coil:Heating:Fuel,
@@ -2957,9 +2987,8 @@
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
-
-  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,hourly;
+Output:Variable,*,Cooling Coil Crankcase Heater Electricity Rate,hourly; !- HVAC Average [W]
+Output:Variable,*,Cooling Coil Crankcase Heater Electricity Energy,hourly; !- HVAC Sum [J]
 
   Output:Variable,*,Fan Electricity Rate,hourly;
 

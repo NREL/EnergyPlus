@@ -1,0 +1,1881 @@
+! UnitarySystem_ZoneVSWSHP_wDOAS.idf
+! Basic file description:  Basic test for zone variable-speed water-to-air heat pump using AirloopHVAC:UnitarySystem.
+!                          Mass walls. Regular slab floor. Regular roof. No Windows.
+!
+! Highlights:              Example of zone HVAC system (WSHP) with dedicated outdoor air system (DOAS)
+!
+!
+! Simulation Location/Run: Denver Stapleton Intl Arpt CO USA WMO=724690, 2 design days, 1 run period,
+!                          Run Control executes two design days (see RUN PERIOD object)
+!
+! Location:                Denver, CO
+!
+! Design Days:             Denver Stapleton Intl Arpt CO USA Annual Heating 99%, MaxDB=-16°C
+!                          Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6°C MWB=15.6°C
+!
+! Run Period (Weather File): 1/1 - 12/31.
+!
+! Run Control:             Zone sizing, design day run control (no weather file simulation)
+!
+! Building: Fictional 1 zone building
+!
+!           The building is oriented due north.
+!
+! Floor Area:        232.25 m2
+! Number of Stories: 1
+!
+! Zone Description Details:
+!
+!       (0,15.24,0)                 (15.24,15.24,0)
+!              _____________________________
+!             |                             |
+!             |                    Zone     |
+!             |                  Inlet NOde |<--SPLITTER--<  <------------|
+!             |                             |                             |
+!             |                             |                      AirLoopHVAC (DOAS)
+!             |                    Zone     |                             |
+!             |                Return Node  |>----MXER---->  >------------|
+!             |                             |
+!             |                    Zone     |
+!             |                 Inlet Node  |<----------|  |-------->>
+!             |                             |           |  |
+!             |                             |        Zone WSHP        GLHX
+!             |                    Zone     |           |  |
+!             |                Exhaust Node |>----------|  |-------->>
+!             |_____________________________|
+!
+!          (0,0,0)                      (15.24,0,0)
+!
+! Internal gains description:     NA
+!
+! Interzone Surfaces:             None
+! Internal Mass:                  None
+! People:                         5 Occupants
+! Lights:                         284 Watts
+! Equipment:                      208 Watts
+! Windows:                        0
+! Detached Shading:               None
+! Daylight:                       None
+! Natural Ventilation:            None
+! Compact Schedules:              Yes
+! Solar Distribution:             MinimalShadowing
+!
+! HVAC:                           AirLoopHVAC serving a single zone (DOAS)
+!
+! Zonal Equipment:                AirloopHVAC:UnitarySystem (example includes an OA mixer for the WSHP but
+!                                 flow is set to 0 since this example has a DOAS). WSHP coil inputs are autosized.
+!
+! Central Air Handling Equipment: No (uses zone equipment)
+! System Equipment Autosize:      Yes
+! Purchased Cooling:              No
+! Purchased Heating:              No
+! Purchased Chilled Water:        No
+! Purchased Hot Water:            No
+! Coils:                          Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit, Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
+! Pumps:                          Pump:VariableSpeed (WSHP Condenser loop - GroundHeatExchanger:Vertical)
+! Boilers:                        None
+! Chillers:                       None
+! Towers:                         None
+!
+! Results:
+! Standard Reports:               Variable Dictionary, Surfaces (dxf-wireframe), Meter File
+! Timestep or Hourly Variables:   Timestep
+! Time bins Report:               None
+! HTML Report:                    None
+! Environmental Emissions:        None
+! Utility Tariffs:                None
+
+  Version,22.2;
+
+  AirLoopHVAC:UnitarySystem,
+    Zone1WTAHP,              !- Name
+    Load,                    !- Control Type
+    SPACE1-1,                !- Controlling Zone or Thermostat Location
+    ,                        !- Dehumidification Control Type
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone 1 Outlet Node,      !- Air Inlet Node Name
+    Zone 1 Inlet Node,       !- Air Outlet Node Name
+    Fan:OnOff,               !- Supply Fan Object Type
+    Zone 1 Fan,              !- Supply Fan Name
+    BlowThrough,             !- Fan Placement
+    CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
+    Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,  !- Heating Coil Object Type
+    Sys 1 Heat Pump Heating Mode,  !- Heating Coil Name
+    ,                        !- DX Heating Coil Sizing Ratio
+    Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,  !- Cooling Coil Object Type
+    Sys 1 Heat Pump Cooling Mode,  !- Cooling Coil Name
+    ,                        !- Use DOAS DX Cooling Coil
+    ,                        !- Minimum Supply Air Temperature {C}
+    ,                        !- Latent Load Control
+    Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
+    Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
+    SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
+    Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
+    Autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
+    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
+    0.0,                     !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    60.0,                    !- Maximum Supply Air Temperature {C}
+    20.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
+    Sys 1 Outside Air Inlet Node,  !- Outdoor Dry-Bulb Temperature Sensor Node Name
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60.0,                    !- Heat Pump Time Constant {s}
+    0.01,                    !- Fraction of On-Cycle Power Use
+    60;                      !- Heat Pump Fan Delay Time {s}
+
+  Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
+    Sys 1 Heat Pump Cooling Mode,  !- Name
+    Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Water-to-Refrigerant HX Water Inlet Node Name
+    Sys 1 Water to Air Heat Pump Source Side1 Outlet Node,  !- Water-to-Refrigerant HX Water Outlet Node Name
+    Sys 1 Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
+    Sys 1 Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
+    10.0,                    !- Number of Speeds {dimensionless}
+    10.0,                    !- Nominal Speed Level {dimensionless}
+    Autosize,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
+    Autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    Autosize,                !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}
+    VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
+    0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 1 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test, !- Speed 1 Waste Heat Function of Temperature Curve Name
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
+    0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 2 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test, !- Speed 2 Waste Heat Function of Temperature Curve Name
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
+    0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 3 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test, !- Speed 3 Waste Heat Function of Temperature Curve Name
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
+    0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 4 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test, !- Speed 4 Waste Heat Function of Temperature Curve Name
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
+    0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 5 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test, !- Speed 5 Waste Heat Function of Temperature Curve Name
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
+    0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 6 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test, !- Speed 6 Waste Heat Function of Temperature Curve Name
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
+    0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 7 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test, !- Speed 7 Waste Heat Function of Temperature Curve Name
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
+    0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 8 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test, !- Speed 8 Waste Heat Function of Temperature Curve Name
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
+    0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 9 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test, !- Speed 9 Waste Heat Function of Temperature Curve Name
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
+    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
+    TC VS Temp1 Test,        !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
+    TC VS AirFrac Test,      !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    TC VS WaterFrac Test,    !- Speed 10 Total Cooling Capacity Function of Water Flow Fraction Curve Name
+    EIR VS Temp1 Test,       !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+    EIR VS AirFrac Test,     !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIR VS WaterFrac Test,   !- Speed 10 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 10 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    wasteHeat VS Temp1 Test; !- Speed 10 Waste Heat Function of Temperature Curve Name
+
+  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
+    Sys 1 Heat Pump Heating Mode,  !- Name
+    Sys 1 Water to Air Heat Pump Source Side2 Inlet Node,  !- Water-to-Refrigerant HX Water Inlet Node Name
+    Sys 1 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water-to-Refrigerant HX Water Outlet Node Name
+    Sys 1 Heating Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
+    Sys 1 SuppHeating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
+    10.0,                    !- Number of Speeds {dimensionless}
+    10.0,                    !- Nominal Speed Level {dimensionless}
+    Autosize,                !- Rated Heating Capacity At Selected Nominal Speed Level {W}
+    Autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    Autosize,                !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}
+    VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name
+    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}
+    0.1661088,               !- Speed 1 Reference Unit Rated Air Flow {m3/s}
+    0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 1 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 1 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 1 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 1 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test,  !- Speed 1 Waste Heat Function of Temperature Curve Name
+    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}
+    0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 2 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 2 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 2 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 2 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test,  !- Speed 2 Waste Heat Function of Temperature Curve Name
+    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}
+    0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 3 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 3 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 3 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 3 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test,  !- Speed 3 Waste Heat Function of Temperature Curve Name
+    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}
+    0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 4 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 4 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 4 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 4 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 4 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test,  !- Speed 4 Waste Heat Function of Temperature Curve Name
+    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}
+    0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 5 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 5 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 5 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 5 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test,  !- Speed 5 Waste Heat Function of Temperature Curve Name
+    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {W/W}
+    0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 6 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 6 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 6 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 6 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 6 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test,  !- Speed 6 Waste Heat Function of Temperature Curve Name
+    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {W/W}
+    0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 7 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 7 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 7 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 7 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 7 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test,  !- Speed 7 Waste Heat Function of Temperature Curve Name
+    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {W/W}
+    0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 8 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 8 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 8 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 8 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 8 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test,  !- Speed 8 Waste Heat Function of Temperature Curve Name
+    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {W/W}
+    0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 9 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 9 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 9 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test,  !- Speed 9 Waste Heat Function of Temperature Curve Name
+    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
+    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {W/W}
+    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
+    Heating VS Temp1 Test,   !- Speed 10 Heating Capacity Function of Temperature Curve Name
+    Heating VS AirFrac Test, !- Speed 10 Total  Heating Capacity Function of Air Flow Fraction Curve Name
+    Heating VS WaterFrac Test,  !- Speed 10 Heating Capacity Function of Water Flow Fraction Curve Name
+    EIRH VS Temp1 Test,      !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+    EIRH VS AirFrac Test,    !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    EIRH VS WaterFrac Test,  !- Speed 10 Energy Input Ratio Function of Water Flow Fraction Curve Name
+    0.1,                     !- Speed 10 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}
+    Heating wasteHeat VS Temp1 Test;  !- Speed 10 Waste Heat Function of Temperature Curve Name
+
+  Curve:Quadratic,
+    VS Energy Part Load Fraction 1,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    TC VS AirFrac Test,      !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    TC VS WaterFrac Test,    !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    EIR VS AirFrac Test,     !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    EIR VS WaterFrac Test,   !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    Heating VS AirFrac Test, !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    Heating VS WaterFrac Test,  !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    EIRH VS AirFrac Test,    !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    EIRH VS WaterFrac Test,  !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Biquadratic,
+    TC VS Temp1 Test,        !- Name
+    1.43085,                 !- Coefficient1 Constant
+    -0.0453653,              !- Coefficient2 x
+    0.00199378,              !- Coefficient3 x**2
+    -0.00805944,             !- Coefficient4 y
+    3.93414E-05,             !- Coefficient5 y**2
+    -1.81187E-04,            !- Coefficient6 x*y
+    10.0,                    !- Minimum Value of x
+    25.6,                    !- Maximum Value of x
+    7.2,                     !- Minimum Value of y
+    48.9;                    !- Maximum Value of y
+
+  Curve:Biquadratic,
+    EIR VS Temp1 Test,       !- Name
+    0.138848,                !- Coefficient1 Constant
+    0.0457985,               !- Coefficient2 x
+    -0.00138661,             !- Coefficient3 x**2
+    0.0141485,               !- Coefficient4 y
+    0.000386055,             !- Coefficient5 y**2
+    -4.38194E-04,            !- Coefficient6 x*y
+    10.0,                    !- Minimum Value of x
+    25.6,                    !- Maximum Value of x
+    7.2,                     !- Minimum Value of y
+    48.9;                    !- Maximum Value of y
+
+  Curve:Biquadratic,
+    wasteHeat VS Temp1 Test, !- Name
+    1.0,                     !- Coefficient1 Constant
+    0,                       !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0,                       !- Coefficient4 y
+    0,                       !- Coefficient5 y**2
+    0,                       !- Coefficient6 x*y
+    10.0,                    !- Minimum Value of x
+    25.6,                    !- Maximum Value of x
+    7.2,                     !- Minimum Value of y
+    48.9;                    !- Maximum Value of y
+
+  Curve:Biquadratic,
+    Heating VS Temp1 Test,   !- Name
+    0.617474,                !- Coefficient1 Constant
+    -0.00245669,             !- Coefficient2 x
+    -1.86550E-05,            !- Coefficient3 x**2
+    0.0254921,               !- Coefficient4 y
+    -1.00773E-04,            !- Coefficient5 y**2
+    -1.09447E-04,            !- Coefficient6 x*y
+    7.0,                     !- Minimum Value of x
+    27.0,                    !- Maximum Value of x
+    10.0,                    !- Minimum Value of y
+    30.0;                    !- Maximum Value of y
+
+  Curve:Biquadratic,
+    EIRH VS Temp1 Test,      !- Name
+    0.993257,                !- Coefficient1 Constant
+    0.0201512,               !- Coefficient2 x
+    7.72375E-05,             !- Coefficient3 x**2
+    -0.0317207,              !- Coefficient4 y
+    0.000740649,             !- Coefficient5 y**2
+    -3.03875E-04,            !- Coefficient6 x*y
+    7.0,                     !- Minimum Value of x
+    27.0,                    !- Maximum Value of x
+    10.0,                    !- Minimum Value of y
+    30.0;                    !- Maximum Value of y
+
+  Curve:Biquadratic,
+    Heating wasteHeat VS Temp1 Test,  !- Name
+    1.0,                     !- Coefficient1 Constant
+    0,                       !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0,                       !- Coefficient4 y
+    0,                       !- Coefficient5 y**2
+    0,                       !- Coefficient6 x*y
+    7.0,                     !- Minimum Value of x
+    27.0,                    !- Maximum Value of x
+    10.0,                    !- Minimum Value of y
+    30.0;                    !- Maximum Value of y
+
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Sensible Cooling Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Source Side Heat Transfer Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Part Load Ratio,timestep;
+
+  Output:Variable,*,Heating Coil Air Outlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Coil Air Outlet Humidity Ratio,timestep;
+
+  Output:Variable,*,Cooling Coil Air Inlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Coil Air Inlet Humidity Ratio,timestep;
+
+  Output:Variable,*,Cooling Coil Source Side Outlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Coil Source Side Inlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Coil Air Mass Flow Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Upper Speed Level,timestep;
+
+  Output:Variable,*,Cooling Coil Neighboring Speed Levels Ratio,timestep;
+
+  Output:Variable,*,Cooling Coil Recoverable Heat Transfer Rate,timestep;
+
+  Timestep,4;
+
+  Building,
+    Simple One Zone (Wireframe DXF),  !- Name
+    0.0000000E+00,           !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    .04,                     !- Loads Convergence Tolerance Value {W}
+    .004,                    !- Temperature Convergence Tolerance Value {deltaC}
+    MinimalShadowing,        !- Solar Distribution
+    30,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  HeatBalanceAlgorithm,ConductionTransferFunction;
+
+  SurfaceConvectionAlgorithm:Inside,TARP;
+
+  SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+  SimulationControl,
+    Yes,                     !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  Site:Location,
+    Denver Centennial CO USA WMO=724666,  !- Name
+    39.57,                   !- Latitude {deg}
+    -104.85,                 !- Longitude {deg}
+    -7.00,                   !- Time Zone {hr}
+    1793.00;                 !- Elevation {m}
+
+ !  WMO=724666 Time Zone=NAM        (GMT-07:00) Mountain Time (US & Canada)
+ !  Data Source=ASHRAE 2009 Annual Design Conditions
+ ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
+ ! Denver Centennial CO USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.5m/s, 5%=8.4m/s
+ ! Denver Centennial CO USA Extreme Annual Temperatures, Max Drybulb=-22.9°C Min Drybulb=36.1°C
+ ! Denver Centennial CO USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
+ ! Coldest Month=December
+ ! Denver Centennial CO USA Annual Heating 99.6%, MaxDB=-18.8°C
+
+  SizingPeriod:DesignDay,
+    Denver Centennial Ann Htg 99.6% Condns DB,  !- Name
+    12,                      !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -18.8,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -18.8,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    81560.,                  !- Barometric Pressure {Pa}
+    3,                       !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+ ! Denver Centennial Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
+ ! Hottest Month=July
+ ! Denver Centennial CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32°C MWB=15.5°C
+
+  SizingPeriod:DesignDay,
+    Denver Centennial Ann Clg 1% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    32,                      !- Maximum Dry-Bulb Temperature {C}
+    15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    15.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    81560.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    0,                       !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+!************************************************************
+! start of dedicated outdoor air system serving a single zone
+
+  BranchList,
+    Air Loop Branches,       !- Name
+    Air Loop Main Branch;    !- Branch 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: BRANCH ===========
+
+  Branch,
+    Air Loop Main Branch,    !- Name
+    ,                        !- Pressure Drop Curve Name
+    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
+    OA Sys 1,                !- Component 1 Name
+    Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
+    Mixed Air Node,          !- Component 1 Outlet Node Name
+    Fan:ConstantVolume,      !- Component 2 Object Type
+    Supply Fan 1,            !- Component 2 Name
+    Mixed Air Node,          !- Component 2 Inlet Node Name
+    Air Loop Outlet Node;    !- Component 2 Outlet Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIR PRIMARY LOOP ===========
+
+  AirLoopHVAC,
+    Dedicated Outdoor Air System,  !- Name
+    ,                        !- Controller List Name
+    Outdoor Air 1 Avail List,!- Availability Manager List Name
+    0.0625,                  !- Design Supply Air Flow Rate {m3/s}
+    Air Loop Branches,       !- Branch List Name
+    ,                        !- Connector List Name
+    Outdoor Air Mixer Inlet Node,  !- Supply Side Inlet Node Name
+    Return Air Mixer Outlet, !- Demand Side Outlet Node Name
+    Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
+    Air Loop Outlet Node;    !- Supply Side Outlet Node Names
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONE SUPPLY AIR PATH ===========
+
+  AirLoopHVAC:SupplyPath,
+    OASysSupplyPath,         !- Name
+    Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name
+    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
+    Zone Supply Air Splitter;!- Component 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONE RETURN AIR PATH ===========
+
+  AirLoopHVAC:ReturnPath,
+    OASysReturnPath,         !- Name
+    Return Air Mixer Outlet, !- Return Air Path Outlet Node Name
+    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
+    Zone Return Air Mixer;   !- Component 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONE SPLITTER ===========
+
+  AirLoopHVAC:ZoneSplitter,
+    Zone Supply Air Splitter,!- Name
+    Zone Equipment Inlet Node,  !- Inlet Node Name
+    Zone 1 OA Inlet Node ATInlet;  !- Outlet 1 Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONE MIXER ===========
+
+  AirLoopHVAC:ZoneMixer,
+    Zone Return Air Mixer,   !- Name
+    Return Air Mixer Outlet, !- Outlet Node Name
+    Zone 1 Return Node;      !- Inlet 1 Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: CONTROLLER LIST ===========
+
+  AirLoopHVAC:ControllerList,
+    OA Sys 1 Controllers,    !- Name
+    Controller:OutdoorAir,   !- Controller 1 Object Type
+    OA Controller 1;         !- Controller 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIR LOOP EQUIPMENT LIST ===========
+
+  AirLoopHVAC:OutdoorAirSystem:EquipmentList,
+    OA Sys 1 Equipment,      !- Name
+    OutdoorAir:Mixer,        !- Component 1 Object Type
+    OA Mixing Box 1;         !- Component 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR SYSTEM ===========
+
+  AirLoopHVAC:OutdoorAirSystem,
+    OA Sys 1,                !- Name
+    OA Sys 1 Controllers,    !- Controller List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR INLET NODE LIST ===========
+
+  OutdoorAir:NodeList,
+    OutsideAirInletNodes;    !- Node or NodeList Name 1
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTSIDE AIR MIXER ===========
+
+  OutdoorAir:Mixer,
+    OA Mixing Box 1,         !- Name
+    Mixed Air Node,          !- Mixed Air Node Name
+    Outside Air Inlet Node,  !- Outdoor Air Stream Node Name
+    Relief Air Outlet Node,  !- Relief Air Stream Node Name
+    Outdoor Air Mixer Inlet Node;  !- Return Air Stream Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: SYSTEM AVAILABILITY MANAGER LIST ===========
+
+  AvailabilityManagerAssignmentList,
+    Outdoor Air 1 Avail List,!- Name
+    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    Outdoor Air 1 Avail;     !- Availability Manager 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: SYSTEM AVAILABILITY MANAGER:SCHEDULED ===========
+
+  AvailabilityManager:Scheduled,
+    Outdoor Air 1 Avail,     !- Name
+    FanAndCoilAvailSched;    !- Schedule Name
+
+!-   ===========  ALL OBJECTS IN CLASS: SET POINT MANAGER:MIXED AIR ===========
+
+  SetpointManager:MixedAir,
+    Mixed Air Temp Manager 1,!- Name
+    Temperature,             !- Control Variable
+    Air Loop Outlet Node,    !- Reference Setpoint Node Name
+    Mixed Air Node,          !- Fan Inlet Node Name
+    Air Loop Outlet Node,    !- Fan Outlet Node Name
+    Mixed Air Node;          !- Setpoint Node or NodeList Name
+
+!-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTSIDE AIR ===========
+
+  Controller:OutdoorAir,
+    OA Controller 1,         !- Name
+    Relief Air Outlet Node,  !- Relief Air Outlet Node Name
+    Outdoor Air Mixer Inlet Node,  !- Return Air Node Name
+    Mixed Air Node,          !- Mixed Air Node Name
+    Outside Air Inlet Node,  !- Actuator Node Name
+    0.0625,                  !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0625,                  !- Maximum Outdoor Air Flow Rate {m3/s}
+    NoEconomizer,            !- Economizer Control Type
+    ,                        !- Economizer Control Action Type
+    23.,                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
+    13.5,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Electronic Enthalpy Limit Curve Name
+    14.,                     !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    NoLockout,               !- Lockout Type
+    FixedMinimum,            !- Minimum Limit Type
+    OAFractionSched,         !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Fraction of Outdoor Air Schedule Name
+    ,                        !- Maximum Fraction of Outdoor Air Schedule Name
+    ;                        !- Mechanical Ventilation Controller Name
+
+!-   ===========  ALL OBJECTS IN CLASS: FAN:SIMPLE:ONOFF ===========
+
+  Fan:ConstantVolume,
+    Supply Fan 1,            !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    600.0,                   !- Pressure Rise {Pa}
+    0.0625,                  !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Airstream Fraction
+    Mixed Air Node,          !- Air Inlet Node Name
+    Air Loop Outlet Node;    !- Air Outlet Node Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+    Zone1DirectAir,          !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Zone 1 OA Inlet Node ATInlet,  !- Air Inlet Node Name
+    Zone 1 OA Inlet Node,    !- Air Outlet Node Name
+    0.0625,                  !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone1DirectAir ADU,      !- Name
+    Zone 1 OA Inlet Node,    !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone1DirectAir,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  Schedule:Compact,
+    OAFractionSched,         !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 7:00,0.05,        !- Field 3
+    Until: 18:00,1.0,        !- Field 5
+    Until: 24:00,0.05;       !- Field 7
+
+!-   ===========  ALL OBJECTS IN CLASS: SetpointManager:SingleZone:Reheat ===========
+
+  SetpointManager:SingleZone:Reheat,
+    Supply Air Temp Manager 1,  !- Name
+    Temperature,             !- Control Variable
+    14.0,                    !- Minimum Supply Air Temperature {C}
+    23.0,                    !- Maximum Supply Air Temperature {C}
+    SPACE1-1,                !- Control Zone Name
+    Zone 1 Node,             !- Zone Node Name
+    Zone 1 OA Inlet Node,    !- Zone Inlet Node Name
+    Air Loop Outlet Node;    !- Setpoint Node or NodeList Name
+
+! end of dedicated outdoor air system serving a single zone
+!**********************************************************
+
+  Site:GroundTemperature:Deep,16.5,16.5,16.5,16.5,16.5,16.5,16.5,16.5,16.5,16.5,16.5,16.5;
+
+  Sizing:Parameters,
+    1.3,                     !- Heating Sizing Factor
+    1.3,                     !- Cooling Sizing Factor
+    ;                        !- Timesteps in Averaging Window
+
+  Sizing:Zone,
+    SPACE1-1,                !- Zone or ZoneList Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    13.,                     !- Zone Cooling Design Supply Air Temperature {C}
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
+    30.,                     !- Zone Heating Design Supply Air Temperature {C}
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    0.0075,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    SZ DSOA SPACE1-1,        !- Design Specification Outdoor Air Object Name
+    0.0,                     !- Zone Heating Sizing Factor
+    0.0,                     !- Zone Cooling Sizing Factor
+    DesignDay,               !- Cooling Design Air Flow Method
+    0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Cooling Minimum Air Flow {m3/s}
+    ,                        !- Cooling Minimum Air Flow Fraction
+    DesignDay,               !- Heating Design Air Flow Method
+    0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Heating Maximum Air Flow {m3/s}
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
+
+  DesignSpecification:OutdoorAir,
+    SZ DSOA SPACE1-1,        !- Name
+    flow/person,             !- Outdoor Air Method
+    0.0125,                  !- Outdoor Air Flow per Person {m3/s-person}
+    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.0;                     !- Outdoor Air Flow per Zone {m3/s}
+
+  People,
+    SPACE1-1 PEOPLE,         !- Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
+    OFFICE OCCUPANCY,        !- Number of People Schedule Name
+    people,                  !- Number of People Calculation Method
+    5.000000,                !- Number of People
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
+    0.3000000,               !- Fraction Radiant
+    ,                        !- Sensible Heat Fraction
+    Activity Sch,            !- Activity Level Schedule Name
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Enable ASHRAE 55 Comfort Warnings
+    zoneaveraged,            !- Mean Radiant Temperature Calculation Type
+    ,                        !- Surface Name/Angle Factor List Name
+    Work Eff Sch,            !- Work Efficiency Schedule Name
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method Schedule Name
+    Clothing Sch,            !- Clothing Insulation Schedule Name
+    Air Velo Sch,            !- Air Velocity Schedule Name
+    FANGER;                  !- Thermal Comfort Model 1 Type
+
+  Schedule:Compact,
+    OFFICE OCCUPANCY,        !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: WeekDays SummerDesignDay, !- Field 2
+    Until: 6:00,0.0,         !- Field 3
+    Until: 7:00,0.10,        !- Field 5
+    Until: 8:00,0.50,        !- Field 7
+    Until: 12:00,1.00,       !- Field 9
+    Until: 13:00,0.50,       !- Field 11
+    Until: 16:00,1.00,       !- Field 13
+    Until: 17:00,0.50,       !- Field 15
+    Until: 18:00,0.10,       !- Field 17
+    Until: 24:00,0.0,        !- Field 19
+    For: AllOtherDays,       !- Field 21
+    Until: 24:00,0.0;        !- Field 22
+
+  Schedule:Compact,
+    Activity Sch,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,131.8;      !- Field 3
+
+  Schedule:Compact,
+    Work Eff Sch,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.0;        !- Field 3
+
+  Schedule:Compact,
+    Clothing Sch,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Compact,
+    Air Velo Sch,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.137;      !- Field 3
+
+  Schedule:Compact,
+    BLDG_EQUIP_SCH,          !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays,           !- Field 2
+    Until: 08:00,0.40,       !- Field 3
+    Until: 12:00,0.90,       !- Field 5
+    Until: 13:00,0.80,       !- Field 7
+    Until: 17:00,0.90,       !- Field 9
+    Until: 18:00,0.50,       !- Field 11
+    Until: 24:00,0.40,       !- Field 13
+    For: SummerDesignDay,    !- Field 15
+    Until: 24:00,1.0,        !- Field 16
+    For: Saturday,           !- Field 18
+    Until: 06:00,0.30,       !- Field 19
+    Until: 08:00,0.4,        !- Field 21
+    Until: 12:00,0.5,        !- Field 23
+    Until: 17:00,0.35,       !- Field 25
+    Until: 24:00,0.30,       !- Field 27
+    For: WinterDesignDay,    !- Field 29
+    Until: 24:00,0.0,        !- Field 30
+    For: Sunday Holidays AllOtherDays, !- Field 32
+    Until: 24:00,0.30;       !- Field 33
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  Lights,
+    SPACE1-1 Lights,         !- Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
+    LIGHTS-1,                !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    284,                     !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0.0,                     !- Return Air Fraction
+    0.59,                    !- Fraction Radiant
+    0.2,                     !- Fraction Visible
+    0,                       !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+  ElectricEquipment,
+    SPACE1-1_MiscPlug_Equip, !- Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
+    BLDG_EQUIP_SCH,          !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    207.7352,                !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0.0000,                  !- Fraction Latent
+    0.5000,                  !- Fraction Radiant
+    0.0000,                  !- Fraction Lost
+    MiscPlug;                !- End-Use Subcategory
+
+  Schedule:Compact,
+    LIGHTS-1,                !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
+    Until: 9:00,0.05,        !- Field 3
+    Until: 10:00,0.9,        !- Field 5
+    Until: 11:00,0.95,       !- Field 7
+    Until: 12:00,1.0,        !- Field 9
+    Until: 13:00,0.95,       !- Field 11
+    Until: 14:00,0.8,        !- Field 13
+    Until: 15:00,0.9,        !- Field 15
+    Until: 17:00,1.0,        !- Field 17
+    Until: 24:00,0.05,       !- Field 19
+    For: AllOtherDays,       !- Field 21
+    Until: 24:00,0.05;       !- Field 22
+
+  ZoneControl:Thermostat,
+    Zone 1 Thermostat,       !- Name
+    SPACE1-1,                !- Zone or ZoneList Name
+    Zone Control Type Sched, !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    Temperature Setpoints;   !- Control 1 Name
+
+  ThermostatSetpoint:DualSetpoint,
+    Temperature Setpoints,   !- Name
+    Heating Setpoints,       !- Heating Setpoint Temperature Schedule Name
+    Cooling Setpoints;       !- Cooling Setpoint Temperature Schedule Name
+
+  Schedule:Compact,
+    Zone Control Type Sched, !- Name
+    Control Type,            !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,4;          !- Field 3
+
+  ScheduleTypeLimits,
+    Control Type,            !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -60,                     !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    CONTINUOUS,              !- Numeric Type
+    Temperature;             !- Unit Type
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  Schedule:Compact,
+    On,                      !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Compact,
+    Heating Setpoints,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until:  7:00,15.0,       !- Field 3
+    Until: 17:00,21.0,       !- Field 5
+    Until: 24:00,15.0;       !- Field 7
+
+  Schedule:Compact,
+    Cooling Setpoints,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until:  7:00,30.0,       !- Field 3
+    Until: 17:00,23.0,       !- Field 5
+    Until: 24:00,30.0;       !- Field 7
+
+  Schedule:Compact,
+    FanAndCoilAvailSched,    !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  ZoneHVAC:EquipmentConnections,
+    SPACE1-1,                !- Zone Name
+    Zone1Equipment,          !- Zone Conditioning Equipment List Name
+    Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
+    Zone 1 Outlet Node,      !- Zone Air Exhaust Node or NodeList Name
+    Zone 1 Node,             !- Zone Air Node Name
+    Zone 1 Return Node;      !- Zone Return Air Node or NodeList Name
+
+  ZoneHVAC:EquipmentList,
+    Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone1DirectAir ADU,      !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    AirLoopHVAC:UnitarySystem,  !- Zone Equipment 2 Object Type
+    Zone1WTAHP,              !- Zone Equipment 2 Name
+    2,                       !- Zone Equipment 2 Cooling Sequence
+    2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+
+  NodeList,
+    Zone1Inlets,             !- Name
+    Zone 1 Inlet Node,       !- Node 1 Name
+    Zone 1 OA Inlet Node;    !- Node 2 Name
+
+  OutdoorAir:NodeList,
+    Sys 1 OutsideAirInletNodes;  !- Node or NodeList Name 1
+
+  NodeList,
+    Sys 1 OutsideAirInletNodes,  !- Name
+    Sys 1 Outside Air Inlet Node,  !- Node 1 Name
+    OUTSIDE AIR INLET NODE;  !- Node 2 Name
+
+!  OutdoorAir:Mixer,
+!    Zone 1 Mixer,            !- Name
+!    Sys 1 Mixed Air Node,    !- Mixed Air Node Name
+!    Sys 1 Outside Air Inlet Node,  !- Outdoor Air Stream Node Name
+!    Sys 1 Relief Air Outlet Node,  !- Relief Air Stream Node Name
+!    Zone 1 Outlet Node;      !- Return Air Stream Node Name
+
+  Schedule:Compact,
+    CyclingFanSch,           !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.0;        !- Field 3
+
+  Fan:OnOff,
+    Zone 1 Fan,              !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    300.0,                   !- Pressure Rise {Pa}
+    Autosize,                !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Airstream Fraction
+    ZONE 1 OUTLET NODE,      !- Air Inlet Node Name
+    Sys 1 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+
+  Coil:Heating:Fuel,
+    Heat Pump DX Supp Heating Coil 1,  !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    NaturalGas,              !- Fuel Type
+    0.8,                     !- Burner Efficiency
+    32000,                   !- Nominal Capacity {W}
+    Sys 1 SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
+    Zone 1 Inlet Node;       !- Air Outlet Node Name
+
+  CondenserLoop,
+    Chilled Water Condenser Loop,  !- Name
+    Water,                   !- Fluid Type
+    ,                        !- User Defined Fluid Type
+    Tower Loop Operation,    !- Condenser Equipment Operation Scheme Name
+    Condenser Supply Outlet Node,  !- Condenser Loop Temperature Setpoint Node Name
+    80,                      !- Maximum Loop Temperature {C}
+    10,                      !- Minimum Loop Temperature {C}
+    0.00400000,              !- Maximum Loop Flow Rate {m3/s}
+    0,                       !- Minimum Loop Flow Rate {m3/s}
+    autocalculate,           !- Condenser Loop Volume {m3}
+    Condenser Supply Inlet Node,  !- Condenser Side Inlet Node Name
+    Condenser Supply Outlet Node,  !- Condenser Side Outlet Node Name
+    Condenser Supply Side Branches,  !- Condenser Side Branch List Name
+    Condenser Supply Side Connectors,  !- Condenser Side Connector List Name
+    Condenser Demand Inlet Node,  !- Demand Side Inlet Node Name
+    Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
+    Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
+    Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
+    SequentialLoad;          !- Load Distribution Scheme
+
+  SetpointManager:FollowGroundTemperature,
+    MyCondenserControl,      !- Name
+    Temperature,             !- Control Variable
+    Site:GroundTemperature:Deep,  !- Reference Ground Temperature Object Type
+    0,                       !- Offset Temperature Difference {deltaC}
+    80.0,                    !- Maximum Setpoint Temperature {C}
+    10.0,                    !- Minimum Setpoint Temperature {C}
+    Condenser Supply Outlet Node;  !- Setpoint Node or NodeList Name
+
+  Sizing:Plant,
+    Chilled Water Condenser Loop,  !- Plant or Condenser Loop Name
+    Condenser,               !- Loop Type
+    29.4,                    !- Design Loop Exit Temperature {C}
+    5.6;                     !- Loop Design Temperature Difference {deltaC}
+
+  BranchList,
+    Condenser Supply Side Branches,  !- Name
+    Condenser Supply Inlet Branch,  !- Branch 1 Name
+    Condenser Supply GHE Branch,  !- Branch 2 Name
+    Condenser Supply Bypass Branch,  !- Branch 3 Name
+    Condenser Supply Outlet Branch;  !- Branch 4 Name
+
+  ConnectorList,
+    Condenser Supply Side Connectors,  !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    Condenser Supply Splitter,  !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    Condenser Supply Mixer;  !- Connector 2 Name
+
+  Branch,
+    Condenser Supply Inlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pump:VariableSpeed,      !- Component 1 Object Type
+    Cond Circ Pump,          !- Component 1 Name
+    Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
+    Condenser Pump Outlet Node;  !- Component 1 Outlet Node Name
+
+  Branch,
+    Condenser Supply GHE Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    GroundHeatExchanger:System,  !- Component 1 Object Type
+    Vertical Ground Heat Exchanger,  !- Component 1 Name
+    GHE Inlet Node,          !- Component 1 Inlet Node Name
+    GHE Outlet Node;         !- Component 1 Outlet Node Name
+
+  Branch,
+    Condenser Supply Bypass Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Supply Side Bypass,  !- Component 1 Name
+    Cond Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
+    Cond Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Condenser Supply Side Bypass,  !- Name
+    Cond Supply Bypass Inlet Node,  !- Inlet Node Name
+    Cond Supply Bypass Outlet Node;  !- Outlet Node Name
+
+  Branch,
+    Condenser Supply Outlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Supply Outlet, !- Component 1 Name
+    Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
+    Condenser Supply Outlet Node;  !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Condenser Supply Outlet, !- Name
+    Condenser Supply Exit Pipe Inlet Node,  !- Inlet Node Name
+    Condenser Supply Outlet Node;  !- Outlet Node Name
+
+  BranchList,
+    Condenser Demand Side Branches,  !- Name
+    Condenser Demand Inlet Branch,  !- Branch 1 Name
+    Sys 1 Gshp Cooling Condenser Branch,  !- Branch 2 Name
+    Sys 1 Gshp Heating Condenser Branch,  !- Branch 3 Name
+    Condenser Demand Bypass Branch,  !- Branch 4 Name
+    Condenser Demand Outlet Branch;  !- Branch 5 Name
+
+  ConnectorList,
+    Condenser Demand Side Connectors,  !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    Condenser Demand Splitter,  !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    Condenser Demand Mixer;  !- Connector 2 Name
+
+  Branch,
+    Condenser Demand Inlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Demand Inlet Pipe,  !- Component 1 Name
+    Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
+    Condenser Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Condenser Demand Inlet Pipe,  !- Name
+    Condenser Demand Inlet Node,  !- Inlet Node Name
+    Condenser Demand Entrance Pipe Outlet Node;  !- Outlet Node Name
+
+  Branch,
+    Sys 1 Gshp Cooling Condenser Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,  !- Component 1 Object Type
+    Sys 1 Heat Pump Cooling Mode,  !- Component 1 Name
+    Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Component 1 Inlet Node Name
+    Sys 1 Water to Air Heat Pump Source Side1 Outlet Node;  !- Component 1 Outlet Node Name
+
+  Branch,
+    Sys 1 Gshp Heating Condenser Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,  !- Component 1 Object Type
+    Sys 1 Heat Pump Heating Mode,  !- Component 1 Name
+    Sys 1 Water to Air Heat Pump Source Side2 Inlet Node,  !- Component 1 Inlet Node Name
+    Sys 1 Water to Air Heat Pump Source Side2 Outlet Node;  !- Component 1 Outlet Node Name
+
+  Branch,
+    Condenser Demand Bypass Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Demand Side Bypass,  !- Component 1 Name
+    Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Condenser Demand Side Bypass,  !- Name
+    Cond Demand Bypass Inlet Node,  !- Inlet Node Name
+    Cond Demand Bypass Outlet Node;  !- Outlet Node Name
+
+  Branch,
+    Condenser Demand Outlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Demand Outlet Pipe,  !- Component 1 Name
+    Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
+    Condenser Demand Outlet Node;  !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Condenser Demand Outlet Pipe,  !- Name
+    Condenser Demand Exit Pipe Inlet Node,  !- Inlet Node Name
+    Condenser Demand Outlet Node;  !- Outlet Node Name
+
+  Connector:Splitter,
+    Condenser Demand Splitter,  !- Name
+    Condenser Demand Inlet Branch,  !- Inlet Branch Name
+    Sys 1 Gshp Cooling Condenser Branch,  !- Outlet Branch 1 Name
+    Sys 1 Gshp Heating Condenser Branch,  !- Outlet Branch 2 Name
+    Condenser Demand Bypass Branch;  !- Outlet Branch 3 Name
+
+  Connector:Mixer,
+    Condenser Demand Mixer,  !- Name
+    Condenser Demand Outlet Branch,  !- Outlet Branch Name
+    Sys 1 Gshp Cooling Condenser Branch,  !- Inlet Branch 1 Name
+    Sys 1 Gshp Heating Condenser Branch,  !- Inlet Branch 2 Name
+    Condenser Demand Bypass Branch;  !- Inlet Branch 3 Name
+
+  Connector:Splitter,
+    Condenser Supply Splitter,  !- Name
+    Condenser Supply Inlet Branch,  !- Inlet Branch Name
+    Condenser Supply GHE Branch,  !- Outlet Branch 1 Name
+    Condenser Supply Bypass Branch;  !- Outlet Branch 2 Name
+
+  Connector:Mixer,
+    Condenser Supply Mixer,  !- Name
+    Condenser Supply Outlet Branch,  !- Outlet Branch Name
+    Condenser Supply GHE Branch,  !- Inlet Branch 1 Name
+    Condenser Supply Bypass Branch;  !- Inlet Branch 2 Name
+
+  CondenserEquipmentOperationSchemes,
+    Tower Loop Operation,    !- Name
+    PlantEquipmentOperation:Uncontrolled,  !- Control Scheme 1 Object Type
+    Year Round Tower Operation,  !- Control Scheme 1 Name
+    ON;                      !- Control Scheme 1 Schedule Name
+
+  PlantEquipmentOperation:Uncontrolled,
+    Year Round Tower Operation,  !- Name
+    All Towers;              !- Equipment List Name
+
+  CondenserEquipmentList,
+    All Towers,              !- Name
+    GroundHeatExchanger:System,  !- Equipment 1 Object Type
+    Vertical Ground Heat Exchanger;  !- Equipment 1 Name
+
+  GroundHeatExchanger:System,
+    Vertical Ground Heat Exchanger,  !- Name
+    GHE Inlet Node,          !- Inlet Node Name
+    GHE Outlet Node,         !- Outlet Node Name
+    0.00033000,              !- Design Flow Rate {m3/s}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
+    Vertical Ground Heat Exchanger Ground Temps,  !- Undisturbed Ground Temperature Model Name
+    .692626E+00,             !- Ground Thermal Conductivity {W/m-K}
+    .234700E+07,             !- Ground Thermal Heat Capacity {J/m3-K}
+    Vertical Ground Heat Exchanger g-functions;  !- GHE:Vertical:ResponseFactors Object Name
+
+  GroundHeatExchanger:Vertical:Properties,
+    Vertical Ground Heat Exchanger Props,  !- Name
+    1,                       !- Depth of Top of Borehole {m}
+    76.2,                    !- Borehole Length {m}
+    0.127016,                !- Borehole Diameter {m}
+    .692626E+00,             !- Grout Thermal Conductivity {W/m-K}
+    3.90E+06,                !- Grout Thermal Heat Capacity {J/m3-K}
+    .391312E+00,             !- Pipe Thermal Conductivity {W/m-K}
+    1.542E+06,               !- Pipe Thermal Heat Capacity {J/m3-K}
+    2.66667E-02,             !- Pipe Outer Diameter {m}
+    2.41285E-03,             !- Pipe Thickness {m}
+    5.1225E-02;              !- U-Tube Distance {m}
+
+  Site:GroundTemperature:Undisturbed:KusudaAchenbach,
+    Vertical Ground Heat Exchanger Ground Temps,  !- Name
+    .692626E+00,             !- Soil Thermal Conductivity {W/m-K}
+    920,                     !- Soil Density {kg/m3}
+    2551.09,                 !- Soil Specific Heat {J/kg-K}
+    13.375,                  !- Average Soil Surface Temperature {C}
+    3.2,                     !- Average Amplitude of Surface Temperature {deltaC}
+    8;                       !- Phase Shift of Minimum Surface Temperature {days}
+
+  GroundHeatExchanger:ResponseFactors,
+    Vertical Ground Heat Exchanger g-functions,  !- Name
+    Vertical Ground Heat Exchanger Props,  !- GHE:Vertical:Properties Object Name
+    24,                      !- Number of Boreholes
+    0.0005,                  !- G-Function Reference Ratio {dimensionless}
+    -15.2996,                !- g-Function Ln(T/Ts) Value 1
+    -0.348322,               !- g-Function g Value 1
+    -14.201,                 !- g-Function Ln(T/Ts) Value 2
+    0.022208,                !- g-Function g Value 2
+    -13.2202,                !- g-Function Ln(T/Ts) Value 3
+    0.412345,                !- g-Function g Value 3
+    -12.2086,                !- g-Function Ln(T/Ts) Value 4
+    0.867498,                !- g-Function g Value 4
+    -11.1888,                !- g-Function Ln(T/Ts) Value 5
+    1.357839,                !- g-Function g Value 5
+    -10.1816,                !- g-Function Ln(T/Ts) Value 6
+    1.852024,                !- g-Function g Value 6
+    -9.1815,                 !- g-Function Ln(T/Ts) Value 7
+    2.345656,                !- g-Function g Value 7
+    -8.6809,                 !- g-Function Ln(T/Ts) Value 8
+    2.593958,                !- g-Function g Value 8
+    -8.5,                    !- g-Function Ln(T/Ts) Value 9
+    2.679,                   !- g-Function g Value 9
+    -7.8,                    !- g-Function Ln(T/Ts) Value 10
+    3.023,                   !- g-Function g Value 10
+    -7.2,                    !- g-Function Ln(T/Ts) Value 11
+    3.32,                    !- g-Function g Value 11
+    -6.5,                    !- g-Function Ln(T/Ts) Value 12
+    3.681,                   !- g-Function g Value 12
+    -5.9,                    !- g-Function Ln(T/Ts) Value 13
+    4.071,                   !- g-Function g Value 13
+    -5.2,                    !- g-Function Ln(T/Ts) Value 14
+    4.828,                   !- g-Function g Value 14
+    -4.5,                    !- g-Function Ln(T/Ts) Value 15
+    6.253,                   !- g-Function g Value 15
+    -3.963,                  !- g-Function Ln(T/Ts) Value 16
+    7.894,                   !- g-Function g Value 16
+    -3.27,                   !- g-Function Ln(T/Ts) Value 17
+    11.82,                   !- g-Function g Value 17
+    -2.864,                  !- g-Function Ln(T/Ts) Value 18
+    15.117,                  !- g-Function g Value 18
+    -2.577,                  !- g-Function Ln(T/Ts) Value 19
+    18.006,                  !- g-Function g Value 19
+    -2.171,                  !- g-Function Ln(T/Ts) Value 20
+    22.887,                  !- g-Function g Value 20
+    -1.884,                  !- g-Function Ln(T/Ts) Value 21
+    26.924,                  !- g-Function g Value 21
+    -1.191,                  !- g-Function Ln(T/Ts) Value 22
+    38.004,                  !- g-Function g Value 22
+    -0.497,                  !- g-Function Ln(T/Ts) Value 23
+    49.919,                  !- g-Function g Value 23
+    -0.274,                  !- g-Function Ln(T/Ts) Value 24
+    53.407,                  !- g-Function g Value 24
+    -0.051,                  !- g-Function Ln(T/Ts) Value 25
+    56.632,                  !- g-Function g Value 25
+    0.196,                   !- g-Function Ln(T/Ts) Value 26
+    59.825,                  !- g-Function g Value 26
+    0.419,                   !- g-Function Ln(T/Ts) Value 27
+    62.349,                  !- g-Function g Value 27
+    0.642,                   !- g-Function Ln(T/Ts) Value 28
+    64.524,                  !- g-Function g Value 28
+    0.873,                   !- g-Function Ln(T/Ts) Value 29
+    66.412,                  !- g-Function g Value 29
+    1.112,                   !- g-Function Ln(T/Ts) Value 30
+    67.993,                  !- g-Function g Value 30
+    1.335,                   !- g-Function Ln(T/Ts) Value 31
+    69.162,                  !- g-Function g Value 31
+    1.679,                   !- g-Function Ln(T/Ts) Value 32
+    70.476,                  !- g-Function g Value 32
+    2.028,                   !- g-Function Ln(T/Ts) Value 33
+    71.361,                  !- g-Function g Value 33
+    2.275,                   !- g-Function Ln(T/Ts) Value 34
+    71.79,                   !- g-Function g Value 34
+    3.003,                   !- g-Function Ln(T/Ts) Value 35
+    72.511;                  !- g-Function g Value 35
+
+  Pump:VariableSpeed,
+    Cond Circ Pump,          !- Name
+    Condenser Supply Inlet Node,  !- Inlet Node Name
+    Condenser Pump Outlet Node,  !- Outlet Node Name
+    .004,                    !- Design Maximum Flow Rate {m3/s}
+    5000,                    !- Design Pump Head {Pa}
+    25,                      !- Design Power Consumption {W}
+    .87,                     !- Motor Efficiency
+    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    0,                       !- Coefficient 1 of the Part Load Performance Curve
+    1,                       !- Coefficient 2 of the Part Load Performance Curve
+    0,                       !- Coefficient 3 of the Part Load Performance Curve
+    0,                       !- Coefficient 4 of the Part Load Performance Curve
+    0,                       !- Design Minimum Flow Rate {m3/s}
+    INTERMITTENT;            !- Pump Control Type
+
+  Curve:Quadratic,
+    HPACCOOLPLFFPLR,         !- Name
+    0.75,                    !- Coefficient1 Constant
+    0.25,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    HPACHEATPLFFPLR,         !- Name
+    0.75,                    !- Coefficient1 Constant
+    0.25,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
+
+  Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;
+
+  Output:Variable,*,Zone Air System Sensible Heating Rate,timestep;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Rate,timestep;
+
+  Output:Variable,*,Zone Air Temperature,timestep;
+
+  Output:Variable,*,Zone Air Relative Humidity,timestep;
+
+  Output:Variable,*,Zone Air Humidity Ratio,timestep;
+
+  Output:Variable,*,Fan Electricity Rate,timestep;
+
+  Output:Variable,*,Heating Coil Heating Energy,timestep;
+
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
+
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
+
+  Output:Variable,*,Fan Electricity Rate,timestep;
+
+  Output:Variable,*,Ground Heat Exchanger Average Borehole Temperature,timestep;
+
+  Output:Variable,*,Ground Heat Exchanger Heat Transfer Rate,timestep;
+
+  Output:Variable,*,Ground Heat Exchanger Inlet Temperature,timestep;
+
+  Output:Variable,*,Ground Heat Exchanger Outlet Temperature,timestep;
+
+  Output:Variable,*,Ground Heat Exchanger Mass Flow Rate,timestep;
+
+  Output:Variable,*,Ground Heat Exchanger Average Fluid Temperature,timestep;
+
+  Output:Variable,Sys 1 Outside Air Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Outside Air Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Outside Air Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Outdoor Air Mixer Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Outdoor Air Mixer Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Mixed Air Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Mixed Air Node,System Node Temperature,timestep;
+
+  Output:Variable,Relief Air Outlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Relief Air Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Zone 1 Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Zone 1 Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Zone 1 Outlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Zone 1 Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Zone 1 Return Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Zone 1 Return Node,System Node Temperature,timestep;
+
+  Output:Variable,*,Fan Rise in Air Temperature,timestep;
+
+  Output:VariableDictionary,Regular;
+
+  Output:Surfaces:Drawing,dxf;
+
+  Output:Constructions,Constructions;
+
+  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
+
+  Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
+
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
+
+  Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
+
+  Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
+
+  Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
+
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
+
+  Material:NoMass,
+    R19LAYER,                !- Name
+    Rough,                   !- Roughness
+    3.344,                   !- Thermal Resistance {m2-K/W}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
+  Material,
+    C5 - 4 IN HW CONCRETE,   !- Name
+    MediumRough,             !- Roughness
+    0.1014984,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    1IN Stucco,              !- Name
+    Smooth,                  !- Roughness
+    0.0253,                  !- Thickness {m}
+    0.6918,                  !- Conductivity {W/m-K}
+    1858.0000,               !- Density {kg/m3}
+    837.0000,                !- Specific Heat {J/kg-K}
+    0.9000,                  !- Thermal Absorptance
+    0.9200,                  !- Solar Absorptance
+    0.9200;                  !- Visible Absorptance
+
+  Material,
+    8IN Concrete HW,         !- Name
+    MediumRough,             !- Roughness
+    0.2033,                  !- Thickness {m}
+    1.7296,                  !- Conductivity {W/m-K}
+    2243.0000,               !- Density {kg/m3}
+    837.0000,                !- Specific Heat {J/kg-K}
+    0.9000,                  !- Thermal Absorptance
+    0.6500,                  !- Solar Absorptance
+    0.6500;                  !- Visible Absorptance
+
+  Material,
+    Wall Insulation [5],     !- Name
+    MediumRough,             !- Roughness
+    0.0453,                  !- Thickness {m}
+    0.0432,                  !- Conductivity {W/m-K}
+    91.0000,                 !- Density {kg/m3}
+    837.0000,                !- Specific Heat {J/kg-K}
+    0.9000,                  !- Thermal Absorptance
+    0.5000,                  !- Solar Absorptance
+    0.5000;                  !- Visible Absorptance
+
+  Material,
+    1/2IN Gypsum,            !- Name
+    Smooth,                  !- Roughness
+    0.0127,                  !- Thickness {m}
+    0.1600,                  !- Conductivity {W/m-K}
+    784.9000,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000,                  !- Thermal Absorptance
+    0.9200,                  !- Solar Absorptance
+    0.9200;                  !- Visible Absorptance
+
+  Construction,
+    ext-walls,               !- Name
+    1IN Stucco,              !- Outside Layer
+    8IN Concrete HW,         !- Layer 2
+    Wall Insulation [5],     !- Layer 3
+    1/2IN Gypsum;            !- Layer 4
+
+  Construction,
+    FLOOR,                   !- Name
+    C5 - 4 IN HW CONCRETE;   !- Outside Layer
+
+  Construction,
+    ROOF19,                  !- Name
+    R19LAYER;                !- Outside Layer
+
+  Site:GroundTemperature:BuildingSurface,18.89,18.92,19.02,19.12,19.21,19.23,19.07,19.32,19.09,19.21,19.13,18.96;
+
+  Zone,
+    SPACE1-1,                !- Name
+    0.0000000E+00,           !- Direction of Relative North {deg}
+    0.0000000E+00,           !- X Origin {m}
+    0.0000000E+00,           !- Y Origin {m}
+    0.0000000E+00,           !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    World;                   !- Coordinate System
+
+  BuildingSurface:Detailed,
+    Zn001:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    ext-walls,               !- Construction Name
+    SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.0000000E+00,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,0.0000000E+00,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    ext-walls,               !- Construction Name
+    SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.24000,0.0000000E+00,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,15.24000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    ext-walls,               !- Construction Name
+    SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,15.24000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000000E+00,15.24000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000000E+00,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    ext-walls,               !- Construction Name
+    SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.0000000E+00,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000000E+00,15.24000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000000E+00,0.0000000E+00,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR,                   !- Construction Name
+    SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF19,                  !- Construction Name
+    SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000000E+00,           !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+

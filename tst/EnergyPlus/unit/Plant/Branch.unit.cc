@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/Branch.hh>
 #include <EnergyPlus/Plant/Component.hh>
 
@@ -92,4 +94,41 @@ TEST_F(EnergyPlusFixture, Plant_Topology_Branch_MaxAbsLoad)
     b.Comp[2].MyLoad = -22000;
     maxLoad = b.max_abs_Comp_MyLoad();
     ASSERT_NEAR(22000, maxLoad, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, TestDetermineBranchFlowRequest)
+{
+    // create a branch to mess with
+    DataPlant::BranchData b;
+
+    // set up the nodes
+    b.NodeNumIn = 1;
+    b.NodeNumOut = 3;
+    state->dataLoopNodes->Node.allocate(3);
+    auto &nodeIn = state->dataLoopNodes->Node(1);
+    auto &nodeMiddle = state->dataLoopNodes->Node(2);
+    auto &nodeOut = state->dataLoopNodes->Node(3);
+
+    // allocate some components
+    b.TotalComponents = 2;
+    b.Comp.allocate(2);
+    b.Comp(1).NodeNumIn = 1;
+    b.Comp(2).NodeNumIn = 2;
+
+    nodeIn.MassFlowRateRequest = 1.0;
+    nodeIn.MassFlowRateMaxAvail = 5.0;
+    nodeMiddle.MassFlowRateRequest = 2.0;
+    nodeMiddle.MassFlowRateMaxAvail = 5.0;
+    nodeOut.MassFlowRateRequest = 3.0; // only the component inlet nodes are checked, so this shouldn't be used
+    nodeOut.MassFlowRateMaxAvail = 5.0;
+
+    // for non-series-active branch, it just takes the inlet node request
+    b.controlType = DataBranchAirLoopPlant::ControlType::Active;
+    Real64 flowRequest = b.DetermineBranchFlowRequest(*state);
+    EXPECT_NEAR(1.0, flowRequest, 0.001);
+
+    // for series-active branch, it takes the max of all of them
+    b.controlType = DataBranchAirLoopPlant::ControlType::SeriesActive;
+    flowRequest = b.DetermineBranchFlowRequest(*state);
+    EXPECT_NEAR(2.0, flowRequest, 0.001);
 }

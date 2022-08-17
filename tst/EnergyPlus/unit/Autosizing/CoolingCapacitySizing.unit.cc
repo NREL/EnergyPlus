@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -233,7 +233,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(4862.02, sizedValue, 0.01);
+    EXPECT_NEAR(4981.71, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 7 - Zone DX Equipment, inlet side AT Mixer
@@ -248,7 +248,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(3843.78, sizedValue, 0.01);
+    EXPECT_NEAR(3899.81, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
     state->dataSize->ZoneEqSizing(1).ATMixerVolFlow = 0.0;
 
@@ -263,7 +263,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(4862.02, sizedValue, 0.01);
+    EXPECT_NEAR(4981.71, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
     state->dataSize->ZoneEqSizing(1).OAVolFlow = 0.0;
 
@@ -381,8 +381,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataFans->Fan(1).MotInAirFrac = 0.5;
     state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-    state->dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
+    state->dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
     // Test 14 - Airloop Equipment, with OA and precooling of OA stream, add fan heat
     // start with an autosized value
@@ -404,7 +404,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     // Test 15 - Airloop Equipment, with OA and precooling of OA stream, add fan heat, add scalable capacity sizing
     state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
     state->dataSize->FinalSysSizing(1).FractionOfAutosizedCoolingCapacity = 0.5;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -493,11 +493,13 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 0.2;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOATemp = 32.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
-    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBeforeCoolingCoilFlag = true;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOAHumRat = 0.009;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolTemp = 12.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolHumRat = 0.006;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanInletNodeNum = 1;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanOutletNodeNum = 2;
 
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -534,6 +536,34 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
         std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Cooling Design Capacity [W], 5634.11835\n"
                     " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Cooling Design Capacity [W], 4200.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+
+    // Test 22 - OA Equipment, DOAS Air loop with no fan heat for cooling capacity
+    state->dataSize->OASysEqSizing(1).CoolingCapacity = false;
+    state->dataAirLoop->OutsideAirSys.allocate(1);
+    state->dataAirLoop->OutsideAirSys(1).AirLoopDOASNum = 0;
+    state->dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 0.2;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOATemp = 32.0;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBeforeCoolingCoilFlag = false;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOAHumRat = 0.009;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolTemp = 12.0;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolHumRat = 0.006;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanInletNodeNum = 1;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanOutletNodeNum = 2;
+
+    // start with an autosized value
+    inputValue = DataSizing::AutoSize;
+    // do sizing
+    sizer.wasAutoSized = false;
+    printFlag = false;
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
+    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(5633.933, sizedValue, 0.01); // capacity includes system fan heat
+    sizer.autoSizedValue = 0.0;              // reset for next test
 }
 
 } // namespace EnergyPlus

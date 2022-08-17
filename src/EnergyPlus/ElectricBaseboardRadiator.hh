@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -117,17 +117,12 @@ namespace ElectricBaseboardRadiator {
         }
     };
 
-    void SimElecBaseboard(EnergyPlusData &state,
-                          std::string const &EquipName,
-                          int const ActualZoneNum,
-                          int const ControlledZoneNum,
-                          bool const FirstHVACIteration,
-                          Real64 &PowerMet,
-                          int &CompIndex);
+    void SimElecBaseboard(
+        EnergyPlusData &state, std::string const &EquipName, int const ZoneNum, bool const FirstHVACIteration, Real64 &PowerMet, int &CompIndex);
 
     void GetElectricBaseboardInput(EnergyPlusData &state);
 
-    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 

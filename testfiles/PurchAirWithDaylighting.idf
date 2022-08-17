@@ -109,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,6;
 
@@ -539,7 +539,13 @@
     1.2,                     !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance
     0.8,                     !- Divider Solar Absorptance
     0.8,                     !- Divider Visible Absorptance
-    0.9;                     !- Divider Thermal Hemispherical Emissivity
+    0.9,                     !- Divider Thermal Hemispherical Emissivity
+    ,                        !- Outside Reveal Solar Absorptance
+    ,                        !- Inside Sill Depth {m}
+    ,                        !- Inside Sill Solar Absorptance
+    ,                        !- Inside Reveal Depth {m}
+    0.5,                     !- Inside Reveal Solar Absorptance
+    ProjectingSingle;        !- NFRC Product Type for Assembly Calculations
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -727,7 +733,7 @@
 
   Daylighting:Controls,
     West Zone_DaylCtrl,      !- Name
-    West Zone,               !- Zone Name
+    West Zone,               !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -740,12 +746,12 @@
     20.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     West Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     West Zone_DaylRefPt1,    !- Name
-    West Zone,               !- Zone Name
+    West Zone,               !- Zone or Space Name
     3.048,                   !- X-Coordinate of Reference Point {m}
     3.048,                   !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
@@ -763,12 +769,12 @@
 
   People,
     West Zone,               !- Name
-    West Zone,               !- Zone or ZoneList Name
+    West Zone,               !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -785,7 +791,7 @@
 
   Lights,
     West Zone Lights 1,      !- Name
-    West Zone,               !- Zone or ZoneList Name
+    West Zone,               !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1464.375,                !- Lighting Level {W}
@@ -799,7 +805,7 @@
 
   ElectricEquipment,
     West Zone ElecEq 1,      !- Name
-    West Zone,               !- Zone or ZoneList Name
+    West Zone,               !- Zone or ZoneList or Space or SpaceList Name
     Intermittent,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}
@@ -811,12 +817,12 @@
 
   People,
     EAST ZONE,               !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -833,7 +839,7 @@
 
   Lights,
     EAST ZONE Lights 1,      !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1464.375,                !- Lighting Level {W}
@@ -847,7 +853,7 @@
 
   ElectricEquipment,
     EAST ZONE ElecEq 1,      !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     Intermittent,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1464.375,                !- Design Level {W}
@@ -859,12 +865,12 @@
 
   People,
     NORTH ZONE,              !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     4.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -881,7 +887,7 @@
 
   Lights,
     NORTH ZONE Lights 1,     !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     878.6252,                !- Lighting Level {W}
@@ -895,7 +901,7 @@
 
   ElectricEquipment,
     NORTH ZONE ElecEq 1,     !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     Intermittent,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}

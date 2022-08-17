@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,24 +83,24 @@ TEST_F(EnergyPlusFixture, SetCoolingPanelControlTemp)
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 10.0;
     state->dataHeatBal->Zone(1).OutWetBulbTemp = 5.0;
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MAT;
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::MAT;
+    ControlTemp = state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).getCoolingPanelControlTemp(*state, ZoneNum);
     EXPECT_EQ(ControlTemp, 22.0);
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MRT;
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::MRT;
+    ControlTemp = state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).getCoolingPanelControlTemp(*state, ZoneNum);
     EXPECT_EQ(ControlTemp, 20.0);
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::Operative;
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::Operative;
+    ControlTemp = state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).getCoolingPanelControlTemp(*state, ZoneNum);
     EXPECT_EQ(ControlTemp, 21.0);
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::ODB;
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::ODB;
+    ControlTemp = state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).getCoolingPanelControlTemp(*state, ZoneNum);
     EXPECT_EQ(ControlTemp, 10.0);
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::OWB;
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::OWB;
+    ControlTemp = state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).getCoolingPanelControlTemp(*state, ZoneNum);
     EXPECT_EQ(ControlTemp, 5.0);
 }
 

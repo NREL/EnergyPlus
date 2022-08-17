@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,4;
 
@@ -601,7 +601,7 @@
 
   Lights,
     PSI FOYER Lights 1,      !- Name
-    PSI FOYER,               !- Zone or ZoneList Name
+    PSI FOYER,               !- Zone or ZoneList or Space or SpaceList Name
     Residence Lighting,      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     518.3889,                !- Lighting Level {W}
@@ -615,7 +615,7 @@
 
   GasEquipment,
     PSI FOYER GasEq 1,       !- Name
-    PSI FOYER,               !- Zone or ZoneList Name
+    PSI FOYER,               !- Zone or ZoneList or Space or SpaceList Name
     Gas Eq Sch,              !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     5857.501,                !- Design Level {W}
@@ -627,7 +627,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     PSI FOYER Infil 1,       !- Name
-    PSI FOYER,               !- Zone or ZoneList Name
+    PSI FOYER,               !- Zone or ZoneList or Space or SpaceList Name
     Infiltration Sch,        !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     2.831685,                !- Design Flow Rate {m3/s}
@@ -641,7 +641,7 @@
 
   Daylighting:Controls,
     PSI FOYER_DaylCtrl,      !- Name
-    PSI FOYER,               !- Zone Name
+    PSI FOYER,               !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -654,24 +654,24 @@
     22,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     PSI FOYER_DaylRefPt1,    !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     PSI FOYER_DaylRefPt1,    !- Name
-    PSI FOYER,               !- Zone Name
+    PSI FOYER,               !- Zone or Space Name
     7.7,                     !- X-Coordinate of Reference Point {m}
     -1.4,                    !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
 
   People,
     DORM ROOMS AND COMMON AREAS,  !- Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
+    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList or Space or SpaceList Name
     Residence Occupancy,     !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     31.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -688,7 +688,7 @@
 
   Lights,
     DORM ROOMS AND COMMON AREAS Lights 1,  !- Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
+    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList or Space or SpaceList Name
     Residence Lighting,      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1247.648,                !- Lighting Level {W}
@@ -702,7 +702,7 @@
 
   ElectricEquipment,
     DORM ROOMS AND COMMON AREAS ElecEq 1,  !- Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
+    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList or Space or SpaceList Name
     Residence Equipment,     !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     9210.921,                !- Design Level {W}
@@ -714,7 +714,7 @@
 
   GasEquipment,
     DORM ROOMS AND COMMON AREAS GasEq 1,  !- Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
+    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList or Space or SpaceList Name
     Gas Eq Sch,              !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     29287.51,                !- Design Level {W}
@@ -726,7 +726,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     DORM ROOMS AND COMMON AREAS Infil 1,  !- Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
+    DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList or Space or SpaceList Name
     Infiltration Sch,        !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     2.831685,                !- Design Flow Rate {m3/s}
@@ -740,7 +740,7 @@
 
   Daylighting:Controls,
     DORM ROOMS AND COMMON AREAS_DaylCtrl,  !- Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    DORM ROOMS AND COMMON AREAS,  !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -753,24 +753,24 @@
     22,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     DORM ROOMS AND COMMON AREAS_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     DORM ROOMS AND COMMON AREAS_DaylRefPt1,  !- Name
-    DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    DORM ROOMS AND COMMON AREAS,  !- Zone or Space Name
     17.56,                   !- X-Coordinate of Reference Point {m}
     10.08,                   !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
 
   People,
     Office Zones with People,!- Name
-    OfficeZones,             !- Zone or ZoneList Name
+    OfficeZones,             !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy,        !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    .11,                     !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    .11,                     !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -787,7 +787,7 @@
 
   Lights,
     Office Zones with Lights,!- Name
-    OfficeZones,             !- Zone or ZoneList Name
+    OfficeZones,             !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -801,7 +801,7 @@
 
   ElectricEquipment,
     Office Zones with Electric Equipment,  !- Name
-    OfficeZones,             !- Zone or ZoneList Name
+    OfficeZones,             !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting,         !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -813,7 +813,7 @@
 
   GasEquipment,
     Office Zones with Gas Equipment,  !- Name
-    OfficeZones,             !- Zone or ZoneList Name
+    OfficeZones,             !- Zone or ZoneList or Space or SpaceList Name
     Gas Eq Sch,              !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -825,7 +825,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     OfficeZones Infiltration,!- Name
-    OfficeZones,             !- Zone or ZoneList Name
+    OfficeZones,             !- Zone or ZoneList or Space or SpaceList Name
     Infiltration Sch,        !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -839,7 +839,7 @@
 
   Daylighting:Controls,
     LEFT FORK_DaylCtrl,      !- Name
-    LEFT FORK,               !- Zone Name
+    LEFT FORK,               !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -852,19 +852,19 @@
     22,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     LEFT FORK_DaylRefPt1,    !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     LEFT FORK_DaylRefPt1,    !- Name
-    LEFT FORK,               !- Zone Name
+    LEFT FORK,               !- Zone or Space Name
     22.07,                   !- X-Coordinate of Reference Point {m}
     31.46,                   !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
 
   Daylighting:Controls,
     MIDDLE FORK_DaylCtrl,    !- Name
-    MIDDLE FORK,             !- Zone Name
+    MIDDLE FORK,             !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -877,19 +877,19 @@
     22,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     MIDDLE FORK_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     MIDDLE FORK_DaylRefPt1,  !- Name
-    MIDDLE FORK,             !- Zone Name
+    MIDDLE FORK,             !- Zone or Space Name
     31.22,                   !- X-Coordinate of Reference Point {m}
     28.41,                   !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
 
   Daylighting:Controls,
     RIGHT FORK_DaylCtrl,     !- Name
-    RIGHT FORK,              !- Zone Name
+    RIGHT FORK,              !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -902,12 +902,12 @@
     22,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     RIGHT FORK_DaylRefPt1,   !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     RIGHT FORK_DaylRefPt1,   !- Name
-    RIGHT FORK,              !- Zone Name
+    RIGHT FORK,              !- Zone or Space Name
     36.7,                    !- X-Coordinate of Reference Point {m}
     20.48,                   !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
@@ -1554,15 +1554,15 @@
     Zn002:IntM001,           !- Name
     INTERIOR,                !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    408.7734;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    408.7734;                !- Surface Area {m2}
 
   InternalMass,
     Zn002:IntM002,           !- Name
     PARTITION02,             !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    371.6122;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    371.6122;                !- Surface Area {m2}
 
   BuildingSurface:Detailed,
     Zn003:Wall001,           !- Name

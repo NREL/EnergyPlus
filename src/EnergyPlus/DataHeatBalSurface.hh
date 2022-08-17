@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -245,118 +245,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     std::vector<int> SurfMovSlatsIndexList;
     void clear_state() override
     {
-        this->Zone_has_mixed_HT_models.clear();
-        this->SurfCurrNumHist.deallocate();
-        this->MaxSurfaceTempLimit = 200.0;
-        this->MaxSurfaceTempLimitBeforeFatal = 500.0;
-        this->MinIterations = 1;
-        this->SurfCTFConstInPart.deallocate();
-        this->SurfCTFConstOutPart.deallocate();
-        this->SurfCTFCross0.deallocate();
-        this->SurfCTFInside0.deallocate();
-        this->SurfCTFSourceIn0.deallocate();
-        this->SurfTempOutHist.deallocate();
-        this->SurfQSourceSinkHist.deallocate();
-        this->SurfIsAdiabatic.deallocate();
-        this->SurfIsSourceOrSink.deallocate();
-        this->SurfIsOperatingPool.deallocate();
-        this->SurfTempTerm.deallocate();
-        this->SurfTempDiv.deallocate();
-        this->SurfTempIn.deallocate();
-        this->SurfTempInsOld.deallocate();
-        this->SurfTempInTmp.deallocate();
-        this->SurfHcExt.deallocate();
-        this->SurfWinCoeffAdjRatio.deallocate();
-        this->SurfHAirExt.deallocate();
-        this->SurfHSkyExt.deallocate();
-        this->SurfHGrdExt.deallocate();
-        this->SurfHConvInt.deallocate();
-
-        this->SurfTempSource.deallocate();
-        this->SurfTempUserLoc.deallocate();
-        this->SurfTempInMovInsRep.deallocate();
-        this->SurfQConvInReport.deallocate();
-        this->SurfQdotConvInRep.deallocate();
-        this->SurfQdotConvInPerArea.deallocate();
-        this->SurfQRadNetSurfInReport.deallocate();
-        this->SurfQdotRadNetSurfInRep.deallocate();
-        this->SurfQRadSolarInReport.deallocate();
-        this->SurfQdotRadSolarInRep.deallocate();
-        this->SurfQdotRadSolarInRepPerArea.deallocate();
-        this->SurfQRadLightsInReport.deallocate();
-        this->SurfQdotRadLightsInRep.deallocate();
-        this->SurfQRadIntGainsInReport.deallocate();
-        this->SurfQdotRadIntGainsInRep.deallocate();
-        this->AnyRadiantSystems.deallocate();
-        this->SurfQRadHVACInReport.deallocate();
-        this->SurfQdotRadHVACInRep.deallocate();
-        this->SurfQdotRadHVACInPerArea.deallocate();
-        this->SurfQConvOutReport.deallocate();
-        this->SurfQdotConvOutRep.deallocate();
-        this->SurfQdotConvOutPerArea.deallocate();
-        this->SurfQRadOutReport.deallocate();
-        this->SurfQdotRadOutRep.deallocate();
-        this->SurfQdotRadOutRepPerArea.deallocate();
-        this->SurfOpaqInsFaceCondGainRep.deallocate();
-        this->SurfOpaqInsFaceCondLossRep.deallocate();
-        this->SurfOpaqInsFaceCond.deallocate();
-        this->SurfOpaqInsFaceCondFlux.deallocate();
-        this->SurfOpaqInsFaceCondEnergy.deallocate();
-        this->SurfOpaqExtFaceCondGainRep.deallocate();
-        this->SurfOpaqExtFaceCondLossRep.deallocate();
-        this->SurfOpaqOutFaceCond.deallocate();
-        this->SurfOpaqOutFaceCondFlux.deallocate();
-        this->SurfOpaqOutFaceCondEnergy.deallocate();
-        this->SurfOpaqAvgFaceCondGainRep.deallocate();
-        this->SurfOpaqAvgFaceCondLossRep.deallocate();
-        this->SurfOpaqAvgFaceCond.deallocate();
-        this->SurfOpaqAvgFaceCondFlux.deallocate();
-        this->SurfOpaqAvgFaceCondEnergy.deallocate();
-        this->SurfOpaqStorageCondGainRep.deallocate();
-        this->SurfOpaqStorageCondLossRep.deallocate();
-        this->SurfOpaqStorageCond.deallocate();
-        this->SurfOpaqStorageCondFlux.deallocate();
-        this->SurfOpaqStorageCondEnergy.deallocate();
-        this->SurfOpaqInsFaceBeamSolAbsorbed.deallocate();
-        this->SurfTempOut.deallocate();
-        this->SurfQRadSWOutMvIns.deallocate();
-        this->SurfQdotRadNetLWInPerArea.deallocate();
-        this->SurfQdotRadLightsInPerArea.deallocate();
-        this->SurfOpaqQRadSWOutAbs.deallocate();
-        this->SurfOpaqQRadSWInAbs.deallocate();
-        this->SurfQRadLWOutSrdSurfs.deallocate();
-        this->SurfQAdditionalHeatSourceOutside.deallocate();
-        this->SurfQAdditionalHeatSourceInside.deallocate();
-        this->SurfOpaqInitialDifSolInAbs.deallocate();
-        this->SurfWinInitialDifSolInTrans.deallocate();
-        this->SurfInsideTempHist.deallocate();
-        this->SurfOutsideTempHist.deallocate();
-        this->SurfInsideTempHistMaster.deallocate();
-        this->SurfOutsideTempHistMaster.deallocate();
-        this->SurfInsideFluxHist.deallocate();
-        this->SurfOutsideFluxHist.deallocate();
-        this->SurfInsideFluxHistMaster.deallocate();
-        this->SurfOutsideFluxHistMaster.deallocate();
-        this->SurfTsrcHist.deallocate();
-        this->SurfQsrcHist.deallocate();
-        this->SurfTsrcHistM.deallocate();
-        this->SurfQsrcHistM.deallocate();
-        this->ZoneFractDifShortZtoZ.deallocate();
-        this->EnclSolRecDifShortFromZ.deallocate();
-        this->InterZoneWindow = false;
-        this->SumSurfaceHeatEmission = 0;
-        this->SurfMovInsulExtPresent.deallocate();
-        this->SurfMovInsulIntPresent.deallocate();
-        this->SurfMovInsulIntPresentPrevTS.deallocate();
-        this->SurfMovInsulHExt.deallocate();
-        this->SurfMovInsulHInt.deallocate();
-        this->SurfAbsSolarExt.deallocate();
-        this->SurfAbsThermalExt.deallocate();
-        this->SurfAbsSolarInt.deallocate();
-        this->SurfAbsThermalInt.deallocate();
-        this->SurfRoughnessExt.deallocate();
-        this->SurfMovInsulIndexList.clear();
-        this->SurfMovSlatsIndexList.clear();
+        *this = HeatBalSurfData();
     }
 };
 

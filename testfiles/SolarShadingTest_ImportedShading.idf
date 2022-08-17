@@ -82,7 +82,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,4;
 
@@ -544,7 +544,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 1 @ 200 601 0 T Infil 1,  !- Name
-    ZONE 1 @ 200 601 0 T,    !- Zone or ZoneList Name
+    ZONE 1 @ 200 601 0 T,    !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.2831685,               !- Design Flow Rate {m3/s}
@@ -558,7 +558,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 2 @ 200 200 0 T Infil 1,  !- Name
-    ZONE 2 @ 200 200 0 T,    !- Zone or ZoneList Name
+    ZONE 2 @ 200 200 0 T,    !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     9.4389483E-02,           !- Design Flow Rate {m3/s}
@@ -572,7 +572,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 3 @ 200 610 0 T Infil 1,  !- Name
-    ZONE 3 @ 200 610 0 T,    !- Zone or ZoneList Name
+    ZONE 3 @ 200 610 0 T,    !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.2831685,               !- Design Flow Rate {m3/s}
@@ -586,7 +586,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 4 @ 200 600 0 T Infil 1,  !- Name
-    ZONE 4 @ 200 600 0 T,    !- Zone or ZoneList Name
+    ZONE 4 @ 200 600 0 T,    !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.2831685,               !- Design Flow Rate {m3/s}
@@ -600,7 +600,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 5 @ 200 601 1 T Infil 1,  !- Name
-    ZONE 5 @ 200 601 1 T,    !- Zone or ZoneList Name
+    ZONE 5 @ 200 601 1 T,    !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.2831685,               !- Design Flow Rate {m3/s}
@@ -614,7 +614,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 6 @ 200 200 1 T Infil 1,  !- Name
-    ZONE 6 @ 200 200 1 T,    !- Zone or ZoneList Name
+    ZONE 6 @ 200 200 1 T,    !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     9.4389483E-02,           !- Design Flow Rate {m3/s}
@@ -628,7 +628,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 7 @ 200 610 1 T Infil 1,  !- Name
-    ZONE 7 @ 200 610 1 T,    !- Zone or ZoneList Name
+    ZONE 7 @ 200 610 1 T,    !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.2831685,               !- Design Flow Rate {m3/s}
@@ -642,7 +642,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 8 @ 200 200 1 T Infil 1,  !- Name
-    ZONE 8 @ 200 200 1 T,    !- Zone or ZoneList Name
+    ZONE 8 @ 200 200 1 T,    !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     9.4389483E-02,           !- Design Flow Rate {m3/s}
@@ -656,7 +656,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 9 @ 200 600 1 T Infil 1,  !- Name
-    ZONE 9 @ 200 600 1 T,    !- Zone or ZoneList Name
+    ZONE 9 @ 200 600 1 T,    !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.2831685,               !- Design Flow Rate {m3/s}

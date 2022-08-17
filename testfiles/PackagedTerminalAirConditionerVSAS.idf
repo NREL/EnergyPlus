@@ -127,7 +127,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER ===========
 
@@ -1539,12 +1539,12 @@
 
   People,
     WEST ZONE,               !- Name
-    WEST ZONE,               !- Zone or ZoneList Name
+    WEST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1561,12 +1561,12 @@
 
   People,
     EAST ZONE,               !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1583,12 +1583,12 @@
 
   People,
     NORTH ZONE,              !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     4.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1607,7 +1607,7 @@
 
   Lights,
     WEST ZONE Lights 1,      !- Name
-    WEST ZONE,               !- Zone or ZoneList Name
+    WEST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1878.6252,               !- Lighting Level {W}
@@ -1621,7 +1621,7 @@
 
   Lights,
     EAST ZONE Lights 1,      !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     878.6252,                !- Lighting Level {W}
@@ -1635,7 +1635,7 @@
 
   Lights,
     NORTH ZONE Lights 1,     !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     878.6252,                !- Lighting Level {W}
@@ -1651,7 +1651,7 @@
 
   ElectricEquipment,
     WEST ZONE ElecEq 1,      !- Name
-    WEST ZONE,               !- Zone or ZoneList Name
+    WEST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE EQUIP,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1928.751,                !- Design Level {W}
@@ -1663,7 +1663,7 @@
 
   ElectricEquipment,
     EAST ZONE ElecEq 1,      !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE EQUIP,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     464.375,                 !- Design Level {W}
@@ -1675,7 +1675,7 @@
 
   ElectricEquipment,
     NORTH ZONE ElecEq 1,     !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE EQUIP,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}
@@ -1689,7 +1689,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     WEST ZONE Infil 1,       !- Name
-    WEST ZONE,               !- Zone or ZoneList Name
+    WEST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0,                     !- Design Flow Rate {m3/s}
@@ -1703,7 +1703,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     EAST ZONE Infil 1,       !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.04,                    !- Design Flow Rate {m3/s}
@@ -1717,7 +1717,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     NORTH ZONE Infil 1,      !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0,                     !- Design Flow Rate {m3/s}

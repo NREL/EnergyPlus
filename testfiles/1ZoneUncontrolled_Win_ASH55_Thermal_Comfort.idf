@@ -89,7 +89,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,4;
 
@@ -444,12 +444,12 @@
 
   People,
     ZONE ONE People,         !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    18.58,                   !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    18.58,                   !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -559,7 +559,7 @@
   OtherEquipment,
     Test 352a,               !- Name
     None,                    !- Fuel Type
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     352,                     !- Design Level {W}
@@ -572,7 +572,7 @@
   OtherEquipment,
     Test 352 minus,          !- Name
     None,                    !- Fuel Type
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     -352,                    !- Design Level {W}
@@ -597,7 +597,7 @@
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -630,7 +630,7 @@
 
   Daylighting:Controls,
     SPACE1-1 Daylighting Control,  !- Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Stepped,                 !- Lighting Control Type
@@ -643,12 +643,12 @@
     20,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     SPACE1-1 Reference Point1,  !- Daylighting Reference Point 1 Name
-    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    1.0000,                  !- Fraction of Lights Controlled by Reference Point 1
     400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     SPACE1-1 Reference Point1,  !- Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or Space Name
     7.5,                     !- X-Coordinate of Reference Point {m}
     7.5,                     !- Y-Coordinate of Reference Point {m}
     0.7;                     !- Z-Coordinate of Reference Point {m}

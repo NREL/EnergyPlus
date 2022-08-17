@@ -12,7 +12,7 @@
 ! Plant:    None
 ! SolDis=FullInteriorAndExterior, Aniso, Detailed Interior and Exterior Convection
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,6;
 
@@ -313,7 +313,7 @@
 
   Lights,
     Lights 1,                !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     ON,                      !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     960.0,                   !- Lighting Level {W}

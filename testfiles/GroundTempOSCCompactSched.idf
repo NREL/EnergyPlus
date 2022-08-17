@@ -3,7 +3,7 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 
-  Version,9.6;
+  Version,22.2;
 
   Building,
     anyplace Load Calc,      !- Name
@@ -404,8 +404,8 @@
     OSCTest:PartitionIntMass,!- Name
     InteriorWall,            !- Construction Name
     OSCTest,                 !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    92.9;                    !- Extended Field
+    ,                        !- Space or SpaceList Name
+    92.9;                    !- Surface Area {m2}
 
   SurfaceProperty:OtherSideCoefficients,
     ExampleOSC,              !- Name
@@ -547,19 +547,19 @@
 
   People,
     OSCTest People 1,        !- Name
-    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest,                 !- Zone or ZoneList or Space or SpaceList Name
     OSCTest-PeopleSchedule,  !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     6,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     OSCTest-PeopleActivity;  !- Activity Level Schedule Name
 
   Lights,
     OSCTest Lights 1,        !- Name
-    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest,                 !- Zone or ZoneList or Space or SpaceList Name
     OSCTest-LightsSchedule,  !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     400,                     !- Lighting Level {W}
@@ -573,7 +573,7 @@
 
   ElectricEquipment,
     OSCTest ElecEq 1,        !- Name
-    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest,                 !- Zone or ZoneList or Space or SpaceList Name
     OSCTest-EquipSchedule,   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     800,                     !- Design Level {W}
@@ -585,7 +585,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     OSCTest Infil 1,         !- Name
-    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest,                 !- Zone or ZoneList or Space or SpaceList Name
     OSCTest-InfiltrationSchedule,  !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     4.716666E-02,            !- Design Flow Rate {m3/s}
@@ -599,7 +599,7 @@
 
   ZoneVentilation:DesignFlowRate,
     OSCTest Ventl 1,         !- Name
-    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest,                 !- Zone or ZoneList or Space or SpaceList Name
     OSCTest-VentilationSchedule,  !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     4.716667E-04,            !- Design Flow Rate {m3/s}

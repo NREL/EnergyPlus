@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,10 +57,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataAirLoop = std::make_unique<DataAirLoopData>();
     this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
     this->dataAirSystemsData = std::make_unique<AirSystemsData>();
-    this->dataAirflowNetwork = std::make_unique<AirflowNetworkData>();
-    this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
-    this->dataAFNProps = std::make_unique<DataAFNProps>();
-    this->dataAFNSolver = std::make_unique<AirflowNetworkSolverData>();
+    this->afn = std::make_unique<AirflowNetwork::Solver>(*this);
     this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
     this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
     this->dataBaseSizerScalableInputs = std::make_unique<BaseSizerWithScalableInputsData>();
@@ -159,7 +156,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataHeatBalHAMTMgr = std::make_unique<HeatBalHAMTMgrData>();
     this->dataHeatBalIntHeatGains = std::make_unique<HeatBalInternalHeatGainsData>();
     this->dataHeatBalIntRadExchg = std::make_unique<HeatBalanceIntRadExchgData>();
-    this->dataHeatBalKivaMgr = std::make_unique<HeatBalanceKivaMgrData>();
     this->dataHeatBalMgr = std::make_unique<HeatBalanceMgrData>();
     this->dataHeatBalSurf = std::make_unique<HeatBalSurfData>();
     this->dataHeatBalSurfMgr = std::make_unique<HeatBalSurfMgr>();
@@ -197,7 +193,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataOutputReportTabularAnnual = std::make_unique<OutputReportTabularAnnualData>();
     this->dataOutputReports = std::make_unique<OutputReportsData>();
     this->dataOutsideEnergySrcs = std::make_unique<OutsideEnergySourcesData>();
-    this->dataPTHP = std::make_unique<PackagedTerminalHeatPumpData>();
     this->dataPackagedThermalStorageCoil = std::make_unique<PackagedThermalStorageCoilData>();
     this->dataPhotovoltaic = std::make_unique<PhotovoltaicsData>();
     this->dataPhotovoltaicState = std::make_unique<PhotovoltaicStateData>();
@@ -228,6 +223,8 @@ EnergyPlusData::EnergyPlusData()
     this->dataReportFlag = std::make_unique<ReportFlagData>();
     this->dataResultsFramework = std::make_unique<ResultsFrameworkData>();
     this->dataRetAirPathMrg = std::make_unique<ReturnAirPathMgr>();
+    this->dataExhAirSystemMrg = std::make_unique<ExhaustAirSystemMgr>();
+    this->dataExhCtrlSystemMrg = std::make_unique<ExhaustControlSystemMgr>();
     this->dataRoomAirMod = std::make_unique<RoomAirModelData>();
     this->dataRoomAirModelMgr = std::make_unique<RoomAirModelManagerData>();
     this->dataRoomAirModelTempPattern = std::make_unique<RoomAirModelUserTempPatternData>();
@@ -308,16 +305,15 @@ EnergyPlusData::EnergyPlusData()
     this->dataZoneTempPredictorCorrector = std::make_unique<ZoneTempPredictorCorrectorData>();
 }
 
+EnergyPlusData::~EnergyPlusData() = default;
+
 void EnergyPlusData::clear_state()
 {
     this->ready = true;
     this->dataAirLoop->clear_state();
     this->dataAirLoopHVACDOAS->clear_state();
     this->dataAirSystemsData->clear_state();
-    this->dataAirflowNetwork->clear_state();
-    this->dataAirflowNetworkBalanceManager->clear_state();
-    this->dataAFNSolver->clear_state();
-    this->dataAFNProps->clear_state();
+    this->afn->clear_state();
     this->dataBSDFWindow->clear_state();
     this->dataBaseSizerFanHeatInputs->clear_state();
     this->dataBaseSizerScalableInputs->clear_state();
@@ -416,7 +412,6 @@ void EnergyPlusData::clear_state()
     this->dataHeatBalHAMTMgr->clear_state();
     this->dataHeatBalIntHeatGains->clear_state();
     this->dataHeatBalIntRadExchg->clear_state();
-    this->dataHeatBalKivaMgr->clear_state();
     this->dataHeatBalMgr->clear_state();
     this->dataHeatBalSurf->clear_state();
     this->dataHeatBalSurfMgr->clear_state();
@@ -454,7 +449,6 @@ void EnergyPlusData::clear_state()
     this->dataOutputReportTabularAnnual->clear_state();
     this->dataOutputReports->clear_state();
     this->dataOutsideEnergySrcs->clear_state();
-    this->dataPTHP->clear_state();
     this->dataPackagedThermalStorageCoil->clear_state();
     this->dataPhotovoltaic->clear_state();
     this->dataPhotovoltaicState->clear_state();
@@ -485,6 +479,8 @@ void EnergyPlusData::clear_state()
     this->dataReportFlag->clear_state();
     this->dataResultsFramework->clear_state();
     this->dataRetAirPathMrg->clear_state();
+    this->dataExhAirSystemMrg->clear_state();
+    this->dataExhCtrlSystemMrg->clear_state();
     this->dataRoomAirMod->clear_state();
     this->dataRoomAirModelMgr->clear_state();
     this->dataRoomAirModelTempPattern->clear_state();

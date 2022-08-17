@@ -86,7 +86,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,4;
 
@@ -542,12 +542,12 @@
 
   People,
     HEARTLAND AREA,          !- Name
-    HEARTLAND AREA,          !- Zone or ZoneList Name
+    HEARTLAND AREA,          !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     48.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -564,7 +564,7 @@
 
   Lights,
     HEARTLAND AREA Lights 1, !- Name
-    HEARTLAND AREA,          !- Zone or ZoneList Name
+    HEARTLAND AREA,          !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     23190.00,                !- Lighting Level {W}
@@ -578,7 +578,7 @@
 
   ElectricEquipment,
     HEARTLAND AREA ElecEq 1, !- Name
-    HEARTLAND AREA,          !- Zone or ZoneList Name
+    HEARTLAND AREA,          !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     11600.00,                !- Design Level {W}
@@ -590,12 +590,12 @@
 
   People,
     OREGON WING,             !- Name
-    OREGON WING,             !- Zone or ZoneList Name
+    OREGON WING,             !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     16.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -612,7 +612,7 @@
 
   Lights,
     OREGON WING Lights 1,    !- Name
-    OREGON WING,             !- Zone or ZoneList Name
+    OREGON WING,             !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     7750.000,                !- Lighting Level {W}
@@ -626,7 +626,7 @@
 
   ElectricEquipment,
     OREGON WING ElecEq 1,    !- Name
-    OREGON WING,             !- Zone or ZoneList Name
+    OREGON WING,             !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3880.000,                !- Design Level {W}
@@ -638,12 +638,12 @@
 
   People,
     GEORGIA WING,            !- Name
-    GEORGIA WING,            !- Zone or ZoneList Name
+    GEORGIA WING,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     16.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -660,7 +660,7 @@
 
   Lights,
     GEORGIA WING Lights 1,   !- Name
-    GEORGIA WING,            !- Zone or ZoneList Name
+    GEORGIA WING,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     7750.000,                !- Lighting Level {W}
@@ -674,7 +674,7 @@
 
   ElectricEquipment,
     GEORGIA WING ElecEq 1,   !- Name
-    GEORGIA WING,            !- Zone or ZoneList Name
+    GEORGIA WING,            !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3880.000,                !- Design Level {W}
@@ -686,12 +686,12 @@
 
   People,
     ARIZONA WING,            !- Name
-    ARIZONA WING,            !- Zone or ZoneList Name
+    ARIZONA WING,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     16.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -708,7 +708,7 @@
 
   Lights,
     ARIZONA WING Lights 1,   !- Name
-    ARIZONA WING,            !- Zone or ZoneList Name
+    ARIZONA WING,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     7750.000,                !- Lighting Level {W}
@@ -722,7 +722,7 @@
 
   ElectricEquipment,
     ARIZONA WING ElecEq 1,   !- Name
-    ARIZONA WING,            !- Zone or ZoneList Name
+    ARIZONA WING,            !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3870.000,                !- Design Level {W}
@@ -734,12 +734,12 @@
 
   People,
     MAINE WING,              !- Name
-    MAINE WING,              !- Zone or ZoneList Name
+    MAINE WING,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     16.00000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -756,7 +756,7 @@
 
   Lights,
     MAINE WING Lights 1,     !- Name
-    MAINE WING,              !- Zone or ZoneList Name
+    MAINE WING,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     7750.000,                !- Lighting Level {W}
@@ -770,7 +770,7 @@
 
   ElectricEquipment,
     MAINE WING ElecEq 1,     !- Name
-    MAINE WING,              !- Zone or ZoneList Name
+    MAINE WING,              !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3880.000,                !- Design Level {W}
@@ -1178,15 +1178,15 @@
     Zn001:IntM001,           !- Name
     CUSTPARTITION,           !- Construction Name
     HEARTLAND AREA,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    130.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    130.0000;                !- Surface Area {m2}
 
   InternalMass,
     Zn001:IntM002,           !- Name
     CUSTPARTITION,           !- Construction Name
     HEARTLAND AREA,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    920.0000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    920.0000;                !- Surface Area {m2}
 
 ! Floor subdivided:
 !  BuildingSurface:Detailed,
@@ -1411,8 +1411,8 @@
     Zn001:IntM003,           !- Name
     CUSTPARTITION,           !- Construction Name
     HEARTLAND AREA,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    2380.000;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    2380.000;                !- Surface Area {m2}
 
   BuildingSurface:Detailed,
     Zn002:Wall001,           !- Name
@@ -2279,7 +2279,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Infiltration 1,          !- Name
-    OREGON WING,             !- Zone or ZoneList Name
+    OREGON WING,             !- Zone or ZoneList or Space or SpaceList Name
     Infiltration Sch,        !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     2.831685,                !- Design Flow Rate {m3/s}
@@ -2315,28 +2315,48 @@
     Any Number,              !- Schedule Type Limits Name
     LocalEnvData.csv,        !- File Name
     3,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    ,                        !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     OutdoorAirNodeWetBulb:0001,  !- Name
     Any Number,              !- Schedule Type Limits Name
     LocalEnvData.csv,        !- File Name
     4,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    ,                        !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     OutdoorAirNodeWindSpeed:0001,  !- Name
     Any Number,              !- Schedule Type Limits Name
     LocalEnvData.csv,        !- File Name
     5,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    ,                        !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     OutdoorAirNodeWindDir:0001,  !- Name
     Any Number,              !- Schedule Type Limits Name
     LocalEnvData.csv,        !- File Name
     6,                       !- Column Number
-    1;                       !- Rows to Skip at Top
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    ,                        !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:Compact,
     ShadingTransmittance:0001,  !- Name

@@ -44,7 +44,7 @@
 !
 !
 
-  Version,9.6;
+  Version,22.2;
 
   Building,
     Urbana             Load Calc,  !- Name
@@ -176,7 +176,7 @@
 ! =========================
 
   ZoneProperty:UserViewFactors:BySurfaceName,
-    Lshaped Zone,            !- Zone or ZoneList Name
+    Lshaped Zone,            !- Zone or ZoneList or Space or SpaceList Name
     Lshaped Zone:South Wall, !- From Surface 1
     Lshaped Zone:South Wall, !- To Surface 1
     0.000000,                !- View Factor 1
@@ -1330,12 +1330,12 @@
 
   People,
     Lshaped zonePeople,      !- Name
-    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone,            !- Zone or ZoneList or Space or SpaceList Name
     Lshaped zone-PeopleSchedule,  !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     1,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Lshaped zone-PeopleActivity;  !- Activity Level Schedule Name
@@ -1344,19 +1344,19 @@
 
   People,
     LshapedZoneBasePeople,   !- Name
-    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase,         !- Zone or ZoneList or Space or SpaceList Name
     LshapedZoneBase-PeopleSchedule,  !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     1,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     LshapedZoneBase-PeopleActivity;  !- Activity Level Schedule Name
 
   Lights,
     Lshaped zoneLights,      !- Name
-    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone,            !- Zone or ZoneList or Space or SpaceList Name
     Lshaped zone-LightsSchedule,  !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     0,                       !- Lighting Level {W}
@@ -1370,7 +1370,7 @@
 
   Lights,
     LshapedZoneBaseLights,   !- Name
-    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase,         !- Zone or ZoneList or Space or SpaceList Name
     LshapedZoneBase-LightsSchedule,  !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     0,                       !- Lighting Level {W}
@@ -1384,7 +1384,7 @@
 
   ElectricEquipment,
     Lshaped zoneEEquip,      !- Name
-    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone,            !- Zone or ZoneList or Space or SpaceList Name
     Lshaped zone-EquipSchedule,  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -1396,7 +1396,7 @@
 
   ElectricEquipment,
     LshapedZoneBaseEEquip,   !- Name
-    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase,         !- Zone or ZoneList or Space or SpaceList Name
     LshapedZoneBase-EquipSchedule,  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0,                       !- Design Level {W}
@@ -1408,7 +1408,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Lshaped zoneInfiltration,!- Name
-    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone,            !- Zone or ZoneList or Space or SpaceList Name
     Lshaped zone-InfiltrationSchedule,  !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0,                       !- Design Flow Rate {m3/s}
@@ -1422,7 +1422,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     LshapedZoneBaseInfiltration,  !- Name
-    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase,         !- Zone or ZoneList or Space or SpaceList Name
     LshapedZoneBase-InfiltrationSchedule,  !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0,                       !- Design Flow Rate {m3/s}
@@ -1436,7 +1436,7 @@
 
   ZoneVentilation:DesignFlowRate,
     Lshaped zoneVentilation, !- Name
-    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone,            !- Zone or ZoneList or Space or SpaceList Name
     Lshaped zone-VentilationSchedule,  !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     4.716667E-04,            !- Design Flow Rate {m3/s}
@@ -1460,7 +1460,7 @@
 
   ZoneVentilation:DesignFlowRate,
     LshapedZoneBaseVentilation,  !- Name
-    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase,         !- Zone or ZoneList or Space or SpaceList Name
     LshapedZoneBase-VentilationSchedule,  !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     4.716667E-04,            !- Design Flow Rate {m3/s}

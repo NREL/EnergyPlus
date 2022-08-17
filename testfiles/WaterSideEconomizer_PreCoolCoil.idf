@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Building,
     Building,                !- Name
@@ -166,7 +166,7 @@
     availability;            !- Unit Type
 
   ScheduleTypeLimits,
-    AnyNumber;              !- Name
+    AnyNumber;               !- Name
 
   RunPeriod,
     Mach 1 to 3,             !- Name
@@ -197,7 +197,6 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-
 
   RunPeriod,
     July 1 to 3,             !- Name
@@ -848,7 +847,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -862,19 +861,19 @@
 
   People,
     SPACE1-1 People 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -888,7 +887,7 @@
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1063,7 +1062,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1077,19 +1076,19 @@
 
   People,
     SPACE2-1 People 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1103,7 +1102,7 @@
 
   ElectricEquipment,
     SPACE2-1 ElecEq 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1243,7 +1242,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE3-1 Infil 1,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -1257,19 +1256,19 @@
 
   People,
     SPACE3-1 People 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE3-1 Lights 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1283,7 +1282,7 @@
 
   ElectricEquipment,
     SPACE3-1 ElecEq 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1438,7 +1437,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE4-1 Infil 1,        !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1452,19 +1451,19 @@
 
   People,
     SPACE4-1 People 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE4-1 Lights 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1478,7 +1477,7 @@
 
   ElectricEquipment,
     SPACE4-1 ElecEq 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1618,7 +1617,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.031089,                !- Design Flow Rate {m3/s}
@@ -1632,19 +1631,19 @@
 
   People,
     SPACE5-1 People 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     20,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     AutoCalculate,           !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE5-1 Lights 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1658,7 +1657,7 @@
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1976,                    !- Design Level {W}
@@ -2045,19 +2044,19 @@
     FanAvailSched,           !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: SummerDesignDay WinterDesignDay, !- Field 13
-    Until: 24:00,1.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,1.0;        !- Field 21
+    For: SummerDesignDay WinterDesignDay, !- Field 2
+    Until: 24:00,1.0,        !- Field 3
+    For: AllOtherDays,       !- Field 5
+    Until: 24:00,1.0;        !- Field 6
 
   Schedule:Compact,
     ReheatCoilAvailSched,    !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: SummerDesignDay WinterDesignDay, !- Field 2
-    Until: 24:00,1.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,1.0;        !- Field 21
+    Until: 24:00,1.0,        !- Field 3
+    For: AllOtherDays,       !- Field 5
+    Until: 24:00,1.0;        !- Field 6
 
   NodeList,
     SupplyAir Temp Nodes,    !- Name
@@ -2466,7 +2465,6 @@
     ,                        !- Outdoor Air Flow Air Changes per Hour {1/hr}
     Min OARequirements Sched;!- Outdoor Air Schedule Name
 
-
   AirTerminal:SingleDuct:VAV:Reheat,
     SPACE2-1 VAV Reheat,     !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
@@ -2474,7 +2472,7 @@
     SPACE2-1 ATU In Node,    !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     Constant,                !- Zone Minimum Air Flow Input Method
-    autosize,                     !- Constant Minimum Air Flow Fraction
+    autosize,                !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
@@ -2496,7 +2494,7 @@
     SPACE3-1 ATU In Node,    !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     Constant,                !- Zone Minimum Air Flow Input Method
-    autosize,                     !- Constant Minimum Air Flow Fraction
+    autosize,                !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
@@ -2518,7 +2516,7 @@
     SPACE4-1 ATU In Node,    !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     Constant,                !- Zone Minimum Air Flow Input Method
-    autosize,                     !- Constant Minimum Air Flow Fraction
+    autosize,                !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
@@ -2540,7 +2538,7 @@
     SPACE5-1 ATU In Node,    !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     Constant,                !- Zone Minimum Air Flow Input Method
-    autosize,                     !- Constant Minimum Air Flow Fraction
+    autosize,                !- Constant Minimum Air Flow Fraction
     ,                        !- Fixed Minimum Air Flow Rate {m3/s}
     ,                        !- Minimum Air Flow Fraction Schedule Name
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
@@ -2665,15 +2663,14 @@
     OA Sys 1,                !- Component 1 Name
     VAV Sys Inlet Node,      !- Component 1 Inlet Node Name
     Mixed Air Node,          !- Component 1 Outlet Node Name
-    CoilSystem:Cooling:Water,!- Component 3 Object Type
-    Unitary-Free-Cooling,    !- Component 3 Name
-    Mixed Air Node,          !- Component 3 Inlet Node Name
-    FreeClgCoil OutletNode,  !- Component 3 Outlet Node Name
-    AirLoopHVAC:UnitarySystem,  !- Component 2 Object Type
-    DXAC Gas Furnace,        !- Component 2 Name
-    FreeClgCoil OutletNode,  !- Component 2 Inlet Node Name
-    VAV Sys 1 Outlet Node;   !- Component 2 Outlet Node Name
-
+    CoilSystem:Cooling:Water,!- Component 2 Object Type
+    Unitary-Free-Cooling,    !- Component 2 Name
+    Mixed Air Node,          !- Component 2 Inlet Node Name
+    FreeClgCoil OutletNode,  !- Component 2 Outlet Node Name
+    AirLoopHVAC:UnitarySystem,  !- Component 3 Object Type
+    DXAC Gas Furnace,        !- Component 3 Name
+    FreeClgCoil OutletNode,  !- Component 3 Inlet Node Name
+    VAV Sys 1 Outlet Node;   !- Component 3 Outlet Node Name
 
   CoilSystem:Cooling:Water,
     Unitary-Free-Cooling,    !- Name
@@ -2685,7 +2682,7 @@
     CoolReheat,              !- Dehumidification Control Type
     Yes,                     !- Run on Sensible Load
     Yes,                     !- Run on Latent Load
-    3.0;                     !- Minimum Air To Water Temperature Offset
+    3.0;                     !- Minimum Air To Water Temperature Offset {deltaC}
 
   Coil:Cooling:Water,
     Free Cooling Coil,       !- Name
@@ -2755,13 +2752,11 @@
     VAV Sys 1 Outlet Node,   !- Air Outlet Node Name
     VAV Sys 1 Outlet Node;   !- Temperature Setpoint Node Name
 
-
   NodeList,
     HumRat SetPoint Nodes,   !- Name
     FreeClgCoil OutletNode,  !- Node 1 Name
     Heating Coil Inlet Node, !- Node 2 Name
     VAV Sys 1 Outlet Node;   !- Node 3 Name
-
 
   SetpointManager:MultiZone:Humidity:Maximum,
     Max MZone HumRat SPM,    !- Name
@@ -2842,7 +2837,6 @@
     Relief Air Outlet Node,  !- Relief Air Stream Node Name
     VAV Sys Inlet Node;      !- Return Air Stream Node Name
 
-
   Coil:Cooling:DX,
     DX Cooling Coil,         !- Name
     DX Clg Coil Inlet Node,  !- Evaporator Inlet Node Name
@@ -2850,7 +2844,7 @@
     ReheatCoilAvailSched,    !- Availability Schedule Name
     ,                        !- Condenser Zone Name
     DX Clg Coil Cond InletNode,  !- Condenser Inlet Node Name
-    DX Clg Coil Cond OutletNode, !- Condenser Outlet Node Name
+    DX Clg Coil Cond OutletNode,  !- Condenser Outlet Node Name
     DX Clg Coil Performance, !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
     ;                        !- Evaporative Condenser Supply Water Storage Tank Name
@@ -2881,7 +2875,7 @@
     AirCooled,               !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
     1,                       !- Nominal Speed Number
-    DX Clg Coil Speed 1 Per; !- Speed 3 Name
+    DX Clg Coil Speed 1 Per; !- Speed 1 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     DX Clg Coil Speed 1 Per, !- Name
@@ -2903,7 +2897,6 @@
     ,                        !- Waste Heat Modifier Function of Temperature Curve Name
     ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
 
   Curve:Biquadratic,
     FurnaceDXCCoilCapFT,     !- Name
@@ -2941,7 +2934,6 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-
   Curve:Quadratic,
     FurnaceDXCCoilCapFFF,    !- Name
     0.8,                     !- Coefficient1 Constant
@@ -2965,7 +2957,6 @@
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
-
 
   OutdoorAir:Node,
     DX Clg Coil Cond InletNode,  !- Name
@@ -2998,6 +2989,8 @@
     ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
     0.7;                     !- Fan Total Efficiency
 
+    !NoEconomizer,            !- Economizer Control Type
+
   Controller:OutdoorAir,
     OA Controller,           !- Name
     Relief Air Outlet Node,  !- Relief Air Outlet Node Name
@@ -3006,7 +2999,6 @@
     Outside Air Inlet Node,  !- Actuator Node Name
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    !NoEconomizer,            !- Economizer Control Type
     FixedDryBulb,            !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
     19.,                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}
@@ -3017,8 +3009,6 @@
     NoLockout,               !- Lockout Type
     FixedMinimum,            !- Minimum Limit Type
     Min OA Sched;            !- Minimum Outdoor Air Schedule Name
-
-
 
 ! Condenser Loop used with Water-Side Economizer
 
@@ -3189,7 +3179,7 @@
   BranchList,
     CondenserPlantLoop Demand Branches,  !- Name
     CondenserPlantLoop Demand Inlet Branch,  !- Branch 1 Name
-    CondenserPlantLoop Demand Branch 2,  !- Branch 3 Name
+    CondenserPlantLoop Demand Branch 2,  !- Branch 2 Name
     CondenserPlantLoop Demand Bypass Branch,  !- Branch 3 Name
     CondenserPlantLoop Demand Outlet Branch;  !- Branch 4 Name
 
@@ -3203,13 +3193,13 @@
   Connector:Splitter,
     CondenserPlantLoop Demand Splitter,  !- Name
     CondenserPlantLoop Demand Inlet Branch,  !- Inlet Branch Name
-    CondenserPlantLoop Demand Branch 2,  !- Outlet Branch 2 Name
+    CondenserPlantLoop Demand Branch 2,  !- Outlet Branch 1 Name
     CondenserPlantLoop Demand Bypass Branch;  !- Outlet Branch 2 Name
 
   Connector:Mixer,
     CondenserPlantLoop Demand Mixer,  !- Name
     CondenserPlantLoop Demand Outlet Branch,  !- Outlet Branch Name
-    CondenserPlantLoop Demand Branch 2,  !- Inlet Branch 2 Name
+    CondenserPlantLoop Demand Branch 2,  !- Inlet Branch 1 Name
     CondenserPlantLoop Demand Bypass Branch;  !- Inlet Branch 2 Name
 
   Branch,
@@ -3229,7 +3219,7 @@
     CondenserPlantLoop Demand Branch 2,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,      !- Component 1 Object Type
-    Free Cooling Coil,          !- Component 1 Name
+    Free Cooling Coil,       !- Component 1 Name
     Node 13,                 !- Component 1 Inlet Node Name
     Node 15;                 !- Component 1 Outlet Node Name
 
@@ -3280,7 +3270,6 @@
     1st Sunday in April,     !- Start Date
     Last Sunday in October;  !- End Date
 
-
   SetpointManager:OutdoorAirReset,
     CoolingTowerSetPoint,    !- Name
     Temperature,             !- Control Variable
@@ -3290,7 +3279,6 @@
     30.0,                    !- Outdoor High Temperature {C}
     Node 17;                 !- Setpoint Node or NodeList Name
 
-
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
   Output:Variable,*,Zone Mean Air Humidity Ratio,hourly;
@@ -3298,13 +3286,13 @@
   Output:Variable,*,Zone Air Relative Humidity,hourly;
 
   Output:Variable,SPACE1-1,Zone Air Temperature,hourly;
-  
+
   Output:Variable,SPACE2-1,Zone Air Temperature,hourly;
-  
+
   Output:Variable,SPACE3-1,Zone Air Temperature,hourly;
-  
+
   Output:Variable,SPACE4-1,Zone Air Temperature,hourly;
-  
+
   Output:Variable,SPACE5-1,Zone Air Temperature,hourly;
 
   Output:Variable,SPACE1-1 In Node,System Node Temperature,hourly;
@@ -3450,3 +3438,4 @@
 
   Output:SQlite,
     simple;                  !- Option Type
+

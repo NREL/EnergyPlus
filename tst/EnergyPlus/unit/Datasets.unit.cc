@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -160,6 +160,18 @@ TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2019)
 {
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/LCCusePriceEscalationDataSet2019.idf"))));
 }
+TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2020)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/LCCusePriceEscalationDataSet2020.idf"))));
+}
+TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2021)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/LCCusePriceEscalationDataSet2021.idf"))));
+}
+TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2022)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/LCCusePriceEscalationDataSet2022.idf"))));
+}
 TEST_F(DataSetFixture, MoistureMaterials)
 {
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/MoistureMaterials.idf"))));
@@ -214,6 +226,10 @@ TEST_F(DataSetFixture, SurfaceColorSchemes)
 TEST_F(DataSetFixture, USHolidays_DST)
 {
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/USHolidays-DST.idf"))));
+}
+TEST_F(DataSetFixture, WaterToAirHeatPumps)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/WaterToAirHeatPumps.idf"))));
 }
 TEST_F(DataSetFixture, WindowBlindMaterials)
 {

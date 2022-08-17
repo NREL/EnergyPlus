@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,7 +76,8 @@ namespace OutputProcessor {
 
 namespace WeatherManager {
     enum class DateType;
-}
+    struct ReportPeriodData;
+} // namespace WeatherManager
 
 namespace General {
 
@@ -121,7 +122,7 @@ namespace General {
         static_assert(std::is_invocable_v<decltype(f), EnergyPlusData &, Real64, const Payload &>,
                       "Function passed in (f) cannot be called with the Payload (Par) passed in, the expected types do not match.");
 
-        Real64 const SMALL(1.e-10);
+        Real64 constexpr SMALL(1.e-10);
 
         Real64 X0;       // present 1st bound
         Real64 X1;       // present 2nd bound
@@ -368,6 +369,9 @@ namespace General {
 
     void InvOrdinalDay(int Number, int &PMonth, int &PDay, int LeapYr);
 
+    bool BetweenDateHoursLeftInclusive(
+        int const TestDate, int const TestHour, int const StartDate, int const StartHour, int const EndDate, int const EndHour);
+
     bool BetweenDates(int TestDate,  // Date to test
                       int StartDate, // Start date in sequence
                       int EndDate    // End date in sequence
@@ -376,9 +380,9 @@ namespace General {
     std::string CreateSysTimeIntervalString(EnergyPlusData &state);
 
     int nthDayOfWeekOfMonth(EnergyPlusData &state,
-                            int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
-                            int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
-                            int const &monthNumber // January = 1
+                            int dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+                            int nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
+                            int monthNumber // January = 1
     );
 
     Real64 SafeDivide(Real64 a, Real64 b);
@@ -500,6 +504,13 @@ namespace General {
     }
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
+
+    bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx);
+
+    void findReportPeriodIdx(EnergyPlusData &state,
+                             const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                             const int nReportPeriods,
+                             Array1D_bool &inReportPeriodFlags);
 
     inline Real64 epexp(const Real64 numerator, const Real64 denominator)
     {

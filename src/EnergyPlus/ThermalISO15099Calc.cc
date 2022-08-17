@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -95,6 +95,14 @@ using namespace TARCOGOutput;
 using namespace TARCOGGasses90;
 using namespace TarcogShading;
 
+//  Calculation outcome
+enum class CalculationOutcome
+{
+    Invalid = -1,
+    OK,
+    Num
+};
+
 void film(Real64 const tex, Real64 const tw, Real64 const ws, int const iwd, Real64 &hcout, int const ibc)
 {
     //***********************************************************************
@@ -109,50 +117,54 @@ void film(Real64 const tex, Real64 const tw, Real64 const ws, int const iwd, Rea
     //   hcout - convective film coeff [w m-2 k-1]
 
     // Locals
-    Real64 const conv(5.6783);
+    Real64 constexpr conv(5.6783);
 
     Real64 vc;
     Real64 acoef;
     Real64 bexp;
 
     // calculation of convection component of exterior film coefficient using the :
-    {
-        auto const SELECT_CASE_var(ibc);
-        if (SELECT_CASE_var == 0) { // ISO 15099
-            hcout = 4.0 + 4.0 * ws;
-        } else if (SELECT_CASE_var == -1) { // old ASHRAE SPC142 correlation
-            if (iwd == 0) {                 // windward
-                if (ws > 2.0) {
-                    vc = 0.25 * ws;
-                } else {
-                    vc = 0.5;
-                }
-            } else { // leeward
-                vc = 0.3 + 0.05 * ws;
+    switch (ibc) {
+    case 0: { // ISO 15099
+        hcout = 4.0 + 4.0 * ws;
+    } break;
+    case -1: {          // old ASHRAE SPC142 correlation
+        if (iwd == 0) { // windward
+            if (ws > 2.0) {
+                vc = 0.25 * ws;
+            } else {
+                vc = 0.5;
             }
-            hcout = 3.28 * std::pow(vc, 0.605);
-            hcout *= conv;                  // convert to metric
-        } else if (SELECT_CASE_var == -2) { // Yazdanian-Klems correlation:
-            if (iwd == 0) {                 // windward
-                acoef = 2.38;
-                bexp = 0.89;
-            } else { // leeward
-                acoef = 2.86;
-                bexp = 0.617;
-            }
-            hcout = std::sqrt(pow_2(0.84 * std::pow(tw - tex, 0.33)) + pow_2(acoef * std::pow(ws, bexp)));
-        } else if (SELECT_CASE_var == -3) { // Kimura correlation (Section 8.4.2.3 in ISO 15099-2001):
-            if (iwd == 0) {                 // windward
-                if (ws > 2.0) {
-                    vc = 0.25 * ws;
-                } else {
-                    vc = 0.5 * ws;
-                }
-            } else { // leeward
-                vc = 0.3 + 0.05 * ws;
-            }
-            hcout = 4.7 + 7.6 * vc;
+        } else { // leeward
+            vc = 0.3 + 0.05 * ws;
         }
+        hcout = 3.28 * std::pow(vc, 0.605);
+        hcout *= conv; // convert to metric
+    } break;
+    case -2: {          // Yazdanian-Klems correlation:
+        if (iwd == 0) { // windward
+            acoef = 2.38;
+            bexp = 0.89;
+        } else { // leeward
+            acoef = 2.86;
+            bexp = 0.617;
+        }
+        hcout = std::sqrt(pow_2(0.84 * std::pow(tw - tex, 0.33)) + pow_2(acoef * std::pow(ws, bexp)));
+    } break;
+    case -3: {          // Kimura correlation (Section 8.4.2.3 in ISO 15099-2001):
+        if (iwd == 0) { // windward
+            if (ws > 2.0) {
+                vc = 0.25 * ws;
+            } else {
+                vc = 0.5 * ws;
+            }
+        } else { // leeward
+            vc = 0.3 + 0.05 * ws;
+        }
+        hcout = 4.7 + 7.6 * vc;
+    } break;
+    default:
+        break;
     }
 }
 
@@ -1367,7 +1379,7 @@ void therm1d(EnergyPlusData &state,
     // Simon: This is set to zero until it is resolved what to do with modifier
     ShadeHcModifiedOut = 0.0;
     CSMFlag = 0;
-    CalcOutcome = CalculationOutcome::Unknown;
+    CalcOutcome = CalculationOutcome::Invalid;
     curTempCorrection = 0;
     AchievedErrorTolerance = 0.0;
     curDifference = 0.0;
@@ -1920,7 +1932,7 @@ void therm1d(EnergyPlusData &state,
                 vfreevent);
     }
 
-    if (CalcOutcome == CalculationOutcome::Unknown) {
+    if (CalcOutcome == CalculationOutcome::Invalid) {
         ErrorMessage = "Tarcog failed to converge";
         nperr = 2; // error 2: failed to converge...
     }
@@ -2512,14 +2524,16 @@ void filmi(EnergyPlusData &state,
     Real64 Gnui(0.0);
 
     if (wsi > 0.0) { // main IF
-        {
-            auto const SELECT_CASE_var(ibc);
-            if (SELECT_CASE_var == 0) {
-                hcin = 4.0 + 4.0 * wsi;
-            } else if (SELECT_CASE_var == -1) {
-                hcin = 5.6 + 3.8 * wsi; // SPC142 correlation
-                return;
-            }
+        switch (ibc) {
+        case 0: {
+            hcin = 4.0 + 4.0 * wsi;
+        } break;
+        case -1: {
+            hcin = 5.6 + 3.8 * wsi; // SPC142 correlation
+            return;
+        } break;
+        default:
+            break;
         }
     } else {                                                  // main IF - else
         tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians

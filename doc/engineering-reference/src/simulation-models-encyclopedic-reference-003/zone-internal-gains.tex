@@ -23,7 +23,7 @@ where:
 
 \(MassFlowRA\) is the mass flow rate at the return node (kg/s)
 
-\(CpAir\) is the specific heat (J/kg)
+\(CpAir\) is the specific heat (J/kg-K)
 
 When both node names of return air and exhaust air are entered in the Lights object, the return heat is shared by both nodes. Both nodes will have the same temperature due to added return heat:
 
@@ -41,7 +41,7 @@ where:
 
 \(MassFlowEx\) is the mass flow rate at the exhaust node (kg/s)
 
-\(CpAir\) is the specific heat (J/kg)
+\(CpAir\) is the specific heat (J/kg-K)
 
 Although a single Lights object allows a return node and an exhaust node, it is possible to have multiple Lights objects with different return nodes and referrred to the same exhaust node. Therefore, the exhaust node will share return heat from different return nodes. The temperature rise at i-th return node is given below:
 
@@ -57,7 +57,7 @@ TempRetRise_i = \frac{QRetAir_i} {(MassFlowRA_i + MassFlowEx ) * CpAir}
 
 \(MassFlowEx\) is the mass flow rate at the exhaust node (kg/s)
 
-\(CpAir\) is the specific heat (J/kg)
+\(CpAir\) is the specific heat (J/kg-K)
 
 The temperature arise at the exhaust node is a sum of all return node temperature rise:
 
@@ -75,7 +75,7 @@ where:
 
 \(MassFlowEx\) is the mass flow rate at the exhaust node (kg/s)
 
-\(CpAir\) is the specific heat (J/kg)
+\(CpAir\) is the specific heat (J/kg-K)
 
 \(n\) is the number of Lights objects with the same exhaust node
 
@@ -126,98 +126,98 @@ The function for sensible gain calculation is compared to the original data poin
 
 The input object ElectricEquipment:ITE:AirCooled describes air-cooled electric information technology equipment (ITE) which has variable power consumption as a function of loading and temperature. The calculations are described below.
 
-\subsubsection{Variable Definitions -- User Inputs:}\label{variable-definitions-user-inputs}
+\subsubsection{Variable Definitions---User Inputs:}\label{variable-definitions-user-inputs}
 
 \begin{itemize}
 \tightlist
 \item
-  PDesign is the design power input when fully loaded and entering air temperature is at the user-specified design inlet temperature (W)
+  P$_\textrm{Design}$ is the design power input when fully loaded and entering air temperature is at the user-specified design inlet temperature (W)
 \item
-  PFanFracDesign is the design fan power input fraction of total power input when fully loaded and entering air temperature is at the user-specified design inlet temperature
+  PFanFrac$_\textrm{Design}$ is the design fan power input fraction of total power input when fully loaded and entering air temperature is at the user-specified design inlet temperature
 \item
   SchDesignLevel is the scheduled fraction of this equipment which is powered up
 \item
   SchCPULoading is the scheduled fraction of CPU loading
 \item
-  TAirInDesign is the air inlet temperature at design condition (\(^{\circ}\)C)
+  T$_\textrm{Air,In,Design}$ is the air inlet temperature at design condition ($^\circ$C)
 \item
-  VAirDesign is the air volume flow rate at design condition (m\(^3\)/s)
+  V$_\textrm{Air,Design}$ is the air volume flow rate at design condition (m$^3$/s)
 \item
-  VAirfLoadTAir is the air volume flow rate modifier function of TAirIn and SchCPULoading
+  VAirfLoadTAir is the air volume flow rate modifier function of  $T_{\textrm{Air,In}}$ and SchCPULoading
 \item
-  PCPUfLoadTAir is the CPU power input modifier function of TAirIn and SchCPULoading
+  PCPUfLoadTAir is the CPU power input modifier function of $T_{\textrm{Air,In}}$ and SchCPULoading
 \item
   PFanfFlowFrac is the fan power input modifier function of air flow fraction
 \item
-  RecircFracDesign is the recirculation fraction at design condition (\(^{\circ}\)C)
+  RecircFrac$_\textrm{Design}$ is the recirculation fraction at design condition ($^\circ$C)
 \item
-  RecircfLoadTAir is the recirculation fraction modifier function of TAirSupply and SchCPULoading
+  RecircfLoadTAir is the recirculation fraction modifier function of  $T_{\textrm{Air,Supply}}$ and SchCPULoading
 \item
-  UPSEfficDesign is the design electric power supply efficiency
+  UPSEffic$_\textrm{Design}$ is the design electric power supply efficiency
 \item
   UPSEfficfPLR is the electric power supply efficiency function of part load ratio
 \item
   UPSLossFracToZone is the fraction of electric power supply losses to zone
 \end{itemize}
 
-\subsubsection{Variable Definitions -- Simulation Inputs:}\label{variable-definitions-simulation-inputs}
+\subsubsection{Variable Definitions---Simulation Inputs:}\label{variable-definitions-simulation-inputs}
 
 \begin{itemize}
 \tightlist
 \item
-  TAirIn is the air inlet temperature at current conditions (\(^{\circ}\)C)
+  T$_\textrm{Air,In}$ is the air inlet temperature at current conditions ($^\circ$C)
 \item
-  TAirSupply is the supply air node temperature at current conditions (\(^{\circ}\)C)
+  T$_\textrm{Air,Supply}$ is the supply air node temperature at current conditions ($^\circ$C)
 \item
-  TZone is the zone air temperature at current conditions (\(^{\circ}\)C)
+  T$_\textrm{Zone}$ is the zone air temperature at current conditions ($^\circ$C)
 \item
-  TRoomAirNodeIn is the room air model inlet node air temperature at current conditions (\(^{\circ}\)C)
+  T$_\textrm{RoomAirNode,In}$ is the room air model inlet node air temperature at current conditions ($^\circ$C)
 \item
-  RhoAir is the air density (kg/m\(^3\))
+  $\rho_\textrm{Air}$ is the air density (kg/m$^3$)
 \item
-  CpAir is the air specific heat (J/kg-K)
+  Cp$_\textrm{Air}$ is the air specific heat (J/kg-K)
 \end{itemize}
 
-\subsubsection{Variable Definitions -- Intermediate Calculations:}\label{variable-definitions-intermediate-calculations}
+\subsubsection{Variable Definitions---Intermediate Calculations:}\label{variable-definitions-intermediate-calculations}
 
 \begin{itemize}
 \tightlist
 \item
-  PCPUDesign is the design CPU power input when fully loaded and entering air temperature is at the user-specified design inlet temperature (W)
+  P$_\textrm{CPU,Design}$ is the design CPU power input when fully loaded and entering air temperature is at the user-specified design inlet temperature (W)
 \item
-  PFanDesign is the design fan power input when fully loaded and entering air temperature is at the user-specified design inlet temperature (W)
+  P$_\textrm{Fan,Design}$ is the design fan power input when fully loaded and entering air temperature is at the user-specified design inlet temperature (W)
 \item
   UPSPLR is the electric power supply part load ratio (can be greater than 1.0)
 \end{itemize}
 
-\subsubsection{Variable Definitions -- Outputs:}\label{variable-definitions-outputs}
+\subsubsection{Variable Definitions---Outputs:}\label{variable-definitions-outputs}
 
 \begin{itemize}
 \tightlist
 \item
-  PCPU is the CPU power input (W)
+  P$_\textrm{CPU}$ is the CPU power input (W)
 \item
-  PFan is the fan power input (W)
+  P$_\textrm{Fan}$ is the fan power input (W)
 \item
-  PUPS is the electric power supply net power input (W)
+  P$_\textrm{UPS}$ is the electric power supply net power input (W)
 \item
-  TAirOut is the air outlet temperature (\(^{\circ}\)C)
+  T$_\textrm{Air,Out}$ is the air outlet temperature ($^\circ$C)
 \item
-  VAir is the air volume flow rate (m\(^3\)/s)
+  V$_\textrm{Air}$ is the air volume flow rate (m$^3$/s)
 \item
   FlowFrac is the air volume flow rate fraction of design flow rate
 \item
   RecircFrac is the recirculation fraction
 \item
-  QAir is the air cooling rate (W)
+  Q$_\textrm{Air}$ is the air cooling rate (W)
 \item
-  QUPS is the electric power supply heat loss rate to zone (W)
+  Q$_\textrm{UPS}$ is the electric power supply heat loss rate to zone (W)
 \item
-  QConv is the convective heat gain rate to zone heat balance (W)
+  Q$_\textrm{Conv}$ is the convective heat gain rate to zone heat balance (W)
 \item
   SHI is the supply heat index
 \item
-  SHIZone is the zone average supply heat index
+  SHI$_{\textrm{Zone}}$ is the zone average supply heat index
 \end{itemize}
 
 \subsubsection{Calculations}\label{calculations}
@@ -225,42 +225,41 @@ The input object ElectricEquipment:ITE:AirCooled describes air-cooled electric i
 The design power input is first split into portions for the CPU (everything in the equipment except the cooling fans) and the fan(s).
 
 \begin{equation}
-PCPUDesign = PDesign * (1 - PFanFracDesign)
+P_{\textrm{CPU,Design}} = P_{\textrm{Design}} \cdot (1 - \textrm{PFanFrac}_{\textrm{Design}})
 \end{equation}
 
 \begin{equation}
-PFanDesign = PDesign * PFanFracDesign
+P_{\textrm{Fan,Design}} = P_{\textrm{Design}} \cdot \textrm{PFanFrac}_{\textrm{Design}}
 \end{equation}
 
 For each time step,  the air inlet and outlet temperature is calculated depending on the type of air flow calculation method. Considering data centers are different from normal well-mixed zones due to the uneven air distribution, two methods are implemented to calculate the IT inlet temperature and zone return air temperature, \textbf{FlowFromSystem} and \textbf{FlowControlWithApproachTemperatures}. Specifically, the IT inlet temperature differs from AHU supply air temperature, and the actual AHU return air temperature differs from the regular return air temperature when the zone is well mixed.
 
 When using \textbf{FlowFromSystem}, the zone is assumed to be well-mixed. The air inlet temperature is calculated depending on the type of air node connection.
 
-\emph{\textbf{TAirIn}}:
+\paragraph{T$_\textrm{Air,In}$:}
 
 \begin{itemize}
     \tightlist
   \item
     If Air Node Connection Type = AdjustedSupply
 \begin{equation}
-RecircFrac = RecircFracDesign * RecircfLoadTAir(SchCPULoading TAirSupply)
+\textrm{RecircFrac} = \textrm{RecircFrac}_{\textrm{Design}} \cdot \textrm{RecircfLoadTAir}(\textrm{SchCPULoading}, T_{\textrm{Air,Supply}})
 \end{equation}
 
 \begin{equation}
-TAirIn = TAirSupply * (1 – RecircFrac) +TAirZone * RecircFrac
+T_{\textrm{Air,In}} = T_{\textrm{Air,Supply}} \cdot (1 - \textrm{RecircFrac}) + T_{\textrm{Air,Zone}} \cdot \textrm{RecircFrac}
 \end{equation}
 
   \item
     If Air Node Connection Type = ZoneAirNode
-    
 \begin{equation}
-TAirIn = TAirZone
+T_{\textrm{Air,In}} = T_{\textrm{Air,Zone}}
 \end{equation}
 
   \item
     If Air Node Connection Type = RoomAirModel
 \begin{equation}
-TAirIn = TRoomAirNodeIn
+T_{\textrm{Air,In}} = T_{\textrm{RoomAirNode,In}}
 \end{equation}
 
 \end{itemize}
@@ -268,90 +267,90 @@ TAirIn = TRoomAirNodeIn
 Using the air inlet temperature, the CPU power consumption, air flow rate, fan power consumption, and power supply power consumption are calculated.
 
 \begin{equation}
-PCPU = PCPUDesign * SchDesignLevel * PfLoadTAir(SchCPULoading, TAirIn)
+P_{\textrm{CPU}} = P_{\textrm{CPU,Design}} \cdot \textrm{SchDesignLevel} \cdot \textrm{PfLoadTAir}(\textrm{SchCPULoading}, T_{\textrm{Air,In}})
 \end{equation}
 
 \begin{equation}
-FlowFrac = VAirfLoadTAir(SchCPULoading, TAirIn)
+\textrm{FlowFrac} = \textrm{VAirfLoadTAir}(\textrm{SchCPULoading}, T_{\textrm{Air,In}})
 \end{equation}
 
 \begin{equation}
-VAir = VAirDesign * FlowFrac
+V_{\textrm{Air}} = V_{\textrm{Air,Design}} \cdot \textrm{FlowFrac}
 \end{equation}
 
 \begin{equation}
-PFan = PFanDesign * SchDesignLevel * PFanfFlowFrac(FlowFrac)
+P_{\textrm{Fan}} = P_{\textrm{Fan,Design}} \cdot \textrm{SchDesignLevel} \cdot \textrm{PFanfFlowFrac}(\textrm{FlowFrac})
 \end{equation}
 
 \begin{equation}
-UPSPLR = (PCPU + PFan) / (PCPUDesign + PFanDesign)
+\textrm{UPSPLR} = \frac{P_{\textrm{CPU}} + P_{\textrm{Fan}}}{P_{\textrm{CPU,Design}} + P_{\textrm{Fan,Design}}}
 \end{equation}
 
 \begin{equation}
-PUPS = (PCPU + PFan) * (1 - UPSEfficDesign * UPSEfficfPLR (UPSPLR))
+P_{\textrm{UPS}} = (P_{\textrm{CPU}} + P_{\textrm{Fan}}) \cdot (1 - \textrm{UPSEffic}_{\textrm{Design}} \cdot \textrm{UPSEfficfPLR}(\textrm{UPSPLR}))
 \end{equation}
 
-The convective heat gain to the zone and the air outlet temperature are then calculated. The user specified fration of power supply losses are always added to the general zone heat balace convective heat gain. For air node connection types AdjustedSupply and ZoneAirNode, the CPU and fan power consumption are also added to the zone convective heat gain. For air connection type RoomAirModel, the gains from the CPU and fan power consumption are added to the outlet room air model node.
+The convective heat gain to the zone and the air outlet temperature are then calculated. The user specified fraction of power supply losses are always added to the general zone heat balance convective heat gain. For air node connection types AdjustedSupply and ZoneAirNode, the CPU and fan power consumption are also added to the zone convective heat gain. For air connection type RoomAirModel, the gains from the CPU and fan power consumption are added to the outlet room air model node.
 
 \begin{equation}
-QAir = PCPU + PFan
+Q_{\textrm{Air}} = P_{\textrm{CPU}} + P_{\textrm{Fan}}
 \end{equation}
 
 \begin{equation}
-QUPS = PUPS * UPSLossFracToZone
+Q_{\textrm{UPS}} = P_{\textrm{UPS}} \cdot \textrm{UPSLossFracToZone}
 \end{equation}
 
-\emph{\textbf{QConv}}:
+\paragraph{Q$_\textrm{Conv}$:}
 
 \begin{itemize}
     \tightlist
   \item
     If Air Node Connection Type = AdjustedSupply OR ZoneAirNode
 \begin{equation}
-QConv = QAir + QUPS
+Q_{\textrm{Conv}} = Q_{\textrm{Air}} + Q_{\textrm{UPS}}
 \end{equation}
   \item
     If Air Node Connection Type = RoomAirModel
 \begin{equation}
-QConv = QUPS
+Q_{\textrm{Conv}} = Q_{\textrm{UPS}}
 \end{equation}
 \end{itemize}
 
 \begin{equation}
-TAirOut = TAirIn + QAir / (VAir * RhoAir * CpAir)
+T_{\textrm{Air,Out}} = T_{\textrm{Air,In}} + \frac{Q_{\textrm{Air}}}{V_{\textrm{Air}} \cdot \rho_{\textrm{Air}} \cdot \textrm{Cp}_{\textrm{Air}}}
 \end{equation}
 
 The individual ITE supply heat index is calculated as shown below.
 
 \begin{equation}
-SHI = (TAirIn - TAirSupply) / (TAirOut - TAirSupply)
+\textrm{SHI} = \frac{T_{\textrm{Air,In}} - T_{\textrm{Air,Supply}}}{T_{\textrm{Air,Out}} - T_{\textrm{Air,Supply}}}
 \end{equation}
 
 The zone average ITE supply heat index is weighted by the air flow rate of each ITE object.
 
 \begin{equation}
-SHIZone = \Sigma [VAir * (TAirIn - TAirSupply)] / \Sigma [VAir * (TAirOut - TAirSupply)]
+\textrm{SHI}_{\textrm{Zone}} = \frac{\Sigma[V_{\textrm{Air}} \cdot (T_{\textrm{Air,In}} - T_{\textrm{Air,Supply}})]}{\Sigma[V_{\textrm{Air}} \cdot (T_{\textrm{Air,Out}} - T_{\textrm{Air,Supply}})]}
 \end{equation}
 
-If \textbf{FlowControlWithApproachTemperatures} is chosen, Two indices are introduced to represent the deviation: (1) Supply approach temperature ($\delta T_{supply}$) and (2) Return approach temperature ($\delta T_{return}$). The two temperature differences indicate to what degree the air flow management of data centers affects the air distribution, and how much they deviate from the regular well-mixed zone scenario.
+If \textbf{FlowControlWithApproachTemperatures} is chosen, Two indices are introduced to represent the deviation: (1) Supply approach temperature ($\Delta T_{\textrm{supply}}$) and (2) Return approach temperature ($\Delta T_{\textrm{return}}$). The two temperature differences indicate to what degree the air flow management of data centers affects the air distribution, and how much they deviate from the regular well-mixed zone scenario.
 
 \begin{equation}
-\delta T_{supply}=T_{in}-T_{supply}
+\Delta T_{\textrm{supply}}=T_{\textrm{in}}-T_{\textrm{supply}}
 \end{equation}
 
 \begin{equation}
-\delta T_{return}=T_{return}-T_{out}
+\Delta T_{\textrm{return}}=T_{\textrm{return}}-T_{\textrm{out}}
 \end{equation}
 
 where:
 
-$T_{in}$ is the IT equipment inlet temperature
+$T_{\textrm{in}}$ is the IT equipment inlet temperature;
 
-$T_{supply}$ is the AHU supply air temperature
+$T_{\textrm{supply}}$ is the AHU supply air temperature;
 
-$T_{return}$ is the actual AHU return air temperature
+$T_{\textrm{return}}$ is the actual AHU return air temperature;
 
-$T_{out}$ is the IT equipment outlet temperature.
+and $T_{\textrm{out}}$ is the IT equipment outlet temperature.
 
 The two approach temperatures can be calculated by CFD tools for typical IT load levels and air flow management of data centers, or provided by measurement data or lookup tables. 
 
@@ -367,10 +366,10 @@ It should be noted that, when \textbf{FlowControlWithApproachTemperatures} is ch
 When \textbf{FlowControlWithApproachTemperatures} method is applied, during sizing and simulation, as the zone is assumed to be unevenly distributed, the supply air flow rate of the AHU is calculated as:
 
 \begin{equation}
-{\dot m_{sys}} = {Q_{sys}}/({C_{p,air}} \cdot ({T_{return}} - {T_{supply}}))
+{\dot m_{\textrm{sys}}} = \frac{Q_{\textrm{sys}}}{\textrm{Cp}_{\textrm{air}} \cdot (T_{\textrm{return}} - T_{\textrm{supply}})}
 \end{equation}
 
-where $T_{return}$ is the weighted return air temperature from all ITE objects in the zone, and $T_{supply}$ is the designed supply air temperature to the ITE objects.
+where $T_{\textrm{return}}$ is the weighted return air temperature from all ITE objects in the zone, and $T_{\textrm{supply}}$ is the designed supply air temperature to the ITE objects.
 
 Another modified assumption for this case is, in zones with ITE objects, to make sure the zone heat balance converge, unlike the original thermostat setpoint control logic, the well-mixed zone temperature is not controlled. The actual controlled object is the supply air temperature. So when using this method, the user input of zone cooling setpoint is ignored and the unmet hour for cooling does not apply.
 
@@ -388,7 +387,7 @@ The input object ZoneBaseboard:OutdoorTemperatureControlled provides a model for
 Q = Q2 - \frac{{(Q2 - Q1)\cdot (T2 - TA)}}{{(T2 - T1)}}
 \end{equation}
 
-These temperature and capacity fields can be autosized based upon envelope, infiltration, and ventilation loads. To autosize these fields, users may set a design zone heating temperature that is assumed to be 20\(^{\circ}\)C if blank.
+These temperature and capacity fields can be autosized based upon envelope, infiltration, and ventilation loads. To autosize these fields, users may set a design zone heating temperature that is assumed to be 20$^\circ$C if blank.
 
 The capacity at low temperature is the maximum capacity of the unit. It includes external envelope conduction load, infiltration load, and ventilation load in a space where the unit serves. The model first finds the lowest outdoor air temperature throughout design days included in the simulation, and determines the conduction load through external envelope as:
 

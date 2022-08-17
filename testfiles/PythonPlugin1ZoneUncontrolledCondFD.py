@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -63,6 +63,7 @@ class Material(object):
         self.nodes = []
         self.cp_handle = None
         self.k_handle = None
+        self.flux_handle = None
 
     def set_num_nodes(self, num_nodes):
         self.num_nodes = num_nodes
@@ -72,6 +73,9 @@ class Material(object):
 
     def set_k_handle(self, handle):
         self.k_handle = handle
+
+    def set_flux_handle(self, handle):
+        self.flux_handle = handle
 
 
 class Construction(object):
@@ -89,10 +93,20 @@ class CondFDSurfaceManager(EnergyPlusPlugin):
     def __init__(self):
         super().__init__()
 
+        # test surfaces for k and cp actuators
         wall_materials = ["Vinyl&#44 Light", "WallSheathing", "WallStudAndCavityk1", "Drywall 0.5 in."]
-        surfaces_names = ["Zn001:Wall001", "Zn001:Wall002", "Zn001:Wall003", "Zn001:Wall004"]
+        surfaces_names = ["Zn001:Wall001", "Zn001:Wall002", "Zn001:Wall003"]
 
         self.surfaces = []
+
+        for surface_name in surfaces_names:
+            constr = Construction(surface_name)
+            constr.set_material_layers(wall_materials)
+            self.surfaces.append(constr)
+
+        # test surface for heat flux actuators
+        wall_materials = ["Drywall 0.25 in. lay-1"]
+        surfaces_names = ["Zn001:Wall004"]
 
         for surface_name in surfaces_names:
             constr = Construction(surface_name)
@@ -132,10 +146,17 @@ class CondFDSurfaceManager(EnergyPlusPlugin):
 
                 # set the specific heat handle in each material layer
                 cp_handle = self.api.exchange.get_actuator_handle(state,
-                                                                 "CondFD Surface Material Layer",
-                                                                 "Specific Heat",
-                                                                 f"{surface.name}:{material.name}")
+                                                                  "CondFD Surface Material Layer",
+                                                                  "Specific Heat",
+                                                                  f"{surface.name}:{material.name}")
                 material.set_cp_handle(cp_handle)
+
+                # set the heat flux handle for each material layer
+                flux_handle = self.api.exchange.get_actuator_handle(state,
+                                                                    "CondFD Surface Material Layer",
+                                                                    "Heat Flux",
+                                                                    f"{surface.name}:{material.name}")
+                material.set_flux_handle(flux_handle)
 
         self.need_to_get_handles = False
 
@@ -169,7 +190,7 @@ class CondFDSurfaceManager(EnergyPlusPlugin):
         # update k and cp using EMS based on temperature conditions
         for surface in self.surfaces:
             for layer in surface.material_layers:
-                if layer.name is "WallStudAndCavityk1":
+                if layer.name == "WallStudAndCavityk1":
                     if actuate_walls:
                         k = 10
                         cp = 1500
@@ -178,5 +199,7 @@ class CondFDSurfaceManager(EnergyPlusPlugin):
                         cp = 1179
                     self.api.exchange.set_actuator_value(state, layer.k_handle, k)
                     self.api.exchange.set_actuator_value(state, layer.cp_handle, cp)
+                elif layer.name == "Drywall 0.25 in. lay-1":
+                    self.api.exchange.set_actuator_value(state, layer.flux_handle, 10)
 
         return 0

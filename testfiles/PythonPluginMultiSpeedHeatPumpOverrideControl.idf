@@ -98,7 +98,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.6;
+  Version,22.2;
 
   Building,
     Single family House,     !- Name
@@ -1115,12 +1115,12 @@
 
   People,
     LIVING ZONE People,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE OCCUPANCY,         !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1137,7 +1137,7 @@
 
   Lights,
     LIVING ZONE Lights,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE LIGHTING,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1000,                    !- Lighting Level {W}
@@ -1151,7 +1151,7 @@
 
   ZoneVentilation:DesignFlowRate,
     LIVING ZONE Ventl 1,     !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.131944,                !- Design Flow Rate {m3/s}
@@ -1173,7 +1173,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     LIVING ZONE Infil 1,     !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.01,                    !- Design Flow Rate {m3/s}
@@ -1187,7 +1187,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ATTIC ZONE Infil 1,      !- Name
-    ATTIC ZONE,              !- Zone or ZoneList Name
+    ATTIC ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.05,                    !- Design Flow Rate {m3/s}
@@ -1201,7 +1201,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     GARAGE ZONE Infil 1,     !- Name
-    GARAGE ZONE,             !- Zone or ZoneList Name
+    GARAGE ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.05,                    !- Design Flow Rate {m3/s}
@@ -1215,7 +1215,7 @@
 
   ElectricEquipment,
     LIVING ZONE ElecEq,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     500,                     !- Design Level {W}
@@ -1983,23 +1983,21 @@
     AllSummary;              !- Report 1 Name
 
   PythonPlugin:Instance,
-    MultiSpeed Coil Speed Level Management,           !- Name
-    Yes,                                              !- Run During Warmup Days
-    PythonPluginMultiSpeedHeatPumpOverrideControl,    !- Python Module Name
-    CoilSpeedControl;                                 !- Plugin Class Name
+    MultiSpeed Coil Speed Level Management,  !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginMultiSpeedHeatPumpOverrideControl,  !- Python Module Name
+    CoilSpeedControl;        !- Plugin Class Name
 
   PythonPlugin:Variables,
-    PythonGlobalVars,              !- Name
+    PythonGlobalVars,        !- Name
     CoilSpeedLevelOverrideReport;  !- Variable Name 1
 
   PythonPlugin:OutputVariable,
     PythonPlugin Coil Speed Level Override On,  !- Name
-    CoilSpeedLevelOverrideReport,               !- Python Plugin Variable Name
-    Averaged,                                   !- Type of Data in Variable
-    SystemTimestep,                             !- Update Frequency
-    On/Off;                                     !- Units
+    CoilSpeedLevelOverrideReport,  !- Python Plugin Variable Name
+    Averaged,                !- Type of Data in Variable
+    SystemTimestep,          !- Update Frequency
+    On/Off;                  !- Units
 
-  Output:Variable,
-    PythonPlugin Coil Speed Level Override On,
-    PythonPlugin:OutputVariable,
-    Hourly;
+  Output:Variable,PythonPlugin Coil Speed Level Override On,PythonPlugin:OutputVariable,Hourly;
+

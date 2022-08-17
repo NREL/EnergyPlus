@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -108,6 +108,14 @@ namespace OutputReportPredefined {
         s->pdchDDwindSp = newPreDefColumn(state, s->pdstDesDay, "Wind Speed [m/s]");
         s->pdchDDwindDr = newPreDefColumn(state, s->pdstDesDay, "Wind Direction");
 
+        s->pdstMonthlyPrec = newPreDefSubTable(state, s->pdrClim, "Monthly Precipitation Summary");
+
+        s->pdchMonthlyTotalPrecInWeather = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Precipitation from .epw [mm]");
+        s->pdchMonthlyTotalHrRain = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Hours of Rain from .epw");
+        s->pdchMonthlyTotalPrecInSitePrec = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Precipitation in Site:Precipitation [mm]");
+        s->pdchMonthlyTotalIrrDep = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Roof Irrigation Depth [mm]");
+        s->pdchMonthlyTotalRainCol = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Rain Collection Volume [m3]");
+
         s->pdstWthr = newPreDefSubTable(state, s->pdrClim, "Weather Statistics File");
         s->pdchWthrVal = newPreDefColumn(state, s->pdstWthr, "Value");
 
@@ -142,6 +150,7 @@ namespace OutputReportPredefined {
         s->pdstFen = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Fenestration");
 
         s->pdchFenCons = newPreDefColumn(state, s->pdstFen, "Construction");
+        s->pdchFenFrameDivName = newPreDefColumn(state, s->pdstFen, "Frame and Divider");
         s->pdchFenGlassAreaOf1 = newPreDefColumn(state, s->pdstFen, "Glass Area [m2]");
         s->pdchFenFrameAreaOf1 = newPreDefColumn(state, s->pdstFen, "Frame Area [m2]");
         s->pdchFenDividerAreaOf1 = newPreDefColumn(state, s->pdstFen, "Divider Area [m2]");
@@ -152,11 +161,26 @@ namespace OutputReportPredefined {
         s->pdchFenVisTr = newPreDefColumn(state, s->pdstFen, "Glass Visible Transmittance");
         s->pdchFenFrameConductance = newPreDefColumn(state, s->pdstFen, "Frame Conductance [W/m2-K]");
         s->pdchFenDividerConductance = newPreDefColumn(state, s->pdstFen, "Divider Conductance [W/m2-K]");
+        s->pdchFenAssemNfrcType = newPreDefColumn(state, s->pdstFen, "NFRC Product Type");
+        s->pdchFenAssemUfact = newPreDefColumn(state, s->pdstFen, "Assembly U-Factor [W/m2-K]");
+        s->pdchFenAssemSHGC = newPreDefColumn(state, s->pdstFen, "Assembly SHGC");
+        s->pdchFenAssemVisTr = newPreDefColumn(state, s->pdstFen, "Assembly Visible Transmittance");
         s->pdchFenSwitchable = newPreDefColumn(state, s->pdstFen, "Shade Control");
         s->pdchFenParent = newPreDefColumn(state, s->pdstFen, "Parent Surface");
         s->pdchFenAzimuth = newPreDefColumn(state, s->pdstFen, "Azimuth [deg]");
         s->pdchFenTilt = newPreDefColumn(state, s->pdstFen, "Tilt [deg]");
         s->pdchFenDir = newPreDefColumn(state, s->pdstFen, "Cardinal Direction");
+
+        s->pdstFenShd = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Fenestration Shaded State");
+
+        s->pdchFenShdFrameDiv = newPreDefColumn(state, s->pdstFenShd, "Frame and Divider");
+        s->pdchFenShdUfact = newPreDefColumn(state, s->pdstFenShd, "Glass U-Factor [W/m2-K]");
+        s->pdchFenShdSHGC = newPreDefColumn(state, s->pdstFenShd, "Glass SHGC");
+        s->pdchFenShdVisTr = newPreDefColumn(state, s->pdstFenShd, "Glass Visible Transmittance");
+        s->pdchFenShdAssemNfrcType = newPreDefColumn(state, s->pdstFenShd, "NFRC Product Type");
+        s->pdchFenShdAssemUfact = newPreDefColumn(state, s->pdstFenShd, "Assembly U-Factor [W/m2-K]");
+        s->pdchFenShdAssemSHGC = newPreDefColumn(state, s->pdstFenShd, "Assembly SHGC");
+        s->pdchFenShdAssemVisTr = newPreDefColumn(state, s->pdstFenShd, "Assembly Visible Transmittance");
 
         s->pdstIntFen = newPreDefSubTable(state, s->pdrEnvelope, "Interior Fenestration");
 
@@ -166,15 +190,14 @@ namespace OutputReportPredefined {
         s->pdchIntFenUfact = newPreDefColumn(state, s->pdstIntFen, "Glass U-Factor [W/m2-K]");
         s->pdchIntFenSHGC = newPreDefColumn(state, s->pdstIntFen, "Glass SHGC");
         s->pdchIntFenVisTr = newPreDefColumn(state, s->pdstIntFen, "Glass Visible Transmittance");
+        s->pdchIntFenParent = newPreDefColumn(state, s->pdstIntFen, "Parent Surface");
         // s->pdchIntFenGlassAreaOf1 =   newPreDefColumn(state, s->pdstIntFen,'Glass Area [m2]')
         // s->pdchIntFenFrameAreaOf1 =   newPreDefColumn(state, s->pdstIntFen,'Frame Area [m2]')
         // s->pdchIntFenDividerAreaOf1 =   newPreDefColumn(state, s->pdstIntFen,'Divider Area [m2]')
         // s->pdchIntFenFrameConductance =  newPreDefColumn(state, s->pdstIntFen,'Frame Conductance [W/m2-K]')
         // s->pdchIntFenDividerConductance =  newPreDefColumn(state, s->pdstIntFen,'Divider Conductance [W/m2-K]')
-        s->pdchIntFenParent = newPreDefColumn(state, s->pdstIntFen, "Parent Surface");
 
         s->pdstDoor = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Door");
-
         s->pdchDrCons = newPreDefColumn(state, s->pdstDoor, "Construction");
         s->pdchDrUfactFilm = newPreDefColumn(state, s->pdstDoor, "U-Factor with Film [W/m2-K]");
         s->pdchDrUfactNoFilm = newPreDefColumn(state, s->pdstDoor, "U-Factor no Film [W/m2-K]");
@@ -333,6 +356,18 @@ namespace OutputReportPredefined {
         s->pdchDXCoolCoilElecPowerC = newPreDefColumn(state, s->pdstDXCoolCoil2, "Rated Electric Power Test C [W]");
         s->pdchDXCoolCoilNetCapSID = newPreDefColumn(state, s->pdstDXCoolCoil2, "Rated Net Cooling Capacity Test D [W]");
         s->pdchDXCoolCoilElecPowerD = newPreDefColumn(state, s->pdstDXCoolCoil2, "Rated Electric Power Test D [W]");
+
+        // Water-to-Air HP report
+        s->pdstWAHP = newPreDefSubTable(state, s->pdrEquip, "Water-to-Air Heat Pumps at Rated Temperatures Report");
+        s->pdchWAHPType = newPreDefColumn(state, s->pdstWAHP, "Coil Type");
+        s->pdchWAHPRatedCapAtRatedCdts = newPreDefColumn(state, s->pdstWAHP, "Rated Total Capacity [W]");
+        s->pdchWAHPRatedSensCapAtRatedCdts = newPreDefColumn(state, s->pdstWAHP, "Rated Sensible Capacity [W]");
+        s->pdchWAHPRatedPowerAtRatedCdts = newPreDefColumn(state, s->pdstWAHP, "Rated Power[W]");
+        s->pdchWAHPRatedCOPAtRatedCdts = newPreDefColumn(state, s->pdstWAHP, "Rated COP [W/W]");
+        s->pdchWAHPRatedAirDBT = newPreDefColumn(state, s->pdstWAHP, "Rated Air Dry-bulb Temperature [C]");
+        s->pdchWAHPRatedAirWBT = newPreDefColumn(state, s->pdstWAHP, "Rated Air Wet-bulb Temperature [C]");
+        s->pdchWAHPRatedWtrT = newPreDefColumn(state, s->pdstWAHP, "Rated Water Temperature [C]");
+        s->pdchWAHPDD = newPreDefColumn(state, s->pdstWAHP, "Design Day used for Sizing");
 
         s->pdstDXHeatCoil = newPreDefSubTable(state, s->pdrEquip, "DX Heating Coils");
         s->pdchDXHeatCoilType = newPreDefColumn(state, s->pdstDXHeatCoil, "DX Heating Coil Type");
@@ -1213,48 +1248,6 @@ namespace OutputReportPredefined {
         s->pdchLeedSchStPt11pmWednesday = newPreDefColumn(state, s->pdstLeedSchedSetPts, "11pm First Wednesday [C]");
         s->pdchLeedSchStPt11pmWedCnt = newPreDefColumn(state, s->pdstLeedSchedSetPts, "Days with Same 11pm Value");
 
-        s->pdrThermalResilience = newPreDefReport(state, "ThermalResilienceSummary", "ThermR", "Annual Thermal Resilience Summary");
-
-        s->pdstHIHours = newPreDefSubTable(state, s->pdrThermalResilience, "Heat Index Hours");
-        s->pdchHIHourSafe = newPreDefColumn(state, s->pdstHIHours, "Safe (≤ 26.7°C) [hr]");
-        s->pdchHIHourCaution = newPreDefColumn(state, s->pdstHIHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
-        s->pdchHIHourExtremeCaution = newPreDefColumn(state, s->pdstHIHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
-        s->pdchHIHourDanger = newPreDefColumn(state, s->pdstHIHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
-        s->pdchHIHourExtremeDanger = newPreDefColumn(state, s->pdstHIHours, "Extreme Danger (> 51.7°C) [hr]");
-
-        s->pdstHIOccuHours = newPreDefSubTable(state, s->pdrThermalResilience, "Heat Index OccupantHours");
-        s->pdchHIOccuHourSafe = newPreDefColumn(state, s->pdstHIOccuHours, "Safe (≤ 26.7°C) [hr]");
-        s->pdchHIOccuHourCaution = newPreDefColumn(state, s->pdstHIOccuHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
-        s->pdchHIOccuHourExtremeCaution = newPreDefColumn(state, s->pdstHIOccuHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
-        s->pdchHIOccuHourDanger = newPreDefColumn(state, s->pdstHIOccuHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
-        s->pdchHIOccuHourExtremeDanger = newPreDefColumn(state, s->pdstHIOccuHours, "Extreme Danger (> 51.7°C) [hr]");
-
-        s->pdstHumidexHours = newPreDefSubTable(state, s->pdrThermalResilience, "Humidex Hours");
-        s->pdchHumidexHourLittle = newPreDefColumn(state, s->pdstHumidexHours, "Little to no Discomfort (≤ 29) [hr]");
-        s->pdchHumidexHourSome = newPreDefColumn(state, s->pdstHumidexHours, "Some Discomfort (> 29, ≤ 40) [hr]");
-        s->pdchHumidexHourGreat = newPreDefColumn(state, s->pdstHumidexHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
-        s->pdchHumidexHourDanger = newPreDefColumn(state, s->pdstHumidexHours, "Dangerous (> 45, ≤ 50) [hr]");
-        s->pdchHumidexHourStroke = newPreDefColumn(state, s->pdstHumidexHours, "Heat Stroke Quite Possible (> 50) [hr]");
-
-        s->pdstHumidexOccuHours = newPreDefSubTable(state, s->pdrThermalResilience, "Humidex OccupantHours");
-        s->pdchHumidexOccuHourLittle = newPreDefColumn(state, s->pdstHumidexOccuHours, "Little to no Discomfort (≤ 29) [hr]");
-        s->pdchHumidexOccuHourSome = newPreDefColumn(state, s->pdstHumidexOccuHours, "Some Discomfort (> 29, ≤ 40) [hr]");
-        s->pdchHumidexOccuHourGreat = newPreDefColumn(state, s->pdstHumidexOccuHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
-        s->pdchHumidexOccuHourDanger = newPreDefColumn(state, s->pdstHumidexOccuHours, "Dangerous (> 45, ≤ 50) [hr]");
-        s->pdchHumidexOccuHourStroke = newPreDefColumn(state, s->pdstHumidexOccuHours, "Heat Stroke Quite Possible (> 50) [hr]");
-
-        s->pdstHeatingSETHours = newPreDefSubTable(state, s->pdrThermalResilience, "Heating SET Hours");
-        s->pdchHeatingSETHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C Hours (°C)");
-        s->pdchHeatingSETOccuHours = newPreDefColumn(state, s->pdstHeatingSETHours, "SET ≤ 12.2°C OccupantHours (°C)");
-        s->pdchHeatingSETUnmetDuration = newPreDefColumn(state, s->pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration [hr]");
-        s->pdchHeatingSETUnmetTime = newPreDefColumn(state, s->pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration");
-
-        s->pdstCoolingSETHours = newPreDefSubTable(state, s->pdrThermalResilience, "Cooling SET Hours");
-        s->pdchCoolingSETHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C Hours (°C)");
-        s->pdchCoolingSETOccuHours = newPreDefColumn(state, s->pdstCoolingSETHours, "SET > 30°C OccupantHours (°C)");
-        s->pdchCoolingSETUnmetDuration = newPreDefColumn(state, s->pdstCoolingSETHours, "Longest SET > 30°C Duration [hr]");
-        s->pdchCoolingSETUnmetTime = newPreDefColumn(state, s->pdstCoolingSETHours, "Start Time of the Longest SET > 30°C Duration");
-
         s->pdrCO2Resilience = newPreDefReport(state, "CO2ResilienceSummary", "CO2R", "Annual CO2 Resilience Summary");
 
         s->pdstCO2Hours = newPreDefSubTable(state, s->pdrCO2Resilience, "CO2 Level Hours");
@@ -1266,6 +1259,11 @@ namespace OutputReportPredefined {
         s->pdchCO2OccuHourSafe = newPreDefColumn(state, s->pdstCO2OccuHours, "Safe (<= 1000 ppm) [hr]");
         s->pdchCO2OccuHourCaution = newPreDefColumn(state, s->pdstCO2OccuHours, "Caution (> 1000, <= 5000 ppm) [hr]");
         s->pdchCO2OccuHourHazard = newPreDefColumn(state, s->pdstCO2OccuHours, "Hazard (> 5000 ppm) [hr]");
+
+        s->pdstCO2OccupiedHours = newPreDefSubTable(state, s->pdrCO2Resilience, "CO2 Level OccupiedHours");
+        s->pdchCO2OccupiedHourSafe = newPreDefColumn(state, s->pdstCO2OccupiedHours, "Safe (<= 1000 ppm) [hr]");
+        s->pdchCO2OccupiedHourCaution = newPreDefColumn(state, s->pdstCO2OccupiedHours, "Caution (> 1000, <= 5000 ppm) [hr]");
+        s->pdchCO2OccupiedHourHazard = newPreDefColumn(state, s->pdstCO2OccupiedHours, "Hazard (> 5000 ppm) [hr]");
 
         s->pdrVisualResilience = newPreDefReport(state, "VisualResilienceSummary", "VisualR", "Annual Visual Resilience Summary");
 
@@ -1280,6 +1278,12 @@ namespace OutputReportPredefined {
         s->pdchIllumOccuHourDim = newPreDefColumn(state, s->pdstIllumOccuHours, "Dim (> 100, <= 300 lux) [hr]");
         s->pdchIllumOccuHourAdequate = newPreDefColumn(state, s->pdstIllumOccuHours, "Adequate (> 300, <= 500 lux) [hr]");
         s->pdchIllumOccuHourBright = newPreDefColumn(state, s->pdstIllumOccuHours, "Bright (>500 lux) [hr]");
+
+        s->pdstIllumOccupiedHours = newPreDefSubTable(state, s->pdrVisualResilience, "Illuminance Level OccupiedHours");
+        s->pdchIllumOccupiedHourDark = newPreDefColumn(state, s->pdstIllumOccupiedHours, "A Bit Dark (<= 100 lux) [hr]");
+        s->pdchIllumOccupiedHourDim = newPreDefColumn(state, s->pdstIllumOccupiedHours, "Dim (> 100, <= 300 lux) [hr]");
+        s->pdchIllumOccupiedHourAdequate = newPreDefColumn(state, s->pdstIllumOccupiedHours, "Adequate (> 300, <= 500 lux) [hr]");
+        s->pdchIllumOccupiedHourBright = newPreDefColumn(state, s->pdstIllumOccupiedHours, "Bright (>500 lux) [hr]");
     }
 
     void PreDefTableEntry(

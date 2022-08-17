@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -65,35 +66,30 @@ namespace DataHeatBalFanSys {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    constexpr bool UseSimpleAirFlow = true;
     constexpr Real64 MaxRadHeatFlux = 4000.0; // [W/m2] max limit for radiant heat flux at a surface due to HVAC equipment
 
     // Controls for PredictorCorrector
 
     enum class PredictorCorrectorCtrl
     {
-        Unassigned = -1,
+        Invalid = -1,
         GetZoneSetPoints,
         PredictStep,
         CorrectStep,
         RevertZoneTimestepHistories,
         PushZoneTimestepHistories,
-        PushSystemTimestepHistories
+        PushSystemTimestepHistories,
+        Num
     };
 
     struct ZoneComfortControlsFangerData
     {
         // Members
-        int FangerType;      // Index for Fanger type
-        Real64 LowPMV;       // Low PMV value
-        Real64 HighPMV;      // High PMV Value
-        int DualPMVErrCount; // Dual PMV setpoint error count
-        int DualPMVErrIndex; // Dual PMV setpoint error index
-
-        // Default Constructor
-        ZoneComfortControlsFangerData() : FangerType(0), LowPMV(0.0), HighPMV(0.0), DualPMVErrCount(0), DualPMVErrIndex(0)
-        {
-        }
+        int FangerType = 0;      // Index for Fanger type
+        Real64 LowPMV = 0.0;     // Low PMV value
+        Real64 HighPMV = 0.0;    // High PMV Value
+        int DualPMVErrCount = 0; // Dual PMV setpoint error count
+        int DualPMVErrIndex = 0; // Dual PMV setpoint error index
     };
 
 } // namespace DataHeatBalFanSys
@@ -252,165 +248,47 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
     Array1D<Real64> ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
     Array1D<Real64> ZoneW1;  // Zone temperature at the previous time step used in Exact and Euler method
-    Array1D_int TempControlType;
-    Array1D_int ComfortControlType;
+    EPVector<DataHVACGlobals::ThermostatType> TempControlType;
+    EPVector<int> TempControlTypeRpt;
+    EPVector<DataHVACGlobals::ThermostatType> ComfortControlType;
+    EPVector<int> ComfortControlTypeRpt;
 
-    Array1D<Real64> ZoneHeatIndex;
-    Array1D<Real64> ZoneHumidex;
-    Array1D_int ZoneNumOcc;
+    Array2D<bool> CrossedColdThreshRepPeriod;
+    Array2D<bool> CrossedHeatThreshRepPeriod;
 
-    Array1D<std::vector<Real64>> ZoneHeatIndexHourBins;
-    Array1D<std::vector<Real64>> ZoneHumidexHourBins;
-    Array1D<std::vector<Real64>> ZoneHeatIndexOccuHourBins;
-    Array1D<std::vector<Real64>> ZoneHumidexOccuHourBins;
-    Array1D<std::vector<Real64>> ZoneCO2LevelHourBins;
-    Array1D<std::vector<Real64>> ZoneCO2LevelOccuHourBins;
-    Array1D<std::vector<Real64>> ZoneLightingLevelHourBins;
-    Array1D<std::vector<Real64>> ZoneLightingLevelOccuHourBins;
+    Array2D<std::vector<Real64>> ZoneHeatIndexHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneHeatIndexOccuHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneHeatIndexOccupiedHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneHumidexHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneHumidexOccuHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneHumidexOccupiedHourBinsRepPeriod;
+    Array2D<Real64> lowSETLongestHoursRepPeriod;
+    Array2D<Real64> highSETLongestHoursRepPeriod;
+    Array2D<int> lowSETLongestStartRepPeriod;
+    Array2D<int> highSETLongestStartRepPeriod;
+    Array2D<std::vector<Real64>> ZoneColdHourOfSafetyBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneHeatHourOfSafetyBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneUnmetDegreeHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneDiscomfortWtExceedOccuHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneCO2LevelHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneCO2LevelOccuHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneCO2LevelOccupiedHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneLightingLevelHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneLightingLevelOccuHourBinsRepPeriod;
+    Array2D<std::vector<Real64>> ZoneLightingLevelOccupiedHourBinsRepPeriod;
 
-    Array1D<Real64> ZoneOccPierceSET;
-    Array1D<Real64> ZoneOccPierceSETLastStep;
-    Array1D<std::vector<Real64>> ZoneLowSETHours;
-    Array1D<std::vector<Real64>> ZoneHighSETHours;
+    Array2D<std::vector<Real64>> ZoneLowSETHoursRepPeriod;
+    Array2D<std::vector<Real64>> ZoneHighSETHoursRepPeriod;
+
+    int PierceSETerrorIndex = 0;
+    int PMVerrorIndex = 0;
 
     EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
     void clear_state() override
     {
-        this->SumConvHTRadSys.deallocate();
-        this->SumLatentHTRadSys.deallocate();
-        this->SumConvPool.deallocate();
-        this->SumLatentPool.deallocate();
-        this->ZoneQdotRadHVACToPerson.deallocate();
-        this->ZoneQHTRadSysToPerson.deallocate();
-        this->ZoneQHWBaseboardToPerson.deallocate();
-        this->ZoneQSteamBaseboardToPerson.deallocate();
-        this->ZoneQElecBaseboardToPerson.deallocate();
-        this->ZoneQCoolingPanelToPerson.deallocate();
-        this->ZTAV.deallocate();
-        this->MAT.deallocate();
-        this->TempTstatAir.deallocate();
-        this->ZT.deallocate();
-        this->XMAT.deallocate();
-        this->XM2T.deallocate();
-        this->XM3T.deallocate();
-        this->XM4T.deallocate();
-        this->DSXMAT.deallocate();
-        this->DSXM2T.deallocate();
-        this->DSXM3T.deallocate();
-        this->DSXM4T.deallocate();
-        this->XMPT.deallocate();
-        this->ZTAVComf.deallocate();
-        this->ZoneAirHumRatAvgComf.deallocate();
-        this->ZoneAirHumRatAvg.deallocate();
-        this->ZoneAirHumRat.deallocate();
-        this->WZoneTimeMinus1.deallocate();
-        this->WZoneTimeMinus2.deallocate();
-        this->WZoneTimeMinus3.deallocate();
-        this->WZoneTimeMinus4.deallocate();
-        this->DSWZoneTimeMinus1.deallocate();
-        this->DSWZoneTimeMinus2.deallocate();
-        this->DSWZoneTimeMinus3.deallocate();
-        this->DSWZoneTimeMinus4.deallocate();
-        this->WZoneTimeMinusP.deallocate();
-        this->ZoneAirHumRatTemp.deallocate();
-        this->WZoneTimeMinus1Temp.deallocate();
-        this->WZoneTimeMinus2Temp.deallocate();
-        this->WZoneTimeMinus3Temp.deallocate();
-        this->ZoneAirHumRatOld.deallocate();
-        this->MCPI.deallocate();
-        this->MCPTI.deallocate();
-        this->MCPV.deallocate();
-        this->MCPTV.deallocate();
-        this->MCPM.deallocate();
-        this->MCPTM.deallocate();
-        this->MCPE.deallocate();
-        this->EAMFL.deallocate();
-        this->EAMFLxHumRat.deallocate();
-        this->MCPTE.deallocate();
-        this->MCPC.deallocate();
-        this->CTMFL.deallocate();
-        this->MCPTC.deallocate();
-        this->ThermChimAMFL.deallocate();
-        this->MCPTThermChim.deallocate();
-        this->MCPThermChim.deallocate();
-        this->ZoneLatentGain.deallocate();
-        this->ZoneLatentGainExceptPeople.deallocate();
-        this->OAMFL.deallocate();
-        this->VAMFL.deallocate();
-        this->NonAirSystemResponse.deallocate();
-        this->SysDepZoneLoads.deallocate();
-        this->SysDepZoneLoadsLagged.deallocate();
-        this->MDotCPOA.deallocate();
-        this->MDotOA.deallocate();
-        this->MixingMassFlowZone.deallocate();
-        this->MixingMassFlowXHumRat.deallocate();
-        this->ZoneMassBalanceFlag.deallocate();
-        this->ZoneInfiltrationFlag.deallocate();
-        this->ZoneReOrder.deallocate();
-        this->QRadSysSource.deallocate();
-        this->TCondFDSourceNode.deallocate();
-        this->QPVSysSource.deallocate();
-        this->CTFTsrcConstPart.deallocate();
-        this->CTFTuserConstPart.deallocate();
-        this->SurfQHTRadSys.deallocate();
-        this->SurfQHWBaseboard.deallocate();
-        this->SurfQSteamBaseboard.deallocate();
-        this->SurfQElecBaseboard.deallocate();
-        this->QPoolSurfNumerator.deallocate();
-        this->QRadSurfAFNDuct.deallocate();
-        this->PoolHeatTransCoefs.deallocate();
-        this->RadSysTiHBConstCoef.deallocate();
-        this->RadSysTiHBToutCoef.deallocate();
-        this->RadSysTiHBQsrcCoef.deallocate();
-        this->RadSysToHBConstCoef.deallocate();
-        this->RadSysToHBTinCoef.deallocate();
-        this->RadSysToHBQsrcCoef.deallocate();
-        this->SumHmAW.deallocate();
-        this->SumHmARa.deallocate();
-        this->SumHmARaW.deallocate();
-        this->TempZoneThermostatSetPoint.deallocate();
-        this->AdapComfortCoolingSetPoint.deallocate();
-        this->ZoneThermostatSetPointHi.deallocate();
-        this->ZoneThermostatSetPointLo.deallocate();
-        this->ZoneThermostatSetPointHiAver.deallocate();
-        this->ZoneThermostatSetPointLoAver.deallocate();
-        this->LoadCorrectionFactor.deallocate();
-        this->AIRRAT.deallocate();
-        this->ZTM1.deallocate();
-        this->ZTM2.deallocate();
-        this->ZTM3.deallocate();
-        this->PreviousMeasuredZT1.deallocate();
-        this->PreviousMeasuredZT2.deallocate();
-        this->PreviousMeasuredZT3.deallocate();
-        this->PreviousMeasuredHumRat1.deallocate();
-        this->PreviousMeasuredHumRat2.deallocate();
-        this->PreviousMeasuredHumRat3.deallocate();
-        this->ZoneTMX.deallocate();
-        this->ZoneTM2.deallocate();
-        this->ZoneT1.deallocate();
-        this->ZoneWMX.deallocate();
-        this->ZoneWM2.deallocate();
-        this->ZoneW1.deallocate();
-        this->TempControlType.deallocate();
-        this->ComfortControlType.deallocate();
-        this->ZoneHeatIndex.deallocate();
-        this->ZoneHumidex.deallocate();
-        this->ZoneNumOcc.deallocate();
-        ;
-        this->ZoneHeatIndexHourBins.deallocate();
-        this->ZoneHeatIndexOccuHourBins.deallocate();
-        this->ZoneHumidexHourBins.deallocate();
-        this->ZoneHumidexOccuHourBins.deallocate();
-        this->ZoneOccPierceSET.deallocate();
-        this->ZoneOccPierceSETLastStep.deallocate();
-        this->ZoneLowSETHours.deallocate();
-        this->ZoneHighSETHours.deallocate();
-        this->ZoneCO2LevelHourBins.deallocate();
-        this->ZoneCO2LevelOccuHourBins.deallocate();
-        this->ZoneLightingLevelHourBins.deallocate();
-        this->ZoneLightingLevelOccuHourBins.deallocate();
-        this->ZoneComfortControlsFanger.deallocate();
+        *this = HeatBalFanSysData();
     }
 };
 

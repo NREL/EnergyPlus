@@ -12,8 +12,8 @@
 !                          The DOAS air is ducted to the inlet side of the PTAC and mixed with zone recirculating air through the
 !                          use of inlet side mixer terminal units for zones: SPACE1-1, and SPACE3-1. The DOAS air is ducted
 !                          to the outlet side of the PTAC and mixed with the PTAC outlet through the use of supply side mixer
-!                          terminal units for zones: SPACE4-1 and SPACE5-1. The DOAS air delivers OA to SPACE2-1 via an uncontrolled 
-!                          terminal unit. 
+!                          terminal units for zones: SPACE4-1 and SPACE5-1. The DOAS air delivers OA to SPACE2-1 via an uncontrolled
+!                          terminal unit.
 !
 ! Highlights:              DOAS ducted to inlet and supply side of ZoneHVAC:PackagedTerminalAirConditioner using AirTerminal:SingleDuct:Mixer,
 !                          except for SPACE2-1, using AirTerminal:SingleDuct:ConstantVolume:NoReheat.
@@ -22,15 +22,15 @@
 !                          All zone return air is connected to a return plenum. There are 3 induce nodes and 1 return outlet node as plenum outlets.
 !                          PTAC1 serves SPACE1-1 and receives OA from return outlet node. The inlet side mixer draws air from retunr node with
 !                          impact of light return heat.
-!                          PTAC2 and OA distribution have their own zone inlet nodes. OA entering the terminal unit is from 
-!                          an induce node, and PTAC2 draws air from a zone exhaust node.   
+!                          PTAC2 and OA distribution have their own zone inlet nodes. OA entering the terminal unit is from
+!                          an induce node, and PTAC2 draws air from a zone exhaust node.
 !                          PTAC3 is connected to a ternimal mixer with InletSide connection. The primary air is from DOAS disctribution and the Mixer
-!                          draws air from an induce node.   
-!                          PTAC4 is connected to a ternimal mixer with SupplySide connection. The primary air is from DOAS disctribution via return 
+!                          draws air from an induce node.
+!                          PTAC4 is connected to a ternimal mixer with SupplySide connection. The primary air is from DOAS disctribution via return
 !                          plenum outlet, and the PTAC4 draws air from the zone directly.
-!                          PTAC5 is connected to a ternimal mixer with SupplySide connection. The primary air is from DOAS disctribution via return 
+!                          PTAC5 is connected to a ternimal mixer with SupplySide connection. The primary air is from DOAS disctribution via return
 !                          plenum outlet, and the PTAC5 draws air from an induce node of zone plenum.
-!                          Mass balance: a sum of all zone return flows = a sum of mass flow rates from outlet node and all induce node. 
+!                          Mass balance: a sum of all zone return flows = a sum of mass flow rates from outlet node and all induce node.
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA WMO=722020, 2 design days, 2 run periods.
 !                          Run Control executes the design days only.
@@ -121,7 +121,8 @@
 ! HTML Report:                    Yes
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
-  Version,9.6;
+
+  Version,22.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -693,7 +694,7 @@
 
   Construction,
     Sgl Grey 3mm,            !- Name
-    CLEAR 3MM;                !- Outside Layer
+    CLEAR 3MM;               !- Outside Layer
 
 !-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========
 
@@ -1457,7 +1458,7 @@
   FenestrationSurface:Detailed,
     WF-1,                    !- Name
     WINDOW,                  !- Surface Type
-    Sgl Grey 3mm,    !- Construction Name
+    Sgl Grey 3mm,            !- Construction Name
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
@@ -1487,7 +1488,7 @@
   FenestrationSurface:Detailed,
     WR-1,                    !- Name
     WINDOW,                  !- Surface Type
-    Sgl Grey 3mm,    !- Construction Name
+    Sgl Grey 3mm,            !- Construction Name
     RIGHT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
@@ -1502,7 +1503,7 @@
   FenestrationSurface:Detailed,
     WB-1,                    !- Name
     WINDOW,                  !- Surface Type
-    Sgl Grey 3mm,    !- Construction Name
+    Sgl Grey 3mm,            !- Construction Name
     BACK-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
@@ -1532,7 +1533,7 @@
   FenestrationSurface:Detailed,
     WL-1,                    !- Name
     WINDOW,                  !- Surface Type
-    Sgl Grey 3mm,    !- Construction Name
+    Sgl Grey 3mm,            !- Construction Name
     LEFT-1,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
@@ -1570,60 +1571,60 @@
 
   People,
     SPACE1-1 People 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     SPACE2-1 People 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     SPACE3-1 People 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     SPACE4-1 People 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     SPACE5-1 People 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     20,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
@@ -1632,26 +1633,26 @@
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
     ,                        !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
-    0.21,                       !- Return Air Fraction
+    0.21,                    !- Return Air Fraction
     0.59,                    !- Fraction Radiant
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
     GeneralLights,           !- End-Use Subcategory
     ,                        !- Return Air Fraction Calculated from Plenum Temperature
     ,                        !- Return Air Fraction Function of Plenum Temperature Coefficient 1
-    ,                        !- Return Air Fraction Function of Plenum Temperature Coefficient 2
-    SPACE1-1 Return Outlet, !- Return Air Heat Gain Node Name
-    SPACE1-1 Air Terminal Mixer Secondary Inlet; !- Exhaust Air Heat Gain Node Name  
+    ,                        !- Return Air Fraction Function of Plenum Temperature Coefficient 2 {1/K}
+    SPACE1-1 Return Outlet,  !- Return Air Heat Gain Node Name
+    SPACE1-1 Air Terminal Mixer Secondary Inlet;  !- Exhaust Air Heat Gain Node Name
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1665,7 +1666,7 @@
 
   Lights,
     SPACE3-1 Lights 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1679,7 +1680,7 @@
 
   Lights,
     SPACE4-1 Lights 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1693,7 +1694,7 @@
 
   Lights,
     SPACE5-1 Lights 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1709,7 +1710,7 @@
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1721,7 +1722,7 @@
 
   ElectricEquipment,
     SPACE2-1 ElecEq 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1733,7 +1734,7 @@
 
   ElectricEquipment,
     SPACE3-1 ElecEq 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1745,7 +1746,7 @@
 
   ElectricEquipment,
     SPACE4-1 ElecEq 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1757,7 +1758,7 @@
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1976,                    !- Design Level {W}
@@ -1771,7 +1772,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -1785,7 +1786,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1799,7 +1800,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE3-1 Infil 1,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -1813,7 +1814,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE4-1 Infil 1,        !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1827,7 +1828,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.031089,                !- Design Flow Rate {m3/s}
@@ -2428,11 +2429,11 @@
     CurrentOccupancy;        !- Per Person Ventilation Rate Mode
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    SPACE2-1 DOAS Air Terminal,          !- Name
-    FanAvailSched,    !- Availability Schedule Name
+    SPACE2-1 DOAS Air Terminal,  !- Name
+    FanAvailSched,           !- Availability Schedule Name
     SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Air Inlet Node Name
-    SPACE2-1 DOAS Inlet,       !- Air Outlet Node Name
-    autosize,                    !- Maximum Air Flow Rate {m3/s}
+    SPACE2-1 DOAS Inlet,     !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
     SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name
     CurrentOccupancy;        !- Per Person Ventilation Rate Mode
 
@@ -2586,16 +2587,17 @@
     SPACE2-1,                !- Zone Name
     SPACE2-1 Equipment,      !- Zone Conditioning Equipment List Name
     SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
-    ,  !- Zone Air Exhaust Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Zone Air Node,  !- Zone Air Node Name
     SPACE2-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
+
+!    SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
     SPACE3-1 Equipment,      !- Zone Conditioning Equipment List Name
     SPACE3-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
-!    SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
-    ,  !- Zone Air Exhaust Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Zone Air Node,  !- Zone Air Node Name
     SPACE3-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
@@ -2607,12 +2609,13 @@
     SPACE4-1 Zone Air Node,  !- Zone Air Node Name
     SPACE4-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
+!    SPACE5-1 PTAC Inlet,     !- Zone Air Exhaust Node or NodeList Name
+
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
     SPACE5-1 Equipment,      !- Zone Conditioning Equipment List Name
     SPACE5-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
-!    SPACE5-1 PTAC Inlet,     !- Zone Air Exhaust Node or NodeList Name
-    ,     !- Zone Air Exhaust Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Zone Air Node,  !- Zone Air Node Name
     SPACE5-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
@@ -2743,7 +2746,6 @@
     DOAS Mixed Air Outlet,   !- Air Inlet Node Name
     DOAS Supply Fan Outlet;  !- Air Outlet Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTDOORAIR ===========
 
   Controller:OutdoorAir,
@@ -2789,8 +2791,8 @@
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     DOAS OA System Equipment,!- Name
-    OutdoorAir:Mixer,        !- Component 2 Object Type
-    DOAS OA Mixing Box;      !- Component 2 Name
+    OutdoorAir:Mixer,        !- Component 1 Object Type
+    DOAS OA Mixing Box;      !- Component 1 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM ===========
 
@@ -2831,26 +2833,25 @@
     Return-Plenum-1,         !- Name
     PLENUM-1,                !- Zone Name
     PLENUM-1 Node,           !- Zone Node Name
-    DOAS PLENUM-1 Out Node,       !- Outlet Node Name
+    DOAS PLENUM-1 Out Node,  !- Outlet Node Name
     DOAS Plenum-1 Induce Nodes,  !- Induced Air Outlet Node or NodeList Name
-    SPACE1-1 Return Outlet,       !- Inlet 1 Node Name
-    SPACE2-1 Return Outlet,       !- Inlet 2 Node Name
-    SPACE3-1 Return Outlet,       !- Inlet 3 Node Name
-    SPACE4-1 Return Outlet,       !- Inlet 4 Node Name
-    SPACE5-1 Return Outlet;       !- Inlet 5 Node Name
+    SPACE1-1 Return Outlet,  !- Inlet 1 Node Name
+    SPACE2-1 Return Outlet,  !- Inlet 2 Node Name
+    SPACE3-1 Return Outlet,  !- Inlet 3 Node Name
+    SPACE4-1 Return Outlet,  !- Inlet 4 Node Name
+    SPACE5-1 Return Outlet;  !- Inlet 5 Node Name
 
   NodeList,
-    DOAS Plenum-1 Induce Nodes,         !- Name
-    SPACE2-1 PTAC Inlet,   !- Node 1 Name
-    SPACE3-1 Air Terminal Mixer Secondary Inlet,   !- Node 2 Name
-    SPACE5-1 PTAC Inlet;   !- Node 3 Name
-
+    DOAS Plenum-1 Induce Nodes,  !- Name
+    SPACE2-1 PTAC Inlet,     !- Node 1 Name
+    SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Node 2 Name
+    SPACE5-1 PTAC Inlet;     !- Node 3 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:RETURNPATH ===========
 
   AirLoopHVAC:ReturnPath,
     DOAS Return Path,        !- Name
-    DOAS PLENUM-1 Out Node,       !- Return Air Path Outlet Node Name
+    DOAS PLENUM-1 Out Node,  !- Return Air Path Outlet Node Name
     AirLoopHVAC:ReturnPlenum,!- Component 1 Object Type
     Return-Plenum-1;         !- Component 1 Name
 
@@ -2882,8 +2883,8 @@
 
   NodeList,
     SPACE2-1 Inlets,         !- Name
-    SPACE2-1 DOAS Inlet,     !- Node 2 Name
-    SPACE2-1 Supply Inlet;   !- Node 1 Name
+    SPACE2-1 DOAS Inlet,     !- Node 1 Name
+    SPACE2-1 Supply Inlet;   !- Node 2 Name
 
   NodeList,
     SPACE3-1 Inlets,         !- Name
@@ -2958,5 +2959,4 @@
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
-
 

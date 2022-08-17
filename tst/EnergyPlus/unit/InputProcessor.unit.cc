@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4244,11 +4244,11 @@ TEST_F(InputProcessorFixture, reportIDFRecordsStats_basic)
     state->dataInputProcessing->inputProcessor->reportIDFRecordsStats(*state);
 
     // TOTAL:
-    // 34 fields with defaults, 6 Autosizable, 3 Autocalculatable
+    // 36 fields with defaults, 6 Autosizable, 3 Autocalculatable
     // 11 fields defaulted    , 4 Autosized  , 2 Autocalculated
 
     EXPECT_EQ(4, state->dataOutput->iNumberOfRecords);             // Number of IDF Records (=Objects)
-    EXPECT_EQ(34, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
+    EXPECT_EQ(36, state->dataOutput->iTotalFieldsWithDefaults);    // Total number of fields that could be defaulted
     EXPECT_EQ(6, state->dataOutput->iTotalAutoSizableFields);      // Total number of autosizeable fields
     EXPECT_EQ(3, state->dataOutput->iTotalAutoCalculatableFields); // Total number of autocalculatable fields
     EXPECT_EQ(11, state->dataOutput->iNumberOfDefaultedFields);    // Number of defaulted fields in IDF

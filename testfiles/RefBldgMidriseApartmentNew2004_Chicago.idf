@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 27
 
-  Version,9.6;
+  Version,22.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4802,12 +4802,12 @@
 
   People,
     Office People,           !- Name
-    Office,                  !- Zone or ZoneList Name
+    Office,                  !- Zone or ZoneList or Space or SpaceList Name
     OFF_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.0,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4824,12 +4824,12 @@
 
   People,
     G SW Apartment People,   !- Name
-    G SW Apartment,          !- Zone or ZoneList Name
+    G SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4846,12 +4846,12 @@
 
   People,
     G NW Apartment People,   !- Name
-    G NW Apartment,          !- Zone or ZoneList Name
+    G NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4868,12 +4868,12 @@
 
   People,
     G NE Apartment People,   !- Name
-    G NE Apartment,          !- Zone or ZoneList Name
+    G NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4890,12 +4890,12 @@
 
   People,
     G N1 Apartment People,   !- Name
-    G N1 Apartment,          !- Zone or ZoneList Name
+    G N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4912,12 +4912,12 @@
 
   People,
     G N2 Apartment People,   !- Name
-    G N2 Apartment,          !- Zone or ZoneList Name
+    G N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4934,12 +4934,12 @@
 
   People,
     G S1 Apartment People,   !- Name
-    G S1 Apartment,          !- Zone or ZoneList Name
+    G S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4956,12 +4956,12 @@
 
   People,
     G S2 Apartment People,   !- Name
-    G S2 Apartment,          !- Zone or ZoneList Name
+    G S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4978,12 +4978,12 @@
 
   People,
     M SW Apartment People,   !- Name
-    M SW Apartment,          !- Zone or ZoneList Name
+    M SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5000,12 +5000,12 @@
 
   People,
     M NW Apartment People,   !- Name
-    M NW Apartment,          !- Zone or ZoneList Name
+    M NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5022,12 +5022,12 @@
 
   People,
     M SE Apartment People,   !- Name
-    M SE Apartment,          !- Zone or ZoneList Name
+    M SE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5044,12 +5044,12 @@
 
   People,
     M NE Apartment People,   !- Name
-    M NE Apartment,          !- Zone or ZoneList Name
+    M NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5066,12 +5066,12 @@
 
   People,
     M N1 Apartment People,   !- Name
-    M N1 Apartment,          !- Zone or ZoneList Name
+    M N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5088,12 +5088,12 @@
 
   People,
     M N2 Apartment People,   !- Name
-    M N2 Apartment,          !- Zone or ZoneList Name
+    M N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5110,12 +5110,12 @@
 
   People,
     M S1 Apartment People,   !- Name
-    M S1 Apartment,          !- Zone or ZoneList Name
+    M S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5132,12 +5132,12 @@
 
   People,
     M S2 Apartment People,   !- Name
-    M S2 Apartment,          !- Zone or ZoneList Name
+    M S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5154,12 +5154,12 @@
 
   People,
     T SW Apartment People,   !- Name
-    T SW Apartment,          !- Zone or ZoneList Name
+    T SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5176,12 +5176,12 @@
 
   People,
     T NW Apartment People,   !- Name
-    T NW Apartment,          !- Zone or ZoneList Name
+    T NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5198,12 +5198,12 @@
 
   People,
     T SE Apartment People,   !- Name
-    T SE Apartment,          !- Zone or ZoneList Name
+    T SE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5220,12 +5220,12 @@
 
   People,
     T NE Apartment People,   !- Name
-    T NE Apartment,          !- Zone or ZoneList Name
+    T NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5242,12 +5242,12 @@
 
   People,
     T N1 Apartment People,   !- Name
-    T N1 Apartment,          !- Zone or ZoneList Name
+    T N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5264,12 +5264,12 @@
 
   People,
     T N2 Apartment People,   !- Name
-    T N2 Apartment,          !- Zone or ZoneList Name
+    T N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5286,12 +5286,12 @@
 
   People,
     T S1 Apartment People,   !- Name
-    T S1 Apartment,          !- Zone or ZoneList Name
+    T S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5308,12 +5308,12 @@
 
   People,
     T S2 Apartment People,   !- Name
-    T S2 Apartment,          !- Zone or ZoneList Name
+    T S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_OCC_SCH,             !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.5,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -5332,7 +5332,7 @@
 
   Lights,
     Office_Lights,           !- Name
-    Office,                  !- Zone or ZoneList Name
+    Office,                  !- Zone or ZoneList or Space or SpaceList Name
     OFF_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5347,7 +5347,7 @@
 
   Lights,
     G Corridor_Lights,       !- Name
-    G Corridor,              !- Zone or ZoneList Name
+    G Corridor,              !- Zone or ZoneList or Space or SpaceList Name
     COR_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5362,7 +5362,7 @@
 
   Lights,
     M Corridor_Lights,       !- Name
-    M Corridor,              !- Zone or ZoneList Name
+    M Corridor,              !- Zone or ZoneList or Space or SpaceList Name
     COR_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5377,7 +5377,7 @@
 
   Lights,
     T Corridor_Lights,       !- Name
-    T Corridor,              !- Zone or ZoneList Name
+    T Corridor,              !- Zone or ZoneList or Space or SpaceList Name
     COR_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5392,7 +5392,7 @@
 
   Lights,
     G SW Apartment_Lights,   !- Name
-    G SW Apartment,          !- Zone or ZoneList Name
+    G SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5407,7 +5407,7 @@
 
   Lights,
     G NW Apartment_Lights,   !- Name
-    G NW Apartment,          !- Zone or ZoneList Name
+    G NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5422,7 +5422,7 @@
 
   Lights,
     G NE Apartment_Lights,   !- Name
-    G NE Apartment,          !- Zone or ZoneList Name
+    G NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5437,7 +5437,7 @@
 
   Lights,
     G N1 Apartment_Lights,   !- Name
-    G N1 Apartment,          !- Zone or ZoneList Name
+    G N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5452,7 +5452,7 @@
 
   Lights,
     G N2 Apartment_Lights,   !- Name
-    G N2 Apartment,          !- Zone or ZoneList Name
+    G N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5467,7 +5467,7 @@
 
   Lights,
     G S1 Apartment_Lights,   !- Name
-    G S1 Apartment,          !- Zone or ZoneList Name
+    G S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5482,7 +5482,7 @@
 
   Lights,
     G S2 Apartment_Lights,   !- Name
-    G S2 Apartment,          !- Zone or ZoneList Name
+    G S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5497,7 +5497,7 @@
 
   Lights,
     M SW Apartment_Lights,   !- Name
-    M SW Apartment,          !- Zone or ZoneList Name
+    M SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5512,7 +5512,7 @@
 
   Lights,
     M NW Apartment_Lights,   !- Name
-    M NW Apartment,          !- Zone or ZoneList Name
+    M NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5527,7 +5527,7 @@
 
   Lights,
     M SE Apartment_Lights,   !- Name
-    M SE Apartment,          !- Zone or ZoneList Name
+    M SE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5542,7 +5542,7 @@
 
   Lights,
     M NE Apartment_Lights,   !- Name
-    M NE Apartment,          !- Zone or ZoneList Name
+    M NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5557,7 +5557,7 @@
 
   Lights,
     M N1 Apartment_Lights,   !- Name
-    M N1 Apartment,          !- Zone or ZoneList Name
+    M N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5572,7 +5572,7 @@
 
   Lights,
     M N2 Apartment_Lights,   !- Name
-    M N2 Apartment,          !- Zone or ZoneList Name
+    M N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5587,7 +5587,7 @@
 
   Lights,
     M S1 Apartment_Lights,   !- Name
-    M S1 Apartment,          !- Zone or ZoneList Name
+    M S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5602,7 +5602,7 @@
 
   Lights,
     M S2 Apartment_Lights,   !- Name
-    M S2 Apartment,          !- Zone or ZoneList Name
+    M S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5617,7 +5617,7 @@
 
   Lights,
     T SW Apartment_Lights,   !- Name
-    T SW Apartment,          !- Zone or ZoneList Name
+    T SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5632,7 +5632,7 @@
 
   Lights,
     T NW Apartment_Lights,   !- Name
-    T NW Apartment,          !- Zone or ZoneList Name
+    T NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5647,7 +5647,7 @@
 
   Lights,
     T SE Apartment_Lights,   !- Name
-    T SE Apartment,          !- Zone or ZoneList Name
+    T SE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5662,7 +5662,7 @@
 
   Lights,
     T NE Apartment_Lights,   !- Name
-    T NE Apartment,          !- Zone or ZoneList Name
+    T NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5677,7 +5677,7 @@
 
   Lights,
     T N1 Apartment_Lights,   !- Name
-    T N1 Apartment,          !- Zone or ZoneList Name
+    T N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5692,7 +5692,7 @@
 
   Lights,
     T N2 Apartment_Lights,   !- Name
-    T N2 Apartment,          !- Zone or ZoneList Name
+    T N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5707,7 +5707,7 @@
 
   Lights,
     T S1 Apartment_Lights,   !- Name
-    T S1 Apartment,          !- Zone or ZoneList Name
+    T S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5722,7 +5722,7 @@
 
   Lights,
     T S2 Apartment_Lights,   !- Name
-    T S2 Apartment,          !- Zone or ZoneList Name
+    T S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_LIGHT_SCH,           !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5739,7 +5739,7 @@
 
   ElectricEquipment,
     Office_PlugMisc_Equip,   !- Name
-    Office,                  !- Zone or ZoneList Name
+    Office,                  !- Zone or ZoneList or Space or SpaceList Name
     OFF_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5752,7 +5752,7 @@
 
   ElectricEquipment,
     G Corridor_Elevators_Equip,  !- Name
-    G Corridor,              !- Zone or ZoneList Name
+    G Corridor,              !- Zone or ZoneList or Space or SpaceList Name
     BLDG_ELEVATORS,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     16054.9450549451,        !- Design Level {W}
@@ -5765,7 +5765,7 @@
 
   ElectricEquipment,
     G SW Apartment_PlugMisc_Equip,  !- Name
-    G SW Apartment,          !- Zone or ZoneList Name
+    G SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5778,7 +5778,7 @@
 
   ElectricEquipment,
     G NW Apartment_PlugMisc_Equip,  !- Name
-    G NW Apartment,          !- Zone or ZoneList Name
+    G NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5791,7 +5791,7 @@
 
   ElectricEquipment,
     G NE Apartment_PlugMisc_Equip,  !- Name
-    G NE Apartment,          !- Zone or ZoneList Name
+    G NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5804,7 +5804,7 @@
 
   ElectricEquipment,
     G N1 Apartment_PlugMisc_Equip,  !- Name
-    G N1 Apartment,          !- Zone or ZoneList Name
+    G N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5817,7 +5817,7 @@
 
   ElectricEquipment,
     G N2 Apartment_PlugMisc_Equip,  !- Name
-    G N2 Apartment,          !- Zone or ZoneList Name
+    G N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5830,7 +5830,7 @@
 
   ElectricEquipment,
     G S1 Apartment_PlugMisc_Equip,  !- Name
-    G S1 Apartment,          !- Zone or ZoneList Name
+    G S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5843,7 +5843,7 @@
 
   ElectricEquipment,
     G S2 Apartment_PlugMisc_Equip,  !- Name
-    G S2 Apartment,          !- Zone or ZoneList Name
+    G S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5856,7 +5856,7 @@
 
   ElectricEquipment,
     M SW Apartment_PlugMisc_Equip,  !- Name
-    M SW Apartment,          !- Zone or ZoneList Name
+    M SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5869,7 +5869,7 @@
 
   ElectricEquipment,
     M NW Apartment_PlugMisc_Equip,  !- Name
-    M NW Apartment,          !- Zone or ZoneList Name
+    M NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5882,7 +5882,7 @@
 
   ElectricEquipment,
     M SE Apartment_PlugMisc_Equip,  !- Name
-    M SE Apartment,          !- Zone or ZoneList Name
+    M SE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5895,7 +5895,7 @@
 
   ElectricEquipment,
     M NE Apartment_PlugMisc_Equip,  !- Name
-    M NE Apartment,          !- Zone or ZoneList Name
+    M NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5908,7 +5908,7 @@
 
   ElectricEquipment,
     M N1 Apartment_PlugMisc_Equip,  !- Name
-    M N1 Apartment,          !- Zone or ZoneList Name
+    M N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5921,7 +5921,7 @@
 
   ElectricEquipment,
     M N2 Apartment_PlugMisc_Equip,  !- Name
-    M N2 Apartment,          !- Zone or ZoneList Name
+    M N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5934,7 +5934,7 @@
 
   ElectricEquipment,
     M S1 Apartment_PlugMisc_Equip,  !- Name
-    M S1 Apartment,          !- Zone or ZoneList Name
+    M S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5947,7 +5947,7 @@
 
   ElectricEquipment,
     M S2 Apartment_PlugMisc_Equip,  !- Name
-    M S2 Apartment,          !- Zone or ZoneList Name
+    M S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5960,7 +5960,7 @@
 
   ElectricEquipment,
     T SW Apartment_PlugMisc_Equip,  !- Name
-    T SW Apartment,          !- Zone or ZoneList Name
+    T SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5973,7 +5973,7 @@
 
   ElectricEquipment,
     T NW Apartment_PlugMisc_Equip,  !- Name
-    T NW Apartment,          !- Zone or ZoneList Name
+    T NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5986,7 +5986,7 @@
 
   ElectricEquipment,
     T SE Apartment_PlugMisc_Equip,  !- Name
-    T SE Apartment,          !- Zone or ZoneList Name
+    T SE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5999,7 +5999,7 @@
 
   ElectricEquipment,
     T NE Apartment_PlugMisc_Equip,  !- Name
-    T NE Apartment,          !- Zone or ZoneList Name
+    T NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -6012,7 +6012,7 @@
 
   ElectricEquipment,
     T N1 Apartment_PlugMisc_Equip,  !- Name
-    T N1 Apartment,          !- Zone or ZoneList Name
+    T N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -6025,7 +6025,7 @@
 
   ElectricEquipment,
     T N2 Apartment_PlugMisc_Equip,  !- Name
-    T N2 Apartment,          !- Zone or ZoneList Name
+    T N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -6038,7 +6038,7 @@
 
   ElectricEquipment,
     T S1 Apartment_PlugMisc_Equip,  !- Name
-    T S1 Apartment,          !- Zone or ZoneList Name
+    T S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -6051,7 +6051,7 @@
 
   ElectricEquipment,
     T S2 Apartment_PlugMisc_Equip,  !- Name
-    T S2 Apartment,          !- Zone or ZoneList Name
+    T S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     APT_EQP_SCH,             !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -6075,7 +6075,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office_Infiltration,     !- Name
-    Office,                  !- Zone or ZoneList Name
+    Office,                  !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_INFIL_SCH,        !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6089,7 +6089,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     G Corridor_Infiltration, !- Name
-    G Corridor,              !- Zone or ZoneList Name
+    G Corridor,              !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6103,7 +6103,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     M Corridor_Infiltration, !- Name
-    M Corridor,              !- Zone or ZoneList Name
+    M Corridor,              !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6117,7 +6117,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     T Corridor_Infiltration, !- Name
-    T Corridor,              !- Zone or ZoneList Name
+    T Corridor,              !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6131,7 +6131,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     G SW Apartment_Infiltration,  !- Name
-    G SW Apartment,          !- Zone or ZoneList Name
+    G SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6145,7 +6145,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     G NW Apartment_Infiltration,  !- Name
-    G NW Apartment,          !- Zone or ZoneList Name
+    G NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6159,7 +6159,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     G NE Apartment_Infiltration,  !- Name
-    G NE Apartment,          !- Zone or ZoneList Name
+    G NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6173,7 +6173,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     G N1 Apartment_Infiltration,  !- Name
-    G N1 Apartment,          !- Zone or ZoneList Name
+    G N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6187,7 +6187,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     G N2 Apartment_Infiltration,  !- Name
-    G N2 Apartment,          !- Zone or ZoneList Name
+    G N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6201,7 +6201,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     G S1 Apartment_Infiltration,  !- Name
-    G S1 Apartment,          !- Zone or ZoneList Name
+    G S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6215,7 +6215,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     G S2 Apartment_Infiltration,  !- Name
-    G S2 Apartment,          !- Zone or ZoneList Name
+    G S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6229,7 +6229,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     M SW Apartment_Infiltration,  !- Name
-    M SW Apartment,          !- Zone or ZoneList Name
+    M SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6243,7 +6243,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     M NW Apartment_Infiltration,  !- Name
-    M NW Apartment,          !- Zone or ZoneList Name
+    M NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6257,7 +6257,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     M SE Apartment_Infiltration,  !- Name
-    M SE Apartment,          !- Zone or ZoneList Name
+    M SE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6271,7 +6271,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     M NE Apartment_Infiltration,  !- Name
-    M NE Apartment,          !- Zone or ZoneList Name
+    M NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6285,7 +6285,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     M N1 Apartment_Infiltration,  !- Name
-    M N1 Apartment,          !- Zone or ZoneList Name
+    M N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6299,7 +6299,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     M N2 Apartment_Infiltration,  !- Name
-    M N2 Apartment,          !- Zone or ZoneList Name
+    M N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6313,7 +6313,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     M S1 Apartment_Infiltration,  !- Name
-    M S1 Apartment,          !- Zone or ZoneList Name
+    M S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6327,7 +6327,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     M S2 Apartment_Infiltration,  !- Name
-    M S2 Apartment,          !- Zone or ZoneList Name
+    M S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6341,7 +6341,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     T SW Apartment_Infiltration,  !- Name
-    T SW Apartment,          !- Zone or ZoneList Name
+    T SW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6355,7 +6355,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     T NW Apartment_Infiltration,  !- Name
-    T NW Apartment,          !- Zone or ZoneList Name
+    T NW Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6369,7 +6369,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     T SE Apartment_Infiltration,  !- Name
-    T SE Apartment,          !- Zone or ZoneList Name
+    T SE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6383,7 +6383,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     T NE Apartment_Infiltration,  !- Name
-    T NE Apartment,          !- Zone or ZoneList Name
+    T NE Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6397,7 +6397,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     T N1 Apartment_Infiltration,  !- Name
-    T N1 Apartment,          !- Zone or ZoneList Name
+    T N1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6411,7 +6411,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     T N2 Apartment_Infiltration,  !- Name
-    T N2 Apartment,          !- Zone or ZoneList Name
+    T N2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6425,7 +6425,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     T S1 Apartment_Infiltration,  !- Name
-    T S1 Apartment,          !- Zone or ZoneList Name
+    T S1 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6439,7 +6439,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     T S2 Apartment_Infiltration,  !- Name
-    T S2 Apartment,          !- Zone or ZoneList Name
+    T S2 Apartment,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -6457,190 +6457,190 @@
     Office Internal Mass,    !- Name
     InteriorFurnishings,     !- Construction Name
     Office,                  !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     G Corridor Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     G Corridor,              !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    155.3169;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    155.3169;                !- Surface Area {m2}
 
   InternalMass,
     M Corridor Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     M Corridor,              !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    155.3169;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    155.3169;                !- Surface Area {m2}
 
   InternalMass,
     T Corridor Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     T Corridor,              !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    155.3169;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    155.3169;                !- Surface Area {m2}
 
   InternalMass,
     G SW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G SW Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     G NW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G NW Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     G NE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G NE Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     G N1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G N1 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     G N2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G N2 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     G S1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G S1 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     G S2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     G S2 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     M SW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M SW Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     M NW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M NW Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     M SE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M SE Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     M NE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M NE Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     M N1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M N1 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     M N2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M N2 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     M S1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M S1 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     M S2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     M S2 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     T SW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T SW Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     T NW Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T NW Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     T SE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T SE Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     T NE Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T NE Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     T N1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T N1 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     T N2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T N2 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     T S1 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T S1 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
   InternalMass,
     T S2 Apartment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     T S2 Apartment,          !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    176.4974;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    176.4974;                !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
 
@@ -16302,8 +16302,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     3.546,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     3.417E+02,               !- CO2 Emission Factor {g/MJ}
@@ -16346,8 +16344,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    37631000,                !- Energy per Unit Factor
     1.092,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     5.21E+01,                !- CO2 Emission Factor {g/MJ}

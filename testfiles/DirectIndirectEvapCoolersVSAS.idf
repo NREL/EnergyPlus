@@ -70,7 +70,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.6;
+  Version,22.2;
 
   AirLoopHVAC:UnitaryHeatCool,
     FURNACE_PACU_CAV:1_Unitary_Package,  !- Name
@@ -2947,12 +2947,12 @@
     units_gr_lf_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     units_gr_lf,             !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    499.4097;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    499.4097;                !- Surface Area {m2}
 
   ZoneInfiltration:EffectiveLeakageArea,
     units_gr_lf_Infiltration,!- Name
-    units_gr_lf,             !- Zone Name
+    units_gr_lf,             !- Zone or Space Name
     INFIL_SCH,               !- Schedule Name
     600,                     !- Effective Air Leakage Area {cm2}
     0.00015,                 !- Stack Coefficient
@@ -2975,12 +2975,12 @@
 
   People,
     units_gr_lf,             !- Name
-    units_gr_lf,             !- Zone or ZoneList Name
+    units_gr_lf,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     8.0000,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3012,7 +3012,7 @@
 
   Lights,
     units_gr_lf_Lights,      !- Name
-    units_gr_lf,             !- Zone or ZoneList Name
+    units_gr_lf,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2957.0000,               !- Lighting Level {W}
@@ -3037,7 +3037,7 @@
 
   ElectricEquipment,
     units_gr_lf_units_gr_lf ElecEq 1_Equip,  !- Name
-    units_gr_lf,             !- Zone or ZoneList Name
+    units_gr_lf,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     4032.0000,               !- Design Level {W}
@@ -3065,7 +3065,7 @@
 
   ElectricEquipment,
     units_gr_lf_units_gr_lf Refrig_Equip,  !- Name
-    units_gr_lf,             !- Zone or ZoneList Name
+    units_gr_lf,             !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     400.0000,                !- Design Level {W}
@@ -3504,12 +3504,12 @@
     units_gr_rt_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     units_gr_rt,             !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    749.1145;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    749.1145;                !- Surface Area {m2}
 
   ZoneInfiltration:EffectiveLeakageArea,
     units_gr_rt_Infiltration,!- Name
-    units_gr_rt,             !- Zone Name
+    units_gr_rt,             !- Zone or Space Name
     INFIL_SCH,               !- Schedule Name
     700,                     !- Effective Air Leakage Area {cm2}
     0.00015,                 !- Stack Coefficient
@@ -3532,12 +3532,12 @@
 
   People,
     units_gr_rt,             !- Name
-    units_gr_rt,             !- Zone or ZoneList Name
+    units_gr_rt,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     12.0000,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3569,7 +3569,7 @@
 
   Lights,
     units_gr_rt_Lights,      !- Name
-    units_gr_rt,             !- Zone or ZoneList Name
+    units_gr_rt,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     4435.0000,               !- Lighting Level {W}
@@ -3594,7 +3594,7 @@
 
   ElectricEquipment,
     units_gr_rt_units_gr_rt ElecEq 1_Equip,  !- Name
-    units_gr_rt,             !- Zone or ZoneList Name
+    units_gr_rt,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     6048.0000,               !- Design Level {W}
@@ -3622,7 +3622,7 @@
 
   ElectricEquipment,
     units_gr_rt_units_gr_rt Refrig_Equip,  !- Name
-    units_gr_rt,             !- Zone or ZoneList Name
+    units_gr_rt,             !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     600.0000,                !- Design Level {W}
@@ -3884,12 +3884,12 @@
     unit_s_g_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     unit_s_g,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    111.8807;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    111.8807;                !- Surface Area {m2}
 
   ZoneInfiltration:FlowCoefficient,
     unit_s_g_Infiltration,   !- Name
-    unit_s_g,                !- Zone Name
+    unit_s_g,                !- Zone or Space Name
     INFIL_SCH,               !- Schedule Name
     0.02,                    !- Flow Coefficient
     0.05,                    !- Stack Coefficient
@@ -3914,12 +3914,12 @@
 
   People,
     unit_s_g,                !- Name
-    unit_s_g,                !- Zone or ZoneList Name
+    unit_s_g,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.0000,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3951,7 +3951,7 @@
 
   Lights,
     unit_s_g_Lights,         !- Name
-    unit_s_g,                !- Zone or ZoneList Name
+    unit_s_g,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     662.0000,                !- Lighting Level {W}
@@ -3976,7 +3976,7 @@
 
   ElectricEquipment,
     unit_s_g_unit_s_g ElecEq 1_Equip,  !- Name
-    unit_s_g,                !- Zone or ZoneList Name
+    unit_s_g,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     903.0000,                !- Design Level {W}
@@ -4004,7 +4004,7 @@
 
   ElectricEquipment,
     unit_s_g_unit_s_g Refrig_Equip,  !- Name
-    unit_s_g,                !- Zone or ZoneList Name
+    unit_s_g,                !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     100.0000,                !- Design Level {W}
@@ -4266,12 +4266,12 @@
     unit_n_g_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     unit_n_g,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    111.8807;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    111.8807;                !- Surface Area {m2}
 
   ZoneInfiltration:FlowCoefficient,
     unit_n_g_Infiltration,   !- Name
-    unit_n_g,                !- Zone Name
+    unit_n_g,                !- Zone or Space Name
     INFIL_SCH,               !- Schedule Name
     0.02,                    !- Flow Coefficient
     0.05,                    !- Stack Coefficient
@@ -4296,12 +4296,12 @@
 
   People,
     unit_n_g,                !- Name
-    unit_n_g,                !- Zone or ZoneList Name
+    unit_n_g,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.0000,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -4333,7 +4333,7 @@
 
   Lights,
     unit_n_g_Lights,         !- Name
-    unit_n_g,                !- Zone or ZoneList Name
+    unit_n_g,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     662.0000,                !- Lighting Level {W}
@@ -4358,7 +4358,7 @@
 
   ElectricEquipment,
     unit_n_g_unit_n_g ElecEq 1_Equip,  !- Name
-    unit_n_g,                !- Zone or ZoneList Name
+    unit_n_g,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     903.0000,                !- Design Level {W}
@@ -4386,7 +4386,7 @@
 
   ElectricEquipment,
     unit_n_g_unit_n_g Refrig_Equip,  !- Name
-    unit_n_g,                !- Zone or ZoneList Name
+    unit_n_g,                !- Zone or ZoneList or Space or SpaceList Name
     CONSTANT,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     100.0000,                !- Design Level {W}

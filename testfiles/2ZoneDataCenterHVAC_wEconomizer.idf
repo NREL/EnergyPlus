@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,4;
 
@@ -2681,12 +2681,12 @@
 
   People,
     West Zone PEOPLE,        !- Name
-    West Zone,               !- Zone or ZoneList Name
+    West Zone,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     0,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -2739,12 +2739,12 @@
 
   People,
     East Zone PEOPLE,        !- Name
-    East Zone,               !- Zone or ZoneList Name
+    East Zone,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     0,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -2833,7 +2833,7 @@
 
   Lights,
     West Zone Lights,        !- Name
-    West Zone,               !- Zone or ZoneList Name
+    West Zone,               !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     284,                     !- Lighting Level {W}
@@ -2847,7 +2847,7 @@
 
   ElectricEquipment,
     West Zone_MiscPlug_Equip,!- Name
-    West Zone,               !- Zone or ZoneList Name
+    West Zone,               !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0.,                      !- Design Level {W}
@@ -2860,7 +2860,7 @@
 
   ElectricEquipment:ITE:AirCooled,
     WestDataCenter_Equip,    !- Name
-    West Zone,               !- Zone Name
+    West Zone,               !- Zone or Space Name
     FlowFromSystem,          !- Air Flow Calculation Method
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
@@ -2974,7 +2974,7 @@
 
   Lights,
     East Zone Lights,        !- Name
-    East Zone,               !- Zone or ZoneList Name
+    East Zone,               !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     284,                     !- Lighting Level {W}
@@ -2988,7 +2988,7 @@
 
   ElectricEquipment,
     East Zone_MiscPlug_Equip,!- Name
-    East Zone,               !- Zone or ZoneList Name
+    East Zone,               !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     0.,                      !- Design Level {W}
@@ -3001,7 +3001,7 @@
 
   ElectricEquipment:ITE:AirCooled,
     EastDataCenter_Equip,    !- Name
-    East Zone,               !- Zone Name
+    East Zone,               !- Zone or Space Name
     FlowControlWithApproachTemperatures,  !- Air Flow Calculation Method
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}

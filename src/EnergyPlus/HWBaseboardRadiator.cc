@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -115,7 +115,7 @@ namespace HWBaseboardRadiator {
     // Use statements for data only modules
     // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
-    using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
+
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     using FluidProperties::GetDensityGlycol;
@@ -128,7 +128,6 @@ namespace HWBaseboardRadiator {
 
     void SimHWBaseboard(EnergyPlusData &state,
                         std::string const &EquipName,
-                        int const ActualZoneNum,
                         int const ControlledZoneNum,
                         bool const FirstHVACIteration,
                         Real64 &PowerMet,
@@ -138,8 +137,6 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
-        //       MODIFIED
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the Baseboard Radiators.
@@ -198,7 +195,7 @@ namespace HWBaseboardRadiator {
 
             InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
 
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -210,35 +207,32 @@ namespace HWBaseboardRadiator {
                 MinWaterFlow = state.dataLoopNodes->Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRateMinAvail;
             }
 
-            {
-                auto const SELECT_CASE_var(HWBaseboard(BaseboardNum).EquipType);
-
-                if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water) { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
-                    ControlCompOutput(state,
-                                      HWBaseboard(BaseboardNum).EquipID,
-                                      cCMO_BBRadiator_Water,
-                                      BaseboardNum,
-                                      FirstHVACIteration,
-                                      QZnReq,
-                                      HWBaseboard(BaseboardNum).WaterInletNode,
-                                      MaxWaterFlow,
-                                      MinWaterFlow,
-                                      HWBaseboardDesignDataObject.Offset,
-                                      HWBaseboard(BaseboardNum).ControlCompTypeNum,
-                                      HWBaseboard(BaseboardNum).CompErrIndex,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
-                                      HWBaseboard(BaseboardNum).LoopNum,
-                                      HWBaseboard(BaseboardNum).LoopSideNum,
-                                      HWBaseboard(BaseboardNum).BranchNum);
-                } else {
-                    ShowSevereError(state, "SimBaseboard: Errors in Baseboard=" + HWBaseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state, format("Invalid or unimplemented equipment type={}", HWBaseboard(BaseboardNum).EquipType));
-                    ShowFatalError(state, "Preceding condition causes termination.");
-                }
+            switch (HWBaseboard(BaseboardNum).EquipType) {
+            case DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water: { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
+                ControlCompOutput(state,
+                                  HWBaseboard(BaseboardNum).EquipID,
+                                  cCMO_BBRadiator_Water,
+                                  BaseboardNum,
+                                  FirstHVACIteration,
+                                  QZnReq,
+                                  HWBaseboard(BaseboardNum).WaterInletNode,
+                                  MaxWaterFlow,
+                                  MinWaterFlow,
+                                  HWBaseboardDesignDataObject.Offset,
+                                  HWBaseboard(BaseboardNum).ControlCompTypeNum,
+                                  HWBaseboard(BaseboardNum).CompErrIndex,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  HWBaseboard(BaseboardNum).plantLoc);
+            } break;
+            default: {
+                ShowSevereError(state, "SimBaseboard: Errors in Baseboard=" + HWBaseboard(BaseboardNum).EquipID);
+                ShowContinueError(state, format("Invalid or unimplemented equipment type={}", HWBaseboard(BaseboardNum).EquipType));
+                ShowFatalError(state, "Preceding condition causes termination.");
+            } break;
             }
 
             PowerMet = HWBaseboard(BaseboardNum).TotPower;
@@ -281,21 +275,21 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetHWBaseboardInput:");
-        Real64 const MaxFraction(1.0);
-        Real64 const MinFraction(0.0);
-        Real64 const MaxWaterTempAvg(150.0);        // Maximum limit of average water temperature in degree C
-        Real64 const MinWaterTempAvg(20.0);         // Minimum limit of average water temperature in degree C
-        Real64 const HighWaterMassFlowRate(10.0);   // Maximum limit of water mass flow rate in kg/s
-        Real64 const LowWaterMassFlowRate(0.00001); // Minimum limit of water mass flow rate in kg/s
-        Real64 const MaxWaterFlowRate(10.0);        // Maximum limit of water volume flow rate in m3/s
-        Real64 const MinWaterFlowRate(0.00001);     // Minimum limit of water volume flow rate in m3/s
-        Real64 const WaterMassFlowDefault(0.063);   // Default water mass flow rate in kg/s
+        Real64 constexpr MaxFraction(1.0);
+        Real64 constexpr MinFraction(0.0);
+        Real64 constexpr MaxWaterTempAvg(150.0);        // Maximum limit of average water temperature in degree C
+        Real64 constexpr MinWaterTempAvg(20.0);         // Minimum limit of average water temperature in degree C
+        Real64 constexpr HighWaterMassFlowRate(10.0);   // Maximum limit of water mass flow rate in kg/s
+        Real64 constexpr LowWaterMassFlowRate(0.00001); // Minimum limit of water mass flow rate in kg/s
+        Real64 constexpr MaxWaterFlowRate(10.0);        // Maximum limit of water volume flow rate in m3/s
+        Real64 constexpr MinWaterFlowRate(0.00001);     // Minimum limit of water volume flow rate in m3/s
+        Real64 constexpr WaterMassFlowDefault(0.063);   // Default water mass flow rate in kg/s
         //    INTEGER, PARAMETER   :: MaxDistribSurfaces    = 20         ! Maximum number of surfaces that a baseboard heater can radiate to
-        int const MinDistribSurfaces(1);                  // Minimum number of surfaces that a baseboard heater can radiate to
-        int const iHeatCAPMAlphaNum(2);                   // get input index to HW baseboard heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(3);       // get input index to HW baseboard heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(1); // get input index to HW baseboard heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr MinDistribSurfaces(1);                  // Minimum number of surfaces that a baseboard heater can radiate to
+        int constexpr iHeatCAPMAlphaNum(2);                   // get input index to HW baseboard heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(3);       // get input index to HW baseboard heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(1); // get input index to HW baseboard heating capacity per floor area sizing
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             2); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -492,7 +486,8 @@ namespace HWBaseboardRadiator {
                 state, cCMO_BBRadiator_Water, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
 
             HWBaseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard
-            HWBaseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Rad_Conv_Water;   //'ZoneHVAC:Baseboard:RadiantConvective:Water'
+            HWBaseboard(BaseboardNum).EquipType =
+                DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
 
             HWBaseboard(BaseboardNum).designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
             HWBaseboard(BaseboardNum).DesignObjectPtr =
@@ -518,22 +513,22 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).WaterInletNode = GetOnlySingleNode(state,
                                                                          state.dataIPShortCut->cAlphaArgs(4),
                                                                          ErrorsFound,
-                                                                         cCMO_BBRadiator_Water,
+                                                                         DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveWater,
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         DataLoopNode::ConnectionType::Inlet,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
 
             // Get outlet node number
             HWBaseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(state,
                                                                           state.dataIPShortCut->cAlphaArgs(5),
                                                                           ErrorsFound,
-                                                                          cCMO_BBRadiator_Water,
+                                                                          DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveWater,
                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                          NodeInputManager::compFluidStream::Primary,
+                                                                          DataLoopNode::ConnectionType::Outlet,
+                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                           ObjectIsNotParent);
             TestCompSet(state,
                         cCMO_BBRadiator_Water,
@@ -657,7 +652,7 @@ namespace HWBaseboardRadiator {
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBWater_Num &&
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBWater &&
                         state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == HWBaseboard(BaseboardNum).EquipID) {
                         HWBaseboard(BaseboardNum).ZonePtr = ctrlZone;
                     }
@@ -832,7 +827,7 @@ namespace HWBaseboardRadiator {
         }
     }
 
-    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -842,7 +837,6 @@ namespace HWBaseboardRadiator {
         //                      Feb 2001
         //       MODIFIED       Aug 2007 Daeho Kang (Add radiant component)
         //                      Sept 2010 Brent Griffith (plant interactions)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the baseboard units, and determines the UA values during simulation.
@@ -863,28 +857,15 @@ namespace HWBaseboardRadiator {
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Constant(0.0062); // Constant of linear equation for air mass flow rate
-        Real64 const Coeff(0.0000275); // Correlation coefficient to capacity
+        Real64 constexpr Constant(0.0062); // Constant of linear equation for air mass flow rate
+        Real64 constexpr Coeff(0.0000275); // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &MyOneTimeFlag = state.dataHWBaseboardRad->MyOneTimeFlag;
         auto &ZoneEquipmentListChecked = state.dataHWBaseboardRad->ZoneEquipmentListChecked;
         auto &MyEnvrnFlag = state.dataHWBaseboardRad->MyEnvrnFlag;
         int Loop;
         int WaterInletNode;
-        int ZoneNode;
-        int ZoneNum;
         Real64 RhoAirStdInit;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
@@ -925,8 +906,7 @@ namespace HWBaseboardRadiator {
             }
         }
 
-        if (HWBaseboard(BaseboardNum).ZonePtr <= 0)
-            HWBaseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        HWBaseboard(BaseboardNum).ZonePtr = ControlledZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -945,10 +925,7 @@ namespace HWBaseboardRadiator {
                 ScanPlantLoopsForObject(state,
                                         HWBaseboard(BaseboardNum).EquipID,
                                         HWBaseboard(BaseboardNum).EquipType,
-                                        HWBaseboard(BaseboardNum).LoopNum,
-                                        HWBaseboard(BaseboardNum).LoopSideNum,
-                                        HWBaseboard(BaseboardNum).BranchNum,
-                                        HWBaseboard(BaseboardNum).CompNum,
+                                        HWBaseboard(BaseboardNum).plantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -975,9 +952,9 @@ namespace HWBaseboardRadiator {
             WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
 
             rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
                                    DataGlobalConstants::HWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                    RoutineName);
 
             HWBaseboard(BaseboardNum).WaterMassFlowRateMax = rho * HWBaseboard(BaseboardNum).WaterVolFlowRateMax;
@@ -986,18 +963,14 @@ namespace HWBaseboardRadiator {
                                0.0,
                                HWBaseboard(BaseboardNum).WaterMassFlowRateMax,
                                HWBaseboard(BaseboardNum).WaterInletNode,
-                               HWBaseboard(BaseboardNum).WaterOutletNode,
-                               HWBaseboard(BaseboardNum).LoopNum,
-                               HWBaseboard(BaseboardNum).LoopSideNum,
-                               HWBaseboard(BaseboardNum).BranchNum,
-                               HWBaseboard(BaseboardNum).CompNum);
+                               HWBaseboard(BaseboardNum).WaterOutletNode);
 
             state.dataLoopNodes->Node(WaterInletNode).Temp = 60.0;
 
             Cp = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
                                        state.dataLoopNodes->Node(WaterInletNode).Temp,
-                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
             state.dataLoopNodes->Node(WaterInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
@@ -1020,7 +993,7 @@ namespace HWBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
+            int ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
             ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum);
             QBBRadSrcAvg(BaseboardNum) = 0.0;
             LastQBBRadSrc(BaseboardNum) = 0.0;
@@ -1030,7 +1003,7 @@ namespace HWBaseboardRadiator {
 
         // Do the every time step initializations
         WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
-        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         HWBaseboard(BaseboardNum).WaterMassFlowRate = state.dataLoopNodes->Node(WaterInletNode).MassFlowRate;
         HWBaseboard(BaseboardNum).WaterInletTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
         HWBaseboard(BaseboardNum).WaterInletEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
@@ -1077,10 +1050,10 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const AirInletTempStd(18.0); // I=B=R rating document
-        Real64 const CPAirStd(1005.0);      // Average specific heat of air at between 25C and 40C in J/kg-k
-        Real64 const Constant(0.0062);      // Constant of linear equation for air mass flow rate
-        Real64 const Coeff(0.0000275);      // Correlation coefficient to capacity
+        Real64 constexpr AirInletTempStd(18.0); // I=B=R rating document
+        Real64 constexpr CPAirStd(1005.0);      // Average specific heat of air at between 25C and 40C in J/kg-k
+        Real64 constexpr Constant(0.0062);      // Constant of linear equation for air mass flow rate
+        Real64 constexpr Coeff(0.0000275);      // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("SizeHWBaseboard");
         static constexpr std::string_view RoutineNameFull("BaseboardRadiatorWater:SizeHWBaseboard");
 
@@ -1188,7 +1161,7 @@ namespace HWBaseboardRadiator {
         }
 
         // find the appropriate heating Plant Sizing object
-        PltSizHeatNum = state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).PlantSizNum;
+        PltSizHeatNum = state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).PlantSizNum;
 
         if (PltSizHeatNum > 0) {
             if (state.dataSize->CurZoneEqNum > 0) {
@@ -1209,14 +1182,14 @@ namespace HWBaseboardRadiator {
                     DesCoilLoad = RatedCapacityDes;
                     if (DesCoilLoad >= SmallLoad) {
                         Cp = GetSpecificHeatGlycol(state,
-                                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
                     } else {
@@ -1265,9 +1238,9 @@ namespace HWBaseboardRadiator {
                 } else if (HWBaseboard(BaseboardNum).RatedCapacity == AutoSize || HWBaseboard(BaseboardNum).RatedCapacity == 0.0) {
                     DesCoilLoad = RatedCapacityDes;
                     rho = GetDensityGlycol(state,
-                                           state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                            RoutineNameFull);
                     WaterMassFlowRateStd = HWBaseboard(BaseboardNum).WaterVolFlowRateMax * rho;
                 }
@@ -1277,9 +1250,9 @@ namespace HWBaseboardRadiator {
                     // m_dot = 0.0062 + 2.75e-05*q
                     AirMassFlowRate = Constant + Coeff * DesCoilLoad;
                     Cp = GetSpecificHeatGlycol(state,
-                                               state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
                                                HWBaseboard(BaseboardNum).WaterTempAvg,
-                                               state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                     WaterInletTempStd = (DesCoilLoad / (2.0 * WaterMassFlowRateStd * Cp)) + HWBaseboard(BaseboardNum).WaterTempAvg;
                     WaterOutletTempStd = std::abs((2.0 * HWBaseboard(BaseboardNum).WaterTempAvg) - WaterInletTempStd);
@@ -1336,9 +1309,9 @@ namespace HWBaseboardRadiator {
                 // m_dot = 0.0062 + 2.75e-05*q
                 AirMassFlowRate = Constant + Coeff * DesCoilLoad;
                 Cp = GetSpecificHeatGlycol(state,
-                                           state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
                                            HWBaseboard(BaseboardNum).WaterTempAvg,
-                                           state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                            RoutineName);
                 WaterInletTempStd = (DesCoilLoad / (2.0 * WaterMassFlowRateStd * Cp)) + HWBaseboard(BaseboardNum).WaterTempAvg;
                 WaterOutletTempStd = std::abs((2.0 * HWBaseboard(BaseboardNum).WaterTempAvg) - WaterInletTempStd);
@@ -1417,7 +1390,7 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
+        Real64 constexpr MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
         static constexpr std::string_view RoutineName("CalcHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1469,9 +1442,9 @@ namespace HWBaseboardRadiator {
             AirMassFlowRate = HWBaseboard(BaseboardNum).AirMassFlowRateStd * (WaterMassFlowRate / HWBaseboard(BaseboardNum).WaterMassFlowRateMax);
             CapacitanceAir = PsyCpAirFnW(HWBaseboard(BaseboardNum).AirInletHumRat) * AirMassFlowRate;
             Cp = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
                                        WaterInletTemp,
-                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
             CapacitanceWater = Cp * WaterMassFlowRate;
@@ -1541,13 +1514,7 @@ namespace HWBaseboardRadiator {
             AirMassFlowRate = 0.0;
             QBBRadSource(BaseboardNum) = 0.0;
             HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy;
-            SetActuatedBranchFlowRate(state,
-                                      WaterMassFlowRate,
-                                      HWBaseboard(BaseboardNum).WaterInletNode,
-                                      HWBaseboard(BaseboardNum).LoopNum,
-                                      HWBaseboard(BaseboardNum).LoopSideNum,
-                                      HWBaseboard(BaseboardNum).BranchNum,
-                                      false);
+            SetActuatedBranchFlowRate(state, WaterMassFlowRate, HWBaseboard(BaseboardNum).WaterInletNode, HWBaseboard(BaseboardNum).plantLoc, false);
         }
 
         HWBaseboard(BaseboardNum).WaterOutletTemp = WaterOutletTemp;
@@ -1722,7 +1689,7 @@ namespace HWBaseboardRadiator {
         using DataHeatBalFanSys::MaxRadHeatFlux;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+        Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
@@ -1860,12 +1827,12 @@ namespace HWBaseboardRadiator {
     }
 
     void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
-                                          int const BaseboardTypeNum,               // type index
-                                          std::string const &BaseboardName,         // component name
-                                          [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
-                                          [[maybe_unused]] int const LoopNum,       // Plant loop index for where called from
-                                          [[maybe_unused]] int const LoopSide,      // Plant loop side index for where called from
-                                          int &CompIndex,                           // Chiller number pointer
+                                          int const BaseboardTypeNum,                                  // type index
+                                          std::string const &BaseboardName,                            // component name
+                                          [[maybe_unused]] int const EquipFlowCtrl,                    // Flow control mode for the equipment
+                                          [[maybe_unused]] int const LoopNum,                          // Plant loop index for where called from
+                                          [[maybe_unused]] const DataPlant::LoopSideLocation LoopSide, // Plant loop side index for where called from
+                                          int &CompIndex,                                              // Chiller number pointer
                                           [[maybe_unused]] bool const FirstHVACIteration,
                                           bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
@@ -1884,8 +1851,7 @@ namespace HWBaseboardRadiator {
         // check input, provide comp index, call utility routines
 
         // Using/Aliasing
-        using DataPlant::ccSimPlantEquipTypes;
-        using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
+        using DataPlant::PlantEquipTypeNames;
 
         using PlantUtilities::PullCompInterconnectTrigger;
 
@@ -1921,13 +1887,13 @@ namespace HWBaseboardRadiator {
                                           BaseboardName,
                                           HWBaseboard(BaseboardNum).EquipID));
                 }
-                if (BaseboardTypeNum != TypeOf_Baseboard_Rad_Conv_Water) {
+                if (BaseboardTypeNum != static_cast<int>(DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water)) {
                     ShowFatalError(state,
                                    format("UpdateHWBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard Name "
                                           "for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          ccSimPlantEquipTypes(BaseboardTypeNum)));
+                                          PlantEquipTypeNames[BaseboardTypeNum]));
                 }
             }
         }
@@ -1937,36 +1903,24 @@ namespace HWBaseboardRadiator {
         }
 
         PullCompInterconnectTrigger(state,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    HWBaseboard(BaseboardNum).BranchNum,
-                                    HWBaseboard(BaseboardNum).CompNum,
+                                    HWBaseboard(BaseboardNum).plantLoc,
                                     HWBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::HeatTransferRate,
+                                    HWBaseboard(BaseboardNum).plantLoc,
+                                    DataPlant::CriteriaType::HeatTransferRate,
                                     HWBaseboard(BaseboardNum).Power);
 
         PullCompInterconnectTrigger(state,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    HWBaseboard(BaseboardNum).BranchNum,
-                                    HWBaseboard(BaseboardNum).CompNum,
+                                    HWBaseboard(BaseboardNum).plantLoc,
                                     HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::MassFlowRate,
+                                    HWBaseboard(BaseboardNum).plantLoc,
+                                    DataPlant::CriteriaType::MassFlowRate,
                                     HWBaseboard(BaseboardNum).WaterMassFlowRate);
 
         PullCompInterconnectTrigger(state,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    HWBaseboard(BaseboardNum).BranchNum,
-                                    HWBaseboard(BaseboardNum).CompNum,
+                                    HWBaseboard(BaseboardNum).plantLoc,
                                     HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
-                                    HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::Temperature,
+                                    HWBaseboard(BaseboardNum).plantLoc,
+                                    DataPlant::CriteriaType::Temperature,
                                     HWBaseboard(BaseboardNum).WaterOutletTemp);
     }
 

@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1031,12 +1031,12 @@
 
   People,
     WEST ZONE PEOPLE,        !- Name
-    WEST ZONE,               !- Zone or ZoneList Name
+    WEST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1053,12 +1053,12 @@
 
   People,
     EAST ZONE,               !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1075,12 +1075,12 @@
 
   People,
     NORTH ZONE,              !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE OCCUPANCY,        !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     4.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1099,7 +1099,7 @@
 
   Lights,
     EAST ZONE Lights 1,      !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1464.375,                !- Lighting Level {W}
@@ -1113,7 +1113,7 @@
 
   Lights,
     NORTH ZONE Lights 1,     !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     OFFICE LIGHTING,         !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     878.6252,                !- Lighting Level {W}
@@ -1129,7 +1129,7 @@
 
   ElectricEquipment,
     WEST ZONE ElecEq 1,      !- Name
-    WEST ZONE,               !- Zone or ZoneList Name
+    WEST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}
@@ -1141,7 +1141,7 @@
 
   ElectricEquipment,
     EAST ZONE ElecEq 1,      !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1464.375,                !- Design Level {W}
@@ -1153,7 +1153,7 @@
 
   ElectricEquipment,
     NORTH ZONE ElecEq 1,     !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2928.751,                !- Design Level {W}
@@ -1545,10 +1545,10 @@
   CoilSystem:Cooling:DX,
     OA DX Cooling Coil,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    Outside Air Inlet Node,         !- DX Cooling Coil System Inlet Node Name
+    Outside Air Inlet Node,  !- DX Cooling Coil System Inlet Node Name
     OA Cooling Coil 1 Outlet Node,  !- DX Cooling Coil System Outlet Node Name
     OA Cooling Coil 1 Outlet Node,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX:SingleSpeed,    !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     OA Cooling Coil 1,       !- Cooling Coil Name
     ,                        !- Dehumidification Control Type
     ,                        !- Run on Sensible Load
@@ -1563,7 +1563,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.67,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    Outside Air Inlet Node,         !- Air Inlet Node Name
+    Outside Air Inlet Node,  !- Air Inlet Node Name
     OA Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
     WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name
@@ -1592,17 +1592,17 @@
     Yes;                     !- Report ASHRAE Standard 127 Performance Ratings
 
   SetpointManager:Scheduled,
-    OA Temp Manager 1,  !- Name
+    OA Temp Manager 1,       !- Name
     Temperature,             !- Control Variable
     OA Cooling Supply Air Temp Sch,  !- Schedule Name
-    OA Cooling Coil 1 Outlet Node;   !- Setpoint Node or NodeList Name
+    OA Cooling Coil 1 Outlet Node;  !- Setpoint Node or NodeList Name
 
   Schedule:Compact,
     OA Cooling Supply Air Temp Sch,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 23.0;      !- Field 3
+    Until: 24:00,23.0;       !- Field 3
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM ===========
 
