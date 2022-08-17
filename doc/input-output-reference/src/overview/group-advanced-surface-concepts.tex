@@ -2404,6 +2404,46 @@ Example for SurfaceProperty:SolarIncidentInside using a compact schedule:
       North Wall SSG;             !- Schedule Name
 \end{lstlisting}
 
+\subsection{SurfaceProperty:IncidentSolarMultiplier}
+
+This object enables a simplified way to specify the properties of a shading
+device that directly discount the incident solar radiation. The multiplier can
+be a single fixed value or a schedule of values. An idd object
+SurfaceProperty:IncidentSolarMultiplier will be added to enable users to specify
+the multiplier. This multiplier resembles the SHADING-SCHEDULE in DOE-2, which
+can adjust the solar heat gain through windows with a multiplier schedule.
+
+This adjustment is compatible with building shading structures like overhangs,
+but not with the following regular shading objects in EnergyPlus:
+WindowMaterial:Shade, WindowMaterial:Blind, WindowMaterial:Screen,
+WindowShadingControl, or WindowMaterial:*:EquivalentLayer objects. If any of
+them are defined for a window in addition to the
+SurfaceProperty:IncidentSolarMultiplier, an error message will be shown:
+``Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier
+for the same window.''
+
+\paragraph{Field: Surface Name}\label{field-surface-name-IncidentSolarMultiplier}
+
+This field is specifies the name of the exterior window outside surface where
+the incident solar multiplier is applied to. If the surface is not an exterior
+window surface, the following error message will be shown:
+``IncidentSolarMultiplier should be defined for exterior windows''.
+
+\paragraph{Field: Incident Solar Multiplier}\label{field-shading-multiplier-IncidentSolarMultiplier}
+
+A constant multiplier for the incident solar radiation. The value should be
+between 0 and 1 (both inclussive). If not specified, the default 1.0 will be
+used. If the Incident Solar Multiplier Schedule Name is defined, the product of
+these two will be the final Incident Solar Multiplier. Otherwise, this constant
+multiplier will be applied throughout the simulation.
+
+\paragraph{Field: Incident Solar Multiplier Schedule Name}\label{field-shading-multiplier-schedule-name-IncidentSolarMultiplier}
+
+The name of the schedule of the incident solar multiplier. If this field is not
+defined, the value of the Incident Solar Multiplier will be used. Otherwise, the
+product of the two will be used. The Schedule value needs to be no less than 0
+and no greater than 1.
+
 \subsection{ComplexFenestrationProperty:SolarAbsorbedLayers}\label{complexfenestrationpropertysolarabsorbedlayers}
 
 This object can be used as an alternative to the standard (automatic) EnergyPlus calculation of the solar radiation absorbed by fenestration systems in the building. Using this method, the normal EnergyPlus calculation is replaced with a schedule of solar absorptance values that are calculated outside the program.

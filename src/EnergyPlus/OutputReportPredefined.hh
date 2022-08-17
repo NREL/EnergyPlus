@@ -284,6 +284,18 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXCoolCoilNetCapSID = 0;  // Standard Rated (Net) Cooling Capacity [W], Test D
     int pdchDXCoolCoilElecPowerD = 0; // Standard Rated Electric Power [W], Test D
 
+    // Water-to-Air HP report
+    int pdstWAHP = 0;
+    int pdchWAHPType = 0;
+    int pdchWAHPRatedCapAtRatedCdts = 0;
+    int pdchWAHPRatedSensCapAtRatedCdts = 0;
+    int pdchWAHPRatedPowerAtRatedCdts = 0;
+    int pdchWAHPRatedCOPAtRatedCdts = 0;
+    int pdchWAHPRatedAirDBT = 0;
+    int pdchWAHPRatedAirWBT = 0;
+    int pdchWAHPRatedWtrT = 0;
+    int pdchWAHPDD = 0;
+
     // VAV DX Cooling Ratings Details
     int pdstVAVDXCoolCoil = 0; // details for Packaged VAV rating under AHRI 340/360
     int pdchVAVDXCoolCoilType = 0;
@@ -1131,6 +1143,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHIOccuHourExtremeCaution = 0;
     int pdchHIOccuHourDanger = 0;
     int pdchHIOccuHourExtremeDanger = 0;
+    int pdstHIOccupiedHours = 0;
+    int pdchHIOccupiedHourSafe = 0;
+    int pdchHIOccupiedHourCaution = 0;
+    int pdchHIOccupiedHourExtremeCaution = 0;
+    int pdchHIOccupiedHourDanger = 0;
+    int pdchHIOccupiedHourExtremeDanger = 0;
     int pdstHumidexHours = 0;
     int pdchHumidexHourLittle = 0;
     int pdchHumidexHourSome = 0;
@@ -1143,17 +1161,57 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHumidexOccuHourGreat = 0;
     int pdchHumidexOccuHourDanger = 0;
     int pdchHumidexOccuHourStroke = 0;
+    int pdstHumidexOccupiedHours = 0;
+    int pdchHumidexOccupiedHourLittle = 0;
+    int pdchHumidexOccupiedHourSome = 0;
+    int pdchHumidexOccupiedHourGreat = 0;
+    int pdchHumidexOccupiedHourDanger = 0;
+    int pdchHumidexOccupiedHourStroke = 0;
 
     int pdstHeatingSETHours = 0;
     int pdchHeatingSETHours = 0;
     int pdchHeatingSETOccuHours = 0;
+    int pdchHeatingSETOccupiedHours = 0;
     int pdchHeatingSETUnmetDuration = 0;
     int pdchHeatingSETUnmetTime = 0;
     int pdstCoolingSETHours = 0;
     int pdchCoolingSETHours = 0;
     int pdchCoolingSETOccuHours = 0;
+    int pdchCoolingSETOccupiedHours = 0;
     int pdchCoolingSETUnmetDuration = 0;
     int pdchCoolingSETUnmetTime = 0;
+
+    int pdstHourOfSafetyColdEvent = 0;
+    int pdchColdHourOfSafety = 0;
+    int pdchColdSafetyEndTime = 0;
+    int pdchColdSafeTempExceedHour = 0;
+    int pdchColdSafeTempExceedOccHour = 0;
+    int pdchColdSafeTempExceedOccupiedHour = 0;
+    int pdstHourOfSafetyHeatEvent = 0;
+    int pdchHeatHourOfSafety = 0;
+    int pdchHeatSafetyEndTime = 0;
+    int pdchHeatSafeTempExceedHour = 0;
+    int pdchHeatSafeTempExceedOccHour = 0;
+    int pdchHeatSafeTempExceedOccupiedHour = 0;
+
+    int pdstUnmetDegreeHour = 0;
+    int pdchCoolingUnmetDegreeHour = 0;
+    int pdchCoolingUnmetDegreeOccHour = 0;
+    int pdchCoolingUnmetDegreeOccupiedHour = 0;
+    int pdchHeatingUnmetDegreeHour = 0;
+    int pdchHeatingUnmetDegreeOccHour = 0;
+    int pdchHeatingUnmetDegreeOccupiedHour = 0;
+
+    int pdstDiscomfortWtExceedOccuHour = 0;
+    int pdstDiscomfortWtExceedOccupiedHour = 0;
+    int pdchVeryColdExceedOccuHour = 0;
+    int pdchCoolExceedOccuHour = 0;
+    int pdchWarmExceedOccuHour = 0;
+    int pdchVeryHotExceedOccuHour = 0;
+    int pdchVeryColdExceedOccupiedHour = 0;
+    int pdchCoolExceedOccupiedHour = 0;
+    int pdchWarmExceedOccupiedHour = 0;
+    int pdchVeryHotExceedOccupiedHour = 0;
 
     int pdrCO2Resilience = 0;
     int pdstCO2Hours = 0;
@@ -1164,6 +1222,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchCO2OccuHourSafe = 0;
     int pdchCO2OccuHourCaution = 0;
     int pdchCO2OccuHourHazard = 0;
+    int pdstCO2OccupiedHours = 0;
+    int pdchCO2OccupiedHourSafe = 0;
+    int pdchCO2OccupiedHourCaution = 0;
+    int pdchCO2OccupiedHourHazard = 0;
 
     int pdrVisualResilience = 0;
     int pdstIllumHours = 0;
@@ -1176,6 +1238,11 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchIllumOccuHourDim = 0;
     int pdchIllumOccuHourAdequate = 0;
     int pdchIllumOccuHourBright = 0;
+    int pdstIllumOccupiedHours = 0;
+    int pdchIllumOccupiedHourDark = 0;
+    int pdchIllumOccupiedHourDim = 0;
+    int pdchIllumOccupiedHourAdequate = 0;
+    int pdchIllumOccupiedHourBright = 0;
 
     int sizeReportName = 0;
     int numReportName = 0;

@@ -227,6 +227,10 @@ TEST_F(DataSetFixture, USHolidays_DST)
 {
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/USHolidays-DST.idf"))));
 }
+TEST_F(DataSetFixture, WaterToAirHeatPumps)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/WaterToAirHeatPumps.idf"))));
+}
 TEST_F(DataSetFixture, WindowBlindMaterials)
 {
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/WindowBlindMaterials.idf"))));
