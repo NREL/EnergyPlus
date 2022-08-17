@@ -1358,8 +1358,9 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
         state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
         AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
-        TempHistTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
-                                 (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum));
+        TempHistTerm = AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
+                                 (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
+                                 (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3);
 
         for (Ctd = 1; Ctd <= 3; ++Ctd) {
             Real64 TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
@@ -1921,8 +1922,8 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
         state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
         AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
-        TempHistTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
-                                 (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum));
+        TempHistTerm = AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 - (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
+                                 (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3);
 
         for (Ctd = 1; Ctd <= 3; ++Ctd) {
             TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;

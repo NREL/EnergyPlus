@@ -121,9 +121,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneAirHumRat;    // AIR Humidity Ratio
 
     Array1D<Real64> ZoneAirHumRatTemp;   // Temp zone air humidity ratio at time plus 1
-    Array1D<Real64> WZoneTimeMinus1Temp; // Zone air humidity ratio at previous timestep
-    Array1D<Real64> WZoneTimeMinus2Temp; // Zone air humidity ratio at timestep T-2
-    Array1D<Real64> WZoneTimeMinus3Temp; // Zone air humidity ratio at timestep T-3
     Array1D<Real64> ZoneAirHumRatOld;    // Last Time Steps Zone AIR Humidity Ratio
 
     Array1D<Real64> MCPI;                       // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
@@ -212,9 +209,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> LoadCorrectionFactor; // PH 3/3/04
 
     Array1D<Real64> AIRRAT; // "air power capacity"  PH 3/5/04
-    Array1D<Real64> ZTM1;   // zone air temperature at previous timestep
-    Array1D<Real64> ZTM2;   // zone air temperature at timestep T-2
-    Array1D<Real64> ZTM3;   // zone air temperature at previous T-3
     // Hybrid Modeling
     Array1D<Real64> PreviousMeasuredZT1;     // Measured zone air temperature at previous timestep1
     Array1D<Real64> PreviousMeasuredZT2;     // Measured zone air temperature at previous timestep2

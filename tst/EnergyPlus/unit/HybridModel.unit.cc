@@ -104,16 +104,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(1);
-    state->dataHeatBalFanSys->ZTM1.allocate(1);
-    state->dataHeatBalFanSys->zoneHeatBalance.allocate(1);
-    state->dataHeatBalFanSys->ZTM2.allocate(1);
-    state->dataHeatBalFanSys->ZTM3.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataRoomAirMod->ZTOC.allocate(1);
     state->dataRoomAirMod->ZTMX.allocate(1);
     state->dataRoomAirMod->ZTM1MX.allocate(1);
-    state->dataHeatBalFanSys->WZoneTimeMinus1Temp.allocate(1);
-    state->dataHeatBalFanSys->WZoneTimeMinus2Temp.allocate(1);
-    state->dataHeatBalFanSys->WZoneTimeMinus3Temp.allocate(1);
     state->dataHeatBalFanSys->AIRRAT.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->NonAirSystemResponse.allocate(1);
@@ -598,7 +592,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     // CorrectZoneContaminants variable initialization
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataHeatBalFanSys->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
     state->dataHeatBalFanSys->OAMFL.allocate(1);
     state->dataHeatBalFanSys->OAMFL(1) = 0.0;

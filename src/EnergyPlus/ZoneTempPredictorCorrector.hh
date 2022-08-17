@@ -136,6 +136,13 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZoneWM2 = 0.0; // Temporary humidity ratio at timestep t-2 in Exact and Euler method
         Real64 ZoneW1 = 0.0;  // Zone/space humidity ratio at the previous time step used in Exact and Euler method
 
+        Real64 ZTM1 = 0.0;                // zone air temperature at previous timestep
+        Real64 ZTM2 = 0.0;                // zone air temperature at timestep T-2
+        Real64 ZTM3 = 0.0;                // zone air temperature at previous T-3
+        Real64 WZoneTimeMinus1Temp = 0.0; // Zone air humidity ratio at previous timestep
+        Real64 WZoneTimeMinus2Temp = 0.0; // Zone air humidity ratio at timestep T-2
+        Real64 WZoneTimeMinus3Temp = 0.0; // Zone air humidity ratio at timestep T-3
+
         void CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac);
     };
 
