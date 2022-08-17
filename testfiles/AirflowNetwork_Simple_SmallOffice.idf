@@ -1806,38 +1806,38 @@
 
   ZoneMixing,
     West Zone Mixng 1,       !- Name
-    West Zone,               !- Zone Name
+    West Zone,               !- Zone or Space Name
     ZONE MIXING,             !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.05,                    !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per  Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    EAST ZONE,               !- Source Zone Name
+    EAST ZONE,               !- Source Zone or Space Name
     0;                       !- Delta Temperature {deltaC}
 
   ZoneCrossMixing,
     EAST ZONE XMixng 1,      !- Name
-    EAST ZONE,               !- Zone Name
+    EAST ZONE,               !- Zone or Space Name
     ZONE MIXING,             !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.1,                     !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    NORTH ZONE,              !- Source Zone Name
+    NORTH ZONE,              !- Source Zone or Space Name
     1.0;                     !- Delta Temperature {deltaC}
 
   ZoneCrossMixing,
     NORTH ZONE XMixng 1,     !- Name
-    NORTH ZONE,              !- Zone Name
+    NORTH ZONE,              !- Zone or Space Name
     ZONE MIXING,             !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.1,                     !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    EAST ZONE,               !- Source Zone Name
+    EAST ZONE,               !- Source Zone or Space Name
     1.0;                     !- Delta Temperature {deltaC}
 
   Curve:Biquadratic,

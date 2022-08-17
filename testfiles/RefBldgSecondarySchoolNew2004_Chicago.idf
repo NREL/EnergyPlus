@@ -12806,14 +12806,14 @@
 
   ZoneMixing,
     Kitchen_ZN_1_FLR_1 Exhaust Fanmixing_0,  !- Name
-    Kitchen_ZN_1_FLR_1,      !- Zone Name
+    Kitchen_ZN_1_FLR_1,      !- Zone or Space Name
     HVACOperationSchd,       !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     1.6288,                  !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Cafeteria_ZN_1_FLR_1,    !- Source Zone Name
+    Cafeteria_ZN_1_FLR_1,    !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
 ! ***HVAC EQUIPMENT***
