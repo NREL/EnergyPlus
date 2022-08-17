@@ -3276,6 +3276,9 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             e.NoHeatToReturnAir = false;
         for (auto &e : state.dataHeatBalFanSys->zoneHeatBalance)
             e.ZoneT1 = 0.0;
+
+        for (auto &e : state.dataHeatBalFanSys->spaceHeatBalance)
+            e.ZoneT1 = 0.0;
         state.dataHeatBalFanSys->PreviousMeasuredZT1 = 0.0;     // Hybrid modeling
         state.dataHeatBalFanSys->PreviousMeasuredZT2 = 0.0;     // Hybrid modeling
         state.dataHeatBalFanSys->PreviousMeasuredZT3 = 0.0;     // Hybrid modeling

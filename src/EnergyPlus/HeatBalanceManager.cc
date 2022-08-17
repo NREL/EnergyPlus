@@ -1074,12 +1074,14 @@ namespace HeatBalanceManager {
             AlphaName(1) = "EulerMethod";
         }
 
+        state.dataHeatBal->doSpaceHeatBalance = static_cast<bool>(getYesNoValue(AlphaName(2)));
+
         // Write Solution Algorithm to the initialization output file for User Verification
         constexpr const char *Format_726(
-            "! <Zone Air Solution Algorithm>, Value {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}\n");
+            "! <Zone Air Solution Algorithm>, Algorithm {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}, Space Heat Balance\n");
         print(state.files.eio, Format_726);
-        constexpr const char *Format_727(" Zone Air Solution Algorithm, {}\n");
-        print(state.files.eio, Format_727, AlphaName(1));
+        constexpr const char *Format_727(" Zone Air Solution Algorithm, {}, {}\n");
+        print(state.files.eio, Format_727, AlphaName(1), AlphaName(2));
 
         // A new object is added by L. Gu, 06/10
         state.dataHeatBalMgr->CurrentModuleObject = "ZoneAirContaminantBalance";
@@ -6066,6 +6068,7 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->zoneHeatBalance.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->spaceHeatBalance.allocate(state.dataGlobal->numSpaces);
         // Allocate this zone air humidity ratio
         state.dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
         state.dataHeatBalFanSys->ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);

@@ -292,6 +292,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
 
     EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
     EPVector<DataHeatBalFanSys::ZoneSpaceHeatBalanceData> zoneHeatBalance;
+    EPVector<DataHeatBalFanSys::ZoneSpaceHeatBalanceData> spaceHeatBalance;
 
     void clear_state() override
     {
