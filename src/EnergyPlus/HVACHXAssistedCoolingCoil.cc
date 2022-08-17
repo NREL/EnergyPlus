@@ -1124,9 +1124,9 @@ namespace HVACHXAssistedCoolingCoil {
                 int mControlType = 2;
                 if (mControlType == 2) {
                     if (mCoolingSpeedNum > 1) {
-                        CoilPLR = 1.0 * double(CompOp);
+                        CoilPLR = 1.0 * ((CompressorOp == CompressorOperation::On) ? 1.0 : 0.0);
                     } else {
-                        CoilPLR = PartLoadRatio * double(CompOp);
+                        CoilPLR = PartLoadRatio * ((CompressorOp == CompressorOperation::On) ? 1.0 : 0.0);
                     }
                 } else {
                     //
@@ -1140,19 +1140,19 @@ namespace HVACHXAssistedCoolingCoil {
                 }
 
                 Real64 mCoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
-                Real64 mCoolCompPartLoadRatio = double(CompOp);
+                Real64 mCoolCompPartLoadRatio = (CompressorOp == CompressorOperation::On) ? 1.0 : 0.0;
 
                 if (mCoolingSpeedNum > 1) {
                     if (mSingleMode == 0) {
-                        mCoolCompPartLoadRatio = double(CompOp);
+                        mCoolCompPartLoadRatio = (CompressorOp == CompressorOperation::On) ? 1.0 : 0.0;
                     } else {
-                        mCoolCompPartLoadRatio = PartLoadRatio * double(CompOp);
+                        mCoolCompPartLoadRatio = PartLoadRatio * ((CompressorOp == CompressorOperation::On) ? 1.0 : 0.0);
                         mCoolingSpeedRatio = 1.0;
                     }
                     CoilPLR = 1.0;
                 } else {
                     mCoolingSpeedRatio = 1.0;
-                    CoilPLR = PartLoadRatio * double(CompOp);
+                    CoilPLR = PartLoadRatio * ((CompressorOp == CompressorOperation::On) ? 1.0 : 0.0);
                 }
 
                 state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(

@@ -1502,34 +1502,34 @@ namespace HeatRecovery {
                 }
             }
 
-                if ((((CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                      (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed)) &&
-                     (CompanionCoilIndex > 0)) ||
-                    ((CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) && (CompanionCoilIndex > -1))) {
+            if ((((CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                  (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed)) &&
+                 (CompanionCoilIndex > 0)) ||
+                ((CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) && (CompanionCoilIndex > -1))) {
 
-                    if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
-                        CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                        if (state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 ||
-                            state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
-                            //       DX Coil is OFF, read actual inlet conditions
-                            state.dataHeatRecovery->FullLoadOutAirTemp = this->SecInTemp;
-                            state.dataHeatRecovery->FullLoadOutAirHumRat = this->SecInHumRat;
-                        } else {
-                            //       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
-                            state.dataHeatRecovery->FullLoadOutAirTemp = state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
-                            state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
-                        }
-                    } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                        // how to support VS dx coil here?
-                        state.dataHeatRecovery->FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
-                        state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
-                    } else if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                        // Use the new coil option:
-                        state.dataHeatRecovery->FullLoadOutAirTemp = state.dataCoilCooingDX->coilCoolingDXs[CompanionCoilIndex].outletAirDryBulbTemp;
-                        state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataCoilCooingDX->coilCoolingDXs[CompanionCoilIndex].outletAirHumRat;
+                if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
+                    CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                    if (state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 ||
+                        state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
+                        //       DX Coil is OFF, read actual inlet conditions
+                        state.dataHeatRecovery->FullLoadOutAirTemp = this->SecInTemp;
+                        state.dataHeatRecovery->FullLoadOutAirHumRat = this->SecInHumRat;
                     } else {
-                        //
+                        //       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
+                        state.dataHeatRecovery->FullLoadOutAirTemp = state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
+                        state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
                     }
+                } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    // how to support VS dx coil here?
+                    state.dataHeatRecovery->FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
+                    state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
+                } else if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                    // Use the new coil option:
+                    state.dataHeatRecovery->FullLoadOutAirTemp = state.dataCoilCooingDX->coilCoolingDXs[CompanionCoilIndex].outletAirDryBulbTemp;
+                    state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataCoilCooingDX->coilCoolingDXs[CompanionCoilIndex].outletAirHumRat;
+                } else {
+                    //
+                }
 
             } else {
 
@@ -2148,7 +2148,7 @@ namespace HeatRecovery {
             //   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
             if (this->ControlToTemperatureSetPoint) {
                 if ((this->SupInTemp - this->SupOutTemp) != 0.0) {
-                    if ((this->SupInTemp < HXTempSetPoint && this->SupOutTemp > HXTempSetPoint) ||
+                    if ((this->SupInTemp<HXTempSetPoint &&this->SupOutTemp> HXTempSetPoint) ||
                         (this->SupInTemp > HXTempSetPoint && this->SupOutTemp < HXTempSetPoint)) {
                         ControlFraction = max(0.0, min(1.0, std::abs((this->SupInTemp - HXTempSetPoint) / (this->SupInTemp - this->SupOutTemp))));
                     } else if ((this->SupInTemp < this->SupOutTemp && this->SupOutTemp < HXTempSetPoint) ||
