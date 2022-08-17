@@ -537,13 +537,13 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
 
             Real64 SteamMdot = MyLoad / LatentHeatSteam;
 
-            PlantUtilities::SetComponentFlowRate(state, SteamMdot, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
-
             this->MassFlowRate = SteamMdot;
+
+            PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
+                        
             this->OutletTemp = SatTemp;
             this->OutletSteamQuality = 1.0;
             MyLoad = this->MassFlowRate * LatentHeatSteam;
-            state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRate = this->MassFlowRate;
             state.dataLoopNodes->Node(this->OutletNodeNum).Quality = this->OutletSteamQuality;
         }
     } else {

@@ -2481,8 +2481,13 @@
     autosize,                             !- Heat Exchanger U-Factor Times Area Value
     OperationSchemeModulated,             !- Control Type
     HW Supply Outlet Node,                !- Heat Exchanger Setpoint Node Name
+    ,                                     !- Minimum Temperature Difference to Activate Heat Exchanger
+    ,                                     !- Heat Transfer Metering End Use Type
+    ,                                     !- Sizing Factor
+    ,                                     !- Operation Minimum Temperature Limit
+    ,                                     !- Operation Maximum Temperature Limit
     3.0,                                  !- Degree of SubCooling
-    15.0;                                 !- Degree of Loop SubCooling
+    13.0;                                 !- Degree of Loop SubCooling
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
 
