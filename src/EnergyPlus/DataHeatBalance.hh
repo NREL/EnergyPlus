@@ -2055,7 +2055,9 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 CondFDRelaxFactorInput = 1.0; // Relaxation factor, for looping across all the surfaces, user input value
     DataHeatBalance::SolutionAlgo ZoneAirSolutionAlgo =
         DataHeatBalance::SolutionAlgo::ThirdOrder; // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    bool doSpaceHeatBalance = false;               // Do space heat balance (in addition to zone heat balance)
+    bool doSpaceHeatBalanceSizing = false;         // Do space heat balance during sizing
+    bool doSpaceHeatBalanceSimulation = false;     // Do space heat balance during simulation
+    bool doSpaceHeatBalance = false;               // Do space heat balance currently
     bool OverrideZoneAirSolutionAlgo = false;      // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
     Real64 BuildingRotationAppendixG = 0.0;        // Building Rotation for Appendix G
     Real64 ZoneTotalExfiltrationHeatLoss = 0.0;    // Building total heat emission through zone exfiltration;
