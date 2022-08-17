@@ -107,6 +107,7 @@
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -1074,7 +1075,8 @@ namespace HeatBalanceManager {
             AlphaName(1) = "EulerMethod";
         }
 
-        state.dataHeatBal->doSpaceHeatBalance = static_cast<bool>(getYesNoValue(AlphaName(2)));
+        state.dataHeatBal->doSpaceHeatBalanceSizing = static_cast<bool>(getYesNoValue(AlphaName(2)));
+        state.dataHeatBal->doSpaceHeatBalanceSimulation = static_cast<bool>(getYesNoValue(AlphaName(3)));
 
         // Write Solution Algorithm to the initialization output file for User Verification
         constexpr const char *Format_726(
@@ -6067,8 +6069,10 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZT.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        state.dataHeatBalFanSys->zoneHeatBalance.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalFanSys->spaceHeatBalance.allocate(state.dataGlobal->numSpaces);
+        state.dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state.dataGlobal->NumOfZones);
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            state.dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(state.dataGlobal->numSpaces);
+        }
         // Allocate this zone air humidity ratio
         state.dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
         state.dataHeatBalFanSys->ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);

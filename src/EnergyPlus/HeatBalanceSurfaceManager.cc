@@ -116,6 +116,7 @@
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <EnergyPlus/WindowManagerExteriorThermal.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 #include <WCECommon.hpp>
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
@@ -2080,7 +2081,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         state.dataHeatBalFanSys->ZT(zoneNum) = ZoneInitialTemp;
         state.dataHeatBalFanSys->ZTAV(zoneNum) = ZoneInitialTemp;
         // TODO: Reinitializing this entire stuct may cause diffs
-        new (&state.dataHeatBalFanSys->zoneHeatBalance(zoneNum)) DataHeatBalFanSys::ZoneSpaceHeatBalanceData();
+        new (&state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum)) ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData();
         // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
         state.dataHeatBalFanSys->ZoneAirHumRatAvg(zoneNum) = state.dataEnvrn->OutHumRat;
         state.dataHeatBalFanSys->ZoneAirHumRat(zoneNum) = state.dataEnvrn->OutHumRat;

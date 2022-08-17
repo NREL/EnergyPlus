@@ -90,38 +90,6 @@ namespace DataHeatBalFanSys {
         int DualPMVErrIndex = 0; // Dual PMV setpoint error index
     };
 
-    struct ZoneSpaceHeatBalanceData
-    {
-        // Zone air drybulb conditions variables
-        Real64 XMAT = ZoneInitialTemp; // Temporary zone/space temperature to test convergence
-        Real64 XM2T = ZoneInitialTemp;
-        Real64 XM3T = ZoneInitialTemp;
-        Real64 XM4T = ZoneInitialTemp;
-        Real64 DSXMAT = ZoneInitialTemp; // Down Stepped MAT history storage
-        Real64 DSXM2T = ZoneInitialTemp; // Down Stepped MAT history storage
-        Real64 DSXM3T = ZoneInitialTemp; // Down Stepped MAT history storage
-        Real64 DSXM4T = ZoneInitialTemp; // Down Stepped MAT history storage
-        Real64 XMPT = ZoneInitialTemp;   // Zone/space air temperature at previous time step
-        // Exact and Euler solutions
-        Real64 ZoneTMX = ZoneInitialTemp; // Temporary zone/space temperature to test convergence in Exact and Euler method
-        Real64 ZoneTM2 = ZoneInitialTemp; // Temporary zone/space temperature at timestep t-2 in Exact and Euler method
-        Real64 ZoneT1 = 0.0;              // Zone/space temperature at the previous time step used in Exact and Euler method
-
-        // Zone Air moisture conditions variables
-        Real64 WZoneTimeMinus1 = 0.0;   // Humidity ratio history terms for 3rd order derivative
-        Real64 WZoneTimeMinus2 = 0.0;   // Time Minus 2 Zone Time Steps Term
-        Real64 WZoneTimeMinus3 = 0.0;   // Time Minus 3 Zone Time Steps Term
-        Real64 WZoneTimeMinus4 = 0.0;   // Time Minus 4 Zone Time Steps Term
-        Real64 DSWZoneTimeMinus1 = 0.0; // DownStepped Humidity ratio history terms for 3rd order derivative
-        Real64 DSWZoneTimeMinus2 = 0.0; // DownStepped Time Minus 2 Zone Time Steps Term
-        Real64 DSWZoneTimeMinus3 = 0.0; // DownStepped Time Minus 3 Zone Time Steps Term
-        Real64 DSWZoneTimeMinus4 = 0.0; // DownStepped Time Minus 4 Zone Time Steps Term
-        Real64 WZoneTimeMinusP = 0.0;   // Humidity ratio history terms at previous time step
-        // Exact and Euler solutions
-        Real64 ZoneWMX = 0.0; // Temporary humidity ratio to test convergence in Exact and Euler method
-        Real64 ZoneWM2 = 0.0; // Temporary humidity ratio at timestep t-2 in Exact and Euler method
-        Real64 ZoneW1 = 0.0;  // Zone/space humidity ratio at the previous time step used in Exact and Euler method
-    };
 } // namespace DataHeatBalFanSys
 
 struct HeatBalFanSysData : BaseGlobalStruct
@@ -291,8 +259,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     int PMVerrorIndex = 0;
 
     EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
-    EPVector<DataHeatBalFanSys::ZoneSpaceHeatBalanceData> zoneHeatBalance;
-    EPVector<DataHeatBalFanSys::ZoneSpaceHeatBalanceData> spaceHeatBalance;
 
     void clear_state() override
     {

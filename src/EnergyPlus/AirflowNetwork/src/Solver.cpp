@@ -104,6 +104,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -5452,8 +5453,8 @@ namespace AirflowNetwork {
             if (simulation_control.type != ControlType::NoMultizoneOrDistribution) {
                 if (RollBackFlag) {
                     for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
-                        ANZT(i) = m_state.dataHeatBalFanSys->zoneHeatBalance(i).XMAT;
-                        ANZW(i) = m_state.dataHeatBalFanSys->zoneHeatBalance(i).WZoneTimeMinus1;
+                        ANZT(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).XMAT;
+                        ANZW(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).WZoneTimeMinus1;
                         if (m_state.dataContaminantBalance->Contaminant.CO2Simulation) ANCO(i) = m_state.dataContaminantBalance->CO2ZoneTimeMinus1(i);
                         if (m_state.dataContaminantBalance->Contaminant.GenericContamSimulation)
                             ANGC(i) = m_state.dataContaminantBalance->GCZoneTimeMinus1(i);

@@ -72,6 +72,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::DisplacementVentMgr {
 
@@ -949,7 +950,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-        Real64 const thisZoneT1 = state.dataHeatBalFanSys->zoneHeatBalance(ZoneNum).ZoneT1;
+        Real64 const thisZoneT1 = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneT1;
         AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
         TempHistTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) +
                                  OneThird * state.dataHeatBalFanSys->ZTM3(ZoneNum));
