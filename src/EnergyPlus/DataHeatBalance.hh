@@ -521,8 +521,10 @@ namespace DataHeatBalance {
         Real64 calcFloorArea = 0.0;                                       // Calculated floor area used for this space
         Real64 floorArea = 0.0;                                           // Floor area used for this space
         bool hasFloor = false;                                            // Has "Floor" surface
-        Real64 extWindowArea = 0.0;                                       // Exterior Window Area for Zone
-        Real64 totalSurfArea = 0.0;                                       // Total surface area for Zone
+        Real64 fracZoneFloorArea = 0.0;                                   // fraction of total floor area for all spaces in zone
+        Real64 fracZoneVolume = 0.0;                                      // fraction of total volume for all spaces in zone
+        Real64 extWindowArea = 0.0;                                       // Exterior Window Area for space
+        Real64 totalSurfArea = 0.0;                                       // Total surface area for space
         int radiantEnclosureNum = 0;                                      // Radiant exchange enclosure this space belongs to
         int solarEnclosureNum = 0;                                        // Solar distribution enclosure this space belongs to
         Real64 totOccupants = 0.0;     // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)

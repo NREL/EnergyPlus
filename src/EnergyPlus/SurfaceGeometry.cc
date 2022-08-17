@@ -2527,6 +2527,15 @@ namespace SurfaceGeometry {
                 } else {
                     state.dataHeatBal->Zone(ZoneNum).FloorArea = state.dataHeatBal->Zone(ZoneNum).CalcFloorArea;
                 }
+                Real64 totSpacesFloorArea = 0.0;
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    totSpacesFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                }
+                if (totSpacesFloorArea > 0.0) {
+                    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                        state.dataHeatBal->space(spaceNum).fracZoneFloorArea = state.dataHeatBal->space(spaceNum).floorArea / totSpacesFloorArea;
+                    }
+                } // else leave fractions at zero
             }
 
             for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
@@ -12252,6 +12261,15 @@ namespace SurfaceGeometry {
                     thisSpace.Volume = thisZone.Volume * thisSpace.floorArea / thisZone.FloorArea;
                 }
             }
+            Real64 totSpacesVolume = 0.0;
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                totSpacesVolume += state.dataHeatBal->space(spaceNum).Volume;
+            }
+            if (totSpacesVolume > 0.0) {
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    state.dataHeatBal->space(spaceNum).fracZoneVolume = state.dataHeatBal->space(spaceNum).Volume / totSpacesVolume;
+                }
+            } // else leave fractions at zero
 
             if (ShowZoneSurfaces) {
                 if (ShowZoneSurfaceHeaders) {
