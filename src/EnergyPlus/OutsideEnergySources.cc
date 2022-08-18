@@ -540,7 +540,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
             this->MassFlowRate = SteamMdot;
 
             PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
-                        
+
             this->OutletTemp = SatTemp;
             this->OutletSteamQuality = 1.0;
             MyLoad = this->MassFlowRate * LatentHeatSteam;
