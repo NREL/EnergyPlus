@@ -3704,132 +3704,15 @@ void PredictSystemLoads(EnergyPlusData &state,
 
     auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
 
-    // Update zone temperatures
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-
-        if (ShortenTimeStepSys) {
-            // timestep has just shifted from full zone timestep to a new shorter system timestep
-            // throw away last updates in corrector and rewind for resimulating smaller timestep
-            if (Zone(ZoneNum).SystemZoneNodeNumber > 0) { // roll back result for zone air node,
-                Node(Zone(ZoneNum).SystemZoneNodeNumber).Temp = thisZoneHB.XMAT;
-                state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = thisZoneHB.XMAT;
-                Node(Zone(ZoneNum).SystemZoneNodeNumber).HumRat = thisZoneHB.WZoneTimeMinus1;
-                Node(Zone(ZoneNum).SystemZoneNodeNumber).Enthalpy = PsyHFnTdbW(thisZoneHB.XMAT, thisZoneHB.WZoneTimeMinus1);
+        // Update zone/space temperatures
+        state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).UpdateTemperatures(
+            state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep, ZoneNum);
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).UpdateTemperatures(
+                    state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep, ZoneNum, spaceNum);
             }
-
-            if (state.dataHVACGlobal->NumOfSysTimeSteps !=
-                state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
-
-                //  MAT,   thisZoneHB.XMAT,   thisZoneHB.XM2T,
-                //  thisZoneHB.XM3T,   thisZoneHB.XM4T, &
-                DownInterpolate4HistoryValues(PriorTimeStep,
-                                              TimeStepSys,
-                                              thisZoneHB.XMAT,
-                                              thisZoneHB.XM2T,
-                                              thisZoneHB.XM3T,
-                                              state.dataHeatBalFanSys->MAT(ZoneNum),
-                                              thisZoneHB.DSXMAT,
-                                              thisZoneHB.DSXM2T,
-                                              thisZoneHB.DSXM3T,
-                                              thisZoneHB.DSXM4T);
-                //     ZoneAirHumRat(ZoneNum),   WZoneTimeMinus1(ZoneNum),   WZoneTimeMinus2(ZoneNum),   &
-                //                                 WZoneTimeMinus3(ZoneNum),   WZoneTimeMinus4(ZoneNum), &
-                DownInterpolate4HistoryValues(PriorTimeStep,
-                                              TimeStepSys,
-                                              thisZoneHB.WZoneTimeMinus1,
-                                              thisZoneHB.WZoneTimeMinus2,
-                                              thisZoneHB.WZoneTimeMinus3,
-                                              state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
-                                              thisZoneHB.DSWZoneTimeMinus1,
-                                              thisZoneHB.DSWZoneTimeMinus2,
-                                              thisZoneHB.DSWZoneTimeMinus3,
-                                              thisZoneHB.DSWZoneTimeMinus4);
-
-                if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
-
-                    //   MATFloor(ZoneNum),   XMATFloor(ZoneNum),    XM2TFloor(ZoneNum),  &
-                    //                        XM3TFloor(ZoneNum),    XM4TFloor(ZoneNum) ,   &
-                    DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  TimeStepSys,
-                                                  state.dataRoomAirMod->XMATFloor(ZoneNum),
-                                                  state.dataRoomAirMod->XM2TFloor(ZoneNum),
-                                                  state.dataRoomAirMod->XM3TFloor(ZoneNum),
-                                                  state.dataRoomAirMod->MATFloor(ZoneNum),
-                                                  state.dataRoomAirMod->DSXMATFloor(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM2TFloor(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM3TFloor(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM4TFloor(ZoneNum));
-                    DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  TimeStepSys,
-                                                  state.dataRoomAirMod->XMATOC(ZoneNum),
-                                                  state.dataRoomAirMod->XM2TOC(ZoneNum),
-                                                  state.dataRoomAirMod->XM3TOC(ZoneNum),
-                                                  state.dataRoomAirMod->MATOC(ZoneNum),
-                                                  state.dataRoomAirMod->DSXMATOC(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM2TOC(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM3TOC(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM4TOC(ZoneNum));
-                    //  MATMX(ZoneNum),   XMATMX(ZoneNum),    XM2TMX(ZoneNum),  &
-                    //                    XM3TMX(ZoneNum),    XM4TMX(ZoneNum) ,   &
-                    DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  TimeStepSys,
-                                                  state.dataRoomAirMod->XMATMX(ZoneNum),
-                                                  state.dataRoomAirMod->XM2TMX(ZoneNum),
-                                                  state.dataRoomAirMod->XM3TMX(ZoneNum),
-                                                  state.dataRoomAirMod->MATMX(ZoneNum),
-                                                  state.dataRoomAirMod->DSXMATMX(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM2TMX(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM3TMX(ZoneNum),
-                                                  state.dataRoomAirMod->DSXM4TMX(ZoneNum));
-                }
-                if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
-                    for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
-                        auto &ThisRAFNNode(RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode));
-                        DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
-                                                      ThisRAFNNode.AirTempX1,
-                                                      ThisRAFNNode.AirTempX2,
-                                                      ThisRAFNNode.AirTempX3,
-                                                      ThisRAFNNode.AirTemp,
-                                                      ThisRAFNNode.AirTempDSX1,
-                                                      ThisRAFNNode.AirTempDSX2,
-                                                      ThisRAFNNode.AirTempDSX3,
-                                                      ThisRAFNNode.AirTempDSX4);
-                        DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
-                                                      ThisRAFNNode.HumRatX1,
-                                                      ThisRAFNNode.HumRatX2,
-                                                      ThisRAFNNode.HumRatX3,
-                                                      ThisRAFNNode.HumRat,
-                                                      ThisRAFNNode.HumRatDSX1,
-                                                      ThisRAFNNode.HumRatDSX2,
-                                                      ThisRAFNNode.HumRatDSX3,
-                                                      ThisRAFNNode.HumRatDSX4);
-                    }
-                }
-            } else { // reuse history data in DS terms from last zone time step to preserve information that would be lost
-                     // do nothing because DS history would have been pushed prior and should be ready
-            }
-        }
-        // now update the variables actually used in the balance equations.
-        if (UseZoneTimeStepHistory) {
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 = thisZoneHB.XMAT;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 = thisZoneHB.XM2T;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3 = thisZoneHB.XM3T;
-
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus1Temp = thisZoneHB.WZoneTimeMinus1;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus2Temp = thisZoneHB.WZoneTimeMinus2;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus3Temp = thisZoneHB.WZoneTimeMinus3;
-
-        } else { // use down-stepped history
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 = thisZoneHB.DSXMAT;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 = thisZoneHB.DSXM2T;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3 = thisZoneHB.DSXM3T;
-
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus1Temp = thisZoneHB.DSWZoneTimeMinus1;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus2Temp = thisZoneHB.DSWZoneTimeMinus2;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus3Temp = thisZoneHB.DSWZoneTimeMinus3;
         }
 
         AIRRAT(ZoneNum) =
@@ -3845,6 +3728,7 @@ void PredictSystemLoads(EnergyPlusData &state,
         // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
         CalcZoneSums(state, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, false);
 
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
         if (state.dataHybridModel->FlagHybridModel_PC) {
             SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
@@ -3853,23 +3737,17 @@ void PredictSystemLoads(EnergyPlusData &state,
         TempDepCoef = SumHA + SumMCp;
         TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) {
-            TempHistoryTerm = AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
-                                        (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
-                                        (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3);
+            TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
             TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
             TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
         } else if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
             // UCSD displacement ventilation model - make dynamic term independent of TimeStepSys
-            TempHistoryTerm = AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
-                                        (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
-                                        (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3);
+            TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
             TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
             TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
         } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
             // UCSD UFAD model - make dynamic term independent of TimeStepSys
-            TempHistoryTerm = AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
-                                        (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
-                                        (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3);
+            TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
             TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
             TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
         } else if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
@@ -3888,18 +3766,14 @@ void PredictSystemLoads(EnergyPlusData &state,
                          RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir * RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir /
                          (TimeStepSys * DataGlobalConstants::SecInHour);
                 AIRRAT(ZoneNum) = AirCap;
-                TempHistoryTerm = AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
-                                            (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
-                                            (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3);
+                TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
                 TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
                 TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HasHVACAssigned)
                     RAFNFrac = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HVAC(1).SupplyFraction;
             }
         } else { // other imperfectly mixed room models
-            TempHistoryTerm = AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
-                                        (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
-                                        (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3);
+            TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
             TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
             TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
         }
@@ -5036,32 +4910,31 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
     // Update zone temperatures
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-        auto &thisMAT = state.dataHeatBalFanSys->MAT(ZoneNum);
         auto &thisZT = state.dataHeatBalFanSys->ZT(ZoneNum);
 
         ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
 
         // update the variables actually used in the balance equations.
         if (!UseZoneTimeStepHistory) {
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 = thisZoneHB.DSXMAT;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 = thisZoneHB.DSXM2T;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3 = thisZoneHB.DSXM3T;
+            thisZoneHB.ZTM1 = thisZoneHB.DSXMAT;
+            thisZoneHB.ZTM2 = thisZoneHB.DSXM2T;
+            thisZoneHB.ZTM3 = thisZoneHB.DSXM3T;
 
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus1Temp = thisZoneHB.DSWZoneTimeMinus1;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus2Temp = thisZoneHB.DSWZoneTimeMinus2;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus3Temp = thisZoneHB.DSWZoneTimeMinus3;
+            thisZoneHB.WZoneTimeMinus1Temp = thisZoneHB.DSWZoneTimeMinus1;
+            thisZoneHB.WZoneTimeMinus2Temp = thisZoneHB.DSWZoneTimeMinus2;
+            thisZoneHB.WZoneTimeMinus3Temp = thisZoneHB.DSWZoneTimeMinus3;
         } else {
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 = thisZoneHB.XMAT;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 = thisZoneHB.XM2T;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3 = thisZoneHB.XM3T;
+            thisZoneHB.ZTM1 = thisZoneHB.XMAT;
+            thisZoneHB.ZTM2 = thisZoneHB.XM2T;
+            thisZoneHB.ZTM3 = thisZoneHB.XM3T;
 
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus1Temp = thisZoneHB.WZoneTimeMinus1;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus2Temp = thisZoneHB.WZoneTimeMinus2;
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).WZoneTimeMinus3Temp = thisZoneHB.WZoneTimeMinus3;
+            thisZoneHB.WZoneTimeMinus1Temp = thisZoneHB.WZoneTimeMinus1;
+            thisZoneHB.WZoneTimeMinus2Temp = thisZoneHB.WZoneTimeMinus2;
+            thisZoneHB.WZoneTimeMinus3Temp = thisZoneHB.WZoneTimeMinus3;
         }
 
         AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
-                          PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisMAT, ZoneAirHumRat(ZoneNum), RoutineName) *
+                          PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, ZoneAirHumRat(ZoneNum), RoutineName) *
                           PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
         AirCap = AIRRAT(ZoneNum);
@@ -5234,7 +5107,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
                 state, ZoneNum, SumIntGain, SumIntGainExceptPeople, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, AirCap);
         }
 
-        thisMAT = thisZT;
+        state.dataHeatBalFanSys->MAT(ZoneNum) = thisZT;
+        thisZoneHB.MAT = thisZT;
 
         // Determine sensible load heating/cooling rate and energy
         state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) = max(SNLoad, 0.0);
@@ -5246,6 +5120,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         CorrectZoneHumRat(state, ZoneNum);
 
         ZoneAirHumRat(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
+        state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
         state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) =
             100.0 * PsyRhFnTdbWPb(state, thisZT, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, RoutineName);
 
@@ -7739,6 +7614,143 @@ temperatureAndCountInSch(EnergyPlusData &state, int const scheduleIndex, bool co
     }
 
     return std::make_tuple(valueAtSelectTime, countOfSame, monthName);
+}
+
+void ZoneSpaceHeatBalanceData::UpdateTemperatures(EnergyPlusData &state,
+                                                  bool const ShortenTimeStepSys,
+                                                  bool const UseZoneTimeStepHistory,
+                                                  Real64 const PriorTimeStep,
+                                                  int const zoneNum,
+                                                  int const spaceNum)
+{
+    if (ShortenTimeStepSys) {
+        // timestep has just shifted from full zone timestep to a new shorter system timestep
+        // throw away last updates in corrector and rewind for resimulating smaller timestep
+        if (spaceNum == 0) {
+            if (state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber > 0) { // roll back result for zone air node,
+                auto &zoneNode = state.dataLoopNodes->Node(state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber);
+                zoneNode.Temp = this->XMAT;
+                state.dataHeatBalFanSys->TempTstatAir(zoneNum) = this->XMAT;
+                zoneNode.HumRat = this->WZoneTimeMinus1;
+                zoneNode.Enthalpy = PsyHFnTdbW(this->XMAT, this->WZoneTimeMinus1);
+            }
+        }
+
+        if (state.dataHVACGlobal->NumOfSysTimeSteps !=
+            state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
+
+            //  MAT,   this->XMAT,   this->XM2T,
+            //  this->XM3T,   this->XM4T, &
+            DownInterpolate4HistoryValues(PriorTimeStep,
+                                          state.dataHVACGlobal->TimeStepSys,
+                                          this->XMAT,
+                                          this->XM2T,
+                                          this->XM3T,
+                                          this->MAT,
+                                          this->DSXMAT,
+                                          this->DSXM2T,
+                                          this->DSXM3T,
+                                          this->DSXM4T);
+            if (spaceNum == 0) state.dataHeatBalFanSys->MAT(zoneNum) = this->MAT;
+            //     ZoneAirHumRat(ZoneNum),   WZoneTimeMinus1(ZoneNum),   WZoneTimeMinus2(ZoneNum),   &
+            //                                 WZoneTimeMinus3(ZoneNum),   WZoneTimeMinus4(ZoneNum), &
+            DownInterpolate4HistoryValues(PriorTimeStep,
+                                          state.dataHVACGlobal->TimeStepSys,
+                                          this->WZoneTimeMinus1,
+                                          this->WZoneTimeMinus2,
+                                          this->WZoneTimeMinus3,
+                                          this->ZoneAirHumRat,
+                                          this->DSWZoneTimeMinus1,
+                                          this->DSWZoneTimeMinus2,
+                                          this->DSWZoneTimeMinus3,
+                                          this->DSWZoneTimeMinus4);
+            if (spaceNum == 0) state.dataHeatBalFanSys->ZoneAirHumRat(zoneNum) = this->ZoneAirHumRat;
+
+            if (state.dataRoomAirMod->IsZoneDV(zoneNum) || state.dataRoomAirMod->IsZoneUI(zoneNum)) {
+
+                //   MATFloor(ZoneNum),   XMATFloor(ZoneNum),    XM2TFloor(ZoneNum),  &
+                //                        XM3TFloor(ZoneNum),    XM4TFloor(ZoneNum) ,   &
+                DownInterpolate4HistoryValues(PriorTimeStep,
+                                              state.dataHVACGlobal->TimeStepSys,
+                                              state.dataRoomAirMod->XMATFloor(zoneNum),
+                                              state.dataRoomAirMod->XM2TFloor(zoneNum),
+                                              state.dataRoomAirMod->XM3TFloor(zoneNum),
+                                              state.dataRoomAirMod->MATFloor(zoneNum),
+                                              state.dataRoomAirMod->DSXMATFloor(zoneNum),
+                                              state.dataRoomAirMod->DSXM2TFloor(zoneNum),
+                                              state.dataRoomAirMod->DSXM3TFloor(zoneNum),
+                                              state.dataRoomAirMod->DSXM4TFloor(zoneNum));
+                DownInterpolate4HistoryValues(PriorTimeStep,
+                                              state.dataHVACGlobal->TimeStepSys,
+                                              state.dataRoomAirMod->XMATOC(zoneNum),
+                                              state.dataRoomAirMod->XM2TOC(zoneNum),
+                                              state.dataRoomAirMod->XM3TOC(zoneNum),
+                                              state.dataRoomAirMod->MATOC(zoneNum),
+                                              state.dataRoomAirMod->DSXMATOC(zoneNum),
+                                              state.dataRoomAirMod->DSXM2TOC(zoneNum),
+                                              state.dataRoomAirMod->DSXM3TOC(zoneNum),
+                                              state.dataRoomAirMod->DSXM4TOC(zoneNum));
+                //  MATMX(zoneNum),   XMATMX(zoneNum),    XM2TMX(zoneNum),  &
+                //                    XM3TMX(zoneNum),    XM4TMX(zoneNum) ,   &
+                DownInterpolate4HistoryValues(PriorTimeStep,
+                                              state.dataHVACGlobal->TimeStepSys,
+                                              state.dataRoomAirMod->XMATMX(zoneNum),
+                                              state.dataRoomAirMod->XM2TMX(zoneNum),
+                                              state.dataRoomAirMod->XM3TMX(zoneNum),
+                                              state.dataRoomAirMod->MATMX(zoneNum),
+                                              state.dataRoomAirMod->DSXMATMX(zoneNum),
+                                              state.dataRoomAirMod->DSXM2TMX(zoneNum),
+                                              state.dataRoomAirMod->DSXM3TMX(zoneNum),
+                                              state.dataRoomAirMod->DSXM4TMX(zoneNum));
+            }
+            if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+                for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
+                    auto &ThisRAFNNode(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).Node(LoopNode));
+                    DownInterpolate4HistoryValues(PriorTimeStep,
+                                                  state.dataHVACGlobal->TimeStepSys,
+                                                  ThisRAFNNode.AirTempX1,
+                                                  ThisRAFNNode.AirTempX2,
+                                                  ThisRAFNNode.AirTempX3,
+                                                  ThisRAFNNode.AirTemp,
+                                                  ThisRAFNNode.AirTempDSX1,
+                                                  ThisRAFNNode.AirTempDSX2,
+                                                  ThisRAFNNode.AirTempDSX3,
+                                                  ThisRAFNNode.AirTempDSX4);
+                    DownInterpolate4HistoryValues(PriorTimeStep,
+                                                  state.dataHVACGlobal->TimeStepSys,
+                                                  ThisRAFNNode.HumRatX1,
+                                                  ThisRAFNNode.HumRatX2,
+                                                  ThisRAFNNode.HumRatX3,
+                                                  ThisRAFNNode.HumRat,
+                                                  ThisRAFNNode.HumRatDSX1,
+                                                  ThisRAFNNode.HumRatDSX2,
+                                                  ThisRAFNNode.HumRatDSX3,
+                                                  ThisRAFNNode.HumRatDSX4);
+                }
+            }
+        } else { // reuse history data in DS terms from last zone time step to preserve information that would be lost
+                 // do nothing because DS history would have been pushed prior and should be ready
+        }
+    }
+    // now update the variables actually used in the balance equations.
+    if (UseZoneTimeStepHistory) {
+        this->ZTM1 = this->XMAT;
+        this->ZTM2 = this->XM2T;
+        this->ZTM3 = this->XM3T;
+
+        this->WZoneTimeMinus1Temp = this->WZoneTimeMinus1;
+        this->WZoneTimeMinus2Temp = this->WZoneTimeMinus2;
+        this->WZoneTimeMinus3Temp = this->WZoneTimeMinus3;
+
+    } else { // use down-stepped history
+        this->ZTM1 = this->DSXMAT;
+        this->ZTM2 = this->DSXM2T;
+        this->ZTM3 = this->DSXM3T;
+
+        this->WZoneTimeMinus1Temp = this->DSWZoneTimeMinus1;
+        this->WZoneTimeMinus2Temp = this->DSWZoneTimeMinus2;
+        this->WZoneTimeMinus3Temp = this->DSWZoneTimeMinus3;
+    }
 }
 
 void ZoneSpaceHeatBalanceData::CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac)

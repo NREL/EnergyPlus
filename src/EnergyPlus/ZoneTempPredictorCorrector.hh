@@ -107,6 +107,7 @@ namespace ZoneTempPredictorCorrector {
     struct ZoneSpaceHeatBalanceData
     {
         // Zone air drybulb conditions variables
+        Real64 MAT = DataHeatBalFanSys::ZoneInitialTemp;  // MEAN AIR TEMPERATURE (C) - duplicate of DataHeatBalFansys::MAT for now
         Real64 XMAT = DataHeatBalFanSys::ZoneInitialTemp; // Temporary zone/space temperature to test convergence
         Real64 XM2T = DataHeatBalFanSys::ZoneInitialTemp;
         Real64 XM3T = DataHeatBalFanSys::ZoneInitialTemp;
@@ -122,6 +123,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZoneT1 = 0.0;                                 // Zone/space temperature at the previous time step used in Exact and Euler method
 
         // Zone Air moisture conditions variables
+        Real64 ZoneAirHumRat;           // AIR Humidity Ratio - duplicate of DataHeatBalFansys::ZoneAirHumRat for now
         Real64 WZoneTimeMinus1 = 0.0;   // Humidity ratio history terms for 3rd order derivative
         Real64 WZoneTimeMinus2 = 0.0;   // Time Minus 2 Zone Time Steps Term
         Real64 WZoneTimeMinus3 = 0.0;   // Time Minus 3 Zone Time Steps Term
@@ -144,6 +146,12 @@ namespace ZoneTempPredictorCorrector {
         Real64 WZoneTimeMinus3Temp = 0.0; // Zone air humidity ratio at timestep T-3
 
         void CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac);
+        void UpdateTemperatures(EnergyPlusData &state,
+                                bool const ShortenTimeStepSys,
+                                bool const UseZoneTimeStepHistory,
+                                Real64 const PriorTimeStep,
+                                int const zoneNum,
+                                int const spaceNum = 0);
     };
 
     // Functions
