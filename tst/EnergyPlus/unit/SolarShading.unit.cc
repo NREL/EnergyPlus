@@ -2693,8 +2693,8 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
     shCtrl2.Name = "WindowShadingControl2";
     shCtrl1.ShadingType = DataSurfaces::WinShadingType::IntShade;
     shCtrl2.ShadingType = DataSurfaces::WinShadingType::ExtShade;
-    shCtrl1.ShadingControlType = DataSurfaces::WindowShadingControlType::HiLumin_HiSolar_OffMidNight;
-    shCtrl2.ShadingControlType = DataSurfaces::WindowShadingControlType::HiLumin_HiSolar_OffNextMorning;
+    shCtrl1.ShadingControlType = DataSurfaces::WindowShadingControlType::HiSolar_HiLumin_OffMidNight;
+    shCtrl2.ShadingControlType = DataSurfaces::WindowShadingControlType::HiSolar_HiLumin_OffNextMorning;
     shCtrl1.SetPoint = 9400;
     shCtrl2.SetPoint = 94.64;
     shCtrl1.SetPoint2 = 2000;

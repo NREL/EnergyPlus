@@ -6822,9 +6822,9 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             ++count;
             ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
             WindowShadingControlType shCtrlType = state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType;
-            if (!((shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffMidNight) ||
-                  (shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffSunset) ||
-                  (shCtrlType == WindowShadingControlType::HiLumin_HiSolar_OffNextMorning)))
+            if (!((shCtrlType == WindowShadingControlType::HiSolar_HiLumin_OffMidNight) ||
+                  (shCtrlType == WindowShadingControlType::HiSolar_HiLumin_OffSunset) ||
+                  (shCtrlType == WindowShadingControlType::HiSolar_HiLumin_OffNextMorning)))
                 continue;
             // need to map back to the original order of the "loop" to not change all the other data structures
             int loop = thisDaylightControl.MapShdOrdToLoopNum(count);

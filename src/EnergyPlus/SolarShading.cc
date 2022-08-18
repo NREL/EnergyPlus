@@ -9736,8 +9736,8 @@ void WindowShadingManager(EnergyPlusData &state)
                 }
                 break;
 
-            case WindowShadingControlType::HiLumin_HiSolar_OffMidNight:
-                // 'OnIfHighLuminanceOrHighSolarTillMidnight'
+            case WindowShadingControlType::HiSolar_HiLumin_OffMidNight:
+                // 'OnIfHighSolarOrHighLuminanceTillMidnight'
                 // if shade is already on, then keep it on until midnight, otherwise check thresholds
                 if (SchedAllowsControl && IS_SHADED(state.dataSurface->SurfWinExtIntShadePrevTS(ISurf))) {
                     shadingOn = true;
@@ -9757,8 +9757,8 @@ void WindowShadingManager(EnergyPlusData &state)
                 }
                 break;
 
-            case WindowShadingControlType::HiLumin_HiSolar_OffSunset:
-                // 'OnIfHighLuminanceOrHighSolarTillSunset'
+            case WindowShadingControlType::HiSolar_HiLumin_OffSunset:
+                // 'OnIfHighSolarOrHighLuminanceTillSunset'
                 // if shade is already on, then keep it on until sunset, otherwise check thresholds
                 if (SchedAllowsControl && IS_SHADED(state.dataSurface->SurfWinExtIntShadePrevTS(ISurf))) {
                     shadingOn = true;
@@ -9778,8 +9778,8 @@ void WindowShadingManager(EnergyPlusData &state)
                 }
                 break;
 
-            case WindowShadingControlType::HiLumin_HiSolar_OffNextMorning:
-                // 'OnIfHighLuminanceOrHighSolarTillNextMorning'
+            case WindowShadingControlType::HiSolar_HiLumin_OffNextMorning:
+                // 'OnIfHighSolarOrHighLuminanceTillNextMorning'
                 // if shade is already on, then keep it on until next day when sun is up, otherwise check thresholds
                 if (SchedAllowsControl && IS_SHADED(state.dataSurface->SurfWinExtIntShadePrevTS(ISurf))) {
                     shadingOn = true;

@@ -31,7 +31,7 @@ Feedback collected during technicalities call also suggests not adding luminance
 
 ## Overview
 
-Three new `Shading Control Type` options in the `WindowShadingControl` object needs to be implemented: `OnIfHighLuminanceOrHighSolarTillMidnight`, `OnIfHighLuminanceOrHighSolarTillSunset`, `OnIfHighLuminanceOrHighSolarTillNextMorning`.
+Three new `Shading Control Type` options in the `WindowShadingControl` object needs to be implemented: `OnIfHighSolarOrHighLuminanceTillMidnight`, `OnIfHighSolarOrHighLuminanceTillSunset`, `OnIfHighSolarOrHighLuminanceTillNextMorning`.
 
 Two setpoints need to be specificd for this shading control option in the idf file. There are two existing setpoints fields in `WindowShadingControl` object:
 
@@ -61,7 +61,7 @@ In the meantime, we decide to continue using the daylighting objects (control an
 2. The shading control is based on three conditions
    1. Compare solar gain of the current timestep with setpoint. This is implemented in `WindowShadingManager` and shading will be turned on (by flags `shadingOn` and `shadingOffButGlareControlOn`) if solar is above setpoint. Otherwise, set shading flags to check for luminance in the next bullet point.
    2. Compare window view luminance to reference point of the current timestep with setpoint. This is implemented in `DayltgInteriorIllum`. If luminance is above setpoint and  do nothing because shades will only be turned off when it is the end of the day.
-   3. If window shading control is `HiLumin_HiSolar_OffMidNight`, check timestep of the day, if it is the first timestep of the day, reset window shading to off by `state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::ShadeOff`. This is also implemented in the same new function of `DayltgInteriorLumTillMidnight`.
+   3. If window shading control is `HiSolar_HiLumin_OffMidNight`, check timestep of the day, if it is the first timestep of the day, reset window shading to off by `state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::ShadeOff`. This is also implemented in the same new function of `DayltgInteriorLumTillMidnight`.
 
 ## Testing/Validation/Data Sources
 
@@ -76,7 +76,7 @@ Under 1.10.58 WindowShadingControl
 
 ## Input Description
 
-- Add three new `WindowShadingControl` options: `OnIfHighLuminanceOrHighSolarTillMidnight`, `OnIfHighLuminanceOrHighSolarTillSunset`, and `OnIfHighLuminanceOrHighSolarTillNextMorning`.
+- Add three new `WindowShadingControl` options: `OnIfHighSolarOrHighLuminanceTillMidnight`, `OnIfHighSolarOrHighLuminanceTillSunset`, and `OnIfHighSolarOrHighLuminanceTillNextMorning`.
 
 ## Outputs Description
 

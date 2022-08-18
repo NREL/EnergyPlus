@@ -4466,11 +4466,11 @@ The following control types can be used to reduce zone cooling load. They are ap
 
 The following three control types can be used to model human behavior of turning on shading during the day to reduce view luminance or solar gain and leaving shading on until a certain time point. They can only be used in zones with daylighting controls. Window view luminance at the first daylighting reference point is used to compare with luminance setpoint. They are applicable to any Shading Type except ExteriorScreen.
 
-\emph{OnIfHighLuminanceOrHighSolarTillMidnight:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till midnight.
+\emph{OnIfHighSolarOrHighLuminanceTillMidnight:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till midnight.
 
-\emph{OnIfHighLuminanceOrHighSolarTillSunset:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunset.
+\emph{OnIfHighSolarOrHighLuminanceTillSunset:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunset.
 
-\emph{OnIfHighLuminanceOrHighSolarTillNextMorning:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunrise next day.
+\emph{OnIfHighSolarOrHighLuminanceTillNextMorning:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunrise next day.
 
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-007}
@@ -4532,7 +4532,7 @@ This is the name of a schedule of slat angles that is used when Type of Slat Ang
 
 \paragraph{Field: Setpoint 2}\label{field-setpoint-2}
 
-Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, OnIfHighZoneAirTempAndHighHorizontalSolar, OnIfHighLuminanceOrHighSolarTillMidnight, OnIfHighLuminanceOrHighSolarTillSunset, and OnIfHighLuminanceOrHighSolarTillNextMorning.
+Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, OnIfHighZoneAirTempAndHighHorizontalSolar, OnIfHighSolarOrHighLuminanceTillMidnight, OnIfHighSolarOrHighLuminanceTillSunset, and OnIfHighSolarOrHighLuminanceTillNextMorning.
 
 \paragraph{Field: Daylighting Controls Object Name}\label{field-daylighting-controls-object-name}
 

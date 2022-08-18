@@ -1373,7 +1373,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
         "    1,                       !- Shading Control Sequence Number ",
         "    InteriorShade,       !- Shading Type ",
         "    SINGLEPANE WITH SHADE,    !- Construction with Shading Name ",
-        "    OnIfHighLuminanceOrHighSolarTillNextMorning,  !- Shading Control Type ",
+        "    OnIfHighSolarOrHighLuminanceTillNextMorning,  !- Shading Control Type ",
         "    ,                        !- Schedule Name ",
         "    94.64,                   !- Setpoint {W/m2, W or deg C} 30 btu/hr/ft2 = 94.64 W/m2 ",
         "    NO,                      !- Shading Control Is Scheduled ",
