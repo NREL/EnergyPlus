@@ -39,13 +39,13 @@ Two setpoints need to be specificd for this shading control option in the idf fi
   - W/m2 for solar-based controls
   - W for cooling- or heating-based controls
   - Degrees C for temperature-based controls
-- Setpoint2: only used for certain two-setpoint control types, in all existing cases listed below, the second setpoint is for solar:
+- Setpoint2: only used for certain two-setpoint control types.
   - `OnIfHighOutdoorAirTempAndHighSolarOnWindow`
   - `OnIfHighOutdoorAirTempAndHighHorizontalSolar`
   - `OnIfHighZoneAirTempAndHighSolarOnWindow`
   - `OnIfHighZoneAirTempAndHighHorizontalSolar`
 
-Based on the current setpoints setup, for the new control option, direct solar transmitted energy can be directly specified in `Setpoint`.
+Based on the current setpoints setup, for the new control option, direct solar transmitted energy can be directly specified in `Setpoint` (W/m2).
 
 To add a setpoint for luminance based control in the option to be implemented, we will be using the Setpoint2 field of `WindowShadingControl` object for the Zone luminance setpoint and expand the application of this field with "cd/m2 for luminance-based controls". We choose not to use `Daylighting:Control` object as this object is dedicated for illuminance based control and adding luminance based control would change its scope and cause confusion (for instance, we would not support luminance based electric lighting control).
 
@@ -53,30 +53,28 @@ In the meantime, we decide to continue using the daylighting objects (control an
 
 ## Approach
 
-1. In `GetDaylightingParametersInput` around `EnergyPlus\src\EnergyPlus\DaylightingManager.cc(4300)`, check if the zone using this new control method has daylighting reference points.
-2. In `WindowShadingManager` around `EnergyPlus\src\EnergyPlus\SolarShading.cc(9704)`, add new control options. Check solar setpoint in this case block.
-3. Around `\EnergyPlus\src\EnergyPlus\HeatBalanceSurfaceManager.cc(1040)`, add the new control name string in `WindowShadingControlTypeStr` vector.
-<!-- 4. Calculate and report a new output variable of `Daylighting Reference Point {} Luminance` in `EnergyPlus::DaylightingManager::DayltgInteriorIllum`, which is the sum of all window view luminance for a reference point. -->
-1. Implements the luminance based control in `EnergyPlus:DaylightingManager::DayltgInteriorIllum` so the updated luminance value is available for control in the same timestep.
-2. The shading control is based on three conditions
-   1. Compare solar gain of the current timestep with setpoint. This is implemented in `WindowShadingManager` and shading will be turned on (by flags `shadingOn` and `shadingOffButGlareControlOn`) if solar is above setpoint. Otherwise, set shading flags to check for luminance in the next bullet point.
-   2. Compare window view luminance to reference point of the current timestep with setpoint. This is implemented in `DayltgInteriorIllum`. If luminance is above setpoint and  do nothing because shades will only be turned off when it is the end of the day.
-   3. If window shading control is `HiSolar_HiLumin_OffMidNight`, check timestep of the day, if it is the first timestep of the day, reset window shading to off by `state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::ShadeOff`. This is also implemented in the same new function of `DayltgInteriorLumTillMidnight`.
+1. Expand enumerations `WindowShadingControlType` (`DataSurfaces.hh`) with new control types. Related variable `cValidWindowShadingControlTypes` (`SurfaceGeometry.cc`) is also updated.
+2. New state variable `state.dataEnvrn->SunIsUpPrevTS` is added for use in `OnIfHighSolarOrHighLuminanceTillNextMorning`.
+3. Add three new control options and non-luminance related control logic in `WindowShadingManager` (`SolarShading.cc`).
+4. Add luminance based shading control logic in `DayltgInteriorIllum` (`DaylightingManager.cc`)
 
+****
 ## Testing/Validation/Data Sources
 
-An example model to use these new shading control options and the result shading status time series and related solar gain and luminance value time series are to be compared to verify the shading is controlled as designed.
-
+Two unit tests are added:
+- `DaylightingManager_DayltgInteriorIllum_LuminanceShading_Test` tests luminance-based control in `DaylightingManager::DayltgInteriorIllum`
+- `WindowShadingManager_Lum_Test` tests control type selection and solar-based control in `SolarShading::WindowShadingManager`
 ## Input Output Reference Documentation
 
-Under 1.10.58 WindowShadingControl
+In `group-thermal-zone-description-geometry.tex`, Under `WindowShadingControl`
 
-- A paragraph describing this new window control method will be added under 1.10.58.1.6 Field: Shading Control Type. We need to emphasize that this control uses luminance measured at the first daylighting reference point.
-- The new control method name is to be added under 1.10.58.1.14 Field: setpoint 2.
+- Description of new control options are added to `Field: Shading Control Type`.
+- New control option names are added to `Field: setpoint 2`.
 
 ## Input Description
 
-- Add three new `WindowShadingControl` options: `OnIfHighSolarOrHighLuminanceTillMidnight`, `OnIfHighSolarOrHighLuminanceTillSunset`, and `OnIfHighSolarOrHighLuminanceTillNextMorning`.
+- Add three new `WindowShadingControl` `Shading Control Type` options: `OnIfHighSolarOrHighLuminanceTillMidnight`, `OnIfHighSolarOrHighLuminanceTillSunset`, and `OnIfHighSolarOrHighLuminanceTillNextMorning`.
+- Change units for `WindowShadingControl` `Setpoint 2` from 'W/m2 or deg C' to 'W/m2, deg C or cd/m2'.
 
 ## Outputs Description
 
@@ -84,7 +82,7 @@ N/A
 
 ## Example File and Transition Changes
 
-Instance of this new shading control method will be added to the existing window testing idf `WindowTests.idf`. No transition change is expected.
+Existing test file `WindowTests.idf` is updated with shading of two window surfaces control by `OnIfHighSolarOrHighLuminanceTillMidnight`, in which the luminance and solar set points for the newly added `WindowShadingControl` object follows typical threshold settings from 90.1 Appendix C. No transition change is expected.
 
 ## References
 
