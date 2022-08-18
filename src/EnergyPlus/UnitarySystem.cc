@@ -5186,7 +5186,7 @@ namespace UnitarySystems {
                         errFlag = false;
                         int childCCIndex = CoilCoolingDX::factory(state, ChildCoolingCoilName);
                         if (childCCIndex < 0) {
-                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                             errFlag = true;
                             errorsFound = true;
                         }

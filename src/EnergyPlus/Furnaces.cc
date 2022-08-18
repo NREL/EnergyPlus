@@ -2148,7 +2148,7 @@ namespace Furnaces {
                     std::string ChildCoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, IsNotOK);
                     std::string ChildCoolingCoilType = HVACHXAssistedCoolingCoil::GetHXDXCoilType(state, CoolingCoilType, CoolingCoilName, IsNotOK);
                     if (IsNotOK) {
-                        ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + Alphas(1));
+                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, Alphas(1)));
                         ErrorsFound = true;
                     }
 
@@ -2157,7 +2157,7 @@ namespace Furnaces {
 
                         int childCCIndex = CoilCoolingDX::factory(state, ChildCoolingCoilName);
                         if (childCCIndex < 0) {
-                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + Alphas(1));
+                            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, Alphas(1)));
                             errFlag = true;
                             ErrorsFound = true;
                         }
@@ -12624,22 +12624,16 @@ namespace Furnaces {
         auto &furnace = state.dataFurnaces->Furnace(FurnaceNum);
 
         // Set minimum OAT for heat pump compressor operation in heating mode
-        errFlag = false;
-        if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, furnace.CoolingCoilIndex, errFlag);
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
-
-            // 2021-10: Comment out the original line
-            // state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
-            //    DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
-
+        if (furnace.CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
+            furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, furnace.CoolingCoilIndex, errFlag);
+        } else if (furnace.CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
             std::string ChildCoolingCoilType = state.dataHVACAssistedCC->HXAssistedCoil(furnace.CoolingCoilIndex).CoolingCoilType;
             std::string ChildCoolingCoilName = state.dataHVACAssistedCC->HXAssistedCoil(furnace.CoolingCoilIndex).CoolingCoilName;
 
             if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
                 int childCCIndex_DX = CoilCoolingDX::factory(state, ChildCoolingCoilName);
                 if (childCCIndex_DX < 0) {
-                    ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + furnace.Name);
+                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, furnace.Name));
                     errFlag = true;
                     ErrorsFound = true;
                 }
@@ -12647,13 +12641,11 @@ namespace Furnaces {
                 furnace.MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
             } else if (UtilityRoutines::SameString(ChildCoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
                 int childCCIndex_VS = state.dataHVACAssistedCC->HXAssistedCoil(furnace.CoolingCoilIndex).CoolingCoilIndex;
-                state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
-                    VariableSpeedCoils::GetVSCoilMinOATCompressor(state, childCCIndex_VS, errFlag);
+                furnace.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, childCCIndex_VS, errFlag);
             } else { // Single speed
                 int childCCIndex_SP = state.dataHVACAssistedCC->HXAssistedCoil(furnace.CoolingCoilIndex).CoolingCoilIndex;
-                state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, childCCIndex_SP, errFlag);
+                furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, childCCIndex_SP, errFlag);
             }
-
         } else if (furnace.CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
             furnace.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, furnace.CoolingCoilIndex, errFlag);
         } else {
