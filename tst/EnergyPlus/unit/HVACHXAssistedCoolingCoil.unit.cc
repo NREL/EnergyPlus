@@ -684,12 +684,6 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_NewDXCoil_Processing_Test)
 {
 
     bool ErrorsFound(false);
-    bool FirstHVACIteration(false);
-    Real64 Qsens_sys(0.0); // UnitarySystem delivered sensible capacity wrt zone
-    Real64 ZoneTemp(0.0);  // control zone temperature
-    int InletNode(0);      // UnitarySystem inlet node number
-    int OutletNode(0);     // UnitarySystem outlet node number
-    int ControlZoneNum(0); // index to control zone
 
     std::string const idf_objects = delimited_string({
         "Zone,",
@@ -1022,16 +1016,8 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_NewDXCoil_Processing_Test)
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
-    int AirLoopNum = 0;
-    int CompIndex = 0;
-    bool HeatingActive = false;
-    bool CoolingActive = false;
-    int OAUnitNum = 0;
-    Real64 OAUCoilOutTemp = 0.0;
     std::string compName = "GASHEAT DXAC FURNACE 1";
     bool zoneEquipment = true;
-    Real64 sensOut = 0.0;
-    Real64 latOut = 0.0;
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
