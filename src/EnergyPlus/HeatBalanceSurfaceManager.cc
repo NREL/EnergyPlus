@@ -2086,10 +2086,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         state.dataHeatBalFanSys->ZoneAirHumRatAvg(zoneNum) = state.dataEnvrn->OutHumRat;
         state.dataHeatBalFanSys->ZoneAirHumRat(zoneNum) = state.dataEnvrn->OutHumRat;
         state.dataHeatBalFanSys->ZoneAirHumRatOld(zoneNum) = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->SumHmAW(zoneNum) = 0.0;
-        state.dataHeatBalFanSys->SumHmARa(zoneNum) = 0.0;
-        state.dataHeatBalFanSys->SumHmARaW(zoneNum) = 0.0;
         state.dataHeatBalFanSys->TempTstatAir(zoneNum) = ZoneInitialTemp;
+    }
+    if (state.dataHeatBal->doSpaceHeatBalance) {
+        for (auto thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+            new (&thisSpaceHB) ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData();
+        }
     }
 
     // "Bulk" initializations of arrays sized to TotSurfaces
@@ -8273,23 +8275,17 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     // Update SumHmXXXX for non-window EMPD or HAMT surfaces
     if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
-
-        // these SumHmA* variables are only used for EMPD and HAMT and should be reset each time step
-        state.dataHeatBalFanSys->SumHmAW = 0.0;
-        state.dataHeatBalFanSys->SumHmARa = 0.0;
-        state.dataHeatBalFanSys->SumHmARaW = 0.0;
-
         for (int SurfNum : HTNonWindowSurfs) {
             auto const &surface(Surface(SurfNum));
             int ZoneNum = surface.Zone;
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
             if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
                 HeatBalanceHAMTManager::UpdateHeatBalHAMT(state, SurfNum);
 
                 Real64 const FD_Area_fac(state.dataMstBal->HMassConvInFD(SurfNum) * surface.Area);
 
-                state.dataHeatBalFanSys->SumHmAW(ZoneNum) +=
-                    FD_Area_fac * (state.dataMstBal->RhoVaporSurfIn(SurfNum) - state.dataMstBal->RhoVaporAirIn(SurfNum));
+                thisZoneHB.SumHmAW += FD_Area_fac * (state.dataMstBal->RhoVaporSurfIn(SurfNum) - state.dataMstBal->RhoVaporAirIn(SurfNum));
 
                 Real64 const MAT_zone(state.dataHeatBalFanSys->MAT(surface.Zone));
                 RhoAirZone = Psychrometrics::PsyRhoAirFnPbTdbW(
@@ -8309,10 +8305,9 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                   Psychrometrics::PsyRhFnTdbRhov(state, surfInTemp, state.dataMstBal->RhoVaporSurfIn(SurfNum), wsurf),
                                                   state.dataEnvrn->OutBaroPress);
 
-                state.dataHeatBalFanSys->SumHmARa(ZoneNum) += FD_Area_fac * RhoAirZone;
+                thisZoneHB.SumHmARa += FD_Area_fac * RhoAirZone;
 
-                state.dataHeatBalFanSys->SumHmARaW(ZoneNum) +=
-                    FD_Area_fac * state.dataMstBal->RhoVaporSurfIn(SurfNum); // old eq'n: FD_Area_fac * RhoAirZone * Wsurf;
+                thisZoneHB.SumHmARaW += FD_Area_fac * state.dataMstBal->RhoVaporSurfIn(SurfNum); // old eq'n: FD_Area_fac * RhoAirZone * Wsurf;
 
             } else if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
                 // need to calculate the amount of moisture that is entering or
@@ -8326,10 +8321,9 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                 MoistureBalanceEMPDManager::UpdateMoistureBalanceEMPD(state, SurfNum);
                 state.dataMstBal->RhoVaporSurfIn(SurfNum) = state.dataMstBalEMPD->RVSurface(SurfNum);
                 Real64 const FD_Area_fac(state.dataMstBal->HMassConvInFD(SurfNum) * surface.Area);
-                state.dataHeatBalFanSys->SumHmAW(ZoneNum) +=
-                    FD_Area_fac * (state.dataMstBal->RhoVaporSurfIn(SurfNum) - state.dataMstBal->RhoVaporAirIn(SurfNum));
+                thisZoneHB.SumHmAW += FD_Area_fac * (state.dataMstBal->RhoVaporSurfIn(SurfNum) - state.dataMstBal->RhoVaporAirIn(SurfNum));
                 Real64 const MAT_zone(state.dataHeatBalFanSys->MAT(ZoneNum));
-                state.dataHeatBalFanSys->SumHmARa(ZoneNum) +=
+                thisZoneHB.SumHmARa +=
                     FD_Area_fac *
                     Psychrometrics::PsyRhoAirFnPbTdbW(
                         state,
@@ -8340,7 +8334,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                       Psychrometrics::PsyRhFnTdbRhovLBnd0C(state, MAT_zone, state.dataMstBal->RhoVaporAirIn(SurfNum)),
                                                       state.dataEnvrn->OutBaroPress)); // surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C(
                 // surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
-                state.dataHeatBalFanSys->SumHmARaW(ZoneNum) += FD_Area_fac * state.dataMstBal->RhoVaporSurfIn(SurfNum);
+                thisZoneHB.SumHmARaW += FD_Area_fac * state.dataMstBal->RhoVaporSurfIn(SurfNum);
             }
         }
     }

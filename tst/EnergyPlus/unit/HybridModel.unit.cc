@@ -175,14 +175,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->ZoneLatentGainExceptPeople(1) = 0.0;
     state->dataHeatBalFanSys->SumLatentHTRadSys.allocate(1);
     state->dataHeatBalFanSys->SumLatentHTRadSys(1) = 0.0;
-    state->dataHeatBalFanSys->SumHmARaW.allocate(1);
-    state->dataHeatBalFanSys->SumHmARaW(1) = 0.0;
     state->dataHeatBalFanSys->SumConvHTRadSys.allocate(1);
     state->dataHeatBalFanSys->SumConvHTRadSys(1) = 0.0;
     state->dataHeatBalFanSys->SumConvPool.allocate(1);
     state->dataHeatBalFanSys->SumConvPool(1) = 0.0;
-    state->dataHeatBalFanSys->SumHmARa.allocate(1);
-    state->dataHeatBalFanSys->SumHmARa(1) = 0.0;
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.0;
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);

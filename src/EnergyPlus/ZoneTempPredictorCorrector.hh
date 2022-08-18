@@ -155,6 +155,12 @@ namespace ZoneTempPredictorCorrector {
         Real64 SumSysMCpT = 0.0; // Sum of air system MassFlowRate*Cp*T
         Real64 SumIntGainExceptPeople = 0.0;
 
+        // Moisture variables to carry info from HB to the Zone Temp Predictor-Corrector for Fan System
+        Real64 SumHmAW = 0.0;   // SUM OF ZONE AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
+        Real64 SumHmARa = 0.0;  // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
+        Real64 SumHmARaW = 0.0; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ration
+        Real64 SumHmARaZ = 0.0;
+
         void CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac);
         void UpdateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,

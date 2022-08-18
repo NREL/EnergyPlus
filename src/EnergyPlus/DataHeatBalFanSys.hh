@@ -193,12 +193,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> RadSysToHBTinCoef;   // Outside heat balance coefficient that modifies Toutside
     Array1D<Real64> RadSysToHBQsrcCoef;  // Outside heat balance coefficient that modifies source/sink
 
-    // Moisture variables to carry info from HB to the Zone Temp Predictor-Corrector for Fan System
-    Array1D<Real64> SumHmAW;   // SUM OF ZONE AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
-    Array1D<Real64> SumHmARa;  // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
-    Array1D<Real64> SumHmARaW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ration
-    Array1D<Real64> SumHmARaZ;
-
     Array1D<Real64> TempZoneThermostatSetPoint;
     Array1D<Real64> AdapComfortCoolingSetPoint;
     Array1D<Real64> ZoneThermostatSetPointHi;
