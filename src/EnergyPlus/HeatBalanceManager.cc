@@ -327,6 +327,8 @@ namespace HeatBalanceManager {
 
         GetBuildingData(state, ErrorsFound); // Read building data from input file
 
+        GetIncidentSolarMultiplier(state, ErrorsFound);
+
         // Added SV 6/26/2013 to load scheduled surface gains
         GetScheduledSurfaceGains(state, ErrorsFound);
 
@@ -4961,6 +4963,8 @@ namespace HeatBalanceManager {
 
         state.dataHeatBal->Zone.allocate(state.dataGlobal->NumOfZones);
         state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
+        // always allocate as the data structure is needed in output variable Zone Heat Index, Zone Humidity Index
+        state.dataHeatBal->Resilience.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;
 
@@ -5171,6 +5175,100 @@ namespace HeatBalanceManager {
 
         // Now get Space data after Zones are set up, because Space is optional, Zones are not
         GetSpaceData(state, ErrorsFound);
+    }
+
+    void GetIncidentSolarMultiplier(EnergyPlusData &state, bool &ErrorsFound)
+    {
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        cCurrentModuleObject = "SurfaceProperty:IncidentSolarMultiplier";
+
+        static constexpr std::string_view RoutineName("GetIncidentSolarMultiplier: ");
+
+        state.dataSurface->TotSurfIncSolMultiplier = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+        if (state.dataSurface->TotSurfIncSolMultiplier <= 0) return;
+
+        if (!allocated(state.dataSurface->SurfIncSolMultiplier)) {
+            // could be extended to interior surfaces later
+            state.dataSurface->SurfIncSolMultiplier.allocate(state.dataSurface->TotSurfaces);
+        }
+
+        int NumAlpha;
+        int NumNumeric;
+        int IOStat;
+        for (int Loop = 1; Loop <= state.dataSurface->TotSurfIncSolMultiplier; ++Loop) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     Loop,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumeric,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                ShowContinueError(
+                    state,
+                    "...each SurfaceProperty:IncidentSolarMultiplier name must not duplicate other SurfaceProperty:IncidentSolarMultiplier name");
+                continue;
+            }
+
+            // Assign surface number
+            int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
+            if (SurfNum == 0) {
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(1) + " has been found.");
+                ShowContinueError(state,
+                                  state.dataIPShortCut->cAlphaFieldNames(1) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                      "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
+                ErrorsFound = true;
+                continue;
+            }
+            auto &Surf = state.dataSurface->Surface(SurfNum);
+            if (Surf.Class != DataSurfaces::SurfaceClass::Window) {
+                ShowSevereError(state, "IncidentSolarMultiplier defined for non-window surfaces");
+                ErrorsFound = true;
+                continue;
+            }
+            if (Surf.ExtBoundCond != DataSurfaces::ExternalEnvironment) {
+                ShowSevereError(state, "IncidentSolarMultiplier defined for interior surfaces");
+                ErrorsFound = true;
+                continue;
+            }
+            int ConstrNum = Surf.Construction;
+            auto const &Constr = state.dataConstruction->Construct(ConstrNum);
+            int MaterNum = Constr.LayerPoint(Constr.TotLayers);
+            auto const &Mat = state.dataMaterial->Material(MaterNum);
+            bool withNoncompatibleShades =
+                (Mat.Group == DataHeatBalance::MaterialGroup::Shade || Mat.Group == DataHeatBalance::MaterialGroup::WindowBlind ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::Screen || Mat.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer ||
+                 Mat.Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer || Surf.HasShadeControl);
+            if (withNoncompatibleShades) {
+                ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
+                ErrorsFound = true;
+                continue;
+            }
+            int ScheduleIdx = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+            // Schedule not found but schedule field is not empty, user had the wrong schedule name
+            if (ScheduleIdx == 0 && !(state.dataIPShortCut->cAlphaArgs(2).empty())) {
+                ShowSevereError(state, "Invalid Incident Solar Multiplier Schedule Name in SurfaceProperty:IncidentSolarMultiplier");
+                continue;
+            }
+            Surf.hasIncSolMultiplier = true;
+            auto &SurfIncSolMult = state.dataSurface->SurfIncSolMultiplier(SurfNum);
+            SurfIncSolMult.Name = state.dataIPShortCut->cAlphaArgs(1);
+            SurfIncSolMult.SurfaceIdx = SurfNum;
+            SurfIncSolMult.Scaler = state.dataIPShortCut->rNumericArgs(1);
+            SurfIncSolMult.SchedPtr = ScheduleIdx;
+        }
     }
 
     void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound) // Error flag indicator (true if errors found)
@@ -6027,22 +6125,57 @@ namespace HeatBalanceManager {
         state.dataHeatBalMgr->LoadZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         // MassConservation.allocate( NumOfZones );
 
-        state.dataHeatBalFanSys->ZoneHeatIndex.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->ZoneHumidex.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->ZoneNumOcc.dimension(state.dataGlobal->NumOfZones, 0);
-        state.dataHeatBalFanSys->ZoneHeatIndexHourBins.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalFanSys->ZoneHumidexHourBins.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalFanSys->ZoneHumidexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalFanSys->ZoneCO2LevelHourBins.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalFanSys->ZoneLightingLevelHourBins.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->CrossedColdThreshRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotThermalReportPers);
+        state.dataHeatBalFanSys->CrossedHeatThreshRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotThermalReportPers);
+        state.dataHeatBalFanSys->CrossedColdThreshRepPeriod = false;
+        state.dataHeatBalFanSys->CrossedHeatThreshRepPeriod = false;
+        if (state.dataWeatherManager->TotThermalReportPers > 0) {
+            state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                             state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                     state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                 state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                           state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                   state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                               state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                               state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                          state.dataWeatherManager->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                              state.dataWeatherManager->TotThermalReportPers);
+        }
 
-        state.dataHeatBalFanSys->ZoneOccPierceSET.dimension(state.dataGlobal->NumOfZones, 0);
-        state.dataHeatBalFanSys->ZoneOccPierceSETLastStep.dimension(state.dataGlobal->NumOfZones, 0);
-        state.dataHeatBalFanSys->ZoneLowSETHours.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalFanSys->ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
+        if (state.dataWeatherManager->TotCO2ReportPers > 0) {
+            state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotCO2ReportPers);
+            state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                state.dataWeatherManager->TotCO2ReportPers);
+            state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                    state.dataWeatherManager->TotCO2ReportPers);
+        }
+        if (state.dataWeatherManager->TotVisualReportPers > 0) {
+            state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                 state.dataWeatherManager->TotVisualReportPers);
+            state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                     state.dataWeatherManager->TotVisualReportPers);
+            state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
+                                                                                         state.dataWeatherManager->TotVisualReportPers);
+        }
+
+        state.dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotThermalReportPers);
+        state.dataHeatBalFanSys->ZoneHighSETHoursRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotThermalReportPers);
+        state.dataHeatBalFanSys->lowSETLongestHoursRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotThermalReportPers);
+        state.dataHeatBalFanSys->highSETLongestHoursRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotThermalReportPers);
+        state.dataHeatBalFanSys->lowSETLongestStartRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotThermalReportPers);
+        state.dataHeatBalFanSys->highSETLongestStartRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotThermalReportPers);
 
         state.dataHeatBalMgr->CountWarmupDayPoints = 0;
 
@@ -6443,19 +6576,11 @@ namespace HeatBalanceManager {
 
     void UpdateWindowFaceTempsNonBSDFWin(EnergyPlusData &state)
     {
-
-        int SurfNum;
-
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            auto &thisSurface(state.dataSurface->Surface(SurfNum));
-            if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
-                auto &thisConstruct(thisSurface.Construction);
-                if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
-                    state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, 1) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
-                    state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, state.dataConstruction->Construct(thisConstruct).TotLayers) =
-                        state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
-                }
-            }
+        for (int SurfNum : state.dataSurface->AllHTWindowSurfaceList) {
+            auto &thisConstruction = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction);
+            if (thisConstruction.WindowTypeBSDF) continue;
+            state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, 1) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+            state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, thisConstruction.TotLayers) = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
         }
     }
 

@@ -1466,6 +1466,7 @@ namespace UnitarySystems {
         Real64 SumOfMassFlowRateMax(0.0); // the sum of zone inlet mass flow rates
         int ZoneInletNodeNum(0);          // zone inlet nodes node number
         Real64 minNoLoadFlow;             // used for sizing MaxNoCoolHeatVolFlow for SingleZoneVAV method
+        Real64 dummy(0.0);
         //////////// hoisted into namespace ////////////////////////////////////////////////
         // static int NumUnitarySystemsSized( 0 ); // counter used to delete UnitarySystemNumericFields array after last system is sized
         ////////////////////////////////////////////////////////////////////////////////////
@@ -3051,7 +3052,7 @@ namespace UnitarySystems {
                                                                 this->m_CoolingCoilIndex,
                                                                 this->m_CoolingCoilSensDemand,
                                                                 this->m_CoolingCoilLatentDemand,
-                                                                0,
+                                                                0.0,
                                                                 0.0,
                                                                 this->m_MaxONOFFCyclesperHour,
                                                                 this->m_HPTimeConstant,
@@ -3065,8 +3066,7 @@ namespace UnitarySystems {
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 this->m_DesignCoolingCapacity = DataSizing::AutoSize;
-                if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
-                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP)
+                if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP)
                     EqSizing.DesHeatingLoad = state.dataSize->DataConstantUsedForSizing;
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP) {
                 WaterToAirHeatPump::SimWatertoAirHP(state,
@@ -3131,6 +3131,47 @@ namespace UnitarySystems {
                 state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 this->m_DesignHeatingCapacity = DataSizing::AutoSize;
+            } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
+                WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
+                                                                blankString,
+                                                                this->m_HeatingCoilIndex,
+                                                                this->m_HeatingCoilSensDemand,
+                                                                dummy,
+                                                                0.0,
+                                                                0.0,
+                                                                this->m_MaxONOFFCyclesperHour,
+                                                                this->m_HPTimeConstant,
+                                                                this->m_FanDelayTime,
+                                                                DataHVACGlobals::CompressorOperation::Off,
+                                                                0.0,
+                                                                FirstHVACIteration);
+                state.dataSize->DataConstantUsedForSizing = WaterToAirHeatPumpSimple::GetCoilCapacity(
+                    state, DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num), this->m_HeatingCoilName, ErrFound);
+                EqSizing.DesHeatingLoad = state.dataSize->DataConstantUsedForSizing;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
+                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                this->m_DesignHeatingCapacity = DataSizing::AutoSize;
+                if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple)
+                    // adjusted cooling coil capacity
+                    WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
+                                                                    blankString,
+                                                                    this->m_CoolingCoilIndex,
+                                                                    this->m_CoolingCoilSensDemand,
+                                                                    this->m_CoolingCoilLatentDemand,
+                                                                    0.0,
+                                                                    0.0,
+                                                                    this->m_MaxONOFFCyclesperHour,
+                                                                    this->m_HPTimeConstant,
+                                                                    this->m_FanDelayTime,
+                                                                    DataHVACGlobals::CompressorOperation::Off,
+                                                                    0.0,
+                                                                    FirstHVACIteration);
+                state.dataSize->DataConstantUsedForSizing = WaterToAirHeatPumpSimple::GetCoilCapacity(
+                    state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
+                EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
+                SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+                this->m_DesignCoolingCapacity = DataSizing::AutoSize;
             }
 
             TempSize = this->m_DesignHeatingCapacity;
