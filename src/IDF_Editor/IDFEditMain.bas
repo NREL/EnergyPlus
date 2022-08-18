@@ -694,7 +694,7 @@ convUnits(59).siName = "eV"
 convUnits(60).siName = "percent"
 convUnits(61).siName = "percentage (as a real decimal)"
 convUnits(62).siName = "s"
-convUnits(63).siName = "W/m2 or deg C"
+convUnits(63).siName = "W/m2, deg C or cd/m2"
 convUnits(64).siName = "W/m2, W or deg C"
 convUnits(65).siName = "1/K"
 convUnits(66).siName = "J/m2-K"
@@ -2440,7 +2440,7 @@ End Sub
 '     WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
 '     the specific language governing rights and limitations under the License.
 '
-'     Copyright © 1996-2014 GARD Analytics.  All rights reserved.
+'     Copyright ï¿½ 1996-2014 GARD Analytics.  All rights reserved.
 '
 '     NOTICE: The U.S. Government is granted for itself and others acting on its
 '     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

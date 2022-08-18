@@ -1381,7 +1381,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
         "    ,                        !- Shading Device Material Name ",
         "    ,                        !- Type of Slat Angle Control for Blinds ",
         "    ,                        !- Slat Angle Schedule Name ",
-        "    2000,                    !- Setpoint 2 {W/m2 or deg C} ",
+        "    2000,                    !- Setpoint 2 {W/m2, deg C or cd/m2} ",
         "    East Zone_DaylCtrl,   !- Daylighting Control Object Name ",
         "    Group,                   !- Multiple Surface Control Type ",
         "    Zn001:Wall001:Win001;    !- Fenestration Surface ",
