@@ -127,7 +127,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.6;
+  Version,22.2;
 
   Building,
     NONE,                    !- Name
@@ -1125,7 +1125,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     WEST ZONE Infil 1,       !- Name
-    WEST ZONE,               !- Zone or ZoneList Name
+    WEST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.01,                    !- Design Flow Rate {m3/s}
@@ -1139,7 +1139,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     EAST ZONE Infil 1,       !- Name
-    EAST ZONE,               !- Zone or ZoneList Name
+    EAST ZONE,               !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.01,                    !- Design Flow Rate {m3/s}
@@ -1153,7 +1153,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     NORTH ZONE Infil 1,      !- Name
-    NORTH ZONE,              !- Zone or ZoneList Name
+    NORTH ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.01,                    !- Design Flow Rate {m3/s}
