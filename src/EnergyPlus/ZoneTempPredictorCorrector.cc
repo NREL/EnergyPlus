@@ -3465,18 +3465,6 @@ void PredictSystemLoads(EnergyPlusData &state,
     using RoomAirModelAirflowNetwork::LoadPredictionRoomAirModelAirflowNetwork;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 TempDepCoef; // Formerly CoefSumha
-    Real64 TempIndCoef; // Formerly CoefSumhat
-    Real64 AirCap;      // Formerly CoefAirrat
-    Real64 TempHistoryTerm;
-    int I;
-    int Itemp;
-    Real64 SetpointOffset;
-    int RoomAirNode;
-    int LoopNode;
-    Real64 RAFNFrac;
-
     auto &Zone = state.dataHeatBal->Zone;
     auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone;
     auto &TempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint;
@@ -3519,9 +3507,9 @@ void PredictSystemLoads(EnergyPlusData &state,
             }
             // Determine either cooling or heating
             if (StageControlledZone(RelativeZoneNum).CoolSetPoint < ZoneT) { // Cooling
-                SetpointOffset = ZoneT - StageControlledZone(RelativeZoneNum).CoolSetPoint;
-                Itemp = 0;
-                for (I = 1; I <= StageControlledZone(RelativeZoneNum).NumOfCoolStages; ++I) {
+                Real64 SetpointOffset = ZoneT - StageControlledZone(RelativeZoneNum).CoolSetPoint;
+                int Itemp = 0;
+                for (int I = 1; I <= StageControlledZone(RelativeZoneNum).NumOfCoolStages; ++I) {
                     if (SetpointOffset >= StageControlledZone(RelativeZoneNum).CoolTOffset(I)) {
                         Itemp = -I;
                     }
@@ -3536,9 +3524,9 @@ void PredictSystemLoads(EnergyPlusData &state,
                 }
                 ZoneThermostatSetPointLo(ActualZoneNum) = ZoneThermostatSetPointHi(ActualZoneNum);
             } else if (StageControlledZone(RelativeZoneNum).HeatSetPoint > ZoneT) { // heating
-                SetpointOffset = ZoneT - StageControlledZone(RelativeZoneNum).HeatSetPoint;
-                Itemp = 0;
-                for (I = 1; I <= StageControlledZone(RelativeZoneNum).NumOfHeatStages; ++I) {
+                Real64 SetpointOffset = ZoneT - StageControlledZone(RelativeZoneNum).HeatSetPoint;
+                int Itemp = 0;
+                for (int I = 1; I <= StageControlledZone(RelativeZoneNum).NumOfHeatStages; ++I) {
                     if (std::abs(SetpointOffset) >= std::abs(StageControlledZone(RelativeZoneNum).HeatTOffset(I))) {
                         Itemp = I;
                     }
@@ -3702,8 +3690,8 @@ void PredictSystemLoads(EnergyPlusData &state,
             PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) *
             PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
-        AirCap = AIRRAT(ZoneNum);
-        RAFNFrac = 0.0;
+        Real64 AirCap = AIRRAT(ZoneNum);
+        Real64 RAFNFrac = 0.0;
 
         // Calculate the various heat balance sums
 
@@ -3718,49 +3706,49 @@ void PredictSystemLoads(EnergyPlusData &state,
             thisZoneHB.SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
         }
 
-        TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp;
-        TempIndCoef = thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT +
-                      state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
+        thisZoneHB.TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp;
+        thisZoneHB.TempIndCoef = thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT +
+                                 state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) {
-            TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
-            TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
-            TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
+            thisZoneHB.TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+            TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + thisZoneHB.TempDepCoef;
+            TempIndZnLd(ZoneNum) = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
         } else if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
             // UCSD displacement ventilation model - make dynamic term independent of TimeStepSys
-            TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
-            TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
-            TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
+            thisZoneHB.TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+            TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + thisZoneHB.TempDepCoef;
+            TempIndZnLd(ZoneNum) = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
         } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
             // UCSD UFAD model - make dynamic term independent of TimeStepSys
-            TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
-            TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
-            TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
+            thisZoneHB.TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+            TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + thisZoneHB.TempDepCoef;
+            TempIndZnLd(ZoneNum) = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
         } else if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             // RoomAirflowNetworkModel - make dynamic term independent of TimeStepSys
             if (RoomAirflowNetworkZoneInfo(ZoneNum).IsUsed) {
-                RoomAirNode = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
+                int RoomAirNode = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
                 LoadPredictionRoomAirModelAirflowNetwork(state, ZoneNum, RoomAirNode);
-                TempDepCoef =
+                thisZoneHB.TempDepCoef =
                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHA + RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMCp;
-                TempIndCoef = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain +
-                              RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHATsurf -
-                              RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHATref +
-                              RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMCpT +
-                              RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SysDepZoneLoadsLagged;
+                thisZoneHB.TempIndCoef = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain +
+                                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHATsurf -
+                                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumHATref +
+                                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumLinkMCpT +
+                                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SysDepZoneLoadsLagged;
                 AirCap = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirVolume * Zone(ZoneNum).ZoneVolCapMultpSens *
                          RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir * RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir /
                          (TimeStepSys * DataGlobalConstants::SecInHour);
                 AIRRAT(ZoneNum) = AirCap;
-                TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
-                TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
-                TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
+                thisZoneHB.TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+                TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + thisZoneHB.TempDepCoef;
+                TempIndZnLd(ZoneNum) = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HasHVACAssigned)
                     RAFNFrac = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HVAC(1).SupplyFraction;
             }
         } else { // other imperfectly mixed room models
-            TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
-            TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
-            TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
+            thisZoneHB.TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+            TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + thisZoneHB.TempDepCoef;
+            TempIndZnLd(ZoneNum) = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
         }
 
         // Exact solution or Euler method
@@ -3771,7 +3759,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                     thisZoneHB.ZoneT1 = thisZoneHB.ZoneTM2;
                     thisZoneHB.ZoneW1 = thisZoneHB.ZoneWM2;
                     if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
-                        for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
+                        for (int LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
                                 RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTM2;
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatW1 =
@@ -3782,7 +3770,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                     thisZoneHB.ZoneT1 = thisZoneHB.ZoneTMX;
                     thisZoneHB.ZoneW1 = thisZoneHB.ZoneWMX;
                     if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
-                        for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
+                        for (int LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
                                 RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX;
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatW1 =
@@ -3795,14 +3783,14 @@ void PredictSystemLoads(EnergyPlusData &state,
                 thisZoneHB.ZoneT1 = state.dataHeatBalFanSys->ZT(ZoneNum);
                 thisZoneHB.ZoneW1 = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
                 if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
-                    for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
+                    for (int LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTemp;
                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatW1 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRat;
                     }
                 }
             }
-            TempDepZnLd(ZoneNum) = TempDepCoef;
-            TempIndZnLd(ZoneNum) = TempIndCoef;
+            TempDepZnLd(ZoneNum) = thisZoneHB.TempDepCoef;
+            TempIndZnLd(ZoneNum) = thisZoneHB.TempIndCoef;
         }
 
         // Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
@@ -4850,20 +4838,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
     using ScheduleManager::GetScheduleMaxValue;
     using ScheduleManager::GetScheduleMinValue;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CorrectZoneAirTemp");
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 CpAir;               // specific heat of air
-    Real64 ZoneEnthalpyIn(0.0); // Zone inlet air enthalpy
-    Real64 TempDepCoef(0.0);    // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
-    Real64 TempIndCoef(0.0);    // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-    Real64 AirCap(0.0);         // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"
-    Real64 SNLoad(0.0);         // Sensible load calculated for zone in watts and then loaded in report variables
-    int ZoneNodeNum(0);         // System node number for air flow through zone either by system or as a plenum
-
-    Real64 TempSupplyAir;
-    Real64 ZoneMult;
 
     // Initializations
     ZoneTempChange = DataPrecisionGlobals::constant_zero;
@@ -4885,7 +4860,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         auto &thisZT = state.dataHeatBalFanSys->ZT(ZoneNum);
 
-        ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+        Real64 ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
 
         // update the variables actually used in the balance equations.
         if (!UseZoneTimeStepHistory) {
@@ -4910,7 +4885,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
                           PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, ZoneAirHumRat(ZoneNum), RoutineName) *
                           PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
-        AirCap = AIRRAT(ZoneNum);
+        Real64 AirCap = AIRRAT(ZoneNum);
 
         ManageAirModel(state, ZoneNum);
 
@@ -4923,43 +4898,44 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         }
 
         //    ZoneTempHistoryTerm = (3.0D0 * ZTM1(ZoneNum) - (3.0D0/2.0D0) * ZTM2(ZoneNum) + (1.0D0/3.0D0) * ZTM3(ZoneNum))
-        ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
+        int ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
 
-        SNLoad = 0.0;
+        Real64 SNLoad = 0.0;
 
         if (ZoneNodeNum > 0) { // This zone is controlled by a zone equipment configuration or zone plenum
 
             // Heat balance coefficients for controlled zone, i.e. with system air flow
-            TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp + thisZoneHB.SumSysMCp;
-            TempIndCoef =
+            thisZoneHB.TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp + thisZoneHB.SumSysMCp;
+            thisZoneHB.TempIndCoef =
                 thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT + thisZoneHB.SumSysMCpT +
                 (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
             //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
             if (state.afn->distribution_simulated) {
-                TempIndCoef += state.afn->exchangeData(ZoneNum).TotalSen;
+                thisZoneHB.TempIndCoef += state.afn->exchangeData(ZoneNum).TotalSen;
             }
-            //    TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
-            //    TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
+            //    TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + thisZoneHB.TempDepCoef
+            //    TempIndZnLd(ZoneNum) = TempHistoryTerm + thisZoneHB.TempIndCoef
             // Solve for zone air temperature
             switch (ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-                thisZT = (TempIndCoef + AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
-                                                  (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
-                                                  (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3)) /
-                         ((11.0 / 6.0) * AirCap + TempDepCoef);
+                thisZT = (thisZoneHB.TempIndCoef + AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
+                                                             (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
+                                                             (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3)) /
+                         ((11.0 / 6.0) * AirCap + thisZoneHB.TempDepCoef);
                 // Exact solution
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
-                if (TempDepCoef == 0.0) { // B=0
-                    thisZT = thisZoneHB.ZoneT1 + TempIndCoef / AirCap;
+                if (thisZoneHB.TempDepCoef == 0.0) { // B=0
+                    thisZT = thisZoneHB.ZoneT1 + thisZoneHB.TempIndCoef / AirCap;
                 } else {
-                    thisZT =
-                        (thisZoneHB.ZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
+                    thisZT = (thisZoneHB.ZoneT1 - thisZoneHB.TempIndCoef / thisZoneHB.TempDepCoef) *
+                                 std::exp(min(700.0, -thisZoneHB.TempDepCoef / AirCap)) +
+                             thisZoneHB.TempIndCoef / thisZoneHB.TempDepCoef;
                 }
             } break;
             case DataHeatBalance::SolutionAlgo::EulerMethod: {
-                thisZT = (AirCap * thisZoneHB.ZoneT1 + TempIndCoef) / (AirCap + TempDepCoef);
+                thisZT = (AirCap * thisZoneHB.ZoneT1 + thisZoneHB.TempIndCoef) / (AirCap + thisZoneHB.TempDepCoef);
             } break;
             default:
                 break;
@@ -4974,7 +4950,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             } else if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
                 // UCSDDV: Not fully mixed - calculate factor to correct load for fully mixed assumption
                 if (thisZoneHB.SumSysMCp > SmallMassFlow) {
-                    TempSupplyAir = thisZoneHB.SumSysMCpT / thisZoneHB.SumSysMCp; // Non-negligible flow, calculate supply air temperature
+                    Real64 TempSupplyAir = thisZoneHB.SumSysMCpT / thisZoneHB.SumSysMCp; // Non-negligible flow, calculate supply air temperature
                     if (std::abs(TempSupplyAir - thisZT) > state.dataHeatBal->TempConvergTol) {
                         state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - thisZT);
                         // constrain value to something reasonable
@@ -4991,7 +4967,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             } else if (AirModel(ZoneNum).SimAirModel && ((AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UserDefined) ||
                                                          (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mundt))) {
                 if (thisZoneHB.SumSysMCp > SmallMassFlow) {
-                    TempSupplyAir = thisZoneHB.SumSysMCpT / thisZoneHB.SumSysMCp; // Non-negligible flow, calculate supply air temperature
+                    Real64 TempSupplyAir = thisZoneHB.SumSysMCpT / thisZoneHB.SumSysMCp; // Non-negligible flow, calculate supply air temperature
                     if (std::abs(TempSupplyAir - thisZT) > state.dataHeatBal->TempConvergTol) {
                         state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - thisZT);
                         // constrain value
@@ -5018,8 +4994,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             }
 
             // Sensible load is the enthalpy into the zone minus the enthalpy that leaves the zone.
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-            ZoneEnthalpyIn = thisZoneHB.SumSysMCpT;
+            Real64 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+            Real64 ZoneEnthalpyIn = thisZoneHB.SumSysMCpT;
 
             // SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
             SNLoad = ZoneEnthalpyIn - (Node(ZoneNodeNum).MassFlowRate / ZoneMult) * CpAir * Node(ZoneNodeNum).Temp +
@@ -5028,36 +5004,37 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         } else {
 
             // Heat balance coefficients for uncontrolled zone, i.e. without system air flow
-            TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp;
-            TempIndCoef = thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT;
+            thisZoneHB.TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp;
+            thisZoneHB.TempIndCoef = thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT;
 
             //      TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
             if (state.afn->distribution_simulated) {
-                TempIndCoef += state.afn->exchangeData(ZoneNum).TotalSen;
+                thisZoneHB.TempIndCoef += state.afn->exchangeData(ZoneNum).TotalSen;
             }
-            //      TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + TempDepCoef
-            //      TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
+            //      TempDepZnLd(ZoneNum) = (11.0/6.0) * AirCap + thisZoneHB.TempDepCoef
+            //      TempIndZnLd(ZoneNum) = TempHistoryTerm + thisZoneHB.TempIndCoef
 
             // Solve for zone air temperature
             switch (ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-                thisZT = (TempIndCoef + AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
-                                                  (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
-                                                  (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3)) /
-                         ((11.0 / 6.0) * AirCap + TempDepCoef);
+                thisZT = (thisZoneHB.TempIndCoef + AirCap * (3.0 * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM1 -
+                                                             (3.0 / 2.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM2 +
+                                                             (1.0 / 3.0) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTM3)) /
+                         ((11.0 / 6.0) * AirCap + thisZoneHB.TempDepCoef);
                 // Exact solution
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
-                if (TempDepCoef == 0.0) { // B=0
-                    thisZT = thisZoneHB.ZoneT1 + TempIndCoef / AirCap;
+                if (thisZoneHB.TempDepCoef == 0.0) { // B=0
+                    thisZT = thisZoneHB.ZoneT1 + thisZoneHB.TempIndCoef / AirCap;
                 } else {
-                    thisZT =
-                        (thisZoneHB.ZoneT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
+                    thisZT = (thisZoneHB.ZoneT1 - thisZoneHB.TempIndCoef / thisZoneHB.TempDepCoef) *
+                                 std::exp(min(700.0, -thisZoneHB.TempDepCoef / AirCap)) +
+                             thisZoneHB.TempIndCoef / thisZoneHB.TempDepCoef;
                 }
             } break;
             case DataHeatBalance::SolutionAlgo::EulerMethod: {
-                thisZT = (AirCap * thisZoneHB.ZoneT1 + TempIndCoef) / (AirCap + TempDepCoef);
+                thisZT = (AirCap * thisZoneHB.ZoneT1 + thisZoneHB.TempIndCoef) / (AirCap + thisZoneHB.TempDepCoef);
             } break;
             default:
                 break;
@@ -5158,8 +5135,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
         CalcZoneComponentLoadSums(state,
                                   ZoneNum,
-                                  TempDepCoef,
-                                  TempIndCoef,
+                                  thisZoneHB.TempDepCoef,
+                                  thisZoneHB.TempIndCoef,
                                   state.dataHeatBal->ZnAirRpt(ZoneNum).SumIntGains,
                                   state.dataHeatBal->ZnAirRpt(ZoneNum).SumHADTsurfs,
                                   state.dataHeatBal->ZnAirRpt(ZoneNum).SumMCpDTzones,

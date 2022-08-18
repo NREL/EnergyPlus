@@ -161,6 +161,10 @@ namespace ZoneTempPredictorCorrector {
         Real64 SumHmARaW = 0.0; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ration
         Real64 SumHmARaZ = 0.0;
 
+        Real64 TempDepCoef = 0.0; // Temperature dependent coefficient
+        Real64 TempIndCoef = 0.0; // Temperature ndependent coefficient
+        Real64 TempHistoryTerm = 0.0;
+
         void CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac);
         void UpdateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,
