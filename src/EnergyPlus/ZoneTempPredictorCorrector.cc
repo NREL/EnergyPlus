@@ -3948,11 +3948,11 @@ void PredictSystemLoads(EnergyPlusData &state,
 
         // Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
         CalcPredictedSystemLoad(state, ZoneNum, RAFNFrac);
-        //if (state.dataHeatBal->doSpaceHeatBalance) {
-        //    for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-        //        state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).CalcSpacePredictedSystemLoad(state, spaceNum, RAFNFrac);
-        //    }
-        //}
+        // if (state.dataHeatBal->doSpaceHeatBalance) {
+        //     for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+        //         state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).CalcSpacePredictedSystemLoad(state, spaceNum, RAFNFrac);
+        //     }
+        // }
 
         // Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
         CalcPredictedHumidityRatio(state, ZoneNum, RAFNFrac);

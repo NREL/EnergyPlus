@@ -120,8 +120,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneAirHumRatAvg; // AIR Humidity Ratio averaged over the zone time step
     Array1D<Real64> ZoneAirHumRat;    // AIR Humidity Ratio
 
-    Array1D<Real64> ZoneAirHumRatTemp;   // Temp zone air humidity ratio at time plus 1
-    Array1D<Real64> ZoneAirHumRatOld;    // Last Time Steps Zone AIR Humidity Ratio
+    Array1D<Real64> ZoneAirHumRatTemp; // Temp zone air humidity ratio at time plus 1
+    Array1D<Real64> ZoneAirHumRatOld;  // Last Time Steps Zone AIR Humidity Ratio
 
     Array1D<Real64> MCPI;                       // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
     Array1D<Real64> MCPTI;                      // INFILTRATION MASS FLOW * AIR CP * AIR TEMPERATURE
