@@ -1066,6 +1066,8 @@ namespace HeatBalanceManager {
                     }
                 }
             }
+            state.dataHeatBal->doSpaceHeatBalanceSizing = static_cast<bool>(getYesNoValue(AlphaName(2)));
+            state.dataHeatBal->doSpaceHeatBalanceSimulation = static_cast<bool>(getYesNoValue(AlphaName(3)));
         } else {
             state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
@@ -1075,15 +1077,16 @@ namespace HeatBalanceManager {
             AlphaName(1) = "EulerMethod";
         }
 
-        state.dataHeatBal->doSpaceHeatBalanceSizing = static_cast<bool>(getYesNoValue(AlphaName(2)));
-        state.dataHeatBal->doSpaceHeatBalanceSimulation = static_cast<bool>(getYesNoValue(AlphaName(3)));
-
         // Write Solution Algorithm to the initialization output file for User Verification
-        constexpr const char *Format_726(
-            "! <Zone Air Solution Algorithm>, Algorithm {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}, Space Heat Balance\n");
+        constexpr const char *Format_726("! <Zone Air Solution Algorithm>, Algorithm {{ThirdOrderBackwardDifference | AnalyticalSolution | "
+                                         "EulerMethod}}, Space Heat Balance Sizing, Space Heat Balance Simulation\n");
         print(state.files.eio, Format_726);
-        constexpr const char *Format_727(" Zone Air Solution Algorithm, {}, {}\n");
-        print(state.files.eio, Format_727, AlphaName(1), AlphaName(2));
+        constexpr const char *Format_727(" Zone Air Solution Algorithm, {}, {}, {}\n");
+        print(state.files.eio,
+              Format_727,
+              AlphaName(1),
+              state.dataHeatBal->doSpaceHeatBalanceSizing ? "Yes" : "No",
+              state.dataHeatBal->doSpaceHeatBalanceSimulation ? "Yes" : "No");
 
         // A new object is added by L. Gu, 06/10
         state.dataHeatBalMgr->CurrentModuleObject = "ZoneAirContaminantBalance";
