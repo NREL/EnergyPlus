@@ -145,6 +145,16 @@ namespace ZoneTempPredictorCorrector {
         Real64 WZoneTimeMinus2Temp = 0.0; // Zone air humidity ratio at timestep T-2
         Real64 WZoneTimeMinus3Temp = 0.0; // Zone air humidity ratio at timestep T-3
 
+        Real64 SumIntGain = 0.0; // Sum of convective internal gains
+        Real64 SumHA = 0.0;      // Sum of Hc*Area
+        Real64 SumHATsurf = 0.0; // Sum of Hc*Area*Tsurf
+        Real64 SumHATref = 0.0;  // Sum of Hc*Area*Tref= 0.0; for ceiling diffuser convection correlation
+        Real64 SumMCp = 0.0;     // Sum of MassFlowRate*Cp
+        Real64 SumMCpT = 0.0;    // Sum of MassFlowRate*Cp*T
+        Real64 SumSysMCp = 0.0;  // Sum of air system MassFlowRate*Cp
+        Real64 SumSysMCpT = 0.0; // Sum of air system MassFlowRate*Cp*T
+        Real64 SumIntGainExceptPeople = 0.0;
+
         void CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac);
         void UpdateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,
@@ -257,14 +267,6 @@ namespace ZoneTempPredictorCorrector {
 
     void CalcZoneSums(EnergyPlusData &state,
                       int ZoneNum,              // Zone number
-                      Real64 &SumIntGain,       // Zone sum of convective internal gains
-                      Real64 &SumHA,            // Zone sum of Hc*Area
-                      Real64 &SumHATsurf,       // Zone sum of Hc*Area*Tsurf
-                      Real64 &SumHATref,        // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
-                      Real64 &SumMCp,           // Zone sum of MassFlowRate*Cp
-                      Real64 &SumMCpT,          // Zone sum of MassFlowRate*Cp*T
-                      Real64 &SumSysMCp,        // Zone sum of air system MassFlowRate*Cp
-                      Real64 &SumSysMCpT,       // Zone sum of air system MassFlowRate*Cp*T
                       bool CorrectorFlag = true // Corrector call flag
     );
 

@@ -3466,31 +3466,16 @@ void PredictSystemLoads(EnergyPlusData &state,
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 SumIntGain; // Zone sum of convective internal gains
-    Real64 SumHA;      // Zone sum of Hc*Area
-    Real64 SumHATsurf; // Zone sum of Hc*Area*Tsurf
-    Real64 SumHATref;  // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
-    Real64 SumMCp;     // Zone sum of MassFlowRate*Cp
-    Real64 SumMCpT;    // Zone sum of MassFlowRate*Cp*T
-    Real64 SumSysMCp;  // Zone sum of air system MassFlowRate*Cp
-    Real64 SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*
-    Real64 SumIntGainExceptPeople;
     Real64 TempDepCoef; // Formerly CoefSumha
     Real64 TempIndCoef; // Formerly CoefSumhat
     Real64 AirCap;      // Formerly CoefAirrat
     Real64 TempHistoryTerm;
-    // int ZoneNum;
-    // Real64 ZoneT; // Zone temperature at previous time step
-    // int RelativeZoneNum;
-    // int ActualZoneNum;
     int I;
     int Itemp;
     Real64 SetpointOffset;
     int RoomAirNode;
     int LoopNode;
     Real64 RAFNFrac;
-
-    SumIntGainExceptPeople = 0.0;
 
     auto &Zone = state.dataHeatBal->Zone;
     auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone;
@@ -3503,9 +3488,6 @@ void PredictSystemLoads(EnergyPlusData &state,
     auto &TempDepZnLd = state.dataZoneTempPredictorCorrector->TempDepZnLd;
     auto &TempIndZnLd = state.dataZoneTempPredictorCorrector->TempIndZnLd;
     auto &ZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand;
-    // auto &MAT = state.dataHeatBalFanSys->MAT;
-    // auto &ZoneT1 = state.dataHeatBalFanSys->ZoneT1;
-    auto &Node = state.dataLoopNodes->Node;
     auto &ZoneAirSolutionAlgo = state.dataHeatBal->ZoneAirSolutionAlgo;
     auto &AIRRAT = state.dataHeatBalFanSys->AIRRAT;
 
@@ -3726,11 +3708,22 @@ void PredictSystemLoads(EnergyPlusData &state,
         // Calculate the various heat balance sums
 
         // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-        CalcZoneSums(state, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, false);
+        CalcZoneSums(state, ZoneNum, false);
 
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+        Real64 &SumIntGain = thisZoneHB.SumIntGain; // Zone sum of convective internal gains
+        Real64 &SumHA = thisZoneHB.SumHA;           // Zone sum of Hc*Area
+        Real64 &SumHATsurf = thisZoneHB.SumHATsurf; // Zone sum of Hc*Area*Tsurf
+        Real64 &SumHATref = thisZoneHB.SumHATref;   // Zone sum of Hc*Area*Tref for ceiling diffuser convection correlation
+        Real64 &SumMCp = thisZoneHB.SumMCp;         // Zone sum of MassFlowRate*Cp
+        Real64 &SumMCpT = thisZoneHB.SumMCpT;       // Zone sum of MassFlowRate*Cp*T
+        Real64 &SumSysMCp = thisZoneHB.SumSysMCp;   // Zone sum of air system MassFlowRate*Cp
+        Real64 &SumSysMCpT = thisZoneHB.SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
+        Real64 &SumIntGainExceptPeople = thisZoneHB.SumIntGainExceptPeople;
+
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
         if (state.dataHybridModel->FlagHybridModel_PC) {
+            SumIntGainExceptPeople = 0.0;
             SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
         }
 
@@ -4871,23 +4864,13 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("CorrectZoneAirTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 CpAir;                       // specific heat of air
-    Real64 SumIntGain(0.0);             // Zone sum of convective internal gains
-    Real64 SumIntGainExceptPeople(0.0); // Zone sum of convective internal gains except for convective heat from people, HybridModel
-    Real64 SumHA(0.0);                  // Zone sum of Hc*Area
-    Real64 SumHATsurf(0.0);             // Zone sum of Hc*Area*Tsurf
-    Real64 SumHATref(0.0);              // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
-    Real64 SumMCp(0.0);                 // Zone sum of MassFlowRate*Cp
-    Real64 SumMCpT(0.0);                // Zone sum of MassFlowRate*Cp*T
-    Real64 SumSysMCp(0.0);              // Zone sum of air system MassFlowRate*Cp
-    Real64 SumSysMCpT(0.0);             // Zone sum of air system MassFlowRate*Cp*T
-    Real64 ZoneEnthalpyIn(0.0);         // Zone inlet air enthalpy
-    Real64 TempDepCoef(0.0);            // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
-    Real64 TempIndCoef(0.0);            // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-    Real64 AirCap(0.0);                 // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"
-    Real64 SNLoad(0.0);                 // Sensible load calculated for zone in watts and then loaded in report variables
-    // int ZoneNum(0);
-    int ZoneNodeNum(0); // System node number for air flow through zone either by system or as a plenum
+    Real64 CpAir;               // specific heat of air
+    Real64 ZoneEnthalpyIn(0.0); // Zone inlet air enthalpy
+    Real64 TempDepCoef(0.0);    // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
+    Real64 TempIndCoef(0.0);    // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
+    Real64 AirCap(0.0);         // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"
+    Real64 SNLoad(0.0);         // Sensible load calculated for zone in watts and then loaded in report variables
+    int ZoneNodeNum(0);         // System node number for air flow through zone either by system or as a plenum
 
     Real64 TempSupplyAir;
     Real64 ZoneMult;
@@ -4942,7 +4925,17 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         ManageAirModel(state, ZoneNum);
 
         // Calculate the various heat balance sums
-        CalcZoneSums(state, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+        CalcZoneSums(state, ZoneNum);
+
+        Real64 &SumIntGain = thisZoneHB.SumIntGain; // Zone sum of convective internal gains
+        Real64 &SumHA = thisZoneHB.SumHA;           // Zone sum of Hc*Area
+        Real64 &SumHATsurf = thisZoneHB.SumHATsurf; // Zone sum of Hc*Area*Tsurf
+        Real64 &SumHATref = thisZoneHB.SumHATref;   // Zone sum of Hc*Area*Tref for ceiling diffuser convection correlation
+        Real64 &SumMCp = thisZoneHB.SumMCp;         // Zone sum of MassFlowRate*Cp
+        Real64 &SumMCpT = thisZoneHB.SumMCpT;       // Zone sum of MassFlowRate*Cp*T
+        Real64 &SumSysMCp = thisZoneHB.SumSysMCp;   // Zone sum of air system MassFlowRate*Cp
+        Real64 &SumSysMCpT = thisZoneHB.SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
+        Real64 &SumIntGainExceptPeople = thisZoneHB.SumIntGainExceptPeople;
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
         if (state.dataHybridModel->FlagHybridModel_PC) {
@@ -6059,15 +6052,7 @@ void InverseModelHumidity(EnergyPlusData &state,
 }
 
 void CalcZoneSums(EnergyPlusData &state,
-                  int const ZoneNum,  // Zone number
-                  Real64 &SumIntGain, // Zone sum of convective internal gains
-                  Real64 &SumHA,      // Zone sum of Hc*Area
-                  Real64 &SumHATsurf, // Zone sum of Hc*Area*Tsurf
-                  Real64 &SumHATref,  // Zone sum of Hc*Area*Tref, for ceiling diffuser convection correlation
-                  Real64 &SumMCp,     // Zone sum of MassFlowRate*Cp
-                  Real64 &SumMCpT,    // Zone sum of MassFlowRate*Cp*T
-                  Real64 &SumSysMCp,  // Zone sum of air system MassFlowRate*Cp
-                  Real64 &SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
+                  int const ZoneNum, // Zone number
                   bool const CorrectorFlag)
 {
 
@@ -6090,6 +6075,17 @@ void CalcZoneSums(EnergyPlusData &state,
     // If Tref is not used at all, SumHATref = 0, and SumHA /= 0.
     // For future implementations, Tref can be easily converted into an array to
     // allow a different reference temperature to be specified for each surface.
+
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+
+    Real64 &SumIntGain = thisZoneHB.SumIntGain; // Zone sum of convective internal gains
+    Real64 &SumHA = thisZoneHB.SumHA;           // Zone sum of Hc*Area
+    Real64 &SumHATsurf = thisZoneHB.SumHATsurf; // Zone sum of Hc*Area*Tsurf
+    Real64 &SumHATref = thisZoneHB.SumHATref;   // Zone sum of Hc*Area*Tref for ceiling diffuser convection correlation
+    Real64 &SumMCp = thisZoneHB.SumMCp;         // Zone sum of MassFlowRate*Cp
+    Real64 &SumMCpT = thisZoneHB.SumMCpT;       // Zone sum of MassFlowRate*Cp*T
+    Real64 &SumSysMCp = thisZoneHB.SumSysMCp;   // Zone sum of air system MassFlowRate*Cp
+    Real64 &SumSysMCpT = thisZoneHB.SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
 
     SumHA = 0.0;
     SumHATsurf = 0.0;
