@@ -3711,24 +3711,16 @@ void PredictSystemLoads(EnergyPlusData &state,
         CalcZoneSums(state, ZoneNum, false);
 
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-        Real64 &SumIntGain = thisZoneHB.SumIntGain; // Zone sum of convective internal gains
-        Real64 &SumHA = thisZoneHB.SumHA;           // Zone sum of Hc*Area
-        Real64 &SumHATsurf = thisZoneHB.SumHATsurf; // Zone sum of Hc*Area*Tsurf
-        Real64 &SumHATref = thisZoneHB.SumHATref;   // Zone sum of Hc*Area*Tref for ceiling diffuser convection correlation
-        Real64 &SumMCp = thisZoneHB.SumMCp;         // Zone sum of MassFlowRate*Cp
-        Real64 &SumMCpT = thisZoneHB.SumMCpT;       // Zone sum of MassFlowRate*Cp*T
-        Real64 &SumSysMCp = thisZoneHB.SumSysMCp;   // Zone sum of air system MassFlowRate*Cp
-        Real64 &SumSysMCpT = thisZoneHB.SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
-        Real64 &SumIntGainExceptPeople = thisZoneHB.SumIntGainExceptPeople;
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
         if (state.dataHybridModel->FlagHybridModel_PC) {
-            SumIntGainExceptPeople = 0.0;
-            SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
+            thisZoneHB.SumIntGainExceptPeople = 0.0;
+            thisZoneHB.SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
         }
 
-        TempDepCoef = SumHA + SumMCp;
-        TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
+        TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp;
+        TempIndCoef = thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT +
+                      state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) {
             TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
             TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
@@ -4927,19 +4919,9 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         // Calculate the various heat balance sums
         CalcZoneSums(state, ZoneNum);
 
-        Real64 &SumIntGain = thisZoneHB.SumIntGain; // Zone sum of convective internal gains
-        Real64 &SumHA = thisZoneHB.SumHA;           // Zone sum of Hc*Area
-        Real64 &SumHATsurf = thisZoneHB.SumHATsurf; // Zone sum of Hc*Area*Tsurf
-        Real64 &SumHATref = thisZoneHB.SumHATref;   // Zone sum of Hc*Area*Tref for ceiling diffuser convection correlation
-        Real64 &SumMCp = thisZoneHB.SumMCp;         // Zone sum of MassFlowRate*Cp
-        Real64 &SumMCpT = thisZoneHB.SumMCpT;       // Zone sum of MassFlowRate*Cp*T
-        Real64 &SumSysMCp = thisZoneHB.SumSysMCp;   // Zone sum of air system MassFlowRate*Cp
-        Real64 &SumSysMCpT = thisZoneHB.SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
-        Real64 &SumIntGainExceptPeople = thisZoneHB.SumIntGainExceptPeople;
-
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
         if (state.dataHybridModel->FlagHybridModel_PC) {
-            SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
+            thisZoneHB.SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
         }
 
         //    ZoneTempHistoryTerm = (3.0D0 * ZTM1(ZoneNum) - (3.0D0/2.0D0) * ZTM2(ZoneNum) + (1.0D0/3.0D0) * ZTM3(ZoneNum))
@@ -4950,9 +4932,9 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         if (ZoneNodeNum > 0) { // This zone is controlled by a zone equipment configuration or zone plenum
 
             // Heat balance coefficients for controlled zone, i.e. with system air flow
-            TempDepCoef = SumHA + SumMCp + SumSysMCp;
+            TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp + thisZoneHB.SumSysMCp;
             TempIndCoef =
-                SumIntGain + SumHATsurf - SumHATref + SumMCpT + SumSysMCpT +
+                thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT + thisZoneHB.SumSysMCpT +
                 (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
             //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
@@ -4993,8 +4975,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
                 state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
             } else if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
                 // UCSDDV: Not fully mixed - calculate factor to correct load for fully mixed assumption
-                if (SumSysMCp > SmallMassFlow) {
-                    TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
+                if (thisZoneHB.SumSysMCp > SmallMassFlow) {
+                    TempSupplyAir = thisZoneHB.SumSysMCpT / thisZoneHB.SumSysMCp; // Non-negligible flow, calculate supply air temperature
                     if (std::abs(TempSupplyAir - thisZT) > state.dataHeatBal->TempConvergTol) {
                         state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - thisZT);
                         // constrain value to something reasonable
@@ -5010,8 +4992,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
                 }
             } else if (AirModel(ZoneNum).SimAirModel && ((AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UserDefined) ||
                                                          (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mundt))) {
-                if (SumSysMCp > SmallMassFlow) {
-                    TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
+                if (thisZoneHB.SumSysMCp > SmallMassFlow) {
+                    TempSupplyAir = thisZoneHB.SumSysMCpT / thisZoneHB.SumSysMCp; // Non-negligible flow, calculate supply air temperature
                     if (std::abs(TempSupplyAir - thisZT) > state.dataHeatBal->TempConvergTol) {
                         state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - thisZT);
                         // constrain value
@@ -5039,7 +5021,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
             // Sensible load is the enthalpy into the zone minus the enthalpy that leaves the zone.
             CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-            ZoneEnthalpyIn = SumSysMCpT;
+            ZoneEnthalpyIn = thisZoneHB.SumSysMCpT;
 
             // SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
             SNLoad = ZoneEnthalpyIn - (Node(ZoneNodeNum).MassFlowRate / ZoneMult) * CpAir * Node(ZoneNodeNum).Temp +
@@ -5048,8 +5030,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         } else {
 
             // Heat balance coefficients for uncontrolled zone, i.e. without system air flow
-            TempDepCoef = SumHA + SumMCp;
-            TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT;
+            TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp;
+            TempIndCoef = thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT;
 
             //      TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
@@ -5096,8 +5078,18 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
              state.dataHybridModel->HybridModelZone(ZoneNum).InternalThermalMassCalc_T ||
              state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_T) &&
             (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
-            InverseModelTemperature(
-                state, ZoneNum, SumIntGain, SumIntGainExceptPeople, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, AirCap);
+            InverseModelTemperature(state,
+                                    ZoneNum,
+                                    thisZoneHB.SumIntGain,
+                                    thisZoneHB.SumIntGainExceptPeople,
+                                    thisZoneHB.SumHA,
+                                    thisZoneHB.SumHATsurf,
+                                    thisZoneHB.SumHATref,
+                                    thisZoneHB.SumMCp,
+                                    thisZoneHB.SumMCpT,
+                                    thisZoneHB.SumSysMCp,
+                                    thisZoneHB.SumSysMCpT,
+                                    AirCap);
         }
 
         state.dataHeatBalFanSys->MAT(ZoneNum) = thisZT;
