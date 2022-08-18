@@ -329,7 +329,7 @@
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
-    UNTIL: 24:00,107.0;      !- Field 3
+    UNTIL: 24:00,100.0;      !- Field 3
 
   Schedule:Compact,
     AlwaysOnSchedule,        !- Name

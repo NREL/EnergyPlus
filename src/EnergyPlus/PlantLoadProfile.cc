@@ -87,7 +87,7 @@ namespace EnergyPlus::PlantLoadProfile {
 // For this reason the plant load profile can only be called for simulation by the non-zone equipment
 // manager (see NonZoneEquipmentManager.cc).
 
-constexpr std::array<std::string_view, static_cast<int>(PlantLoopFluidType::Num)> PlantLoopFluidTypeNamesUC{"Water", "Steam"};
+constexpr std::array<std::string_view, static_cast<int>(PlantLoopFluidType::Num)> PlantLoopFluidTypeNamesUC{"WATER", "STEAM"};
 
 PlantComponent *PlantProfileData::factory(EnergyPlusData &state, std::string const &objectName)
 {
