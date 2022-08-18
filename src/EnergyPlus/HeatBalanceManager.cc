@@ -1066,8 +1066,12 @@ namespace HeatBalanceManager {
                     }
                 }
             }
-            state.dataHeatBal->doSpaceHeatBalanceSizing = static_cast<bool>(getYesNoValue(AlphaName(2)));
-            state.dataHeatBal->doSpaceHeatBalanceSimulation = static_cast<bool>(getYesNoValue(AlphaName(3)));
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                state.dataHeatBal->doSpaceHeatBalanceSizing = static_cast<bool>(getYesNoValue(AlphaName(2)));
+            }
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                state.dataHeatBal->doSpaceHeatBalanceSimulation = static_cast<bool>(getYesNoValue(AlphaName(3)));
+            }
         } else {
             state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
