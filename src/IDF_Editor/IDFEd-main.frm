@@ -5884,7 +5884,7 @@ End If
 Call FillGrid
 'search for and go to the correct object in the class
 foundCol = 0
-For i = 1 To grdNew.Cols
+For i = 1 To grdNew.Cols - 1
   If grdNew.ColData(i) = inObj Then
     foundCol = i
     Exit For
