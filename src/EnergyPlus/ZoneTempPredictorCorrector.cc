@@ -2778,9 +2778,6 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataHeatBalFanSys->ZoneAirHumRatTemp.dimension(NumOfZones, 0.0);
         state.dataZoneTempPredictorCorrector->TempIndZnLd.dimension(NumOfZones, 0.0);
         state.dataZoneTempPredictorCorrector->TempDepZnLd.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->NonAirSystemResponse.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->SysDepZoneLoads.dimension(NumOfZones, 0.0);
-        state.dataHeatBalFanSys->SysDepZoneLoadsLagged.dimension(NumOfZones, 0.0);
         state.dataZoneTempPredictorCorrector->ZoneAirRelHum.dimension(NumOfZones, 0.0);
 
         state.dataHeatBal->ZoneListSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
@@ -3262,9 +3259,6 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
 
         state.dataZoneTempPredictorCorrector->TempIndZnLd = 0.0;
         state.dataZoneTempPredictorCorrector->TempDepZnLd = 0.0;
-        state.dataHeatBalFanSys->NonAirSystemResponse = 0.0;
-        state.dataHeatBalFanSys->SysDepZoneLoads = 0.0;
-        state.dataHeatBalFanSys->SysDepZoneLoadsLagged = 0.0;
         state.dataZoneTempPredictorCorrector->ZoneAirRelHum = 0.0;
         for (auto &e : state.dataHeatBal->Zone)
             e.NoHeatToReturnAir = false;
@@ -3707,8 +3701,8 @@ void PredictSystemLoads(EnergyPlusData &state,
         }
 
         thisZoneHB.TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp;
-        thisZoneHB.TempIndCoef = thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT +
-                                 state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
+        thisZoneHB.TempIndCoef =
+            thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT + thisZoneHB.SysDepZoneLoadsLagged;
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) {
             thisZoneHB.TempHistoryTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
             TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + thisZoneHB.TempDepCoef;
@@ -4659,8 +4653,8 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         // Calculate hourly humidity ratio from infiltration + humidity added from latent load
         // to determine system added/subtracted moisture.
-        LatentGain = state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) +
-                     state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
+        LatentGain =
+            thisZoneHB.ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
 
         SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
@@ -4682,14 +4676,11 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
                 thisZoneHB.SumHmARaW;
             A = state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr + thisZoneHB.SumHmARa;
         } else {
-            B = (LatentGain / H2OHtOfVap) +
-                ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                 state.dataEnvrn->OutHumRat) +
-                state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) + thisZoneHB.SumHmARaW + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) +
-                state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
-            A = state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) +
-                state.dataHeatBalFanSys->CTMFL(ZoneNum) + thisZoneHB.SumHmARa + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) +
-                state.dataHeatBalFanSys->MDotOA(ZoneNum);
+            B = (LatentGain / H2OHtOfVap) + ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.CTMFL) * state.dataEnvrn->OutHumRat) +
+                thisZoneHB.EAMFLxHumRat + thisZoneHB.SumHmARaW + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) +
+                thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
+            A = thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.SumHmARa +
+                state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + thisZoneHB.MDotOA;
         }
         C = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
@@ -4906,9 +4897,8 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
             // Heat balance coefficients for controlled zone, i.e. with system air flow
             thisZoneHB.TempDepCoef = thisZoneHB.SumHA + thisZoneHB.SumMCp + thisZoneHB.SumSysMCp;
-            thisZoneHB.TempIndCoef =
-                thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT + thisZoneHB.SumSysMCpT +
-                (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
+            thisZoneHB.TempIndCoef = thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT +
+                                     thisZoneHB.SumSysMCpT + (thisZoneHB.NonAirSystemResponse / ZoneMult + thisZoneHB.SysDepZoneLoadsLagged);
             //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
             if (state.afn->distribution_simulated) {
@@ -4999,7 +4989,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
             // SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
             SNLoad = ZoneEnthalpyIn - (Node(ZoneNodeNum).MassFlowRate / ZoneMult) * CpAir * Node(ZoneNodeNum).Temp +
-                     state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
+                     thisZoneHB.NonAirSystemResponse / ZoneMult + thisZoneHB.SysDepZoneLoadsLagged;
 
         } else {
 
@@ -5454,9 +5444,10 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         ZoneMassFlowRate += inletNode.MassFlowRate / ZoneMult;
     }
 
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
     // Calculate hourly humidity ratio from infiltration + humidity added from latent load + system added moisture
-    Real64 LatentGain = state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) +
-                        state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
+    Real64 LatentGain =
+        thisZoneHB.ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
 
     Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
@@ -5466,19 +5457,15 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // operating and system shutdown.
     Real64 const thisZT = state.dataHeatBalFanSys->ZT(ZoneNum);
 
-    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
     Real64 const RhoAir =
         PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZT, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), RoutineName);
     Real64 const H2OHtOfVap = PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), thisZT);
 
-    Real64 B = (LatentGain / H2OHtOfVap) +
-               ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                state.dataEnvrn->OutHumRat) +
-               state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) + (MoistureMassFlowRate) + thisZoneHB.SumHmARaW +
-               state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
-    Real64 A = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
-               state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + thisZoneHB.SumHmARa +
-               state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
+    Real64 B = (LatentGain / H2OHtOfVap) + ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.CTMFL) * state.dataEnvrn->OutHumRat) +
+               thisZoneHB.EAMFLxHumRat + (MoistureMassFlowRate) + thisZoneHB.SumHmARaW + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) +
+               thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
+    Real64 A = ZoneMassFlowRate + thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.SumHmARa +
+               state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + thisZoneHB.MDotOA;
 
     if (state.afn->multizone_always_simulated ||
         (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
@@ -5540,8 +5527,8 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
         Real64 LatentGainExceptPeople = 0.0;
         if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_H) {
-            LatentGainExceptPeople = state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(ZoneNum) +
-                                     state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
+            LatentGainExceptPeople = thisZoneHB.ZoneLatentGainExceptPeople + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) +
+                                     state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
         }
 
         InverseModelHumidity(state, ZoneNum, LatentGain, LatentGainExceptPeople, ZoneMassFlowRate, MoistureMassFlowRate, H2OHtOfVap, RhoAir);
@@ -5668,6 +5655,7 @@ void InverseModelTemperature(EnergyPlusData &state,
     auto &zone = state.dataHeatBal->Zone(ZoneNum);
     auto &ZT = state.dataHeatBalFanSys->ZT(ZoneNum);
     auto &hybridModelZone = state.dataHybridModel->HybridModelZone(ZoneNum);
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     int ZoneMult = zone.Multiplier * zone.ListMultiplier;
     zone.ZoneMeasuredTemperature = GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredTemperatureSchedulePtr);
@@ -5694,18 +5682,13 @@ void InverseModelTemperature(EnergyPlusData &state,
                 Real64 SumSysMCp_HM = zone.ZoneMeasuredSupplyAirFlowRate * CpAirInlet;
                 Real64 SumSysMCpT_HM = zone.ZoneMeasuredSupplyAirFlowRate * CpAirInlet * zone.ZoneMeasuredSupplyAirTemperature;
 
-                AA = SumSysMCp_HM + SumHA + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) +
-                     state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
-                BB = SumSysMCpT_HM + SumIntGain + SumHATsurf - SumHATref + state.dataHeatBalFanSys->MCPTV(ZoneNum) +
-                     state.dataHeatBalFanSys->MCPTM(ZoneNum) + state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * zone.OutDryBulbTemp +
-                     (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
+                AA = SumSysMCp_HM + SumHA + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MCPE + thisZoneHB.MCPC + thisZoneHB.MDotCPOA;
+                BB = SumSysMCpT_HM + SumIntGain + SumHATsurf - SumHATref + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MCPTE + thisZoneHB.MCPTC +
+                     thisZoneHB.MDotCPOA * zone.OutDryBulbTemp + (thisZoneHB.NonAirSystemResponse / ZoneMult + thisZoneHB.SysDepZoneLoadsLagged);
             } else {
-                AA = SumHA + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) +
-                     state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
-                BB = SumIntGain + SumHATsurf - SumHATref + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) +
-                     state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * zone.OutDryBulbTemp;
+                AA = SumHA + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MCPE + thisZoneHB.MCPC + thisZoneHB.MDotCPOA;
+                BB = SumIntGain + SumHATsurf - SumHATref + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MCPTE + thisZoneHB.MCPTC +
+                     thisZoneHB.MDotCPOA * zone.OutDryBulbTemp;
             }
             Real64 CC = AirCap;
             Real64 DD =
@@ -5737,9 +5720,8 @@ void InverseModelTemperature(EnergyPlusData &state,
             state.dataHVACGlobal->UseZoneTimeStepHistory) { // HM calculation only when SumSysMCpT =0,
                                                             // TimeStepZone (not @ TimeStepSys)
             Real64 TempDepCoef = SumHA + SumMCp + SumSysMCp;
-            Real64 TempIndCoef =
-                SumIntGain + SumHATsurf - SumHATref + SumMCpT + SumSysMCpT +
-                (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
+            Real64 TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SumSysMCpT +
+                                 (thisZoneHB.NonAirSystemResponse / ZoneMult + thisZoneHB.SysDepZoneLoadsLagged);
             //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
             if (state.afn->distribution_simulated) {
@@ -5841,7 +5823,7 @@ void InverseModelTemperature(EnergyPlusData &state,
 
                 AA = SumSysMCp_HM + SumHA + SumMCp;
                 BB = SumSysMCpT_HM + SumIntGainExceptPeople + SumHATsurf - SumHATref + SumMCpT +
-                     (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
+                     (thisZoneHB.NonAirSystemResponse / ZoneMult + thisZoneHB.SysDepZoneLoadsLagged);
             } else {
                 AA = SumHA + SumMCp;
                 BB = SumIntGainExceptPeople + SumHATsurf - SumHATref + SumMCpT;
@@ -5915,20 +5897,16 @@ void InverseModelHumidity(EnergyPlusData &state,
                 Real64 SumSysM_HM = zone.ZoneMeasuredSupplyAirFlowRate;
                 Real64 SumSysMHumRat_HM = zone.ZoneMeasuredSupplyAirFlowRate * zone.ZoneMeasuredSupplyAirHumidityRatio;
 
-                AA = SumSysM_HM + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) +
-                     state.dataHeatBalFanSys->CTMFL(ZoneNum) + thisZoneHB.SumHmARa + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotOA(ZoneNum);
-                BB = SumSysMHumRat_HM + (LatentGain / H2OHtOfVap) +
-                     ((state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
-                     state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) + thisZoneHB.SumHmARaW + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+                AA = SumSysM_HM + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.SumHmARa +
+                     state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + thisZoneHB.MDotOA;
+                BB = SumSysMHumRat_HM + (LatentGain / H2OHtOfVap) + ((thisZoneHB.VAMFL + thisZoneHB.CTMFL) * state.dataEnvrn->OutHumRat) +
+                     thisZoneHB.EAMFLxHumRat + thisZoneHB.SumHmARaW + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) +
+                     thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
             } else {
-                AA = state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) +
-                     thisZoneHB.SumHmARa + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
-                BB = (LatentGain / H2OHtOfVap) +
-                     ((state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
-                     state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) + thisZoneHB.SumHmARaW + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+                AA = thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.SumHmARa +
+                     state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + thisZoneHB.MDotOA;
+                BB = (LatentGain / H2OHtOfVap) + ((thisZoneHB.VAMFL + thisZoneHB.CTMFL) * state.dataEnvrn->OutHumRat) + thisZoneHB.EAMFLxHumRat +
+                     thisZoneHB.SumHmARaW + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
             }
 
             Real64 CC = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
@@ -5977,23 +5955,17 @@ void InverseModelHumidity(EnergyPlusData &state,
                 Real64 SumSysM_HM = zone.ZoneMeasuredSupplyAirFlowRate;
                 Real64 SumSysMHumRat_HM = zone.ZoneMeasuredSupplyAirFlowRate * zone.ZoneMeasuredSupplyAirHumidityRatio;
 
-                AA = SumSysM_HM + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
-                     state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + thisZoneHB.SumHmARa +
-                     state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                AA = SumSysM_HM + thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.SumHmARa +
+                     state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + thisZoneHB.MDotOA;
                 BB = SumSysMHumRat_HM + (LatentGainExceptPeople / H2OHtOfVap) +
-                     ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                      state.dataEnvrn->OutHumRat) +
-                     state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) + thisZoneHB.SumHmARaW + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+                     ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.CTMFL) * state.dataEnvrn->OutHumRat) + thisZoneHB.EAMFLxHumRat +
+                     thisZoneHB.SumHmARaW + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
             } else {
-                AA = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) +
-                     state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + thisZoneHB.SumHmARa +
-                     state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
-                BB = (LatentGainExceptPeople / H2OHtOfVap) +
-                     ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) *
-                      state.dataEnvrn->OutHumRat) +
-                     state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) + (MoistureMassFlowRate) + thisZoneHB.SumHmARaW +
-                     state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+                AA = ZoneMassFlowRate + thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.SumHmARa +
+                     state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + thisZoneHB.MDotOA;
+                BB = (LatentGainExceptPeople / H2OHtOfVap) + ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.CTMFL) * state.dataEnvrn->OutHumRat) +
+                     thisZoneHB.EAMFLxHumRat + (MoistureMassFlowRate) + thisZoneHB.SumHmARaW +
+                     state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
             }
 
             Real64 CC = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
@@ -6070,11 +6042,9 @@ void CalcZoneSums(EnergyPlusData &state,
     }
 
     // Sum all non-system air flow, i.e. infiltration, simple ventilation, mixing, earth tube: SumMCp, SumMCpT
-    SumMCp = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) +
-             state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
-    SumMCpT = state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) +
-              state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
-              state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * zone.OutDryBulbTemp;
+    SumMCp = thisZoneHB.MCPI + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MCPE + thisZoneHB.MCPC + thisZoneHB.MDotCPOA;
+    SumMCpT =
+        thisZoneHB.MCPTI + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MCPTE + thisZoneHB.MCPTC + thisZoneHB.MDotCPOA * zone.OutDryBulbTemp;
 
     // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model
     if (state.afn->multizone_always_simulated ||
@@ -6309,18 +6279,14 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     }
 
     // sum non-system air flow transfers between zones
-    SumMCpDTzones =
-        state.dataHeatBalFanSys->MCPTM(ZoneNum) - state.dataHeatBalFanSys->MCPM(ZoneNum) * thisMAT; // but maybe it should be ZTAV(ZoneNum)
+    SumMCpDTzones = thisZoneHB.MCPTM - thisZoneHB.MCPM * thisMAT; // but maybe it should be ZTAV(ZoneNum)
 
     // Sum non-system air flow, i.e. infiltration, simple ventilation, earth tube
     //  reuse SumMCp, SumMCpT from CalcZoneSum but use MAT (or maybe ZTAV?) to complete
-    SumMCpDtInfil =
-        (state.dataHeatBalFanSys->MCPTI(ZoneNum) - state.dataHeatBalFanSys->MCPI(ZoneNum) * thisMAT) +
-        (state.dataHeatBalFanSys->MCPTV(ZoneNum) - state.dataHeatBalFanSys->MCPV(ZoneNum) * thisMAT) +
-        (state.dataHeatBalFanSys->MCPTE(ZoneNum) - state.dataHeatBalFanSys->MCPE(ZoneNum) * thisMAT) +
-        (state.dataHeatBalFanSys->MCPTC(ZoneNum) - state.dataHeatBalFanSys->MCPC(ZoneNum) * thisMAT) +
-        (state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * zone.OutDryBulbTemp -
-         state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * thisMAT); // infiltration | Ventilation (simple) | Earth tube. | Cooltower | combined OA flow
+    SumMCpDtInfil = (thisZoneHB.MCPTI - thisZoneHB.MCPI * thisMAT) + (thisZoneHB.MCPTV - thisZoneHB.MCPV * thisMAT) +
+                    (thisZoneHB.MCPTE - thisZoneHB.MCPE * thisMAT) + (thisZoneHB.MCPTC - thisZoneHB.MCPC * thisMAT) +
+                    (thisZoneHB.MDotCPOA * zone.OutDryBulbTemp -
+                     thisZoneHB.MDotCPOA * thisMAT); // infiltration | Ventilation (simple) | Earth tube. | Cooltower | combined OA flow
 
     // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model (if used)
     if (state.afn->multizone_always_simulated ||
@@ -6393,8 +6359,8 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     }
 
     // non air system response.
-    SumNonAirSystem = state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) + state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) +
-                      state.dataHeatBalFanSys->SumConvPool(ZoneNum);
+    SumNonAirSystem =
+        thisZoneHB.NonAirSystemResponse + state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
     // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {

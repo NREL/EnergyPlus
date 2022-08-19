@@ -129,8 +129,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBal->Zone(1).Volume = 1000.0;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
-    state->dataHeatBalFanSys->ZoneLatentGain(1) = 0.0;
     state->dataHeatBalFanSys->SumLatentHTRadSys.allocate(1);
     state->dataHeatBalFanSys->SumLatentHTRadSys(1) = 0.0;
     state->dataHeatBalFanSys->SumLatentPool.allocate(1);
@@ -151,15 +149,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
-    state->dataHeatBalFanSys->OAMFL.allocate(1);
-    state->dataHeatBalFanSys->VAMFL.allocate(1);
-    state->dataHeatBalFanSys->EAMFL.allocate(1);
-    state->dataHeatBalFanSys->EAMFLxHumRat.allocate(1);
-    state->dataHeatBalFanSys->CTMFL.allocate(1);
-
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
-    state->dataHeatBalFanSys->MDotOA.allocate(1);
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
     state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
@@ -181,15 +172,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFLxHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).VAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFLxHumRat = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 0.0;
     state->dataEnvrn->OutHumRat = 0.008;
     state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.0;
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataHeatBalFanSys->MDotOA(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.0;
 
     // HybridModel
     state->dataHybridModel->HybridModelZone(1).PeopleCountCalc_H = false;
@@ -211,15 +202,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataLoopNodes->Node(4).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFLxHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).VAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFLxHumRat = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 0.0;
     state->dataEnvrn->OutHumRat = 0.004;
     state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.0;
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataHeatBalFanSys->MDotOA(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.0;
 
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
@@ -238,15 +229,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataLoopNodes->Node(4).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFLxHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).VAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFLxHumRat = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 0.0;
     state->dataEnvrn->OutHumRat = 0.004;
     state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.02 * 0.008;
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.02;
-    state->dataHeatBalFanSys->MDotOA(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.0;
 
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
@@ -265,15 +256,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataLoopNodes->Node(4).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFLxHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).VAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFL = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFLxHumRat = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 0.0;
     state->dataEnvrn->OutHumRat = 0.004;
     state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.0;
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataHeatBalFanSys->MDotOA(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.0;
 
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
@@ -966,29 +957,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBal->ZoneIntGain.allocate(ZoneNum);
     state->dataHeatBalFanSys->SumConvHTRadSys.allocate(ZoneNum);
     state->dataHeatBalFanSys->SumConvPool.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPI.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPV.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPM.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPE.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPC.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPTI.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPTV.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPTM.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPTE.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPTC.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MDotCPOA.allocate(ZoneNum);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(ZoneNum);
-    state->dataHeatBalFanSys->MCPI(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MCPV(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MCPM(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MCPE(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MCPC(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MCPTI(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MCPTV(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MCPTM(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MCPTE(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MCPTC(ZoneNum) = 0.0;
-    state->dataHeatBalFanSys->MDotCPOA(ZoneNum) = 0.0;
 
     state->dataHeatBalFanSys->SumConvHTRadSys(1) = 0.0;
     state->dataHeatBalFanSys->SumConvPool(1) = 0.0;
@@ -1017,8 +986,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBal->Zone(1).Volume = 1000.0;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
-    state->dataHeatBalFanSys->ZoneLatentGain(1) = 0.0;
     state->dataHeatBalFanSys->SumLatentHTRadSys.allocate(1);
     state->dataHeatBalFanSys->SumLatentHTRadSys(1) = 0.0;
     state->dataHeatBalFanSys->SumLatentPool.allocate(1);

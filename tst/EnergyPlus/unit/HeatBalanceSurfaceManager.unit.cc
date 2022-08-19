@@ -800,7 +800,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataMstBal->HMassConvInFD.allocate(6);
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     SolarShading::AllocateModuleArrays(*state);
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
@@ -829,22 +828,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(1));
     EXPECT_EQ(23.0, state->dataHeatBal->SurfTempEffBulkAir(2));
     EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(3));
-
-    state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataSize->ZoneEqSizing.deallocate();
-    state->dataHeatBalFanSys->MAT.deallocate(); // Zone temperature C
-    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    state->dataLoopNodes->Node.deallocate();
-    state->dataGlobal->KickOffSimulation = false;
-    state->dataHeatBalSurf->SurfTempInTmp.deallocate();
-    state->dataHeatBalSurf->SurfHConvInt.deallocate();
-    state->dataMstBal->HConvInFD.deallocate();
-    state->dataMstBal->RhoVaporAirIn.deallocate();
-    state->dataMstBal->HMassConvInFD.deallocate();
-    state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRepEnergy.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurfKiva)
@@ -1369,7 +1352,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
 
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
@@ -1887,7 +1869,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -2466,7 +2447,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -3043,7 +3023,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -3075,23 +3054,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     EXPECT_EQ(-0.1, state->dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(1));
     CalcHeatBalanceInsideSurf(*state);
     EXPECT_EQ(0.1, state->dataHeatBalSurf->SurfQAdditionalHeatSourceInside(6));
-
-    state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataSize->ZoneEqSizing.deallocate();
-    state->dataHeatBalFanSys->MAT.deallocate(); // Zone temperature C
-    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    state->dataLoopNodes->Node.deallocate();
-    state->dataGlobal->KickOffSimulation = false;
-    state->dataHeatBalSurf->SurfTempInTmp.deallocate();
-    state->dataHeatBal->SurfTempEffBulkAir.deallocate();
-    state->dataHeatBalSurf->SurfHConvInt.deallocate();
-    state->dataMstBal->HConvInFD.deallocate();
-    state->dataMstBal->RhoVaporAirIn.deallocate();
-    state->dataMstBal->HMassConvInFD.deallocate();
-    state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRepEnergy.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSurfTemp)
@@ -4866,7 +4828,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -5338,7 +5299,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->KickOffSimulation = true;
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataGlobal->NumOfTimeStepInHour = 6;
     state->dataGlobal->HourOfDay = 1;
@@ -7106,7 +7066,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
 
     state->dataSurface->TotSurfaces = 6;
     // set convective coefficient adjustment ratio to 1.0
@@ -8351,7 +8310,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
 
     state->dataSurface->TotSurfaces = 6;
     // set convective coefficient adjustment ratio to 1.0

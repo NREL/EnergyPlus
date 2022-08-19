@@ -95,6 +95,7 @@
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -7302,10 +7303,11 @@ namespace InternalHeatGains {
 
         for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
 
-            state.dataHeatBalFanSys->ZoneLatentGain(NZ) = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
+            thisZoneHB.ZoneLatentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
             // Added for hybrid model
             if (state.dataHybridModel->FlagHybridModel_PC) {
-                state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ) = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
+                thisZoneHB.ZoneLatentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
             }
         }
 
@@ -8433,10 +8435,11 @@ namespace InternalHeatGains {
         }
         if (ReSumLatentGains) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-                state.dataHeatBalFanSys->ZoneLatentGain(NZ) = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
+                auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
+                thisZoneHB.ZoneLatentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
                 // Added for the hybrid model
                 if (state.dataHybridModel->FlagHybridModel_PC) {
-                    state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ) = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
+                    thisZoneHB.ZoneLatentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
                 }
             }
         }

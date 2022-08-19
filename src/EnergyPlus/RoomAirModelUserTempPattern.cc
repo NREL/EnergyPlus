@@ -71,6 +71,7 @@
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::RoomAirModelUserTempPattern {
 
@@ -803,6 +804,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving;
     }
 
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
     for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount) {
         // BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
         int ReturnNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(nodeCount);
@@ -855,7 +857,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
                         // All of return air comes from flow through airflow windows
                         TempRetAir = WinGapTtoRA;
                         // Put heat from window airflow that exceeds return air flow into zone air
-                        state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += (WinGapFlowToRA - MassFlowRA) * CpAir * (WinGapTtoRA - TempZoneAir);
+                        thisZoneHB.SysDepZoneLoads += (WinGapFlowToRA - MassFlowRA) * CpAir * (WinGapTtoRA - TempZoneAir);
                     }
                 }
                 // Add heat-to-return from lights
@@ -863,21 +865,21 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
                 if (TempRetAir > RetTempMax) {
                     state.dataLoopNodes->Node(ReturnNode).Temp = RetTempMax;
                     if (!state.dataGlobal->ZoneSizingCalc) {
-                        state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
+                        thisZoneHB.SysDepZoneLoads += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
                     }
                 } else if (TempRetAir < RetTempMin) {
                     state.dataLoopNodes->Node(ReturnNode).Temp = RetTempMin;
                     if (!state.dataGlobal->ZoneSizingCalc) {
-                        state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
+                        thisZoneHB.SysDepZoneLoads += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
                     }
                 } else {
                     state.dataLoopNodes->Node(ReturnNode).Temp = TempRetAir;
                 }
             } else { // No return air flow
                 // Assign all heat-to-return from window gap airflow to zone air
-                if (WinGapFlowToRA > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);
+                if (WinGapFlowToRA > 0.0) thisZoneHB.SysDepZoneLoads += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);
                 // Assign all heat-to-return from lights to zone air
-                if (QRetAir > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += QRetAir;
+                if (QRetAir > 0.0) thisZoneHB.SysDepZoneLoads += QRetAir;
                 state.dataLoopNodes->Node(ReturnNode).Temp = state.dataLoopNodes->Node(ZoneNode).Temp;
             }
         } else {
@@ -904,14 +906,14 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, 0);
-                state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
+                thisZoneHB.ZoneLatentGain += SumRetAirLatentGainRate;
             }
         } else {
             state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
             state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
             // shouldn't the HVAC term be zeroed out then?
             SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
-            state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
+            thisZoneHB.ZoneLatentGain += SumRetAirLatentGainRate;
         }
 
         state.dataLoopNodes->Node(ReturnNode).Enthalpy =

@@ -66,6 +66,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace ZoneEquipmentManager;
@@ -145,8 +146,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataHeatBal->Zone.allocate(2);
     state->dataSize->CalcZoneSizing.allocate(1, 2);
     state->dataSize->CalcFinalZoneSizing.allocate(2);
-    state->dataHeatBalFanSys->NonAirSystemResponse.allocate(2);
-    state->dataHeatBalFanSys->SysDepZoneLoads.allocate(2);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig.allocate(2);
     state->dataHeatBalFanSys->TempControlType.allocate(2);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(2);
@@ -310,28 +310,6 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 2).HeatMassFlow);
     EXPECT_NEAR(1444.767, state->dataSize->CalcZoneSizing(1, 2).CoolLoad, .001);
     EXPECT_NEAR(.127528, state->dataSize->CalcZoneSizing(1, 2).CoolMassFlow, .000001);
-
-    state->dataLoopNodes->Node.deallocate();
-    state->dataSize->ZoneEqSizing.deallocate();
-    state->dataHeatBal->Zone.deallocate();
-    state->dataSize->CalcZoneSizing.deallocate();
-    state->dataHeatBalFanSys->NonAirSystemResponse.deallocate();
-    state->dataHeatBalFanSys->SysDepZoneLoads.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.deallocate();
-    state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataHeatBalFanSys->TempControlType.deallocate();
-    state->dataHeatBalFanSys->TempZoneThermostatSetPoint.deallocate();
-    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.deallocate();
-    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.deallocate();
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
-    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.deallocate();
-    state->dataZoneEnergyDemand->DeadBandOrSetback.deallocate();
-    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
-    state->dataHeatBalFanSys->ZoneMassBalanceFlag.deallocate();
-    state->dataHeatBal->MassConservation.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)

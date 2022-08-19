@@ -69,6 +69,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -862,6 +863,7 @@ namespace CrossVentMgr {
 
         GainsFrac = 0.0;
         ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         for (Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDCV; ++Ctd) {
             if (ZoneNum == state.dataRoomAirMod->ZoneUCSDCV(Ctd).ZonePtr) {
@@ -871,7 +873,7 @@ namespace CrossVentMgr {
 
         ConvGains = SumAllInternalConvectionGains(state, ZoneNum);
         ConvGains += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
-                     state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) + state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
+                     thisZoneHB.SysDepZoneLoadsLagged + thisZoneHB.NonAirSystemResponse / ZoneMult;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
         if (Zone(ZoneNum).NoHeatToReturnAir) {
@@ -881,11 +883,9 @@ namespace CrossVentMgr {
 
         ConvGainsJet = ConvGains * GainsFrac;
         ConvGainsRec = ConvGains * (1.0 - GainsFrac);
-        MCp_Total = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) +
-                    state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
-        MCpT_Total = state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) +
-                     state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
-                     state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
+        MCp_Total = thisZoneHB.MCPI + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MCPE + thisZoneHB.MCPC + thisZoneHB.MDotCPOA;
+        MCpT_Total = thisZoneHB.MCPTI + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MCPTE + thisZoneHB.MCPTC +
+                     thisZoneHB.MDotCPOA * Zone(ZoneNum).OutDryBulbTemp;
 
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithoutDistribution) {
             MCp_Total = state.afn->exchangeData(ZoneNum).SumMCp + state.afn->exchangeData(ZoneNum).SumMVCp + state.afn->exchangeData(ZoneNum).SumMMCp;

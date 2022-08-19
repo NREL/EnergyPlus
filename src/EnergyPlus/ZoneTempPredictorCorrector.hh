@@ -165,6 +165,39 @@ namespace ZoneTempPredictorCorrector {
         Real64 TempIndCoef = 0.0; // Temperature ndependent coefficient
         Real64 TempHistoryTerm = 0.0;
 
+        Real64 MCPI = 0.0;                       // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
+        Real64 MCPTI = 0.0;                      // INFILTRATION MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 MCPV = 0.0;                       // VENTILATION MASS FLOW * AIR SPECIFIC HEAT
+        Real64 MCPTV = 0.0;                      // VENTILATION MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 MCPM = 0.0;                       // Mixing MASS FLOW * AIR SPECIFIC HEAT
+        Real64 MCPTM = 0.0;                      // Mixing MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 MCPE = 0.0;                       // EARTHTUBE MASS FLOW * AIR SPECIFIC HEAT
+        Real64 EAMFL = 0.0;                      // OUTDOOR AIR MASS FLOW for EarthTube
+        Real64 EAMFLxHumRat = 0.0;               // OUTDOOR AIR MASS FLOW * Humidity Ratio for EarthTube (water vapor mass flow)
+        Real64 MCPTE = 0.0;                      // EARTHTUBE MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 MCPC = 0.0;                       // COOLTOWER MASS FLOW * AIR SPECIFIC HEAT
+        Real64 CTMFL = 0.0;                      // OUTDOOR AIR MASS FLOW for cooltower
+        Real64 MCPTC = 0.0;                      // COOLTOWER MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 ThermChimAMFL = 0.0;              // OUTDOOR AIR MASS FLOW for THERMALCHIMNEY
+        Real64 MCPTThermChim = 0.0;              // THERMALCHIMNEY MASS FLOW * AIR SPECIFIC HEAT
+        Real64 MCPThermChim = 0.0;               // THERMALCHIMNEY MASS FLOW * AIR CP * AIR TEMPERATURE
+        Real64 ZoneLatentGain = 0.0;             // Latent Energy from each Zone (People, equipment)
+        Real64 ZoneLatentGainExceptPeople = 0.0; // Added for hybrid model -- Latent Energy from each Zone (equipment)
+        Real64 OAMFL = 0.0;                      // OUTDOOR AIR MASS FLOW (kg/s) for infiltration
+        Real64 VAMFL = 0.0;                      // OUTDOOR AIR MASS FLOW (kg/s) for ventilation
+        Real64 NonAirSystemResponse = 0.0;       // Convective heat addition rate from non forced air
+        // equipment such as baseboards plus heat from lights to
+        Real64 SysDepZoneLoads = 0.0; // Convective heat addition or subtraction rate from sources that
+        // depend on what is happening with the HVAC system. Such as:
+        // heat gain from lights to return air when return flow = 0= 0.0; heat gain
+        // from air flow windows to return air when return air flow = 0= 0.0;
+        // and heat removed by return air from refrigeration cases when
+        // return air flow = 0.
+        Real64 SysDepZoneLoadsLagged = 0.0; // SysDepZoneLoads saved to be added to zone heat balance next
+        // HVAC time step
+        Real64 MDotCPOA = 0.0; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
+        Real64 MDotOA = 0.0;   // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
+
         void CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac);
         void UpdateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,

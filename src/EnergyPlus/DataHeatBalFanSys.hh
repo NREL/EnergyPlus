@@ -123,38 +123,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneAirHumRatTemp; // Temp zone air humidity ratio at time plus 1
     Array1D<Real64> ZoneAirHumRatOld;  // Last Time Steps Zone AIR Humidity Ratio
 
-    Array1D<Real64> MCPI;                       // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPTI;                      // INFILTRATION MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPV;                       // VENTILATION MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPTV;                      // VENTILATION MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPM;                       // Mixing MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPTM;                      // Mixing MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPE;                       // EARTHTUBE MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> EAMFL;                      // OUTDOOR AIR MASS FLOW for EarthTube
-    Array1D<Real64> EAMFLxHumRat;               // OUTDOOR AIR MASS FLOW * Humidity Ratio for EarthTube (water vapor mass flow)
-    Array1D<Real64> MCPTE;                      // EARTHTUBE MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> MCPC;                       // COOLTOWER MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> CTMFL;                      // OUTDOOR AIR MASS FLOW for cooltower
-    Array1D<Real64> MCPTC;                      // COOLTOWER MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> ThermChimAMFL;              // OUTDOOR AIR MASS FLOW for THERMALCHIMNEY
-    Array1D<Real64> MCPTThermChim;              // THERMALCHIMNEY MASS FLOW * AIR SPECIFIC HEAT
-    Array1D<Real64> MCPThermChim;               // THERMALCHIMNEY MASS FLOW * AIR CP * AIR TEMPERATURE
-    Array1D<Real64> ZoneLatentGain;             // Latent Energy from each Zone (People, equipment)
-    Array1D<Real64> ZoneLatentGainExceptPeople; // Added for hybrid model -- Latent Energy from each Zone (equipment)
-    Array1D<Real64> OAMFL;                      // OUTDOOR AIR MASS FLOW (kg/s) for infiltration
-    Array1D<Real64> VAMFL;                      // OUTDOOR AIR MASS FLOW (kg/s) for ventilation
-    Array1D<Real64> NonAirSystemResponse;       // Convective heat addition rate from non forced air
-    // equipment such as baseboards plus heat from lights to
-    Array1D<Real64> SysDepZoneLoads; // Convective heat addition or subtraction rate from sources that
-    // depend on what is happening with the HVAC system. Such as:
-    // heat gain from lights to return air when return flow = 0; heat gain
-    // from air flow windows to return air when return air flow = 0;
-    // and heat removed by return air from refrigeration cases when
-    // return air flow = 0.
-    Array1D<Real64> SysDepZoneLoadsLagged; // SysDepZoneLoads saved to be added to zone heat balance next
-    // HVAC time step
-    Array1D<Real64> MDotCPOA; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
-    Array1D<Real64> MDotOA;   // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
 
     Array1D<Real64> MixingMassFlowZone;    // Mixing MASS FLOW (kg/s)
     Array1D<Real64> MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio

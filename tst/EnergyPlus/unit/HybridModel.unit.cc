@@ -110,10 +110,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataRoomAirMod->ZTM1MX.allocate(1);
     state->dataHeatBalFanSys->AIRRAT.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->NonAirSystemResponse.allocate(1);
-    state->dataHeatBalFanSys->NonAirSystemResponse(1) = 0.0;
-    state->dataHeatBalFanSys->SysDepZoneLoadsLagged.allocate(1);
-    state->dataHeatBalFanSys->SysDepZoneLoadsLagged(1) = 0.0;
     state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
@@ -129,28 +125,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataScheduleMgr->Schedule.allocate(6);
 
     // CalcZoneComponentLoadSums variable initialization
-    state->dataHeatBalFanSys->MCPI.allocate(1);
-    state->dataHeatBalFanSys->MCPI(1) = 0.0;
-    state->dataHeatBalFanSys->MCPV.allocate(1);
-    state->dataHeatBalFanSys->MCPM.allocate(1);
-    state->dataHeatBalFanSys->MCPM(1) = 0.0;
-    state->dataHeatBalFanSys->MCPE.allocate(1);
-    state->dataHeatBalFanSys->MCPE(1) = 0.0;
-    state->dataHeatBalFanSys->MCPC.allocate(1);
-    state->dataHeatBalFanSys->MCPC(1) = 0.0;
-    state->dataHeatBalFanSys->MDotCPOA.allocate(1);
-    state->dataHeatBalFanSys->MDotCPOA(1) = 0.0;
-    state->dataHeatBalFanSys->MDotOA.allocate(1);
-    state->dataHeatBalFanSys->MDotOA(1) = 0.0;
-    state->dataHeatBalFanSys->MCPTI.allocate(1);
-    state->dataHeatBalFanSys->MCPTI(1) = 0.0;
-    state->dataHeatBalFanSys->MCPTV.allocate(1);
-    state->dataHeatBalFanSys->MCPTM.allocate(1);
-    state->dataHeatBalFanSys->MCPTM(1) = 0.0;
-    state->dataHeatBalFanSys->MCPTE.allocate(1);
-    state->dataHeatBalFanSys->MCPTE(1) = 0.0;
-    state->dataHeatBalFanSys->MCPTC.allocate(1);
-    state->dataHeatBalFanSys->MCPTC(1) = 0.0;
     state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBalSurf->SurfHConvInt.allocate(1);
@@ -169,10 +143,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataSize->ZoneEqSizing.allocate(1);
 
     // CorrectZoneHumRat variable initialization
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
-    state->dataHeatBalFanSys->ZoneLatentGain(1) = 0.0;
-    state->dataHeatBalFanSys->ZoneLatentGainExceptPeople.allocate(1);
-    state->dataHeatBalFanSys->ZoneLatentGainExceptPeople(1) = 0.0;
     state->dataHeatBalFanSys->SumLatentHTRadSys.allocate(1);
     state->dataHeatBalFanSys->SumLatentHTRadSys(1) = 0.0;
     state->dataHeatBalFanSys->SumConvHTRadSys.allocate(1);
@@ -186,16 +156,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
     state->dataHeatBalFanSys->SumLatentPool.allocate(1);
     state->dataHeatBalFanSys->SumLatentPool(1) = 0.0;
-    state->dataHeatBalFanSys->OAMFL.allocate(1);
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL.allocate(1);
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL.allocate(1);
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFLxHumRat.allocate(1);
-    state->dataHeatBalFanSys->EAMFLxHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL.allocate(1);
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
     state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBalFanSys->ZT(1) = 0.0;
 
@@ -258,8 +218,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = 0.3;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -5.21;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.002083;
-    state->dataHeatBalFanSys->MCPV(1) = 1414.60;   // Assign TempDepCoef
-    state->dataHeatBalFanSys->MCPTV(1) = -3335.10; // Assign TempIndCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 1414.60;   // Assign TempDepCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = -3335.10; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99166.67;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, true);
@@ -283,8 +243,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 8.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.002083;
-    state->dataHeatBalFanSys->MCPV(1) = 539.49;  // Assign TempDepCoef
-    state->dataHeatBalFanSys->MCPTV(1) = 270.10; // Assign TempIndCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 539.49;  // Assign TempDepCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = 270.10; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99250;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, true);
@@ -312,8 +272,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->PreviousMeasuredHumRat3(1) = 0.0011155109625;
     state->dataHybridModel->HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
     state->dataScheduleMgr->Schedule(state->dataHybridModel->HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.001120003;
-    state->dataHeatBalFanSys->MCPV(1) = 539.49;
-    state->dataHeatBalFanSys->MCPTV(1) = 270.10;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 539.49;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = 270.10;
     state->dataEnvrn->OutBaroPress = 99500;
 
     CorrectZoneHumRat(*state, 1);
@@ -339,8 +299,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0024964;
     state->dataEnvrn->OutBaroPress = 98916.7;
-    state->dataHeatBalFanSys->MCPV(1) = 5163.5;    // Assign TempDepCoef
-    state->dataHeatBalFanSys->MCPTV(1) = -15956.8; // Assign TempIndCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 5163.5;    // Assign TempDepCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = -15956.8; // Assign TempIndCoef
     state->dataHybridModel->HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
     state->dataScheduleMgr->Schedule(state->dataHybridModel->HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = -2.923892218;
 
@@ -365,9 +325,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->ZT(1) = -2.92;
     state->dataEnvrn->OutHumRat = 0.0025365002784602363;
     state->dataEnvrn->OutBaroPress = 98916.7;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.700812;
-    state->dataHeatBalFanSys->ZoneLatentGain(1) = 211.2;
-    state->dataHeatBalFanSys->ZoneLatentGainExceptPeople(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.700812;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneLatentGain = 211.2;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneLatentGainExceptPeople = 0.0;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat1(1) = 0.002496356;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat2(1) = 0.002489048;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat3(1) = 0.002480404;
@@ -397,8 +357,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0077647;
-    state->dataHeatBalFanSys->MCPV(1) = 4456;   // Assign TempDepCoef
-    state->dataHeatBalFanSys->MCPTV(1) = 60650; // Assign TempIndCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 4456;   // Assign TempDepCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = 60650; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99500;
     state->dataEnvrn->OutHumRat = 0.00113669;
     state->dataHybridModel->HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
@@ -463,8 +423,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0024964;
     state->dataEnvrn->OutBaroPress = 98916.7;
-    state->dataHeatBalFanSys->MCPV(1) = 6616;      // Assign TempDepCoef
-    state->dataHeatBalFanSys->MCPTV(1) = 138483.2; // Assign TempIndCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 6616;      // Assign TempDepCoef
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = 138483.2; // Assign TempIndCoef
     state->dataHybridModel->HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
     state->dataHybridModel->HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr = 2;
     state->dataHybridModel->HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr = 3;
@@ -529,10 +489,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataRoomAirMod->ZTOC.allocate(1);
     state->dataHeatBalFanSys->AIRRAT.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->NonAirSystemResponse.allocate(1);
-    state->dataHeatBalFanSys->NonAirSystemResponse(1) = 0.0;
-    state->dataHeatBalFanSys->SysDepZoneLoadsLagged.allocate(1);
-    state->dataHeatBalFanSys->SysDepZoneLoadsLagged(1) = 0.0;
     state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
@@ -551,28 +507,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataScheduleMgr->Schedule.allocate(7);
 
     // CalcZoneComponentLoadSums variable initialization
-    state->dataHeatBalFanSys->MCPI.allocate(1);
-    state->dataHeatBalFanSys->MCPI(1) = 0.0;
-    state->dataHeatBalFanSys->MCPV.allocate(1);
-    state->dataHeatBalFanSys->MCPM.allocate(1);
-    state->dataHeatBalFanSys->MCPM(1) = 0.0;
-    state->dataHeatBalFanSys->MCPE.allocate(1);
-    state->dataHeatBalFanSys->MCPE(1) = 0.0;
-    state->dataHeatBalFanSys->MCPC.allocate(1);
-    state->dataHeatBalFanSys->MCPC(1) = 0.0;
-    state->dataHeatBalFanSys->MDotCPOA.allocate(1);
-    state->dataHeatBalFanSys->MDotCPOA(1) = 0.0;
-    state->dataHeatBalFanSys->MDotOA.allocate(1);
-    state->dataHeatBalFanSys->MDotOA(1) = 0.0;
-    state->dataHeatBalFanSys->MCPTI.allocate(1);
-    state->dataHeatBalFanSys->MCPTI(1) = 0.0;
-    state->dataHeatBalFanSys->MCPTV.allocate(1);
-    state->dataHeatBalFanSys->MCPTM.allocate(1);
-    state->dataHeatBalFanSys->MCPTM(1) = 0.0;
-    state->dataHeatBalFanSys->MCPTE.allocate(1);
-    state->dataHeatBalFanSys->MCPTE(1) = 0.0;
-    state->dataHeatBalFanSys->MCPTC.allocate(1);
-    state->dataHeatBalFanSys->MCPTC(1) = 0.0;
     state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBalSurf->SurfHConvInt.allocate(1);
@@ -590,16 +524,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
-    state->dataHeatBalFanSys->OAMFL.allocate(1);
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL.allocate(1);
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL.allocate(1);
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFLxHumRat.allocate(1);
-    state->dataHeatBalFanSys->EAMFLxHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL.allocate(1);
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
     state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBalFanSys->ZT(1) = 0.0;
     state->dataContaminantBalance->AZ.allocate(1);
@@ -697,7 +621,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.00112;
     state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     state->dataEnvrn->OutBaroPress = 98916.7;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.700812;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.700812;
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.00001989;
     state->dataContaminantBalance->CO2ZoneTimeMinus1(1) = 387.9962885;
     state->dataContaminantBalance->CO2ZoneTimeMinus2(1) = 387.676037;

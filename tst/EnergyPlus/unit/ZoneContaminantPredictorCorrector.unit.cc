@@ -203,12 +203,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
-    state->dataHeatBalFanSys->OAMFL.allocate(1);
-    state->dataHeatBalFanSys->VAMFL.allocate(1);
-    state->dataHeatBalFanSys->EAMFL.allocate(1);
-    state->dataHeatBalFanSys->CTMFL.allocate(1);
-    state->dataHeatBalFanSys->MDotOA.allocate(1);
-    state->dataHeatBalFanSys->MDotOA(1) = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.001;
     state->dataScheduleMgr->Schedule.allocate(1);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
@@ -226,10 +222,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
     state->dataHeatBalFanSys->ZT(1) = 24.0;
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
@@ -349,12 +341,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
-    state->dataHeatBalFanSys->OAMFL.allocate(1);
-    state->dataHeatBalFanSys->VAMFL.allocate(1);
-    state->dataHeatBalFanSys->EAMFL.allocate(1);
-    state->dataHeatBalFanSys->CTMFL.allocate(1);
-    state->dataHeatBalFanSys->MDotOA.allocate(1);
-    state->dataHeatBalFanSys->MDotOA(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
@@ -369,10 +356,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
     state->dataHeatBalFanSys->ZT(1) = 24.0;
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
@@ -522,12 +505,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
-    state->dataHeatBalFanSys->OAMFL.allocate(3);
-    state->dataHeatBalFanSys->VAMFL.allocate(3);
-    state->dataHeatBalFanSys->EAMFL.allocate(3);
-    state->dataHeatBalFanSys->CTMFL.allocate(3);
-    state->dataHeatBalFanSys->MDotOA.allocate(3);
-    state->dataHeatBalFanSys->MDotOA = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(3);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MDotOA = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MDotOA = 0.001;
     state->dataScheduleMgr->Schedule.allocate(1);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
@@ -545,18 +526,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
-    state->dataHeatBalFanSys->OAMFL(2) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(2) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(2) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(2) = 0.0;
-    state->dataHeatBalFanSys->OAMFL(3) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(3) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(3) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(3) = 0.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
     state->dataHeatBalFanSys->ZT(1) = 24.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.008;
@@ -721,12 +690,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
-    state->dataHeatBalFanSys->OAMFL.allocate(3);
-    state->dataHeatBalFanSys->VAMFL.allocate(3);
-    state->dataHeatBalFanSys->EAMFL.allocate(3);
-    state->dataHeatBalFanSys->CTMFL.allocate(3);
-    state->dataHeatBalFanSys->MDotOA.allocate(3);
-    state->dataHeatBalFanSys->MDotOA = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(3);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MDotOA = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MDotOA = 0.001;
     state->dataScheduleMgr->Schedule.allocate(1);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
@@ -744,18 +711,6 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataHeatBalFanSys->OAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(1) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(1) = 0.0;
-    state->dataHeatBalFanSys->OAMFL(2) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(2) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(2) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(2) = 0.0;
-    state->dataHeatBalFanSys->OAMFL(3) = 0.0;
-    state->dataHeatBalFanSys->VAMFL(3) = 0.0;
-    state->dataHeatBalFanSys->EAMFL(3) = 0.0;
-    state->dataHeatBalFanSys->CTMFL(3) = 0.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
     state->dataHeatBalFanSys->ZT(1) = 24.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.008;

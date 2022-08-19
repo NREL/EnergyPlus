@@ -64,6 +64,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -423,10 +424,10 @@ namespace MundtSimMgr {
             state.dataMundtSimMgr->QsysCoolTot = -(SumSysMCpT - ZoneMassFlowRate * CpAir * state.dataHeatBalFanSys->MAT(ZoneNum));
         }
         // determine heat gains
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         state.dataMundtSimMgr->ConvIntGain = SumAllInternalConvectionGains(state, ZoneNum);
         state.dataMundtSimMgr->ConvIntGain += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
-                                              state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) +
-                                              state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
+                                              thisZoneHB.SysDepZoneLoadsLagged + thisZoneHB.NonAirSystemResponse / ZoneMult;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
@@ -435,8 +436,7 @@ namespace MundtSimMgr {
             state.dataMundtSimMgr->ConvIntGain += RetAirConvGain;
         }
 
-        state.dataMundtSimMgr->QventCool =
-            -state.dataHeatBalFanSys->MCPI(ZoneNum) * (Zone(ZoneNum).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(ZoneNum));
+        state.dataMundtSimMgr->QventCool = -thisZoneHB.MCPI * (Zone(ZoneNum).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(ZoneNum));
 
         // get surface data
         for (int SurfNum = 1; SurfNum <= state.dataMundtSimMgr->ZoneData(ZoneNum).NumOfSurfs; ++SurfNum) {

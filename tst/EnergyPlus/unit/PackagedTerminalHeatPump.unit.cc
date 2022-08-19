@@ -3858,8 +3858,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(6);
     state->dataHeatBalFanSys->MAT = 23.0;
     state->dataHeatBalFanSys->ZoneAirHumRat = 0.001;
-    state->dataHeatBalFanSys->NonAirSystemResponse.allocate(6);
-    state->dataHeatBalFanSys->SysDepZoneLoads.allocate(6);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(6);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(state->dataGlobal->NumOfZones);

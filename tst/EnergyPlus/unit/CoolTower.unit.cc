@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 
@@ -86,12 +87,10 @@ TEST_F(EnergyPlusFixture, ExerciseCoolTower)
     state->dataHeatBal->Zone(1).Name = "ZONE 1";
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 20.0;
-    state->dataHeatBalFanSys->MCPC.allocate(1);
-    state->dataHeatBalFanSys->MCPC(1) = 1;
-    state->dataHeatBalFanSys->MCPTC.allocate(1);
-    state->dataHeatBalFanSys->MCPTC(1) = 1;
-    state->dataHeatBalFanSys->CTMFL.allocate(1);
-    state->dataHeatBalFanSys->CTMFL(1) = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPC = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTC = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 1;
     state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBalFanSys->ZT(1) = 1;
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);

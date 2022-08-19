@@ -2088,10 +2088,9 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         state.dataHeatBalFanSys->ZoneAirHumRatOld(zoneNum) = state.dataEnvrn->OutHumRat;
         state.dataHeatBalFanSys->TempTstatAir(zoneNum) = ZoneInitialTemp;
     }
-    if (state.dataHeatBal->doSpaceHeatBalance) {
-        for (auto thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
-            new (&thisSpaceHB) ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData();
-        }
+    // Reset spaceHeatBalance even if doSpaceHeatBalance is false, beause spaceHB is used to gether zoneHB
+    for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+        new (&thisSpaceHB) ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData();
     }
 
     // "Bulk" initializations of arrays sized to TotSurfaces

@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPLus/ZoneTempPredictorCorrector.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -1159,9 +1160,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
-    state->dataHeatBalFanSys->MCPThermChim.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     // No EMS

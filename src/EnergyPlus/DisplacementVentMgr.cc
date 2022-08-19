@@ -603,6 +603,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     state.dataRoomAirMod->DVHcIn = state.dataHeatBalSurf->SurfHConvInt;
     CeilingHeight = state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
     ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     for (Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDDV; ++Ctd) {
         if (ZoneNum == state.dataRoomAirMod->ZoneUCSDDV(Ctd).ZonePtr) {
@@ -616,7 +617,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
 
     ConvGainsOccupiedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesOccupied);
 
-    ConvGainsOccupiedSubzone += 0.5 * state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
+    ConvGainsOccupiedSubzone += 0.5 * thisZoneHB.SysDepZoneLoadsLagged;
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
@@ -626,8 +627,8 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     }
 
     ConvGainsMixedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesMixedSubzone);
-    ConvGainsMixedSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
-                             0.5 * state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
+    ConvGainsMixedSubzone +=
+        state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) + 0.5 * thisZoneHB.SysDepZoneLoadsLagged;
     if (Zone(ZoneNum).NoHeatToReturnAir) {
         RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesMixedSubzone);
         ConvGainsMixedSubzone += RetAirGain;
@@ -650,11 +651,9 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         }
     }
 
-    SumMCp = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) +
-             state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
-    SumMCpT = state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) +
-              state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
-              state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
+    SumMCp = thisZoneHB.MCPI + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MCPE + thisZoneHB.MCPC + thisZoneHB.MDotCPOA;
+    SumMCpT = thisZoneHB.MCPTI + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MCPTE + thisZoneHB.MCPTC +
+              thisZoneHB.MDotCPOA * Zone(ZoneNum).OutDryBulbTemp;
     if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithoutDistribution) {
         SumMCp = state.afn->exchangeData(ZoneNum).SumMCp + state.afn->exchangeData(ZoneNum).SumMVCp + state.afn->exchangeData(ZoneNum).SumMMCp;
         SumMCpT = state.afn->exchangeData(ZoneNum).SumMCpT + state.afn->exchangeData(ZoneNum).SumMVCpT + state.afn->exchangeData(ZoneNum).SumMMCpT;
@@ -840,7 +839,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
             TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTM1Floor(ZoneNum) - (3.0 / 2.0) * state.dataRoomAirMod->ZTM2Floor(ZoneNum) +
                                      OneThird * state.dataRoomAirMod->ZTM3Floor(ZoneNum));
             TempDepCoef = state.dataDispVentMgr->HA_FLOOR + MCp_Total;
-            TempIndCoef = state.dataDispVentMgr->HAT_FLOOR + MCpT_Total + state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
+            TempIndCoef = state.dataDispVentMgr->HAT_FLOOR + MCpT_Total + thisZoneHB.NonAirSystemResponse / ZoneMult;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
                 state.dataRoomAirMod->ZTFloor(ZoneNum) = calculateThirdOrderFloorTemperature(TempHistTerm,
@@ -849,7 +848,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                                                                                              MCpT_Total,
                                                                                              MCp_Total,
                                                                                              state.dataRoomAirMod->ZTOC(ZoneNum),
-                                                                                             state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum),
+                                                                                             thisZoneHB.NonAirSystemResponse,
                                                                                              ZoneMult,
                                                                                              AirCap);
             } break;

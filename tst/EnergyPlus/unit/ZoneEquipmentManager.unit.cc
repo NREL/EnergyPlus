@@ -74,6 +74,7 @@
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -394,12 +395,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
 
     state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPM.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTM.allocate(state->dataGlobal->NumOfZones);
-
-    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->OAMFL.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTI.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(state->dataGlobal->NumOfZones);
@@ -428,14 +424,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
 
     CalcAirFlowSimple(*state, 2);
 
-    EXPECT_NEAR(720.738493, state->dataHeatBalFanSys->MCPM(1), 0.00001);
-    EXPECT_NEAR(119.818784, state->dataHeatBalFanSys->MCPM(2), 0.00001);
-    EXPECT_NEAR(599.907893, state->dataHeatBalFanSys->MCPM(3), 0.00001);
-    EXPECT_NEAR(719.116710, state->dataHeatBalFanSys->MCPM(4), 0.00001);
-    EXPECT_NEAR(16937.0496, state->dataHeatBalFanSys->MCPTM(1), 0.001);
-    EXPECT_NEAR(2875.6508, state->dataHeatBalFanSys->MCPTM(2), 0.001);
-    EXPECT_NEAR(13315.7667, state->dataHeatBalFanSys->MCPTM(3), 0.001);
-    EXPECT_NEAR(15699.7370, state->dataHeatBalFanSys->MCPTM(4), 0.001);
+    EXPECT_NEAR(720.738493, state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPM, 0.00001);
+    EXPECT_NEAR(119.818784, state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MCPM, 0.00001);
+    EXPECT_NEAR(599.907893, state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MCPM, 0.00001);
+    EXPECT_NEAR(719.116710, state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MCPM, 0.00001);
+    EXPECT_NEAR(16937.0496, state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTM, 0.001);
+    EXPECT_NEAR(2875.6508, state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MCPTM, 0.001);
+    EXPECT_NEAR(13315.7667, state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MCPTM, 0.001);
+    EXPECT_NEAR(15699.7370, state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MCPTM, 0.001);
     EXPECT_NEAR(0.71594243, state->dataHeatBalFanSys->MixingMassFlowZone(1), 0.00001);
     EXPECT_NEAR(0.11902146, state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.00001);
     EXPECT_NEAR(0.59591588, state->dataHeatBalFanSys->MixingMassFlowZone(3), 0.00001);
@@ -444,19 +440,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     EXPECT_NEAR(0.00011902146, state->dataHeatBalFanSys->MixingMassFlowXHumRat(2), 0.0000001);
     EXPECT_NEAR(0.00059591588, state->dataHeatBalFanSys->MixingMassFlowXHumRat(3), 0.0000001);
     EXPECT_NEAR(0.00071433143, state->dataHeatBalFanSys->MixingMassFlowXHumRat(4), 0.0000001);
-
-    // Deallocate everything - should all be taken care of in clear_states
-
-    state->dataHeatBalFanSys->MAT.deallocate();
-    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    state->dataHeatBalFanSys->MCPM.deallocate();
-    state->dataHeatBalFanSys->MCPTM.deallocate();
-    state->dataHeatBalFanSys->MCPI.deallocate();
-    state->dataHeatBalFanSys->OAMFL.deallocate();
-    state->dataHeatBalFanSys->MCPTI.deallocate();
-    state->dataHeatBalFanSys->MixingMassFlowZone.deallocate();
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat.deallocate();
-    state->dataHeatBalFanSys->ZoneReOrder.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
@@ -4421,15 +4404,7 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
 
     state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPM.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTM.allocate(state->dataGlobal->NumOfZones);
-
-    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->OAMFL.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTI.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPThermChim.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(state->dataGlobal->NumOfZones);
@@ -4546,6 +4521,7 @@ TEST_F(EnergyPlusFixture, CZoeEquipmentManager_CalcZoneLeavingConditions_Test)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataZoneEquip->ZoneEquipList.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     CalcZoneLeavingConditions(*state, true);
     // Zone node temperature is the same as input
@@ -4570,9 +4546,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataSize->CalcZoneSizing.allocate(1, state->dataGlobal->NumOfZones);
     state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
     state->dataSize->FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneLatentGain.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->NonAirSystemResponse.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->SysDepZoneLoads.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->TempControlType.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(state->dataGlobal->NumOfZones);

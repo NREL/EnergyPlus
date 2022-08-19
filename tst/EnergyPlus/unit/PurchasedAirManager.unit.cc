@@ -72,6 +72,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHeatBalance;
@@ -116,15 +117,13 @@ protected:
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 1000.0;
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 2000.0;
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
-        state->dataHeatBalFanSys->NonAirSystemResponse.allocate(1);
-        state->dataHeatBalFanSys->SysDepZoneLoads.allocate(1);
+        state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
         state->dataHeatBal->MassConservation.allocate(1);
         state->dataHeatBal->ZoneIntGain.allocate(1);
         state->dataHeatBal->spaceIntGain.allocate(1);
         state->dataHeatBal->spaceIntGainDevices.allocate(1);
         state->dataSurface->SurfaceWindow.allocate(1);
         state->dataHeatBal->RefrigCaseCredit.allocate(1);
-        state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
 
         state->dataHeatBalFanSys->TempControlType.allocate(1);
         state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;

@@ -66,6 +66,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -633,14 +634,14 @@ namespace CoolTower {
         Real64 OutletTemp;      // Dry bulb temperature of air at the cooltower outlet
         Real64 IntHumRat;       // Humidity ratio of initialized air
 
-        state.dataHeatBalFanSys->MCPTC = 0.0;
-        state.dataHeatBalFanSys->MCPC = 0.0;
-        state.dataHeatBalFanSys->CTMFL = 0.0;
-
         auto &Zone(state.dataHeatBal->Zone);
 
         for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
             ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+            thisZoneHB.MCPTC = 0.0;
+            thisZoneHB.MCPC = 0.0;
+            thisZoneHB.CTMFL = 0.0;
 
             if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
                 // check component operation
@@ -719,25 +720,24 @@ namespace CoolTower {
                 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
                 CVF_ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate *
                               GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
-                state.dataHeatBalFanSys->MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;
-                state.dataHeatBalFanSys->MCPTC(ZoneNum) = state.dataHeatBalFanSys->MCPC(ZoneNum) * OutletTemp;
-                state.dataHeatBalFanSys->CTMFL(ZoneNum) = state.dataHeatBalFanSys->MCPC(ZoneNum) / AirSpecHeat;
+                thisZoneHB.MCPC = CVF_ZoneNum * AirDensity * AirSpecHeat;
+                thisZoneHB.MCPTC = thisZoneHB.MCPC * OutletTemp;
+                thisZoneHB.CTMFL = thisZoneHB.MCPC / AirSpecHeat;
 
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower =
-                    state.dataHeatBalFanSys->MCPC(ZoneNum) * std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - OutletTemp);
+                    thisZoneHB.MCPC * std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - OutletTemp);
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower =
                     CVF_ZoneNum * std::abs(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) - OutletHumRat);
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletTemp = OutletTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletHumRat = OutletHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate = CVF_ZoneNum;
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate = state.dataHeatBalFanSys->CTMFL(ZoneNum);
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd =
-                    state.dataHeatBalFanSys->CTMFL(ZoneNum) / state.dataEnvrn->StdRhoAir;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate = thisZoneHB.CTMFL;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd = thisZoneHB.CTMFL / state.dataEnvrn->StdRhoAir;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletDBTemp = Zone(ZoneNum).OutDryBulbTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletWBTemp = Zone(ZoneNum).OutWetBulbTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletHumRat = state.dataEnvrn->OutHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsumpRate =
-                    (std::abs(InletHumRat - OutletHumRat) * state.dataHeatBalFanSys->CTMFL(ZoneNum)) / RhoWater;
+                    (std::abs(InletHumRat - OutletHumRat) * thisZoneHB.CTMFL) / RhoWater;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeupRate = 0.0; // initialize -- calc in update
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpElecPower =
                     state.dataCoolTower->CoolTowerSys(CoolTowerNum).RatedPumpPower * PumpPartLoadRat;
