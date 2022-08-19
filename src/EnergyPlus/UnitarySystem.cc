@@ -2597,10 +2597,80 @@ namespace UnitarySystems {
             if (childCCType_Num == DataHVACGlobals::CoilDX_Cooling) {
                 int childCCIndex = state.dataHVACAssistedCC->HXAssistedCoil(this->m_CoolingCoilIndex).CoolingCoilIndex;
                 if (childCCIndex < 0) {
-                    ShowContinueError(state, "Occurs in sizing HeatExchangerAssistedCoolingCoil.");
+                    ShowWarningError(state, "Occurs in sizing HeatExchangerAssistedCoolingCoil.");
+                    ShowFatalError(state, "No cooling coil = Coil:Cooling:DX found.");
+                    ErrFound = true;
                 }
                 auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
+                this->m_NumOfSpeedCooling = newCoil.performance.normalMode.speeds.size();
+                if (this->m_NumOfSpeedCooling > 0) {
+                    if (this->m_CoolVolumeFlowRate.empty()) this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+                    if (this->m_CoolMassFlowRate.empty()) this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+                    if (this->m_MSCoolingSpeedRatio.empty()) this->m_MSCoolingSpeedRatio.resize(this->m_NumOfSpeedCooling + 1);
+                }
+
+                // it feels like we are jamming the rectangular DXCoil into an oval box here
+                MSHPIndex = this->m_DesignSpecMSHPIndex;
+                if (MSHPIndex > -1) {
+                    for (Iter = state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedCooling; Iter >= 1;
+                         --Iter) { // use reverse order since we divide by HeatVolumeFlowRate(max)
+                        if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter - 1] == DataSizing::AutoSize) {
+                            state.dataUnitarySystems->designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter - 1] =
+                                double(Iter) / double(state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedCooling);
+                        }
+                    }
+                }
+
+                // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
+                if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
+                    ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
+                    ShowContinueError(state, "Number of cooling speeds does not match coil object.");
+                    ShowFatalError(state, "Cooling coil = Coil:Cooling:DX: " + newCoil.name);
+                }
+
+                // Use discrete/continuous control algorithm regardless of number of speeds
+                if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::DISCRETE) {
+                    this->m_DiscreteSpeedCoolingCoil = true;
+                } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::CONTINUOUS) {
+                    this->m_ContSpeedCoolingCoil = true;
+                }
+
                 newCoil.size(state);
+                if (MSHPIndex == -1) {
+                    for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
+                        this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.normalMode.speeds[Iter - 1].evap_air_flow_rate;
+                        this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
+                        // it seems the ratio should reference the actual flow rates, not the fan flow ???
+                        if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
+                            this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+                        } else {
+                            this->m_MSCoolingSpeedRatio[Iter] =
+                                this->m_CoolVolumeFlowRate[Iter] / this->m_CoolVolumeFlowRate[this->m_NumOfSpeedCooling];
+                        }
+                    }
+                }
+
+                state.dataSize->DXCoolCap = newCoil.performance.normalMode.ratedGrossTotalCap;
+                EqSizing.DesCoolingLoad = state.dataSize->DXCoolCap;
+                if (this->m_HeatPump) EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
+
+                if (MSHPIndex > -1) {
+                    for (Iter = state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedCooling; Iter > 0; --Iter) {
+                        if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter - 1] == DataSizing::AutoSize)
+                            state.dataUnitarySystems->designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter - 1] =
+                                double(Iter) / double(state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedCooling);
+                        this->m_CoolVolumeFlowRate[Iter] =
+                            this->m_MaxCoolAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter - 1];
+                        this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
+                        this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+                    }
+                    this->m_MaxNoCoolHeatAirVolFlow =
+                        this->m_MaxCoolAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
+                    this->MaxNoCoolHeatAirMassFlow = this->m_MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
+                    this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
+                } else if (this->m_CoolVolumeFlowRate.empty()) {
+                    this->m_NoLoadAirFlowRateRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_DesignFanVolFlowRate;
+                }
             }
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
             if (this->m_NumOfSpeedCooling > 0) {
