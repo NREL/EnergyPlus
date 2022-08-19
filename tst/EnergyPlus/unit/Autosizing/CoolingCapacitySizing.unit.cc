@@ -493,11 +493,13 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 0.2;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOATemp = 32.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
-    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBeforeCoolingCoilFlag = true;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOAHumRat = 0.009;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolTemp = 12.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolHumRat = 0.006;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanInletNodeNum = 1;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanOutletNodeNum = 2;
 
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -534,6 +536,34 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
         std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Cooling Design Capacity [W], 5634.11835\n"
                     " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Cooling Design Capacity [W], 4200.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+
+    // Test 22 - OA Equipment, DOAS Air loop with no fan heat for cooling capacity
+    state->dataSize->OASysEqSizing(1).CoolingCapacity = false;
+    state->dataAirLoop->OutsideAirSys.allocate(1);
+    state->dataAirLoop->OutsideAirSys(1).AirLoopDOASNum = 0;
+    state->dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 0.2;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOATemp = 32.0;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBeforeCoolingCoilFlag = false;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOAHumRat = 0.009;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolTemp = 12.0;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolHumRat = 0.006;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanInletNodeNum = 1;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanOutletNodeNum = 2;
+
+    // start with an autosized value
+    inputValue = DataSizing::AutoSize;
+    // do sizing
+    sizer.wasAutoSized = false;
+    printFlag = false;
+    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(*this->state, inputValue, errorsFound);
+    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(5633.933, sizedValue, 0.01); // capacity includes system fan heat
+    sizer.autoSizedValue = 0.0;              // reset for next test
 }
 
 } // namespace EnergyPlus

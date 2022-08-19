@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -75,9 +76,12 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -86,6 +90,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -296,6 +301,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ("F", curUnits);
     EXPECT_EQ(1.8, curConversionFactor);
     EXPECT_EQ(32., curConversionOffset);
+
+    varNameWithUnits = "SET > 30°C DEGREE-HOURS [°C·hr]";
+    LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
+    GetUnitConversion(*state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+    EXPECT_EQ(118, indexUnitConv);
+    EXPECT_EQ("°F·hr", curUnits);
+    EXPECT_EQ(1.8, curConversionFactor);
 
     varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY[J]";
     LookupSItoIP(*state, varNameWithUnits, indexUnitConv, curUnits);
@@ -10116,6 +10128,488 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
         std::string colHeader = col[0];
         EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
     }
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
+{
+    // when multiple people objects with different threshold settings are defined for one zone,
+    // a warning is thrown, as people-dependent resilience metrics are not meaningful in these
+    // settings
+    std::string const idf_objects = delimited_string({
+
+        "Zone,",
+        "ZONE ONE,                !- Name",
+        "0,                       !- Direction of Relative North {deg}",
+        "0,                       !- X Origin {m}",
+        "0,                       !- Y Origin {m}",
+        "0,                       !- Z Origin {m}",
+        "1,                       !- Type",
+        "1,                       !- Multiplier",
+        "autocalculate,           !- Ceiling Height {m}",
+        "autocalculate;           !- Volume {m3}",
+
+        "People,",
+        "ZONE ONE People 1,       !- Name",
+        "ZONE ONE,                !- Zone or ZoneList Name",
+        "BLDG_OCC_SCH,            !- Number of People Schedule Name",
+        "People,                  !- Number of People Calculation Method",
+        "10,                      !- Number of People",
+        ",                        !- People per Zone Floor Area {person/m2}",
+        ",                        !- Zone Floor Area per Person {m2/person}",
+        "0.3000,                  !- Fraction Radiant",
+        "AUTOCALCULATE,           !- Sensible Heat Fraction",
+        "ACTIVITY_SCH,            !- Activity Level Schedule Name",
+        ",                        !- Carbon Dioxide Generation Rate {m3/s-W}",
+        "No,                      !- Enable ASHRAE 55 Comfort Warnings",
+        "ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        ",                        !- Surface Name/Angle Factor List Name",
+        ",                        !- Work Efficiency Schedule Name",
+        ",                        !- Clothing Insulation Calculation Method",
+        ",                        !- Clothing Insulation Calculation Method Schedule Name",
+        ",                        !- Clothing Insulation Schedule Name",
+        ",                        !- Air Velocity Schedule Name",
+        ",                        !- Thermal Comfort Model 1 Type",
+        ",                        !- Thermal Comfort Model 2 Type",
+        ",                        !- Thermal Comfort Model 3 Type",
+        ",                        !- Thermal Comfort Model 4 Type",
+        ",                        !- Thermal Comfort Model 5 Type",
+        ",                        !- Thermal Comfort Model 6 Type",
+        ",                        !- Thermal Comfort Model 7 Type",
+        ",                        !- Ankle Level Air Velocity Schedule Name",
+        "10.5,                    !- Cold Stress Temperature Threshold [C]",
+        "32.5;                    !- Heat Stress Temperature Threshold [C]",
+
+        "People,",
+        "ZONE ONE People 2,       !- Name",
+        "ZONE ONE,                !- Zone or ZoneList Name",
+        "BLDG_OCC_SCH,            !- Number of People Schedule Name",
+        "People,                  !- Number of People Calculation Method",
+        "10,                      !- Number of People",
+        ",                        !- People per Zone Floor Area {person/m2}",
+        ",                        !- Zone Floor Area per Person {m2/person}",
+        "0.3000,                  !- Fraction Radiant",
+        "AUTOCALCULATE,           !- Sensible Heat Fraction",
+        "ACTIVITY_SCH,            !- Activity Level Schedule Name",
+        ",                        !- Carbon Dioxide Generation Rate {m3/s-W}",
+        "No,                      !- Enable ASHRAE 55 Comfort Warnings",
+        "ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        ",                        !- Surface Name/Angle Factor List Name",
+        ",                        !- Work Efficiency Schedule Name",
+        ",                        !- Clothing Insulation Calculation Method",
+        ",                        !- Clothing Insulation Calculation Method Schedule Name",
+        ",                        !- Clothing Insulation Schedule Name",
+        ",                        !- Air Velocity Schedule Name",
+        ",                        !- Thermal Comfort Model 1 Type",
+        ",                        !- Thermal Comfort Model 2 Type",
+        ",                        !- Thermal Comfort Model 3 Type",
+        ",                        !- Thermal Comfort Model 4 Type",
+        ",                        !- Thermal Comfort Model 5 Type",
+        ",                        !- Thermal Comfort Model 6 Type",
+        ",                        !- Thermal Comfort Model 7 Type",
+        ",                        !- Ankle Level Air Velocity Schedule Name",
+        "11.5,                    !- Cold Stress Temperature Threshold [C]",
+        "30.5;                    !- Heat Stress Temperature Threshold [C]",
+
+        "ScheduleTypeLimits,",
+        "Any Number;              !- Name",
+        "ScheduleTypeLimits,",
+        "Fraction,                !- Name",
+        "0.0,                     !- Lower Limit Value",
+        "1.0,                     !- Upper Limit Value",
+        "CONTINUOUS;              !- Numeric Type",
+
+        "Schedule:Compact,",
+        "ACTIVITY_SCH,            !- Name",
+        "Any Number,              !- Schedule Type Limits Name",
+        "Through: 12/31,          !- Field 1",
+        "For: AllDays,            !- Field 2",
+        "Until: 24:00,120.;       !- Field 3",
+
+        "Schedule:Compact,",
+        "BLDG_OCC_SCH,            !- Name",
+        "Fraction,                !- Schedule Type Limits Name",
+        "Through: 12/31,          !- Field 1",
+        "For: AllDays,            !- Field 2",
+        "Until: 24:00,1.0;        !- Field 3",
+
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+
+    state->dataOutRptTab->displayThermalResilienceSummary = true;
+    UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
+
+    std::string error_string =
+        delimited_string({"   ** Warning ** Zone 1 has multiple people objects with different Cold Stress Temperature Threshold.",
+                          "   ** Warning ** Zone 1 has multiple people objects with different Heat Stress Temperature Threshold."});
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableReportingPeriod)
+{
+
+    // test unit conversion in SET Degree-Hour report table for reporting periods
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Resilience.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Test";
+
+    int columnNum = 5;
+
+    Array1D_int columnWidth;
+    columnWidth.allocate(columnNum);
+    columnWidth = 10;
+    Array1D_string columnHead(columnNum);
+    columnHead(1) = "SET ≤ 12.2°C Degree-Hours [°C·hr]";
+    columnHead(2) = "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]";
+    columnHead(3) = "SET ≤ 12.2°C Occupied Degree-Hours [°C·hr]";
+    columnHead(4) = "Longest SET ≤ 12.2°C Duration for Occupied Period [hr]";
+    columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
+
+    Real64 degreeHourConversion = 1.8;
+    state->dataWeatherManager->TotReportPers = 2;
+
+    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+        state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, i).assign(5, 0.0);
+    }
+
+    int encodedMonDayHrMin;
+    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+        for (int i = 0; i < 4; i++) {
+            state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+        }
+        General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * k, 30);
+        state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, k)[4] = encodedMonDayHrMin;
+    }
+
+    std::string tableName = "Heating SET Degree-Hours";
+
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(state->dataGlobal->NumOfZones + 3);
+    tableBody.allocate(columnNum, state->dataGlobal->NumOfZones + 3);
+
+    WriteSETHoursTableReportingPeriod(*state,
+                                      columnNum,
+                                      1,
+                                      "Test Period 1",
+                                      tableName,
+                                      columnHead,
+                                      columnWidth,
+                                      state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod,
+                                      rowHead,
+                                      tableBody,
+                                      degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-1.8", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("7.20", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    //    duration hour don't change, 1, 1
+    EXPECT_EQ("-9.0", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("01-JAN-04:30", RetrieveEntryFromTableBody(tableBody, 1, 5));
+
+    WriteSETHoursTableReportingPeriod(*state,
+                                      columnNum,
+                                      2,
+                                      "Test Period 2",
+                                      tableName,
+                                      columnHead,
+                                      columnWidth,
+                                      state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod,
+                                      rowHead,
+                                      tableBody,
+                                      degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-3.6", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("14.40", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    //    duration hour don't change
+    EXPECT_EQ("-18.0", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("01-JAN-09:30", RetrieveEntryFromTableBody(tableBody, 1, 5));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitConv)
+{
+    // test unit conversion in unmet degree hour table for reporting periods
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Test";
+
+    int columnNumUnmetDegHr = 6;
+    Array1D_string columnHeadUnmetDegHr(6);
+    // must initialize this otherwise it will only output 5 columns
+    Array1D_int columnWidthUnmetDegHr;
+    columnWidthUnmetDegHr.allocate(columnNumUnmetDegHr);
+    columnWidthUnmetDegHr = 10;
+    columnHeadUnmetDegHr(1) = "Cooling Setpoint Unmet Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(2) = "Cooling Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(3) = "Cooling Setpoint Unmet Occupied Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(4) = "Heating Setpoint Unmet Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(5) = "Heating Setpoint Unmet Occupant-Weighted Degree-Hours [°C·hr]";
+    columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
+    std::string tableName = "Unmet Degree-Hours";
+
+    Real64 degreeHourConversion = 1.8;
+    state->dataWeatherManager->TotReportPers = 2;
+
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
+    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+        state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, i).assign(columnNumUnmetDegHr, 0.0);
+    }
+    // state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins: [0, -1, 4, -9, 16, -25]
+    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+        for (int i = 0; i < 6; i++) {
+            state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+        }
+    }
+
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(state->dataGlobal->NumOfZones + 4);
+    tableBody.allocate(columnNumUnmetDegHr, state->dataGlobal->NumOfZones + 4);
+
+    WriteResilienceBinsTableReportingPeriod(*state,
+                                            "Thermal",
+                                            columnNumUnmetDegHr,
+                                            1,
+                                            "Test Period 1",
+                                            tableName,
+                                            columnHeadUnmetDegHr,
+                                            columnWidthUnmetDegHr,
+                                            state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody,
+                                            degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-1.8", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("7.20", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    EXPECT_EQ("-16.2", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("28.80", RetrieveEntryFromTableBody(tableBody, 1, 5));
+    EXPECT_EQ("-45.0", RetrieveEntryFromTableBody(tableBody, 1, 6));
+
+    WriteResilienceBinsTableReportingPeriod(*state,
+                                            "Thermal",
+                                            columnNumUnmetDegHr,
+                                            2,
+                                            "Test Period 1",
+                                            tableName,
+                                            columnHeadUnmetDegHr,
+                                            columnWidthUnmetDegHr,
+                                            state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod,
+                                            rowHead,
+                                            tableBody,
+                                            degreeHourConversion);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 2, 1));
+    EXPECT_EQ("-3.6", RetrieveEntryFromTableBody(tableBody, 2, 2));
+    EXPECT_EQ("14.40", RetrieveEntryFromTableBody(tableBody, 2, 3));
+    EXPECT_EQ("-32.4", RetrieveEntryFromTableBody(tableBody, 2, 4));
+    EXPECT_EQ("57.60", RetrieveEntryFromTableBody(tableBody, 2, 5));
+    EXPECT_EQ("-90.0", RetrieveEntryFromTableBody(tableBody, 2, 6));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_RetrieveEntryFromTableBody)
+{
+
+    Array2D_string tableBody;
+    int columnCount = 4;
+    int rowCount = 3;
+    tableBody.allocate(columnCount, rowCount);
+    for (int col_i = 1; col_i <= columnCount; col_i++) {
+        for (int row_i = 1; row_i <= rowCount; row_i++) {
+            tableBody(col_i, row_i) = fmt::format("{}-{}", col_i, row_i);
+        }
+    }
+    EXPECT_EQ(RetrieveEntryFromTableBody(tableBody, 1, 1), "1-1");
+    EXPECT_EQ(RetrieveEntryFromTableBody(tableBody, 2, 1), "1-2");
+    EXPECT_EQ(RetrieveEntryFromTableBody(tableBody, 3, 4), "4-3");
+}
+
+// fixme: change the testcase
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteResilienceBinsTableNonPreDef)
+{
+    std::string tableName = "test table";
+    Array1D_string columnHead;
+    columnHead.allocate(numColumnThermalTbl);
+    columnHead(1) = "col 1";
+    columnHead(2) = "col 2";
+    columnHead(3) = "col 3";
+    columnHead(4) = "col 4";
+    columnHead(5) = "col 5";
+    Array1D_int columnWidth;
+    columnWidth.allocate(numColumnThermalTbl);
+    columnWidth = 10;
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    state->dataGlobal->NumOfZones = 2;
+    int numZone = state->dataGlobal->NumOfZones;
+    state->dataHeatBal->Zone.allocate(numZone);
+    state->dataHeatBal->Resilience.allocate(numZone);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+    state->dataHeatBal->Zone(2).Name = "Zone 2";
+    int rowNum = numZone + 4;
+    rowHead.allocate(rowNum);
+    tableBody.allocate(numColumnThermalTbl, rowNum);
+    Real64 unitConvMultiplier = 1.0;
+
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        for (int j = 0; j < numColumnThermalTbl; j++) {
+            (state->dataHeatBal->Resilience(zone_i).ZoneHeatIndexHourBins).at(j) = std::pow(j, 2) * zone_i;
+        }
+    }
+
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrHeatIndex = &DataHeatBalance::ZoneResilience::ZoneHeatIndexHourBins;
+    WriteResilienceBinsTableNonPreDefUseZoneData<numColumnThermalTbl>(
+        *state, tableName, columnHead, columnWidth, ptrHeatIndex, rowHead, tableBody, unitConvMultiplier);
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        for (int j = 0; j < numColumnThermalTbl; j++) {
+            EXPECT_EQ(tableBody(j + 1, zone_i), RealToStr(std::pow(j, 2) * zone_i * 1.0, 2));
+        }
+    }
+
+    for (int j = 0; j < numColumnThermalTbl; j++) {
+        EXPECT_EQ(tableBody(j + 1, numZone + 1), RealToStr(std::pow(j, 2) * 1 * 1.0, 2));                                    // min
+        EXPECT_EQ(tableBody(j + 1, numZone + 2), RealToStr(std::pow(j, 2) * 2 * 1.0, 2));                                    // max
+        EXPECT_EQ(tableBody(j + 1, numZone + 3), RealToStr((std::pow(j, 2) * 1 * 1.0 + std::pow(j, 2) * 2 * 1.0) / 2.0, 2)); // mean
+        EXPECT_EQ(tableBody(j + 1, numZone + 4), RealToStr(std::pow(j, 2) * 1 * 1.0 + std::pow(j, 2) * 2 * 1.0, 2));         // sum
+    }
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableNonPreDef)
+{
+
+    Array1D_string columnHead;
+    columnHead.allocate(numColumnThermalTbl);
+    columnHead(1) = "col 1";
+    columnHead(2) = "col 2";
+    columnHead(3) = "col 3";
+    columnHead(4) = "col 4";
+    columnHead(5) = "col 5";
+    Array1D_int columnWidth;
+    columnWidth.allocate(numColumnThermalTbl);
+    columnWidth = 10;
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    state->dataGlobal->NumOfZones = 2;
+    int numZone = state->dataGlobal->NumOfZones;
+    state->dataHeatBal->Zone.allocate(numZone);
+    state->dataHeatBal->Resilience.allocate(numZone);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+    state->dataHeatBal->Zone(2).Name = "Zone 2";
+
+    state->dataHeatBal->Zone.allocate(numZone);
+
+    int encodedMonDayHrMin;
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        for (int i = 0; i < 5; i++) {
+            (state->dataHeatBal->Resilience(zone_i).ZoneLowSETHours).at(i) = float(zone_i) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
+        }
+        General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * zone_i, 30);
+        (state->dataHeatBal->Resilience(zone_i).ZoneLowSETHours).at(4) = encodedMonDayHrMin;
+    }
+
+    std::string tableName = "Heating SET Degree-Hours";
+
+    rowHead.allocate(state->dataGlobal->NumOfZones + 3);
+    tableBody.allocate(numColumnThermalTbl, state->dataGlobal->NumOfZones + 3);
+    Real64 unitConvMultiplier = 1.0;
+
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrZoneLowSETHours = &DataHeatBalance::ZoneResilience::ZoneLowSETHours;
+    WriteSETHoursTableNonPreDefUseZoneData(
+        *state, numColumnThermalTbl, tableName, columnHead, columnWidth, ptrZoneLowSETHours, rowHead, tableBody, unitConvMultiplier);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-1.0", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("4.00", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    EXPECT_EQ("-9.0", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("01-JAN-04:30", RetrieveEntryFromTableBody(tableBody, 1, 5));
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 2, 1));
+    EXPECT_EQ("-2.0", RetrieveEntryFromTableBody(tableBody, 2, 2));
+    EXPECT_EQ("8.00", RetrieveEntryFromTableBody(tableBody, 2, 3));
+    EXPECT_EQ("-18.0", RetrieveEntryFromTableBody(tableBody, 2, 4));
+    EXPECT_EQ("01-JAN-09:30", RetrieveEntryFromTableBody(tableBody, 2, 5));
+
+    unitConvMultiplier = 1.8;
+    WriteSETHoursTableNonPreDefUseZoneData(
+        *state, numColumnThermalTbl, tableName, columnHead, columnWidth, ptrZoneLowSETHours, rowHead, tableBody, unitConvMultiplier);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("-1.8", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("7.20", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    //    duration hour don't change, 1, 1
+    EXPECT_EQ("-9.0", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("01-JAN-04:30", RetrieveEntryFromTableBody(tableBody, 1, 5));
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 2, 1));
+    EXPECT_EQ("-3.6", RetrieveEntryFromTableBody(tableBody, 2, 2));
+    EXPECT_EQ("14.40", RetrieveEntryFromTableBody(tableBody, 2, 3));
+    //    duration hour don't change, 1, 1
+    EXPECT_EQ("-18.0", RetrieveEntryFromTableBody(tableBody, 2, 4));
+    EXPECT_EQ("01-JAN-09:30", RetrieveEntryFromTableBody(tableBody, 2, 5));
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteHourOfSafetyTableNonPreDef)
+{
+    std::string tableName = "Hours of Safety for Cold Events";
+    Array1D_string columnHead;
+    columnHead.allocate(numColumnThermalTbl);
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    Array1D_int columnWidth;
+    columnWidth.allocate(numColumnThermalTbl);
+    columnWidth = 10;
+    state->dataGlobal->NumOfZones = 2;
+    int numZone = state->dataGlobal->NumOfZones;
+    state->dataHeatBal->Zone.allocate(numZone);
+    state->dataHeatBal->Resilience.allocate(numZone);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+    state->dataHeatBal->Zone(2).Name = "Zone 2";
+    rowHead.allocate(numZone + 4);
+    tableBody.allocate(numColumnThermalTbl, numZone + 4);
+    columnHead(1) = "Hours of Safety [hr]";
+    columnHead(2) = "End Time of the Safety Duration";
+    columnHead(3) = "Safe Temperature Exceedance Hours [hr]";
+    columnHead(4) = "Safe Temperature Exceedance OccupantHours [hr]";
+    columnHead(5) = "Safe Temperature Exceedance OccupiedHours [hr]";
+
+    state->dataHeatBal->Zone.allocate(numZone);
+    int timeColumnIdx = 2;
+    int encodedMonDayHrMin;
+    for (int zone_i = 1; zone_i <= numZone; zone_i++) {
+        for (int j = 0; j < numColumnThermalTbl; j++) {
+            (state->dataHeatBal->Resilience(zone_i).ZoneColdHourOfSafetyBins).at(j) = std::pow(j, 2) * zone_i;
+        }
+        General::EncodeMonDayHrMin(encodedMonDayHrMin, 1, 1, 5 * zone_i, 30);
+        (state->dataHeatBal->Resilience(zone_i).ZoneColdHourOfSafetyBins).at(timeColumnIdx - 1) = encodedMonDayHrMin;
+    }
+
+    std::array<Real64, numColumnThermalTbl> DataHeatBalance::ZoneResilience::*ptrColdHourOfSafetyBins =
+        &DataHeatBalance::ZoneResilience::ZoneColdHourOfSafetyBins;
+    WriteHourOfSafetyTableNonPreDefUseZoneData(
+        *state, numColumnThermalTbl, tableName, columnHead, columnWidth, ptrColdHourOfSafetyBins, rowHead, tableBody, timeColumnIdx);
+
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 1, 1));
+    EXPECT_EQ("01-JAN-04:30", RetrieveEntryFromTableBody(tableBody, 1, 2));
+    EXPECT_EQ("4.00", RetrieveEntryFromTableBody(tableBody, 1, 3));
+    EXPECT_EQ("9.00", RetrieveEntryFromTableBody(tableBody, 1, 4));
+    EXPECT_EQ("16.00", RetrieveEntryFromTableBody(tableBody, 1, 5));
+    EXPECT_EQ("0.00", RetrieveEntryFromTableBody(tableBody, 2, 1));
+    EXPECT_EQ("01-JAN-09:30", RetrieveEntryFromTableBody(tableBody, 2, 2));
+    EXPECT_EQ("8.00", RetrieveEntryFromTableBody(tableBody, 2, 3));
+    EXPECT_EQ("18.00", RetrieveEntryFromTableBody(tableBody, 2, 4));
+    EXPECT_EQ("32.00", RetrieveEntryFromTableBody(tableBody, 2, 5));
 }
 
 TEST_F(SQLiteFixture, StatFile_TMYx)
