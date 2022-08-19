@@ -9799,6 +9799,16 @@ namespace SurfaceGeometry {
                                      ControlType + "\"");
             }
 
+            if (has_prefix(ControlType, "ONIFHIGHSOLARORHIGHLUMINANCETILL")) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" invalid " +
+                                        state.dataIPShortCut->cAlphaFieldNames(12) + " must not be empty for shading control type \"" + ControlType +
+                                        "\"");
+                }
+            }
+
             if (state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice > 0) {
                 if (state.dataMaterial->Material(state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice).Group ==
                         DataHeatBalance::MaterialGroup::Screen &&
