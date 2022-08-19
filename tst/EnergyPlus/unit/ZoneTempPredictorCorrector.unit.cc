@@ -1042,37 +1042,29 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-    Real64 &SumIntGain = thisZoneHB.SumIntGain; // Zone sum of convective internal gains
-    Real64 &SumHA = thisZoneHB.SumHA;           // Zone sum of Hc*Area
-    Real64 &SumHATsurf = thisZoneHB.SumHATsurf; // Zone sum of Hc*Area*Tsurf
-    Real64 &SumHATref = thisZoneHB.SumHATref;   // Zone sum of Hc*Area*Tref for ceiling diffuser convection correlation
-    Real64 &SumMCp = thisZoneHB.SumMCp;         // Zone sum of MassFlowRate*Cp
-    Real64 &SumMCpT = thisZoneHB.SumMCpT;       // Zone sum of MassFlowRate*Cp*T
-    Real64 &SumSysMCp = thisZoneHB.SumSysMCp;   // Zone sum of air system MassFlowRate*Cp
-    Real64 &SumSysMCpT = thisZoneHB.SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
 
     CalcZoneSums(*state, ZoneNum);
 
-    EXPECT_EQ(5.0, SumHA);
-    EXPECT_EQ(300.0, SumHATsurf);
-    EXPECT_EQ(150.0, SumHATref);
+    EXPECT_EQ(5.0, thisZoneHB.SumHA);
+    EXPECT_EQ(300.0, thisZoneHB.SumHATsurf);
+    EXPECT_EQ(150.0, thisZoneHB.SumHATref);
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
     CalcZoneSums(*state, ZoneNum);
-    EXPECT_EQ(10.0, SumHA);
-    EXPECT_EQ(300.0, SumHATsurf);
-    EXPECT_EQ(50.0, SumHATref);
+    EXPECT_EQ(10.0, thisZoneHB.SumHA);
+    EXPECT_EQ(300.0, thisZoneHB.SumHATsurf);
+    EXPECT_EQ(50.0, thisZoneHB.SumHATref);
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(2).MassFlowRate = 0.2;
     CalcZoneSums(*state, ZoneNum);
-    EXPECT_NEAR(302.00968500, SumSysMCp, 0.0001);
-    EXPECT_NEAR(6040.1937, SumSysMCpT, 0.0001);
+    EXPECT_NEAR(302.00968500, thisZoneHB.SumSysMCp, 0.0001);
+    EXPECT_NEAR(6040.1937, thisZoneHB.SumSysMCpT, 0.0001);
 
     CalcZoneSums(*state, ZoneNum, false);
-    EXPECT_EQ(0.0, SumSysMCp);
-    EXPECT_EQ(0.0, SumSysMCpT);
+    EXPECT_EQ(0.0, thisZoneHB.SumSysMCp);
+    EXPECT_EQ(0.0, thisZoneHB.SumSysMCpT);
 }
 
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)

@@ -123,7 +123,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneAirHumRatTemp; // Temp zone air humidity ratio at time plus 1
     Array1D<Real64> ZoneAirHumRatOld;  // Last Time Steps Zone AIR Humidity Ratio
 
-
     Array1D<Real64> MixingMassFlowZone;    // Mixing MASS FLOW (kg/s)
     Array1D<Real64> MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio
 
