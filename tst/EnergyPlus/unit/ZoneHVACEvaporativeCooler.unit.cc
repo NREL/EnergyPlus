@@ -102,7 +102,6 @@ protected:
         state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
 
         state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "One Zone";
-        state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
         state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
         state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
         state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 3;
@@ -116,11 +115,9 @@ protected:
         state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
         state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-        state->dataHeatBal->Zone(1).ZoneEqNum = 1;
         state->dataHeatBal->Zone(1).Multiplier = 1.0;
         state->dataHeatBal->Zone(1).Volume = 1000.0;
-        state->dataHeatBal->Zone(state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
-            state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
+        state->dataHeatBal->Zone(1).SystemZoneNodeNumber = state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
         state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
 
         state->dataZoneEquip->ZoneEquipList(1).Name = "ZONEHVACEVAPEQUIPMENT";

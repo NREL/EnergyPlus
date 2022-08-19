@@ -468,7 +468,7 @@
   OtherEquipment,
     Test 352a,               !- Name
     None,                    !- Fuel Type
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     352,                     !- Design Level {W}
@@ -481,7 +481,7 @@
   OtherEquipment,
     Test 352 minus,          !- Name
     None,                    !- Fuel Type
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     -352,                    !- Design Level {W}

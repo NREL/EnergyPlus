@@ -337,7 +337,6 @@ namespace DualDuct {
                                     state.dataDefineEquipment->AirDistUnit(thisDD.ADUNum).ZoneEqNum = CtrlZone;
                                 }
                                 thisDD.CtrlZoneNum = CtrlZone;
-                                thisDD.ActualZoneNum = thisZoneEquipConfig.ActualZoneNum;
                                 thisDD.CtrlZoneInNodeIndex = SupAirIn;
                             }
                         }
@@ -469,7 +468,6 @@ namespace DualDuct {
                                 state.dataDefineEquipment->AirDistUnit(thisDD.ADUNum).ZoneEqNum = CtrlZone;
 
                                 thisDD.CtrlZoneNum = CtrlZone;
-                                thisDD.ActualZoneNum = thisZoneEquipConfig.ActualZoneNum;
                                 thisDD.CtrlZoneInNodeIndex = SupAirIn;
                             }
                         }
@@ -649,7 +647,6 @@ namespace DualDuct {
                                 state.dataDefineEquipment->AirDistUnit(thisDD.ADUNum).ZoneEqNum = CtrlZone;
 
                                 thisDD.CtrlZoneNum = CtrlZone;
-                                thisDD.ActualZoneNum = thisZoneEquipConfig.ActualZoneNum;
                                 thisDD.CtrlZoneInNodeIndex = SupAirIn;
                             }
                         }
@@ -838,7 +835,7 @@ namespace DualDuct {
                 // figure per person by design level for the OA duct.
                 PeopleFlow = 0.0;
                 for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
-                    if (state.dataHeatBal->People(Loop).ZonePtr != this->ActualZoneNum) continue;
+                    if (state.dataHeatBal->People(Loop).ZonePtr != this->CtrlZoneNum) continue;
                     int damperOAFlowMethod = state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowMethod;
                     if (damperOAFlowMethod == DataSizing::OAFlowPPer || damperOAFlowMethod == DataSizing::OAFlowSum ||
                         damperOAFlowMethod == DataSizing::OAFlowMax) {
@@ -1663,7 +1660,7 @@ namespace DualDuct {
                 Real64 const OAVolumeFlowRate =
                     DataSizing::calcDesignSpecificationOutdoorAir(state,
                                                                   this->OARequirementsPtr,
-                                                                  this->ActualZoneNum,
+                                                                  this->CtrlZoneNum,
                                                                   state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
                                                                   UseMinOASchFlag);
                 Real64 const OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
@@ -1711,7 +1708,7 @@ namespace DualDuct {
         bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
         Real64 OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state,
                                                                                 this->OARequirementsPtr,
-                                                                                this->ActualZoneNum,
+                                                                                this->CtrlZoneNum,
                                                                                 UseOccSchFlag,
                                                                                 UseMinOASchFlag,
                                                                                 PerPersonNotSet); // outside air volume flow rate (m3/s)
@@ -1720,7 +1717,7 @@ namespace DualDuct {
 
         if (present(MaxOAVolFlow)) {
             OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
-                state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, false, true);
+                state, this->OARequirementsPtr, this->CtrlZoneNum, UseOccSchFlag, UseMinOASchFlag, false, true);
             MaxOAVolFlow = OAVolumeFlowRate;
         }
     }

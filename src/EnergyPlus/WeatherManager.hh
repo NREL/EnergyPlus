@@ -199,6 +199,11 @@ namespace WeatherManager {
         int RawSimDays;                  // number of basic sim days.
         bool firstHrInterpUseHr1;        // true when using Hour 1 for first hour interpolations; false to use Hour 24
 
+        Real64 maxCoolingOATSizing = -1000.0;  // max outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+        Real64 maxCoolingOADPSizing = -1000.0; // outdoor dew point at max outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+        Real64 minHeatingOATSizing = 1000.0;   // min outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+        Real64 minHeatingOADPSizing = 1000.0;  // outdoor dew point at min outdoor dry-bulb for DesignDay or RunPeriodDesign type weather
+
         // Default Constructor
         EnvironmentData()
             : KindOfEnvrn(DataGlobalConstants::KindOfSim::Invalid), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
@@ -253,6 +258,30 @@ namespace WeatherManager {
               BeamSolarSchPtr(0), DiffuseSolarSchPtr(0), TauB(0.0), TauD(0.0), DailyWBRange(0.0), PressureEntered(false),
               DewPointNeedsSet(false),                      //**Trane:BEG: Sizing Speed Up
               maxWarmupDays(-1), suppressBegEnvReset(false) //**Trane:END: Sizing Speed Up
+        {
+        }
+    };
+
+    struct ReportPeriodData
+    {
+        std::string title;
+        std::string reportName;
+        int startYear;
+        int startMonth;
+        int startDay;
+        int startHour;
+        int startJulianDate;
+        int endYear;
+        int endMonth;
+        int endDay;
+        int endHour;
+        int endJulianDate;
+        Real64 totalElectricityUse;
+
+        // Default Constructor
+        ReportPeriodData()
+            : startYear(2017), startMonth(1), startDay(1), startHour(1), startJulianDate(2457755), endYear(2017), endMonth(12), endDay(31),
+              endHour(24), endJulianDate(2458119), totalElectricityUse(0.0)
         {
         }
     };
@@ -698,6 +727,18 @@ namespace WeatherManager {
 
     void ReadUserWeatherInput(EnergyPlusData &state);
 
+    //    copy report period data from source to target
+    void CopyReportPeriodObject(const Array1D<WeatherManager::ReportPeriodData> &source,
+                                const int sourceIdx,
+                                Array1D<WeatherManager::ReportPeriodData> &target,
+                                const int targetIdx);
+
+    void GroupReportPeriodByType(EnergyPlusData &state, const int nReportPeriods);
+
+    void GetReportPeriodData(EnergyPlusData &state,
+                             int &nReportPeriods, // Total number of Report Periods requested
+                             bool &ErrorsFound);
+
     void GetRunPeriodData(EnergyPlusData &state,
                           int &nRunPeriods, // Total number of Run Periods requested
                           bool &ErrorsFound);
@@ -850,8 +891,12 @@ struct WeatherManagerData : BaseGlobalStruct
     std::string WaterMainsTempsScheduleName;                        // water mains tempeature schedule name
     bool wthFCGroundTemps;
 
-    int TotRunPers;    // Total number of Run Periods (Weather data) to Setup
-    int TotRunDesPers; // Total number of Run Design Periods (Weather data) to Setup
+    int TotRunPers;           // Total number of Run Periods (Weather data) to Setup
+    int TotRunDesPers;        // Total number of Run Design Periods (Weather data) to Setup
+    int TotReportPers;        // Total number of reporting periods
+    int TotThermalReportPers; // Total number of thermal reporting periods
+    int TotCO2ReportPers;     // Total number of CO2 reporting periods
+    int TotVisualReportPers;  // Total number of visual reporting periods
 
     int NumSpecialDays;
     Array1D_int SpecialDayTypes; // To hold holiday types given in input file NOLINT(cert-err58-cpp)
@@ -974,6 +1019,11 @@ struct WeatherManagerData : BaseGlobalStruct
     std::unordered_map<std::string, std::string> RunPeriodInputUniqueNames;
     EPVector<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodDesignInputUniqueNames;
+    Array1D<WeatherManager::ReportPeriodData> ReportPeriodInput;
+    Array1D<WeatherManager::ReportPeriodData> ThermalReportPeriodInput;
+    Array1D<WeatherManager::ReportPeriodData> CO2ReportPeriodInput;
+    Array1D<WeatherManager::ReportPeriodData> VisualReportPeriodInput;
+    std::unordered_map<std::string, std::string> ReportPeriodInputUniqueNames;
     EPVector<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
     WeatherManager::DaylightSavingPeriodData EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
     WeatherManager::DaylightSavingPeriodData IDFDST;                    // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
@@ -1050,8 +1100,12 @@ struct WeatherManagerData : BaseGlobalStruct
         this->WaterMainsTempsMaxDiffAirTemp = 0.0;   // Maximum difference in monthly average outdoor air temperatures (deltaC)
         this->WaterMainsTempsScheduleName = "";      // water mains tempeature schedule name
         this->wthFCGroundTemps = false;
-        this->TotRunPers = 0;    // Total number of Run Periods (Weather data) to Setup
-        this->TotRunDesPers = 0; // Total number of Run Design Periods (Weather data) to Setup
+        this->TotRunPers = 0;           // Total number of Run Periods (Weather data) to Setup
+        this->TotRunDesPers = 0;        // Total number of Run Design Periods (Weather data) to Setup
+        this->TotReportPers = 0;        // Total number of reporting periods
+        this->TotThermalReportPers = 0; // Total number of thermal reporting periods
+        this->TotCO2ReportPers = 0;     // Total number of CO2 reporting periods
+        this->TotVisualReportPers = 0;  // Total number of visual reporting periods
         this->NumSpecialDays = 0;
 
         this->SpecialDayTypes = Array1D<int>(366, 0);
@@ -1146,6 +1200,11 @@ struct WeatherManagerData : BaseGlobalStruct
         this->RunPeriodInputUniqueNames.clear();
         this->RunPeriodDesignInput.deallocate();
         this->RunPeriodDesignInputUniqueNames.clear();
+        this->ReportPeriodInput.deallocate();
+        this->ThermalReportPeriodInput.deallocate();
+        this->CO2ReportPeriodInput.deallocate();
+        this->VisualReportPeriodInput.deallocate();
+        this->ReportPeriodInputUniqueNames.clear();
         this->TypicalExtremePeriods.deallocate();
 
         this->EPWDST.StDateType = WeatherManager::DateType::Invalid;
@@ -1228,13 +1287,13 @@ struct WeatherManagerData : BaseGlobalStruct
           WeatherFileElevation(0.0), GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0),
           SnowGndRefModifierForDayltg(1.0), WaterMainsTempsMethod{WeatherManager::WaterMainsTempCalcMethod::FixedDefault}, WaterMainsTempsSchedule(0),
           WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0), WaterMainsTempsScheduleName(""), wthFCGroundTemps(false),
-          TotRunPers(0), TotRunDesPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0),
-          NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true), UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false),
-          IDFDaylightSaving(false), DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0),
-          NumEPWTypExtSets(0), NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0),
-          SolarAzimuthAngle(0.0), HorizIRSky(0.0), TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0),
-          EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), LeapYearAdd(0), DatesShouldBeReset(false),
-          StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
+          TotRunPers(0), TotRunDesPers(0), TotReportPers(0), TotThermalReportPers(0), TotCO2ReportPers(0), TotVisualReportPers(0), NumSpecialDays(0),
+          SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0), NumIntervalsPerHour(1), UseDaylightSaving(true),
+          UseSpecialDays(true), UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false), IDFDaylightSaving(false),
+          DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0),
+          NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0),
+          HorizIRSky(0.0), TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}),
+          LeapYearAdd(0), DatesShouldBeReset(false), StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
     {
     }
 };

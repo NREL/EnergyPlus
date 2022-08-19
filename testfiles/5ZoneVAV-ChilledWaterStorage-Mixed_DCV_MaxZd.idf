@@ -1219,7 +1219,7 @@
 
   Daylighting:Controls,
     ZN_1_FLR_1_SEC_1_DaylCtrl,  !- Name
-    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ZN_1_FLR_1_SEC_1,        !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Stepped,                 !- Lighting Control Type
@@ -1232,12 +1232,12 @@
     20,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    1.0000,                  !- Fraction of Lights Controlled by Reference Point 1
     400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     ZN_1_FLR_1_SEC_1_DaylRefPt1,  !- Name
-    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ZN_1_FLR_1_SEC_1,        !- Zone or Space Name
     20.000,                  !- X-Coordinate of Reference Point {m}
     2.285,                   !- Y-Coordinate of Reference Point {m}
     0.762;                   !- Z-Coordinate of Reference Point {m}
@@ -1261,12 +1261,12 @@
     ZN_1_FLR_1_SEC_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    323.8302;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    323.8302;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_1_Infiltration,  !- Name
-    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0855,                  !- Design Flow Rate {m3/s}
@@ -1295,12 +1295,12 @@
 
   People,
     ZN_1_FLR_1_SEC_1,        !- Name
-    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     6.3309,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -1332,7 +1332,7 @@
 
   Lights,
     ZN_1_FLR_1_SEC_1_Lights, !- Name
-    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1748.6831,               !- Lighting Level {W}
@@ -1357,7 +1357,7 @@
 
   ElectricEquipment,
     ZN_1_FLR_1_SEC_1_MiscPlug_Equip,  !- Name
-    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2601.9757,               !- Design Level {W}
@@ -1727,7 +1727,7 @@
 
   Daylighting:Controls,
     ZN_1_FLR_1_SEC_2_DaylCtrl,  !- Name
-    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ZN_1_FLR_1_SEC_2,        !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Stepped,                 !- Lighting Control Type
@@ -1740,12 +1740,12 @@
     20,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    1.0000,                  !- Fraction of Lights Controlled by Reference Point 1
     400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     ZN_1_FLR_1_SEC_2_DaylRefPt1,  !- Name
-    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ZN_1_FLR_1_SEC_2,        !- Zone or Space Name
     -2.285,                  !- X-Coordinate of Reference Point {m}
     10.000,                  !- Y-Coordinate of Reference Point {m}
     0.762;                   !- Z-Coordinate of Reference Point {m}
@@ -1769,12 +1769,12 @@
     ZN_1_FLR_1_SEC_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    141.0302;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    141.0302;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_2_Infiltration,  !- Name
-    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0372,                  !- Design Flow Rate {m3/s}
@@ -1803,12 +1803,12 @@
 
   People,
     ZN_1_FLR_1_SEC_2,        !- Name
-    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.7571,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -1840,7 +1840,7 @@
 
   Lights,
     ZN_1_FLR_1_SEC_2_Lights, !- Name
-    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     761.5631,                !- Lighting Level {W}
@@ -1865,7 +1865,7 @@
 
   ElectricEquipment,
     ZN_1_FLR_1_SEC_2_MiscPlug_Equip,  !- Name
-    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1133.1777,               !- Design Level {W}
@@ -2195,7 +2195,7 @@
 
   Daylighting:Controls,
     ZN_1_FLR_1_SEC_3_DaylCtrl,  !- Name
-    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ZN_1_FLR_1_SEC_3,        !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Stepped,                 !- Lighting Control Type
@@ -2208,12 +2208,12 @@
     20,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    1.0000,                  !- Fraction of Lights Controlled by Reference Point 1
     400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     ZN_1_FLR_1_SEC_3_DaylRefPt1,  !- Name
-    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ZN_1_FLR_1_SEC_3,        !- Zone or Space Name
     15.430,                  !- X-Coordinate of Reference Point {m}
     2.285,                   !- Y-Coordinate of Reference Point {m}
     0.762;                   !- Z-Coordinate of Reference Point {m}
@@ -2237,12 +2237,12 @@
     ZN_1_FLR_1_SEC_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    323.8302;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    323.8302;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_3_Infiltration,  !- Name
-    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0855,                  !- Design Flow Rate {m3/s}
@@ -2271,12 +2271,12 @@
 
   People,
     ZN_1_FLR_1_SEC_3,        !- Name
-    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     6.3309,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2308,7 +2308,7 @@
 
   Lights,
     ZN_1_FLR_1_SEC_3_Lights, !- Name
-    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1748.6831,               !- Lighting Level {W}
@@ -2333,7 +2333,7 @@
 
   ElectricEquipment,
     ZN_1_FLR_1_SEC_3_MiscPlug_Equip,  !- Name
-    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2601.9757,               !- Design Level {W}
@@ -2682,7 +2682,7 @@
 
   Daylighting:Controls,
     ZN_1_FLR_1_SEC_4_DaylCtrl,  !- Name
-    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ZN_1_FLR_1_SEC_4,        !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Stepped,                 !- Lighting Control Type
@@ -2695,12 +2695,12 @@
     20,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    1.0000,                  !- Fraction of Lights Controlled by Reference Point 1
     400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     ZN_1_FLR_1_SEC_4_DaylRefPt1,  !- Name
-    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ZN_1_FLR_1_SEC_4,        !- Zone or Space Name
     2.285,                   !- X-Coordinate of Reference Point {m}
     10.000,                  !- Y-Coordinate of Reference Point {m}
     0.762;                   !- Z-Coordinate of Reference Point {m}
@@ -2724,12 +2724,12 @@
     ZN_1_FLR_1_SEC_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    141.0302;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    141.0302;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_4_Infiltration,  !- Name
-    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0372,                  !- Design Flow Rate {m3/s}
@@ -2758,12 +2758,12 @@
 
   People,
     ZN_1_FLR_1_SEC_4,        !- Name
-    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2.7571,                  !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -2795,7 +2795,7 @@
 
   Lights,
     ZN_1_FLR_1_SEC_4_Lights, !- Name
-    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     761.5631,                !- Lighting Level {W}
@@ -2820,7 +2820,7 @@
 
   ElectricEquipment,
     ZN_1_FLR_1_SEC_4_MiscPlug_Equip,  !- Name
-    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1133.1777,               !- Design Level {W}
@@ -3255,7 +3255,7 @@
 
   Daylighting:Controls,
     ZN_1_FLR_1_SEC_5_DaylCtrl,  !- Name
-    ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ZN_1_FLR_1_SEC_5,        !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Stepped,                 !- Lighting Control Type
@@ -3268,12 +3268,12 @@
     20,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    1.0000,                  !- Fraction of Lights Controlled by Reference Point 1
     400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     ZN_1_FLR_1_SEC_5_DaylRefPt1,  !- Name
-    ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ZN_1_FLR_1_SEC_5,        !- Zone or Space Name
     15.430,                  !- X-Coordinate of Reference Point {m}
     5.430,                   !- Y-Coordinate of Reference Point {m}
     0.762;                   !- Z-Coordinate of Reference Point {m}
@@ -3297,12 +3297,12 @@
     ZN_1_FLR_1_SEC_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    670.2792;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    670.2792;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_5_Infiltration,  !- Name
-    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.1769,                  !- Design Flow Rate {m3/s}
@@ -3331,12 +3331,12 @@
 
   People,
     ZN_1_FLR_1_SEC_5,        !- Name
-    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     13.1040,                 !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -3368,7 +3368,7 @@
 
   Lights,
     ZN_1_FLR_1_SEC_5_Lights, !- Name
-    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     3619.5077,               !- Lighting Level {W}
@@ -3393,7 +3393,7 @@
 
   ElectricEquipment,
     ZN_1_FLR_1_SEC_5_MiscPlug_Equip,  !- Name
-    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList Name
+    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     5385.6934,               !- Design Level {W}
@@ -3684,7 +3684,7 @@
     ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
     ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,  !- System Outdoor Air Method
     0.3,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     autosize,                !- Cooling Design Capacity {W}
@@ -3797,7 +3797,7 @@
     VAV WITH REHEAT_OAMechanical Ventilation,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,  !- System Outdoor Air Method
     0.3,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
     ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList 1 Name
     CM DSOA ZN_1_FLR_1_SEC_1,!- Design Specification Outdoor Air Object Name 1
@@ -5236,7 +5236,19 @@
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
     ,                        !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
-    ;                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    ,                        !- Evaporation Loss Mode
+    ,                        !- Evaporation Loss Factor {percent/K}
+    ,                        !- Drift Loss Percent {percent}
+    ,                        !- Blowdown Calculation Mode
+    ;                        !- Blowdown Concentration Ratio
 
   Branch,
     TowerWaterSys Supply Equipment Bypass Branch,  !- Name
