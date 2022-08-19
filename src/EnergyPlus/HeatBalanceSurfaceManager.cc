@@ -8274,6 +8274,14 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     // Update SumHmXXXX for non-window EMPD or HAMT surfaces
     if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
+
+        // these SumHmA* variables are only used for EMPD and HAMT and should be reset each time step (and every iteration)
+        for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
+            thisZoneHB.SumHmAW = 0.0;
+            thisZoneHB.SumHmARa = 0.0;
+            thisZoneHB.SumHmARaW = 0.0;
+        }
+
         for (int SurfNum : HTNonWindowSurfs) {
             auto const &surface(Surface(SurfNum));
             int ZoneNum = surface.Zone;
