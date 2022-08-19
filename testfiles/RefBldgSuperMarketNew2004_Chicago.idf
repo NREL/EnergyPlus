@@ -1995,14 +1995,14 @@
 
   ZoneMixing,
     Deli Exhaust Fanmixing_0,!- Name
-    Deli,                    !- Zone Name
+    Deli,                    !- Zone or Space Name
     HVACOperationSchd,       !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     1.0785,                  !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Sales,                   !- Source Zone Name
+    Sales,                   !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
 ! ***HVAC EQUIPMENT***

@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -75,6 +76,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -2309,5 +2311,307 @@ TEST_F(EnergyPlusFixture, Window5DataFileSpaceInName)
 
     EXPECT_EQ(ConstructName, "DOUBLE CLEAR");
     EXPECT_TRUE(ConstructionFound);
+}
+
+TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput_invalidSched)
+{
+    std::string const idf_objects_invalid_sch = delimited_string({
+        "Material:NoMass,",
+        "R13LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "2.290965,                !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+
+        "Construction,",
+        "R13WALL,                 !- Name",
+        "R13LAYER;                !- Outside Layer",
+
+        "CONSTRUCTION,",
+        "GlzSys_1,                !- Name",
+        "Glass_102_LayerAvg;      !- Outside Layer",
+
+        "Construction,",
+        "FLOOR,                   !- Name",
+        "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+
+        "Material,",
+        "C5 - 4 IN HW CONCRETE,   !- Name",
+        "MediumRough,             !- Roughness",
+        "0.1014984,               !- Thickness {m}",
+        "1.729577,                !- Conductivity {W/m-K}",
+        "2242.585,                !- Density {kg/m3}",
+        "836.8000,                !- Specific Heat {J/kg-K}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.6500000,               !- Solar Absorptance",
+        "0.6500000;               !- Visible Absorptance",
+
+        "WindowMaterial:Glazing,",
+        "Glass_102_LayerAvg,      !- Name",
+        "SpectralAverage,         !- Optical Data Type",
+        ",                        !- Window Glass Spectral Data Set Name",
+        "0.003048,                !- Thickness {m}",
+        "0.833848,                !- Solar Transmittance at Normal Incidence",
+        "7.476376e-002,           !- Front Side Solar Reflectance at Normal Incidence",
+        "7.485449e-002,           !- Back Side Solar Reflectance at Normal Incidence",
+        "0.899260,                !- Visible Transmittance at Normal Incidence",
+        "0.082563,                !- Front Side Visible Reflectance at Normal Incidence",
+        "0.082564,                !- Back Side Visible Reflectance at Normal Incidence",
+        "0.000000,                !- Infrared Transmittance at Normal Incidence",
+        "0.840000,                !- Front Side Infrared Hemispherical Emissivity",
+        "0.840000,                !- Back Side Infrared Hemispherical Emissivity",
+        "1.000000;                !- Conductivity {W/m-K}",
+
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall001,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "Zn001:Wall001:Win001,    !- Name",
+        "Window,                  !- Surface Type",
+        "GlzSys_1,                !- Construction Name",
+        "Zn001:Wall001,           !- Building Surface Name",
+        ",                        !- Outside Boundary Condition Object",
+        "0.5000000,               !- View Factor to Ground",
+        ",                        !- Frame and Divider Name",
+        "1.0,                     !- Multiplier",
+        "4,                       !- Number of Vertices",
+        "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "SurfaceProperty:IncidentSolarMultiplier,",
+        "Zn001:Wall001:Win001,     !- Surface Name",
+        "0.6,                      !- Shading Multiplier",
+        "wrongSchedule;            !- Shading Multiplier Schedule Name",
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;              !- Name",
+
+        "Schedule:Compact,",
+        "  SolarMultCompact,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  0.1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  0.3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  0.1;                       !- Field 12",
+    });
+    ASSERT_TRUE(process_idf(idf_objects_invalid_sch));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    state->dataSurface->TotSurfaces = 2;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface(1).Name = "ZN001:WALL001";
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Name = "ZN001:WALL001:WIN001";
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).Construction = 2;
+    GetIncidentSolarMultiplier(*state, ErrorsFound);
+    std::string error_string =
+        delimited_string({"   ** Severe  ** Invalid Incident Solar Multiplier Schedule Name in SurfaceProperty:IncidentSolarMultiplier"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "Material:NoMass,",
+        "R13LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "2.290965,                !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+
+        "Construction,",
+        "R13WALL,                 !- Name",
+        "R13LAYER;                !- Outside Layer",
+
+        "CONSTRUCTION,",
+        "GlzSys_1,                !- Name",
+        "Glass_102_LayerAvg;      !- Outside Layer",
+
+        "Construction,",
+        "FLOOR,                   !- Name",
+        "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+
+        "Material,",
+        "C5 - 4 IN HW CONCRETE,   !- Name",
+        "MediumRough,             !- Roughness",
+        "0.1014984,               !- Thickness {m}",
+        "1.729577,                !- Conductivity {W/m-K}",
+        "2242.585,                !- Density {kg/m3}",
+        "836.8000,                !- Specific Heat {J/kg-K}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.6500000,               !- Solar Absorptance",
+        "0.6500000;               !- Visible Absorptance",
+
+        "WindowMaterial:Glazing,",
+        "Glass_102_LayerAvg,      !- Name",
+        "SpectralAverage,         !- Optical Data Type",
+        ",                        !- Window Glass Spectral Data Set Name",
+        "0.003048,                !- Thickness {m}",
+        "0.833848,                !- Solar Transmittance at Normal Incidence",
+        "7.476376e-002,           !- Front Side Solar Reflectance at Normal Incidence",
+        "7.485449e-002,           !- Back Side Solar Reflectance at Normal Incidence",
+        "0.899260,                !- Visible Transmittance at Normal Incidence",
+        "0.082563,                !- Front Side Visible Reflectance at Normal Incidence",
+        "0.082564,                !- Back Side Visible Reflectance at Normal Incidence",
+        "0.000000,                !- Infrared Transmittance at Normal Incidence",
+        "0.840000,                !- Front Side Infrared Hemispherical Emissivity",
+        "0.840000,                !- Back Side Infrared Hemispherical Emissivity",
+        "1.000000;                !- Conductivity {W/m-K}",
+
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall001,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "Zn001:Wall001:Win001,    !- Name",
+        "Window,                  !- Surface Type",
+        "GlzSys_1,                !- Construction Name",
+        "Zn001:Wall001,           !- Building Surface Name",
+        ",                        !- Outside Boundary Condition Object",
+        "0.5000000,               !- View Factor to Ground",
+        ",                        !- Frame and Divider Name",
+        "1.0,                     !- Multiplier",
+        "4,                       !- Number of Vertices",
+        "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "SurfaceProperty:IncidentSolarMultiplier,",
+        "Zn001:Wall001:Win001,     !- Surface Name",
+        "0.6,                      !- Shading Multiplier",
+        "SolarMultCompact;           !- Shading Multiplier Schedule Name",
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;              !- Name",
+
+        "Schedule:Compact,",
+        "  SolarMultCompact,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  0.1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  0.3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  0.1;                       !- Field 12",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+
+    state->dataEnvrn->Month = 5;
+    state->dataEnvrn->DayOfMonth = 31;
+    state->dataGlobal->HourOfDay = 24;
+    state->dataEnvrn->DayOfWeek = 4;
+    state->dataEnvrn->DayOfWeekTomorrow = 5;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 0);
+    ScheduleManager::UpdateScheduleValues(*state);
+
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataSurface->TotSurfaces = 2;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface(1).Name = "ZN001:WALL001";
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Name = "ZN001:WALL001:WIN001";
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).Construction = 2;
+    GetIncidentSolarMultiplier(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    EXPECT_EQ(state->dataSurface->SurfIncSolMultiplier(2).Scaler, 0.6);
+    EXPECT_EQ(GetScheduleName(*state, state->dataSurface->SurfIncSolMultiplier(2).SchedPtr), "SOLARMULTCOMPACT");
+
+    EXPECT_EQ(ScheduleManager::GetCurrentScheduleValue(*state, state->dataSurface->SurfIncSolMultiplier(2).SchedPtr), 0.1);
+
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Door;
+    GetIncidentSolarMultiplier(*state, ErrorsFound);
+    std::string error_string = delimited_string({"   ** Severe  ** IncidentSolarMultiplier defined for non-window surfaces"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).ExtBoundCond = 1; // internal
+    GetIncidentSolarMultiplier(*state, ErrorsFound);
+    error_string = delimited_string({"   ** Severe  ** IncidentSolarMultiplier defined for interior surfaces"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    state->dataSurface->Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    state->dataSurface->Surface(2).HasShadeControl = true;
+    GetIncidentSolarMultiplier(*state, ErrorsFound);
+    error_string =
+        delimited_string({"   ** Severe  ** Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    state->dataSurface->Surface(2).HasShadeControl = false;
+    state->dataMaterial->Material(3).Group = DataHeatBalance::MaterialGroup::Screen;
+    GetIncidentSolarMultiplier(*state, ErrorsFound);
+    error_string =
+        delimited_string({"   ** Severe  ** Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 } // namespace EnergyPlus
