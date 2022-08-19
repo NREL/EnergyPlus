@@ -280,7 +280,7 @@ namespace StandardRatings {
         Real64 PartLoadRatio(0.0);      // Part load ratio (PLR) at which chiller is operatign at reduced capacity
         int RedCapNum;                  // Integer counter for reduced capacity
         int SolFla;                     // Flag of solver
-        Array1D<Real64> Par(11);        // Parameter array need for RegulaFalsi routine
+        Array1D<Real64> Par(12);        // Parameter array need for RegulaFalsi routine
 
         // Initialize local variables
         AvailChillerCap = 0.0;
@@ -381,6 +381,7 @@ namespace StandardRatings {
                 Par(9) = RefCap;
                 Par(10) = RefCOP;
                 Par(11) = OpenMotorEff;
+                Par(12) = ChillerCapFT_rated;
                 CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
                 CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
                 General::SolveRoot(state,
@@ -519,7 +520,7 @@ namespace StandardRatings {
         //           551/591 conditons[C]
         // par(2)  = Evaporator outlet temperature [C]
         // par(3)  = Water specific heat [J/(kg*C)]
-        // par(4)  = Part load ratio
+        // par(4)  = Load
         // par(5)  = Condenser mass flow rate [kg/s]
         // par(6)  = Index for the total cooling capacity modifier curve
         // par(7)  = Index for the energy input ratio modifier curve
@@ -527,6 +528,7 @@ namespace StandardRatings {
         // par(9)  = Reference capacity of chiller [W]
         // par(10) = Reference coefficient of performance [W/W]
         // par(11) = Open chiller motor efficiency [fraction, 0 to 1]
+        // par(12) = cap-f-t a reference temperature
 
         // FUNCTION PARAMETER DEFINITIONS:
         // na
@@ -547,6 +549,7 @@ namespace StandardRatings {
         Real64 ReformEIRChillerCapFT(0.0);   // Chiller capacity fraction (evaluated as a function of temperature)
         Real64 ReformEIRChillerEIRFT(0.0);   // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
         Real64 ReformEIRChillerEIRFPLR(0.0); // Chiller EIR as a function of part-load ratio (PLR)
+        Real64 PartLoadRatio(0.0);           // Chiller part load ratio
 
         EvapOutletTemp = Par(2);
 
@@ -561,7 +564,13 @@ namespace StandardRatings {
 
         Power = (AvailChillerCap / Par(10)) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
 
-        QEvap = AvailChillerCap * Par(4);
+        if (Par(4) >= 1.0) {
+            PartLoadRatio = Par(4);
+        } else {
+            PartLoadRatio = Par(4) * Par(12) / ReformEIRChillerCapFT;
+        }
+
+        QEvap = AvailChillerCap * PartLoadRatio;
 
         QCond = Power * Par(11) + QEvap;
 

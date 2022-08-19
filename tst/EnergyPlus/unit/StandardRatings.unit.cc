@@ -453,9 +453,6 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     state->dataCurveManager->NumCurves = 3;
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
-    state->dataCurveManager->NumCurves = 3;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
-
     // Cap=f(T)
     CurveNum = 1;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
@@ -548,7 +545,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
                     1,
                     1.0);
 
-    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 4.87);
+    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 4.83);
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
