@@ -520,15 +520,11 @@ namespace StandardRatings {
         //           551/591 conditons[C]
         // par(2)  = Evaporator outlet temperature [C]
         // par(3)  = Water specific heat [J/(kg*C)]
-        // par(4)  = Load
-        // par(5)  = Condenser mass flow rate [kg/s]
-        // par(6)  = Index for the total cooling capacity modifier curve
-        // par(7)  = Index for the energy input ratio modifier curve
-        // par(8)  = Index for the EIR vs part-load ratio curve
-        // par(9)  = Reference capacity of chiller [W]
-        // par(10) = Reference coefficient of performance [W/W]
-        // par(11) = Open chiller motor efficiency [fraction, 0 to 1]
-        // par(12) = cap-f-t a reference temperature
+        // par(4)  = Percent load per AHRI: The ratio of the part-load net capacity to the full-load rated net capacity at the full-load rating
+        // conditions par(5)  = Condenser mass flow rate [kg/s] par(6)  = Index for the total cooling capacity modifier curve par(7)  = Index for the
+        // energy input ratio modifier curve par(8)  = Index for the EIR vs part-load ratio curve par(9)  = Reference capacity of chiller [W] par(10)
+        // = Reference coefficient of performance [W/W] par(11) = Open chiller motor efficiency [fraction, 0 to 1] par(12) = CAP-f-T at
+        // reference/rated temperatures
 
         // FUNCTION PARAMETER DEFINITIONS:
         // na
