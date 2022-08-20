@@ -5418,7 +5418,15 @@ To model a heat exchanger-assisted DX cooling coil, the input data file should i
 \hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow}
 \end{itemize}
 \item
-  DX cooling coil object (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed})
+  DX cooling coil object such as:
+\begin{itemize}
+\item
+\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
+\item
+\hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
+\item
+\hyperref[coilcoolingdx]{Coil:Cooling:DX}
+\end{itemize}
 \end{itemize}
 
 In terms of controlling the operation of the heat exchanger, the heat exchanger is assumed to always provide its heat transfer when the associated DX cooling coil is operating and no high humidity control mechanism is specified. However, the heat exchanger\textquotesingle s energy transfer may be controlled (i.e., turned on and off) based on a zone air humidity level using either a humidistat (ref. \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem}, \hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool} or \hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool}) or a humidistat and a maximum humidity set point manager to place a humidity ratio set point on the appropriate control node (ref. \hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}). This model may also be used with the unitary changeover bypass system and the unitary air-to-air heat pump system (ref. \hyperref[airloophvacunitaryheatcoolvavchangeoverbypass]{AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass} and \hyperref[airloophvacunitaryheatpumpairtoair]{AirLoopHVAC:UnitaryHeatPump:AirToAir}); however, the heat exchanger is assumed to always provide its heat transfer when the cooling coil operates and cannot be turned on and off based on a zone air humidity set point. Two zone air conditioners may also use this model for improved dehumidification. The first type is the packaged terminal heat pump (ref. \hyperref[zonehvacpackagedterminalheatpump]{ZoneHVAC:PackagedTerminalHeatPump}) where the heat exchanger's heat transfer is always active whenever the cooling coil operates. The second type is the window air conditioner (ref. \hyperref[zonehvacwindowairconditioner]{ZoneHVAC:WindowAirConditioner}) where the heat exchanger's heat transfer is always active when the cooling coil operates and no high humidity control mechanism is specified, OR the heat exchanger's heat transfer may be controlled based on zone air humidity level if a humidistat and high humidity set point manager are specified (maximum humidity ratio set point placed on the heat exchanger's exhaust air outlet node, ref. Figure~\ref{fig:schematic-of-the-coilsystem-cooling-dx}).
@@ -5458,7 +5466,7 @@ This alpha field denotes the name of the air-to-air heat exchanger being modeled
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-1}
 
-This alpha field denotes the type of DX cooling coil being modeled. The only valid choices are \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}.
+This alpha field denotes the type of DX cooling coil being modeled. The only valid choices are \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}, \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}, or \hyperref[coilcoolingdx]{Coil:Cooling:DX}.
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-1}
 
