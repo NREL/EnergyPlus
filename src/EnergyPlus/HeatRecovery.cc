@@ -55,6 +55,7 @@
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -1501,7 +1502,10 @@ namespace HeatRecovery {
                 }
             }
 
-            if (CompanionCoilIndex > 0) {
+            if ((((CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                  (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed)) &&
+                 (CompanionCoilIndex > 0)) ||
+                ((CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) && (CompanionCoilIndex > -1))) {
 
                 if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                     CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
@@ -1519,6 +1523,12 @@ namespace HeatRecovery {
                     // how to support VS dx coil here?
                     state.dataHeatRecovery->FullLoadOutAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
                     state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
+                } else if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                    // Use the new coil option:
+                    state.dataHeatRecovery->FullLoadOutAirTemp = state.dataCoilCooingDX->coilCoolingDXs[CompanionCoilIndex].outletAirDryBulbTemp;
+                    state.dataHeatRecovery->FullLoadOutAirHumRat = state.dataCoilCooingDX->coilCoolingDXs[CompanionCoilIndex].outletAirHumRat;
+                } else {
+                    //
                 }
 
             } else {
