@@ -35,7 +35,13 @@ kiva-ep/README.md
 kiva-ep/.gitmodules
 penumbra/.gitmodules
 btwxt/.gitmodules
+libtk205/.gitmodules
 
 # unused repo directories/files
 btwxt/vendor/googletest
 penumbra/vendor/googletest
+libtk205/.github
+libtk205/examples
+libtk205/test
+libtk205/vendor/btwxt
+libtk205/vendor/json
