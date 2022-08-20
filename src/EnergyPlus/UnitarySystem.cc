@@ -17179,7 +17179,6 @@ namespace UnitarySystems {
         int FanOpMode = int(Par[5]);
         int UnitarySysNum = int(Par[6]);
         int DehumidificationMode_par = int(Par[7]);
-        Real64 CoilSHR_par = Par[8];
         UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
 
         if (thisSys.CoolCoilFluidInletNode > 0) {
@@ -17234,7 +17233,6 @@ namespace UnitarySystems {
         bool HXUnitOn = (Par[4] == 1.0);
         int FanOpMode = int(Par[5]);
         int DehumidificationMode_par = int(Par[6]);
-        Real64 CoilSHR_par = Par[7];
 
         HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
                                                              CoilIndex,
