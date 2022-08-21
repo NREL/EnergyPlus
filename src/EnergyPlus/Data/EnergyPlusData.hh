@@ -83,6 +83,7 @@ struct ChillerExhaustAbsorptionData;
 struct ChillerGasAbsorptionData;
 struct ChillerIndirectAbsoprtionData;
 struct ChillerReformulatedEIRData;
+struct ChillerElectricASHRAE205Data;
 struct CoilCoolingDXData;
 struct CondenserLoopTowersData;
 struct ConstructionData;
@@ -340,6 +341,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ChillerGasAbsorptionData> dataChillerGasAbsorption;
     std::unique_ptr<ChillerIndirectAbsoprtionData> dataChillerIndirectAbsorption;
     std::unique_ptr<ChillerReformulatedEIRData> dataChillerReformulatedEIR;
+    std::unique_ptr<ChillerElectricASHRAE205Data> dataChillerElectricASHRAE205;
     std::unique_ptr<CoilCoolingDXData> dataCoilCooingDX;
     std::unique_ptr<CondenserLoopTowersData> dataCondenserLoopTowers;
     std::unique_ptr<ConstructionData> dataConstruction;
