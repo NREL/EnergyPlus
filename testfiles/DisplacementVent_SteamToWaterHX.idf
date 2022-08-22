@@ -16,7 +16,7 @@
 ! Design Days:             SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4°C
 !                          SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6°C MWB=16.6°C
 !
-! Run Period (Weather File): annual,  USA_CA_SanFrancisco TMY2-23234
+! Run Period (Weather File): January,  USA_CA_SanFrancisco TMY2-23234
 !
 ! Run Control:             Zone and System sizing with weather file run control (no design days run)
 !
@@ -110,7 +110,7 @@
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
-    annual,                  !- Name
+    January,                  !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -742,9 +742,15 @@
     AirSysAvailSched,        !- Name
     AnyNumber,               !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,1.00;       !- Field 3
-
+    For: Weekdays SummerDesignDay WinterDesignDay CustomDay1 CustomDay2, !- Field 2
+    Until: 6:00,0.00,        !- Field 3
+    Until: 21:00,1.00,       !- Field 5
+    Until: 24:00,0.00,       !- Field 7
+    For: Weekends Holidays,  !- Field 9
+    Until: 6:00,0.00,        !- Field 10
+    Until: 21:00,1.00,       !- Field 12
+    Until: 24:00,0.00;       !- Field 14
+    
   Schedule:Compact,
     ActSchd,                 !- Name
     AnyNumber,               !- Schedule Type Limits Name
@@ -829,15 +835,31 @@
     HeatingAvailSched,       !- Name
     AnyNumber,               !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,1.00;       !- Field 3
+    For: Weekdays SummerDesignDay WinterDesignDay CustomDay1 CustomDay2, !- Field 2
+    Until: 6:00,0.00,        !- Field 3
+    Until: 21:00,1.00,       !- Field 5
+    Until: 24:00,0.00,       !- Field 7
+    For: Weekends Holidays,  !- Field 9
+    Until: 6:00,0.00,        !- Field 10
+    Until: 21:00,1.00,       !- Field 12
+    Until: 24:00,0.00;       !- Field 14
 
   Schedule:Compact,
     HEAT1,                   !- Name
     AnyNumber,               !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,21.10;      !- Field 3
+    For: Weekdays CustomDay1 CustomDay2, !- Field 2
+    Until: 6:00,12.80,       !- Field 3
+    Until: 21:00,21.10,      !- Field 5
+    Until: 24:00,12.80,      !- Field 7
+    For: Weekends Holidays,  !- Field 9
+    Until: 6:00,12.80,       !- Field 10
+    Until: 13:00,21.10,      !- Field 12
+    Until: 24:00,12.80,      !- Field 14
+    For: SummerDesignDay,    !- Field 16
+    Until: 24:00,12.80,      !- Field 17
+    For: WinterDesignDay,    !- Field 19
+    Until: 24:00,21.10;      !- Field 20
 
   Schedule:Compact,
     HW Loop Temp Schedule,   !- Name
@@ -1272,7 +1294,7 @@
   Sizing:Plant,
     Steam Loop,              !- Plant or Condenser Loop Name
     Steam,                   !- Loop Type
-    100,                    !- Design Loop Exit Temperature {C}
+    110,                    !- Design Loop Exit Temperature {C}
     25;                      !- Loop Design Temperature Difference {deltaC}
 
   NodeList,
@@ -2491,7 +2513,7 @@
     Steam to Water HX Water Outlet Node,  !- Water Outlet Node Name
     autosize,                             !- Water Side Design Flow Rate
     autosize,                             !- Heat Exchanger U-Factor Times Area Value
-    OperationSchemeModulated,             !- Control Type
+    OperationSchemeOnOff,             !- Control Type
     HW Supply Outlet Node,                !- Heat Exchanger Setpoint Node Name
     ,                                     !- Minimum Temperature Difference to Activate Heat Exchanger
     ,                                     !- Heat Transfer Metering End Use Type
@@ -2501,7 +2523,7 @@
     3.0,                                  !- Degree of SubCooling
     13.0;                                 !- Degree of Loop SubCooling
 
-  Output:Variable,*,Zone Mean Air Temperature,timestep;
+  Output:Variable,*,Zone Air Temperature,timestep;
 
   Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,timestep;
 
@@ -2516,12 +2538,20 @@
   Output:Variable,HOT WATER LOOP,Plant Supply Side Inlet Temperature,timestep;
 
   Output:Variable,HOT WATER LOOP,Plant Supply Side Outlet Temperature,timestep;
-  
+
   Output:Variable,Zone 1 Reheat Water Inlet Node,System Node Temperature,timestep;
 
   Output:Variable,Zone 1 Reheat Water Outlet Node,System Node Temperature,timestep;
   
   Output:Variable,Zone 1 Reheat Water Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Zone 1 Reheat Air Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,ZONE1 Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Zone 1 Reheat Air Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,ZONE1 Inlet Node,System Node Mass Flow Rate,timestep;
 
   Output:Variable,STEAM LOOP,Plant Supply Side Heating Demand Rate,timestep;
 
@@ -2532,8 +2562,6 @@
   Output:Variable,STEAM LOOP,Plant Supply Side Inlet Temperature,timestep;
 
   Output:Variable,STEAM LOOP,Plant Supply Side Outlet Temperature,timestep;
-  
-  !Output:Variable,*,Surface Inside Face Temperature,timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
@@ -2547,6 +2575,10 @@
 
   Output:Variable,*,Steam to Water Heat Exchanger Water Outlet Temperature,timestep;
 
+  Output:Variable,*,Steam to Water Heat Exchanger Steam Inlet Temperature,timestep;
+
+  Output:Variable,*,Steam to Water Heat Exchanger Steam Outlet Temperature,timestep;
+
   Output:Variable,*,Steam to Water Heat Exchanger Operation Status,timestep;
 
   Output:Variable,Steam to Water HX Steam Inlet Node,System Node Temperature,timestep;
@@ -2557,19 +2589,13 @@
 
   Output:Variable,Steam to Water HX Water Outlet Node,System Node Temperature,timestep;
 
-  Output:Variable,Zone 1 Reheat Water Inlet Node,System Node Temperature,timestep;
-
-  Output:Variable,Zone 1 Reheat Water Outlet Node,System Node Temperature,timestep;
-
   Output:Variable,*,Boiler Heating Rate,timestep;
 
-  Output:Variable,ZONE1 Inlet Node,System Node Mass Flow Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
-  Output:Variable,ZONE1 Inlet Node,System Node Temperature,timestep;
+  Output:Variable,*,Heating Coil Source Side Heat Transfer Energy,timestep;
 
   Output:VariableDictionary,Regular;
-
-  Output:Surfaces:Drawing,dxf;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
