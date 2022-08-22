@@ -5042,7 +5042,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
             Real64 WinGapTtoRA = 0.0;     // Temp of outlet flow mixture to return air from all airflow windows in zone [C]
             Real64 WinGapFlowTtoRA = 0.0; // Sum of mass flow times outlet temp for all airflow windows in zone [(kg/s)-C]
 
-            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneHasAirFlowWindowReturn) {
+            if (state.dataHeatBal->Zone(ZoneNum).HasAirFlowWindowReturn) {
                 for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
                      ++SurfNum) {
                     if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&

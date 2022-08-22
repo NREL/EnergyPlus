@@ -330,11 +330,10 @@ namespace DataZoneEquipment {
         bool InWallActiveElement;       // Convection adapation, true if zone has in-wall HVAC
         bool InCeilingActiveElement;    // Convection adapation,
         // true when zone has in-ceiling HVAC
-        bool ZoneHasAirFlowWindowReturn; // true if zone has an airflow window (WindowProperty:AirflowControl) with destination=ReturnAir
-        bool ZoneHasAirLoopWithOASys;    // true if zone is served by one or more airloops with an outdoor air system
-        int ZoneAirDistributionIndex;    // index to DesignSpecification:ZoneAirDistribution object
-        int ZoneDesignSpecOAIndex;       // index to DesignSpecification:OutdoorAir object
-        Real64 AirLoopDesSupply;         // air lood design supply air flow rate [kg/s]
+        bool ZoneHasAirLoopWithOASys; // true if zone is served by one or more airloops with an outdoor air system
+        int ZoneAirDistributionIndex; // index to DesignSpecification:ZoneAirDistribution object
+        int ZoneDesignSpecOAIndex;    // index to DesignSpecification:OutdoorAir object
+        Real64 AirLoopDesSupply;      // air lood design supply air flow rate [kg/s]
 
         // Default Constructor
         EquipConfiguration()
@@ -342,8 +341,7 @@ namespace DataZoneEquipment {
               NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false), ZonalSystemOnly(false), IsControlled(false), ZoneExh(0.0),
               ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0), TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0),
               TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
-              ZoneHasAirFlowWindowReturn(false), ZoneHasAirLoopWithOASys(false), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0),
-              AirLoopDesSupply(0.0)
+              ZoneHasAirLoopWithOASys(false), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0), AirLoopDesSupply(0.0)
         {
         }
     };
@@ -480,8 +478,6 @@ namespace DataZoneEquipment {
                                 std::string_view ComponentType, // Type of component
                                 std::string_view ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
-
-    int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
     int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
                                                            int TrialZoneNodeNum); // Node number to match into Controlled Zone structure

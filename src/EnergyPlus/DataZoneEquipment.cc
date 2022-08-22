@@ -1056,32 +1056,6 @@ EquipList_exit:;
     return IsOnList;
 }
 
-int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) // Zone name to match into Controlled Zone structure
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   March 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function returns the index into the Controlled Zone Equipment structure
-    // of the indicated zone.
-
-    // Return value
-    int ControlledZoneIndex; // Index into Controlled Zone structure
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
-
-    ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
-
-    return ControlledZoneIndex;
-}
-
 int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
                                                        int const TrialZoneNodeNum) // Node number to match into Controlled Zone structure
 {

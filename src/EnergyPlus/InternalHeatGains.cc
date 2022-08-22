@@ -2900,12 +2900,12 @@ namespace InternalHeatGains {
                         }
 
                         // check supply air node for matches with zone equipment supply air node
-                        int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, state.dataHeatBal->Zone(thisZoneITEq.ZonePtr).Name);
-                        thisZoneITEq.zoneEqIndex = zoneEqIndex;
-                        if (zoneEqIndex > 0) { // zoneEqIndex could be zero in the case of an uncontrolled zone
-                            auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
-                            auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
+                        if (thisZoneITEq.ZonePtr > 0 && state.dataHeatBal->Zone(thisZoneITEq.ZonePtr)
+                                                            .IsControlled) { // zoneEqIndex could be zero in the case of an uncontrolled zone
+                            auto itStart = state.dataZoneEquip->ZoneEquipConfig(thisZoneITEq.ZonePtr).InletNode.begin();
+                            auto itEnd = state.dataZoneEquip->ZoneEquipConfig(thisZoneITEq.ZonePtr).InletNode.end();
                             auto key = thisZoneITEq.SupplyAirNodeNum;
+                            thisZoneITEq.inControlledZone = true;
                             bool supplyNodeFound = false;
                             if (std::find(itStart, itEnd, key) != itEnd) {
                                 supplyNodeFound = true;
@@ -7572,7 +7572,7 @@ namespace InternalHeatGains {
                     WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
-                    if (state.dataHeatBal->ZoneITEq(Loop).zoneEqIndex > 0) {
+                    if (state.dataHeatBal->ZoneITEq(Loop).inControlledZone) {
                         int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
                         TSupply = state.dataLoopNodes->Node(ZoneAirInletNode).Temp;
                     } else {

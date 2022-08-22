@@ -1032,7 +1032,7 @@ namespace DataHeatBalance {
         int SupplyApproachTempSch = 0;      // The difference schedule of the IT inlet temperature from the AHU supply air temperature
         Real64 ReturnApproachTemp = 0.0;    // The difference of the unit outlet temperature from the well mixed zone temperature
         int ReturnApproachTempSch = 0;      // The difference schedule of the unit outlet temperature from the well mixed zone temperature
-        int zoneEqIndex = 0;                // index in zone equipment data structure for the zone this IT equipment is in
+        bool inControlledZone = false;      // True if in a controlled zone 
 
         // Report variables
         std::array<Real64, (int)PERptVars::Num> PowerRpt;
