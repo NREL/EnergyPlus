@@ -649,22 +649,8 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).FracDistribToSurf.allocate(HWBaseboard(BaseboardNum).TotSurfToDistrib);
             HWBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
 
-            // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBWater &&
-                        state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == HWBaseboard(BaseboardNum).EquipID) {
-                        HWBaseboard(BaseboardNum).ZonePtr = ctrlZone;
-                    }
-                }
-            }
-            if (HWBaseboard(BaseboardNum).ZonePtr <= 0) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + HWBaseboard(BaseboardNum).EquipID +
-                                    "\" is not on any ZoneHVAC:EquipmentList.");
-                ErrorsFound = true;
-                continue;
-            }
+            HWBaseboard(BaseboardNum).ZonePtr =
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBWater, HWBaseboard(BaseboardNum).EquipID);
 
             AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {

@@ -1056,6 +1056,32 @@ EquipList_exit:;
     return IsOnList;
 }
 
+int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) // Zone name to match into Controlled Zone structure
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   March 2008
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This function returns the index into the Controlled Zone Equipment structure
+    // of the indicated zone.
+
+    // Return value
+    int ControlledZoneIndex; // Index into Controlled Zone structure
+
+    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
+        GetZoneEquipmentData(state);
+        state.dataZoneEquip->ZoneEquipInputsFilled = true;
+    }
+
+    ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
+
+    return ControlledZoneIndex;
+}
+
 int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
                                                        int const TrialZoneNodeNum) // Node number to match into Controlled Zone structure
 {
@@ -1281,20 +1307,23 @@ Real64 EquipList::SequentialCoolingFraction(EnergyPlusData &state, const int equ
 
 int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::ZoneEquip const ZoneEquipTypeNum, std::string const &EquipmentName)
 {
+    static constexpr std::string_view RoutineName("GetZoneEquipControlledZoneNum: ");
     int ControlZoneNum = 0;
 
     for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
         for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
-            if (UtilityRoutines::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
-                ZoneEquipTypeNum == state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeEnum(Num)) {
-                ControlZoneNum = CtrlZone;
-                break;
+            if (ZoneEquipTypeNum == state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeEnum(Num) &&
+                UtilityRoutines::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num))) {
+                return ControlZoneNum = CtrlZone;
             }
         }
-        if (ControlZoneNum > 0) break;
     }
-
+    ShowSevereError(state,
+                    fmt::format("{}{}=\"{}\" is not on any ZoneHVAC:Equipmentlist. It will not be simulated.",
+                                RoutineName,
+                                DataZoneEquipment::ZoneEquipTypeNamesUC[ZoneEquipTypeNum],
+                                EquipmentName));
     return ControlZoneNum;
 }
 

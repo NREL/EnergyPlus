@@ -187,9 +187,9 @@ namespace ElectricBaseboardRadiator {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
-        Real64 constexpr MaxFraction(1.0);                                    // Maximum limit of fractional values
-        Real64 constexpr MinFraction(0.0);                                    // Minimum limit of fractional values
+        static constexpr std::string_view RoutineName("GetElectricBaseboardInput: "); // include trailing blank space
+        Real64 constexpr MaxFraction(1.0);                                            // Maximum limit of fractional values
+        Real64 constexpr MinFraction(0.0);                                            // Minimum limit of fractional values
         //    INTEGER,PARAMETER :: MaxDistribSurfaces   = 20      ! Maximum number of surfaces that a baseboard heater can radiate to
         int constexpr MinDistribSurfaces(1);                  // Minimum number of surfaces that a baseboard heater can radiate to
         int constexpr iHeatCAPMAlphaNum(3);                   // get input index to HW baseboard heating capacity sizing method
@@ -416,22 +416,8 @@ namespace ElectricBaseboardRadiator {
             ElecBaseboard(BaseboardNum).FracDistribToSurf.allocate(ElecBaseboard(BaseboardNum).TotSurfToDistrib);
             ElecBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
 
-            // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBElectric &&
-                        state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ElecBaseboard(BaseboardNum).EquipName) {
-                        ElecBaseboard(BaseboardNum).ZonePtr = ctrlZone;
-                    }
-                }
-            }
-            if (ElecBaseboard(BaseboardNum).ZonePtr <= 0) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + ElecBaseboard(BaseboardNum).EquipName +
-                                    "\" is not on any ZoneHVAC:EquipmentList.");
-                ErrorsFound = true;
-                break;
-            }
+            ElecBaseboard(BaseboardNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
+                state, DataZoneEquipment::ZoneEquip::BBElectric, ElecBaseboard(BaseboardNum).EquipName);
 
             AllFracsSummed = ElecBaseboard(BaseboardNum).FracDistribPerson;
             for (SurfNum = 1; SurfNum <= ElecBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
@@ -607,8 +593,6 @@ namespace ElectricBaseboardRadiator {
 
             MyOneTimeFlag = false;
         }
-
-        if (ElecBaseboard(BaseboardNum).ZonePtr <= 0) ElecBaseboard(BaseboardNum).ZonePtr = ControlledZoneNum;
 
         if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.

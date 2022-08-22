@@ -410,23 +410,8 @@ namespace BaseboardRadiator {
                     thisBaseboard.Offset = 0.001;
                 }
 
-                for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    for (int ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes;
-                         ++ZoneEquipTypeNum) {
-                        if (state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeEnum(ZoneEquipTypeNum) ==
-                                DataZoneEquipment::ZoneEquip::BBWaterConvective &&
-                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(ZoneEquipTypeNum) == thisBaseboard.EquipID) {
-                            thisBaseboard.ZonePtr = CtrlZone;
-                        }
-                    }
-                }
-                if (thisBaseboard.ZonePtr == 0) {
-                    ShowSevereError(
-                        state,
-                        fmt::format(
-                            "{}{}=\"{}\" not found in any ZoneHVAC:Equipmentlist.", RoutineName, cCurrentModuleObject, thisBaseboard.EquipID));
-                    ErrorsFound = true;
-                }
+                thisBaseboard.ZonePtr =
+                    DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBWaterConvective, thisBaseboard.EquipID);
             }
 
             if (ErrorsFound) {

@@ -479,6 +479,8 @@ namespace DataZoneEquipment {
                                 std::string_view ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
 
+    int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
+
     int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
                                                            int TrialZoneNodeNum); // Node number to match into Controlled Zone structure
 

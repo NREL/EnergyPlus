@@ -2900,10 +2900,10 @@ namespace InternalHeatGains {
                         }
 
                         // check supply air node for matches with zone equipment supply air node
-                        if (thisZoneITEq.ZonePtr > 0 && state.dataHeatBal->Zone(thisZoneITEq.ZonePtr)
-                                                            .IsControlled) { // zoneEqIndex could be zero in the case of an uncontrolled zone
-                            auto itStart = state.dataZoneEquip->ZoneEquipConfig(thisZoneITEq.ZonePtr).InletNode.begin();
-                            auto itEnd = state.dataZoneEquip->ZoneEquipConfig(thisZoneITEq.ZonePtr).InletNode.end();
+                        int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, state.dataHeatBal->Zone(thisZoneITEq.ZonePtr).Name);
+                        if (zoneEqIndex > 0) { // zoneEqIndex could be zero in the case of an uncontrolled zone
+                            auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
+                            auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
                             auto key = thisZoneITEq.SupplyAirNodeNum;
                             thisZoneITEq.inControlledZone = true;
                             bool supplyNodeFound = false;
