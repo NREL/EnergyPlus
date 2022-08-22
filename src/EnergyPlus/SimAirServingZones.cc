@@ -4805,7 +4805,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                     ZoneOAUnc =
                         termUnitFinalZoneSizing.TotalOAFromPeople +
                         termUnitFinalZoneSizing.TotalOAFromArea; // should not have diversity at this point (no should have diversity in Vou if VRP)
-                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) { // ZoneSum Method
+                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::ZoneSum) { // ZoneSum Method
                         SysOAUnc += ZoneOAUnc;
                     } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::VRP ||
                                state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) { // Ventilation Rate Procedure
