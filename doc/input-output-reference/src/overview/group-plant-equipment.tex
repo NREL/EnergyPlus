@@ -5366,7 +5366,7 @@ The name of the air source node for the heat pump, for either the heating mode o
 
 This optional name field allows the user to specify the companion cooling water to water heat pump for this heating component. This should be the name of an HeatPump:AirToWater:FuelFired:Cooling object defined elsewhere in the input file. Because the cooling and heating models are often intended to represent separate operating modes of one single reversible heat pump, it is useful to identify the corresponding cooling heat pump input object by name. This is currently used with autosizing so that the sizing calculations can be coordinated so that the two companion heat pumps get the same design reference flow rates.
 
-For the input field for object HeatPump:AirToWater:FuelFired:Cooling coil, this field will be ``Companion Heaigng Heat Pump Name'' instead.
+For HeatPump:AirToWater:FuelFired:Cooling object, this field name will be ``Companion Heating Heat Pump Name'' instead.
 
 \paragraph{Field: Fuel Type}
 
@@ -5388,11 +5388,11 @@ The volumetric design flow rate of the water side in [m3/s].
 
 \paragraph{Field: Design Supply Temperature}
 
-The design supply temperature on the water side in degree [C].
+The design supply temperature on the water side in degree [C]. For the HeatPump:AirToWater:FuelFired:Heating object, the default value is 60$^\circ$C. For the HeatPump:AirToWater:FuelFired:Cooling object, the default value is 7.0$^\circ$C.
 
 \paragraph{Field: Design Temperature Lift}
 
-The design temperature difference between the outlet water node and the inlet water node, in degree [C].
+The design temperature difference between the outlet water node and the inlet water node, in degree [C]. The default value is 11.1$^\circ$C. For the HeatPump:AirToWater:FuelFired:Heating object, this is a temperature rise; and for HeatPump:AirToWater:FuelFired:Cooling object, this is a temperature drop.
 
 \paragraph{Field: Sizing Factor}
 
