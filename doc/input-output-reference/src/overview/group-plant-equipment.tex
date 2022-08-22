@@ -5339,6 +5339,206 @@ This output variable represents the average load side mass flow rate during the 
 
 This output variable represents the average source side mass flow rate during the specified reporting window.
 
+\subsection{HeatPump:AirToWater:FuelFired:Heating (and Cooling)}
+
+HeatPump:AirToWater:FuelFired:Heating is a gas-fired (or fuel fired) absorption heat pump that can be used for space heating and domestic hot water. It is can be considered a more efficient heat source (like a boiler) for hot water loop or DHW loop. It can be used as the heat source for a low temperature radiant heating system. 
+
+\subsubsection{Inputs}
+
+The HeatPump:AirToWater:FuelFired:Heating will take the following input fields:
+
+\paragraph{Field: Name}
+The name of the gas-fired (fuel-fired) absorption heat pump system.
+
+\paragraph{Field: Water Inlet Node Name}
+
+The name of the water inlet node connection. For the heating mode, this will be likely the incoming DHW water node. For the cooling mode, this will be the chilled water inlet node.
+
+Note that here the ``water'' does not have to be literally mean ``water''. Rather it is the working fluid in the connected water side plant loop, which is can be some kind of glycol-water solution as well. 
+
+\paragraph{Field: Water Outlet Node Name}
+The name of the water outlet node connection. For the heating mode, this will be likely the supply DHW water node. For the cooling mode, this will be the supply chilled water outlet node.
+
+\paragraph{Field: Air Source Node Name}
+The name of the air source node for the heat pump, for either the heating mode or the cooling mode. This should be an outdoor air node.
+
+\paragraph{Field: Companion Cooling Heat Pump Name}
+
+This optional name field allows the user to specify the companion cooling water to water heat pump for this heating component. This should be the name of an HeatPump:AirToWater:FuelFired:Cooling object defined elsewhere in the input file. Because the cooling and heating models are often intended to represent separate operating modes of one single reversible heat pump, it is useful to identify the corresponding cooling heat pump input object by name. This is currently used with autosizing so that the sizing calculations can be coordinated so that the two companion heat pumps get the same design reference flow rates.
+
+For the input field for object HeatPump:AirToWater:FuelFired:Cooling coil, this field will be ``Companion Heaigng Heat Pump Name'' instead.
+
+\paragraph{Field: Fuel Type}
+
+This alpha field determines the type of fuel that the chiller uses. The default is NaturalGas. Valid values are NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2.
+
+\paragraph{Field: End-Use Subcategory}
+
+This the end-use subcategory of the fuel usage.
+
+\paragraph{Field: Nominal Heating Capacity}
+
+The nominal heating capacity in [W].
+
+For the HeatPump:AirToWater:FuelFired:Cooling object, this field name is ``Nominal Cooling Capacity''.
+
+\paragraph{Field: Design Flow Rate}
+
+The volumetric design flow rate of the water side in [m3/s].
+
+\paragraph{Field: Design Supply Temperature}
+
+The design supply temperature on the water side in degree [C].
+
+\paragraph{Field: Design Temperature Lift}
+
+The design temperature difference between the outlet water node and the inlet water node, in degree [C].
+
+\paragraph{Field: Sizing Factor}
+
+This optional numeric field allows the user to specify a sizing factor for this component. The sizing factor is used when the component design inputs are autosized: the autosizing calculations are performed as usual and the results are multiplied by the sizing factor. For this component the inputs that would be altered by the sizing factor are: Nominal Capacity and Design Flow Rate. Sizing factor allows the user to size a component to meet part of the design load while continuing to use the autosizing feature.
+
+\paragraph{Field: Flow Mode}
+
+This choice field determines how the gas-fired absorption heat pump operates with respect to the intended fluid flow through the device. There are three different choices for specifying operating modes for the intended flow behavior: ``NotModulated'', ``ConstantFlow'', and ``LeavingSetpointModulated''. \emph{NotModulated} is useful for either variable or constant speed pumping arrangements where the boiler is passive in the sense that although it makes a nominal request for its design flow rate it can operate at varying flow rates. \emph{ConstantFlow} is useful for constant speed pumping arrangements where the heat pump's request for flow is more strict and can increase the overall loop flow. \emph{LeavingSetpointModulated} changes the heat pump model to internally vary the flow rate so that the temperature leaving the heat pump matches a setpoint. In all cases the operation of the external plant system can also impact the flow through the heat pump---for example if the relative sizes and operation are such that flow is restricted and the requests cannot be met. The default, if not specified, is \emph{NotModulated}.
+
+\paragraph{Field: Outdoor Air Temperature Curve Input Variable}
+
+This field sets the first independent variable in the three temperature dependent performance curves to either the outdoor air drybulb or wetbulb temperature. Manufacturers express the performance of their heat pumps using either the outdoor air drybulb temperature or the outdoor air wetbulb air temperature. Valid choices for this field are: ``Drybulb'' or ``Wetbulb''. It is important that the performance curves and this field are consistent with each other. The default is \emph{Drybulb}.
+
+\paragraph{Field: Water Temperature Curve Input Variable}
+
+This field sets the second independent variable in the three temperature dependent performance curves to either the leaving or entering condenser water temperature. Manufacturers express the performance of their heat pumps using either the leaving condenser water temperature or the entering condenser water temperature. Valid choices for this field are: ``LeavingCondenser'' or ``EnteringCondenser''. It is important that the performance curves and this field are consistent with each other. The default is \emph{EnteringCondenser}.
+
+For HeatPump:AirToWater:FuelFired:Cooling object, the choices for this field should be the ``LeavingEvaporator'' and ``EnteringEvaporator''.
+
+\paragraph{Field: Normalized Capacity Function of Temperature Curve Name}
+
+This field is the curve name of the normalized capacity function of the two independent temperature variables. The maximum capacity is adjusted from the rated conditions, and represents what the actual capacity the heat pump can achieve under the outdoor air temperature (either drybulb or wetbuld depending on the previous input field choice), and the water temperature (either leaving condenser/evaporator or entering condenser/evaporator depending on the previous input field choice).
+
+\paragraph{Field: Fuel Energy Input Ratio Function of Temperature Curve name}
+
+The field is curve name for the fuel energy input ratio as a function of the two independent temperature values (air and water). It is the ratio of fuel consumption rate compared to the actual heating/cooling rate of the heat pump.
+
+\paragraph{Field: Fuel Energy Input Ratio Function of PLR Curve Name}
+
+The field is curve name for the fuel energy input ratio as a function of the Part Load Ratio (PLR). It is the ratio of fuel consumption rate compared to the actual heating/cooling rate of the heat pump.
+
+\paragraph{Field: Minimum Part Load Ratio}
+
+A positive fraction that represents the minimum heating output possible when operated continually at partial load conditions divided by the available heating capacity at those same conditions. The default is 0.1.
+
+\paragraph{Field: Maximum Part Load Ratio}
+
+A positive fraction that represents the maximum heating output possible when operated continually at rated temperature conditions divided by the available heating capacity at those same conditions. If greater than 1.0, the equipment is typically thought of as capable of being overloaded. The default is 1.0.
+
+\paragraph{Field: Fuel Energy Input Ratio Defrost Adjustment Curve name}
+This is a normalized curve that would adjust the fuel energy input ratio taken into consideration of the defrost operation.
+
+This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+
+\paragraph{Field: Defrost Control Type}
+
+The defrost control type. There are two options for this input: \emph{timed}, or \emph{OnDemand}. The \emph{timed} option will use a fraction of time per hour to account for the defrost action. The \emph{OnDemand} option will work when the outdoor air temperature drops to a certain point. The default choice is \emph{timed}.
+
+This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+
+\paragraph{Field: Defrost Operation Time Fraction}
+
+The fraction of the defrost time to the total operation time. The value should be in between 0.0 and 1.0 (inclusive). The default value is 0.0.
+
+This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+
+\paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Defrost Operation}
+
+The maximum outdoor air dry-bulb temperature in degree [C] that the defrost operation will be turned on. When the outdoor air dry-bulb temperature rises above this temperature, the will be no defrost operation. The maximum value for this value is 10$^\circ$C. The default value is 5$^\circ$C.
+
+This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+
+\paragraph{Field: Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name}
+
+Auxiliary Electric EIRFT - Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name, which is a biquadratic curve or a lookup table which accounts for system internal fans, pumps, and electronics.
+
+\paragraph{Field: Auxiliary Electric Energy Input Ratio Function of PLR Curve Name}
+
+Auxiliary Electric EIRFPLR - Auxiliary Electric Energy Input Ratio Function of PLR (Part Load Ratio) Curve Name.
+
+\paragraph{Field: Standby Electric Power}
+
+The standby electric power, which typically include the power for the electronics control board power consumption in the standby mode. The minimum value is 0.0.
+
+An example of the HeatPump:AirToWater:FuelFired:Heating input object is like this:
+
+\begin{lstlisting}
+HeatPump:AirToWater:FuelFired:Heating,
+AbsorptionHeatPumpName1, !- Name
+Inlet_Node_Name, !-Water Inlet Node Name
+Outlet_Node_Name, !-Water Outlet Node Name
+Air_Source_Node_Name, ! Air Source Node Name
+Companion_Cooling_Heat_Pump_Name, !-Companion Cooling Heat Pump Name
+NaturalGas, !-Fuel Type
+General, !-End-Use Subcategory
+10000, !-Nominal Heating Capacity
+0.005, !-Design Flow Rate
+60, !-Design Supply Temperature
+11.1, !-Design Temperature Lift
+1.1, ! Sizing Factor
+NotModulated, !-Flow Mode
+DryBulb, !-Outdoor Air Temperature Curve Input Variable
+EnteringCondenser, !-Water Temperature Curve Input Variable
+CAPFT_CurveName, !-Normalized Capacity Function of Temperature Curve Name
+Fuel_EIRFT_CurveName, !-Fuel Energy Input Ratio Function of Temperature Curve name
+Fuel_EIRFPLR_CurveName, !-Fuel Energy Input Ratio Function of PLR Curve Name
+0.1, !-Minimum Part Load Ratio
+1, !-Maximum Part Load Ratio
+Fuel_EIRDefrost_CurveName, !-Fuel Energy Input Ratio Defrost Adjustment Curve name
+OnDemand, !-Defrost Control Type
+, !-Defrost operation time fraction
+5, !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
+CRF_CurveName, !-Cycling Ratio Factor Curve Name
+900, !-Nominal Auxiliary Electric Power
+Aux_Elec_EIRFT_CurveName, !-Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name
+Aux_EIRPLR_CurveName, !-Auxiliary Electric Energy Input Ratio Function of PLR Curve Name
+20; !-Standby Electric Power
+\end{lstlisting}
+
+\subsubsection{Outputs}
+
+The following output will be added the to the new gas-fired (fuel-fired) absorption heat pump system: 
+
+\begin{itemize}
+\item HVAC,average,Fuel-fired Absorption HeatPump Load Side Heating Transfer Rate [W]
+\item HVAC,sum,Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [J]
+\item HVAC,average,Fuel-fired Absorption HeatPump Fuel Rate [W]
+\item HVAC,sum,Fuel-fired Absorption HeatPump Fuel Energy [J]
+\item HVAC,average,Fuel-fired Absorption HeatPump Electricity Rate [W]
+\item HVAC,sum,Fuel-fired Absorption HeatPump Electricity Energy [J]
+\item HVAC,average,Fuel-fired Absorption HeatPump Mass Flow Rate [kg/s];
+\item HVAC,average,Fuel-fired Absorption HeatPump Volumetric Flow Rate [m3/s];
+\item HVAC,average,Fuel-fired Absorption HeatPump Inlet Temperature [C]
+\item HVAC,average,Fuel-fired Absorption HeatPump Outlet Temperature [C]
+\end{itemize}
+
+\paragraph{Fuel-fired Absorption HeatPump Load Side Heating Transfer Rate [W]}
+
+\paragraph{Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [J]}
+
+\paragraph{Fuel-fired Absorption HeatPump Fuel Rate [W]}
+
+\paragraph{Fuel-fired Absorption HeatPump Fuel Energy [J]}
+
+\paragraph{Fuel-fired Absorption HeatPump Electricity Rate [W]}
+
+\paragraph{Fuel-fired Absorption HeatPump Electricity Energy [J]}
+
+\paragraph{Fuel-fired Absorption HeatPump Mass Flow Rate [kg/s]}
+
+\paragraph{Fuel-fired Absorption HeatPump Volumetric Flow Rate [m3/s]}
+
+\paragraph{Fuel-fired Absorption HeatPump Inlet Temperature [C]}
+
+\paragraph{Fuel-fired Absorption HeatPump Outlet Temperature [C]}
+
 \subsection{Steps to specify the Ground Source Heat Pump}\label{steps-to-specify-the-ground-source-heat-pump}
 
 Since the heat pump is defined with two separate objects (one for heating, one for cooling), the connections to the condenser has to be done carefully. The example below shows the configuration for parameter estimation objects. The same specifications and configuration also applies to the equation fit model.
