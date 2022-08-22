@@ -1199,7 +1199,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatPump::OATempCurveVar::Num)> OATempCurveVarNamesUC = {"DRYBULB",
                                                                                                                                     "WETBULB"};
 static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatPump::WaterTempCurveVar::Num)> WaterTempCurveVarNamesUC = {
-    "ENTERINGCONDENSER", "LEAVINGCONDENSER"};
+    "ENTERINGCONDENSER", "LEAVINGCONDENSER", "ENTERINGEVAPORATOR", "LEAVINGEVAPORATOR"};
 static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatPump::DefrostType::Num)> DefrostTypeNamesUC = {"TIMED", "ONDEMAND"};
 
 void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
@@ -1231,7 +1231,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
     // Load (water) side temperature variable
     Real64 waterTempforCurve = this->loadSideInletTemp;
-    if (this->waterTempCurveInputVar == WaterTempCurveVar::LeavingCondenser) {
+    if (this->waterTempCurveInputVar == WaterTempCurveVar::LeavingCondenser || this->waterTempCurveInputVar == WaterTempCurveVar::LeavingEvaporator) {
         waterTempforCurve = this->loadSideOutletTemp;
     } else {
         //
@@ -1661,8 +1661,14 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // A5
-                if (fields.find("companion_cooling_heat_pump_name") != fields.end()) { // optional field
-                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_cooling_heat_pump_name").get<std::string>());
+                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) {
+                    if (fields.find("companion_cooling_heat_pump_name") != fields.end()) { // optional field
+                        thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_cooling_heat_pump_name").get<std::string>());
+                    }
+                } else if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                    if (fields.find("companion_heating_heat_pump_name") != fields.end()) { // optional field
+                        thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_heating_heat_pump_name").get<std::string>());
+                    }
                 }
 
                 // A6 Fuel Type
@@ -1694,7 +1700,10 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 // N1 Nominal heating capacity
-                auto tmpRefCapacity = fields.at("nominal_heating_capacity");
+                auto tmpRefCapacity =
+                    fields.at((thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) ? "nominal_heating_capacity"
+                                                                                                              : "nominal_cooling_capacity");
+
                 if (tmpRefCapacity == "Autosize") {
                     thisPLHP.referenceCapacity = DataSizing::AutoSize;
                     thisPLHP.referenceCapacityWasAutoSized = true;
@@ -1902,7 +1911,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
                 // A15 defrost_control_type
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                    thisPLHP.defrostType = DefrostType::OnDemand;
+                    thisPLHP.defrostType = DefrostType::Invalid;
                 } else {
                     std::string defrostControlType = UtilityRoutines::MakeUPPERCase(fields.at("defrost_control_type").get<std::string>());
                     thisPLHP.defrostType = static_cast<DefrostType>(getEnumerationValue(DefrostTypeNamesUC, defrostControlType));
@@ -1936,7 +1945,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 // N9 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
-                    thisPLHP.defrostMaxOADBT = 5.0;
+                    thisPLHP.defrostMaxOADBT = -99.0;
                 } else {
                     if (fields.find("maximum_outdoor_dry_bulb_temperature_for_defrost_operation") != fields.end()) {
                         thisPLHP.defrostMaxOADBT = fields.at("maximum_outdoor_dry_bulb_temperature_for_defrost_operation").get<Real64>();

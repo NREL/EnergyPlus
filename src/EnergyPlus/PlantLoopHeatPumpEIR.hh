@@ -218,8 +218,18 @@ namespace EIRPlantLoopHeatPumps {
             Invalid = -1,
             EnteringCondenser = 0,
             LeavingCondenser = 1,
+            EnteringVaporator = 2,
+            LeavingEvaporator = 3,
             Num
         };
+
+        // enum class WaterTempCurveVarCooling
+        //{
+        //    Invalid = -1,
+        //    EnteringEvaporator = 0,
+        //    LeavingEvaporator = 1,
+        //    Num
+        //};
 
         enum class DefrostType
         {
