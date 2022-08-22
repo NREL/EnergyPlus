@@ -4464,6 +4464,15 @@ The following control types can be used to reduce zone cooling load. They are ap
 
 \emph{OnIfHighZoneAirTempAndHighHorizontalSolar:} Shading is on if the zone air temperature exceeds the Setpoint (C) and if the horizontal solar radiation exceeds SetPoint 2 (W/m\(^{2}\)).
 
+The following three control types can be used to model human behavior of turning on shading during the day to reduce view luminance or solar gain and leaving shading on until a certain time point. They can only be used in zones with daylighting controls. Window view luminance at the first daylighting reference point is used to compare with luminance setpoint. They are applicable to any Shading Type except ExteriorScreen.
+
+\emph{OnIfHighSolarOrHighLuminanceTillMidnight:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till midnight.
+
+\emph{OnIfHighSolarOrHighLuminanceTillSunset:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunset.
+
+\emph{OnIfHighSolarOrHighLuminanceTillNextMorning:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunrise next day.
+
+
 \paragraph{Field: Schedule Name}\label{field-schedule-name-007}
 
 Required if Shading Control Is Scheduled = Yes. If schedule value \textgreater{} 0 , shading control is active, i.e., shading can be on only if the shading control test passes. If schedule value = 0, shading is off whether or not the control test passes. If Schedule Name is not specified, shading control is assumed to be active at all times.
@@ -4523,7 +4532,7 @@ This is the name of a schedule of slat angles that is used when Type of Slat Ang
 
 \paragraph{Field: Setpoint 2}\label{field-setpoint-2}
 
-Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar
+Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, OnIfHighZoneAirTempAndHighHorizontalSolar, OnIfHighSolarOrHighLuminanceTillMidnight, OnIfHighSolarOrHighLuminanceTillSunset, and OnIfHighSolarOrHighLuminanceTillNextMorning.
 
 \paragraph{Field: Daylighting Controls Object Name}\label{field-daylighting-controls-object-name}
 
@@ -4598,7 +4607,7 @@ WindowShadingControl,
        ,                             !- Material Name of Shading Device
        ,                             !- Type of Slat Angle Control for Blinds
        ,                             !- Slat Angle Schedule Name
-       ,                             !- Setpoint 2 {W/m2 or deg C}
+       ,                             !- Setpoint 2 {W/m2, deg C or cd/m2}
        West Zone_DaylCtrl,           !- Daylighting Control Object Name
        Sequential,                   !- Multiple Surface Control Type
        Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name
@@ -4669,7 +4678,7 @@ WindowShadingControl,
        ROLL SHADE,                   !- Material Name of Shading Device
        ,                             !- Type of Slat Angle Control for Blinds
        ,                             !- Slat Angle Schedule Name
-       ,                             !- Setpoint 2 {W/m2 or deg C}
+       ,                             !- Setpoint 2 {W/m2, deg C or cd/m2}
        West Zone_DaylCtrl,           !- Daylighting Control Object Name
        Sequential,                   !- Multiple Surface Control Type
        Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name

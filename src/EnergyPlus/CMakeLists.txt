@@ -116,6 +116,8 @@ set(SRC
     ChillerAbsorption.hh
     ChillerElectricEIR.cc
     ChillerElectricEIR.hh
+    ChillerElectricASHRAE205.cc
+    ChillerElectricASHRAE205.hh
     ChillerExhaustAbsorption.cc
     ChillerExhaustAbsorption.hh
     ChillerGasAbsorption.cc
@@ -775,7 +777,8 @@ target_link_libraries(
          Windows-CalcEngine
          airflownetworklib
          ssc
-         cpgfunctionEP)
+         cpgfunctionEP
+         libtk205)
 
 target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings cpp_pch_files)
 

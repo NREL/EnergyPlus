@@ -9602,29 +9602,32 @@ namespace SurfaceGeometry {
                                                            "BETWEENGLASSBLIND"  // 9
                                                        });
 
-        int constexpr NumValidWindowShadingControlTypes(21);
-        static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
-                                                                    {"ALWAYSON",
-                                                                     "ALWAYSOFF",
-                                                                     "ONIFSCHEDULEALLOWS",
-                                                                     "ONIFHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHHORIZONTALSOLAR",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPERATURE",
-                                                                     "ONIFHIGHZONEAIRTEMPERATURE",
-                                                                     "ONIFHIGHZONECOOLING",
-                                                                     "ONIFHIGHGLARE",
-                                                                     "MEETDAYLIGHTILLUMINANCESETPOINT",
-                                                                     "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY",
-                                                                     "ONNIGHTIFLOWINSIDETEMPANDOFFDAY",
-                                                                     "ONNIGHTIFHEATINGANDOFFDAY",
-                                                                     "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING",
-                                                                     "ONNIGHTIFHEATINGANDONDAYIFCOOLING",
-                                                                     "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-                                                                     "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
-                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"});
+        int constexpr NumValidWindowShadingControlTypes(static_cast<int>(WindowShadingControlType::Num) - 1);
+        constexpr std::array<std::string_view, static_cast<int>(NumValidWindowShadingControlTypes)> cValidWindowShadingControlTypes = {
+            "ALWAYSON",
+            "ALWAYSOFF",
+            "ONIFSCHEDULEALLOWS",
+            "ONIFHIGHSOLARONWINDOW",
+            "ONIFHIGHHORIZONTALSOLAR",
+            "ONIFHIGHOUTDOORAIRTEMPERATURE",
+            "ONIFHIGHZONEAIRTEMPERATURE",
+            "ONIFHIGHZONECOOLING",
+            "ONIFHIGHGLARE",
+            "MEETDAYLIGHTILLUMINANCESETPOINT",
+            "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY",
+            "ONNIGHTIFLOWINSIDETEMPANDOFFDAY",
+            "ONNIGHTIFHEATINGANDOFFDAY",
+            "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING",
+            "ONNIGHTIFHEATINGANDONDAYIFCOOLING",
+            "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
+            "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
+            "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
+            "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
+            "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
+            "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR",
+            "ONIFHIGHSOLARORHIGHLUMINANCETILLMIDNIGHT",
+            "ONIFHIGHSOLARORHIGHLUMINANCETILLSUNSET",
+            "ONIFHIGHSOLARORHIGHLUMINANCETILLNEXTMORNING"};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;          // IO Status when calling get input subroutine
@@ -9796,6 +9799,16 @@ namespace SurfaceGeometry {
                                      ControlType + "\"");
             }
 
+            if (has_prefix(ControlType, "ONIFHIGHSOLARORHIGHLUMINANCETILL")) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" invalid " +
+                                        state.dataIPShortCut->cAlphaFieldNames(12) + " must not be empty for shading control type \"" + ControlType +
+                                        "\"");
+                }
+            }
+
             if (state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice > 0) {
                 if (state.dataMaterial->Material(state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice).Group ==
                         DataHeatBalance::MaterialGroup::Screen &&
@@ -9863,8 +9876,8 @@ namespace SurfaceGeometry {
                                      ControlType + "\"");
             }
 
-            // Error if illegal control type
-            Found = UtilityRoutines::FindItemInList(ControlType, cValidWindowShadingControlTypes, NumValidWindowShadingControlTypes);
+            // Error if illegal control type, +1 to match index of WindowShadingControlType
+            Found = getEnumerationValue(cValidWindowShadingControlTypes, ControlType) + 1;
             if (Found == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state,

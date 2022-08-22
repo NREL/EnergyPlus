@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Solver.hpp>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -61,6 +62,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/Furnaces.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -1194,9 +1196,28 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
     state->dataDXCoils->DXCoil(1).MinOATCompressor = 30.0;
     state->dataDXCoils->DXCoil(2).MinOATCompressor = 30.0;
 
+    state->dataHVACAssistedCC->HXAssistedCoil.allocate(1);
+    state->dataHVACAssistedCC->HXAssistedCoil(1).CoolingCoilType = "COIL:COOLING:DX";
+    state->dataHVACAssistedCC->HXAssistedCoil(1).CoolingCoilName = "Dummy_Name";
+
+    state->dataCoilCooingDX->coilCoolingDXGetInputFlag = false;
+    CoilCoolingDX thisCoil;
+    thisCoil.name = "Dummy_Name";
+    state->dataCoilCooingDX->coilCoolingDXs.push_back(thisCoil);
+
     int FurnaceNum = 1;
     std::string cCurModObj = "Furnace_Test";
     bool ErrFound = false;
+
+    // Test HXAsssisted type with new coil
+    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = CoilDX_CoolingHXAssisted;
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 0.0, 1e-6);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
+    // reset once as test
+    state->dataFurnaces->Furnace(1).MinOATCompressorCooling = -999.0;
+    state->dataFurnaces->Furnace(1).MinOATCompressorHeating = -999.0;
 
     // Check that each coil type returns correctly
     state->dataFurnaces->Furnace(1).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
@@ -1211,12 +1232,6 @@ TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
     state->dataFurnaces->Furnace(1).MinOATCompressorHeating = -999.0;
 
     state->dataFurnaces->Furnace(1).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
-    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
-    EXPECT_FALSE(ErrFound);
-    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
-    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
-
-    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = CoilDX_CoolingHXAssisted;
     SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
     EXPECT_FALSE(ErrFound);
     EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);

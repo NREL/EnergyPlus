@@ -81,7 +81,7 @@ Begin VB.Form About
       Begin VB.Label lblVersion 
          Alignment       =   1  'Right Justify
          AutoSize        =   -1  'True
-         Caption         =   "Version 1.51"
+         Caption         =   "Version 1.52"
          BeginProperty Font 
             Name            =   "Arial"
             Size            =   12
@@ -151,7 +151,7 @@ End Sub
 
 Private Sub Form_Load()
 lblAboutEPVer.Caption = "EnergyPlus and IDD version number: " & IDDVersion
-txtNotice.Text = "Copyright (c) 2000-2020 GARD Analytics, " & vbCrLf
+txtNotice.Text = "Copyright (c) 2000-2022 GARD Analytics, " & vbCrLf
 txtNotice.Text = txtNotice.Text & "Inc.  All rights reserved." & vbCrLf
 txtNotice.Text = txtNotice.Text & "                                        " & vbCrLf
 txtNotice.Text = txtNotice.Text & "The code for quick select dropdowns     " & vbCrLf
@@ -259,3 +259,6 @@ End Sub
 '
 '     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 '
+Private Sub lblVersion_Click()
+
+End Sub

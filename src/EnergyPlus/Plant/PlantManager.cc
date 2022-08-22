@@ -61,6 +61,7 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricASHRAE205.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
@@ -1025,6 +1026,15 @@ void GetPlantInput(EnergyPlusData &state)
                             this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(state, CompNames(CompNum));
+                        break;
+                    }
+                    case PlantEquipmentType::Chiller_ElectricASHRAE205: {
+                        if (LoopSideNum == LoopSideLocation::Demand) {
+                            this_comp.CurOpSchemeType = OpScheme::Demand;
+                        } else if (LoopSideNum == LoopSideLocation::Supply) {
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        }
+                        this_comp.compPtr = ChillerElectricASHRAE205::ASHRAE205ChillerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
                     case PlantEquipmentType::Chiller_EngineDriven: {
@@ -4196,6 +4206,16 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         } else {
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
                             this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
+                        }
+                    } break;
+                    case DataPlant::PlantEquipmentType::Chiller_ElectricASHRAE205: {
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                        if (LoopSideCtr == LoopSideLocation::Demand) {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
+                        } else {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapLowOutLimit;
                         }
                     } break;
                     default: {
