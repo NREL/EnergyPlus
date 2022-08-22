@@ -528,15 +528,6 @@ namespace BaseboardRadiator {
             }
             this->SetLoopIndexFlag = false;
         }
-        // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!this->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            this->ZoneEquipmentListChecked = true;
-            if (!DataZoneEquipment::CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, this->EquipID)) {
-                ShowSevereError(state,
-                                "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + this->EquipID +
-                                    "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
-            }
-        }
 
         if (!state.dataGlobal->SysSizingCalc && this->MySizeFlag && !this->SetLoopIndexFlag) {
             // for each coil, do the sizing once.

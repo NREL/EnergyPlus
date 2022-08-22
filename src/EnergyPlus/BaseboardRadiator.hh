@@ -103,7 +103,6 @@ namespace BaseboardRadiator {
         bool CheckEquipName = true;
         bool SetLoopIndexFlag = true;
         bool MyEnvrnFlag = true;
-        bool ZoneEquipmentListChecked = false;
 
         void InitBaseboard(EnergyPlusData &state, int baseboardNum);
 

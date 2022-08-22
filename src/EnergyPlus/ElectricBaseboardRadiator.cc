@@ -558,9 +558,6 @@ namespace ElectricBaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
-        // Using/Aliasing
-        using DataZoneEquipment::CheckZoneEquipmentList;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
         int Loop;
@@ -575,7 +572,6 @@ namespace ElectricBaseboardRadiator {
         auto &LastQBBElecRadSrc = state.dataElectBaseboardRad->LastQBBElecRadSrc;
         auto &LastSysTimeElapsed = state.dataElectBaseboardRad->LastSysTimeElapsed;
         auto &LastTimeStepSys = state.dataElectBaseboardRad->LastTimeStepSys;
-        auto &ZoneEquipmentListChecked = state.dataElectBaseboardRad->ZoneEquipmentListChecked;
 
         // Do the one time initializations
         if (MyOneTimeFlag) {
@@ -598,17 +594,6 @@ namespace ElectricBaseboardRadiator {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
             MySizeFlag(BaseboardNum) = false;
-        }
-
-        // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= NumElecBaseboards; ++Loop) {
-                if (CheckZoneEquipmentList(state, state.dataElectBaseboardRad->cCMO_BBRadiator_Electric, ElecBaseboard(Loop).EquipName)) continue;
-                ShowSevereError(state,
-                                "InitBaseboard: Unit=[" + state.dataElectBaseboardRad->cCMO_BBRadiator_Electric + ',' +
-                                    ElecBaseboard(Loop).EquipName + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
-            }
         }
 
         // Do the Begin Environment initializations

@@ -170,7 +170,6 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct
     Array1D<ElectricBaseboardRadiator::ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
     bool GetInputFlag = true; // One time get input flag
     bool MyOneTimeFlag = true;
-    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
     Array1D_bool MyEnvrnFlag;
     void clear_state() override
@@ -179,7 +178,6 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct
         this->NumElecBaseboards = 0;
         this->GetInputFlag = true;
         this->MyOneTimeFlag = true;
-        this->ZoneEquipmentListChecked = false;
         this->QBBElecRadSource.clear();     // Need to keep the last value in case we are still iterating
         this->QBBElecRadSrcAvg.clear();     // Need to keep the last value in case we are still iterating
         this->ZeroSourceSumHATsurf.clear(); // Equal to the SumHATsurf for all the walls in a zone with no source
