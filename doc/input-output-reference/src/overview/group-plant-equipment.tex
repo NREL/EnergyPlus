@@ -5504,11 +5504,11 @@ Aux_EIRPLR_CurveName, !-Auxiliary Electric Energy Input Ratio Function of PLR Cu
 
 \subsubsection{Outputs}
 
-The following output will be added the to the new gas-fired (fuel-fired) absorption heat pump system: 
+The output variables for the fuel-fired (or gas-fired) absorption heat pump system are: 
 
 \begin{itemize}
-\item HVAC,average,Fuel-fired Absorption HeatPump Load Side Heating Transfer Rate [W]
-\item HVAC,sum,Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [J]
+\item HVAC,average,Fuel-fired Absorption HeatPump Load Side Heat Transfer Rate [W]
+\item HVAC,sum,Fuel-fired Absorption HeatPump Load Side Heat Transfer Energy [J]
 \item HVAC,average,Fuel-fired Absorption HeatPump Fuel Rate [W]
 \item HVAC,sum,Fuel-fired Absorption HeatPump Fuel Energy [J]
 \item HVAC,average,Fuel-fired Absorption HeatPump Electricity Rate [W]
@@ -5519,25 +5519,35 @@ The following output will be added the to the new gas-fired (fuel-fired) absorpt
 \item HVAC,average,Fuel-fired Absorption HeatPump Outlet Temperature [C]
 \end{itemize}
 
-\paragraph{Fuel-fired Absorption HeatPump Load Side Heating Transfer Rate [W]}
+\paragraph{Fuel-fired Absorption HeatPump Load Side Heat Transfer Rate [W]}
+This is the load side heat transfer rate for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
 
 \paragraph{Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [J]}
+This is the accumulated value fo the load side heat transfer energy for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
 
 \paragraph{Fuel-fired Absorption HeatPump Fuel Rate [W]}
+This is the fuel consumption rate in [W] of the fuel-fired absorption heat pump. 
 
 \paragraph{Fuel-fired Absorption HeatPump Fuel Energy [J]}
+This is the accumulated fuel consumption in [J] of the fuel-fired absorption heat pump. 
 
 \paragraph{Fuel-fired Absorption HeatPump Electricity Rate [W]}
+This is the electricity consumption rate in [W] of the fuel-fired absorption heat pump.
 
 \paragraph{Fuel-fired Absorption HeatPump Electricity Energy [J]}
+This is the accumulated electricity consumption in [J] of the fuel-fired absorption heat pump.
 
 \paragraph{Fuel-fired Absorption HeatPump Mass Flow Rate [kg/s]}
+This is the water side mass flow rate in [kg/s] of the fuel-fired absorption heat pump.
 
 \paragraph{Fuel-fired Absorption HeatPump Volumetric Flow Rate [m3/s]}
+This is the water side volumetric flow rate in [m3/s] of the fuel-fired absorption heat pump.
 
 \paragraph{Fuel-fired Absorption HeatPump Inlet Temperature [C]}
+This is the inlet water temperature of the fuel-fired absorption heat pump in degree [C].
 
 \paragraph{Fuel-fired Absorption HeatPump Outlet Temperature [C]}
+This is the outlet water temperature of the fuel-fired absorption heat pump in degree [C].
 
 \subsection{Steps to specify the Ground Source Heat Pump}\label{steps-to-specify-the-ground-source-heat-pump}
 
