@@ -10,6 +10,7 @@
 !                          double pane with drapes, double pane with interior roll shade,
 !                          coated double pane (no shading device), "shading coefficient" double pane (no shading device),
 !                          double pane switchable glazing with illuminance setpoint control,
+!                          double pane with solar / luminance setpoint control,
 !                          triple pane (no shading device), and quadruple pane (no shading device).
 !                          All shades are assumed to be perfect diffusers, i.e,
 !                          their optical properties, such as transmittance, do not depend on direction
@@ -39,6 +40,7 @@
 !   Zone 4 has double-pane windows with interior drapes.
 !   Zone 5 has double-pane windows with interior roll shades.
 !   Zone 10 has double-pane windows with switchable glazing and illuminance control.
+!   Zone 10 has double pane windows with solar / luminance control.
 !
 !
 ! Floor Area:        900 m2
@@ -612,7 +614,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn003:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -653,7 +655,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn004:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -675,7 +677,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn005:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -697,13 +699,31 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     DPSG Daylighting Ctrl,   !- Daylighting Control Object Name
     Group,                   !- Multiple Surface Control Type
     Zn010:Wall001:Win001,    !- Fenestration Surface 1 Name
-    Zn010:Wall002:Win001,    !- Fenestration Surface 2 Name
-    Zn010:Wall003:Win001,    !- Fenestration Surface 3 Name
-    Zn010:Wall004:Win001;    !- Fenestration Surface 4 Name
+    Zn010:Wall002:Win001;    !- Fenestration Surface 2 Name
+
+  WindowShadingControl,
+    LuminTesting-DOUBLE PANE WITH SWITCHABLE GLAZING-DPSG,  !- Name
+    DPSG,                    !- Zone Name
+    1,                       !- Shading Control Sequence Number
+    InteriorShade,           !- Shading Type
+    DOUBLE PANE WITH SHADE,  !- Construction with Shading Name
+    OnIfHighSolarOrHighLuminanceTillMidNight,  !- Shading Control Type
+    ,                        !- Schedule Name
+    94.64,                   !- Setpoint {W/m2, W or deg C}
+    NO,                      !- Shading Control Is Scheduled
+    NO,                      !- Glare Control Is Active
+    ,                        !- Shading Device Material Name
+    ,                        !- Type of Slat Angle Control for Blinds
+    ,                        !- Slat Angle Schedule Name
+    2000,                    !- Setpoint 2 {W/m2, deg C or cd/m2}
+    DPSG Daylighting Ctrl,   !- Daylighting Control Object Name
+    Group,                   !- Multiple Surface Control Type
+    Zn010:Wall003:Win001,    !- Fenestration Surface 1 Name
+    Zn010:Wall004:Win001;    !- Fenestration Surface 2 Name
 
   Daylighting:Controls,
     DPW Daylighting Ctrl,    !- Name
@@ -2427,7 +2447,7 @@
   FenestrationSurface:Detailed,
     Zn010:Wall003:Win001,    !- Name
     Window,                  !- Surface Type
-    DOUBLE PANE WINDOW,      !- Construction Name
+    DOUBLE PANE WITH SHADE:no-shade,      !- Construction Name
     Zn010:Wall003,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground
@@ -2459,7 +2479,7 @@
   FenestrationSurface:Detailed,
     Zn010:Wall004:Win001,    !- Name
     Window,                  !- Surface Type
-    DOUBLE PANE WINDOW,      !- Construction Name
+    DOUBLE PANE WITH SHADE:no-shade,      !- Construction Name
     Zn010:Wall004,           !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.5000000,               !- View Factor to Ground

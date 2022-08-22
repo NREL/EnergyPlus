@@ -739,7 +739,7 @@
     ,                        !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    0,                       !- Setpoint 2 {W/m2 or deg C}
+    0,                       !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Room 102 Window;         !- Fenestration Surface 1 Name

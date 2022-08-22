@@ -427,9 +427,12 @@ def parse_field(data, token):
                     root['data_type'] = 'external_list'
                 else:
                     raise RuntimeError("Two external-lists?")
-            elif match_string(data, REAL_STR) or match_string(data, INTEGER_STR):
-                if 'type' not in root or 'type' != 'number':
+            elif match_string(data, REAL_STR):
+                if 'type' not in root or root['type'] != 'number':
                     root['type'] = 'number'
+            elif match_string(data, INTEGER_STR):
+                if 'type' not in root or root['type'] != 'integer':
+                    root['type'] = 'integer'
             elif match_string(data, NODE_STR):
                 root['type'] = 'string'
             else:
@@ -549,6 +552,21 @@ def parse_field(data, token):
             if 'enum' in root and has_default:
                 root['enum'].insert(0, '')
                 root['enum'].sort()
+            if 'type' in root and root['type'] == 'integer':
+                # Go back and make sure default, min/max are integers for integer fields
+                # Handle default slightly differently
+                if 'default' in root:
+                    if root['default'] in ['Autocalculate', 'Autosize']:
+                        continue
+                    if not root['default'].is_integer():
+                        raise RuntimeError("found float default for integer field")
+                    root['default'] = int(root['default'])
+                # Now for the min/max items
+                for fld in ['minimum', 'exclusiveMinimum', 'maximum', 'exclusiveMaximum']:
+                    if fld in root:
+                        if not root[fld].is_integer():
+                            raise RuntimeError("found float %s for integer field" % fld)
+                        root[fld] = int(root[fld])
             return root
 
 

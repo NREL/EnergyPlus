@@ -4714,6 +4714,7 @@ namespace WeatherManager {
         }
 
         SunDirectionCosines(3) = CosZenith;
+        state.dataEnvrn->SunIsUpPrevTS = state.dataEnvrn->SunIsUp;
         if (CosZenith < DataEnvironment::SunIsUpValue) {
             state.dataEnvrn->SunIsUp = false;
             SunDirectionCosines(2) = 0.0;
