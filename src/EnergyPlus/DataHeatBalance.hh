@@ -499,9 +499,20 @@ namespace DataHeatBalance {
         Array1D<Real64> ReflBack;   // Back reflectance at normal incidence
     };
 
-    struct SpaceData
+    struct ZoneSpaceData
     {
-        std::string Name;                                                 // Space name
+        // Base class for zones and spaces.
+        // For now, only including fields that are new to Space to avoid excess changes
+        // due to case differences between existing space and zone field names.
+        std::string Name;
+        Real64 CeilingHeight = DataGlobalConstants::AutoCalculate; // Ceiling Height entered by user [m] or calculated
+        Real64 Volume = DataGlobalConstants::AutoCalculate;        // Volume entered by user [m3] or calculated
+        Real64 ExtGrossWallArea = 0.0;                             // Exterior Wall Area for Zone (Gross)
+        Real64 ExteriorTotalSurfArea = 0.0;                        // Total surface area of all exterior surfaces for Zone
+    };
+
+    struct SpaceData : ZoneSpaceData
+    {
         int zoneNum = 0;                                                  // Pointer to Zone wich contains this space
         Real64 userEnteredFloorArea = DataGlobalConstants::AutoCalculate; // User input floor area for this space
         std::string spaceType = "General";                                // Space type tag
@@ -531,20 +542,67 @@ namespace DataHeatBalance {
         EPVector<int> spaces;                           // Pointers to Spaces in the list
     };
 
-    struct ZoneData
+    //    number of columns in resilience report tables
+    constexpr int numColumnThermalTbl(5);
+    constexpr int numColumnUnmetDegreeHourTbl(6);
+    constexpr int numColumnDiscomfortWtExceedHourTbl(4);
+    constexpr int numColumnCO2Tbl(3);
+    constexpr int numColumnVisualTbl(4);
+
+    struct ZoneResilience
+    {
+        Real64 ZoneNumOcc;
+        Real64 ColdStressTempThresh;
+        Real64 HeatStressTempThresh;
+        Real64 PierceSET;
+        Real64 PMV;
+        Real64 ZonePierceSET;
+        Real64 ZonePierceSETLastStep;
+        Real64 ZoneHeatIndex;
+        Real64 ZoneHumidex;
+        bool CrossedColdThresh;
+        bool CrossedHeatThresh;
+
+        std::array<Real64, numColumnThermalTbl> ZoneHeatIndexHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHeatIndexOccuHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHeatIndexOccupiedHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHumidexHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHumidexOccuHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHumidexOccupiedHourBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneLowSETHours = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHighSETHours = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneColdHourOfSafetyBins = {0.0};
+        std::array<Real64, numColumnThermalTbl> ZoneHeatHourOfSafetyBins = {0.0};
+        std::array<Real64, numColumnUnmetDegreeHourTbl> ZoneUnmetDegreeHourBins = {0.0};
+        std::array<Real64, numColumnDiscomfortWtExceedHourTbl> ZoneDiscomfortWtExceedOccuHourBins = {0.0};
+        std::array<Real64, numColumnDiscomfortWtExceedHourTbl> ZoneDiscomfortWtExceedOccupiedHourBins = {0.0};
+
+        std::array<Real64, numColumnCO2Tbl> ZoneCO2LevelHourBins = {0.0};
+        std::array<Real64, numColumnCO2Tbl> ZoneCO2LevelOccuHourBins = {0.0};
+        std::array<Real64, numColumnCO2Tbl> ZoneCO2LevelOccupiedHourBins = {0.0};
+
+        std::array<Real64, numColumnVisualTbl> ZoneLightingLevelHourBins = {0.0};
+        std::array<Real64, numColumnVisualTbl> ZoneLightingLevelOccuHourBins = {0.0};
+        std::array<Real64, numColumnVisualTbl> ZoneLightingLevelOccupiedHourBins = {0.0};
+
+        // Default Constructor
+        ZoneResilience()
+            : ZoneNumOcc(0.0), ColdStressTempThresh(15.56), HeatStressTempThresh(30.0), PierceSET(-999.0), PMV(0.0), ZonePierceSET(-1.0),
+              ZonePierceSETLastStep(-1.0), ZoneHeatIndex(0.0), ZoneHumidex(0.0), CrossedColdThresh(false), CrossedHeatThresh(false)
+        {
+        }
+    };
+    struct ZoneData : ZoneSpaceData
     {
         // Members
-        std::string Name;
-        int Multiplier = 1;                                        // Used in reporting and for systems calculations
-        int ListMultiplier = 1;                                    // For Zone Group object:  used in reporting and systems calculations
-        int ListGroup = 0;                                         // used only in Zone Group verification.  and for error message.
-        Real64 RelNorth = 0.0;                                     // Relative North (to building north) [Degrees]
-        Real64 OriginX = 0.0;                                      // X origin  [m]
-        Real64 OriginY = 0.0;                                      // Y origin  [m]
-        Real64 OriginZ = 0.0;                                      // Z origin  [m]
-        Real64 CeilingHeight = DataGlobalConstants::AutoCalculate; // Ceiling Height entered by user [m] or calculated
-        Real64 Volume = DataGlobalConstants::AutoCalculate;        // Volume entered by user [m3] or calculated
-        int OfType = 1;                                            // 1=Standard Zone, Not yet used:
+        int Multiplier = 1;     // Used in reporting and for systems calculations
+        int ListMultiplier = 1; // For Zone Group object:  used in reporting and systems calculations
+        int ListGroup = 0;      // used only in Zone Group verification.  and for error message.
+        Real64 RelNorth = 0.0;  // Relative North (to building north) [Degrees]
+        Real64 OriginX = 0.0;   // X origin  [m]
+        Real64 OriginY = 0.0;   // Y origin  [m]
+        Real64 OriginZ = 0.0;   // Z origin  [m]
+        int OfType = 1;         // 1=Standard Zone, Not yet used:
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
         Real64 UserEnteredFloorArea = DataGlobalConstants::AutoCalculate; // User input floor area for this zone
         // Calculated after input
@@ -556,12 +614,10 @@ namespace DataHeatBalance {
         bool HasWindow = false;     // Window(s) present in this zone
         Real64 AirCapacity = 0.0;
         Real64 ExtWindowArea = 0.0;               // Exterior Window Area for Zone
-        Real64 ExtGrossWallArea = 0.0;            // Exterior Wall Area for Zone (Gross)
         Real64 ExtWindowArea_Multiplied = 0.0;    // Exterior Window Area for Zone with multipliers
         Real64 ExtGrossWallArea_Multiplied = 0.0; // Exterior Wall Area for Zone (Gross) with multipliers
         Real64 ExtNetWallArea = 0.0;              // Exterior Wall Area for Zone (Net)
         Real64 TotalSurfArea = 0.0;               // Total surface area for Zone
-        Real64 ExteriorTotalSurfArea = 0.0;       // Total surface area of all exterior surfaces for Zone
         // (ignoring windows as they will be included in their base surfaces)
         Real64 ExteriorTotalGroundSurfArea = 0.0;       // Total surface area of all surfaces for Zone with ground contact
         Real64 ExtGrossGroundWallArea = 0.0;            // Ground contact Wall Area for Zone (Gross)
@@ -684,6 +740,8 @@ namespace DataHeatBalance {
         Real64 delta_HumRat = 0.0;                          // Indoor and outdoor humidity ratio delta
 
         Real64 ZeroSourceSumHATsurf = 0.0; // From Chilled Ceiling Panel, equal to the SumHATsurf for all the walls in a zone with no source
+        bool zoneOAQuadratureSum = false;  // True when zone OA balance method is Quadrature
+        int zoneOABalanceIndex = 0;        // Index to ZoneAirBalance for this zone, if any
 
         // Spaces
         bool anySurfacesWithoutSpace = false; // True if any surfaces in a zone do not have a space assigned in input
@@ -723,22 +781,6 @@ namespace DataHeatBalance {
         std::string Name;   // Zone Group name
         int ZoneList = 0;   // Pointer to the zone list
         int Multiplier = 1; // Zone List multiplier
-    };
-
-    struct GlobalInternalGainMiscObject
-    {
-        // Members
-        std::string Name;
-        int ZoneOrZoneListPtr = 0;
-        int NumOfZones = 0;
-        int StartPtr = 0;
-        bool ZoneListActive = false;
-        int spaceOrSpaceListPtr = 0;
-        int numOfSpaces = 0;
-        int spaceStartPtr = 0;
-        bool spaceListActive = false;
-        EPVector<int> spaceNums;     // Indexes to spaces associated with this input object
-        EPVector<std::string> names; // Names for each instance created from this input object
     };
 
     enum class ClothingType
@@ -796,8 +838,10 @@ namespace DataHeatBalance {
         bool Show55Warning = false;                              // show the warning messages about ASHRAE 55-2004
         Real64 CO2RateFactor = 0.0;                              // Carbon Dioxide Generation Rate [m3/s-W]
         // Report variables
-        Real64 NumOcc = 0.0;                 // Number of occupants at current timestep []
-        Real64 TemperatureInZone = 0.0;      // Temperature in zone (C)
+        Real64 NumOcc = 0.0;            // Number of occupants at current timestep []
+        Real64 TemperatureInZone = 0.0; // Temperature in zone (C)
+        Real64 ColdStressTempThresh = 15.56;
+        Real64 HeatStressTempThresh = 30.0;
         Real64 RelativeHumidityInZone = 0.0; // Relative humidity in zone
         Real64 RadGainRate = 0.0;            // Radiant heat gain [W]
         Real64 ConGainRate = 0.0;            // Convective heat gain [W]
@@ -903,6 +947,47 @@ namespace DataHeatBalance {
             ExteriorEnergyUse::ExteriorFuelUsage::Invalid; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
     };
 
+    // ITE Equipment Environmental Class Data
+    // MODULE PARAMETER DEFINITIONS:
+    enum class ITEClass
+    {
+        Invalid = -1,
+        None, // (0)
+        A1,   // (1)
+        A2,   // (2)
+        A3,   // (3)
+        A4,   // (4)
+        B,    // (5)
+        C,    // (6)
+        H1,   // (7)
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(ITEClass::Num)> ITEClassNamesUC = {"NONE", "A1", "A2", "A3", "A4", "B", "C", "H1"};
+
+    enum class ITEInletConnection
+    {
+        Invalid = -1,
+        AdjustedSupply,
+        ZoneAirNode,
+        RoomAirModel,
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(ITEInletConnection::Num)> ITEInletConnectionNamesUC = {
+        "ADJUSTEDSUPPLY", "ZONEAIRNODE", "ROOMAIRMODEL"};
+
+    enum class PERptVars
+    {
+        CPU = 0,       // ITE CPU Electric Power/Energy
+        Fan,           // ITE Fan Electric Power/Energy
+        UPS,           // ITE UPS Electric Power/Energy
+        CPUAtDesign,   // ITE CPU Electric Power/Energy at Design Inlet Conditions
+        FanAtDesign,   // ITE Fan Electric Power/Energy at Design Inlet Conditions
+        UPSGainToZone, // ITE UPS Heat Gain to Zone Power(Rate)/Energy - convective gain
+        ConGainToZone, // ITE Total Heat Gain to Zone Power(Rate)/Energy - convective gain - includes heat gain from UPS, plus CPU and Fans if
+                       // room air model not used
+        Num
+    };
+
     struct ITEquipData // IT Equipment
     {
         // Members
@@ -921,51 +1006,38 @@ namespace DataHeatBalance {
         Real64 DesignFanPower = 0.0;               // Design fan power input [W]
         Real64 DesignCPUPower = 0.0;               // Design CPU power input [W]
         Real64 DesignAirVolFlowRate = 0.0;         // Design air volume flow rate [m3/s]
-        int Class = 0;                             // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6)
+        ITEClass Class = ITEClass::None;           // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6, H1=7)
         int AirFlowFLTCurve = 0;                   // Index for airflow function of CPULoadFrac (x) and TAirIn (y) curve
         int CPUPowerFLTCurve = 0;                  // Index for CPU power function of CPULoadFrac (x) and TAirIn (y) curve
         int FanPowerFFCurve = 0;                   // Index for fan power function of flow fraction curve
-        int AirConnectionType = 0;                 // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
-        int InletRoomAirNodeNum = 0;               // Room air model node number for air inlet
-        int OutletRoomAirNodeNum = 0;              // Room air model node number for air outlet
-        int SupplyAirNodeNum = 0;                  // Node number for supply air inlet
-        Real64 DesignRecircFrac = 0.0;             // Design recirculation fraction (0.0-0.5)
-        int RecircFLTCurve = 0;                    // Index for recirculation function of CPULoadFrac (x) and TSupply (y) curve
-        Real64 DesignUPSEfficiency = 0.0;          // Design power supply efficiency (>0.0 - 1.0)
-        int UPSEfficFPLRCurve = 0;                 // Index for recirculation function of part load ratio
-        Real64 UPSLossToZoneFrac = 0.0;            // Fraction of UPS power loss to zone (0.0 - 1.0); remainder is lost
-        std::string EndUseSubcategoryCPU;          // User defined name for the end use category for the CPU
-        std::string EndUseSubcategoryFan;          // User defined name for the end use category for the Fans
-        std::string EndUseSubcategoryUPS;          // User defined name for the end use category for the power supply
-        bool EMSCPUPowerOverrideOn = false;        // EMS actuating CPU power if .TRUE.
-        Real64 EMSCPUPower = 0.0;                  // Value EMS is directing to use for override of CPU power [W]
-        bool EMSFanPowerOverrideOn = false;        // EMS actuating Fan power if .TRUE.
-        Real64 EMSFanPower = 0.0;                  // Value EMS is directing to use for override of Fan power [W]
-        bool EMSUPSPowerOverrideOn = false;        // EMS actuating UPS power if .TRUE.
-        Real64 EMSUPSPower = 0.0;                  // Value EMS is directing to use for override of UPS power [W]
-        Real64 SupplyApproachTemp = 0.0;           // The difference of the IT inlet temperature from the AHU supply air temperature
-        int SupplyApproachTempSch = 0;             // The difference schedule of the IT inlet temperature from the AHU supply air temperature
-        Real64 ReturnApproachTemp = 0.0;           // The difference of the unit outlet temperature from the well mixed zone temperature
-        int ReturnApproachTempSch = 0;             // The difference schedule of the unit outlet temperature from the well mixed zone temperature
-        int zoneEqIndex = 0;                       // index in zone equipment data structure for the zone this IT equipment is in
+        ITEInletConnection AirConnectionType = ITEInletConnection::AdjustedSupply; // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
+        int InletRoomAirNodeNum = 0;                                               // Room air model node number for air inlet
+        int OutletRoomAirNodeNum = 0;                                              // Room air model node number for air outlet
+        int SupplyAirNodeNum = 0;                                                  // Node number for supply air inlet
+        Real64 DesignRecircFrac = 0.0;                                             // Design recirculation fraction (0.0-0.5)
+        int RecircFLTCurve = 0;             // Index for recirculation function of CPULoadFrac (x) and TSupply (y) curve
+        Real64 DesignUPSEfficiency = 0.0;   // Design power supply efficiency (>0.0 - 1.0)
+        int UPSEfficFPLRCurve = 0;          // Index for recirculation function of part load ratio
+        Real64 UPSLossToZoneFrac = 0.0;     // Fraction of UPS power loss to zone (0.0 - 1.0); remainder is lost
+        std::string EndUseSubcategoryCPU;   // User defined name for the end use category for the CPU
+        std::string EndUseSubcategoryFan;   // User defined name for the end use category for the Fans
+        std::string EndUseSubcategoryUPS;   // User defined name for the end use category for the power supply
+        bool EMSCPUPowerOverrideOn = false; // EMS actuating CPU power if .TRUE.
+        Real64 EMSCPUPower = 0.0;           // Value EMS is directing to use for override of CPU power [W]
+        bool EMSFanPowerOverrideOn = false; // EMS actuating Fan power if .TRUE.
+        Real64 EMSFanPower = 0.0;           // Value EMS is directing to use for override of Fan power [W]
+        bool EMSUPSPowerOverrideOn = false; // EMS actuating UPS power if .TRUE.
+        Real64 EMSUPSPower = 0.0;           // Value EMS is directing to use for override of UPS power [W]
+        Real64 SupplyApproachTemp = 0.0;    // The difference of the IT inlet temperature from the AHU supply air temperature
+        int SupplyApproachTempSch = 0;      // The difference schedule of the IT inlet temperature from the AHU supply air temperature
+        Real64 ReturnApproachTemp = 0.0;    // The difference of the unit outlet temperature from the well mixed zone temperature
+        int ReturnApproachTempSch = 0;      // The difference schedule of the unit outlet temperature from the well mixed zone temperature
+        int zoneEqIndex = 0;                // index in zone equipment data structure for the zone this IT equipment is in
 
         // Report variables
-        Real64 CPUPower = 0.0;          // ITE CPU Electric Power [W]
-        Real64 FanPower = 0.0;          // ITE Fan Electric Power [W]
-        Real64 UPSPower = 0.0;          // ITE UPS Electric Power [W]
-        Real64 CPUPowerAtDesign = 0.0;  // ITE CPU Electric Power at Design Inlet Conditions [W]
-        Real64 FanPowerAtDesign = 0.0;  // ITE Fan Electric Power at Design Inlet Conditions [W]
-        Real64 UPSGainRateToZone = 0.0; // ITE UPS Heat Gain to Zone Rate [W] - convective gain
-        Real64 ConGainRateToZone = 0.0; // ITE Total Heat Gain to Zone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if
-                                        // room air model not used
-        Real64 CPUConsumption = 0.0;    // ITE CPU Electric Energy [J]
-        Real64 FanConsumption = 0.0;    // ITE Fan Electric Energy [J]
-        Real64 UPSConsumption = 0.0;    // ITE UPS Electric Energy [J]
-        Real64 CPUEnergyAtDesign = 0.0; // ITE CPU Electric Energy at Design Inlet Conditions [J]
-        Real64 FanEnergyAtDesign = 0.0; // ITE Fan Electric Energy at Design Inlet Conditions [J]
-        Real64 UPSGainEnergyToZone = 0.0; // ITE UPS Heat Gain to Zone Energy [J] - convective gain
-        Real64 ConGainEnergyToZone = 0.0; // ITE Total Heat Gain to Zone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans
-                                          // if room air model not used
+        std::array<Real64, (int)PERptVars::Num> PowerRpt;
+        std::array<Real64, (int)PERptVars::Num> EnergyRpt;
+
         Real64 AirVolFlowStdDensity = 0.0; // Air volume flow rate at standard density [m3/s]
         Real64 AirVolFlowCurDensity = 0.0; // Air volume flow rate at current density [m3/s]
         Real64 AirMassFlow = 0.0;          // Air mass flow rate [kg/s]
@@ -1023,6 +1095,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;
         int ZonePtr = 0;                                                  // Which zone infiltration is in
+        int spaceIndex = 0;                                               // Space index for this infiltration instance
         int SchedPtr = 0;                                                 // Schedule for infiltration
         InfiltrationModelType ModelType = InfiltrationModelType::Invalid; // which model is used for infiltration
         // Design Flow Rate model terms
@@ -1043,8 +1116,6 @@ namespace DataHeatBalance {
         Real64 ShelterFactor = 0.0;         // "s" shelter factor
         bool EMSOverrideOn = false;         // if true then EMS is requesting to override
         Real64 EMSAirFlowRateValue = 0.0;   // value EMS is setting for air flow rate
-        bool QuadratureSum = false;         // If quadrature sum of zone air balance method is used
-        int OABalancePtr = 0;               // A pointer to ZoneAirBalance If quadrature is true
         Real64 VolumeFlowRate = 0.0;        // infiltration air volume flow rate
         Real64 MassFlowRate = 0.0;          // infiltration air mass flow rate
         Real64 MCpI_temp = 0.0;             // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
@@ -1068,6 +1139,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;
         int ZonePtr = 0;
+        int spaceIndex = 0; // Space index for this ventilation instance
         int SchedPtr = 0;
         VentilationModelType ModelType =
             VentilationModelType::Invalid; // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
@@ -1101,8 +1173,6 @@ namespace DataHeatBalance {
         HybridCtrlType HybridControlType = HybridCtrlType::Indiv; // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
         int HybridControlMasterNum = 0;                           // Hybrid ventilation control master object number
         bool HybridControlMasterStatus = false;                   // Hybrid ventilation control master object opening status
-        bool QuadratureSum = false;                               // If quadrature sum of zone air balance method is used
-        int OABalancePtr = 0;                                     // A pointer to ZoneAirBalance
         // WindandStackOpenArea
         Real64 OpenArea = 0.0;    // Opening area [m2]
         int OpenAreaSchedPtr = 0; // Opening area fraction schedule pointer
@@ -1138,9 +1208,11 @@ namespace DataHeatBalance {
         // Members
         std::string Name;
         int ZonePtr = 0;
+        int spaceIndex = 0; // Space index for this mixing instance
         int SchedPtr = 0;
         Real64 DesignLevel = 0.0;
         int FromZone = 0;
+        int fromSpaceIndex = 0; // Source space index for this mixing instance
         Real64 DeltaTemperature = 0.0;
         Real64 DesiredAirFlowRate = 0.0;
         Real64 DesiredAirFlowRateSaved = 0.0;
@@ -1176,6 +1248,14 @@ namespace DataHeatBalance {
         Array1D_string DoorProtTypeName;     // Used in eio
                                              // Note, for mixing and crossmixing, this type dimensioned by number of mixing objects.
         // For ref door mixing, dimensioned by number of zones.
+    };
+
+    struct AirBoundaryMixingSpecs
+    {
+        int space1;                  // Air boundary simple mixing space 1
+        int space2;                  // Air boundary simple mixing space 2
+        int scheduleIndex;           // Air boundary simple mixing schedule index
+        Real64 mixingVolumeFlowRate; // Air boundary simple mixing volume flow rate [m3/s]
     };
 
     struct ZoneAirMassFlowConservation
@@ -1826,22 +1906,8 @@ namespace DataHeatBalance {
         Real64 OtherLostRate = 0.0;
         Real64 OtherTotGainRate = 0.0;
         // IT Equipment
-        Real64 ITEqCPUPower = 0.0;          // Zone ITE CPU Electric Power [W]
-        Real64 ITEqFanPower = 0.0;          // Zone ITE Fan Electric Power [W]
-        Real64 ITEqUPSPower = 0.0;          // Zone ITE UPS Electric Power [W]
-        Real64 ITEqCPUPowerAtDesign = 0.0;  // Zone ITE CPU Electric Power at Design Inlet Conditions [W]
-        Real64 ITEqFanPowerAtDesign = 0.0;  // Zone ITE Fan Electric Power at Design Inlet Conditions [W]
-        Real64 ITEqUPSGainRateToZone = 0.0; // Zone ITE UPS Heat Gain to Zone Rate [W] - convective gain
-        Real64 ITEqConGainRateToZone = 0.0; // Zone ITE Total Heat Gain toZone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and
-                                            // Fans if room air model not used
-        Real64 ITEqCPUConsumption = 0.0;    // Zone ITE CPU Electric Energy [J]
-        Real64 ITEqFanConsumption = 0.0;    // Zone ITE Fan Electric Energy [J]
-        Real64 ITEqUPSConsumption = 0.0;    // Zone ITE UPS Electric Energy [J]
-        Real64 ITEqCPUEnergyAtDesign = 0.0; // Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
-        Real64 ITEqFanEnergyAtDesign = 0.0; // Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
-        Real64 ITEqUPSGainEnergyToZone = 0.0;  // Zone ITE UPS Heat Gain to Zone Energy [J] - convective gain
-        Real64 ITEqConGainEnergyToZone = 0.0;  // Zone ITE Total Heat Gain toZone Energy [J] - convective gain - includes heat gain from UPS, plus CPU
-                                               // and Fans if room air model not used
+        std::array<Real64, (int)PERptVars::Num> PowerRpt;
+        std::array<Real64, (int)PERptVars::Num> EnergyRpt;
         Real64 ITEqAirVolFlowStdDensity = 0.0; // Zone Air volume flow rate at standard density [m3/s]
         Real64 ITEqAirMassFlow = 0.0;          // Zone Air mass flow rate [kg/s]
         Real64 ITEqSHI = 0.0;                  // Zone Supply Heat Index []
@@ -1988,64 +2054,48 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 SysTotalHVACReliefHeatLoss = 0.0;       // Building total heat emission through HVAC system relief air;
     Real64 SysTotalHVACRejectHeatLoss = 0.0;       // Building total heat emission through HVAC system heat rejection;
     // END SiteData
-    int NumOfZoneLists = 0;             // Total number of zone lists
-    int NumOfZoneGroups = 0;            // Total number of zone groups
-    int NumPeopleStatements = 0;        // Number of People objects in input - possibly global assignments
-    int NumLightsStatements = 0;        // Number of Lights objects in input - possibly global assignments
-    int NumZoneElectricStatements = 0;  // Number of ZoneElectric objects in input - possibly global assignments
-    int NumZoneGasStatements = 0;       // Number of ZoneGas objects in input - possibly global assignments
-    int NumInfiltrationStatements = 0;  // Number of Design Flow Infiltration objects in input - possibly global assignments
-    int NumVentilationStatements = 0;   // Number of Design Flow Ventilation objects in input - possibly global assignments
-    int NumHotWaterEqStatements = 0;    // number of Hot Water Equipment objects in input. - possibly global assignments
-    int NumSteamEqStatements = 0;       // number of Steam Equipment objects in input. - possibly global assignments
-    int NumOtherEqStatements = 0;       // number of Other Equipment objects in input. - possibly global assignments
-    int NumZoneITEqStatements = 0;      // number of Other Equipment objects in input. - possibly global assignments
-    int NumZoneBBHeatStatements = 0;    // number of ZoneBaseboard heat objects in input. - possibly global assignments
-    int TotPeople = 0;                  // Total People instances after expansion to spaces
-    int TotLights = 0;                  // Total Lights instances after expansion to spaces
-    int TotElecEquip = 0;               // Total Electric Equipment instances after expansion to spaces
-    int TotGasEquip = 0;                // Total Gas Equipment instances after expansion to spaces
-    int TotOthEquip = 0;                // Total Other Equipment instances after expansion to spaces
-    int TotHWEquip = 0;                 // Total Hot Water Equipment instances after expansion to spaces
-    int TotStmEquip = 0;                // Total Steam Equipment instances after expansion to spaces
-    int TotITEquip = 0;                 // Total IT Equipment instances after expansion to spaces
-    int TotInfiltration = 0;            // Total Infiltration Statements in input and extrapolated from global assignments
-    int TotDesignFlowInfiltration = 0;  // number of Design Flow rate ZoneInfiltration in input
-    int TotShermGrimsInfiltration = 0;  // number of Sherman Grimsrud (ZoneInfiltration:ResidentialBasic) in input
-    int TotAIM2Infiltration = 0;        // number of AIM2 (ZoneInfiltration:ResidentialEnhanced) in input
-    int TotVentilation = 0;             // Total Ventilation Statements in input
-    int TotDesignFlowVentilation = 0;   // number of Design Flow rate ZoneVentilation in input
-    int TotWindAndStackVentilation = 0; // number of wind and stack open area ZoneVentilation in input
-    int TotMixing = 0;                  // Total Mixing Statements in input
-    int TotCrossMixing = 0;             // Total Cross Mixing Statements in input
-    int TotRefDoorMixing = 0;           // Total RefrigerationDoor Mixing Statements in input
-    int TotBBHeat = 0;                  // Total BBHeat Statements instances after expansion to spaces
-    int TotMaterials = 0;               // Total number of unique materials (layers) in this simulation
-    int TotConstructs = 0;              // Total number of unique constructions in this simulation
-    int TotSpectralData = 0;            // Total window glass spectral data sets
-    int W5GlsMat = 0;                   // Window5 Glass Materials, specified by transmittance and front and back reflectance
-    int W5GlsMatAlt = 0;                // Window5 Glass Materials, specified by index of refraction and extinction coeff
-    int W5GasMat = 0;                   // Window5 Single-Gas Materials
-    int W5GasMatMixture = 0;            // Window5 Gas Mixtures
-    int W7SupportPillars = 0;           // Complex fenestration support pillars
-    int W7DeflectionStates = 0;         // Complex fenestration deflection states
-    int W7MaterialGaps = 0;             // Complex fenestration material gaps
-    int TotBlinds = 0;                  // Total number of blind materials
-    int TotScreens = 0;                 // Total number of exterior window screen materials
-    int TotTCGlazings = 0;              // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
-    int NumSurfaceScreens = 0;          // Total number of screens on exterior windows
-    int TotShades = 0;                  // Total number of shade materials
-    int TotComplexShades = 0;           // Total number of shading materials for complex fenestrations
-    int TotComplexGaps = 0;             // Total number of window gaps for complex fenestrations
-    int TotSimpleWindow = 0;            // number of simple window systems.
-    int W5GlsMatEQL = 0;                // Window5 Single-Gas Materials for Equivalent Layer window model
-    int TotShadesEQL = 0;               // Total number of shade materials for Equivalent Layer window model
-    int TotDrapesEQL = 0;               // Total number of drape materials for Equivalent Layer window model
-    int TotBlindsEQL = 0;               // Total number of blind materials for Equivalent Layer window model
-    int TotScreensEQL = 0;              // Total number of exterior window screen materials for Equivalent Layer window model
-    int W5GapMatEQL = 0;                // Window5 Equivalent Layer Single-Gas Materials
-    int TotZoneAirBalance = 0;          // Total Zone Air Balance Statements in input
-    int TotFrameDivider = 0;            // Total number of window frame/divider objects
+    int NumOfZoneLists = 0;     // Total number of zone lists
+    int NumOfZoneGroups = 0;    // Total number of zone groups
+    int TotPeople = 0;          // Total People instances after expansion to spaces
+    int TotLights = 0;          // Total Lights instances after expansion to spaces
+    int TotElecEquip = 0;       // Total Electric Equipment instances after expansion to spaces
+    int TotGasEquip = 0;        // Total Gas Equipment instances after expansion to spaces
+    int TotOthEquip = 0;        // Total Other Equipment instances after expansion to spaces
+    int TotHWEquip = 0;         // Total Hot Water Equipment instances after expansion to spaces
+    int TotStmEquip = 0;        // Total Steam Equipment instances after expansion to spaces
+    int TotITEquip = 0;         // Total IT Equipment instances after expansion to spaces
+    int TotInfiltration = 0;    // Total Infiltration (all types) instances after expansion to spaces
+    int TotVentilation = 0;     // Total Ventilation (all types) instances after expansion to spaces
+    int TotMixing = 0;          // Total Mixing Statementsn instances after expansion to spaces
+    int TotCrossMixing = 0;     // Total Cross Mixing Statementsn instances after expansion to spaces
+    int TotRefDoorMixing = 0;   // Total RefrigerationDoor Mixing Statements in input
+    int TotBBHeat = 0;          // Total BBHeat Statements instances after expansion to spaces
+    int TotMaterials = 0;       // Total number of unique materials (layers) in this simulation
+    int TotConstructs = 0;      // Total number of unique constructions in this simulation
+    int TotSpectralData = 0;    // Total window glass spectral data sets
+    int W5GlsMat = 0;           // Window5 Glass Materials, specified by transmittance and front and back reflectance
+    int W5GlsMatAlt = 0;        // Window5 Glass Materials, specified by index of refraction and extinction coeff
+    int W5GasMat = 0;           // Window5 Single-Gas Materials
+    int W5GasMatMixture = 0;    // Window5 Gas Mixtures
+    int W7SupportPillars = 0;   // Complex fenestration support pillars
+    int W7DeflectionStates = 0; // Complex fenestration deflection states
+    int W7MaterialGaps = 0;     // Complex fenestration material gaps
+    int TotBlinds = 0;          // Total number of blind materials
+    int TotScreens = 0;         // Total number of exterior window screen materials
+    int TotTCGlazings = 0;      // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
+    int NumSurfaceScreens = 0;  // Total number of screens on exterior windows
+    int TotShades = 0;          // Total number of shade materials
+    int TotComplexShades = 0;   // Total number of shading materials for complex fenestrations
+    int TotComplexGaps = 0;     // Total number of window gaps for complex fenestrations
+    int TotSimpleWindow = 0;    // number of simple window systems.
+    int W5GlsMatEQL = 0;        // Window5 Single-Gas Materials for Equivalent Layer window model
+    int TotShadesEQL = 0;       // Total number of shade materials for Equivalent Layer window model
+    int TotDrapesEQL = 0;       // Total number of drape materials for Equivalent Layer window model
+    int TotBlindsEQL = 0;       // Total number of blind materials for Equivalent Layer window model
+    int TotScreensEQL = 0;      // Total number of exterior window screen materials for Equivalent Layer window model
+    int W5GapMatEQL = 0;        // Window5 Equivalent Layer Single-Gas Materials
+    int TotZoneAirBalance = 0;  // Total Zone Air Balance Statements in input
+    int TotFrameDivider = 0;    // Total number of window frame/divider objects
     bool AirFlowFlag = false;
     int TotCO2Gen = 0;                       // Total CO2 source and sink statements in input
     bool CalcWindowRevealReflection = false; // True if window reveal reflection is to be calculated for at least one exterior window
@@ -2193,11 +2243,6 @@ struct HeatBalanceData : BaseGlobalStruct
     Array4D<Real64> SurfWinOverlapAreas; // For a given hour and timestep, the areas of the exterior window sending beam solar radiation to the
                                          // surfaces listed in BackSurfaces
     Real64 zeroPointerVal = 0.0;
-    int NumAirBoundaryMixing = 0;             // Number of air boundary simple mixing objects needed
-    std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
-    std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
-    std::vector<int> AirBoundaryMixingSched;  // Air boundary simple mixing schedule index
-    std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
     EPVector<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
     DataHeatBalance::ZonePreDefRepType BuildingPreDefRep;
     EPVector<DataHeatBalance::SpaceZoneSimData> ZoneIntGain;
@@ -2209,6 +2254,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::SpaceData> space;
     EPVector<DataHeatBalance::SpaceListData> spaceList;
     EPVector<DataHeatBalance::ZoneData> Zone;
+    EPVector<DataHeatBalance::ZoneResilience> Resilience;
     EPVector<DataHeatBalance::ZoneListData> ZoneList;
     EPVector<DataHeatBalance::ZoneGroupData> ZoneGroup;
     EPVector<DataHeatBalance::PeopleData> People;
@@ -2225,6 +2271,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
     EPVector<DataHeatBalance::MixingData> Mixing;
     EPVector<DataHeatBalance::MixingData> CrossMixing;
+    EPVector<DataHeatBalance::AirBoundaryMixingSpecs> airBoundaryMixing;
     EPVector<DataHeatBalance::MixingData> RefDoorMixing;
     Array1D<DataHeatBalance::WindowBlindProperties> Blind;
     EPVector<DataHeatBalance::WindowComplexShade> ComplexShade;
@@ -2241,17 +2288,6 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::AirReportVars> ZnAirRpt;
     EPVector<DataHeatBalance::TCGlazingsType> TCGlazings;
     EPVector<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> PeopleObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> LightsObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneElectricObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneGasObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> HotWaterEqObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> SteamEqObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> OtherEqObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ITEqObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneBBHeatObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
-    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
     EPVector<DataHeatBalance::ZoneReportVars> ZoneRpt;
     EPVector<DataHeatBalance::ZoneReportVars> spaceRpt;
     EPVector<DataHeatBalance::ZoneMassConservationData> MassConservation;

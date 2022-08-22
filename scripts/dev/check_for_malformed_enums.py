@@ -111,6 +111,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
             "IdfParser.hh:Token",
             "OutputProcessor.hh:ReportingFrequency",
             "HVACInterfaceManager.cc:UpdateType",
+            "DataHeatBalance.hh:PERptVars",
         ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tMissing 'Invalid' at position 0\n"
@@ -127,7 +128,10 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
     # check for num names at N-th position
     if keys_uc[-1] not in valid_num_enum_value_names:
         # exceptions listed by <FILE>:<ENUM NAME>
-        exceptions = ["HVACInterfaceManager.cc:UpdateType"]
+        exceptions = [
+            "HVACInterfaceManager.cc:UpdateType",
+            "IdfParser.hh:Token"
+        ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tMissing 'Num' at position N\n"
 
@@ -191,8 +195,12 @@ def find_enums(search_path: Path) -> int:
 
     for file in files_to_search:
 
-        with open(file, "r") as f:
-            lines = f.readlines()
+        try:
+            with open(file, "r") as f:
+                lines = f.readlines()
+        except UnicodeDecodeError:
+            with open(file, "r", encoding='utf-8') as f:
+                lines = f.readlines()
 
         lines = [x.strip() for x in lines]
 

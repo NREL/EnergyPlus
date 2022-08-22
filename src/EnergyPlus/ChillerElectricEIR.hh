@@ -199,7 +199,7 @@ namespace ChillerElectricEIR {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void getDesignCapacities(
+        virtual void getDesignCapacities(
             EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
@@ -212,11 +212,11 @@ namespace ChillerElectricEIR {
 
         void initEachEnvironment(EnergyPlusData &state);
 
-        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
+        virtual void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
-        void size(EnergyPlusData &state);
+        virtual void size(EnergyPlusData &state);
 
-        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
+        virtual void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         void calcHeatRecovery(EnergyPlusData &state,
                               Real64 &QCond,        // Current condenser load [W]
@@ -225,7 +225,7 @@ namespace ChillerElectricEIR {
                               Real64 &QHeatRec      // Amount of heat recovered [W]
         );
 
-        void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
+        virtual void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
     void GetElectricEIRChillerInput(EnergyPlusData &state);

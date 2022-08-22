@@ -396,6 +396,27 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with B, insert the rules here
 
               ! If your original object starts with C, insert the rules here
+              CASE('COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:10) = InArgs(1:10)
+                 OutArgs(11) = '30.0'
+                 OutArgs(12) = '27.0'
+                 OutArgs(13) = '19.0'
+                 OutArgs(14:CurArgs + 3) = InArgs(11:CurArgs)
+                 CurArgs = CurArgs + 3
+                 CALL ShowWarningError('For ' // TRIM(ObjectName) // ', rated temperature from ISO 13256-1:1988 for water loop application are used, make sure that they align with your application.', Auditf)
+
+              CASE('COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:9) = InArgs(1:9)
+                 OutArgs(10) = '20.0'
+                 OutArgs(11) = '20.0'
+                 OutArgs(12) = '1.0'
+                 OutArgs(13:CurArgs + 3) = InArgs(10:CurArgs)
+                 CurArgs = CurArgs + 3
+                 CALL ShowWarningError('For ' // TRIM(ObjectName) // ', rated temperature from ISO 13256-1:1988 for water loop application are used, make sure that they align with your application.', Auditf)
 
               ! If your original object starts with D, insert the rules here
 
@@ -409,8 +430,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(1)=InArgs(1)
                  OutArgs(2:CurArgs-2)=InArgs(4:CurArgs)
                  CurArgs = CurArgs - 2
-
-              ! If your original object starts with D, insert the rules here
 
               ! If your original object starts with G, insert the rules here
 
@@ -432,7 +451,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with S, insert the rules here
 
-              ! If your original object starts with S, insert the rules here
+              CASE('SPACE')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:2)=InArgs(1:2)
+                  OutArgs(3:4) = 'autocalculate'
+                  OutArgs(5:CurArgs+2)=InArgs(3:CurArgs)
+                  CurArgs = CurArgs + 2
 
               ! If your original object starts with T, insert the rules here
 

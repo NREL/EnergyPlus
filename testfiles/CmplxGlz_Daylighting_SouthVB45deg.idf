@@ -85349,7 +85349,7 @@
 
   Daylighting:Controls,
     COMFENZone_DaylCtrl,     !- Name
-    COMFENZone,              !- Zone Name
+    COMFENZone,              !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -85362,12 +85362,12 @@
     22,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     COMFENZone_DaylRefPt1,   !- Daylighting Reference Point 1 Name
-    1,                       !- Fraction of Zone Controlled by Reference Point 1
+    1,                       !- Fraction of Lights Controlled by Reference Point 1
     538.195;                 !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
     COMFENZone_DaylRefPt1,   !- Name
-    COMFENZone,              !- Zone Name
+    COMFENZone,              !- Zone or Space Name
     3.05,                    !- X-Coordinate of Reference Point {m}
     1.52,                    !- Y-Coordinate of Reference Point {m}
     .762;                    !- Z-Coordinate of Reference Point {m}
@@ -85421,7 +85421,8 @@
     0.0,                     !- Inside Sill Depth {m}
     .6,                      !- Inside Sill Solar Absorptance
     0.0,                     !- Inside Reveal Depth {m}
-    0.5;                     !- Inside Reveal Solar Absorptance
+    0.5,                     !- Inside Reveal Solar Absorptance
+    ;                        !- NFRC Product Type for Assembly Calculations
 
 !- ##======================================================================
 !- ##          COMFEN EXTERIOR SHADE FILE (ExtShade.inc)
@@ -85441,12 +85442,12 @@
 
   People,
     COMFENZone People 1,     !- Name
-    COMFENZone,              !- Zone or ZoneList Name
+    COMFENZone,              !- Zone or ZoneList or Space or SpaceList Name
     OCC-SCHED,               !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     2,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ACTIVITY-SCHED,          !- Activity Level Schedule Name
@@ -85464,7 +85465,7 @@
 
   Lights,
     COMFENZone Lights,       !- Name
-    COMFENZone,              !- Zone or ZoneList Name
+    COMFENZone,              !- Zone or ZoneList or Space or SpaceList Name
     LIGHT-SCHED,             !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     83.630989075,            !- Lighting Level {W}
@@ -85478,7 +85479,7 @@
 
   ElectricEquipment,
     COMFENZone ElecEq,       !- Name
-    COMFENZone,              !- Zone or ZoneList Name
+    COMFENZone,              !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-SCHED,             !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     27.876996994,            !- Design Level {W}
@@ -85491,7 +85492,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     COMFENZone Infil,        !- Name
-    COMFENZone,              !- Zone or ZoneList Name
+    COMFENZone,              !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCHED,             !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -85511,8 +85512,8 @@
     COMFENZone Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     COMFENZone,              !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    55.753993988;            !- Extended Field
+    ,                        !- Space or SpaceList Name
+    55.753993988;            !- Surface Area {m2}
 
 ! Schedule.inc
 ! Office

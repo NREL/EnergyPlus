@@ -25,6 +25,20 @@ The name of the Space object. This name must be unique across Zone, Space, ZoneL
 
 The name of the \hyperref[zone]{Zone} this Space is a part of. This field is required.
 
+\paragraph{Field: Ceiling Height}\label{field-space-ceiling-height}
+
+Space ceiling height is used in several areas within EnergyPlus (such as various room models, some convection coefficient calculations and, primarily, in calculating the space volume in the absence of other parameters). Energyplus automatically calculates the space ceiling height (m) from the average height of the space. If this field is 0.0, negative or \textbf{autocalculate}, then the calculated space ceiling height will be used in subsequent calculations. If this field is positive, then the calculated space ceiling height will not be used -- the number entered here will be used as the space ceiling height. If this number differs significantly from the calculated ceiling height, then a warning message will be issued. If a space ceiling height and floor area are entered, but no volume is entered, then the volume will be the ceiling height times floor area.
+
+Note that the Ceiling Height is the distance from the Floor to the Ceiling in the Space, not an absolute height from the ground.
+
+NOTE: At the moment, the autocalcuted Space ceiling height is set to the Zone ceiling height.
+
+\paragraph{Field: Volume}\label{field-space-volume}
+
+Space volume is used in several areas within EnergyPlus (such as calculating air change rates for reporting or flow when air change rates are chosen as input, daylighting calculations, some convection coefficient calculations). EnergyPlus automatically calculates the space volume (\SI{}{\volume}) from the space geometry given by the surfaces that belong to the space. If this field is 0.0, negative or \textbf{autocalculate}, then the calculated space volume will be used in subsequent calculations. If this field is positive, then it will be used as the space volume. If this number differs significantly from the calculated space volume a warning message will be issued. For autocalculate to work properly, the space must be enclosed by the entered walls. Note that indicating the volume to be calculated but entering a positive ceiling height in the previous field will cause the volume to be calculated as the floor area (if \textgreater{} 0) times the entered ceiling height; else the volume will be calculated from the described surfaces. If this field is positive, any ceiling height positive value will not be used in volume calculations.
+
+NOTE: At the moment, the autocalculated Space volume is the Zone volume apportioned by floor area.
+
 \paragraph{Field: Floor Area}\label{space-field-floor-area}
 
 Space floor area is used in many places within EnergyPlus. EnergyPlus automatically calculates the space floor area (\SI{}{\area}) as the total area of surfaces with Surface Type = Floor. If this field is 0.0, negative or \textbf{autocalculate} (the default), then the calculated space floor area will be used in subsequent calculations. If this field is positive, then it will be used as the space floor area. If the calculated floor area differs from the user input floor area by more than 5\%, a warning message will be issued.
@@ -4450,6 +4464,15 @@ The following control types can be used to reduce zone cooling load. They are ap
 
 \emph{OnIfHighZoneAirTempAndHighHorizontalSolar:} Shading is on if the zone air temperature exceeds the Setpoint (C) and if the horizontal solar radiation exceeds SetPoint 2 (W/m\(^{2}\)).
 
+The following three control types can be used to model human behavior of turning on shading during the day to reduce view luminance or solar gain and leaving shading on until a certain time point. They can only be used in zones with daylighting controls. Window view luminance at the first daylighting reference point is used to compare with luminance setpoint. They are applicable to any Shading Type except ExteriorScreen.
+
+\emph{OnIfHighSolarOrHighLuminanceTillMidnight:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till midnight.
+
+\emph{OnIfHighSolarOrHighLuminanceTillSunset:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunset.
+
+\emph{OnIfHighSolarOrHighLuminanceTillNextMorning:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunrise next day.
+
+
 \paragraph{Field: Schedule Name}\label{field-schedule-name-007}
 
 Required if Shading Control Is Scheduled = Yes. If schedule value \textgreater{} 0 , shading control is active, i.e., shading can be on only if the shading control test passes. If schedule value = 0, shading is off whether or not the control test passes. If Schedule Name is not specified, shading control is assumed to be active at all times.
@@ -4509,7 +4532,7 @@ This is the name of a schedule of slat angles that is used when Type of Slat Ang
 
 \paragraph{Field: Setpoint 2}\label{field-setpoint-2}
 
-Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar
+Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, OnIfHighZoneAirTempAndHighHorizontalSolar, OnIfHighSolarOrHighLuminanceTillMidnight, OnIfHighSolarOrHighLuminanceTillSunset, and OnIfHighSolarOrHighLuminanceTillNextMorning.
 
 \paragraph{Field: Daylighting Controls Object Name}\label{field-daylighting-controls-object-name}
 
@@ -4584,7 +4607,7 @@ WindowShadingControl,
        ,                             !- Material Name of Shading Device
        ,                             !- Type of Slat Angle Control for Blinds
        ,                             !- Slat Angle Schedule Name
-       ,                             !- Setpoint 2 {W/m2 or deg C}
+       ,                             !- Setpoint 2 {W/m2, deg C or cd/m2}
        West Zone_DaylCtrl,           !- Daylighting Control Object Name
        Sequential,                   !- Multiple Surface Control Type
        Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name
@@ -4655,7 +4678,7 @@ WindowShadingControl,
        ROLL SHADE,                   !- Material Name of Shading Device
        ,                             !- Type of Slat Angle Control for Blinds
        ,                             !- Slat Angle Schedule Name
-       ,                             !- Setpoint 2 {W/m2 or deg C}
+       ,                             !- Setpoint 2 {W/m2, deg C or cd/m2}
        West Zone_DaylCtrl,           !- Daylighting Control Object Name
        Sequential,                   !- Multiple Surface Control Type
        Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name
