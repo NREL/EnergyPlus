@@ -1792,7 +1792,7 @@ void GetDXCoils(EnergyPlusData &state)
                                                   Alphas2(7),
                                                   ErrorsFound,
                                                   (DataLoopNode::ConnectionObjectType)getEnumerationValue(
-                                                      DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(PerfObjectType)),
+                                                      BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(PerfObjectType)),
                                                   PerfObjectName,
                                                   DataLoopNode::NodeFluidType::Air,
                                                   DataLoopNode::ConnectionType::OutsideAirReference,

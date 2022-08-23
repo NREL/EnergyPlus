@@ -139,8 +139,6 @@ namespace SimulationManager {
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   January 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This module contains the main driver routine which manages the major
@@ -317,7 +315,6 @@ namespace SimulationManager {
                 ReportLoopConnections(state);
                 SystemReports::ReportAirLoopConnections(state);
                 ReportNodeConnections(state);
-                // Debug reports    CALL ReportCompSetMeterVariables, CALL ReportParentChildren
             }
             SystemReports::CreateEnergyReportStructure(state);
             bool anyEMSRan;
@@ -1970,7 +1967,7 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
                   DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
@@ -2033,7 +2030,7 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Non-Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
                   DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
@@ -2668,7 +2665,7 @@ namespace SimulationManager {
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
 
             auto ctypeStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentType)]);
+                BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentType)]);
 
             NumChildren = GetNumChildren(state, ctypeStr, state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName);
             if (NumChildren > 0) {
@@ -2726,117 +2723,6 @@ namespace SimulationManager {
                       state.dataBranchNodeConnections->ParentNodeList(Loop).InletNodeName,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).OutletNodeName);
             }
-        }
-    }
-
-    void ReportCompSetMeterVariables(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   May 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Reports comp set meter variables.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataBranchNodeConnections;
-        using namespace BranchNodeConnections;
-        using namespace DataGlobalConstants;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop;
-        int Loop1;
-        int NumVariables;
-        Array1D_int VarIndexes;
-        Array1D_int VarIDs;
-        Array1D<OutputProcessor::TimeStepType> IndexTypes;
-        Array1D<OutputProcessor::VariableType> VarTypes;
-        Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
-        Array1D_string VarNames;
-        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;
-        Array1D_string EndUses;
-        Array1D_string Groups;
-
-        print(state.files.debug, "{}\n", " CompSet,ComponentType,ComponentName,NumMeteredVariables");
-        print(state.files.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
-
-        for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-            NumVariables = GetNumMeteredVariables(
-                state, state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName);
-            print(state.files.debug,
-                  "CompSet, {}, {}, {:5}\n",
-                  state.dataBranchNodeConnections->CompSets(Loop).CType,
-                  state.dataBranchNodeConnections->CompSets(Loop).CName,
-                  NumVariables);
-            if (NumVariables <= 0) continue;
-            VarIndexes.dimension(NumVariables, 0);
-            VarIDs.dimension(NumVariables, 0);
-            IndexTypes.dimension(NumVariables, 0);
-            VarTypes.dimension(NumVariables, 0);
-            VarNames.allocate(NumVariables);
-            unitsForVar.allocate(NumVariables);
-
-            for (int idx = 1; idx <= NumVariables; ++idx) {
-                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
-            }
-
-            EndUses.allocate(NumVariables);
-            Groups.allocate(NumVariables);
-            GetMeteredVariables(state,
-                                state.dataBranchNodeConnections->CompSets(Loop).CType,
-                                state.dataBranchNodeConnections->CompSets(Loop).CName,
-                                VarIndexes,
-                                VarTypes,
-                                IndexTypes,
-                                unitsForVar,
-                                ResourceTypes,
-                                EndUses,
-                                Groups,
-                                VarNames,
-                                VarIDs);
-            for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
-                print(state.files.debug,
-                      "RepVar,{:5},{:5},{},[{}],{},{},{},{:5}\n",
-                      VarIndexes(Loop1),
-                      VarIDs(Loop1),
-                      VarNames(Loop1),
-                      unitEnumToString(unitsForVar(Loop1)),
-                      GetResourceTypeChar(ResourceTypes.at(Loop1)),
-                      EndUses(Loop1),
-                      Groups(Loop1)
-                      // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
-                      ,
-                      static_cast<int>(IndexTypes(Loop1)));
-            }
-            VarIndexes.deallocate();
-            IndexTypes.deallocate();
-            VarTypes.deallocate();
-            VarIDs.deallocate();
-            VarNames.deallocate();
-            unitsForVar.deallocate();
-            EndUses.deallocate();
-            Groups.deallocate();
         }
     }
 

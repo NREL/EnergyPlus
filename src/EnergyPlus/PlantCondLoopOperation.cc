@@ -58,11 +58,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/BranchNodeconnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -1001,7 +1001,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
 
     SchemeNameFound = true;
 
-    auto cmoStr = std::string(DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(CurrentModuleObject)]);
+    auto cmoStr = std::string(BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(CurrentModuleObject)]);
 
     // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cmoStr, TotalArgs, NumAlphas, NumNums);
@@ -1352,7 +1352,7 @@ void FindCompSPInput(EnergyPlusData &state,
 
     SchemeNameFound = true;
 
-    auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC,
+    auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
                                                                            UtilityRoutines::MakeUPPERCase(CurrentModuleObject));
 
     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {

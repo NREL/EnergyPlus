@@ -67,6 +67,9 @@ namespace DataBranchNodeConnections {
 
 namespace BranchNodeConnections {
 
+    extern const std::array<std::string_view, static_cast<int>(DataLoopNode::ConnectionObjectType::Num)> ConnectionObjectTypeNames;
+    extern const std::array<std::string_view, static_cast<int>(DataLoopNode::ConnectionObjectType::Num)> ConnectionObjectTypeNamesUC;
+
     void RegisterNodeConnection(EnergyPlusData &state,
                                 int NodeNumber,                                // Number for this Node
                                 std::string_view NodeName,                     // Name of this Node

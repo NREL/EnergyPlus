@@ -116,7 +116,7 @@ void GetNodeNums(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetNodeNums: ");
 
-    std::string objTypeStr = std::string(DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)]);
+    std::string objTypeStr = std::string(BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)]);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     DataLoopNode::ConnectionType ConnectionType;
@@ -783,7 +783,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
 
     DataLoopNode::NodeFluidType FluidType;
     std::string ConnectionType;
-    std::string objTypeStr = std::string(DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)]);
+    std::string objTypeStr = std::string(BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)]);
 
     if (state.dataNodeInputMgr->GetOnlySingleNodeFirstTime) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
@@ -1300,7 +1300,7 @@ void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
     for (int NodeNum = 1; NodeNum <= state.dataLoopNodes->NumOfNodes; ++NodeNum) {
         if (state.dataLoopNodes->MarkedNode(NodeNum).IsMarked) {
             if (state.dataNodeInputMgr->NodeRef(NodeNum) == 0) {
-                auto objType = DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataLoopNodes->MarkedNode(NodeNum).ObjectType)];
+                auto objType = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(state.dataLoopNodes->MarkedNode(NodeNum).ObjectType)];
                 ShowSevereError(state, "Node=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\" did not find reference by another object.");
                 ShowContinueError(state,
                                   format(R"(Object="{}", Name="{}", Field=[{}])",
