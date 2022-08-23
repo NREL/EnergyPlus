@@ -64,9 +64,11 @@ namespace DataBranchNodeConnections {
     struct ComponentListData
     {
         // Members
-        std::string ParentCType;    // Parent Object Type (Cannot be SPLITTER or MIXER)
-        std::string ParentCName;    // Parent Object Name
-        std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
+        std::string ParentCType; // Parent Object Type (Cannot be SPLITTER or MIXER)
+        DataLoopNode::ConnectionObjectType ParentObjectType = DataLoopNode::ConnectionObjectType::Invalid;
+        std::string ParentCName; // Parent Object Name
+        std::string CType;       // Component Type (Cannot be SPLITTER or MIXER)
+        DataLoopNode::ConnectionObjectType ComponentObjectType = DataLoopNode::ConnectionObjectType::Invalid;
         std::string CName;          // Component Name
         std::string InletNodeName;  // Inlet Node ID
         std::string OutletNodeName; // Outlet Node ID

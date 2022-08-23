@@ -1279,23 +1279,26 @@ void SetUpCompSets(EnergyPlusData &state,
     // This subroutine also
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string CompTypeUC;   // Component type in upper case
-    std::string ParentTypeUC; // Parent component type in upper case
     int Found;
     int Found2;
 
     // Object Data
 
-    ParentTypeUC = UtilityRoutines::MakeUPPERCase(ParentType);
-    CompTypeUC = UtilityRoutines::MakeUPPERCase(CompType);
+    std::string ParentTypeUC = UtilityRoutines::MakeUPPERCase(ParentType);
+    std::string CompTypeUC = UtilityRoutines::MakeUPPERCase(CompType);
+    // TODO: Refactor this away by passing in enums
+    DataLoopNode::ConnectionObjectType ParentTypeEnum =
+        static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC, ParentTypeUC));
+    DataLoopNode::ConnectionObjectType ComponentTypeEnum =
+        static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC, CompTypeUC));
     Found = 0;
 
     // See if Component-Nodes set is already there - should be unique
     // Try to fill in blanks (passed in as undefined
     for (int Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
         if (CompName != state.dataBranchNodeConnections->CompSets(Count).CName) continue;
-        if (CompTypeUC != "UNDEFINED") {
-            if (CompTypeUC != state.dataBranchNodeConnections->CompSets(Count).CType) continue;
+        if (ComponentTypeEnum != DataLoopNode::ConnectionObjectType::Undefined) {
+            if (ComponentTypeEnum != state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType) continue;
         }
         // Component name matches, component type matches or is undefined
         if (InletNode != "UNDEFINED") {
@@ -1313,10 +1316,11 @@ void SetUpCompSets(EnergyPlusData &state,
             }
         }
         //  See if something undefined and set here
-        if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" &&
+        if (state.dataBranchNodeConnections->CompSets(Count).ParentObjectType == DataLoopNode::ConnectionObjectType::Undefined &&
             state.dataBranchNodeConnections->CompSets(Count).ParentCName == "UNDEFINED") {
             // Assume this is a further definition for this compset
             state.dataBranchNodeConnections->CompSets(Count).ParentCType = ParentTypeUC;
+            state.dataBranchNodeConnections->CompSets(Count).ParentObjectType = ParentTypeEnum;
             state.dataBranchNodeConnections->CompSets(Count).ParentCName = ParentName;
             if (!Description.empty()) {
                 state.dataBranchNodeConnections->CompSets(Count).Description = Description;
@@ -1334,15 +1338,16 @@ void SetUpCompSets(EnergyPlusData &state,
             if (InletNode != state.dataBranchNodeConnections->CompSets(Count).InletNodeName) {
                 continue;
                 // If parent type is "UNDEFINED" then no error
-            } else if ((ParentTypeUC == "UNDEFINED") || (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED")) {
+            } else if ((ParentTypeEnum == DataLoopNode::ConnectionObjectType::Undefined) ||
+                       (state.dataBranchNodeConnections->CompSets(Count).ParentObjectType == DataLoopNode::ConnectionObjectType::Undefined)) {
                 // If node name is "UNDEFINED" then no error
             } else if (InletNode != "UNDEFINED") {
                 // If the matching node name does not belong to the parent or child object, then error
                 // For example a fan may share the same inlet node as the furnace object which is its parent
-                if ((ParentTypeUC == state.dataBranchNodeConnections->CompSets(Count).CType) &&
+                if ((ParentTypeEnum == state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType) &&
                     (ParentName == state.dataBranchNodeConnections->CompSets(Count).CName)) {
                     // OK - The duplicate inlet node belongs to this component's parent
-                } else if ((CompTypeUC == state.dataBranchNodeConnections->CompSets(Count).ParentCType) &&
+                } else if ((ComponentTypeEnum == state.dataBranchNodeConnections->CompSets(Count).ParentObjectType) &&
                            (CompName == state.dataBranchNodeConnections->CompSets(Count).ParentCName)) {
                     // OK - The duplicate inlet node belongs to a child of this component
                 } else {
@@ -1350,11 +1355,11 @@ void SetUpCompSets(EnergyPlusData &state,
                     // belongs to a component that appears as a parent, then OK
                     Found2 = 0;
                     for (int Count2 = 1; Count2 <= state.dataBranchNodeConnections->NumCompSets; ++Count2) {
-                        if ((state.dataBranchNodeConnections->CompSets(Count).CType ==
-                             state.dataBranchNodeConnections->CompSets(Count2).ParentCType) &&
+                        if ((state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType ==
+                             state.dataBranchNodeConnections->CompSets(Count2).ParentObjectType) &&
                             (state.dataBranchNodeConnections->CompSets(Count).CName == state.dataBranchNodeConnections->CompSets(Count2).ParentCName))
                             Found2 = 1;
-                        if ((CompTypeUC == state.dataBranchNodeConnections->CompSets(Count2).ParentCType) &&
+                        if ((ComponentTypeEnum == state.dataBranchNodeConnections->CompSets(Count2).ParentObjectType) &&
                             (CompName == state.dataBranchNodeConnections->CompSets(Count2).ParentCName))
                             Found2 = 1;
                     }
@@ -1377,13 +1382,14 @@ void SetUpCompSets(EnergyPlusData &state,
             if (OutletNode != state.dataBranchNodeConnections->CompSets(Count).OutletNodeName) {
                 continue;
                 // If parent type is "UNDEFINED" then no error
-            } else if ((ParentTypeUC == "UNDEFINED") || (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED")) {
+            } else if ((ParentTypeEnum == DataLoopNode::ConnectionObjectType::Undefined) ||
+                       (state.dataBranchNodeConnections->CompSets(Count).ParentObjectType == DataLoopNode::ConnectionObjectType::Undefined)) {
                 // If node name is "UNDEFINED" then no error
             } else if (OutletNode != "UNDEFINED") {
-                if ((ParentTypeUC == state.dataBranchNodeConnections->CompSets(Count).CType) &&
+                if ((ParentTypeEnum == state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType) &&
                     (ParentName == state.dataBranchNodeConnections->CompSets(Count).CName)) {
                     // OK - The duplicate outlet node belongs to this component's parent
-                } else if ((CompTypeUC == state.dataBranchNodeConnections->CompSets(Count).ParentCType) &&
+                } else if ((ComponentTypeEnum == state.dataBranchNodeConnections->CompSets(Count).ParentObjectType) &&
                            (CompName == state.dataBranchNodeConnections->CompSets(Count).ParentCName)) {
                     // OK - The duplicate outlet node belongs to a child of this component
                 } else {
@@ -1391,11 +1397,11 @@ void SetUpCompSets(EnergyPlusData &state,
                     // belongs to a component that appears as a parent, then OK
                     Found2 = 0;
                     for (int Count2 = 1; Count2 <= state.dataBranchNodeConnections->NumCompSets; ++Count2) {
-                        if ((state.dataBranchNodeConnections->CompSets(Count).CType ==
-                             state.dataBranchNodeConnections->CompSets(Count2).ParentCType) &&
+                        if ((state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType ==
+                             state.dataBranchNodeConnections->CompSets(Count2).ParentObjectType) &&
                             (state.dataBranchNodeConnections->CompSets(Count).CName == state.dataBranchNodeConnections->CompSets(Count2).ParentCName))
                             Found2 = 1;
-                        if ((CompTypeUC == state.dataBranchNodeConnections->CompSets(Count2).ParentCType) &&
+                        if ((ComponentTypeEnum == state.dataBranchNodeConnections->CompSets(Count2).ParentObjectType) &&
                             (CompName == state.dataBranchNodeConnections->CompSets(Count2).ParentCName))
                             Found2 = 1;
                     }
@@ -1414,7 +1420,9 @@ void SetUpCompSets(EnergyPlusData &state,
                     }
                 }
             }
-            if (CompTypeUC != state.dataBranchNodeConnections->CompSets(Count).CType && CompTypeUC != "UNDEFINED") continue;
+            if (ComponentTypeEnum != state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType &&
+                ComponentTypeEnum != DataLoopNode::ConnectionObjectType::Undefined)
+                continue;
             if (CompName != state.dataBranchNodeConnections->CompSets(Count).CName) continue;
             Found = Count;
             break;
@@ -1423,8 +1431,11 @@ void SetUpCompSets(EnergyPlusData &state,
     if (Found == 0) {
         state.dataBranchNodeConnections->CompSets.redimension(++state.dataBranchNodeConnections->NumCompSets);
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).ParentCType = ParentTypeUC;
+        state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).ParentObjectType = ParentTypeEnum;
+
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).ParentCName = ParentName;
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).CType = CompTypeUC;
+        state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).ComponentObjectType = ComponentTypeEnum;
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).CName = CompName;
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).InletNodeName =
             UtilityRoutines::MakeUPPERCase(InletNode); // TODO: Fix this....
@@ -1554,12 +1565,15 @@ void TestCompSet(EnergyPlusData &state,
     std::string CompTypeUC; // Component type in upper case
 
     CompTypeUC = UtilityRoutines::MakeUPPERCase(CompType);
+    // TODO: Refactor this away by passing in enums
+    DataLoopNode::ConnectionObjectType ComponentTypeEnum =
+        static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC, CompTypeUC));
 
     // See if Already there
     Found = 0;
     for (int Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
-        if ((CompTypeUC != state.dataBranchNodeConnections->CompSets(Count).CType) &&
-            (state.dataBranchNodeConnections->CompSets(Count).CType != "UNDEFINED"))
+        if ((ComponentTypeEnum != state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType) &&
+            (state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType != DataLoopNode::ConnectionObjectType::Undefined))
             continue;
         if (CompName != state.dataBranchNodeConnections->CompSets(Count).CName) continue;
         if ((InletNode != state.dataBranchNodeConnections->CompSets(Count).InletNodeName) &&
@@ -1580,8 +1594,10 @@ void TestCompSet(EnergyPlusData &state,
         //   If the parent object did not specify a component type or inlet or outlet node, then that value
         //   is UNDEFINED in CompSets.  When a component calls TestCompSet, the comp type and inlet and
         //   outlet nodes are known, so they can be filled in for future reference.
-        if (state.dataBranchNodeConnections->CompSets(Found).CType == "UNDEFINED")
+        if (state.dataBranchNodeConnections->CompSets(Found).ComponentObjectType == DataLoopNode::ConnectionObjectType::Undefined) {
             state.dataBranchNodeConnections->CompSets(Found).CType = CompTypeUC;
+            state.dataBranchNodeConnections->CompSets(Found).ComponentObjectType = ComponentTypeEnum;
+        }
         if (state.dataBranchNodeConnections->CompSets(Found).InletNodeName == "UNDEFINED")
             state.dataBranchNodeConnections->CompSets(Found).InletNodeName = InletNode;
         if (state.dataBranchNodeConnections->CompSets(Found).OutletNodeName == "UNDEFINED")

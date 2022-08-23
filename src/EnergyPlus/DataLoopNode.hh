@@ -147,7 +147,9 @@ namespace DataLoopNode {
         Invalid = -1,
         AirConditionerVariableRefrigerantFlow,
         AirLoopHVAC,
+        AirLoopHVACDedicatedOutdoorAirSystem,
         AirLoopHVACMixer,
+        AirLoopHVACOutdoorAirsystem,
         AirLoopHVACReturnPath,
         AirLoopHVACReturnPlenum,
         AirLoopHVACSupplyPath,
@@ -406,13 +408,16 @@ namespace DataLoopNode {
         ZoneHVACWaterToAirHeatPump,
         ZoneHVACWindowAirConditioner,
         ZonePropertyLocalEnvironment,
+        Undefined,
         Num,
     };
 
     constexpr static std::array<std::string_view, static_cast<int>(ConnectionObjectType::Num)> ConnectionObjectTypeNames = {
         "AirConditioner:VariableRefrigerantFlow",
         "AirLoopHVAC",
+        "AirLoopHVAC:DedicatedOutdoorAirSystem",
         "AirLoopHVAC:Mixer",
+        "AirLoopHVAC:OutdoorAirSystem",
         "AirLoopHVAC:ReturnPath",
         "AirLoopHVAC:ReturnPlenum",
         "AirLoopHVAC:SupplyPath",
@@ -671,12 +676,14 @@ namespace DataLoopNode {
         "ZoneHVAC:WaterToAirHeatPump",
         "ZoneHVAC:WindowAirConditioner",
         "ZoneProperty:LocalEnvironment",
-    };
+        "Undefined"};
 
     constexpr static std::array<std::string_view, static_cast<int>(ConnectionObjectType::Num)> ConnectionObjectTypeNamesUC = {
         "AIRCONDITIONER:VARIABLEREFRIGERANTFLOW",
         "AIRLOOPHVAC",
+        "AIRLOOPHVAC:DEDICATEDOUTDOORAIRSYSTEM",
         "AIRLOOPHVAC:MIXER",
+        "AIRLOOPHVAC:OUTDOORAIRSYSTEM",
         "AIRLOOPHVAC:RETURNPATH",
         "AIRLOOPHVAC:RETURNPLENUM",
         "AIRLOOPHVAC:SUPPLYPATH",
@@ -935,7 +942,7 @@ namespace DataLoopNode {
         "ZONEHVAC:WATERTOAIRHEATPUMP",
         "ZONEHVAC:WINDOWAIRCONDITIONER",
         "ZONEPROPERTY:LOCALENVIRONMENT",
-    };
+        "UNDEFINED"};
 
     // Types
     struct NodeData
