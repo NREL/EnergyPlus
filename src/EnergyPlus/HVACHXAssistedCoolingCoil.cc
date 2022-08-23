@@ -1026,16 +1026,15 @@ namespace HVACHXAssistedCoolingCoil {
     //******************************************************************************
 
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
-                                   int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
-                                   bool const FirstHVACIteration,           // FirstHVACIteration flag
-                                   CompressorOperation const CompressorOp,  // compressor operation; 1=on, 0=off
-                                   Real64 const PartLoadRatio,              // Cooling coil part load ratio
-                                   bool const HXUnitOn,                     // Flag to enable heat exchanger
-                                   int const FanOpMode,                     // Allows parent object to control fan operation
-                                   Optional<Real64 const> OnOffAirFlow,     // Ratio of compressor ON air mass flow to AVERAGE over time step
-                                   Optional_bool_const EconomizerFlag,      // OA (or airloop) econommizer status
-                                   Optional_int_const DehumidificationMode, // Optional dehumbidication mode
-                                   Optional<Real64 const> LoadSHR           // Optional coil SHR pass over
+                                   int const HXAssistedCoilNum,            // Index number for HXAssistedCoolingCoil
+                                   bool const FirstHVACIteration,          // FirstHVACIteration flag
+                                   CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
+                                   Real64 const PartLoadRatio,             // Cooling coil part load ratio
+                                   bool const HXUnitOn,                    // Flag to enable heat exchanger
+                                   int const FanOpMode,                    // Allows parent object to control fan operation
+                                   Optional<Real64 const> OnOffAirFlow,    // Ratio of compressor ON air mass flow to AVERAGE over time step
+                                   Optional_bool_const EconomizerFlag,     // OA (or airloop) econommizer status
+                                   Optional_int_const DehumidificationMode // Optional dehumbidication mode
     )
     {
 
@@ -1163,8 +1162,7 @@ namespace HVACHXAssistedCoolingCoil {
                     mCoolingSpeedNum,
                     mCoolingSpeedRatio,
                     FanOpMode,
-                    singleMode); //,
-                                 // LoadSHR);
+                    singleMode); //
 
             } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
                 SimDXCoil(state,
