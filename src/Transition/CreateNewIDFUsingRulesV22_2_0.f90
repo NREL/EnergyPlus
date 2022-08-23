@@ -396,27 +396,67 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with B, insert the rules here
 
               ! If your original object starts with C, insert the rules here
-              CASE('COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:10) = InArgs(1:10)
-                 OutArgs(11) = '30.0'
-                 OutArgs(12) = '27.0'
-                 OutArgs(13) = '19.0'
-                 OutArgs(14:CurArgs + 3) = InArgs(11:CurArgs)
-                 CurArgs = CurArgs + 3
-                 CALL ShowWarningError('For ' // TRIM(ObjectName) // ', rated temperature from ISO 13256-1:1988 for water loop application are used, make sure that they align with your application.', Auditf)
+              CASE('COIL:COOLING:DX:CURVEFIT:SPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:8)=InArgs(1:8)
+                OutArgs(9) = ''  ! new 2023 rated field
+                OutArgs(10:CurArgs+1)=InArgs(9:CurArgs)
+                CurArgs = CurArgs + 1
 
-              CASE('COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:9) = InArgs(1:9)
-                 OutArgs(10) = '20.0'
-                 OutArgs(11) = '20.0'
-                 OutArgs(12) = '1.0'
-                 OutArgs(13:CurArgs + 3) = InArgs(10:CurArgs)
-                 CurArgs = CurArgs + 3
-                 CALL ShowWarningError('For ' // TRIM(ObjectName) // ', rated temperature from ISO 13256-1:1988 for water loop application are used, make sure that they align with your application.', Auditf)
+              CASE('COIL:COOLING:DX:SINGLESPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:7)=InArgs(1:7)
+                OutArgs(8) = ''  ! new 2023 rated field
+                OutArgs(9:CurArgs+1)=InArgs(8:CurArgs)
+                CurArgs = CurArgs + 1
+
+              CASE('COIL:COOLING:DX:MULTISPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! Manipulate OutArgs for all speeds, regardless of CurArgs count
+                OutArgs(1:23)=InArgs(1:23)
+                OutArgs(24) = ''  ! new field speed 1
+                OutArgs(25:43)=InArgs(24:42)
+                OutArgs(44) = ''  ! new field speed 2
+                OutArgs(45:63)=InArgs(43:61)
+                OutArgs(64) = ''  ! new field speed 3
+                OutArgs(65:83)=InArgs(62:80)
+                OutArgs(84) = ''  ! new field speed 4
+                OutArgs(85:CurArgs+4) = InArgs(81:CurArgs)
+                ! But then only modify the CurArgs based on the original size of the object
+                IF (CurArgs .GE. 23) CurArgs = CurArgs + 1  ! This will always do speed 1
+                IF (CurArgs .GE. 42) CurArgs = CurArgs + 1  ! Only do speed 2 if we have that many input args
+                IF (CurArgs .GE. 61) CurArgs = CurArgs + 1  ! Only do speed 3 if we have that many input args
+                IF (CurArgs .GE. 80) CurArgs = CurArgs + 1  ! Only do speed 4 if we have that many input args
+
+              CASE('COIL:HEATING:DX:SINGLESPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:5)=InArgs(1:5)
+                OutArgs(6) = ''  ! new 2023 rated field
+                OutArgs(7:CurArgs+1)=InArgs(6:CurArgs)
+                CurArgs = CurArgs + 1
+
+              CASE('COIL:HEATING:DX:MULTISPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! Manipulate OutArgs for all speeds, regardless of CurArgs count
+                OutArgs(1:22)=InArgs(1:22)
+                OutArgs(23) = ''  ! new field speed 1
+                OutArgs(24:34)=InArgs(23:33)
+                OutArgs(35) = ''  ! new field speed 2
+                OutArgs(36:46)=InArgs(34:44)
+                OutArgs(47) = ''  ! new field speed 3
+                OutArgs(48:58)=InArgs(45:55)
+                OutArgs(59) = ''  ! new field speed 4
+                OutArgs(60:CurArgs+4) = InArgs(56:CurArgs)
+                ! But then only modify the CurArgs based on the original size of the object
+                IF (CurArgs .GE. 22) CurArgs = CurArgs + 1  ! This will always do speed 1
+                IF (CurArgs .GE. 33) CurArgs = CurArgs + 1  ! Only do speed 2 if we have that many input args
+                IF (CurArgs .GE. 44) CurArgs = CurArgs + 1  ! Only do speed 3 if we have that many input args
+                IF (CurArgs .GE. 55) CurArgs = CurArgs + 1  ! Only do speed 4 if we have that many input args
 
               ! If your original object starts with D, insert the rules here
 
@@ -466,6 +506,27 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with V, insert the rules here
 
               ! If your original object starts with W, insert the rules here
+              CASE('COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:10) = InArgs(1:10)
+                 OutArgs(11) = '30.0'
+                 OutArgs(12) = '27.0'
+                 OutArgs(13) = '19.0'
+                 OutArgs(14:CurArgs + 3) = InArgs(11:CurArgs)
+                 CurArgs = CurArgs + 3
+                 CALL ShowWarningError('For ' // TRIM(ObjectName) // ', rated temperature from ISO 13256-1:1988 for water loop application are used, make sure that they align with your application.', Auditf)
+
+              CASE('COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:9) = InArgs(1:9)
+                 OutArgs(10) = '20.0'
+                 OutArgs(11) = '20.0'
+                 OutArgs(12) = '1.0'
+                 OutArgs(13:CurArgs + 3) = InArgs(10:CurArgs)
+                 CurArgs = CurArgs + 3
+                 CALL ShowWarningError('For ' // TRIM(ObjectName) // ', rated temperature from ISO 13256-1:1988 for water loop application are used, make sure that they align with your application.', Auditf)
 
               ! If your original object starts with Z, insert the rules here
 

@@ -2501,6 +2501,7 @@
     4.500000,                !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 1 Furnace DX Cool DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -2522,6 +2523,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 1 Furnace DX Cool DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -2956,6 +2958,7 @@
     4.500000,                !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 2 Furnace DX Cool DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -2977,6 +2980,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 2 Furnace DX Cool DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3398,6 +3402,7 @@
     4.500000,                !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 3 Heat Pump Air Source DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3419,6 +3424,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 3 Heat Pump Air Source DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3546,6 +3552,7 @@
     2.75,                    !- Gross Rated Heating COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 3 Heat Pump Air Source Cooling Coil Outlet,  !- Air Inlet Node Name
     Sys 3 Heat Pump Air Source Heating Coil Outlet,  !- Air Outlet Node Name
     Sys 3 Heat Pump Air Source HP Heating Coil Cap-FT,  !- Heating Capacity Function of Temperature Curve Name
@@ -3921,6 +3928,7 @@
     4.500000,                !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 4 Heat Pump Air Source DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3942,6 +3950,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 4 Heat Pump Air Source DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -4069,6 +4078,7 @@
     2.75,                    !- Gross Rated Heating COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 4 Heat Pump Air Source Cooling Coil Outlet,  !- Air Inlet Node Name
     Sys 4 Heat Pump Air Source Heating Coil Outlet,  !- Air Outlet Node Name
     Sys 4 Heat Pump Air Source HP Heating Coil Cap-FT,  !- Heating Capacity Function of Temperature Curve Name
@@ -4444,6 +4454,7 @@
     4.500000,                !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 5 Furnace DX Cool DX Coil Low Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -4465,6 +4476,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     1.0,                     !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 5 Furnace DX Cool DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
