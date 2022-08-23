@@ -76,7 +76,8 @@ TEST_F(EnergyPlusFixture, ExerciseHVACDXHeatPumpSystem)
                           "    autosize,                !- Gross Rated Heating Capacity {W}",
                           "    2.75,                    !- Gross Rated Heating COP {W/W}",
                           "    autosize,                !- Rated Air Flow Rate {m3/s}",
-                          "    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+                          "    ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+                          "    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
                           "    Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
                           "    SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name",
                           "    HPACHeatCapFT,           !- Heating Capacity Function of Temperature Curve Name",
@@ -119,6 +120,7 @@ TEST_F(EnergyPlusFixture, ExerciseHVACDXHeatPumpSystem)
     state->dataDXCoils->DXCoil(1).PLFFPLR(1) = 1;
     state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1) = 1.0;
     state->dataDXCoils->DXCoil(1).FanPowerPerEvapAirFlowRate(1) = 0.0;
+    state->dataDXCoils->DXCoil(1).FanPowerPerEvapAirFlowRate_2023(1) = 0.0;
     state->dataDXCoils->DXCoil(1).RegionNum = 1;
     state->dataDXCoils->DXCoilOutletTemp.allocate(1);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);

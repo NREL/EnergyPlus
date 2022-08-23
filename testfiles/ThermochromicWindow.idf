@@ -3690,6 +3690,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Air Outlet Node Name
     PSZ-AC:1_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -3985,6 +3986,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC:2_OA-PSZ-AC:2_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- Air Outlet Node Name
     PSZ-AC:2_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -4280,6 +4282,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC:3_OA-PSZ-AC:3_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- Air Outlet Node Name
     PSZ-AC:3_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -4575,6 +4578,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC:4_OA-PSZ-AC:4_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- Air Outlet Node Name
     PSZ-AC:4_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -4870,6 +4874,7 @@
     3.04924,                 !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC:5_OA-PSZ-AC:5_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC:5_CoolC-PSZ-AC:5_HeatCNode,  !- Air Outlet Node Name
     PSZ-AC:5_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
