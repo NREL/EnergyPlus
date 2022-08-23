@@ -2389,6 +2389,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.71,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Mixed Air 1 Node,        !- Air Inlet Node Name
     DX Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2405,6 +2406,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.67,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Mixed Air 2 Node,        !- Air Inlet Node Name
     DX Cooling Coil 2 Outlet Node,  !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2421,6 +2423,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.79,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Mixed Air 3 Node,        !- Air Inlet Node Name
     DX Cooling Coil 3 Outlet Node,  !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2437,6 +2440,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.75,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Mixed Air 4 Node,        !- Air Inlet Node Name
     DX Cooling Coil 4 Outlet Node,  !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name

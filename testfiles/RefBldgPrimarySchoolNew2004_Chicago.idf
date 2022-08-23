@@ -6808,6 +6808,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_1:6_OA-PSZ-AC_1:6_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC_1:6_CoolC-PSZ-AC_1:6_HeatCNode,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6824,6 +6825,7 @@
     3.50015986358308,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_2:5_OA-PSZ-AC_2:5_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC_2:5_CoolC-PSZ-AC_2:5_HeatCNode,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
