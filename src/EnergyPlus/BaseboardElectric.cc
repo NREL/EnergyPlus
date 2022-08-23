@@ -188,9 +188,6 @@ namespace BaseboardElectric {
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
 
-        int CtrlZone;         // index to constrolled zone number
-        int ZoneEquipTypeNum; // index to zone equipment in a zone equipment list
-
         auto &baseboard = state.dataBaseboardElectric;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = cCMO_BBRadiator_Electric;

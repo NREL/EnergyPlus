@@ -637,7 +637,6 @@ namespace BaseboardRadiator {
         auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
         auto &FinalZoneSizing(state.dataSize->FinalZoneSizing);
         auto &DataScalableCapSizingON(state.dataSize->DataScalableCapSizingON);
-        auto &baseboard = state.dataBaseboardRadiator;
 
         // find the appropriate heating Plant Sizing object
         PltSizHeatNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;

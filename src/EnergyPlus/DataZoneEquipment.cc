@@ -1062,24 +1062,17 @@ int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) /
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function returns the index into the Controlled Zone Equipment structure
     // of the indicated zone.
-
-    // Return value
-    int ControlledZoneIndex; // Index into Controlled Zone structure
 
     if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
         GetZoneEquipmentData(state);
         state.dataZoneEquip->ZoneEquipInputsFilled = true;
     }
 
-    ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
-
-    return ControlledZoneIndex;
+    return UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
 }
 
 int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
@@ -1094,7 +1087,6 @@ int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
     // This function returns the zone number for the indicated
     // zone node num.  Returns 0 if did not find zone node in any Zone
 
-    // Return value
     int ControlledZoneIndex = 0; // Index into Controlled Zone structure
 
     bool FoundIt = false;
@@ -1110,6 +1102,7 @@ int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
                 // found it.
                 FoundIt = true;
                 ControlledZoneIndex = ZoneNum;
+                break;
             }
         }
     }
@@ -1128,7 +1121,6 @@ int GetSystemNodeNumberForZone(EnergyPlusData &state, int const zoneNum)
     // This function returns the system node number for the indicated
     // zone.  Returns 0 if the Zone is not a controlled zone.
 
-    // Return value
     int SystemZoneNodeNumber = 0; // System node number for controlled zone
 
     if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
