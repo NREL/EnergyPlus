@@ -2058,7 +2058,7 @@ namespace StandardRatings {
                                                           Real64 TotCapFlowModFac,
                                                           int EIRFTempCurveIndex,
                                                           Real64 EIRFlowModFac,
-                                                          int EIRFFlowCurveIndex,
+                                                          [[maybe_unused]] int EIRFFlowCurveIndex,
                                                           Real64 RatedCOP,
                                                           Real64 FanPowerPerEvapAirFlowRate,
                                                           Real64 RatedAirVolFlowRate,
@@ -2183,7 +2183,7 @@ namespace StandardRatings {
         Real64 SEER2_User(0.0);     // seasonal energy efficiency ratio of single speed DX cooling coil, from user-input PLF curve and C_D value
         Real64 SEER2_Standard(0.0); // seasonal energy efficiency ratio of single speed DX cooling coil, from user-input PLF curve and C_D value
         Real64 EER_2023(0.0);       // energy efficiency ratio of single speed DX cooling coil
-        Real64 IEER_2023(0.0);      // Integareted energy efficiency ratio of single speed DX cooling coil
+                                    //        Real64 IEER_2023(0.0);      // Integareted energy efficiency ratio of single speed DX cooling coil
 
         std::map<std::string, Real64> StandarRatingResults;
         // StandarRatingResults["NetCoolingCapRated"] = NetCoolingCapRated;
