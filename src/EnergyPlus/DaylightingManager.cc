@@ -6814,6 +6814,45 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
     } // ISWFLG /= 0 .AND. DaylIllum(1) > SETPNT(1)
 
+    // loop over windows to do luminance based control
+    int count = 0;
+    for (std::size_t igroup = 1; igroup <= thisDaylightControl.ShadeDeployOrderExtWins.size(); igroup++) {
+        for (int const IWin : thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1]) {
+            ++count;
+            ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
+            WindowShadingControlType shCtrlType = state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType;
+            if (!((shCtrlType == WindowShadingControlType::HiSolar_HiLumin_OffMidNight) ||
+                  (shCtrlType == WindowShadingControlType::HiSolar_HiLumin_OffSunset) ||
+                  (shCtrlType == WindowShadingControlType::HiSolar_HiLumin_OffNextMorning)))
+                continue;
+            // need to map back to the original order of the "loop" to not change all the other data structures
+            int loop = thisDaylightControl.MapShdOrdToLoopNum(count);
+            if (loop > 0) {
+                WinShadingType currentFlag = state.dataSurface->SurfWinShadingFlag(IWin);
+                WinShadingType ShType = state.dataSurface->WindowShadingControl(ICtrl).ShadingType;
+                if ((currentFlag == WinShadingType::IntShadeConditionallyOff) || (currentFlag == WinShadingType::GlassConditionallyLightened) ||
+                    (currentFlag == WinShadingType::ExtShadeConditionallyOff) || (currentFlag == WinShadingType::IntBlindConditionallyOff) ||
+                    (currentFlag == WinShadingType::ExtBlindConditionallyOff) || (currentFlag == WinShadingType::BGShadeConditionallyOff) ||
+                    (currentFlag == WinShadingType::BGBlindConditionallyOff)) {
+                    if (thisDaylightControl.SourceLumFromWinAtRefPt(loop, 1, 1) > state.dataSurface->WindowShadingControl(ICtrl).SetPoint2) {
+                        // shade on if luminance of this window is above setpoint
+                        state.dataSurface->SurfWinShadingFlag(IWin) = ShType;
+                        // update total illuminance and background luminance
+                        for (int IL = 1; IL <= NREFPT; ++IL) {
+                            state.dataDaylightingManager->DaylIllum(IL) +=
+                                thisDaylightControl.IllumFromWinAtRefPt(loop, 2, IL) - thisDaylightControl.IllumFromWinAtRefPt(loop, 1, IL);
+                            thisDaylightControl.BacLum(IL) +=
+                                thisDaylightControl.BackLumFromWinAtRefPt(loop, 2, IL) - thisDaylightControl.BackLumFromWinAtRefPt(loop, 1, IL);
+                        }
+                    } else {
+                        // shade off if luminance is below setpoint
+                        state.dataSurface->SurfWinShadingFlag(IWin) = WinShadingType::ShadeOff;
+                    }
+                }
+            }
+        }
+    }
+
     // Calculate glare index at each reference point assuming the daylight illuminance setpoint is
     //  met at both reference points, either by daylight or electric lights
     for (int IL = 1; IL <= NREFPT; ++IL) {
