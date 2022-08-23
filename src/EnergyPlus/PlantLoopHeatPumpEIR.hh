@@ -208,34 +208,26 @@ namespace EIRPlantLoopHeatPumps {
         enum class OATempCurveVar
         {
             Invalid = -1,
-            DryBulb = 0,
-            WetBulb = 1,
+            DryBulb, // = 0,
+            WetBulb, // = 1,
             Num
         };
 
         enum class WaterTempCurveVar
         {
             Invalid = -1,
-            EnteringCondenser = 0,
-            LeavingCondenser = 1,
-            EnteringVaporator = 2,
-            LeavingEvaporator = 3,
+            EnteringCondenser, // = 0,
+            LeavingCondenser,  // = 1,
+            EnteringVaporator, // = 2,
+            LeavingEvaporator, // = 3,
             Num
         };
-
-        // enum class WaterTempCurveVarCooling
-        //{
-        //    Invalid = -1,
-        //    EnteringEvaporator = 0,
-        //    LeavingEvaporator = 1,
-        //    Num
-        //};
 
         enum class DefrostType
         {
             Invalid = -1,
-            Timed = 0,
-            OnDemand = 1,
+            Timed,    // = 0,
+            OnDemand, // = 1,
             Num
         };
 
