@@ -24,6 +24,9 @@ jobs:
             macos_dev_target: 11.6
           - os: macos-11
             macos_dev_target: 10.15
+    permissions:
+      # Needed permission to upload the release asset
+      contents: write
 
     steps:
     - uses: actions/checkout@v2

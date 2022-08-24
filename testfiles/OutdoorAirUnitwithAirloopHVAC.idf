@@ -756,6 +756,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Heat Recovery Outlet Node,  !- Air Inlet Node Name
     Zone5DESHCoilIn,         !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -968,6 +969,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Zone5OAUOANode2,         !- Air Inlet Node Name
     Zone5DESHCoilIn2,        !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1523,6 +1525,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.42,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Zone3OAUCCoilIn,         !- Air Inlet Node Name
     Zone3OAUHCoilin,         !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2010,6 +2013,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     0.42,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Zone1OAUCCoilin,         !- Air Inlet Node Name
     Zone1OAUHCoilin,         !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2205,6 +2209,7 @@
     2.75,                    !- Gross Rated Heating COP {W/W}
     Autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Zone1OAUHCoilin,         !- Air Inlet Node Name
     SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
     HPACHeatCapFT,           !- Heating Capacity Function of Temperature Curve Name
