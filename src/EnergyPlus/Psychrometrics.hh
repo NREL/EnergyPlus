@@ -90,6 +90,7 @@ struct EnergyPlusData;
 
 // purposfully doing nothing here - does MSVC not have a strict-aliasing warning?
 #define DISABLE_WARNING_STRICT_ALIASING
+#define DISABLE_WARNING_UNINITIALIZED
 #elif defined(__GNUC__) || defined(__clang__)
 #define DO_PRAGMA(X) _Pragma(#X)
 #define DISABLE_WARNING_PUSH DO_PRAGMA(GCC diagnostic push)
