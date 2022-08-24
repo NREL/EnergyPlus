@@ -1452,6 +1452,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     West Zone IEC Outlet Node,  !- Air Inlet Node Name
     West Zone CCoil Air Outlet Node,  !- Air Outlet Node Name
     DXSysACCoolCapFT,        !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1909,6 +1910,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     East Zone IEC Outlet Node,  !- Air Inlet Node Name
     East Zone CCoil Air Outlet Node,  !- Air Outlet Node Name
     DXSysACCoolCapFT,        !- Total Cooling Capacity Function of Temperature Curve Name

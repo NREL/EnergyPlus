@@ -2515,6 +2515,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 1 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -2536,6 +2537,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 1 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -2975,6 +2977,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 2 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -2996,6 +2999,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 2 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3017,6 +3021,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 2 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3444,6 +3449,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 3 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3465,6 +3471,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 3 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3486,6 +3493,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 3 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3507,6 +3515,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 3 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -3630,6 +3639,7 @@
     2.75,                    !- Speed 1 Gross Rated Heating COP {W/W}
     autosize,                !- Speed 1 Rated Air Flow Rate {m3/s}
     ,                        !- Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 3 Heat Pump Air Source Heat Coil Cap-FT,  !- Speed 1 Heating Capacity Function of Temperature Curve Name
     Sys 3 Heat Pump Air Source Heat Coil Cap-FF,  !- Speed 1 Heating Capacity Function of Flow Fraction Curve Name
     Sys 3 Heat Pump Air Source Heat Coil EIR-FT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -3641,6 +3651,7 @@
     2.75,                    !- Speed 2 Gross Rated Heating COP {W/W}
     autosize,                !- Speed 2 Rated Air Flow Rate {m3/s}
     ,                        !- Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 3 Heat Pump Air Source Heat Coil Cap-FT,  !- Speed 2 Heating Capacity Function of Temperature Curve Name
     Sys 3 Heat Pump Air Source Heat Coil Cap-FF,  !- Speed 2 Heating Capacity Function of Flow Fraction Curve Name
     Sys 3 Heat Pump Air Source Heat Coil EIR-FT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -3652,6 +3663,7 @@
     2.75,                    !- Speed 3 Gross Rated Heating COP {W/W}
     autosize,                !- Speed 3 Rated Air Flow Rate {m3/s}
     ,                        !- Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 3 Heat Pump Air Source Heat Coil Cap-FT,  !- Speed 3 Heating Capacity Function of Temperature Curve Name
     Sys 3 Heat Pump Air Source Heat Coil Cap-FF,  !- Speed 3 Heating Capacity Function of Flow Fraction Curve Name
     Sys 3 Heat Pump Air Source Heat Coil EIR-FT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -3663,6 +3675,7 @@
     2.75,                    !- Speed 4 Gross Rated Heating COP {W/W}
     autosize,                !- Speed 4 Rated Air Flow Rate {m3/s}
     ,                        !- Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 3 Heat Pump Air Source Heat Coil Cap-FT,  !- Speed 4 Heating Capacity Function of Temperature Curve Name
     Sys 3 Heat Pump Air Source Heat Coil Cap-FF,  !- Speed 4 Heating Capacity Function of Flow Fraction Curve Name
     Sys 3 Heat Pump Air Source Heat Coil EIR-FT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -4093,6 +4106,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 4 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -4114,6 +4128,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 4 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -4135,6 +4150,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 4 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -4156,6 +4172,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 4 Heat Pump Air Source Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -4279,6 +4296,7 @@
     2.75,                    !- Speed 1 Gross Rated Heating COP {W/W}
     autosize,                !- Speed 1 Rated Air Flow Rate {m3/s}
     ,                        !- Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 4 Heat Pump Air Source Heat Coil Cap-FT,  !- Speed 1 Heating Capacity Function of Temperature Curve Name
     Sys 4 Heat Pump Air Source Heat Coil Cap-FF,  !- Speed 1 Heating Capacity Function of Flow Fraction Curve Name
     Sys 4 Heat Pump Air Source Heat Coil EIR-FT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -4290,6 +4308,7 @@
     2.75,                    !- Speed 2 Gross Rated Heating COP {W/W}
     autosize,                !- Speed 2 Rated Air Flow Rate {m3/s}
     ,                        !- Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 4 Heat Pump Air Source Heat Coil Cap-FT,  !- Speed 2 Heating Capacity Function of Temperature Curve Name
     Sys 4 Heat Pump Air Source Heat Coil Cap-FF,  !- Speed 2 Heating Capacity Function of Flow Fraction Curve Name
     Sys 4 Heat Pump Air Source Heat Coil EIR-FT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -4301,6 +4320,7 @@
     2.75,                    !- Speed 3 Gross Rated Heating COP {W/W}
     autosize,                !- Speed 3 Rated Air Flow Rate {m3/s}
     ,                        !- Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 4 Heat Pump Air Source Heat Coil Cap-FT,  !- Speed 3 Heating Capacity Function of Temperature Curve Name
     Sys 4 Heat Pump Air Source Heat Coil Cap-FF,  !- Speed 3 Heating Capacity Function of Flow Fraction Curve Name
     Sys 4 Heat Pump Air Source Heat Coil EIR-FT,  !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -4312,6 +4332,7 @@
     2.75,                    !- Speed 4 Gross Rated Heating COP {W/W}
     autosize,                !- Speed 4 Rated Air Flow Rate {m3/s}
     ,                        !- Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Sys 4 Heat Pump Air Source Heat Coil Cap-FT,  !- Speed 4 Heating Capacity Function of Temperature Curve Name
     Sys 4 Heat Pump Air Source Heat Coil Cap-FF,  !- Speed 4 Heating Capacity Function of Flow Fraction Curve Name
     Sys 4 Heat Pump Air Source Heat Coil EIR-FT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -4742,6 +4763,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 5 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -4763,6 +4785,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 5 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -4784,6 +4807,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 5 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
@@ -4805,6 +4829,7 @@
     3,                       !- Gross Cooling COP {W/W}
     1.0,                     !- Active Fraction of Coil Face Area
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
     Sys 5 Furnace DX Cool Cool Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name

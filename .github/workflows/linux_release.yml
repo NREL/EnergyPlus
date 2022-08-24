@@ -16,6 +16,9 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04, ubuntu-20.04]
+    permissions:
+      # Needed permission to upload the release asset
+      contents: write
 
     steps:
     - uses: actions/checkout@v2
