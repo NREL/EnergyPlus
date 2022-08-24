@@ -153,7 +153,6 @@ namespace DataSurfaces {
     enum class WindowShadingControlType : int
     {
         Invalid = -1,
-        UnControlled,
         AlwaysOn,
         AlwaysOff,
         OnIfScheduled,
@@ -1103,9 +1102,9 @@ namespace DataSurfaces {
         // Default Constructor
         WindowShadingControlData()
             : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0),
-              ShadingControlType(WindowShadingControlType::UnControlled), Schedule(0), SetPoint(0.0), SetPoint2(0.0),
-              ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0), SlatAngleControlForBlinds(0),
-              DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
+              ShadingControlType(WindowShadingControlType::Invalid), Schedule(0), SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false),
+              GlareControlIsActive(false), SlatAngleSchedule(0), SlatAngleControlForBlinds(0), DaylightControlIndex(0),
+              MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
         {
         }
     };
