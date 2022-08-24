@@ -97,6 +97,8 @@ struct EnergyPlusData;
 #define DISABLE_WARNING(warningName) DO_PRAGMA(GCC diagnostic ignored #warningName)
 
 #define DISABLE_WARNING_STRICT_ALIASING DISABLE_WARNING(-Wstrict-aliasing)
+#define DISABLE_WARNING_UNINITIALIZED DISABLE_WARNING(-Wuninitialized)
+
 #endif
 // clang-format on
 
