@@ -1930,16 +1930,15 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             for (int BranchNum = 1; BranchNum <= thisPrimaryAirSys.NumBranches; ++BranchNum) {
 
                 for (int CompNum = 1; CompNum <= thisPrimaryAirSys.Branch(BranchNum).TotalComponents; ++CompNum) {
-                    CompType CompTypeNum = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).CompType_Num;
+                    CompType compType = thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).CompType_Num;
                     if (thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).CompType_Num == CompType::OAMixer_Num) {
                         FoundOASys = true;
                     }
-                    if (CompTypeNum == CompType::WaterCoil_Cooling || CompTypeNum == CompType::WaterCoil_DetailedCool ||
-                        CompTypeNum == CompType::WaterCoil_CoolingHXAsst || CompTypeNum == CompType::DXSystem) {
+                    if (compType == CompType::WaterCoil_Cooling || compType == CompType::WaterCoil_DetailedCool ||
+                        compType == CompType::WaterCoil_CoolingHXAsst || compType == CompType::DXSystem) {
                         FoundCentralCoolCoil = true;
                     }
-                    if (CompTypeNum == CompType::Fan_Simple_CV || CompTypeNum == CompType::Fan_Simple_VAV ||
-                        CompTypeNum == CompType::Fan_ComponentModel) {
+                    if (compType == CompType::Fan_Simple_CV || compType == CompType::Fan_Simple_VAV || compType == CompType::Fan_ComponentModel) {
                         if (thisPrimaryAirSys.OASysExists && !thisPrimaryAirSys.isAllOA) {
                             if (FoundOASys) {
                                 if (thisPrimaryAirSys.Branch(BranchNum).DuctType != DataHVACGlobals::AirDuctType::Heating) {
@@ -1957,7 +1956,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                             goto EndOfAirLoop;
                         }
                     }
-                    if (CompTypeNum == CompType::Fan_System_Object) {
+                    if (compType == CompType::Fan_System_Object) {
                         if (thisPrimaryAirSys.OASysExists && !thisPrimaryAirSys.isAllOA) {
                             if (FoundOASys) {
                                 if (thisPrimaryAirSys.Branch(BranchNum).DuctType != DataHVACGlobals::AirDuctType::Heating) {

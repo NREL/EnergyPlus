@@ -771,23 +771,22 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 } else {
                     CheckSysSizing(state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name);
+                    auto &thisFinalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
                     if (state.dataSize->CurOASysNum > 0) {
-                        DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                        DesignVolFlowRateDes = thisFinalSysSizing.DesOutAirVolFlow;
                     } else {
                         switch (state.dataSize->CurDuctType) {
                         case DataHVACGlobals::AirDuctType::Main: {
-                            DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                                   state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                            DesignVolFlowRateDes = thisFinalSysSizing.SysAirMinFlowRat * thisFinalSysSizing.DesMainVolFlow;
                         } break;
                         case DataHVACGlobals::AirDuctType::Cooling: {
-                            DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                                   state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                            DesignVolFlowRateDes = thisFinalSysSizing.SysAirMinFlowRat * thisFinalSysSizing.DesCoolVolFlow;
                         } break;
                         case DataHVACGlobals::AirDuctType::Heating: {
-                            DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                            DesignVolFlowRateDes = thisFinalSysSizing.DesHeatVolFlow;
                         } break;
                         default: {
-                            DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                            DesignVolFlowRateDes = thisFinalSysSizing.DesMainVolFlow;
                         } break;
                         }
                     }

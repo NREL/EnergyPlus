@@ -5044,18 +5044,14 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
             case MixedAirControllerType::ControllerOutsideAir: {
                 CheckSysSizing(state, CurrentModuleObject, this->Name);
                 switch (state.dataSize->CurDuctType) {
-                case DataHVACGlobals::AirDuctType::Main: {
-                    this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                } break;
                 case DataHVACGlobals::AirDuctType::Cooling: {
                     this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                 } break;
                 case DataHVACGlobals::AirDuctType::Heating: {
                     this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                 } break;
-                case DataHVACGlobals::AirDuctType::Other: {
-                    this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                } break;
+                case DataHVACGlobals::AirDuctType::Main:
+                case DataHVACGlobals::AirDuctType::Other:
                 default: {
                     this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } break;

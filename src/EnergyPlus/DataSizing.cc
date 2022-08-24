@@ -634,7 +634,7 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
         // This is a DesignSpecification:OutdoorAir:SpaceList
         Real64 sumPeopleOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
-            auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
+            auto const &thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
             if (thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerArea && thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerZone &&
                 thisDSOA.OAFlowMethod != OAFlowCalcMethod::ACH) {
                 Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).totOccupants;
