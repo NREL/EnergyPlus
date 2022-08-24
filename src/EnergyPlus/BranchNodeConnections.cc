@@ -1987,7 +1987,7 @@ void SetUpCompSets(EnergyPlusData &state,
     }
 }
 
-void TestInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound)
+void TestInletOutletNodes(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:

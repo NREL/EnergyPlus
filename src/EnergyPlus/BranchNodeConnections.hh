@@ -153,7 +153,7 @@ namespace BranchNodeConnections {
                        std::string_view const Description = {} // Description
     );
 
-    void TestInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
+    void TestInletOutletNodes(EnergyPlusData &state);
 
     void TestCompSet(EnergyPlusData &state,
                      std::string const &CompType,   // Component Type
