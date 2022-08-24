@@ -1967,7 +1967,8 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                      state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
                   DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
@@ -2030,7 +2031,8 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Non-Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                      state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
                   DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
@@ -2116,15 +2118,19 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Component Set,{},{},{},{},{},{},{},{}\n",
                   Count,
-                  state.dataBranchNodeConnections->CompSets(Count).ParentCType,
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                      state.dataBranchNodeConnections->CompSets(Count).ParentObjectType)],
                   state.dataBranchNodeConnections->CompSets(Count).ParentCName,
-                  state.dataBranchNodeConnections->CompSets(Count).CType,
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                      state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)],
                   state.dataBranchNodeConnections->CompSets(Count).CName,
                   state.dataBranchNodeConnections->CompSets(Count).InletNodeName,
                   state.dataBranchNodeConnections->CompSets(Count).OutletNodeName,
                   state.dataBranchNodeConnections->CompSets(Count).Description);
 
-            if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" ||
+            std::string CType = static_cast<std::string>(BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)]);
+            if (state.dataBranchNodeConnections->CompSets(Count).ParentObjectType == DataLoopNode::ConnectionObjectType::Undefined ||
                 state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
                 state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
                 if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
@@ -2134,13 +2140,13 @@ namespace SimulationManager {
                     state.dataSimulationManager->WarningOut = false;
                 }
                 ShowWarningError(state,
-                                 "Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType +
-                                     ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                                 "Node Connection Error for object " + CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                 ShowContinueError(state, "  " + state.dataBranchNodeConnections->CompSets(Count).Description + " not on any Branch or Parent Object");
                 ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
                 ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
-                if (UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(Count).CType, "SolarCollector:UnglazedTranspired")) {
+                if (state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType ==
+                    DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired) {
                     ShowContinueError(state, "This report does not necessarily indicate a problem for a MultiSystem Transpired Collector");
                 }
             }
@@ -2152,7 +2158,7 @@ namespace SimulationManager {
                     state.dataSimulationManager->WarningOut = false;
                 }
                 ShowWarningError(state,
-                                 "Potential Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType +
+                                 "Potential Node Connection Error for object " + CType +
                                      ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                 ShowContinueError(state, "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
                 ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
@@ -2163,7 +2169,9 @@ namespace SimulationManager {
 
         for (int Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
             for (int Count1 = Count + 1; Count1 <= state.dataBranchNodeConnections->NumCompSets; ++Count1) {
-                if (state.dataBranchNodeConnections->CompSets(Count).CType != state.dataBranchNodeConnections->CompSets(Count1).CType) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType !=
+                    state.dataBranchNodeConnections->CompSets(Count1).ComponentObjectType)
+                    continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Count1).CName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName)
                     continue;
@@ -2176,18 +2184,18 @@ namespace SimulationManager {
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
                 }
+                std::string CType = static_cast<std::string>(BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                    state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)]);
+                std::string ParentCType = static_cast<std::string>(BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                    state.dataBranchNodeConnections->CompSets(Count1).ParentObjectType)]);
+                std::string ParentCType1 = static_cast<std::string>(BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                    state.dataBranchNodeConnections->CompSets(Count).ParentObjectType)]);
                 ShowWarningError(state, "Component plus inlet/outlet node pair used more than once:");
-                ShowContinueError(state,
-                                  "  Component  : " + state.dataBranchNodeConnections->CompSets(Count).CType +
-                                      ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                ShowContinueError(state, "  Component  : " + CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                 ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
                 ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
-                ShowContinueError(state,
-                                  "  Used by    : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ' ' +
-                                      state.dataBranchNodeConnections->CompSets(Count).ParentCName);
-                ShowContinueError(state,
-                                  "  and  by    : " + state.dataBranchNodeConnections->CompSets(Count1).ParentCType + ' ' +
-                                      state.dataBranchNodeConnections->CompSets(Count1).ParentCName);
+                ShowContinueError(state, "  Used by    : " + ParentCType + ' ' + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                ShowContinueError(state, "  and  by    : " + ParentCType1 + ' ' + state.dataBranchNodeConnections->CompSets(Count1).ParentCName);
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
             }
         }
@@ -2608,122 +2616,6 @@ namespace SimulationManager {
         }
 
         state.dataErrTracking->AskForConnectionsReport = false;
-    }
-
-    void ReportParentChildren(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   May 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Reports parent compsets with ensuing children data.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses IsParentObject,GetNumChildren,GetChildrenData
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-
-        using namespace DataBranchNodeConnections;
-        using namespace BranchNodeConnections;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop;
-        int Loop1;
-        Array1D_string ChildCType;
-        Array1D_string ChildCName;
-        Array1D_string ChildInNodeName;
-        Array1D_string ChildOutNodeName;
-        Array1D_int ChildInNodeNum;
-        Array1D_int ChildOutNodeNum;
-        int NumChildren;
-        bool ErrorsFound;
-
-        ErrorsFound = false;
-        print(state.files.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
-        for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
-
-            auto ctypeStr = std::string(
-                BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentType)]);
-
-            NumChildren = GetNumChildren(state, ctypeStr, state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName);
-            if (NumChildren > 0) {
-                ChildCType.allocate(NumChildren);
-                ChildCName.allocate(NumChildren);
-                ChildInNodeName.allocate(NumChildren);
-                ChildOutNodeName.allocate(NumChildren);
-                ChildInNodeNum.allocate(NumChildren);
-                ChildOutNodeNum.allocate(NumChildren);
-                ChildCType = std::string{};
-                ChildCName = std::string{};
-                ChildInNodeName = std::string{};
-                ChildOutNodeName = std::string{};
-                ChildInNodeNum = 0;
-                ChildOutNodeNum = 0;
-                GetChildrenData(state,
-                                ctypeStr,
-                                state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName,
-                                NumChildren,
-                                ChildCType,
-                                ChildCName,
-                                ChildInNodeName,
-                                ChildInNodeNum,
-                                ChildOutNodeName,
-                                ChildOutNodeNum,
-                                ErrorsFound);
-                if (Loop > 1) print(state.files.debug, "{}\n", std::string(60, '='));
-
-                print(state.files.debug,
-                      " Parent Node,{}:{},{},{}\n",
-                      ctypeStr,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).InletNodeName,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).OutletNodeName);
-                for (Loop1 = 1; Loop1 <= NumChildren; ++Loop1) {
-                    print(state.files.debug,
-                          "..ChildNode,{}:{},{},{}\n",
-                          ChildCType(Loop1),
-                          ChildCName(Loop1),
-                          ChildInNodeName(Loop1),
-                          ChildOutNodeName(Loop1));
-                }
-                ChildCType.deallocate();
-                ChildCName.deallocate();
-                ChildInNodeName.deallocate();
-                ChildOutNodeName.deallocate();
-                ChildInNodeNum.deallocate();
-                ChildOutNodeNum.deallocate();
-            } else {
-                if (Loop > 1) print(state.files.debug, "{}\n", std::string(60, '='));
-                print(state.files.debug,
-                      " Parent Node (no children),{}:{},{},{}\n",
-                      ctypeStr,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).InletNodeName,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).OutletNodeName);
-            }
-        }
     }
 
     void PostIPProcessing(EnergyPlusData &state)

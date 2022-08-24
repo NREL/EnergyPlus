@@ -10342,7 +10342,7 @@ namespace AirflowNetwork {
         bool ErrorsFound(false);
         bool IsNotOK(false);
         bool errFlag(false);
-        Array1D<DataLoopNode::ConnectionType> NodeConnectionType; // Specifies the type of node connection
+        EPVector<DataLoopNode::ConnectionType> NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
 
         bool HPWHFound(false);          // Flag for HPWH identification
@@ -11974,12 +11974,15 @@ namespace AirflowNetwork {
                         return AirLoopNum;
                     }
                     if (m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NumSubComps == 0) {
-                        std::string TypeOfComp = m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).TypeOf;
+                        DataLoopNode::ConnectionObjectType TypeOfComp =
+                            static_cast<DataLoopNode::ConnectionObjectType>(EnergyPlus::getEnumerationValue(
+                                BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                                m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).TypeOf));
                         std::string NameOfComp = m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).Name;
                         if (IsParentObject(m_state, TypeOfComp, NameOfComp)) {
 
                             int NumChildren = GetNumChildren(m_state, TypeOfComp, NameOfComp);
-                            Array1D_string SubCompTypes;
+                            EPVector<DataLoopNode::ConnectionObjectType> SubCompTypes;
                             Array1D_string SubCompNames;
                             Array1D_string InletNodeNames;
                             Array1D_int InletNodeNumbers;
@@ -12026,12 +12029,12 @@ namespace AirflowNetwork {
                                 }
                             }
                             for (NumOfSubComp = 1; NumOfSubComp <= NumChildren; ++NumOfSubComp) {
-                                std::string TypeOfComp = SubCompTypes(NumOfSubComp);
+                                DataLoopNode::ConnectionObjectType TypeOfComp = SubCompTypes(NumOfSubComp);
                                 std::string NameOfComp = SubCompNames(NumOfSubComp);
                                 if (IsParentObject(m_state, TypeOfComp, NameOfComp)) {
 
                                     int NumGrandChildren = GetNumChildren(m_state, TypeOfComp, NameOfComp);
-                                    Array1D_string SubSubCompTypes;
+                                    EPVector<DataLoopNode::ConnectionObjectType> SubSubCompTypes;
                                     Array1D_string SubSubCompNames;
                                     Array1D_string SubSubInletNodeNames;
                                     Array1D_int SubSubInletNodeNumbers;
