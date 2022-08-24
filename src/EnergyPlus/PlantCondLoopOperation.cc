@@ -58,7 +58,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
-#include <EnergyPlus/BranchNodeconnections.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>

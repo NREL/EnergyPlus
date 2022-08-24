@@ -560,7 +560,6 @@ namespace ElectricBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
-        int Loop;
 
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
