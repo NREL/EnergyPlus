@@ -11978,7 +11978,8 @@ namespace AirflowNetwork {
                             static_cast<DataLoopNode::ConnectionObjectType>(EnergyPlus::getEnumerationValue(
                                 BranchNodeConnections::ConnectionObjectTypeNamesUC,
                                 m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).TypeOf));
-                        std::string const &NameOfComp = m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).Name;
+                        std::string const &NameOfComp =
+                            m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).Name;
                         if (IsParentObject(m_state, TypeOfComp, NameOfComp)) {
 
                             int NumChildren = GetNumChildren(m_state, TypeOfComp, NameOfComp);
