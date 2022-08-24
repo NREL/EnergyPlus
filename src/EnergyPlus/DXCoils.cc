@@ -16173,7 +16173,7 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
     DXCoolingCoilIndex = 0;
 
     DataLoopNode::ConnectionObjectType HeatingCoilTypeNum = static_cast<DataLoopNode::ConnectionObjectType>(
-        EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(HeatingCoilType)));
+        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(HeatingCoilType)));
 
     DataLoopNode::ConnectionObjectType CompSetsParentType; // Parent object type which uses DX heating coil pass into this function
     std::string CompSetsParentName;
