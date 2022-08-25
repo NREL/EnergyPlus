@@ -115,7 +115,7 @@ void GetNodeNums(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetNodeNums: ");
 
-    std::string_view const &objTypeStr = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)];
+    std::string_view const objTypeStr = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)];
 
     if (state.dataNodeInputMgr->GetNodeInputFlag) {
         GetNodeListsInput(state, ErrorsFound);
@@ -773,7 +773,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
     int NumAlphas;
     int NumNums;
 
-    std::string_view const &objTypeStr = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)];
+    std::string_view const objTypeStr = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)];
 
     if (state.dataNodeInputMgr->GetOnlySingleNodeFirstTime) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);

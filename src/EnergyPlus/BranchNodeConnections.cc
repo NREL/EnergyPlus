@@ -661,8 +661,8 @@ void RegisterNodeConnection(EnergyPlusData &state,
         ErrorsFoundHere = true;
     }
 
-    std::string_view const &objTypeStr = ConnectionObjectTypeNames[static_cast<int>(ObjectType)];
-    std::string_view const &conTypeStr = ConnectionTypeNames[static_cast<int>(ConnectionType)];
+    std::string_view const objTypeStr = ConnectionObjectTypeNames[static_cast<int>(ObjectType)];
+    std::string_view const conTypeStr = ConnectionTypeNames[static_cast<int>(ConnectionType)];
 
     if ((ConnectionType == DataLoopNode::ConnectionType::Invalid) || (ConnectionType == DataLoopNode::ConnectionType::Num)) {
         ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));

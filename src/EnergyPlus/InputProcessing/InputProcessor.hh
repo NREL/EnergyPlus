@@ -117,7 +117,7 @@ public:
 
     int getNumSectionsFound(std::string const &SectionWord);
 
-    int getNumObjectsFound(EnergyPlusData &state, std::string_view const &ObjectWord);
+    int getNumObjectsFound(EnergyPlusData &state, std::string_view const ObjectWord);
 
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
@@ -192,7 +192,7 @@ public:
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);
 
     void getObjectDefMaxArgs(EnergyPlusData &state,
-                             std::string_view const &ObjectWord, // Object for definition
+                             std::string_view const ObjectWord, // Object for definition
                              int &NumArgs,                       // How many arguments (max) this Object can have
                              int &NumAlpha,                      // How many Alpha arguments (max) this Object can have
                              int &NumNumeric                     // How many Numeric arguments (max) this Object can have

@@ -508,7 +508,7 @@ int InputProcessor::getNumSectionsFound(std::string const &SectionWord)
     return static_cast<int>(SectionWord_iter.value().size());
 }
 
-int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string_view const &ObjectWord)
+int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string_view const ObjectWord)
 {
 
     // FUNCTION INFORMATION:
@@ -1452,7 +1452,7 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
 }
 
 void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
-                                         std::string_view const &ObjectWord, // Object for definition
+                                         std::string_view const ObjectWord, // Object for definition
                                          int &NumArgs,                       // How many arguments (max) this Object can have
                                          int &NumAlpha,                      // How many Alpha arguments (max) this Object can have
                                          int &NumNumeric                     // How many Numeric arguments (max) this Object can have

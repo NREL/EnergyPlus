@@ -2118,7 +2118,7 @@ namespace SimulationManager {
                   state.dataBranchNodeConnections->CompSets(Count).OutletNodeName,
                   state.dataBranchNodeConnections->CompSets(Count).Description);
 
-            std::string_view const &CType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+            std::string_view const CType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
                 state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)];
             if (state.dataBranchNodeConnections->CompSets(Count).ParentObjectType == DataLoopNode::ConnectionObjectType::Undefined ||
                 state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
@@ -2175,11 +2175,11 @@ namespace SimulationManager {
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
                 }
-                std::string_view const &CType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                std::string_view const CType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
                     state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)];
-                std::string_view const &ParentCType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                std::string_view const ParentCType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
                     state.dataBranchNodeConnections->CompSets(Count1).ParentObjectType)];
-                std::string_view const &ParentCType1 = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                std::string_view const ParentCType1 = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
                     state.dataBranchNodeConnections->CompSets(Count).ParentObjectType)];
                 ShowWarningError(state, "Component plus inlet/outlet node pair used more than once:");
                 ShowContinueError(state, format("  Component  : {}={}", CType, state.dataBranchNodeConnections->CompSets(Count).CName));
