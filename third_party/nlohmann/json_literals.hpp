@@ -1,7 +1,13 @@
-#ifndef JSON_STRING_LITERALLS_HPP
-#define JSON_STRING_LITERALLS_HPP
+#ifndef JSON_STRING_LITERALS_HPP
+#define JSON_STRING_LITERALS_HPP
 
 #include <hedley.hpp>
+
+inline namespace literals
+{
+inline namespace json_literals
+{
+
 
 /// @brief user-defined string literal for JSON values
 /// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json/
@@ -19,6 +25,8 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
     return nlohmann::json::json_pointer(std::string(s, n));
 }
 
+}
+}
 #include <hedley_undef.hpp>
 
 #endif
