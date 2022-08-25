@@ -1453,9 +1453,9 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
 
 void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
                                          std::string_view const ObjectWord, // Object for definition
-                                         int &NumArgs,                       // How many arguments (max) this Object can have
-                                         int &NumAlpha,                      // How many Alpha arguments (max) this Object can have
-                                         int &NumNumeric                     // How many Numeric arguments (max) this Object can have
+                                         int &NumArgs,                      // How many arguments (max) this Object can have
+                                         int &NumAlpha,                     // How many Alpha arguments (max) this Object can have
+                                         int &NumNumeric                    // How many Numeric arguments (max) this Object can have
 )
 {
     // PURPOSE OF THIS SUBROUTINE:
