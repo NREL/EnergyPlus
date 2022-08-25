@@ -3657,4 +3657,28 @@ TEST_F(ConvectionCoefficientsFixture, testTARPNaturalConvectionAlgorithm)
     expectedResult = 1.31184;
     actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
     EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+
+    // Test 4a: zero delta T, cosTilt positive--use "vertical" convection correlation (answer should be zero)
+    surfT = 1.0;
+    ambT = 1.0;
+    cosTilt = 0.01;
+    expectedResult = 0.0;
+    actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
+    EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+
+    // Test 4b: zero delta T, cosTilt zero--use "vertical" convection correlation (answer should be zero)
+    surfT = 1.0;
+    ambT = 1.0;
+    cosTilt = 0.0;
+    expectedResult = 0.0;
+    actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
+    EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+
+    // Test 4c: zero delta T, cosTilt negative--use "vertical" convection correlation (answer should be zero)
+    surfT = 1.0;
+    ambT = 1.0;
+    cosTilt = -0.01;
+    expectedResult = 0.0;
+    actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
+    EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
 }
