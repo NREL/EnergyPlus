@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,57 +62,72 @@ namespace DataWater {
 
     enum class TankThermalMode
     {
-        Unassigned,
-        ScheduledTankTemp,     // tank water temperature is user input via schedule
-        TankZoneThermalCoupled // tank water temperature is modeled using simple UA
+        Invalid = -1,
+        Scheduled,   // tank water temperature is user input via schedule
+        ZoneCoupled, // tank water temperature is modeled using simple UA
+        Num
     };
 
     enum class RainfallMode
     {
-        Unassigned,
+        Invalid = -1,
+        None,
         RainSchedDesign, // mode of Rainfall determination is Scheduled Design
-        IrrSchedDesign,  // mode of Irrigation determination is Scheduled Design
-        IrrSmartSched    // mode of irrigation
+        EPWPrecipitation,
+        Num
+    };
+
+    enum class IrrigationMode
+    {
+        Invalid = -1,
+        IrrSchedDesign, // mode of Irrigation determination is Scheduled Design
+        IrrSmartSched,  // mode of irrigation
+        Num
     };
 
     enum class RainLossFactor
     {
-        Unassigned,
+        Invalid = -1,
         Constant,
-        Scheduled
+        Scheduled,
+        Num
     };
 
     enum class AmbientTempType
     {
-        Unassigned,
+        Invalid = -1,
         Schedule, // ambient temperature around tank (or HPWH inlet air) is scheduled
         Zone,     // tank is located in a zone or HPWH inlet air is zone air only
-        Exterior  // tank is located outdoors or HPWH inlet air is outdoor air only
+        Exterior, // tank is located outdoors or HPWH inlet air is outdoor air only
+        Num
     };
 
     enum class GroundWaterTable
     {
-        Unassigned,
-        ConstantWaterTable,
-        ScheduledWaterTable
+        Invalid = -1,
+        Constant,
+        Scheduled,
+        Num
     };
 
     enum class ControlSupplyType
     {
-        Unassigned,
+        Invalid = -1,
         NoControlLevel,
         MainsFloatValve,
         WellFloatValve,
         WellFloatMainsBackup,
         OtherTankFloatValve,
-        TankMainsBackup
+        TankMainsBackup,
+        Num
     };
 
     enum class Overflow
     {
-        Unassigned,
+        Invalid = -1,
         Discarded,
-        ToTank
+        ToTank,
+        Num
     };
 
     struct StorageTankDataStruct
@@ -181,10 +196,10 @@ namespace DataWater {
 
         // Default Constructor
         StorageTankDataStruct()
-            : MaxCapacity(0.0), OverflowMode(Overflow::Unassigned), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0),
-              ValveOffCapacity(0.0), LastTimeStepFilling(false), ControlSupply(ControlSupplyType::Unassigned), GroundWellID(0), SupplyTankID(0),
+            : MaxCapacity(0.0), OverflowMode(Overflow::Invalid), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0),
+              ValveOffCapacity(0.0), LastTimeStepFilling(false), ControlSupply(ControlSupplyType::Invalid), GroundWellID(0), SupplyTankID(0),
               SupplyTankDemandARRID(0), BackupMainsCapacity(0.0), InitialVolume(0.0), MaxInFlowRate(0.0), MaxOutFlowRate(0.0),
-              ThermalMode(TankThermalMode::Unassigned), InitialTankTemp(20.0), TempSchedID(0), AmbientTempIndicator(AmbientTempType::Unassigned),
+              ThermalMode(TankThermalMode::Invalid), InitialTankTemp(20.0), TempSchedID(0), AmbientTempIndicator(AmbientTempType::Invalid),
               AmbientTempSchedule(0), ZoneID(0), UValue(0.0), SurfArea(0.0), InternalMassID(0), ThisTimeStepVolume(0.0), LastTimeStepVolume(0.0),
               LastTimeStepTemp(0.0), NumWaterSupplies(0), NumWaterDemands(0), VdotFromTank(0.0), VdotToTank(0.0), VdotOverflow(0.0), VolOverflow(0.0),
               NetVdot(0.0), Twater(0.0), TouterSkin(0.0), TwaterOverflow(0.0), MainsDrawVdot(0.0), MainsDrawVol(0.0), SkinLossPower(0.0),
@@ -212,11 +227,12 @@ namespace DataWater {
         Real64 HorizArea; // area of surfaces in the vertical normal direction
         Real64 VdotAvail;
         Real64 VolCollected;
+        std::array<Real64, 12> VolCollectedMonthly = {0.0}; // Monthly rain water collected in mm;
         Real64 MeanHeight;
 
         // Default Constructor
         RainfallCollectorDataStruct()
-            : StorageTankID(0), StorageTankSupplyARRID(0), LossFactorMode(RainLossFactor::Unassigned), LossFactor(0.0), LossFactorSchedID(0),
+            : StorageTankID(0), StorageTankSupplyARRID(0), LossFactorMode(RainLossFactor::Invalid), LossFactor(0.0), LossFactorSchedID(0),
               MaxCollectRate(0.0), NumCollectSurfs(0), HorizArea(0.0), VdotAvail(0.0), VolCollected(0.0), MeanHeight(0.0)
         {
         }
@@ -250,7 +266,7 @@ namespace DataWater {
         // Default Constructor
         GroundwaterWellDataStruct()
             : StorageTankID(0), StorageTankSupplyARRID(0), PumpDepth(0.0), PumpNomVolFlowRate(0.0), PumpNomHead(0.0), PumpNomPowerUse(0.0),
-              PumpEfficiency(0.0), WellRecoveryRate(0.0), NomWellStorageVol(0.0), GroundwaterTableMode(GroundWaterTable::Unassigned),
+              PumpEfficiency(0.0), WellRecoveryRate(0.0), NomWellStorageVol(0.0), GroundwaterTableMode(GroundWaterTable::Invalid),
               WaterTableDepth(0.0), WaterTableDepthSchedID(0), VdotRequest(0.0), VdotDelivered(0.0), VolDelivered(0.0), PumpPower(0.0),
               PumpEnergy(0.0)
         {
@@ -266,11 +282,14 @@ namespace DataWater {
         Real64 NomAnnualRain;
         // calculated and from elsewhere.
         Real64 CurrentRate;
-        Real64 CurrentAmount;
+        Real64 CurrentAmount;                                      //  units of m
+        std::array<Real64, 12> MonthlyTotalPrecInWeather = {0.0};  // Monthly total rain in weather file [mm]
+        std::array<Real64, 12> MonthlyTotalPrecInSitePrec = {0.0}; // Monthly total rain in site:precipitation [mm]
+        std::array<int, 12> numRainyHoursInWeather = {0};          // Monthly number of rainy hours
 
         // Default Constructor
         SiteRainFallDataStruct()
-            : ModeID(RainfallMode::Unassigned), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
+            : ModeID(RainfallMode::None), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
         {
         }
     };
@@ -278,14 +297,14 @@ namespace DataWater {
     struct IrrigationDataStruct
     {
         // Members
-        RainfallMode ModeID; // type of irrigation modeling
+        IrrigationMode ModeID; // type of irrigation modeling
         int IrrSchedID;
         Real64 ScheduledAmount;
         Real64 ActualAmount;
         Real64 IrrigationThreshold; // percent at which no irrigation happens (smart schedule)
 
         // Default Constructor
-        IrrigationDataStruct() : ModeID(RainfallMode::Unassigned), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
+        IrrigationDataStruct() : ModeID(IrrigationMode::Invalid), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
         {
         }
     };
@@ -310,6 +329,7 @@ struct DataWaterData : BaseGlobalStruct
     bool AnyWaterSystemsInModel = false;    // control flag set true if any water systems
     bool WaterSystemGetInputCalled = false; // set true once input data gotten.
     bool AnyIrrigationInModel = false;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
+    int PrecipOverwrittenByRainFlag = 0;    // recurring warning index when the rain flag is on but the liquidprecipitation = 0
 
     void clear_state() override
     {
@@ -325,6 +345,7 @@ struct DataWaterData : BaseGlobalStruct
         AnyWaterSystemsInModel = false;
         WaterSystemGetInputCalled = false;
         AnyIrrigationInModel = false;
+        PrecipOverwrittenByRainFlag = 0;
     }
 };
 

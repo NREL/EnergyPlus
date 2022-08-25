@@ -44,6 +44,8 @@ namespace Tarcog
 
             [[nodiscard]] std::vector<double> getMaxDeflections() const;
             [[nodiscard]] std::vector<double> getMeanDeflections() const;
+            [[nodiscard]] std::vector<double> getPanesLoad() const;
+            void setAppliedLoad(std::vector<double> load);
 
             [[nodiscard]] std::shared_ptr<CSingleSystem> clone() const;
 
@@ -51,6 +53,8 @@ namespace Tarcog
             [[nodiscard]] double getConvectiveHeatFlow(Environment t_Environment) const;
             [[nodiscard]] double getRadiationHeatFlow(Environment t_Environment) const;
             [[nodiscard]] double getHc(Environment t_Environment) const;
+            [[nodiscard]] double getHr(Environment t_Environment) const;
+            [[nodiscard]] double getH(Environment t_Environment) const;
             [[nodiscard]] double getAirTemperature(Environment t_Environment) const;
 
             // If interior layer have openings, this will return heat flow from airflow
@@ -78,9 +82,14 @@ namespace Tarcog
 
             void setWidth(double width);
             void setHeight(double height);
+            void setTilt(double tilt);
 
             //! If IGU is part of the window then frame will still count in surface height.
             void setInteriorAndExteriorSurfacesHeight(double height);
+
+            void setDeflectionProperties(double t_Tini, double t_Pini);
+
+            void clearDeflection();
 
         private:
             CIGU m_IGU;

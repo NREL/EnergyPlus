@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,7 +76,7 @@ namespace DataWindowEquivalentLayer {
     // CFSLAYER: layer types
     enum class LayerType
     {
-        Unassigned = -1,
+        Invalid = -1,
         NONE,   // unused / empty layer
         GLAZE,  // glazing layer i.e, purely specular
         DRAPE,  // pleated drapes/curtains
@@ -85,31 +85,35 @@ namespace DataWindowEquivalentLayer {
         VBVER,  // venetian blinds - vertical
         INSCRN, // insect screen
         ROOM,   // indoor space and/or make no adjustment
-        GZS     // glazing with spectral data (read from aux file)
+        GZS,    // glazing with spectral data (read from aux file)
+        Num
     };
 
     // index for solar arrays
     enum class SolarArrays
     {
-        Unassigned = -1,
+        Invalid = -1,
         DIFF,
-        BEAM
+        BEAM,
+        Num
     };
 
     // Parameters to indicate blind orientation for use with the Material
     // derived type (see below):
     enum class Orientation
     {
-        Unassigned = -1,
+        Invalid = -1,
         Horizontal,
-        Vertical
+        Vertical,
+        Num
     };
 
     enum class AngleType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Fixed,
-        Variable
+        Variable,
+        Num
     };
 
     struct CFSLWP
@@ -202,7 +206,7 @@ namespace DataWindowEquivalentLayer {
         //                   PHI_DEG = 20 if diffuse only
 
         // Default Constructor
-        CFSLAYER() : LTYPE(LayerType::Unassigned), iGZS(0), S(0.0), W(0.0), C(0.0), PHI_DEG(0.0), CNTRL(0)
+        CFSLAYER() : LTYPE(LayerType::Invalid), iGZS(0), S(0.0), W(0.0), C(0.0), PHI_DEG(0.0), CNTRL(0)
         {
         }
     };

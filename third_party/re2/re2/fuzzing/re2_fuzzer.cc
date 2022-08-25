@@ -5,19 +5,95 @@
 #include <fuzzer/FuzzedDataProvider.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <memory>
-#include <queue>
+#include <algorithm>
 #include <string>
 #include <vector>
 
-#include "re2/prefilter.h"
 #include "re2/re2.h"
 #include "re2/regexp.h"
+#include "re2/walker-inl.h"
 
 using re2::StringPiece;
 
 // NOT static, NOT signed.
 uint8_t dummy = 0;
+
+// Walks kRegexpConcat and kRegexpAlternate subexpressions
+// to determine their maximum length.
+class SubexpressionWalker : public re2::Regexp::Walker<int> {
+ public:
+  SubexpressionWalker() = default;
+  ~SubexpressionWalker() override = default;
+
+  int PostVisit(re2::Regexp* re, int parent_arg, int pre_arg,
+                int* child_args, int nchild_args) override {
+    switch (re->op()) {
+      case re2::kRegexpConcat:
+      case re2::kRegexpAlternate: {
+        int max = nchild_args;
+        for (int i = 0; i < nchild_args; i++)
+          max = std::max(max, child_args[i]);
+        return max;
+      }
+
+      default:
+        break;
+    }
+    return -1;
+  }
+
+  // Should never be called: we use Walk(), not WalkExponential().
+  int ShortVisit(re2::Regexp* re, int parent_arg) override {
+    return parent_arg;
+  }
+
+ private:
+  SubexpressionWalker(const SubexpressionWalker&) = delete;
+  SubexpressionWalker& operator=(const SubexpressionWalker&) = delete;
+};
+
+// Walks substrings (i.e. kRegexpLiteralString subexpressions)
+// to determine their maximum length... in runes, but avoiding
+// overheads due to UTF-8 encoding is worthwhile when fuzzing.
+class SubstringWalker : public re2::Regexp::Walker<int> {
+ public:
+  SubstringWalker() = default;
+  ~SubstringWalker() override = default;
+
+  int PostVisit(re2::Regexp* re, int parent_arg, int pre_arg,
+                int* child_args, int nchild_args) override {
+    switch (re->op()) {
+      case re2::kRegexpConcat:
+      case re2::kRegexpAlternate:
+      case re2::kRegexpStar:
+      case re2::kRegexpPlus:
+      case re2::kRegexpQuest:
+      case re2::kRegexpRepeat:
+      case re2::kRegexpCapture: {
+        int max = -1;
+        for (int i = 0; i < nchild_args; i++)
+          max = std::max(max, child_args[i]);
+        return max;
+      }
+
+      case re2::kRegexpLiteralString:
+        return re->nrunes();
+
+      default:
+        break;
+    }
+    return -1;
+  }
+
+  // Should never be called: we use Walk(), not WalkExponential().
+  int ShortVisit(re2::Regexp* re, int parent_arg) override {
+    return parent_arg;
+  }
+
+ private:
+  SubstringWalker(const SubstringWalker&) = delete;
+  SubstringWalker& operator=(const SubstringWalker&) = delete;
+};
 
 void TestOneInput(StringPiece pattern, const RE2::Options& options,
                   StringPiece text) {
@@ -27,11 +103,15 @@ void TestOneInput(StringPiece pattern, const RE2::Options& options,
   // generating such patterns that fall within the other limits, but result
   // in timeouts nonetheless. The marginal cost is high - even more so when
   // counted repetition is involved - whereas the marginal benefit is zero.
+  // Crudely limit the use of 'k', 'K', 's' and 'S' too because they become
+  // three-element character classes when case-insensitive and using UTF-8.
   // TODO(junyer): Handle [:isalnum:] et al. when they start to cause pain.
   int char_class = 0;
   int backslash_p = 0;  // very expensive, so handle specially
   for (size_t i = 0; i < pattern.size(); i++) {
-    if (pattern[i] == '.')
+    if (pattern[i] == '.' ||
+        pattern[i] == 'k' || pattern[i] == 'K' ||
+        pattern[i] == 's' || pattern[i] == 'S')
       char_class++;
     if (pattern[i] != '\\')
       continue;
@@ -59,27 +139,18 @@ void TestOneInput(StringPiece pattern, const RE2::Options& options,
   if (!re.ok())
     return;
 
+  // Don't waste time fuzzing programs with large subexpressions.
+  // They can cause bug reports due to fuzzer timeouts. And they
+  // aren't interesting for fuzzing purposes.
+  if (SubexpressionWalker().Walk(re.Regexp(), -1) > 9)
+    return;
+
   // Don't waste time fuzzing programs with large substrings.
   // They can cause bug reports due to fuzzer timeouts when they
   // are repetitions (e.g. hundreds of NUL bytes) and matching is
   // unanchored. And they aren't interesting for fuzzing purposes.
-  std::unique_ptr<re2::Prefilter> prefilter(re2::Prefilter::FromRE2(&re));
-  if (prefilter == nullptr)
+  if (SubstringWalker().Walk(re.Regexp(), -1) > 9)
     return;
-  std::queue<re2::Prefilter*> nodes;
-  nodes.push(prefilter.get());
-  while (!nodes.empty()) {
-    re2::Prefilter* node = nodes.front();
-    nodes.pop();
-    if (node->op() == re2::Prefilter::ATOM) {
-      if (node->atom().size() > 9)
-        return;
-    } else if (node->op() == re2::Prefilter::AND ||
-               node->op() == re2::Prefilter::OR) {
-      for (re2::Prefilter* sub : *node->subs())
-        nodes.push(sub);
-    }
-  }
 
   // Don't waste time fuzzing high-size programs.
   // They can cause bug reports due to fuzzer timeouts.

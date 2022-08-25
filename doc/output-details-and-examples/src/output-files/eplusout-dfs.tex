@@ -1,6 +1,6 @@
 \section{eplusout.dfs}\label{eplusout.dfs}
 
-The daylight factors report contains the pre-calculated hourly daylight factors for the four CIE sky types (clear, clear turbid, intermediate, and overcast sky), for each daylight reference points for each exterior window of a daylight zone. The file is CSV formatted -- ready for spreadsheet viewing. The input for requesting the report is simple:
+The daylight factors report contains the pre-calculated hourly daylight factors for the four CIE sky types (clear, clear turbid, intermediate, and overcast sky), for each daylight reference points for each exterior window of a daylight enclosure which consists of one or more spaces. The file is CSV formatted -- ready for spreadsheet viewing. The input for requesting the report is simple:
 
 \begin{lstlisting}
 Output:DaylightFactors,
@@ -11,9 +11,9 @@ The following shows an excerpt the daylight factors for a window without shade:
 
 \begin{lstlisting}
 This file contains daylight factors for all exterior windows of daylight zones.
-MonthAndDay,Zone Name,Window Name,Window State
+MonthAndDay,Enclosure Name, Zone Name,Window Name,Window State
 Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky
-01/21,ZN_1,ZN_1_WALL_NORTH_WINDOW,Base Window
+01/21,Enclosure 1,ZN_1,ZN_1_WALL_NORTH_WINDOW,Base Window
 1,ZN_1_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000
 1,ZN_1_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000
 1,ZN_1_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000

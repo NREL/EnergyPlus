@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, TestPipesInput)
     ASSERT_TRUE(process_idf(idf_objects));
     Pipes::GetPipeInput(*state);
     EXPECT_EQ(2u, state->dataPipes->LocalPipe.size());
-    EXPECT_EQ(DataPlant::TypeOf_Pipe, state->dataPipes->LocalPipe(1).TypeOf);
-    EXPECT_EQ(DataPlant::TypeOf_PipeSteam, state->dataPipes->LocalPipe(2).TypeOf);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Pipe, state->dataPipes->LocalPipe(1).Type));
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::PipeSteam, state->dataPipes->LocalPipe(2).Type));
 }
 } // namespace EnergyPlus

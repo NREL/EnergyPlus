@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,7 +72,8 @@ protected:
                                                           " 0.9,                           ",
                                                           " 0.9,                           ",
                                                           " 0.5,                           ",
-                                                          " 300,                           ",
+                                                          " 300,                           ", // 2017 Rated Evaporator Fan Power Per Volume Flow Rate
+                                                          " 300,                           ", // 2023 Rated Evaporator Fan Power Per Volume Flow Rate
                                                           " 6.9,                           ",
                                                           " 0.8,                           ",
                                                           " " + speedObjectName + "CapFT,  ",

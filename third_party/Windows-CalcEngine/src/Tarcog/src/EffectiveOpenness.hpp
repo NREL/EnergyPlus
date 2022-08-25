@@ -48,6 +48,7 @@ namespace EffectiveLayers
     class EffectiveLayer
     {
     public:
+        virtual ~EffectiveLayer() = default;
         EffectiveLayer(double width,
                        double height,
                        double thickness,

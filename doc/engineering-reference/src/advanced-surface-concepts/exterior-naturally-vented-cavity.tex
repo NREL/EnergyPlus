@@ -205,7 +205,7 @@ The exterior vented cavity can be defined such that it has multiple underlying h
 Exterior cavity modeling requires calculating up to three different coefficients for surface convection heat transfer.~ These coefficients are defined in the classic way by:
 
 \begin{equation}
-{h_c} = \frac{{{T_{air}} - {T_{surf}}}}{{{{q''}_{conv}}}}
+{h_c} = \frac{q^{''}_{conv}}{T_{air} - T_{surf}}
 \end{equation}
 
 First, \({h_{co}}\) ~is the convection coefficient for the baffle surface facing the outdoors.~ It is modeled in exactly the same way as elsewhere in EnergyPlus and will depend on the user setting for Outside Convection Algorithm -- Outside Surface Heat Balance entry elsewhere in this document.

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -131,7 +131,6 @@ void SimPurchasedAir(EnergyPlusData &state,
                      Real64 &MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
                      bool const FirstHVACIteration,
                      int const ControlledZoneNum,
-                     int const ActualZoneNum,
                      int &CompIndex)
 {
 
@@ -181,9 +180,9 @@ void SimPurchasedAir(EnergyPlusData &state,
         }
     }
 
-    InitPurchasedAir(state, PurchAirNum, FirstHVACIteration, ControlledZoneNum, ActualZoneNum);
+    InitPurchasedAir(state, PurchAirNum, ControlledZoneNum);
 
-    CalcPurchAirLoads(state, PurchAirNum, SysOutputProvided, MoistOutputProvided, ControlledZoneNum, ActualZoneNum);
+    CalcPurchAirLoads(state, PurchAirNum, SysOutputProvided, MoistOutputProvided, ControlledZoneNum);
 
     UpdatePurchasedAir(state, PurchAirNum, FirstHVACIteration);
 
@@ -205,7 +204,7 @@ void GetPurchasedAir(EnergyPlusData &state)
     // Set up output variables.
 
     // Using/Aliasing
-    using NodeInputManager::CheckUniqueNodes;
+    using NodeInputManager::CheckUniqueNodeNames;
     using NodeInputManager::EndUniqueNodeCheck;
     using NodeInputManager::GetOnlySingleNode;
     using NodeInputManager::InitUniqueNodeCheck;
@@ -279,20 +278,18 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).ZoneSupplyAirNodeNum = GetOnlySingleNode(state,
                                                                            state.dataIPShortCut->cAlphaArgs(3),
                                                                            ErrorsFound,
-                                                                           cCurrentModuleObject,
+                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           DataLoopNode::ConnectionType::Outlet,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            ObjectIsNotParent);
             UniqueNodeError = false;
-            CheckUniqueNodes(state,
-                             state.dataIPShortCut->cAlphaFieldNames(3),
-                             "NodeName",
-                             UniqueNodeError,
-                             state.dataIPShortCut->cAlphaArgs(3),
-                             _,
-                             state.dataIPShortCut->cAlphaArgs(1));
+            CheckUniqueNodeNames(state,
+                                 state.dataIPShortCut->cAlphaFieldNames(3),
+                                 UniqueNodeError,
+                                 state.dataIPShortCut->cAlphaArgs(3),
+                                 state.dataIPShortCut->cAlphaArgs(1));
             if (UniqueNodeError) ErrorsFound = true;
             // If new (optional) exhaust air node name is present, then register it as inlet
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
@@ -300,42 +297,40 @@ void GetPurchasedAir(EnergyPlusData &state)
                     PurchAir(PurchAirNum).ZoneExhaustAirNodeNum = GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(4),
                                                                                     ErrorsFound,
-                                                                                    cCurrentModuleObject,
+                                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    DataLoopNode::ConnectionType::Inlet,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsNotParent);
                 } else {
                     PurchAir(PurchAirNum).ZoneExhaustAirNodeNum = GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(4),
                                                                                     ErrorsFound,
-                                                                                    cCurrentModuleObject,
+                                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsNotParent);
                 }
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 state.dataIPShortCut->cAlphaFieldNames(4),
-                                 "NodeName",
-                                 UniqueNodeError,
-                                 state.dataIPShortCut->cAlphaArgs(4),
-                                 _,
-                                 state.dataIPShortCut->cAlphaArgs(1));
+                CheckUniqueNodeNames(state,
+                                     state.dataIPShortCut->cAlphaFieldNames(4),
+                                     UniqueNodeError,
+                                     state.dataIPShortCut->cAlphaArgs(4),
+                                     state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 PurchAir(PurchAirNum).PlenumExhaustAirNodeNum = GetOnlySingleNode(state,
                                                                                   state.dataIPShortCut->cAlphaArgs(5),
                                                                                   ErrorsFound,
-                                                                                  cCurrentModuleObject,
+                                                                                  DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                  DataLoopNode::ConnectionType::Inlet,
+                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsNotParent);
             }
             PurchAir(PurchAirNum).MaxHeatSuppAirTemp = state.dataIPShortCut->rNumericArgs(1);
@@ -516,11 +511,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                 PurchAir(PurchAirNum).OutdoorAirNodeNum = GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(13),
                                                                             ErrorsFound,
-                                                                            cCurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ZoneHVACIdealLoadsAirSystem,
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            DataLoopNode::ConnectionType::Outlet,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
                 // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist
                 CheckAndAddAirNodeNumber(state, PurchAir(PurchAirNum).OutdoorAirNodeNum, IsOANodeListed);
@@ -532,25 +527,23 @@ void GetPurchasedAir(EnergyPlusData &state)
                     ShowContinueError(state, "Adding OutdoorAir:Node=" + state.dataIPShortCut->cAlphaArgs(13));
                 }
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 state.dataIPShortCut->cAlphaFieldNames(13),
-                                 "NodeName",
-                                 UniqueNodeError,
-                                 state.dataIPShortCut->cAlphaArgs(13),
-                                 _,
-                                 state.dataIPShortCut->cAlphaArgs(1));
+                CheckUniqueNodeNames(state,
+                                     state.dataIPShortCut->cAlphaFieldNames(13),
+                                     UniqueNodeError,
+                                     state.dataIPShortCut->cAlphaArgs(13),
+                                     state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
 
                 // get Demand controlled ventilation type
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "None")) {
-                    PurchAir(PurchAirNum).DCVType = DCV::NoDCV;
+                    PurchAir(PurchAirNum).DCVType = DCV::None;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "OccupancySchedule")) {
                     PurchAir(PurchAirNum).DCVType = DCV::OccupancySchedule;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "CO2Setpoint")) {
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         PurchAir(PurchAirNum).DCVType = DCV::CO2SetPoint;
                     } else {
-                        PurchAir(PurchAirNum).DCVType = DCV::NoDCV;
+                        PurchAir(PurchAirNum).DCVType = DCV::None;
                         ShowWarningError(
                             state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
                         ShowContinueError(state,
@@ -586,7 +579,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                 }
                 // get Outdoor air heat recovery type and effectiveness
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "None")) {
-                    PurchAir(PurchAirNum).HtRecType = HeatRecovery::NoHeatRecovery;
+                    PurchAir(PurchAirNum).HtRecType = HeatRecovery::None;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Sensible")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::Sensible;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Enthalpy")) {
@@ -600,9 +593,9 @@ void GetPurchasedAir(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else { // No outdoorair
-                PurchAir(PurchAirNum).DCVType = DCV::NoDCV;
+                PurchAir(PurchAirNum).DCVType = DCV::None;
                 PurchAir(PurchAirNum).EconomizerType = Econ::NoEconomizer;
-                PurchAir(PurchAirNum).HtRecType = HeatRecovery::NoHeatRecovery;
+                PurchAir(PurchAirNum).HtRecType = HeatRecovery::None;
             }
 
             PurchAir(PurchAirNum).HtRecSenEff = state.dataIPShortCut->rNumericArgs(10);
@@ -1165,18 +1158,12 @@ void GetPurchasedAir(EnergyPlusData &state)
     }
 }
 
-void InitPurchasedAir(EnergyPlusData &state,
-                      int const PurchAirNum,
-                      [[maybe_unused]] bool const FirstHVACIteration, // unused1208
-                      int const ControlledZoneNum,
-                      int const ActualZoneNum)
+void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const ControlledZoneNum)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Russ Taylor
     //       DATE WRITTEN   Nov 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Initialize the PurchAir data structure.
@@ -1340,8 +1327,8 @@ void InitPurchasedAir(EnergyPlusData &state,
 
     // These initializations are done every iteration
     // check that supply air temps can meet the zone thermostat setpoints
-    if (PurchAir(PurchAirNum).MinCoolSuppAirTemp > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) &&
-        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) != 0 && PurchAir(PurchAirNum).CoolingLimit == LimitType::NoLimit) {
+    if (PurchAir(PurchAirNum).MinCoolSuppAirTemp > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum) &&
+        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum) != 0 && PurchAir(PurchAirNum).CoolingLimit == LimitType::NoLimit) {
         // Check if the unit is scheduled off
         UnitOn = true;
         //        IF (PurchAir(PurchAirNum)%AvailSchedPtr > 0) THEN
@@ -1360,12 +1347,12 @@ void InitPurchasedAir(EnergyPlusData &state,
             if (PurchAir(PurchAirNum).CoolErrIndex == 0) {
                 ShowSevereError(state,
                                 "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name + " serving Zone " +
-                                    state.dataHeatBal->Zone(ActualZoneNum).Name);
+                                    state.dataHeatBal->Zone(ControlledZoneNum).Name);
                 ShowContinueError(state,
                                   format("..the minimum supply air temperature for cooling [{:.2R}] is greater than the zone cooling mean air "
                                          "temperature (MAT) setpoint [{:.2R}].",
                                          PurchAir(PurchAirNum).MinCoolSuppAirTemp,
-                                         state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum)));
+                                         state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum)));
                 ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                 ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too warm.");
                 ShowContinueError(state, "Unit availability is nominally ON and Cooling availability is nominally ON.");
@@ -1375,7 +1362,7 @@ void InitPurchasedAir(EnergyPlusData &state,
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                              " serving Zone " + state.dataHeatBal->Zone(ActualZoneNum).Name +
+                                              " serving Zone " + state.dataHeatBal->Zone(ControlledZoneNum).Name +
                                               ", the minimum supply air temperature for cooling error continues",
                                           PurchAir(PurchAirNum).CoolErrIndex,
                                           PurchAir(PurchAirNum).MinCoolSuppAirTemp,
@@ -1385,8 +1372,8 @@ void InitPurchasedAir(EnergyPlusData &state,
                                           "C");
         }
     }
-    if (PurchAir(PurchAirNum).MaxHeatSuppAirTemp < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) &&
-        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) != 0 && PurchAir(PurchAirNum).HeatingLimit == LimitType::NoLimit) {
+    if (PurchAir(PurchAirNum).MaxHeatSuppAirTemp < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum) &&
+        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum) != 0 && PurchAir(PurchAirNum).HeatingLimit == LimitType::NoLimit) {
         // Check if the unit is scheduled off
         UnitOn = true;
         //        IF (PurchAir(PurchAirNum)%AvailSchedPtr > 0) THEN
@@ -1405,12 +1392,12 @@ void InitPurchasedAir(EnergyPlusData &state,
             if (PurchAir(PurchAirNum).HeatErrIndex == 0) {
                 ShowSevereMessage(state,
                                   "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                      " serving Zone " + state.dataHeatBal->Zone(ActualZoneNum).Name);
+                                      " serving Zone " + state.dataHeatBal->Zone(ControlledZoneNum).Name);
                 ShowContinueError(state,
                                   format("..the maximum supply air temperature for heating [{:.2R}] is less than the zone mean air temperature "
                                          "heating setpoint [{:.2R}].",
                                          PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
-                                         state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum)));
+                                         state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum)));
                 ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                 ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too cold.");
                 ShowContinueError(state, "Unit availability is nominally ON and Heating availability is nominally ON.");
@@ -1420,7 +1407,7 @@ void InitPurchasedAir(EnergyPlusData &state,
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                              " serving Zone " + state.dataHeatBal->Zone(ActualZoneNum).Name +
+                                              " serving Zone " + state.dataHeatBal->Zone(ControlledZoneNum).Name +
                                               ", maximum supply air temperature for heating error continues",
                                           PurchAir(PurchAirNum).HeatErrIndex,
                                           PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
@@ -2071,8 +2058,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                        int const PurchAirNum,
                        Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
                        Real64 &MoistOutputProvided, // Moisture output provided [kg/s] dehumidification = negative
-                       int const ControlledZoneNum,
-                       int const ActualZoneNum)
+                       int const ControlledZoneNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2088,7 +2074,6 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     using DataHVACGlobals::ForceOff;
     using DataHVACGlobals::SmallLoad;
     auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-    using DataZoneEquipment::PurchasedAir_Num;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcPurchAirLoads");
@@ -2160,12 +2145,12 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     UnitOn = true;
     EconoOn = false;
     // get current zone requirements
-    QZnHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
-    QZnCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
+    QZnHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
+    QZnCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToCoolSP;
 
     if (allocated(ZoneComp)) {
-        ZoneComp(PurchasedAir_Num).ZoneCompAvailMgrs(PurchAirNum).ZoneNum = ActualZoneNum;
-        PurchAir(PurchAirNum).AvailStatus = ZoneComp(PurchasedAir_Num).ZoneCompAvailMgrs(PurchAirNum).AvailStatus;
+        ZoneComp(DataZoneEquipment::ZoneEquip::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum).ZoneNum = ControlledZoneNum;
+        PurchAir(PurchAirNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum).AvailStatus;
         // Check if the hybrid ventilation availability manager is turning the unit off
         if (PurchAir(PurchAirNum).AvailStatus == ForceOff) {
             UnitOn = false;
@@ -2194,7 +2179,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
     if (UnitOn) {
         // Calculate current minimum outdoor air flow rate based on design OA specifications and DCV or CO2 control
-        CalcPurchAirMinOAMassFlow(state, PurchAirNum, ActualZoneNum, OAMassFlowRate);
+        CalcPurchAirMinOAMassFlow(state, PurchAirNum, ControlledZoneNum, OAMassFlowRate);
 
         // EMS override point  Purch air outdoor air massflow rate.....
         if (PurchAir(PurchAirNum).EMSOverrideOAMdotOn) {
@@ -2215,7 +2200,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         // Check if cooling of the supply air stream is required
 
         // Cooling operation
-        if ((MinOASensOutput >= QZnCoolSP) && (state.dataHeatBalFanSys->TempControlType(ActualZoneNum) != SingleHeatingSetPoint)) {
+        if ((MinOASensOutput >= QZnCoolSP) &&
+            (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating)) {
             OperatingMode = OpMode::Cool;
             // Calculate supply mass flow, temp and humidity with the following constraints:
             //  Min cooling supply temp
@@ -2260,7 +2246,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                           state.dataLoopNodes->Node(PurchAir(PurchAirNum).ZoneRecircAirNodeNum).Enthalpy))) {
 
                         // Calculate supply MassFlowRate based on sensible load but limit to Max Cooling Supply Air Flow Rate if specified
-                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
+                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
                         DeltaT = (state.dataLoopNodes->Node(OANodeNum).Temp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
                         if (DeltaT < -SmallTempDiff) {
                             SupplyMassFlowRate = QZnCoolSP / CpAir / DeltaT;
@@ -2283,7 +2269,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Mass flow rate to meet sensible load, at Minimum Cooling Supply Air Temperature
             SupplyMassFlowRateForCool = 0.0;
             if (CoolOn) {
-                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
                 DeltaT = (PurchAir(PurchAirNum).MinCoolSuppAirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
                 if (DeltaT < -SmallTempDiff) {
                     SupplyMassFlowRateForCool = QZnCoolSP / CpAir / DeltaT;
@@ -2294,7 +2280,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             SupplyMassFlowRateForDehum = 0.0;
             if (CoolOn) {
                 if (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) {
-                    MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                    MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;
                     DeltaHumRat = (PurchAir(PurchAirNum).MinCoolSuppAirHumRat - state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
                     if ((DeltaHumRat < -SmallDeltaHumRat) && (MdotZnDehumidSP < 0.0)) {
                         SupplyMassFlowRateForDehum = MdotZnDehumidSP / DeltaHumRat;
@@ -2310,7 +2296,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 if (PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) {
                     if ((PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) ||
                         (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::None)) {
-                        MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                        MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToHumidSP;
                         DeltaHumRat = (PurchAir(PurchAirNum).MaxHeatSuppAirHumRat - state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
                         if ((DeltaHumRat > SmallDeltaHumRat) && (MdotZnHumidSP > 0.0)) {
                             SupplyMassFlowRateForHumid = MdotZnHumidSP / DeltaHumRat;
@@ -2358,7 +2344,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // In general, in the cooling section, don't let SupplyTemp be set to something that results in heating
             if (SupplyMassFlowRate > 0.0) {
                 // Calculate supply temp at SupplyMassFlowRate and recheck limit on Minimum Cooling Supply Air Temperature
-                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
                 PurchAir(PurchAirNum).SupplyTemp = QZnCoolSP / (CpAir * SupplyMassFlowRate) + state.dataLoopNodes->Node(ZoneNodeNum).Temp;
                 PurchAir(PurchAirNum).SupplyTemp = max(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MinCoolSuppAirTemp);
                 // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
@@ -2383,35 +2369,38 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
                 // Set supply humidity ratio for cooling/dehumidification
                 PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
-                {
-                    auto const SELECT_CASE_var(PurchAir(PurchAirNum).DehumidCtrlType);
-                    if (SELECT_CASE_var == HumControl::None) {
-                        PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat; // Unnecessary line?
-                    } else if (SELECT_CASE_var == HumControl::ConstantSensibleHeatRatio) {
-                        // SHR = CoolSensOutput/CoolTotOutput
-                        // CoolTotOutput = CoolSensOutput/SHR
-                        CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
-                        CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
-                        CoolTotOutput = CoolSensOutput / PurchAir(PurchAirNum).CoolSHR;
-                        SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;
-                        //  Limit for overdrying (avoid Pysch errors which occur if SupplyEnthalpy is too low for SupplyTemp)
-                        SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, 0.00001));
-                        PurchAir(PurchAirNum).SupplyHumRat =
-                            min(PurchAir(PurchAirNum).SupplyHumRat, PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName));
-                        // Apply min cooling humidity ratio limit
-                        PurchAir(PurchAirNum).SupplyHumRat = max(PurchAir(PurchAirNum).SupplyHumRat, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
-                        // But don't let it be higher than incoming MixedAirHumRat
-                        PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).SupplyHumRat, PurchAir(PurchAirNum).MixedAirHumRat);
-                    } else if (SELECT_CASE_var == HumControl::Humidistat) {
-                        MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
-                        SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;
-                        SupplyHumRatForDehum = min(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
-                        PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).MixedAirHumRat, SupplyHumRatForDehum);
-                    } else if (SELECT_CASE_var == HumControl::ConstantSupplyHumidityRatio) {
-                        PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MinCoolSuppAirHumRat;
-                    } else {
-                        PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
-                    }
+                switch (PurchAir(PurchAirNum).DehumidCtrlType) {
+                case HumControl::None: {
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat; // Unnecessary line?
+                } break;
+                case HumControl::ConstantSensibleHeatRatio: {
+                    // SHR = CoolSensOutput/CoolTotOutput
+                    // CoolTotOutput = CoolSensOutput/SHR
+                    CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                    CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
+                    CoolTotOutput = CoolSensOutput / PurchAir(PurchAirNum).CoolSHR;
+                    SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;
+                    //  Limit for overdrying (avoid Pysch errors which occur if SupplyEnthalpy is too low for SupplyTemp)
+                    SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, 0.00001));
+                    PurchAir(PurchAirNum).SupplyHumRat =
+                        min(PurchAir(PurchAirNum).SupplyHumRat, PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName));
+                    // Apply min cooling humidity ratio limit
+                    PurchAir(PurchAirNum).SupplyHumRat = max(PurchAir(PurchAirNum).SupplyHumRat, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
+                    // But don't let it be higher than incoming MixedAirHumRat
+                    PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).SupplyHumRat, PurchAir(PurchAirNum).MixedAirHumRat);
+                } break;
+                case HumControl::Humidistat: {
+                    MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;
+                    SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;
+                    SupplyHumRatForDehum = min(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
+                    PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).MixedAirHumRat, SupplyHumRatForDehum);
+                } break;
+                case HumControl::ConstantSupplyHumidityRatio: {
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MinCoolSuppAirHumRat;
+                } break;
+                default: {
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
+                } break;
                 }
 
                 // Check supply humidity ratio for humidification (SupplyHumRatForHum should always be < SupplyHumRatForDehum)
@@ -2421,7 +2410,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                     if (PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) {
                         if ((PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) ||
                             (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::None)) {
-                            MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                            MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToHumidSP;
                             SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;
                             SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir(PurchAirNum).MaxHeatSuppAirHumRat);
                             PurchAir(PurchAirNum).SupplyHumRat = max(PurchAir(PurchAirNum).SupplyHumRat, SupplyHumRatForHumid);
@@ -2446,44 +2435,44 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                             CoolTotOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
                             SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;
                             // Adjust output based on dehumidification control type
-                            {
-                                auto const SELECT_CASE_var(PurchAir(PurchAirNum).DehumidCtrlType);
-                                if (SELECT_CASE_var == HumControl::ConstantSensibleHeatRatio) {
-                                    // Adjust both supply temp and humidity ratio to maintain SHR
-                                    // SHR = CoolSensOutput/CoolTotOutput
-                                    // CoolSensOutput = SHR*CoolTotOutput
-                                    CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
-                                    CoolSensOutput = CoolTotOutput * PurchAir(PurchAirNum).CoolSHR;
-                                    PurchAir(PurchAirNum).SupplyTemp =
-                                        PurchAir(PurchAirNum).MixedAirTemp - CoolSensOutput / (CpAir * SupplyMassFlowRate);
+                            switch (PurchAir(PurchAirNum).DehumidCtrlType) {
+                            case HumControl::ConstantSensibleHeatRatio: {
+                                // Adjust both supply temp and humidity ratio to maintain SHR
+                                // SHR = CoolSensOutput/CoolTotOutput
+                                // CoolSensOutput = SHR*CoolTotOutput
+                                CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                                CoolSensOutput = CoolTotOutput * PurchAir(PurchAirNum).CoolSHR;
+                                PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MixedAirTemp - CoolSensOutput / (CpAir * SupplyMassFlowRate);
+                                // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
+                                PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
+                                //  Limit for overdrying (avoid Pysch errors which occur if SupplyEnthalpy is too low for SupplyTemp)
+                                SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, 0.00001));
+                                PurchAir(PurchAirNum).SupplyHumRat = PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
+                            } break;
+                            case HumControl::Humidistat: {
+                                // Keep supply temp and adjust humidity ratio to reduce load
+                                PurchAir(PurchAirNum).SupplyHumRat = PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
+                            } break;
+                            case HumControl::None:
+                            case HumControl::ConstantSupplyHumidityRatio: {
+                                // Keep humidity ratio and adjust supply temp
+                                // Check if latent output exceeds capacity
+                                CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                                CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
+                                CoolLatOutput = CoolTotOutput - CoolSensOutput;
+                                if (CoolLatOutput >= PurchAir(PurchAirNum).MaxCoolTotCap) {
+                                    PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MixedAirTemp;
+                                    PurchAir(PurchAirNum).SupplyHumRat =
+                                        PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
+                                    CoolLatOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
+                                } else {
+                                    PurchAir(PurchAirNum).SupplyTemp = PsyTdbFnHW(SupplyEnthalpy, PurchAir(PurchAirNum).SupplyHumRat);
                                     // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
                                     PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
-                                    //  Limit for overdrying (avoid Pysch errors which occur if SupplyEnthalpy is too low for SupplyTemp)
-                                    SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, 0.00001));
-                                    PurchAir(PurchAirNum).SupplyHumRat =
-                                        PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
-                                } else if (SELECT_CASE_var == HumControl::Humidistat) {
-                                    // Keep supply temp and adjust humidity ratio to reduce load
-                                    PurchAir(PurchAirNum).SupplyHumRat =
-                                        PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
-                                } else if ((SELECT_CASE_var == HumControl::None) || (SELECT_CASE_var == HumControl::ConstantSupplyHumidityRatio)) {
-                                    // Keep humidity ratio and adjust supply temp
-                                    // Check if latent output exceeds capacity
-                                    CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
-                                    CoolSensOutput =
-                                        SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
-                                    CoolLatOutput = CoolTotOutput - CoolSensOutput;
-                                    if (CoolLatOutput >= PurchAir(PurchAirNum).MaxCoolTotCap) {
-                                        PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).MixedAirTemp;
-                                        PurchAir(PurchAirNum).SupplyHumRat =
-                                            PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
-                                        CoolLatOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
-                                    } else {
-                                        PurchAir(PurchAirNum).SupplyTemp = PsyTdbFnHW(SupplyEnthalpy, PurchAir(PurchAirNum).SupplyHumRat);
-                                        // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
-                                        PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MixedAirTemp);
-                                    }
                                 }
+                            } break;
+                            default:
+                                break;
                             }
                             // Limit supply humidity ratio to saturation at supply outlet temp
                             // If saturation exceeded, then honor capacity limit and set to dew point at supplyenthalpy
@@ -2523,7 +2512,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             }
             // Heating or no-load operation
         } else { // Heating or no-load case
-            if ((MinOASensOutput < QZnHeatSP) && (state.dataHeatBalFanSys->TempControlType(ActualZoneNum) != SingleCoolingSetPoint)) {
+            if ((MinOASensOutput < QZnHeatSP) &&
+                (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
                 OperatingMode = OpMode::Heat;
             } else { // DeadBand mode shuts off heat recovery and economizer
                 OperatingMode = OpMode::DeadBand;
@@ -2568,7 +2558,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Mass flow rate to meet sensible load, at Minimum Cooling Supply Air Temperature
             SupplyMassFlowRateForHeat = 0.0;
             if ((HeatOn) && (OperatingMode == OpMode::Heat)) {
-                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
                 DeltaT = (PurchAir(PurchAirNum).MaxHeatSuppAirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
                 if (DeltaT > SmallTempDiff) {
                     SupplyMassFlowRateForHeat = QZnHeatSP / CpAir / DeltaT;
@@ -2584,7 +2574,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 if (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) {
                     if ((PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) ||
                         (PurchAir(PurchAirNum).HumidCtrlType == HumControl::None) || (OperatingMode == OpMode::DeadBand)) {
-                        MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                        MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;
                         DeltaHumRat = (PurchAir(PurchAirNum).MinCoolSuppAirHumRat - state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
                         if ((DeltaHumRat < -SmallDeltaHumRat) && (MdotZnDehumidSP < 0.0)) {
                             SupplyMassFlowRateForDehum = MdotZnDehumidSP / DeltaHumRat;
@@ -2597,7 +2587,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             SupplyMassFlowRateForHumid = 0.0;
             if (HeatOn) {
                 if (PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) {
-                    MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                    MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToHumidSP;
                     DeltaHumRat = (PurchAir(PurchAirNum).MaxHeatSuppAirHumRat - state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
                     if ((DeltaHumRat > SmallDeltaHumRat) && (MdotZnHumidSP > 0.0)) {
                         SupplyMassFlowRateForHumid = MdotZnHumidSP / DeltaHumRat;
@@ -2644,7 +2634,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             if (SupplyMassFlowRate > 0.0) {
                 if ((HeatOn) && (OperatingMode == OpMode::Heat)) {
                     // Calculate supply temp at SupplyMassFlowRate and check limit on Maximum Heating Supply Air Temperature
-                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
+                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
                     PurchAir(PurchAirNum).SupplyTemp = QZnHeatSP / (CpAir * SupplyMassFlowRate) + state.dataLoopNodes->Node(ZoneNodeNum).Temp;
                     PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MaxHeatSuppAirTemp);
                     // This is the heating mode, so SupplyTemp can't be less than MixedAirTemp
@@ -2666,47 +2656,48 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
                 // Set supply humidity ratio first for heating/humidification
                 PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
-                {
-                    auto const SELECT_CASE_var(PurchAir(PurchAirNum).HumidCtrlType);
-                    if (SELECT_CASE_var == HumControl::None) {
-                        PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
-                    } else if (SELECT_CASE_var == HumControl::Humidistat) {
-                        MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
-                        SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;
-                        SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir(PurchAirNum).MaxHeatSuppAirHumRat);
-                        PurchAir(PurchAirNum).SupplyHumRat = max(PurchAir(PurchAirNum).SupplyHumRat, SupplyHumRatForHumid);
-                    } else if (SELECT_CASE_var == HumControl::ConstantSupplyHumidityRatio) {
-                        if (OperatingMode == OpMode::Heat) {
-                            // If this results in dehumidification, must check cooling capacity limit
-                            if (PurchAir(PurchAirNum).MixedAirHumRat > PurchAir(PurchAirNum).MaxHeatSuppAirHumRat) {
-                                if ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitCapacity) ||
-                                    (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity)) {
-                                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MaxHeatSuppAirHumRat;
-                                    SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
-                                    CoolTotOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);
-                                    CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
-                                    CoolSensOutput =
-                                        SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
-                                    CoolLatOutput = CoolTotOutput - CoolSensOutput;
-                                    if (CoolLatOutput >= PurchAir(PurchAirNum).MaxCoolTotCap) {
-                                        CoolLatOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
-                                        CoolTotOutput = CoolSensOutput + CoolLatOutput;
-                                        SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;
-                                        PurchAir(PurchAirNum).SupplyHumRat =
-                                            PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
-                                    }
-                                } else {
-                                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MaxHeatSuppAirHumRat;
+                switch (PurchAir(PurchAirNum).HumidCtrlType) {
+                case HumControl::None: {
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
+                } break;
+                case HumControl::Humidistat: {
+                    MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToHumidSP;
+                    SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;
+                    SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir(PurchAirNum).MaxHeatSuppAirHumRat);
+                    PurchAir(PurchAirNum).SupplyHumRat = max(PurchAir(PurchAirNum).SupplyHumRat, SupplyHumRatForHumid);
+                } break;
+                case HumControl::ConstantSupplyHumidityRatio: {
+                    if (OperatingMode == OpMode::Heat) {
+                        // If this results in dehumidification, must check cooling capacity limit
+                        if (PurchAir(PurchAirNum).MixedAirHumRat > PurchAir(PurchAirNum).MaxHeatSuppAirHumRat) {
+                            if ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitCapacity) ||
+                                (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity)) {
+                                PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MaxHeatSuppAirHumRat;
+                                SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
+                                CoolTotOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);
+                                CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
+                                CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).MixedAirTemp - PurchAir(PurchAirNum).SupplyTemp);
+                                CoolLatOutput = CoolTotOutput - CoolSensOutput;
+                                if (CoolLatOutput >= PurchAir(PurchAirNum).MaxCoolTotCap) {
+                                    CoolLatOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
+                                    CoolTotOutput = CoolSensOutput + CoolLatOutput;
+                                    SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;
+                                    PurchAir(PurchAirNum).SupplyHumRat =
+                                        PsyWFnTdbH(state, PurchAir(PurchAirNum).SupplyTemp, SupplyEnthalpy, RoutineName);
                                 }
                             } else {
                                 PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MaxHeatSuppAirHumRat;
                             }
                         } else {
-                            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
+                            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MaxHeatSuppAirHumRat;
                         }
                     } else {
                         PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
                     }
+                } break;
+                default: {
+                    PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).MixedAirHumRat;
+                } break;
                 }
                 SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
 
@@ -2718,7 +2709,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                     if (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) {
                         if ((PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) ||
                             (PurchAir(PurchAirNum).HumidCtrlType == HumControl::None) || (OperatingMode == OpMode::DeadBand)) {
-                            MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                            MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;
                             SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;
                             SupplyHumRatForDehum = max(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
                             PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).SupplyHumRat, SupplyHumRatForDehum);
@@ -2831,7 +2822,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
             SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
 
-            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
+            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
             SysOutputProvided = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
             MoistOutputProvided =
                 SupplyMassFlowRate * (PurchAir(PurchAirNum).SupplyHumRat - state.dataLoopNodes->Node(ZoneNodeNum).HumRat); // Latent rate, kg/s
@@ -2840,7 +2831,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             PurchAir(PurchAirNum).LatOutputToZone =
                 SupplyMassFlowRate * (SupplyEnthalpy - state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy) - PurchAir(PurchAirNum).SenOutputToZone;
 
-            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
+            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ControlledZoneNum));
             if (PurchAir(PurchAirNum).OutdoorAir) {
                 PurchAir(PurchAirNum).OASenOutput =
                     OAMassFlowRate * CpAir * (state.dataLoopNodes->Node(OANodeNum).Temp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
@@ -2945,9 +2936,9 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 }
 
 void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
-                               int const PurchAirNum,   // index to ideal loads unit
-                               int const ActualZoneNum, // index to actual zone number
-                               Real64 &OAMassFlowRate   // outside air mass flow rate [kg/s] from volume flow using std density
+                               int const PurchAirNum, // index to ideal loads unit
+                               int const ZoneNum,     // index to zone
+                               Real64 &OAMassFlowRate // outside air mass flow rate [kg/s] from volume flow using std density
 )
 {
 
@@ -2965,7 +2956,7 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
     // User input defines method used to calculate OA.
 
     // FUNCTION PARAMETER DEFINITIONS:
-    bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+    bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     bool UseOccSchFlag;      // TRUE = use actual occupancy, FALSE = use total zone people
@@ -2980,13 +2971,13 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
         } else {
             UseOccSchFlag = false;
         }
-        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
-            state, PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
+        OAVolumeFlowRate =
+            DataSizing::calcDesignSpecificationOutdoorAir(state, PurchAir(PurchAirNum).OARequirementsPtr, ZoneNum, UseOccSchFlag, UseMinOASchFlag);
         OAMassFlowRate = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
         // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint
         if (PurchAir(PurchAirNum).DCVType == DCV::CO2SetPoint) {
-            OAMassFlowRate = max(OAMassFlowRate, state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP);
+            OAMassFlowRate = max(OAMassFlowRate, state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP);
         }
 
         if (OAMassFlowRate <= VerySmallMassFlow) OAMassFlowRate = 0.0;
@@ -3152,7 +3143,7 @@ void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const
         if (all(state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated)) {
             SimAirZonePlenum(state,
                              PurchAir(PurchAirNum).ReturnPlenumName,
-                             DataZoneEquipment::ZoneReturnPlenum_Type,
+                             DataZoneEquipment::AirLoopHVACZone::ReturnPlenum,
                              PurchAir(PurchAirNum).ReturnPlenumIndex,
                              FirstHVACIteration,
                              FirstCall,
@@ -3384,7 +3375,7 @@ Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int const PurchAirNu
     return state.dataPurchasedAirMgr->PurchAir(PurchAirNum).MixedAirHumRat;
 }
 
-bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPlenumIndex)
+bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const ReturnPlenumIndex)
 {
 
     // FUNCTION INFORMATION:

@@ -24,9 +24,7 @@ namespace ObjexxFCL {
 template< typename > class Reference;
 
 // Types
-typedef  Reference< bool >                Reference_bool;
 typedef  Reference< short int >           Reference_short;
-typedef  Reference< int >                 Reference_int;
 typedef  Reference< std::size_t >         Reference_size;
 typedef  Reference< std::int32_t >        Reference_int32;
 typedef  Reference< double >              Reference_double;

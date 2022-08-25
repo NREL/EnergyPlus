@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -164,12 +164,12 @@ public:
                                             int const storeTypeIndex,
                                             std::string const &indexGroup,
                                             std::string_view keyedValueString,
-                                            std::string const &variableName,
+                                            std::string_view const variableName,
                                             int const indexType,
                                             std::string const &units,
                                             int const reportingFreq,
                                             bool isMeter,
-                                            Optional_string_const ScheduleName = _);
+                                            std::string_view const ScheduleName = {});
 
     void createSQLiteReportDataRecord(int const recordIndex,
                                       Real64 const value,

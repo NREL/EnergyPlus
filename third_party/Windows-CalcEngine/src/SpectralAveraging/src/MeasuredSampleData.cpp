@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <cassert>
+#include <utility>
 
 #include "MeasuredSampleData.hpp"
 #include "WCECommon.hpp"
@@ -13,10 +14,7 @@ namespace SpectralAveraging
     ////     MeasuredRow
     ////////////////////////////////////////////////////////////////////////////
     MeasuredRow::MeasuredRow(double wl, double t, double rf, double rb) :
-        wavelength(wl),
-        T(t),
-        Rf(rf),
-        Rb(rb)
+        wavelength(wl), T(t), Rf(rf), Rb(rb)
     {}
 
     ////////////////////////////////////////////////////////////////////////////
@@ -166,100 +164,35 @@ namespace SpectralAveraging
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// PVMeasurement
-    ///////////////////////////////////////////////////////////////////////////
-    PVMeasurement::PVMeasurement(double eqe, double voc, double ff) : EQE(eqe), VOC(voc), FF(ff)
-    {}
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// PVMeasurementRow
-    ///////////////////////////////////////////////////////////////////////////
-    PVMeasurementRow::PVMeasurementRow(double wavelength,
-                                       const PVMeasurement & front,
-                                       const PVMeasurement & back) :
-        wavelength(wavelength),
-        front(front),
-        back(back)
-    {}
-
-    ///////////////////////////////////////////////////////////////////////////
     /// PhotovoltaicData
     ///////////////////////////////////////////////////////////////////////////
     PhotovoltaicSampleData::PhotovoltaicSampleData(const CSpectralSampleData & spectralSampleData) :
         CSpectralSampleData(spectralSampleData),
-        m_PVData{{{Side::Front, PVM::EQE}, CSeries()},
-                 {{Side::Front, PVM::VOC}, CSeries()},
-                 {{Side::Front, PVM::FF}, CSeries()},
-                 {{Side::Back, PVM::EQE}, CSeries()},
-                 {{Side::Back, PVM::VOC}, CSeries()},
-                 {{Side::Back, PVM::FF}, CSeries()}}
+        m_EQE{{Side::Front, CSeries()}, {Side::Back, CSeries()}}
     {}
 
-    void PhotovoltaicSampleData::addRecord(double m_Wavelength,
-                                           const PVMeasurement frontSide,
-                                           const PVMeasurement backSide)
+    PhotovoltaicSampleData::PhotovoltaicSampleData(const CSpectralSampleData & spectralSampleData,
+                                                   const CSeries & eqeValuesFront,
+                                                   const CSeries & eqeValuesBack) :
+        CSpectralSampleData(spectralSampleData),
+        m_EQE{{Side::Front, eqeValuesFront}, {Side::Back, eqeValuesBack}}
     {
-        m_PVData.at(std::make_pair(Side::Front, PVM::EQE)).addProperty(m_Wavelength, frontSide.EQE);
-        m_PVData.at(std::make_pair(Side::Front, PVM::VOC)).addProperty(m_Wavelength, frontSide.VOC);
-        m_PVData.at(std::make_pair(Side::Front, PVM::FF)).addProperty(m_Wavelength, frontSide.FF);
-        m_PVData.at(std::make_pair(Side::Back, PVM::EQE)).addProperty(m_Wavelength, backSide.EQE);
-        m_PVData.at(std::make_pair(Side::Back, PVM::VOC)).addProperty(m_Wavelength, backSide.VOC);
-        m_PVData.at(std::make_pair(Side::Back, PVM::FF)).addProperty(m_Wavelength, backSide.FF);
-    }
-
-    PhotovoltaicSampleData::PhotovoltaicSampleData(
-      const CSpectralSampleData & spectralSampleData,
-      const std::vector<PVMeasurementRow> & pvMeasurements) :
-        PhotovoltaicSampleData(spectralSampleData)
-    {
-        for(const auto & measurement : pvMeasurements)
+        const auto spectralWl{getWavelengths()};
+        for(const auto side : FenestrationCommon::EnumSide())
         {
-            addRecord(measurement);
-        }
-
-        const std::vector<double> spectralWl{getWavelengths()};
-        const std::vector<double> pvWl{
-          m_PVData.at(std::make_pair(Side::Front, PVM::EQE)).getXArray()};
-
-        if(spectralWl.size() != pvWl.size())
-        {
-            throw std::runtime_error("Photovoltaic measurements do not have same amount of data as "
-                                     "specular measurements.");
-        }
-
-        // Need to check if wavelengths are matching too
-        bool wavelengthsMatch{true};
-
-        for(auto i = 0u; i < spectralWl.size(); ++i)
-        {
-            if(spectralWl[i] != pvWl[i])
+            const auto eqeWavelengths{m_EQE.at(side).getXArray()};
+            if(spectralWl.size() != eqeWavelengths.size())
             {
-                wavelengthsMatch = false;
-                break;
+                throw std::runtime_error("Measured spectral data do not have same amount of data "
+                                         "as provided eqe values for the photovoltaic.");
             }
-        }
-
-        if(!wavelengthsMatch)
-        {
-            throw std::runtime_error(
-              "Wavelengths in spectral and photovoltaic measurements do not match.");
-        }
-    }
-
-    void PhotovoltaicSampleData::addRecord(const PVMeasurementRow & pvRow)
-    {
-        addRecord(pvRow.wavelength, pvRow.front, pvRow.back);
-    }
-
-    void PhotovoltaicSampleData::interpolate(const std::vector<double> & t_Wavelengths)
-    {
-        CSpectralSampleData::interpolate(t_Wavelengths);
-        for(const auto & side : EnumSide())
-        {
-            for(const auto & pvm : EnumPVM())
+            for(size_t i = 0u; i < spectralWl.size(); ++i)
             {
-                m_PVData[std::make_pair(side, pvm)] =
-                  m_PVData.at(std::make_pair(side, pvm)).interpolate(t_Wavelengths);
+                if(spectralWl[i] != eqeWavelengths[i])
+                {
+                    throw std::runtime_error("Measured spectral wavelengths are not matching to "
+                                             "provided eqe photovoltaic wavelengths.");
+                }
             }
         }
     }
@@ -269,17 +202,13 @@ namespace SpectralAveraging
         CSpectralSampleData::cutExtraData(minLambda, maxLambda);
         for(const auto & side : EnumSide())
         {
-            for(const auto & pvm : EnumPVM())
-            {
-                m_PVData.at(std::make_pair(side, pvm)).cutExtraData(minLambda, maxLambda);
-            }
+            m_EQE.at(side).cutExtraData(minLambda, maxLambda);
         }
     }
 
-    FenestrationCommon::CSeries
-      PhotovoltaicSampleData::pvProperty(const FenestrationCommon::Side side, const PVM prop) const
+    CSeries PhotovoltaicSampleData::eqe(const Side side) const
     {
-        return m_PVData.at(std::make_pair(side, prop));
+        return m_EQE.at(side);
     }
 
 }   // namespace SpectralAveraging

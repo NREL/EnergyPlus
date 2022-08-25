@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -113,6 +113,7 @@ namespace PlantPipingSystemsManager {
     std::string const ObjName_HorizTrench("GroundHeatExchanger:HorizontalTrench");
     std::string const ObjName_ZoneCoupled_Slab("Site:GroundDomain:Slab");
     std::string const ObjName_ZoneCoupled_Basement("Site:GroundDomain:Basement");
+    constexpr std::array<std::string_view, static_cast<int>(SegmentFlow::Num)> flowDirectionNamesUC = {"INCREASINGZ", "DECREASINGZ"};
 
 #pragma clang diagnostic pop
 
@@ -138,7 +139,7 @@ namespace PlantPipingSystemsManager {
         state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
     }
 
-    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] int objectType, std::string objectName)
+    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] DataPlant::PlantEquipmentType objectType, const std::string &objectName)
     {
         // Process the input data for circuits if it hasn't been done already
         if (state.dataPlantPipingSysMgr->GetInputFlag) {
@@ -771,7 +772,7 @@ namespace PlantPipingSystemsManager {
 
             // Need to loop once to store the names ahead of time because calling the segment factory will override cAlphaArgs
             std::vector<std::string> circuitNamesToFind;
-            int const NumAlphasBeforePipeCircOne = 10;
+            int constexpr NumAlphasBeforePipeCircOne = 10;
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                 CurIndex = CircuitCtr + NumAlphasBeforePipeCircOne;
                 if (state.dataIPShortCut->lAlphaFieldBlanks(CurIndex)) {
@@ -1514,11 +1515,11 @@ namespace PlantPipingSystemsManager {
             thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                            state.dataIPShortCut->cAlphaArgs(2),
                                                                            ErrorsFound,
-                                                                           ObjName_Circuit,
+                                                                           DataLoopNode::ConnectionObjectType::PipingSystemUndergroundPipeCircuit,
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           DataLoopNode::ConnectionType::Inlet,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
@@ -1535,11 +1536,11 @@ namespace PlantPipingSystemsManager {
             thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(3),
                                                                             ErrorsFound,
-                                                                            ObjName_Circuit,
+                                                                            DataLoopNode::ConnectionObjectType::PipingSystemUndergroundPipeCircuit,
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            DataLoopNode::ConnectionType::Outlet,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
@@ -1573,7 +1574,7 @@ namespace PlantPipingSystemsManager {
 
             // Need to loop once to store the names ahead of time because calling the segment factory will override cAlphaArgs
             std::vector<std::string> segmentNamesToFind;
-            int const NumAlphasBeforeSegmentOne = 3;
+            int constexpr NumAlphasBeforeSegmentOne = 3;
             for (int ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 CurIndex = ThisCircuitPipeSegmentCounter + NumAlphasBeforeSegmentOne;
                 if (state.dataIPShortCut->lAlphaFieldBlanks(CurIndex)) {
@@ -1652,11 +1653,11 @@ namespace PlantPipingSystemsManager {
             thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                            thisCircuit.InletNodeName,
                                                                            ErrorsFound,
-                                                                           ObjName_HorizTrench,
+                                                                           DataLoopNode::ConnectionObjectType::GroundHeatExchangerHorizontalTrench,
                                                                            thisTrenchName,
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           DataLoopNode::ConnectionType::Inlet,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
@@ -1665,11 +1666,11 @@ namespace PlantPipingSystemsManager {
             thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             thisCircuit.OutletNodeName,
                                                                             ErrorsFound,
-                                                                            ObjName_HorizTrench,
+                                                                            DataLoopNode::ConnectionObjectType::GroundHeatExchangerHorizontalTrench,
                                                                             thisTrenchName,
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            DataLoopNode::ConnectionType::Outlet,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
@@ -1691,7 +1692,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    Segment *Segment::factory(EnergyPlusData &state, std::string segmentName)
+    Segment *Segment::factory(EnergyPlusData &state, const std::string &segmentName)
     {
         if (state.dataPlantPipingSysMgr->GetSegmentInputFlag) {
             bool errorsFound = false;
@@ -1711,7 +1712,7 @@ namespace PlantPipingSystemsManager {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    Circuit *Circuit::factory(EnergyPlusData &state, std::string circuitName, bool &errorsFound)
+    Circuit *Circuit::factory(EnergyPlusData &state, const std::string &circuitName, bool &errorsFound)
     {
         if (state.dataPlantPipingSysMgr->GetCircuitInputFlag) {
             ReadPipeCircuitInputs(state, errorsFound);
@@ -1778,23 +1779,18 @@ namespace PlantPipingSystemsManager {
             thisSegment.PipeLocation = PointF(state.dataIPShortCut->rNumericArgs(1), state.dataIPShortCut->rNumericArgs(2));
 
             // Read in the flow direction
-            {
-                auto const SELECT_CASE_var(stripped(state.dataIPShortCut->cAlphaArgs(2)));
-                if (SELECT_CASE_var == "INCREASINGZ") {
-                    thisSegment.FlowDirection = SegmentFlow::IncreasingZ;
-                } else if (SELECT_CASE_var == "DECREASINGZ") {
-                    thisSegment.FlowDirection = SegmentFlow::DecreasingZ;
-                } else {
-                    CurIndex = 2;
-                    IssueSevereInputFieldError(state,
-                                               RoutineName,
-                                               ObjName_Segment,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaFieldNames(CurIndex),
-                                               state.dataIPShortCut->cAlphaArgs(CurIndex),
-                                               "Invalid flow direction, use one of the available keys.",
-                                               ErrorsFound);
-                }
+            thisSegment.FlowDirection =
+                static_cast<SegmentFlow>(getEnumerationValue(flowDirectionNamesUC, stripped(state.dataIPShortCut->cAlphaArgs(2))));
+            if (thisSegment.FlowDirection == SegmentFlow::Invalid) {
+                CurIndex = 2;
+                IssueSevereInputFieldError(state,
+                                           RoutineName,
+                                           ObjName_Segment,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(CurIndex),
+                                           state.dataIPShortCut->cAlphaArgs(CurIndex),
+                                           "Invalid flow direction, use one of the available keys.",
+                                           ErrorsFound);
             }
 
             state.dataPlantPipingSysMgr->segments.push_back(thisSegment);
@@ -2106,36 +2102,24 @@ namespace PlantPipingSystemsManager {
         // Do any one-time initializations
         if (thisCircuit->NeedToFindOnPlantLoop) {
 
-            int TypeToLookFor;
+            DataPlant::PlantEquipmentType TypeToLookFor;
             if (thisCircuit->IsActuallyPartOfAHorizontalTrench) {
-                TypeToLookFor = DataPlant::TypeOf_GrndHtExchgHorizTrench;
+                TypeToLookFor = DataPlant::PlantEquipmentType::GrndHtExchgHorizTrench;
             } else {
-                TypeToLookFor = DataPlant::TypeOf_PipingSystemPipeCircuit;
+                TypeToLookFor = DataPlant::PlantEquipmentType::PipingSystemPipeCircuit;
             }
 
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    thisCircuit->Name,
-                                                    TypeToLookFor,
-                                                    thisCircuit->LoopNum,
-                                                    thisCircuit->LoopSideNum,
-                                                    thisCircuit->BranchNum,
-                                                    thisCircuit->CompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(state, thisCircuit->Name, TypeToLookFor, thisCircuit->plantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError(state, "PipingSystems:" + std::string{RoutineName} + ": Program terminated due to previous condition(s).");
             }
 
             // Once we find ourselves on the plant loop, we can do other things
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             thisCircuit->DesignMassFlowRate = thisCircuit->DesignVolumeFlowRate * rho;
             thisCircuit->NeedToFindOnPlantLoop = false;
@@ -2197,14 +2181,7 @@ namespace PlantPipingSystemsManager {
 
         // request design, set component flow will decide what to give us based on restrictions and flow lock status
         thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             thisCircuit->CurCircuitFlowRate,
-                                             InletNodeNum,
-                                             OutletNodeNum,
-                                             thisCircuit->LoopNum,
-                                             thisCircuit->LoopSideNum,
-                                             thisCircuit->BranchNum,
-                                             thisCircuit->CompNum);
+        PlantUtilities::SetComponentFlowRate(state, thisCircuit->CurCircuitFlowRate, InletNodeNum, OutletNodeNum, thisCircuit->plantLoc);
     }
 
     void Domain::UpdatePipingSystems(EnergyPlusData &state, Circuit *thisCircuit)
@@ -2503,7 +2480,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    bool Domain::CheckForOutOfRangeTemps()
+    bool Domain::CheckForOutOfRangeTemps() const
     {
 
         // FUNCTION INFORMATION:
@@ -2515,9 +2492,8 @@ namespace PlantPipingSystemsManager {
         Real64 const MaxLimit = this->SimControls.MaximumTemperatureLimit;
         Real64 const MinLimit = this->SimControls.MinimumTemperatureLimit;
 
-        auto const &Cells(this->Cells);
-        for (std::size_t i = 0, e = Cells.size(); i < e; ++i) {
-            double const Temperature(Cells[i].Temperature);
+        for (std::size_t i = 0, e = this->Cells.size(); i < e; ++i) {
+            double const Temperature(this->Cells[i].Temperature);
             if ((Temperature > MaxLimit) || (Temperature < MinLimit)) return true;
         }
         return false;
@@ -2534,15 +2510,12 @@ namespace PlantPipingSystemsManager {
 
         switch (direction) {
         case Direction::PositiveY:
-            return this->YNormalArea();
         case Direction::NegativeY:
             return this->YNormalArea();
         case Direction::PositiveX:
-            return this->XNormalArea();
         case Direction::NegativeX:
             return this->XNormalArea();
         case Direction::PositiveZ:
-            return this->ZNormalArea();
         case Direction::NegativeZ:
             return this->ZNormalArea();
         default:
@@ -2553,7 +2526,7 @@ namespace PlantPipingSystemsManager {
     }
 
     CartesianPipeCellInformation::CartesianPipeCellInformation(Real64 const GridCellWidth,
-                                                               RadialSizing const &PipeSizes,
+                                                               PlantPipingSystemsManager::RadialSizing const PipeSizes,
                                                                int const NumRadialNodes,
                                                                Real64 const CellDepth,
                                                                Real64 const InsulationThickness,
@@ -2760,7 +2733,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const BasementCellFraction(0.001); // the fraction of domain extent to use for the basement cells
+        Real64 constexpr BasementCellFraction(0.001); // the fraction of domain extent to use for the basement cells
         // actual dimension shouldn't matter for calculation purposes
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3384,7 +3357,7 @@ namespace PlantPipingSystemsManager {
                     RectangleF XYRectangle = RectangleF(CellXMinValue, CellYMinValue, CellWidth, CellHeight);
 
                     //'determine cell type
-                    CellType cellType = CellType::Unknown;
+                    CellType cellType = CellType::Invalid;
 
                     //'if this is a pipe node, some flags are needed
                     bool pipeCell = false;
@@ -3567,7 +3540,7 @@ namespace PlantPipingSystemsManager {
                     case CellType::BasementCutaway:
                         ++NumCutawayBasementCells;
                         break;
-                    case CellType::Unknown:
+                    case CellType::Invalid:
                         cellType = CellType::GeneralField;
                         // fallthrough
                     default:
@@ -3895,6 +3868,8 @@ namespace PlantPipingSystemsManager {
                     SegmentOutletCellY = segment->PipeCellCoordinates.Y;
                     SegmentOutletCellZ = 0;
                     break;
+                default:
+                    assert(false);
                 }
                 if (!CircuitInletCellSet) {
                     CircuitInletCellX = SegmentInletCellX;
@@ -3912,7 +3887,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    int Domain::getCellWidthsCount(RegionType const dir)
+    int Domain::getCellWidthsCount(RegionType const dir) const
     {
 
         // FUNCTION INFORMATION:
@@ -3933,7 +3908,7 @@ namespace PlantPipingSystemsManager {
         return 0;
     }
 
-    void Domain::getCellWidths(GridRegion &g, RegionType const direction)
+    void Domain::getCellWidths(GridRegion &g, RegionType const direction) const
     {
 
         // FUNCTION INFORMATION:
@@ -4188,7 +4163,7 @@ namespace PlantPipingSystemsManager {
                     case CellType::BasementCutaway:
                         // it's ok to not simulate this one
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -4246,16 +4221,16 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const AirDensity(1.22521);   // '[kg/m3]
-        Real64 const AirSpecificHeat(1003); // '[J/kg-K]
+        Real64 constexpr AirDensity(1.22521);   // '[kg/m3]
+        Real64 constexpr AirSpecificHeat(1003); // '[J/kg-K]
         // evapotranspiration parameters
-        Real64 const MeanSolarConstant(0.08196); // 1367 [W/m2], entered in [MJ/m2-minute]
-        Real64 const A_s(0.25);                  // ?
-        Real64 const B_s(0.5);                   // ?
-        Real64 const Absor_Corrected(0.77);
+        Real64 constexpr MeanSolarConstant(0.08196); // 1367 [W/m2], entered in [MJ/m2-minute]
+        Real64 constexpr A_s(0.25);                  // ?
+        Real64 constexpr B_s(0.5);                   // ?
+        Real64 constexpr Absor_Corrected(0.77);
         Real64 const Convert_Wm2_To_MJhrmin(3600.0 / 1000000.0);
         Real64 const Convert_MJhrmin_To_Wm2(1.0 / Convert_Wm2_To_MJhrmin);
-        Real64 const Rho_water(998.0); // [kg/m3]
+        Real64 constexpr Rho_water(998.0); // [kg/m3]
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 NeighborTemp = 0.0;
@@ -4786,7 +4761,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const BigNumber(10000.0);
+        Real64 constexpr BigNumber(10000.0);
 
         // First the wall
         this->BasementWallTemp = this->GetAverageTempByType(state, CellType::BasementWall);
@@ -4832,7 +4807,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const BigNumber(10000.0);
+        Real64 constexpr BigNumber(10000.0);
 
         this->ZoneCoupledSurfaceTemp = this->GetAverageTempByType(state, CellType::ZoneGroundInterface);
         int OSCMIndex = this->ZoneCoupledOSCMIndex;
@@ -4845,7 +4820,7 @@ namespace PlantPipingSystemsManager {
         this->ResetHeatFluxFlag = true;
     }
 
-    Real64 Domain::GetAverageTempByType(EnergyPlusData &state, CellType const cellType)
+    Real64 Domain::GetAverageTempByType(EnergyPlusData &state, CellType const cellType) const
     {
 
         // FUNCTION INFORMATION:
@@ -4905,6 +4880,8 @@ namespace PlantPipingSystemsManager {
         case Direction::PositiveZ:
             distance = (cell.depth() / 2.0);
             break;
+        default:
+            assert(false);
         }
 
         resistance = (distance / 2.0) / (cell.Properties.Conductivity * cell.normalArea(direction));
@@ -4937,7 +4914,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        Real64 const StagnantFluidConvCoeff(200.0);
+        Real64 constexpr StagnantFluidConvCoeff(200.0);
 
         // Setup circuit flow conditions -- convection coefficient
         int const CellX = thisCircuit->CircuitInletCell.X;
@@ -5581,7 +5558,7 @@ namespace PlantPipingSystemsManager {
                         break;
                     case CellType::BasementCutaway:
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -5689,7 +5666,7 @@ namespace PlantPipingSystemsManager {
                         break;
                     case CellType::BasementCutaway:
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -5722,24 +5699,24 @@ namespace PlantPipingSystemsManager {
         // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
         // but need to verify the value of inlet temperature during warm up, etc.
         FluidCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                         state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                         state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                          thisCircuit->InletTemperature,
-                                                         state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                         state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
         FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                         state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                         state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                          thisCircuit->InletTemperature,
-                                                         state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                         state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
         FluidConductivity = FluidProperties::GetConductivityGlycol(state,
-                                                                   state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                                    thisCircuit->InletTemperature,
-                                                                   state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
         FluidViscosity = FluidProperties::GetViscosityGlycol(state,
-                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                              thisCircuit->InletTemperature,
-                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                              RoutineName);
 
         // Doesn't anyone care about poor Ludwig Prandtl?
@@ -5858,13 +5835,13 @@ namespace PlantPipingSystemsManager {
         Real64 const Theta_ice = Theta_liq;
 
         //'Cp (freezing) calculations
-        Real64 const rho_ice = 917.0;  //'Kg / m3
-        Real64 const rho_liq = 1000.0; //'kg / m3
+        Real64 constexpr rho_ice = 917.0;  //'Kg / m3
+        Real64 constexpr rho_liq = 1000.0; //'kg / m3
 
         //'from( " An improved model for predicting soil thermal conductivity from water content at room temperature, Fig 4" )
-        Real64 const CP_liq = 4180.0;    //'J / KgK
-        Real64 const CP_ice = 2066.0;    //'J / KgK
-        Real64 const Lat_fus = 334000.0; //'J / Kg
+        Real64 constexpr CP_liq = 4180.0;    //'J / KgK
+        Real64 constexpr CP_ice = 2066.0;    //'J / KgK
+        Real64 constexpr Lat_fus = 334000.0; //'J / Kg
         Real64 const Cp_transient = Lat_fus / 0.4 + (0.5 * CP_ice - (CP_liq + CP_ice) / 2.0 * 0.1) / 0.4;
 
         //'from( " Numerical and experimental investigation of melting and freezing processes in phase change material storage" )
@@ -5875,7 +5852,7 @@ namespace PlantPipingSystemsManager {
         this->Moisture.rhoCP_soil_ice = this->Moisture.rhoCp_soil_liq_1 * (1.0 - Theta_sat) + rho_ice * CP_ice * Theta_ice; //'!J / m3K
     }
 
-    void Domain::EvaluateSoilRhoCp(Real64 const CellTemp, Real64 &rhoCp)
+    void Domain::EvaluateSoilRhoCp(Real64 const CellTemp, Real64 &rhoCp) const
     {
 
         // SUBROUTINE INFORMATION:
@@ -5885,10 +5862,10 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         //'set some temperatures here for generalization -- these could be set in the input file
-        Real64 const frzAllIce = -0.5;
-        Real64 const frzIceTrans = -0.4;
-        Real64 const frzLiqTrans = -0.1;
-        Real64 const frzAllLiq = 0.0;
+        Real64 constexpr frzAllIce = -0.5;
+        Real64 constexpr frzIceTrans = -0.4;
+        Real64 constexpr frzLiqTrans = -0.1;
+        Real64 constexpr frzAllLiq = 0.0;
 
         //'calculate this cell's new Cp value based on the cell temperature
         if (CellTemp <= frzAllIce) { // totally frozen
@@ -5906,7 +5883,7 @@ namespace PlantPipingSystemsManager {
         }
     }
 
-    void CartesianCell::EvaluateNeighborCoordinates(Direction const CurDirection, int &NX, int &NY, int &NZ)
+    void CartesianCell::EvaluateNeighborCoordinates(Direction const CurDirection, int &NX, int &NY, int &NZ) const
     {
 
         // SUBROUTINE INFORMATION:

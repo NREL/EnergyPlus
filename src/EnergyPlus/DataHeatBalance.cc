@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -93,39 +94,6 @@ using DataSurfaces::MaxSlatAngs;
 using namespace DataVectorTypes;
 using DataBSDFWindow::BSDFLayerAbsorpStruct;
 using DataBSDFWindow::BSDFWindowInputStruct;
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsCon(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {2.873e-3, 2.285e-3, 9.443e-4, 4.538e-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0,
-         0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
-        {3, 10})); // Gas conductivity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsVis(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {3.723e-6, 3.379e-6, 2.213e-6, 1.069e-6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0,
-         0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
-        {3, 10})); // Gas viscosity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsCp(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.2324e-2, 0.0, 0.0, 0.0, 0.0,
-         0.0,      0.0,     0.0,     0.0,     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,       0.0, 0.0, 0.0, 0.0},
-        {3, 10})); // Gas specific heat coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array1D<Real64> const GasWght(10, {28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas molecular weights for gases in a mixture
-
-// Gas specific heat ratios.  Used for gasses in low pressure
-Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
 // Functions
 
@@ -313,12 +281,14 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         case DataHeatBalance::MaterialGroup::GapEquivalentLayer:
             state.dataConstruction->Construct(ConstrNum).TypeIsWindow = true;
             break;
-        case DataHeatBalance::MaterialGroup::Unassigned:
+        case DataHeatBalance::MaterialGroup::Invalid:
         case DataHeatBalance::MaterialGroup::Air:
         case DataHeatBalance::MaterialGroup::RegularMaterial:
         case DataHeatBalance::MaterialGroup::EcoRoof:
         case DataHeatBalance::MaterialGroup::IRTMaterial:
             break; // Purposely not doing anything
+        default:
+            assert(false);
         }
     }
 
@@ -1003,7 +973,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // without Theta and Phi.
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const Small(1.E-9); // Small Number used to approximate zero
+    Real64 constexpr Small(1.E-9); // Small Number used to approximate zero
 
     // FUNCTION PARAMETER DEFINITIONS:
     int ScNum;                        // Index to screen data
@@ -1274,23 +1244,28 @@ std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness const Roughn
     std::string cRoughness; // Character representation of Roughness
 
     // Select the correct Number for the associated ascii name for the roughness type
-    {
-        auto const SELECT_CASE_var(Roughness);
-        if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::VeryRough) {
-            cRoughness = "VeryRough";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::Rough) {
-            cRoughness = "Rough";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::MediumRough) {
-            cRoughness = "MediumRough";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::MediumSmooth) {
-            cRoughness = "MediumSmooth";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::Smooth) {
-            cRoughness = "Smooth";
-        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::VerySmooth) {
-            cRoughness = "VerySmooth";
-        } else {
-            cRoughness = "";
-        }
+    switch (Roughness) {
+    case DataSurfaces::SurfaceRoughness::VeryRough: {
+        cRoughness = "VeryRough";
+    } break;
+    case DataSurfaces::SurfaceRoughness::Rough: {
+        cRoughness = "Rough";
+    } break;
+    case DataSurfaces::SurfaceRoughness::MediumRough: {
+        cRoughness = "MediumRough";
+    } break;
+    case DataSurfaces::SurfaceRoughness::MediumSmooth: {
+        cRoughness = "MediumSmooth";
+    } break;
+    case DataSurfaces::SurfaceRoughness::Smooth: {
+        cRoughness = "Smooth";
+    } break;
+    case DataSurfaces::SurfaceRoughness::VerySmooth: {
+        cRoughness = "VerySmooth";
+    } break;
+    default: {
+        cRoughness = "";
+    } break;
     }
 
     return cRoughness;
@@ -1335,50 +1310,54 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
 
     isValid = true;
     // exterior conditions
-    {
-        auto const SELECT_CASE_var(state.dataSurface->Surface(numSurf).ExtBoundCond);
-        if (SELECT_CASE_var == ExternalEnvironment) {
-            outsideFilm = 0.0299387; // All exterior conditions
-        } else if ((SELECT_CASE_var == Ground) || (SELECT_CASE_var == GroundFCfactorMethod)) {
-            outsideFilm = 0.0; // No outside film when underground
-        } else {
-            if (state.dataSurface->Surface(numSurf).ExtBoundCond > 0) { // interzone partition
-                // use companion surface in adjacent zone
-                {
-                    auto const SELECT_CASE_var1(state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class);
-                    if ((SELECT_CASE_var1 == SurfaceClass::Wall) ||
-                        (SELECT_CASE_var1 == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-                        outsideFilm = 0.1197548;
-                    } else if (SELECT_CASE_var1 ==
-                               SurfaceClass::Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-                        outsideFilm = 0.1620212;
-                    } else if (SELECT_CASE_var1 ==
-                               SurfaceClass::Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-                        outsideFilm = 0.1074271;
-                    } else {
-                        outsideFilm = 0.0810106; // All semi-exterior surfaces
-                    }
-                }
-            } else {
+    switch (state.dataSurface->Surface(numSurf).ExtBoundCond) {
+    case ExternalEnvironment: {
+        outsideFilm = 0.0299387; // All exterior conditions
+    } break;
+    case Ground:
+    case GroundFCfactorMethod: {
+        outsideFilm = 0.0; // No outside film when underground
+    } break;
+    default: {
+        if (state.dataSurface->Surface(numSurf).ExtBoundCond > 0) { // interzone partition
+            // use companion surface in adjacent zone
+            switch (state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class) {
+            case SurfaceClass::Wall:
+            case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+                outsideFilm = 0.1197548;
+            } break;
+            case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+                outsideFilm = 0.1620212;
+            } break;
+            case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+                outsideFilm = 0.1074271;
+            } break;
+            default: {
                 outsideFilm = 0.0810106; // All semi-exterior surfaces
+            } break;
             }
+        } else {
+            outsideFilm = 0.0810106; // All semi-exterior surfaces
         }
+    } break;
     }
     // interior conditions
     if (state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction) > 0.0) {
-        {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(numSurf).Class);
-            if ((SELECT_CASE_var == SurfaceClass::Wall) ||
-                (SELECT_CASE_var == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-                insideFilm = 0.1197548;
-            } else if (SELECT_CASE_var == SurfaceClass::Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-                insideFilm = 0.1620212;
-            } else if (SELECT_CASE_var == SurfaceClass::Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-                insideFilm = 0.1074271;
-            } else {
-                insideFilm = 0.0;
-                outsideFilm = 0.0;
-            }
+        switch (state.dataSurface->Surface(numSurf).Class) {
+        case SurfaceClass::Wall:
+        case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+            insideFilm = 0.1197548;
+        } break;
+        case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+            insideFilm = 0.1620212;
+        } break;
+        case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+            insideFilm = 0.1074271;
+        } break;
+        default: {
+            insideFilm = 0.0;
+            outsideFilm = 0.0;
+        } break;
         }
         NominalUwithConvCoeffs =
             1.0 / (insideFilm + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction)) + outsideFilm);
@@ -1430,6 +1409,14 @@ void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state)
             }
         }
     }
+}
+
+void AllocateIntGains(EnergyPlusData &state)
+{
+    state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
+    state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
+    state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+    state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
 }
 
 } // namespace EnergyPlus::DataHeatBalance

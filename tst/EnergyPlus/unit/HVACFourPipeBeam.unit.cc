@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -224,18 +224,18 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 3;
     bool ErrorsFound = false;
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode(*state,
-                                                                                            "Zone 1 Node",
-                                                                                            ErrorsFound,
-                                                                                            "Zone",
-                                                                                            "BeamTest",
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::ZoneNode,
-                                                                                            NodeInputManager::compFluidStream::Primary,
-                                                                                            DataLoopNode::ObjectIsNotParent,
-                                                                                            "Test zone node");
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            "Zone 1 Node",
+                                            ErrorsFound,
+                                            DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                            "BeamTest",
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::ConnectionType::ZoneNode,
+                                            NodeInputManager::CompFluidStream::Primary,
+                                            DataLoopNode::ObjectIsNotParent,
+                                            "Test zone node");
 
-    state->dataDefineEquipment->NumAirDistUnits = 1;
     state->dataDefineEquipment->AirDistUnit.allocate(1);
     state->dataDefineEquipment->AirDistUnit(1).EquipName(1) =
         "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP
@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
                           "    YES,                     !- Do System Sizing Calculation",
                           "    YES,                     !- Do Plant Sizing Calculation",
                           "    Yes,                     !- Run Simulation for Sizing Periods",
-                          "    yes;                     !- Run Simulation for Weather File Run Periods",
+                          "    No;                      !- Run Simulation for Weather File Run Periods",
 
                           "    Building,",
                           "    Simple One Zone (Wireframe DXF),  !- Name",
@@ -1754,7 +1754,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool FirstHVACIteration = true;
 
     // PlantManager::InitializeLoops( FirstHVACIteration );
-    PlantUtilities::SetAllFlowLocks(*state, DataPlant::iFlowLock::Unlocked);
+    PlantUtilities::SetAllFlowLocks(*state, DataPlant::FlowLock::Unlocked);
     // first run with a sensible cooling load of 5000 W and cold supply air
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
@@ -3333,7 +3333,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
                           "    YES,                     !- Do System Sizing Calculation",
                           "    YES,                     !- Do Plant Sizing Calculation",
                           "    Yes,                     !- Run Simulation for Sizing Periods",
-                          "    yes;                     !- Run Simulation for Weather File Run Periods",
+                          "    No;                      !- Run Simulation for Weather File Run Periods",
 
                           "    Building,",
                           "    Simple One Zone (Wireframe DXF),  !- Name",
@@ -4830,7 +4830,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
     bool FirstHVACIteration = true;
 
     // PlantManager::InitializeLoops( FirstHVACIteration );
-    PlantUtilities::SetAllFlowLocks(*state, DataPlant::iFlowLock::Unlocked);
+    PlantUtilities::SetAllFlowLocks(*state, DataPlant::FlowLock::Unlocked);
     // next run with heating load and neutral supply air
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;

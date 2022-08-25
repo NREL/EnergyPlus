@@ -79,6 +79,11 @@ namespace Tarcog
             return m_FrontPorosity;
         }
 
+        bool CShadeOpenings::isOpen() const
+        {
+            return m_Abot > 0 || m_Atop > 0 || m_Aleft > 0 || m_Aright > 0 || m_Afront > 0;
+        }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////
         /// CIGUShadeLayer
         ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +115,11 @@ namespace Tarcog
         std::shared_ptr<CBaseLayer> CIGUShadeLayer::clone() const
         {
             return std::make_shared<CIGUShadeLayer>(*this);
+        }
+
+        bool CIGUShadeLayer::isPermeable() const
+        {
+            return m_ShadeOpenings->isOpen();
         }
 
         void CIGUShadeLayer::calculateConvectionOrConductionFlow()

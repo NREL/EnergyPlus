@@ -67,7 +67,7 @@ namespace Tarcog
             double m_IGUUvalue{0};
             double m_VT{1};
             double m_Tsol{0};
-            double m_HcExterior{0};
+            double m_HExterior{0};
 
             //! Exterior surface height is used to calculate exterior film coefficient.
             //! Since vision can be part of any construction, this variable is kept internally.

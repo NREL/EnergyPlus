@@ -542,6 +542,26 @@ Schedule:File,
   60;                 !- Minutes per Item
 \end{lstlisting}
 
+\paragraph{Field: Adjust Schedule for Daylight Savings}\label{adjust-schedule-for-daylight-savings-1}
+
+This field indicates whether or not to shift the schedule forward an hour during daylight savings time. If ``Yes" the schedule skips forward an hour in the CSV on the ``spring forward" day and repeats an hour on the ``fall back" day. If  ``No", the schedule is read and applied in standard time, without adjusting for daylight savings time (\textbf{\hyperref[runperiodcontroldaylightsavingtime]{RunPeriodControl:DaylightSavingTime}}). This indicator is defaulted to ``Yes" if no input is provided. 
+
+Here is an IDF example:
+
+\begin{lstlisting}
+	Schedule:File,
+	TestName,	!- Name
+	Any Number,	!- Schedule Type Limits Name
+	schedulefile.csv, !- File Name
+	2,		!- Column Number
+	1,		!- Rows to Skip at Top
+	8760,		!- Number of Hours of Data
+	Comma,		!- Column Separator
+	No,		!- Interpolate to Timestep
+	60,		!- Minutes per Item
+	No;		!- Adjust Schedule for Daylight Savings
+\end{lstlisting}
+
 \subsubsection{Outputs}\label{outputs-031}
 
 An optional report can be used to gain the values described in the previous Schedule objects. This is a condensed reporting that illustrates the full range of schedule values -- in the style of input: DaySchedule, WeekSchedule, Annual Schedule.

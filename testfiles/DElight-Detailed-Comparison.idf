@@ -18,7 +18,7 @@
 ! System:   Ideal Loads
 ! Plant:    None (simple ideal loads)
 
-  Version,9.6;
+  Version,22.2;
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -387,7 +387,7 @@
 
   Daylighting:Controls,
     DElight Zone,            !- Name
-    3i2eFc1ofBz80jvIMxrXvL,  !- Zone Name
+    3i2eFc1ofBz80jvIMxrXvL,  !- Zone or Space Name
     DElight,                 !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -400,10 +400,10 @@
     ,                        !- Maximum Allowable Discomfort Glare Index
     1.0,                     !- DElight Gridding Resolution {m2}
     RefPt 1,                 !- Daylighting Reference Point 1 Name
-    0.5,                     !- Fraction of Zone Controlled by Reference Point 1
+    0.5,                     !- Fraction of Lights Controlled by Reference Point 1
     500.,                    !- Illuminance Setpoint at Reference Point 1 {lux}
     RefPt 2,                 !- Daylighting Reference Point 2 Name
-    0.5,                     !- Fraction of Zone Controlled by Reference Point 2
+    0.5,                     !- Fraction of Lights Controlled by Reference Point 2
     500.;                    !- Illuminance Setpoint at Reference Point 2 {lux}
 
 !  Daylighting:DELight:ReferencePoint,
@@ -417,7 +417,7 @@
 
   Daylighting:ReferencePoint,
     RefPt 1,                 !- Name
-    3i2eFc1ofBz80jvIMxrXvL,  !- Zone Name
+    3i2eFc1ofBz80jvIMxrXvL,  !- Zone or Space Name
     2.309,                   !- X-Coordinate of Reference Point {m}
     1.4224,                  !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
@@ -433,14 +433,14 @@
 
   Daylighting:ReferencePoint,
     RefPt 2,                 !- Name
-    3i2eFc1ofBz80jvIMxrXvL,  !- Zone Name
+    3i2eFc1ofBz80jvIMxrXvL,  !- Zone or Space Name
     2.309,                   !- X-Coordinate of Reference Point {m}
     2.8448,                  !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
 
   Lights,
     3i2eFc1ofBz80jvIMxrXvL Lights 1,  !- Name
-    3i2eFc1ofBz80jvIMxrXvL,  !- Zone or ZoneList Name
+    3i2eFc1ofBz80jvIMxrXvL,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   3,            !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1464.375,                !- Lighting Level {W}
@@ -454,7 +454,7 @@
 
   Daylighting:Controls,
     1fNY1vx3jAvesY6geZTgIV_DaylCtrl,  !- Name
-    1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
+    1fNY1vx3jAvesY6geZTgIV,  !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -467,29 +467,29 @@
     50.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     1fNY1vx3jAvesY6geZTgIV_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.5,                     !- Fraction of Zone Controlled by Reference Point 1
+    0.5,                     !- Fraction of Lights Controlled by Reference Point 1
     500.,                    !- Illuminance Setpoint at Reference Point 1 {lux}
     1fNY1vx3jAvesY6geZTgIV_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.5,                     !- Fraction of Zone Controlled by Reference Point 2
+    0.5,                     !- Fraction of Lights Controlled by Reference Point 2
     500.;                    !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:ReferencePoint,
     1fNY1vx3jAvesY6geZTgIV_DaylRefPt1,  !- Name
-    1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
+    1fNY1vx3jAvesY6geZTgIV,  !- Zone or Space Name
     6.827,                   !- X-Coordinate of Reference Point {m}
     1.4224,                  !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     1fNY1vx3jAvesY6geZTgIV_DaylRefPt2,  !- Name
-    1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
+    1fNY1vx3jAvesY6geZTgIV,  !- Zone or Space Name
     6.827,                   !- X-Coordinate of Reference Point {m}
     2.8448,                  !- Y-Coordinate of Reference Point {m}
     0.9;                     !- Z-Coordinate of Reference Point {m}
 
   Lights,
     1fNY1vx3jAvesY6geZTgIV Lights 1,  !- Name
-    1fNY1vx3jAvesY6geZTgIV,  !- Zone or ZoneList Name
+    1fNY1vx3jAvesY6geZTgIV,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   3,            !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1464.375,                !- Lighting Level {W}

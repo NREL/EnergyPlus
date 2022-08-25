@@ -84,7 +84,7 @@
 ! Utility Tariffs:
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.6;
+  Version,22.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -858,15 +858,15 @@
     Zn001:IntM001,           !- Name
     Medium Partitions,       !- Construction Name
     Full Building - 1 Zone,  !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    956.9014;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    956.9014;                !- Surface Area {m2}
 
   InternalMass,
     Zn001:IntM002,           !- Name
     Medium/Heavy Partitions, !- Construction Name
     Full Building - 1 Zone,  !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    1757.725;                !- Extended Field
+    ,                        !- Space or SpaceList Name
+    1757.725;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPE ===========
 ! Not limited
@@ -1029,12 +1029,12 @@
 
   People,
     Full Building - 1 Zone_People_1,  !- Name
-    Full Building - 1 Zone,  !- Zone or ZoneList Name
+    Full Building - 1 Zone,  !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy,        !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     205.0000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.7000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Lvl   1;        !- Activity Level Schedule Name
@@ -1043,7 +1043,7 @@
 
   Lights,
     Full Building - 1 Zone_Lights_1,  !- Name
-    Full Building - 1 Zone,  !- Zone or ZoneList Name
+    Full Building - 1 Zone,  !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting and Receptacles,  !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     26360,                   !- Lighting Level {W}
@@ -1059,7 +1059,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Full Building - 1 Zone_Infil_1,  !- Name
-    Full Building - 1 Zone,  !- Zone or ZoneList Name
+    Full Building - 1 Zone,  !- Zone or ZoneList or Space or SpaceList Name
     On,                      !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.75,                    !- Design Flow Rate {m3/s}

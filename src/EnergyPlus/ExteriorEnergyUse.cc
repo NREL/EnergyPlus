@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -309,7 +309,7 @@ namespace ExteriorEnergyUse {
                                                 state.dataIPShortCut->cAlphaFieldNames(2),
                                                 state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType ==
-                ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
+                ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(2) +
@@ -550,7 +550,7 @@ namespace ExteriorEnergyUse {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::Unknown;
+        FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::Invalid;
         FuelTypeString = "";
 
         // Select the correct Number for the associated ascii name for the fuel type

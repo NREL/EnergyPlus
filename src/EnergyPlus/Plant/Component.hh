@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,43 +61,143 @@ struct EnergyPlusData;
 
 namespace DataPlant {
 
+    static constexpr std::array<bool, static_cast<int>(PlantEquipmentType::Num)> PlantEquipmentTypeIsPump = {
+        false, //	"Boiler:HotWater"
+        false, //	"Boiler:Steam"
+        false, //	"Chiller:Absorption"
+        false, //	"Chiller:Absorption:Indirect"
+        false, //	"Chiller:CombustionTurbine"
+        false, //	"Chiller:ConstantCOP"
+        false, //	"ChillerHeater:Absorption:DirectFired"
+        false, //	"Chiller:Electric"
+        false, //	"Chiller:Electric:EIR"
+        false, //	"Chiller:Electric:ReformulatedEIR"
+        false, //	"Chiller:Electric:ASHRAE205"
+        false, //	"Chiller:EngineDriven"
+        false, //	"CoolingTower:SingleSpeed"
+        false, //	"CoolingTower:TwoSpeed"
+        false, //	"CoolingTower:VariableSpeed"
+        false, //	"Generator:Fuelcell:ExhaustGastoWaterHeatExchanger"
+        false, //	"WaterHeater:HeatPump:PumpedCondenser"
+        false, //	"Heatpump:WatertoWater:Equationfit:Cooling"
+        false, //	"Heatpump:WatertoWater:Equationfit:Heating"
+        false, //	"Heatpump:WatertoWater:ParameterEstimation:Cooling"
+        false, //	"Heatpump:WatertoWater:ParameterEstimation:Heating"
+        false, //	"Pipe:Adiabatic"
+        false, //	"Pipe:Adiabatic:Steam"
+        false, //	"Pipe:Outdoor"
+        false, //	"Pipe:Indoor"
+        false, //	"Pipe:Underground"
+        false, //	"DistrictCooling"
+        false, //	"DistrictHeating"
+        false, //	"ThermalStorage:Ice:Detailed"
+        false, //	"ThermalStorage:Ice:Simple"
+        false, //	"TemperingValve"
+        false, //	"WaterHeater:Mixed"
+        false, //	"WaterHeater:Stratified"
+        true,  //	"Pump:VariableSpeed"
+        true,  //	"Pump:ConstantSpeed"
+        true,  //	"Pump:VariableSpeed:Condensate"
+        true,  //	"HeaderedPumps:VariableSpeed"
+        true,  //	"HeaderedPumps:ConstantSpeed"
+        false, //	"WaterUse:Connections"
+        false, //	"Coil:Cooling:Water"
+        false, //	"Coil:Cooling:Water:DetailedGeometry"
+        false, //	"Coil:Heating:Water"
+        false, //	"Coil:Heating:Steam"
+        false, //	"Solarcollector:Flatplate:Water"
+        false, //	"LoadProfile:Plant"
+        false, //	"GroundHeatExchanger:System"
+        false, //	"GroundHeatExchanger:Surface"
+        false, //	"GroundHeatExchanger:Pond"
+        false, //	"Generator:Microturbine"
+        false, //	"Generator:InternalCombustionEngine"
+        false, //	"Generator:CombustionTurbine"
+        false, //	"Generator:Microchp"
+        false, //	"Generator:Fuelcell:StackCooler"
+        false, //	"FluidCooler:SingleSpeed"
+        false, //	"FluidCooler:TwoSpeed"
+        false, //	"EvaporativeFluidCooler:SingleSpeed"
+        false, //	"EvaporativeFluidCooler:TwoSpeed"
+        false, //	"ThermalStorage:ChilledWater:Mixed"
+        false, //	"ThermalStorage:ChilledWater:Stratified"
+        false, //	"SolarCollector:FlatPlate:PhotovoltaicThermal"
+        false, //	"ZoneHVAC:Baseboard:Convective:Water"
+        false, //	"ZoneHVAC:Baseboard:RadiantConvective:Steam"
+        false, //	"ZoneHVAC:Baseboard:RadiantConvective:Water"
+        false, //	"ZoneHVAC:LowTemperatureRadiant:VariableFlow"
+        false, //	"ZoneHVAC:LowTemperatureRadiant:ConstantFlow"
+        false, //	"AirTerminal:SingleDuct:ConstantVolume:CooledBeam"
+        false, //	"Coil:Heating:WaterToAirHeatPump:EquationFit"
+        false, //	"Coil:Cooling:WaterToAirHeatPump:EquationFit"
+        false, //	"Coil:Heating:WaterToAirHeatPump:ParameterEstimation"
+        false, //	"Coil:Cooling:WaterToAirHeatPump:ParameterEstimation"
+        false, //	"Refrigeration:Condenser:WaterCooled"
+        false, //	"Refrigeration:CompressorRack"
+        false, //	"AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed"
+        false, //	"ChillerHeater:Absorption:DoubleEffect"
+        false, //	"PipingSystem:Underground:PipeCircuit"
+        false, //	"SolarCollector:IntegralCollectorStorage"
+        false, //	"Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit"
+        false, //	"Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"
+        false, //	"PlantComponent:UserDefined"
+        false, //	"Coil:UserDefined"
+        false, //	"ZoneHVAC:ForcedAir:UserDefined"
+        false, //	"AirTerminal:SingleDuct:UserDefined"
+        false, //	"AirConditioner:VariableRefrigerantFlow"
+        false, //	"GroundHeatExchanger:HorizontalTrench"
+        false, //	"HeatExchanger:FluidToFluid"
+        false, //	"PlantComponent:TemperatureSource"
+        false, //	"CentralHeatPumpSystem"
+        false, //	"AirLoopHVAC:UnitarySystem"
+        false, //	"Coil:Cooling:DX:SingleSpeed:ThermalStorage"
+        false, //	"CoolingTower:VariableSpeed:Merkel"
+        false, //	"SwimmingPool:Indoor"
+        false, //	"GroundHeatExchanger:Slinky"
+        false, //	"WaterHeater:HeatPump:WrappedCondenser"
+        false, //	"AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam"
+        false, //	"ZoneHVAC:CoolingPanel:RadiantConvective:Water"
+        false, //	"HeatPump:PlantLoop:EIR:Cooling"
+        false  //	"HeatPump:PlantLoop:EIR:Heating"
+    };
+
     struct CompData
     {
         // Members
-        std::string TypeOf;                               // The 'keyWord' identifying  component type
-        int TypeOf_Num;                                   // Reference the "TypeOf" parameters in DataPlant
-        std::string Name;                                 // Component name
-        int CompNum;                                      // Component ID number
-        DataBranchAirLoopPlant::ControlTypeEnum FlowCtrl; // flow control for splitter/mixer (ACTIVE/PASSIVE/BYPASS)
-        LoopFlowStatus FlowPriority;                      // status for overall loop flow determination
-        bool ON;                                          // TRUE = designated component or operation scheme available
-        bool Available;                                   // TRUE = designated component or operation scheme available
-        std::string NodeNameIn;                           // Component inlet node name
-        std::string NodeNameOut;                          // Component outlet node name
-        int NodeNumIn;                                    // Component inlet node number
-        int NodeNumOut;                                   // Component outlet node number
-        Real64 MyLoad;                                    // Distributed Load
-        Real64 MaxLoad;                                   // Maximum load
-        Real64 MinLoad;                                   // Minimum Load
-        Real64 OptLoad;                                   // Optimal Load
-        Real64 SizFac;                                    // Sizing Fraction
-        int CurOpSchemeType;                              // updated pointer to
+        std::string TypeOf;                           // The 'keyWord' identifying  component type
+        DataPlant::PlantEquipmentType Type;           // Reference the "TypeOf" parameters in DataPlant
+        std::string Name;                             // Component name
+        int CompNum;                                  // Component ID number
+        DataBranchAirLoopPlant::ControlType FlowCtrl; // flow control for splitter/mixer (ACTIVE/PASSIVE/BYPASS)
+        LoopFlowStatus FlowPriority;                  // status for overall loop flow determination
+        bool ON;                                      // TRUE = designated component or operation scheme available
+        bool Available;                               // TRUE = designated component or operation scheme available
+        std::string NodeNameIn;                       // Component inlet node name
+        std::string NodeNameOut;                      // Component outlet node name
+        int NodeNumIn;                                // Component inlet node number
+        int NodeNumOut;                               // Component outlet node number
+        Real64 MyLoad;                                // Distributed Load
+        Real64 MaxLoad;                               // Maximum load
+        Real64 MinLoad;                               // Minimum Load
+        Real64 OptLoad;                               // Optimal Load
+        Real64 SizFac;                                // Sizing Fraction
+        DataPlant::OpScheme CurOpSchemeType;          // updated pointer to
         // Plant()%OpScheme(CurOpSchemeType)...
         int NumOpSchemes;      // number of schemes held in the pointer array
         int CurCompLevelOpNum; // pointer to the OpScheme array defined next
         // PlantLoop()%LoopSide()%Branch()%Comp()%OpScheme(curOpSchemePtr)
-        Array1D<OpSchemePtrData> OpScheme;                 // Pointers to component on lists
-        Real64 EquipDemand;                                // Component load request based on inlet temp and outlet SP
-        bool EMSLoadOverrideOn;                            // EMS is calling to override load dispatched to component
-        Real64 EMSLoadOverrideValue;                       // EMS value to use for load when overridden [W] always positive.
-        DataPlant::HowMet HowLoadServed;                   // nature of component in terms of how it can meet load
-        Real64 MinOutletTemp;                              // Component exit lower limit temperature
-        Real64 MaxOutletTemp;                              // Component exit upper limit temperature
-        bool FreeCoolCntrlShutDown;                        // true if component was shut down because of free cooling
-        Real64 FreeCoolCntrlMinCntrlTemp;                  // current control temp value for free cooling controls
-        DataPlant::iFreeCoolControlMode FreeCoolCntrlMode; // type of sensor used for free cooling controls
-        int FreeCoolCntrlNodeNum;                          // chiller condenser inlet node number for free cooling controls
-        int IndexInLoopSidePumps;                          // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
+        Array1D<OpSchemePtrData> OpScheme;                // Pointers to component on lists
+        Real64 EquipDemand;                               // Component load request based on inlet temp and outlet SP
+        bool EMSLoadOverrideOn;                           // EMS is calling to override load dispatched to component
+        Real64 EMSLoadOverrideValue;                      // EMS value to use for load when overridden [W] always positive.
+        DataPlant::HowMet HowLoadServed;                  // nature of component in terms of how it can meet load
+        Real64 MinOutletTemp;                             // Component exit lower limit temperature
+        Real64 MaxOutletTemp;                             // Component exit upper limit temperature
+        bool FreeCoolCntrlShutDown;                       // true if component was shut down because of free cooling
+        Real64 FreeCoolCntrlMinCntrlTemp;                 // current control temp value for free cooling controls
+        DataPlant::FreeCoolControlMode FreeCoolCntrlMode; // type of sensor used for free cooling controls
+        int FreeCoolCntrlNodeNum;                         // chiller condenser inlet node number for free cooling controls
+        int IndexInLoopSidePumps;                         // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
         Real64 TempDesCondIn;
         Real64 TempDesEvapOut;
         PlantComponent *compPtr;
@@ -105,12 +205,13 @@ namespace DataPlant {
 
         // Default Constructor
         CompData()
-            : TypeOf_Num(0), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), FlowPriority(LoopFlowStatus::Unknown), ON(false),
-              Available(false), NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0), MinLoad(0.0), OptLoad(0.0), SizFac(0.0),
-              CurOpSchemeType(UnknownStatusOpSchemeType), NumOpSchemes(0), CurCompLevelOpNum(0), EquipDemand(0.0), EMSLoadOverrideOn(false),
-              EMSLoadOverrideValue(0.0), HowLoadServed(DataPlant::HowMet::Unknown), MinOutletTemp(0.0), MaxOutletTemp(0.0),
-              FreeCoolCntrlShutDown(false), FreeCoolCntrlMinCntrlTemp(0.0), FreeCoolCntrlMode(DataPlant::iFreeCoolControlMode::Unassigned),
-              FreeCoolCntrlNodeNum(0), IndexInLoopSidePumps(0), TempDesCondIn(0.0), TempDesEvapOut(0.0), compPtr(nullptr)
+            : Type(DataPlant::PlantEquipmentType::Invalid), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlType::Invalid),
+              FlowPriority(LoopFlowStatus::Invalid), ON(false), Available(false), NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0),
+              MinLoad(0.0), OptLoad(0.0), SizFac(0.0), CurOpSchemeType(DataPlant::OpScheme::Invalid), NumOpSchemes(0), CurCompLevelOpNum(0),
+              EquipDemand(0.0), EMSLoadOverrideOn(false), EMSLoadOverrideValue(0.0), HowLoadServed(DataPlant::HowMet::Invalid), MinOutletTemp(0.0),
+              MaxOutletTemp(0.0), FreeCoolCntrlShutDown(false), FreeCoolCntrlMinCntrlTemp(0.0),
+              FreeCoolCntrlMode(DataPlant::FreeCoolControlMode::Invalid), FreeCoolCntrlNodeNum(0), IndexInLoopSidePumps(0), TempDesCondIn(0.0),
+              TempDesEvapOut(0.0), compPtr(nullptr)
         {
         }
 
@@ -125,9 +226,9 @@ namespace DataPlant {
 
         void simulate(EnergyPlusData &state, bool FirstHVACIteration);
 
-        bool isPump();
-
         void oneTimeInit(EnergyPlusData &state) const;
+
+        static CompData &getPlantComponent(EnergyPlusData &state, PlantLocation const &plantLoc);
     };
 } // namespace DataPlant
 } // namespace EnergyPlus

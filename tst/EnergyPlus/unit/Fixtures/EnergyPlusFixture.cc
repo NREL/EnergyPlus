@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -293,7 +293,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 {
     bool success = true;
     auto &inputProcessor = state->dataInputProcessing->inputProcessor;
-    inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
+    inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema(), success);
 
     // Add common objects that will trigger a warning if not present
     if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {

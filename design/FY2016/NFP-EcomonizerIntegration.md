@@ -1051,7 +1051,7 @@ In order to perform single mode operation, an optional argument will be added in
 		int & CompIndex,
 		Optional_int_const SpeedNum, // Speed number for multispeed cooling coil onlyn
 		Optional_int_const FanOpMode, // Fan operation mode
-		Optional_int_const CompOp, // Compressor on/off; 1=on, 0=off
+		Optional_int_const CompressorOp, // Compressor on/off; 1=on, 0=off
 
 <span style="color:red;">Optional_bool_const SingleModeFlag // Single mode operation </span>
 
@@ -1066,7 +1066,7 @@ The additional argument will be carried by two sub-functions: CalcMultiSpeedDXCo
 		Real64 const CycRatio, // cycling part load ratio
 		int const SpeedNum, // Speed number
 		int const FanOpMode, // Sets fan control to CycFanCycCoil or ContFanCycCoil
-		int const CompOp, // Compressor on/off; 1=on, 0=off
+		int const CompressorOp, // Compressor on/off; 1=on, 0=off
 <span style="color:red;">Optional_bool_const SingleModeFlag // Single mode operation </span>
 
 	)
@@ -1121,7 +1121,7 @@ One more dimension is added in the Par variable to have information on single mo
 
 Add an optional argument to represent a single mode operation
 
-		CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutput, LatOutput, HXUnitOn, _, _, CompOp, SingleModeFlag );
+		CalcUnitarySystemToLoad( UnitarySysNum, AirLoopNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutput, LatOutput, HXUnitOn, _, _, CompressorOp, SingleModeFlag );
 
 The optional argument of SingleModeFlag will be passed into the following two functions: CalcUnitaryCoolingSystem and CalcUnitaryHeatingSystem. The optional argument is only valid for two type of coils: CoilDX_MultiSpeedCooling and CoilDX_MultiSpeedHeating. When these two functions call a function of SimDXCoilMultiSpeed in the DXCoils, the optional argument is passed in the SimDXCoilMultiSpeed function to perform single mode operation with given speed number.  
  

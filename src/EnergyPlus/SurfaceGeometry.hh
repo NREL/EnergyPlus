@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -234,6 +234,8 @@ namespace SurfaceGeometry {
 
     void GetSurfaceHeatTransferAlgorithmOverrides(EnergyPlusData &state, bool &ErrorsFound);
 
+    void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound); // Error flag indicator (true if errors found)
+
     class ExposedFoundationPerimeter
     {
     public:
@@ -288,12 +290,19 @@ namespace SurfaceGeometry {
 
     struct EdgeOfSurf
     {
-        int surfNum;
+        int surfNum = 0;
         Vector start;
         Vector end;
-        EdgeOfSurf() : surfNum(0), start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
+        std::vector<int> otherSurfNums;
+        int count = 0;
+        EdgeOfSurf() : start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
         {
         }
+
+        bool operator==(const EdgeOfSurf &other) const;
+        bool operator!=(const EdgeOfSurf &other) const;
+        bool containsPoints(const Vector &vertex) const;
+        double length() const;
     };
 
     bool isEnclosedVolume(DataVectorTypes::Polyhedron const &zonePoly, std::vector<EdgeOfSurf> &edgeNot2);
@@ -304,12 +313,10 @@ namespace SurfaceGeometry {
 
     std::vector<EdgeOfSurf> edgesNotTwoForEnclosedVolumeTest(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> const &uniqueVertices);
 
-    void makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> &uniqVertices);
+    std::vector<Vector> makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly);
 
     DataVectorTypes::Polyhedron updateZonePolygonsForMissingColinearPoints(DataVectorTypes::Polyhedron const &zonePoly,
                                                                            std::vector<Vector> const &uniqVertices);
-
-    void insertVertexOnFace(DataVectorTypes::Face &face, int const &indexBefore, DataVectorTypes::Vector const &vertexToInsert);
 
     bool areFloorAndCeilingSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
@@ -322,11 +329,11 @@ namespace SurfaceGeometry {
                               Real64 &oppositeWallArea,
                               Real64 &distanceBetweenOppositeWalls);
 
-    std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth);
+    std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 azimuth);
 
-    int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex);
+    int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int faceIndex);
 
-    bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex, int const &opFaceIndex, Real64 &distanceBetween);
+    bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int faceIndex, int opFaceIndex, Real64 &distanceBetween);
 
     bool isAlmostEqual3dPt(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2);
 
@@ -335,6 +342,8 @@ namespace SurfaceGeometry {
     int findIndexOfVertex(DataVectorTypes::Vector vertexToFind, std::vector<DataVectorTypes::Vector> listOfVertices);
 
     Real64 distance(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2);
+
+    Real64 distanceFromPointToLine(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
 
     bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
 
@@ -384,7 +393,7 @@ namespace SurfaceGeometry {
     void
     SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
                                     Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
-                                    SurfaceGeometry::enclosureType const &EnclosureType,                            // Radiant or Solar
+                                    SurfaceGeometry::enclosureType EnclosureType,                                   // Radiant or Solar
                                     bool &ErrorsFound);                                                             // Set to true if errors found
 
     void CheckConvexity(EnergyPlusData &state,
@@ -440,10 +449,6 @@ struct SurfaceGeometryData : BaseGlobalStruct
     Array1D_string const SubSurfCls;
     Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs;
     Array1D<DataSurfaces::SurfaceClass> const SubSurfIDs;
-    int const UnenteredAdjacentZoneSurface = -998; // allows users to enter one zone surface ("Zone")
-                                                   // referencing another in adjacent zone
-    int const UnreconciledZoneSurface = -999;      // interim value between entering surfaces ("Surface") and reconciling
-
     Array1D<SurfaceGeometry::SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
     HeatBalanceKivaManager::KivaManager kivaManager;
     SurfaceGeometry::ExposedFoundationPerimeter exposedFoundationPerimeter;
@@ -455,8 +460,8 @@ struct SurfaceGeometryData : BaseGlobalStruct
     int ErrCount4 = 0; // counts of interzone area mismatches.
     bool ShowZoneSurfaceHeaders = true;
     int ErrCount5 = 0;
-    Real64 OldAspectRatio;
-    Real64 NewAspectRatio;
+    Real64 OldAspectRatio = 0.0;
+    Real64 NewAspectRatio = 0.0;
     std::string transformPlane;
     Array1D<Vectors::Vector> Triangle1 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
     Array1D<Vectors::Vector> Triangle2 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
@@ -465,9 +470,7 @@ struct SurfaceGeometryData : BaseGlobalStruct
     Array1D<Real64> Z;
     Array1D<Real64> A; // containers for convexity test
     Array1D<Real64> B;
-    Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
-    int VertSize;                   // size of X,Y,Z,A,B arrays
-    Real64 ACosZero;                // set on firstTime
+    int VertSize = 0; // size of X,Y,Z,A,B arrays
 
     void clear_state() override
     {

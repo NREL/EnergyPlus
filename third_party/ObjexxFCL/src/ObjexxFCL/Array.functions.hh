@@ -902,44 +902,6 @@ isize( A< T > const & a, int const dim )
 	return static_cast< int >( size( a, dim ) );
 }
 
-// reshape /////
-
-template< typename T, typename I >
-inline
-Array2D< T >
-reshape2( Array< T > const & a, Array1< I > const & shape )
-{
-	assert( shape.size() == 2 );
-	return Array2D< T >( shape[ 0 ], shape[ 1 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array2D< T >
-reshape2( std::initializer_list< T > const & l, Array1< I > const & shape )
-{
-	assert( shape.size() == 2 );
-	return Array2D< T >( shape[ 0 ], shape[ 1 ], l );
-}
-
-template< typename T, typename I >
-inline
-Array2D< T >
-reshape2( Array< T > const & a, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 2 );
-	return Array2D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], a );
-}
-
-template< typename T, typename I >
-inline
-Array2D< T >
-reshape2( std::initializer_list< T > const & l, std::initializer_list< I > const & shape )
-{
-	assert( shape.size() == 2 );
-	return Array2D< T >( shape.begin()[ 0 ], shape.begin()[ 1 ], l );
-}
-
 // pack /////
 
 template< typename T >

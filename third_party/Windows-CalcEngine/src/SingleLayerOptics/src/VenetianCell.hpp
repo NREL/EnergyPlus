@@ -30,10 +30,11 @@ namespace SingleLayerOptics
     {
     public:
         CVenetianBase(const std::shared_ptr<CMaterial> & t_MaterialProperties,
-                      const std::shared_ptr<ICellDescription> & t_Cell);
+                      const std::shared_ptr<ICellDescription> & t_Cell,
+                      double rotation = 0);
 
     protected:
-        std::shared_ptr<CVenetianCellDescription> getCellAsVenetian() const;
+        [[nodiscard]] std::shared_ptr<CVenetianCellDescription> getCellAsVenetian() const;
     };
 
     // Simple structure to hold backward and forward irradiances
@@ -92,8 +93,7 @@ namespace SingleLayerOptics
         // Keeps information about beam view factor and percentage view
         struct BeamSegmentView
         {
-        public:
-            BeamSegmentView() : viewFactor(0), percentViewed(0){};
+            BeamSegmentView() : viewFactor(0), percentViewed(0){}
             double viewFactor;
             double percentViewed;
         };
@@ -191,50 +191,51 @@ namespace SingleLayerOptics
     {
     public:
         CVenetianCell(const std::shared_ptr<CMaterial> & t_MaterialProperties,
-                      const std::shared_ptr<ICellDescription> & t_Cell);
+                      const std::shared_ptr<ICellDescription> & t_Cell,
+                      double rotation = 0);
 
         void setSourceData(FenestrationCommon::CSeries & t_SourceData) override;
 
-        double T_dir_dir(const FenestrationCommon::Side t_Side,
+        double T_dir_dir(FenestrationCommon::Side t_Side,
                          const CBeamDirection & t_Direction) override;
-        std::vector<double> T_dir_dir_band(const FenestrationCommon::Side t_Side,
+        std::vector<double> T_dir_dir_band(FenestrationCommon::Side t_Side,
                                            const CBeamDirection & t_Direction) override;
 
         /////////////////////////////////////////////////////////////////////////////////////////////
         // Uniform diffuse components
         /////////////////////////////////////////////////////////////////////////////////////////////
-        double T_dir_dif(const FenestrationCommon::Side t_Side,
+        double T_dir_dif(FenestrationCommon::Side t_Side,
                          const CBeamDirection & t_Direction) override;
-        std::vector<double> T_dir_dif_band(const FenestrationCommon::Side t_Side,
+        std::vector<double> T_dir_dif_band(FenestrationCommon::Side t_Side,
                                            const CBeamDirection & t_Direction) override;
-        double R_dir_dif(const FenestrationCommon::Side t_Side,
+        double R_dir_dif(FenestrationCommon::Side t_Side,
                          const CBeamDirection & t_Direction) override;
-        std::vector<double> R_dir_dif_band(const FenestrationCommon::Side t_Side,
+        std::vector<double> R_dir_dif_band(FenestrationCommon::Side t_Side,
                                            const CBeamDirection & t_Direction) override;
 
         /////////////////////////////////////////////////////////////////////////////////////////////
         // Directional diffuse components
         /////////////////////////////////////////////////////////////////////////////////////////////
-        double T_dir_dif(const FenestrationCommon::Side t_Side,
+        double T_dir_dif(FenestrationCommon::Side t_Side,
                          const CBeamDirection & t_IncomingDirection,
                          const CBeamDirection & t_OutgoingDirection) override;
 
-        double R_dir_dif(const FenestrationCommon::Side t_Side,
+        double R_dir_dif(FenestrationCommon::Side t_Side,
                          const CBeamDirection & t_IncomingDirection,
                          const CBeamDirection & t_OutgoingDirection) override;
 
-        std::vector<double> T_dir_dif_band(const FenestrationCommon::Side t_Side,
+        std::vector<double> T_dir_dif_band(FenestrationCommon::Side t_Side,
                                            const CBeamDirection & t_IncomingDirection,
                                            const CBeamDirection & t_OutgoingDirection) override;
 
-        std::vector<double> R_dir_dif_band(const FenestrationCommon::Side t_Side,
+        std::vector<double> R_dir_dif_band(FenestrationCommon::Side t_Side,
                                            const CBeamDirection & t_IncomingDirection,
                                            const CBeamDirection & t_OutgoingDirection) override;
 
         // Functions specific only for Venetian cell. Diffuse to diffuse component based only on
         // view factors
-        double T_dif_dif(const FenestrationCommon::Side t_Side);
-        double R_dif_dif(const FenestrationCommon::Side t_Side);
+        double T_dif_dif(FenestrationCommon::Side t_Side);
+        double R_dif_dif(FenestrationCommon::Side t_Side);
 
     private:
         void generateVenetianEnergy();

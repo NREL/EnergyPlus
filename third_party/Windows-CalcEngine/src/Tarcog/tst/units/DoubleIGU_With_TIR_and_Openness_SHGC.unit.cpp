@@ -91,25 +91,23 @@ protected:
     }
 
 public:
-    std::shared_ptr<Tarcog::ISO15099::CSystem> getSystem() const
+    [[nodiscard]] std::shared_ptr<Tarcog::ISO15099::CSystem> getSystem() const
     {
         return m_TarcogSystem;
-    };
+    }
 };
 
 TEST_F(DoubleIGU_With_TIR_and_Openness_SHGC, Test1)
 {
     SCOPED_TRACE("Begin Test: Indoor Shade");
 
-    auto aSystem = getSystem();
+    const auto aSystem = getSystem();
 
-    auto temperature = aSystem->getTemperatures(Tarcog::ISO15099::System::SHGC);
-    auto radiosity = aSystem->getRadiosities(Tarcog::ISO15099::System::SHGC);
+    const auto temperature = aSystem->getTemperatures(Tarcog::ISO15099::System::SHGC);
+    const auto radiosity = aSystem->getRadiosities(Tarcog::ISO15099::System::SHGC);
 
-    std::vector<double> correctTemp = {
-      311.16511198886826, 311.35084358843835, 312.56143334708418, 312.18578373706208};
-    std::vector<double> correctJ = {
-      525.13728201703634, 532.26392522289359, 529.47497000248063, 528.72274402817823};
+    const std::vector correctTemp{311.156776, 311.341981, 312.547758, 312.172916};
+    const std::vector correctJ{525.089442, 532.199938, 529.393517, 528.645065};
 
     EXPECT_EQ(correctTemp.size(), temperature.size());
     EXPECT_EQ(correctJ.size(), radiosity.size());
@@ -121,12 +119,12 @@ TEST_F(DoubleIGU_With_TIR_and_Openness_SHGC, Test1)
     }
 
     const auto numOfIter = aSystem->getNumberOfIterations(Tarcog::ISO15099::System::SHGC);
-    EXPECT_EQ(1, int(numOfIter));
+    EXPECT_EQ(1u, numOfIter);
 
     const auto uValue = aSystem->getUValue();
-    EXPECT_NEAR(3.2151172563457391, uValue, 1e-6);
+    EXPECT_NEAR(3.219847, uValue, 1e-6);
 
     const auto Ttot_sol{0.119033947587};
     const auto shgc = aSystem->getSHGC(Ttot_sol);
-    EXPECT_NEAR(0.25575797028047931, shgc, 1e-6);
+    EXPECT_NEAR(0.255930, shgc, 1e-6);
 }

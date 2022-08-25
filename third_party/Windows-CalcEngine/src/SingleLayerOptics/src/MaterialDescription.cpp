@@ -21,7 +21,12 @@ namespace SingleLayerOptics
         }
         else
         {
-            return (t_Solar - t_Fraction * t_Range) / (1 - t_Fraction);
+            auto ratio{(t_Solar - t_Fraction * t_Range) / (1 - t_Fraction)};
+            if(ratio > 1)
+                ratio = 1;
+            if(ratio < 0)
+                ratio = 0;
+            return ratio;
         }
     }
 
@@ -159,9 +164,7 @@ namespace SingleLayerOptics
     ////////////////////////////////////////////////////////////////////////////////////
 
     CMaterial::CMaterial(const double minLambda, const double maxLambda) :
-        m_MinLambda(minLambda),
-        m_MaxLambda(maxLambda),
-        m_WavelengthsCalculated(false)
+        m_MinLambda(minLambda), m_MaxLambda(maxLambda), m_WavelengthsCalculated(false)
     {}
 
     CMaterial::CMaterial(const WavelengthRange t_Range) : m_WavelengthsCalculated(false)
@@ -227,6 +230,12 @@ namespace SingleLayerOptics
         return m_Wavelengths;
     }
 
+    bool CMaterial::isWavelengthInRange(double wavelength) const
+    {
+        return ((m_MinLambda - ConstantsData::wavelengthErrorTolerance) <= wavelength)
+               && ((m_MaxLambda + ConstantsData::wavelengthErrorTolerance) >= wavelength);
+    }
+
     std::vector<double>
       CMaterial::trimWavelengthToRange(const std::vector<double> & wavelengths) const
     {
@@ -248,6 +257,7 @@ namespace SingleLayerOptics
     {
         // Trimming is necessary in order to keep data within integration range
         m_Wavelengths = trimWavelengthToRange(wavelengths);
+        m_WavelengthsCalculated = true;
     }
 
     size_t CMaterial::getBandSize()
@@ -371,7 +381,7 @@ namespace SingleLayerOptics
         double lowLambda = m_MaterialPartialRange->getMinLambda();
         double highLambda = m_MaterialPartialRange->getMaxLambda();
         CNIRRatio nirRatio = CNIRRatio(t_SourceData, lowLambda, highLambda);
-        createNIRRange(m_MaterialPartialRange, m_MaterialFullRange, nirRatio.ratio());
+        createNIRRange(m_MaterialPartialRange, m_MaterialFullRange, NIRRatio);
     }
 
     void IMaterialDualBand::setDetectorData(FenestrationCommon::CSeries & t_DetectorData)
@@ -395,12 +405,12 @@ namespace SingleLayerOptics
                                            const CBeamDirection & t_Outgoing) const
     {
         m_RangeCreator();
-        size_t aSize = m_Materials.size();
         std::vector<double> aResults;
-        for(size_t i = 0; i < aSize; ++i)
+
+        for(const auto wl : m_Wavelengths)
         {
-            double value = m_Materials[i]->getProperty(t_Property, t_Side, t_Incoming, t_Outgoing);
-            aResults.push_back(value);
+            aResults.emplace_back(getMaterialFromWavelegth(wl)->getProperty(
+              t_Property, t_Side, t_Incoming, t_Outgoing));
         }
 
         return aResults;
@@ -416,10 +426,6 @@ namespace SingleLayerOptics
             aWavelengths.push_back(m_Materials[i]->getMinLambda());
         }
 
-        // TODO: Do not create extra wavelength since this might be important for the integration.
-        // Range is already kept with min and max lambda. Integration of double specular layer is
-        // working correctly. Make sure that integration of single shading layer is working
-        // correctly too.
         // aWavelengths.push_back(m_Materials.back()->getMaxLambda());
 
         return aWavelengths;
@@ -479,6 +485,12 @@ namespace SingleLayerOptics
         checkIfMaterialWithingSolarRange(*m_MaterialPartialRange);
         createUVRange();
         createNIRRange(m_MaterialPartialRange, m_MaterialFullRange, t_Ratio);
+
+        if(!m_WavelengthsCalculated)
+        {
+            m_Wavelengths = getWavelengthsFromMaterials();
+            m_WavelengthsCalculated = true;
+        }
     }
 
     void IMaterialDualBand::createRangesFromSolarRadiation(
@@ -490,10 +502,47 @@ namespace SingleLayerOptics
         }
         checkIfMaterialWithingSolarRange(*m_MaterialPartialRange);
         createUVRange();
-        double lowLambda = m_MaterialPartialRange->getMinLambda();
-        double highLambda = m_MaterialPartialRange->getMaxLambda();
+        const double lowLambda = m_MaterialPartialRange->getMinLambda();
+        const double highLambda = m_MaterialPartialRange->getMaxLambda();
         CNIRRatio nirRatio = CNIRRatio(t_SolarRadiation, lowLambda, highLambda);
-        createNIRRange(m_MaterialPartialRange, m_MaterialFullRange, nirRatio.ratio());
+        createNIRRange(m_MaterialPartialRange, m_MaterialFullRange, NIRRatio);
+        if(!m_WavelengthsCalculated)
+        {
+            m_Wavelengths = getWavelengthsFromMaterials();
+            m_WavelengthsCalculated = true;
+        }
+    }
+
+    std::vector<double> IMaterialDualBand::getWavelengthsFromMaterials() const
+    {
+        std::vector<double> result;
+
+        if(m_MaterialFullRange != nullptr && m_MaterialPartialRange != nullptr)
+        {
+            result.emplace_back(m_MaterialFullRange->getMinLambda());
+            result.emplace_back(0.32);
+            result.emplace_back(m_MaterialPartialRange->getMinLambda());
+            result.emplace_back(m_MaterialPartialRange->getMaxLambda());
+            result.emplace_back(m_MaterialFullRange->getMaxLambda());
+        }
+
+        return result;
+    }
+
+    std::shared_ptr<CMaterial>
+      IMaterialDualBand::getMaterialFromWavelegth(const double wavelength) const
+    {
+        std::shared_ptr<CMaterial> result;
+
+        for(const auto & material : m_Materials)
+        {
+            if(material->isWavelengthInRange(wavelength))
+            {
+                result = material;
+            }
+        }
+
+        return result;
     }
 
 
@@ -604,14 +653,10 @@ namespace SingleLayerOptics
         m_PVSample(t_SpectralSample)
     {}
 
-    FenestrationCommon::CSeries CMaterialPhotovoltaic::PCE(FenestrationCommon::Side t_Side) const
+    FenestrationCommon::CSeries
+      CMaterialPhotovoltaic::jscPrime(FenestrationCommon::Side t_Side) const
     {
-        return m_PVSample->pce(t_Side);
-    }
-
-    FenestrationCommon::CSeries CMaterialPhotovoltaic::W(FenestrationCommon::Side t_Side) const
-    {
-        return m_PVSample->w(t_Side);
+        return m_PVSample->jscPrime(t_Side);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -622,8 +667,7 @@ namespace SingleLayerOptics
       const std::shared_ptr<SpectralAveraging::CAngularMeasurements> & t_AngularMeasurements,
       const double minLambda,
       const double maxLambda) :
-        CMaterial(minLambda, maxLambda),
-        m_AngularMeasurements(t_AngularMeasurements)
+        CMaterial(minLambda, maxLambda), m_AngularMeasurements(t_AngularMeasurements)
     {
         if(t_AngularMeasurements == nullptr)
         {
@@ -635,8 +679,7 @@ namespace SingleLayerOptics
     CMaterialMeasured::CMaterialMeasured(
       const std::shared_ptr<SpectralAveraging::CAngularMeasurements> & t_AngularMeasurements,
       const WavelengthRange t_Range) :
-        CMaterial(t_Range),
-        m_AngularMeasurements(t_AngularMeasurements)
+        CMaterial(t_Range), m_AngularMeasurements(t_AngularMeasurements)
     {
         if(t_AngularMeasurements == nullptr)
         {
@@ -703,8 +746,7 @@ namespace SingleLayerOptics
                                                      CBSDFHemisphere const & t_Hemisphere,
                                                      double minLambda,
                                                      double maxLambda) :
-        CMaterial(minLambda, maxLambda),
-        m_Hemisphere(t_Hemisphere)
+        CMaterial(minLambda, maxLambda), m_Hemisphere(t_Hemisphere)
     {
         validateMatrix(t_Tf, m_Hemisphere);
         validateMatrix(t_Tb, m_Hemisphere);
@@ -726,8 +768,7 @@ namespace SingleLayerOptics
                                                      std::vector<std::vector<double>> const & t_Rb,
                                                      CBSDFHemisphere const & t_Hemisphere,
                                                      FenestrationCommon::WavelengthRange t_Range) :
-        CMaterial(t_Range),
-        m_Hemisphere(t_Hemisphere)
+        CMaterial(t_Range), m_Hemisphere(t_Hemisphere)
     {
         validateMatrix(t_Tf, m_Hemisphere);
         validateMatrix(t_Tb, m_Hemisphere);

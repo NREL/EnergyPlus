@@ -190,85 +190,31 @@ public:
     CScatteringLayer & getLayer()
     {
         return m_Layer;
-    };
+    }
 };
 
 TEST_F(TestVE345ScatteringLayer_IR_Range, TestFrontIR)
 {
-    SCOPED_TRACE("Begin Test: VE345 scattering layer - 0 deg incident.");
+    SCOPED_TRACE("Begin Test: VE345 scattering layer IR properties.");
 
-    const double minLambda = 5.0;
-    const double maxLambda = 100.0;
+    auto aLayer{CScatteringLayerIR(getLayer())};
 
-    auto aLayer = getLayer();
-
-    Side aSide = Side::Front;
-
-    double T_dir_dir = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DirectDirect);
-    EXPECT_NEAR(0.0, T_dir_dir, 1e-6);
-
-    double R_dir_dir = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DirectDirect);
-    EXPECT_NEAR(0.110058, R_dir_dir, 1e-6);
-
-    double T_dir_dif = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DirectDiffuse);
-    EXPECT_NEAR(0.0, T_dir_dif, 1e-6);
-
-    double R_dir_dif = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DirectDiffuse);
-    EXPECT_NEAR(0.0, R_dir_dif, 1e-6);
-
-    double T_dif_dif = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DiffuseDiffuse);
-    EXPECT_NEAR(0.0, T_dif_dif, 1e-6);
-
-    double R_dif_dif = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse);
-    EXPECT_NEAR(0.167092, R_dif_dif, 1e-6);
-
-    double emiss =
-      aLayer.normalToHemisphericalEmissivity(aSide, EmissivityPolynomials::NFRC_301_Uncoated);
+    const double emiss = aLayer.emissivity(Side::Front, EmissivityPolynomials::NFRC_301_Uncoated);
     EXPECT_NEAR(0.840263, emiss, 1e-6);
+
+    const double transmittance = aLayer.transmittance(Side::Front);
+    EXPECT_NEAR(0.0, transmittance, 1e-6);
 }
 
 TEST_F(TestVE345ScatteringLayer_IR_Range, TestBackIR)
 {
-    SCOPED_TRACE("Begin Test: VE345 scattering layer - 0 deg incident.");
+    SCOPED_TRACE("Begin Test: VE345 scattering layer IR properties.");
 
-    const double minLambda = 5.0;
-    const double maxLambda = 100.0;
+    auto aLayer{CScatteringLayerIR(getLayer())};
 
-    auto aLayer = getLayer();
-
-    Side aSide = Side::Back;
-
-    double T_dir_dir = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DirectDirect);
-    EXPECT_NEAR(0.0, T_dir_dir, 1e-6);
-
-    double R_dir_dir = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DirectDirect);
-    EXPECT_NEAR(0.926332, R_dir_dir, 1e-6);
-
-    double T_dir_dif = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DirectDiffuse);
-    EXPECT_NEAR(0, T_dir_dif, 1e-6);
-
-    double R_dir_dif = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DirectDiffuse);
-    EXPECT_NEAR(0, R_dir_dif, 1e-6);
-
-    double T_dif_dif = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::T, aSide, Scattering::DiffuseDiffuse);
-    EXPECT_NEAR(0.0, T_dif_dif, 1e-6);
-
-    double R_dif_dif = aLayer.getPropertySimple(
-      minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse);
-    EXPECT_NEAR(0.931043, R_dif_dif, 1e-6);
-
-    double emiss =
-      aLayer.normalToHemisphericalEmissivity(aSide, EmissivityPolynomials::NFRC_301_Coated);
+    const double emiss = aLayer.emissivity(Side::Back, EmissivityPolynomials::NFRC_301_Coated);
     EXPECT_NEAR(0.088879, emiss, 1e-6);
+
+    const double transmittance = aLayer.transmittance(Side::Front);
+    EXPECT_NEAR(0.0, transmittance, 1e-6);
 }

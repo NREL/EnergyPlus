@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef BoundaryConditions_HPP
@@ -35,15 +35,15 @@ public:
   ForcedConvectionTerm gradeForcedTerm;
 
   BoundaryConditions()
-      : slabConvectiveTemp(293.15), wallConvectiveTemp(293.15), slabRadiantTemp(293.15), wallRadiantTemp(293.15), outdoorTemp(273.15),
-        localWindSpeed(0.0), windDirection(0.0), solarAzimuth(3.14), solarAltitude(0.0),
-        directNormalFlux(0.0), diffuseHorizontalFlux(0.0), skyEmissivity(0.0),
-        slabAbsRadiation(0.0), wallAbsRadiation(0.0), deepGroundTemperature(283.15),
-        slabConvectionAlgorithm(&getDOE2ConvectionCoeff),
+      : slabConvectiveTemp(293.15), wallConvectiveTemp(293.15), slabRadiantTemp(293.15),
+        wallRadiantTemp(293.15), outdoorTemp(273.15), localWindSpeed(0.0), windDirection(0.0),
+        solarAzimuth(3.14), solarAltitude(0.0), directNormalFlux(0.0), diffuseHorizontalFlux(0.0),
+        skyEmissivity(0.0), slabAbsRadiation(0.0), wallAbsRadiation(0.0),
+        deepGroundTemperature(283.15), slabConvectionAlgorithm(&getDOE2ConvectionCoeff),
         intWallConvectionAlgorithm(&getDOE2ConvectionCoeff),
         extWallConvectionAlgorithm(&getDOE2ConvectionCoeff),
-        gradeConvectionAlgorithm(&getDOE2ConvectionCoeff),
-        extWallForcedTerm(&getMoWiTTForcedTerm), gradeForcedTerm(&getMoWiTTForcedTerm) {}
+        gradeConvectionAlgorithm(&getDOE2ConvectionCoeff), extWallForcedTerm(&getMoWiTTForcedTerm),
+        gradeForcedTerm(&getMoWiTTForcedTerm) {}
 };
 
 } // namespace Kiva

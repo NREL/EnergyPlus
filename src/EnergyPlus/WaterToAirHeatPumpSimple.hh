@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,62 +68,68 @@ namespace WaterToAirHeatPumpSimple {
     struct SimpleWatertoAirHPConditions
     {
         // Members
-        std::string Name;             // Name of the Water to Air Heat pump
-        std::string WatertoAirHPType; // Type of WatertoAirHP ie. Heating or Cooling
-        int WAHPPlantTypeOfNum;       // type of component in plant
-        bool SimFlag;                 // Heat Pump Simulation Flag
-        Real64 AirVolFlowRate;        // Air Volumetric Flow Rate[m3/s]
-        Real64 AirMassFlowRate;       // Air Mass Flow Rate[kg/s]
-        Real64 InletAirDBTemp;        // Inlet Air Dry Bulb Temperature [C]
-        Real64 InletAirHumRat;        // Inlet Air Humidity Ratio [kg/kg]
-        Real64 InletAirEnthalpy;      // Inlet Air Enthalpy [J/kg]
-        Real64 OutletAirDBTemp;       // Outlet Air Dry Bulb Temperature [C]
-        Real64 OutletAirHumRat;       // Outlet Air Humidity Ratio [kg/kg]
-        Real64 OutletAirEnthalpy;     // Outlet Air Enthalpy [J/kg]
-        Real64 WaterVolFlowRate;      // Water Volumetric Flow Rate [m3/s]
-        Real64 WaterMassFlowRate;     // Water Mass Flow Rate [kg/s]
+        std::string Name;                            // Name of the Water to Air Heat pump
+        std::string WatertoAirHPType;                // Type of WatertoAirHP ie. Heating or Cooling
+        DataPlant::PlantEquipmentType WAHPPlantType; // type of component in plant
+        bool SimFlag;                                // Heat Pump Simulation Flag
+        Real64 AirVolFlowRate;                       // Air Volumetric Flow Rate[m3/s]
+        Real64 AirMassFlowRate;                      // Air Mass Flow Rate[kg/s]
+        Real64 InletAirDBTemp;                       // Inlet Air Dry Bulb Temperature [C]
+        Real64 InletAirHumRat;                       // Inlet Air Humidity Ratio [kg/kg]
+        Real64 InletAirEnthalpy;                     // Inlet Air Enthalpy [J/kg]
+        Real64 OutletAirDBTemp;                      // Outlet Air Dry Bulb Temperature [C]
+        Real64 OutletAirHumRat;                      // Outlet Air Humidity Ratio [kg/kg]
+        Real64 OutletAirEnthalpy;                    // Outlet Air Enthalpy [J/kg]
+        Real64 WaterVolFlowRate;                     // Water Volumetric Flow Rate [m3/s]
+        Real64 WaterMassFlowRate;                    // Water Mass Flow Rate [kg/s]
         Real64 DesignWaterMassFlowRate;
-        Real64 InletWaterTemp;        // Inlet Water Temperature [C]
-        Real64 InletWaterEnthalpy;    // Inlet Water Enthalpy [J/kg]
-        Real64 OutletWaterTemp;       // Outlet Water Temperature [C]
-        Real64 OutletWaterEnthalpy;   // Outlet Water Enthalpy [J/kg]
-        Real64 Power;                 // Power Consumption [W]
-        Real64 QLoadTotal;            // Load Side Total Heat Transfer Rate [W]
-        Real64 QLoadTotalReport;      // Load side total heat transfer rate for reporting[W]
-        Real64 QSensible;             // Sensible Load Side Heat Transfer Rate [W]
-        Real64 QLatent;               // Latent Load Side Heat Transfer Rate [W]
-        Real64 QSource;               // Source Side Heat Transfer Rate [W]
-        Real64 Energy;                // Energy Consumption [J]
-        Real64 EnergyLoadTotal;       // Load Side Total Heat Transferred [J]
-        Real64 EnergySensible;        // Sensible Load Side Heat Transferred [J]
-        Real64 EnergyLatent;          // Latent Load Side Heat Transferred [J]
-        Real64 EnergySource;          // Source Side Heat Transferred [J]
-        Real64 COP;                   // Heat Pump Coefficient of Performance [-]
-        Real64 RunFrac;               // Duty Factor
-        Real64 PartLoadRatio;         // Part Load Ratio
-        Real64 RatedWaterVolFlowRate; // Rated/Ref Water Volumetric Flow Rate [m3/s]
-        Real64 RatedAirVolFlowRate;   // Rated/Ref Air Volumetric Flow Rate [m3/s]
-        Real64 RatedCapHeat;          // Rated/Ref Heating Capacity [W]
-        Real64 RatedPowerHeat;        // Rated/Ref Heating Power Consumption[W]
-        Real64 RatedCOPHeat;          // Rated/Ref Heating COP [W/W]
-        Real64 RatedCapCoolTotal;     // Rated/Ref Total Cooling Capacity [W]
-        Real64 RatedCapCoolSens;      // Rated/Ref Sensible Cooling Capacity [W]
-        Real64 RatedPowerCool;        // Rated/Ref Cooling Power Consumption[W]
-        Real64 RatedCOPCool;          // Rated/Ref Cooling COP [W/W]
-        int HeatCapCurveIndex;        // Index of the heating capacity performance curve
-        int HeatPowCurveIndex;        // Index of the heating power consumption curve
-        int TotalCoolCapCurveIndex;   // Index of the Total Cooling capacity performance curve
-        int SensCoolCapCurveIndex;    // Index of the Sensible Cooling capacity performance curve
-        int CoolPowCurveIndex;        // Index of the Cooling power consumption curve
-        int AirInletNodeNum;          // Node Number of the Air Inlet
-        int AirOutletNodeNum;         // Node Number of the Air Outlet
-        int WaterInletNodeNum;        // Node Number of the Water Onlet
-        int WaterOutletNodeNum;       // Node Number of the Water Outlet
-        int LoopNum;                  // plant loop index for water side
-        int LoopSide;                 // plant loop side index
-        int BranchNum;                // plant branch index
-        int CompNum;                  // plant component index
-        int WaterCyclingMode;         // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
+        Real64 InletWaterTemp;                 // Inlet Water Temperature [C]
+        Real64 InletWaterEnthalpy;             // Inlet Water Enthalpy [J/kg]
+        Real64 OutletWaterTemp;                // Outlet Water Temperature [C]
+        Real64 OutletWaterEnthalpy;            // Outlet Water Enthalpy [J/kg]
+        Real64 Power;                          // Power Consumption [W]
+        Real64 QLoadTotal;                     // Load Side Total Heat Transfer Rate [W]
+        Real64 QLoadTotalReport;               // Load side total heat transfer rate for reporting[W]
+        Real64 QSensible;                      // Sensible Load Side Heat Transfer Rate [W]
+        Real64 QLatent;                        // Latent Load Side Heat Transfer Rate [W]
+        Real64 QSource;                        // Source Side Heat Transfer Rate [W]
+        Real64 Energy;                         // Energy Consumption [J]
+        Real64 EnergyLoadTotal;                // Load Side Total Heat Transferred [J]
+        Real64 EnergySensible;                 // Sensible Load Side Heat Transferred [J]
+        Real64 EnergyLatent;                   // Latent Load Side Heat Transferred [J]
+        Real64 EnergySource;                   // Source Side Heat Transferred [J]
+        Real64 COP;                            // Heat Pump Coefficient of Performance [-]
+        Real64 RunFrac;                        // Duty Factor
+        Real64 PartLoadRatio;                  // Part Load Ratio
+        Real64 RatedWaterVolFlowRate;          // Rated Water Volumetric Flow Rate [m3/s]
+        Real64 RatedAirVolFlowRate;            // Rated Air Volumetric Flow Rate [m3/s]
+        Real64 RatedCapHeat;                   // Rated Heating Capacity [W]
+        Real64 RatedCapHeatAtRatedCdts;        // Rated Heating Capacity at Rated Conditions [W]
+        Real64 RatedCapCoolAtRatedCdts;        // Rated Cooling Capacity at Rated Conditions [W]
+        Real64 RatedCapCoolSensDesAtRatedCdts; // Rated Sensible Capacity at Rated Conditions [W]
+        Real64 RatedPowerHeat;                 // Rated Heating Power Consumption [W]
+        Real64 RatedPowerHeatAtRatedCdts;      // Rated Heating Power Consumption at Rated Conditions[W]
+        Real64 RatedCOPHeatAtRatedCdts;        // Rated Heating COP at Rated Conditions [W/w]
+        Real64 RatedCapCoolTotal;              // Rated Total Cooling Capacity [W]
+        Real64 RatedCapCoolSens;               // Rated Sensible Cooling Capacity [W]
+        Real64 RatedPowerCool;                 // Rated Cooling Power Consumption[W]
+        Real64 RatedPowerCoolAtRatedCdts;      // Rated Cooling Power Consumption at Rated Conditions [W]
+        Real64 RatedCOPCoolAtRatedCdts;        // Rated Cooling COP at Rated Conditions [W/W]
+        Real64 RatedEntWaterTemp;              // Rated Entering Water Temperature [C]
+        Real64 RatedEntAirWetbulbTemp;         // Rated Entering Air Wetbulb Temperature [C]
+        Real64 RatedEntAirDrybulbTemp;         // Rated Entering Air Drybulb Temperature [C]
+        Real64 RatioRatedHeatRatedTotCoolCap;  // Ratio of Rated Heating Capacity to Rated Cooling Capacity [-]
+        int HeatCapCurveIndex;                 // Index of the heating capacity performance curve
+        int HeatPowCurveIndex;                 // Index of the heating power consumption curve
+        int TotalCoolCapCurveIndex;            // Index of the Total Cooling capacity performance curve
+        int SensCoolCapCurveIndex;             // Index of the Sensible Cooling capacity performance curve
+        int CoolPowCurveIndex;                 // Index of the Cooling power consumption curve
+        int AirInletNodeNum;                   // Node Number of the Air Inlet
+        int AirOutletNodeNum;                  // Node Number of the Air Outlet
+        int WaterInletNodeNum;                 // Node Number of the Water Onlet
+        int WaterOutletNodeNum;                // Node Number of the Water Outlet
+        PlantLocation plantLoc;
+        int WaterCyclingMode; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
         // 1=water cycling, 2=water constant, 3=water constant on demand (old mode)
         int LastOperatingMode; // type of coil calling for water flow, either heating or cooling,
         // start it at 1 so there will be water flow from the start,
@@ -144,17 +150,18 @@ namespace WaterToAirHeatPumpSimple {
         bool reportCoilFinalSizes;    // one time report of sizes to coil report
         // Default Constructor
         SimpleWatertoAirHPConditions()
-            : WAHPPlantTypeOfNum(0), SimFlag(false), AirVolFlowRate(0.0), AirMassFlowRate(0.0), InletAirDBTemp(0.0), InletAirHumRat(0.0),
-              InletAirEnthalpy(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0), OutletAirEnthalpy(0.0), WaterVolFlowRate(0.0),
+            : WAHPPlantType(DataPlant::PlantEquipmentType::Invalid), SimFlag(false), AirVolFlowRate(0.0), AirMassFlowRate(0.0), InletAirDBTemp(0.0),
+              InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0), OutletAirEnthalpy(0.0), WaterVolFlowRate(0.0),
               WaterMassFlowRate(0.0), DesignWaterMassFlowRate(0.0), InletWaterTemp(0.0), InletWaterEnthalpy(0.0), OutletWaterTemp(0.0),
               OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QLoadTotalReport(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), Energy(0.0),
               EnergyLoadTotal(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0),
-              RatedWaterVolFlowRate(0.0), RatedAirVolFlowRate(0.0), RatedCapHeat(0.0), RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolTotal(0.0),
-              RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0),
-              SensCoolCapCurveIndex(0), CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
-              LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), WaterCyclingMode(0), LastOperatingMode(DataHVACGlobals::WaterCycling),
-              WaterFlowMode(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), Twet_Rated(0.0), Gamma_Rated(0.0),
-              MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), FanDelayTime(0.0), reportCoilFinalSizes(true)
+              RatedWaterVolFlowRate(0.0), RatedAirVolFlowRate(0.0), RatedCapHeat(0.0), RatedCapHeatAtRatedCdts(0.0), RatedCapCoolAtRatedCdts(0.0),
+              RatedPowerHeat(0.0), RatedCOPHeatAtRatedCdts(0.0), RatedCapCoolTotal(0.0), RatedCapCoolSens(0.0), RatedPowerCool(0.0),
+              RatedCOPCoolAtRatedCdts(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0), SensCoolCapCurveIndex(0),
+              CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), plantLoc{},
+              WaterCyclingMode(0), LastOperatingMode(DataHVACGlobals::WaterCycling), WaterFlowMode(false), CompanionCoolingCoilNum(0),
+              CompanionHeatingCoilNum(0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), FanDelayTime(0.0),
+              reportCoilFinalSizes(true)
         {
         }
     };
@@ -169,7 +176,7 @@ namespace WaterToAirHeatPumpSimple {
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                                Real64 &HPTimeConstant,        // Heat pump time constant [s]
                                Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
-                               int const CompOp,
+                               DataHVACGlobals::CompressorOperation CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
                                Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
@@ -198,24 +205,24 @@ namespace WaterToAirHeatPumpSimple {
     void SizeHVACWaterToAir(EnergyPlusData &state, int const HPNum);
 
     void CalcHPCoolingSimple(EnergyPlusData &state,
-                             int const HPNum,               // Heat Pump Number
-                             int const CyclingScheme,       // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,      // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                             Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
-                             Real64 const LatentDemand,     // Cooling Latent Demand [W]
-                             int const CompOp,              // compressor operation flag
-                             Real64 const PartLoadRatio,    // compressor part load ratio
-                             Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
+                             int const HPNum,           // Heat Pump Number
+                             int const CyclingScheme,   // Fan/Compressor cycling scheme indicator
+                             Real64 const RuntimeFrac,  // Runtime Fraction of compressor or percent on time (on-time/cycle time)
+                             Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
+                             Real64 const LatentDemand, // Cooling Latent Demand [W]
+                             DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag
+                             Real64 const PartLoadRatio,                        // compressor part load ratio
+                             Real64 const OnOffAirFlowRatio                     // ratio of compressor on flow to average flow over time step
     );
 
     void CalcHPHeatingSimple(EnergyPlusData &state,
-                             int const HPNum,               // Heat Pump Number
-                             int const CyclingScheme,       // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,      // Runtime Fraction of compressor
-                             Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
-                             int const CompOp,              // compressor operation flag
-                             Real64 const PartLoadRatio,    // compressor part load ratio
-                             Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
+                             int const HPNum,                                   // Heat Pump Number
+                             int const CyclingScheme,                           // Fan/Compressor cycling scheme indicator
+                             Real64 const RuntimeFrac,                          // Runtime Fraction of compressor
+                             Real64 const SensDemand,                           // Cooling Sensible Demand [W] !unused1208
+                             DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag
+                             Real64 const PartLoadRatio,                        // compressor part load ratio
+                             Real64 const OnOffAirFlowRatio                     // ratio of compressor on flow to average flow over time step
     );
 
     void UpdateSimpleWatertoAirHP(EnergyPlusData &state, int const HPNum);
@@ -270,6 +277,10 @@ namespace WaterToAirHeatPumpSimple {
                            int const WaterCyclingMode,               // the coil water flow mode (cycling, constant or constantondemand)
                            Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
                            Optional_int CompanionHeatingCoilNum = _  // Index to heating coil for cooling coil = SimpleWSHPNum
+    );
+
+    void CheckSimpleWAHPRatedCurvesOutputs(EnergyPlusData &state,
+                                           std::string const &CoilName // must match coil names for the coil type
     );
 
 } // namespace WaterToAirHeatPumpSimple

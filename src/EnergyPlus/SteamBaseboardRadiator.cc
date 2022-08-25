@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -105,14 +105,13 @@ namespace SteamBaseboardRadiator {
 
     using DataHVACGlobals::SmallLoad;
     using DataLoopNode::ObjectIsNotParent;
-    using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
+
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimSteamBaseboard(EnergyPlusData &state,
                            std::string const &EquipName,
-                           int const ActualZoneNum,
                            int const ControlledZoneNum,
                            bool const FirstHVACIteration,
                            Real64 &PowerMet,
@@ -175,13 +174,13 @@ namespace SteamBaseboardRadiator {
 
             InitSteamBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
 
             SteamBaseboardDesignData SteamBaseboardDesignDataObject{state.dataSteamBaseboardRadiator->SteamBaseboardDesign(
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum)
                     .DesignObjectPtr)}; // Array that contains the design data for steam baseboard objects
 
-            if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ActualZoneNum) &&
+            if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ControlledZoneNum) &&
                 (GetCurrentScheduleValue(state, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr) > 0.0)) {
 
                 // On the first HVAC iteration the system values are given to the controller, but after that
@@ -196,39 +195,35 @@ namespace SteamBaseboardRadiator {
                         state.dataLoopNodes->Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRateMinAvail;
                 }
 
-                {
-                    auto const SELECT_CASE_var(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType);
-
-                    if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
-                        ControlCompOutput(state,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
-                                          state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
-                                          BaseboardNum,
-                                          FirstHVACIteration,
-                                          QZnReq,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
-                                          MaxSteamFlow,
-                                          MinSteamFlow,
-                                          SteamBaseboardDesignDataObject.Offset,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ControlCompTypeNum,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompErrIndex,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum);
-                    } else {
-                        ShowSevereError(state,
-                                        "SimSteamBaseboard: Errors in Baseboard=" +
-                                            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state,
-                                          format("Invalid or unimplemented equipment type={}",
-                                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType));
-                        ShowFatalError(state, "Preceding condition causes termination.");
-                    }
+                switch (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType) {
+                case DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam: { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
+                    ControlCompOutput(state,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
+                                      state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                                      BaseboardNum,
+                                      FirstHVACIteration,
+                                      QZnReq,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
+                                      MaxSteamFlow,
+                                      MinSteamFlow,
+                                      SteamBaseboardDesignDataObject.Offset,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ControlCompTypeNum,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompErrIndex,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc);
+                } break;
+                default: {
+                    ShowSevereError(
+                        state, "SimSteamBaseboard: Errors in Baseboard=" + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
+                    ShowContinueError(state,
+                                      format("Invalid or unimplemented equipment type={}",
+                                             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType));
+                    ShowFatalError(state, "Preceding condition causes termination.");
+                } break;
                 }
 
                 PowerMet = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower;
@@ -239,10 +234,7 @@ namespace SteamBaseboardRadiator {
                                      mdot,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum);
+                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc);
                 CalcSteamBaseboard(state, BaseboardNum, PowerMet);
             }
 
@@ -285,17 +277,17 @@ namespace SteamBaseboardRadiator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetSteamBaseboardInput:");
-        Real64 const MaxFraction(1.0);       // Maximum limit of fractional values
-        Real64 const MinFraction(0.0);       // Minimum limit of fractional values
-        Real64 const MaxSteamFlowRate(10.0); // Maximum limit of steam volume flow rate in m3/s
-        Real64 const MinSteamFlowRate(0.0);  // Minimum limit of steam volume flow rate in m3/s
+        Real64 constexpr MaxFraction(1.0);       // Maximum limit of fractional values
+        Real64 constexpr MinFraction(0.0);       // Minimum limit of fractional values
+        Real64 constexpr MaxSteamFlowRate(10.0); // Maximum limit of steam volume flow rate in m3/s
+        Real64 constexpr MinSteamFlowRate(0.0);  // Minimum limit of steam volume flow rate in m3/s
         //    INTEGER,PARAMETER :: MaxDistribSurfaces   = 20          ! Maximum number of surfaces that a baseboard heater can radiate to
-        int const MinDistribSurfaces(1);            // Minimum number of surfaces that a baseboard heater can radiate to
-        int const iHeatCAPMAlphaNum(2);             // get input index to steam baseboard Radiator system heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(1); // get input index to steam baseboard Radiator system electric heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(
+        int constexpr MinDistribSurfaces(1);            // Minimum number of surfaces that a baseboard heater can radiate to
+        int constexpr iHeatCAPMAlphaNum(2);             // get input index to steam baseboard Radiator system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to steam baseboard Radiator system electric heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(
             1); // get input index to steam baseboard Radiator system electric heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             2); //  get input index to steam baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -519,7 +511,7 @@ namespace SteamBaseboardRadiator {
 
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of the baseboard
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType =
-                TypeOf_Baseboard_Rad_Conv_Steam; //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
+                DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam; //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
 
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).designObjectName =
                 state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
@@ -551,11 +543,11 @@ namespace SteamBaseboardRadiator {
                 GetOnlySingleNode(state,
                                   state.dataIPShortCut->cAlphaArgs(4),
                                   ErrorsFound,
-                                  state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveSteam,
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
-                                  DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
 
             // Get outlet node number
@@ -563,11 +555,11 @@ namespace SteamBaseboardRadiator {
                 GetOnlySingleNode(state,
                                   state.dataIPShortCut->cAlphaArgs(5),
                                   ErrorsFound,
-                                  state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                                  DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveSteam,
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
-                                  DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             TestCompSet(state,
                         state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
@@ -675,7 +667,7 @@ namespace SteamBaseboardRadiator {
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBSteam_Num &&
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBSteam &&
                         state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) ==
                             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID) {
                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ctrlZone;
@@ -855,7 +847,7 @@ namespace SteamBaseboardRadiator {
         }
     }
 
-    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -865,7 +857,6 @@ namespace SteamBaseboardRadiator {
         //                      Feb 2001
         //       MODIFIED       Sep 2009 Daeho Kang (Add Radiant Component)
         //                      Sept 2010 Chandan Sharma, FSEC (plant interactions)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the baseboard units.
@@ -883,24 +874,11 @@ namespace SteamBaseboardRadiator {
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("InitSteamCoil");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &MyEnvrnFlag = state.dataSteamBaseboardRadiator->MyEnvrnFlag;
         int Loop;
         int SteamInletNode;
-        int ZoneNode;
-        int ZoneNum;
         Real64 StartEnthSteam;
         Real64 SteamDensity;
         bool errFlag;
@@ -924,9 +902,7 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SetLoopIndexFlag = true;
         }
 
-        if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr <= 0)
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr =
-                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ControlledZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!state.dataSteamBaseboardRadiator->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -949,10 +925,7 @@ namespace SteamBaseboardRadiator {
                 ScanPlantLoopsForObject(state,
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType,
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
+                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -997,11 +970,7 @@ namespace SteamBaseboardRadiator {
                                0.0,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRateMax,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum);
+                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode);
             state.dataLoopNodes->Node(SteamInletNode).Enthalpy = StartEnthSteam;
             state.dataLoopNodes->Node(SteamInletNode).Quality = 1.0;
             state.dataLoopNodes->Node(SteamInletNode).HumRat = 0.0;
@@ -1022,7 +991,7 @@ namespace SteamBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            ZoneNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
+            int ZoneNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
             state.dataSteamBaseboardRadiator->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum);
             state.dataSteamBaseboardRadiator->QBBSteamRadSrcAvg(BaseboardNum) = 0.0;
             state.dataSteamBaseboardRadiator->LastQBBSteamRadSrc(BaseboardNum) = 0.0;
@@ -1032,7 +1001,6 @@ namespace SteamBaseboardRadiator {
 
         // Do the every time step initializations
         SteamInletNode = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode;
-        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate = state.dataLoopNodes->Node(SteamInletNode).MassFlowRate;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletTemp = state.dataLoopNodes->Node(SteamInletNode).Temp;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletEnthalpy = state.dataLoopNodes->Node(SteamInletNode).Enthalpy;
@@ -1108,7 +1076,7 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
         // Find the appropriate steam plant sizing object
-        PltSizSteamNum = state.dataPlnt->PlantLoop(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum).PlantSizNum;
+        PltSizSteamNum = state.dataPlnt->PlantLoop(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.loopNum).PlantSizNum;
         //    PltSizSteamNum = MyPlantSizingIndex('Coil:Heating:Steam', SteamBaseboard(BaseboardNum)%EquipID, &
         //                    SteamBaseboard(BaseboardNum)%SteamInletNode, &
         //                    SteamBaseboard(BaseboardNum)%SteamOutletNode, ErrorsFound)
@@ -1510,7 +1478,7 @@ namespace SteamBaseboardRadiator {
 
         using DataHeatBalFanSys::MaxRadHeatFlux;
 
-        Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+        Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
         int BaseboardNum;         // Counter for the baseboard
@@ -1654,15 +1622,16 @@ namespace SteamBaseboardRadiator {
         return SumHATsurf;
     }
 
-    void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
-                                             int const BaseboardTypeNum,               // type index
-                                             std::string const &BaseboardName,         // component name
-                                             [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
-                                             [[maybe_unused]] int const LoopNum,       // Plant loop index for where called from
-                                             [[maybe_unused]] int const LoopSide,      // Plant loop side index for where called from
-                                             int &CompIndex,                           // Chiller number pointer
-                                             [[maybe_unused]] bool const FirstHVACIteration,
-                                             bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
+    void
+    UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
+                                        DataPlant::PlantEquipmentType BaseboardType,                 // type index
+                                        std::string const &BaseboardName,                            // component name
+                                        [[maybe_unused]] int const EquipFlowCtrl,                    // Flow control mode for the equipment
+                                        [[maybe_unused]] int const LoopNum,                          // Plant loop index for where called from
+                                        [[maybe_unused]] const DataPlant::LoopSideLocation LoopSide, // Plant loop side index for where called from
+                                        int &CompIndex,                                              // Chiller number pointer
+                                        [[maybe_unused]] bool const FirstHVACIteration,
+                                        bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {
 
@@ -1682,8 +1651,7 @@ namespace SteamBaseboardRadiator {
         // Based on UpdateBaseboardPlantConnection from Brent Griffith, Sept 2010
 
         // Using/Aliasing
-        using DataPlant::ccSimPlantEquipTypes;
-        using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
+        using DataPlant::PlantEquipTypeNames;
 
         using PlantUtilities::PullCompInterconnectTrigger;
 
@@ -1718,13 +1686,13 @@ namespace SteamBaseboardRadiator {
                                           BaseboardName,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID));
                 }
-                if (BaseboardTypeNum != TypeOf_Baseboard_Rad_Conv_Steam) {
+                if (BaseboardType != DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam) {
                     ShowFatalError(state,
                                    format("UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard "
                                           "Name for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          ccSimPlantEquipTypes(BaseboardTypeNum)));
+                                          PlantEquipTypeNames[static_cast<int>(BaseboardType)]));
                 }
             }
         }
@@ -1734,36 +1702,24 @@ namespace SteamBaseboardRadiator {
         }
 
         PullCompInterconnectTrigger(state,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::HeatTransferRate,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
+                                    DataPlant::CriteriaType::HeatTransferRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power);
 
         PullCompInterconnectTrigger(state,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::MassFlowRate,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
+                                    DataPlant::CriteriaType::MassFlowRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate);
 
         PullCompInterconnectTrigger(state,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::Temperature,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
+                                    DataPlant::CriteriaType::Temperature,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletTemp);
     }
 

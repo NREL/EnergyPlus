@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Cell_HPP
@@ -14,8 +14,6 @@
 #include <fstream>
 #include <memory>
 #include <numeric>
-
-#include <Eigen/SparseCore>
 
 namespace Kiva {
 
@@ -63,8 +61,8 @@ public:
   Surface *surfacePtr;
   Mesher *meshPtr;
 
-  void setDistances(const double &dxp_in, const double &dxm_in, const double &dyp_in,
-                    const double &dym_in, const double &dzp_in, const double &dzm_in);
+  void setDistances(const double dxp_in, const double dxm_in, const double dyp_in,
+                    const double dym_in, const double dzp_in, const double dzm_in);
 
   void setConductivities(const std::vector<std::shared_ptr<Cell>> &cell_v);
 
@@ -83,17 +81,17 @@ public:
   virtual double calcCellExplicit(double timestep, const Foundation &foundation,
                                   const BoundaryConditions &bcs);
 
-  virtual void calcCellMatrix(Foundation::NumericalScheme scheme, const double &timestep,
+  virtual void calcCellMatrix(Foundation::NumericalScheme scheme, const double timestep,
                               const Foundation &foundation, const BoundaryConditions &bcs,
                               double &A, double (&Alt)[3][2], double &bVal);
 
   void calcCellSteadyState(const Foundation &foundation, double &A, double (&Alt)[3][2],
                            double &bVal);
 
-  virtual void calcCellADI(std::size_t dim, const double &timestep, const Foundation &foundation,
+  virtual void calcCellADI(std::size_t dim, const double timestep, const Foundation &foundation,
                            const BoundaryConditions &bcs, double &A, double (&Alt)[2],
                            double &bVal);
-  void gatherCCoeffs(const double &theta, bool cylindrical, double (&C)[3][2]);
+  void gatherCCoeffs(const double theta, bool cylindrical, double (&C)[3][2]);
 
   virtual std::vector<double> calculateHeatFlux(int ndims, double &TNew, std::size_t nX,
                                                 std::size_t nY, std::size_t nZ,
@@ -121,10 +119,10 @@ public:
                        double &v) override;
   double calcCellExplicit(double timestep, const Foundation &foundation,
                           const BoundaryConditions &bcs) override;
-  void calcCellMatrix(Foundation::NumericalScheme scheme, const double &timestep,
+  void calcCellMatrix(Foundation::NumericalScheme scheme, const double timestep,
                       const Foundation &foundation, const BoundaryConditions &bcs, double &A,
                       double (&Alt)[3][2], double &bVal) override;
-  void calcCellADI(std::size_t dim, const double &timestep, const Foundation &foundation,
+  void calcCellADI(std::size_t dim, const double timestep, const Foundation &foundation,
                    const BoundaryConditions &bcs, double &A, double (&Alt)[2],
                    double &bVal) override;
   std::vector<double> calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
@@ -145,10 +143,10 @@ public:
                        double &v) override;
   double calcCellExplicit(double timestep, const Foundation &foundation,
                           const BoundaryConditions &bcs) override;
-  void calcCellMatrix(Foundation::NumericalScheme scheme, const double &timestep,
+  void calcCellMatrix(Foundation::NumericalScheme scheme, const double timestep,
                       const Foundation &foundation, const BoundaryConditions &bcs, double &A,
                       double (&Alt)[3][2], double &bVal) override;
-  void calcCellADI(std::size_t dim, const double &timestep, const Foundation &foundation,
+  void calcCellADI(std::size_t dim, const double timestep, const Foundation &foundation,
                    const BoundaryConditions &bcs, double &A, double (&Alt)[2],
                    double &bVal) override;
   std::vector<double> calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
@@ -168,10 +166,10 @@ public:
                        double &V) override;
   double calcCellExplicit(double timestep, const Foundation &foundation,
                           const BoundaryConditions &bcs) override;
-  void calcCellMatrix(Foundation::NumericalScheme scheme, const double &timestep,
+  void calcCellMatrix(Foundation::NumericalScheme scheme, const double timestep,
                       const Foundation &foundation, const BoundaryConditions &bcs, double &A,
                       double (&Alt)[3][2], double &bVal) override;
-  void calcCellADI(std::size_t dim, const double &timestep, const Foundation &foundation,
+  void calcCellADI(std::size_t dim, const double timestep, const Foundation &foundation,
                    const BoundaryConditions &bcs, double &A, double (&Alt)[2],
                    double &bVal) override;
   std::vector<double> calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
@@ -179,22 +177,26 @@ public:
                                         const std::vector<std::shared_ptr<Cell>> &cell_v) override;
 
 private:
-  inline void zfCellADI(const int &dim, const int &sdim, const int &sign, double &A, double &Alt,
-                        double &bVal);
-  inline void ifCellADI(const int &dim, const int &sdim, const int &dir, double &A, double &Alt, double &bVal);
-  inline void efCellADI(const int &dim, const int &sdim, const int &sign, double &A, double &Alt, double &bVal);
+  inline void zfCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t sign,
+                        double &A, double &Alt, double &bVal);
+  inline void ifCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t dir,
+                        double &A, double &Alt, double &bVal);
+  inline void efCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t sign,
+                        double &A, double &Alt, double &bVal);
   inline void zfCellMatrix(double &A, double &Alt, double &bVal);
-  inline void ifCellMatrix(const int &dim, const int &dir, double &A, double &Alt, double &bVal);
-  inline void efCellMatrix(const int &dim, const int &dir, double &A, double &Alt, double &bVal);
-  inline void zfCellADEUp(const std::size_t &dim, const std::size_t &dir, double &U);
-  inline void ifCellADEUp(const int &dim, const int &dir, double &U);
-  inline void efCellADEUp(const int &dim, const int &dir, double &U);
-  inline void zfCellADEDown(const std::size_t &dim, const std::size_t &dir, double &V);
-  inline void ifCellADEDown(const int &dim, const int &dir, double &V);
-  inline void efCellADEDown(const int &dim, const int &dir, double &V);
-  inline double zfCellExplicit(const std::size_t &dim, const std::size_t &dir);
-  inline double ifCellExplicit(const std::size_t &dim, const std::size_t &dir);
-  inline double efCellExplicit(const std::size_t &dim, const std::size_t &dir);
+  inline void ifCellMatrix(const std::size_t dim, const std::size_t dir, double &A, double &Alt,
+                           double &bVal);
+  inline void efCellMatrix(const std::size_t dim, const std::size_t dir, double &A, double &Alt,
+                           double &bVal);
+  inline void zfCellADEUp(const std::size_t dim, const std::size_t &dir, double &U);
+  inline void ifCellADEUp(const std::size_t dim, const std::size_t dir, double &U);
+  inline void efCellADEUp(const std::size_t dim, const std::size_t dir, double &U);
+  inline void zfCellADEDown(const std::size_t dim, const std::size_t &dir, double &V);
+  inline void ifCellADEDown(const std::size_t dim, const std::size_t dir, double &V);
+  inline void efCellADEDown(const std::size_t dim, const std::size_t dir, double &V);
+  inline double zfCellExplicit(const std::size_t dim, const std::size_t &dir);
+  inline double ifCellExplicit(const std::size_t dim, const std::size_t &dir);
+  inline double efCellExplicit(const std::size_t dim, const std::size_t &dir);
 };
 
 class ZeroThicknessCell : public Cell {

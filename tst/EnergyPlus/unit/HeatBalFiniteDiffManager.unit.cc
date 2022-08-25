@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,10 +69,10 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
 {
     auto &SurfaceFD = state->dataHeatBalFiniteDiffMgr->SurfaceFD;
-    int const numNodes(4);
+    int constexpr numNodes(4);
     int nodeNum(0);
     SurfaceFD.allocate(1);
-    int const SurfNum(1);
+    int constexpr SurfNum(1);
     SurfaceFD(SurfNum).QDreport.allocate(numNodes + 1);
     SurfaceFD(SurfNum).TDpriortimestep.allocate(numNodes + 1);
     SurfaceFD(SurfNum).TDT.allocate(numNodes + 1);
@@ -211,8 +211,8 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     ASSERT_TRUE(process_idf(idf_objects, false));
 
     // allocate a finite difference surface object and needed member variables
-    int const surfaceIndex = 1;
-    int const finiteDiffLayerIndex = 1;
+    int constexpr surfaceIndex = 1;
+    int constexpr finiteDiffLayerIndex = 1;
     auto &SurfaceFD = state->dataHeatBalFiniteDiffMgr->SurfaceFD;
     SurfaceFD.allocate(1);
     SurfaceFD(surfaceIndex).PhaseChangeTemperatureReverse.allocate(1);

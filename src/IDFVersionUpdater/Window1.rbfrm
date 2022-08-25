@@ -3,15 +3,14 @@ Begin Window Window1
    BackColor       =   &cFFFFFF00
    Backdrop        =   0
    CloseButton     =   True
-   Compatibility   =   ""
    Composite       =   False
    Frame           =   0
    FullScreen      =   False
    FullScreenButton=   False
    HasBackColor    =   False
-   Height          =   200
+   Height          =   230
    ImplicitInstance=   True
-   LiveResize      =   True
+   LiveResize      =   "True"
    MacProcID       =   0
    MaxHeight       =   200
    MaximizeButton  =   False
@@ -25,7 +24,7 @@ Begin Window Window1
    Resizeable      =   True
    Title           =   "IDF Version Updater"
    Visible         =   True
-   Width           =   662
+   Width           =   802
    Begin TextField txtFileName
       AcceptTabs      =   False
       Alignment       =   0
@@ -63,10 +62,11 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   47
+      Transparent     =   True
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
-      Width           =   622
+      Width           =   762
    End
    Begin BevelButton cmdChooseFile
       AcceptFocus     =   False
@@ -97,7 +97,6 @@ Begin Window Window1
       LockLeft        =   True
       LockRight       =   False
       LockTop         =   True
-      MenuValue       =   0
       Scope           =   0
       TabIndex        =   1
       TabPanelIndex   =   0
@@ -107,10 +106,11 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   14
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   189
+      Width           =   283
    End
    Begin BevelButton cmdConvert
       AcceptFocus     =   False
@@ -141,7 +141,6 @@ Begin Window Window1
       LockLeft        =   True
       LockRight       =   False
       LockTop         =   False
-      MenuValue       =   0
       Scope           =   0
       TabIndex        =   2
       TabPanelIndex   =   0
@@ -150,11 +149,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   153
+      Top             =   183
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   147
+      Width           =   283
    End
    Begin BevelButton cmdExit
       AcceptFocus     =   False
@@ -179,13 +179,12 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   519
+      Left            =   639
       LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   False
-      MenuValue       =   0
       Scope           =   0
       TabIndex        =   3
       TabPanelIndex   =   0
@@ -194,11 +193,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   153
+      Top             =   183
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   123
+      Width           =   143
    End
    Begin CheckBox chkIntermediate
       AutoDeactivate  =   True
@@ -212,7 +212,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   413
+      Left            =   468
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -226,11 +226,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   83
+      Top             =   84
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   229
+      Width           =   314
    End
    Begin Label Label2
       AutoDeactivate  =   True
@@ -239,6 +240,41 @@ Begin Window Window1
       DataSource      =   ""
       Enabled         =   True
       Height          =   20
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   188
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Multiline       =   False
+      Scope           =   0
+      Selectable      =   False
+      TabIndex        =   10
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Text            =   "New Version"
+      TextAlign       =   0
+      TextColor       =   &c00000000
+      TextFont        =   "System"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   83
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   144
+   End
+   Begin Label Label3
+      AutoDeactivate  =   True
+      Bold            =   True
+      DataField       =   ""
+      DataSource      =   ""
+      Enabled         =   True
+      Height          =   24
       HelpTag         =   ""
       Index           =   -2147483648
       InitialParent   =   ""
@@ -252,53 +288,20 @@ Begin Window Window1
       Multiline       =   False
       Scope           =   0
       Selectable      =   False
-      TabIndex        =   10
-      TabPanelIndex   =   0
-      Text            =   "New Version"
-      TextAlign       =   1
-      TextColor       =   &c00000000
-      TextFont        =   "System"
-      TextSize        =   0.0
-      TextUnit        =   0
-      Top             =   83
-      Transparent     =   False
-      Underline       =   False
-      Visible         =   True
-      Width           =   107
-   End
-   Begin Label Label3
-      AutoDeactivate  =   True
-      Bold            =   False
-      DataField       =   ""
-      DataSource      =   ""
-      Enabled         =   True
-      Height          =   21
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   False
-      Left            =   94
-      LockBottom      =   False
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   False
-      LockTop         =   True
-      Multiline       =   False
-      Scope           =   0
-      Selectable      =   False
       TabIndex        =   12
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "-->"
       TextAlign       =   1
       TextColor       =   &c00000000
       TextFont        =   "System"
-      TextSize        =   0.0
+      TextSize        =   20.0
       TextUnit        =   0
-      Top             =   106
+      Top             =   104
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   28
+      Width           =   40
    End
    Begin TextField txtCurrentVersion
       AcceptTabs      =   False
@@ -313,12 +316,12 @@ Begin Window Window1
       DataSource      =   ""
       Enabled         =   False
       Format          =   ""
-      Height          =   23
+      Height          =   25
       HelpTag         =   "This field shows the current version of the file selected and shown above."
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   43
+      Left            =   29
       LimitText       =   0
       LockBottom      =   False
       LockedInPosition=   False
@@ -337,11 +340,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   107
+      Top             =   105
+      Transparent     =   True
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
-      Width           =   39
+      Width           =   76
    End
    Begin Label Label1
       AutoDeactivate  =   True
@@ -354,7 +358,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   20
+      Left            =   29
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
@@ -365,17 +369,18 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   14
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Current Version"
-      TextAlign       =   1
+      TextAlign       =   0
       TextColor       =   &c00000000
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   83
+      Top             =   84
       Transparent     =   False
       Underline       =   False
       Visible         =   True
-      Width           =   95
+      Width           =   134
    End
    Begin BevelButton cmdViewAudit
       AcceptFocus     =   False
@@ -400,13 +405,12 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   361
+      Left            =   468
       LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   False
-      MenuValue       =   0
       Scope           =   0
       TabIndex        =   15
       TabPanelIndex   =   0
@@ -415,11 +419,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   153
+      Top             =   183
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   125
+      Width           =   146
    End
    Begin CheckBox chkDeleteOrig
       AutoDeactivate  =   True
@@ -433,7 +438,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   413
+      Left            =   468
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
@@ -447,11 +452,12 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   107
+      Top             =   110
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
-      Width           =   150
+      Width           =   307
    End
    Begin PopupMenu pmnuNewVersion
       AutoDeactivate  =   True
@@ -465,7 +471,7 @@ Begin Window Window1
       InitialParent   =   ""
       InitialValue    =   ""
       Italic          =   False
-      Left            =   150
+      Left            =   188
       ListIndex       =   0
       LockBottom      =   False
       LockedInPosition=   False
@@ -479,10 +485,11 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   104
+      Top             =   105
+      Transparent     =   True
       Underline       =   False
       Visible         =   True
-      Width           =   71
+      Width           =   115
    End
    Begin Label lblProcessing
       AutoDeactivate  =   True
@@ -490,12 +497,12 @@ Begin Window Window1
       DataField       =   ""
       DataSource      =   ""
       Enabled         =   True
-      Height          =   22
+      Height          =   39
       HelpTag         =   ""
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   196
+      Left            =   20
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
@@ -506,17 +513,18 @@ Begin Window Window1
       Selectable      =   False
       TabIndex        =   18
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Processing"
       TextAlign       =   0
       TextColor       =   &c0000FF00
       TextFont        =   "System"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   130
+      Top             =   140
       Transparent     =   False
       Underline       =   False
       Visible         =   False
-      Width           =   446
+      Width           =   762
    End
    Begin BevelButton cmdAbout
       AcceptFocus     =   False
@@ -541,13 +549,12 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   592
+      Left            =   732
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   False
       LockRight       =   True
       LockTop         =   True
-      MenuValue       =   0
       Scope           =   0
       TabIndex        =   19
       TabPanelIndex   =   0
@@ -557,6 +564,7 @@ Begin Window Window1
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   7
+      Transparent     =   True
       Underline       =   False
       Value           =   False
       Visible         =   True
@@ -590,7 +598,6 @@ End
 		  dim dirOfTransApp as FolderItem
 		  dim s as Shell
 		  dim origFileOrigDate as FolderItem
-		  dim origFileNewOld as FolderItem
 		  dim origFileInter as FolderItem
 		  dim origFileWithNewName as String
 		  dim auditSource as FolderItem
@@ -614,7 +621,7 @@ End
 		  inFileExt = ExtensionOnly(inFile)
 		  
 		  if inFile<>"" then
-		    origFile = new FolderItem(inFile )
+		    origFile = new FolderItem(inFile)
 		    origVerIndx = AllOldVersions.IndexOf(inOrigVersion)
 		    origShortVersion = "_V" + inOrigVersion.ReplaceAll(".","") ' make the version identifier for the end of a file name "_V320" if the version is 3.2.0
 		    finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
@@ -626,7 +633,7 @@ End
 		      'indicate the dialog box is waiting
 		      lblProcessing.Visible = True
 		      lblProcessing.Text = "Processing: " + origFile.Name
-		      dirOfTransApp = transitionapps(iver).Parent
+		      dirOfTransApp = transitionapps(iVer).Parent
 		      'msgbox origFile.AbsolutePath + EndOfLine + origVer + EndOfLine + finalVer
 		      'if original file should be retained then make copy with name ending with "_original.idf"
 		      if not chkDeleteOrig.Value then
@@ -669,7 +676,7 @@ End
 		        end if
 		      end if
 		      'delete the Transition.audit file
-		      auditSource = new FolderItem(dirOfTransApp.AbsolutePath + "Transition.audit")
+		      auditSource = new FolderItem(dirOfTransApp.NativePath + "Transition.audit")
 		      if auditSource.Exists then
 		        auditSource.Delete
 		      end if
@@ -679,16 +686,11 @@ End
 		        Window1.Refresh
 		        'msgbox dirOfTransApp.AbsolutePath + EndOfLine + TransitionApps(iVer).AbsolutePath + EndOfLine + origFile.AbsolutePath
 		        
-		        'for windows
-		        #if TargetWin32
-		          cmdLine = "CD /D " ' this changes the directory and drive - must end with a space
-		          cmdLine = cmdLine + chr(34) + dirOfTransApp.AbsolutePath + chr(34) 'change to the directory of the transition app because needs to find IDD files in that location - use shellpath to eliminate spaces
-		          cmdLine = cmdLine + " && " 'this is DOS function that joins to commands on the same line and only does the second if the first was successful - need spaces before and after
-		          cmdLine = cmdLine + TransitionApps(iVer).name 'this is the name of the Transition program
-		          cmdLine = cmdLine + " " ' leave a space before the argument
-		          cmdLine = cmdLine + chr(34) + origFile.AbsolutePath + chr(34) 'pass the name of the file to be transitioned as an argument
+		        'for windows and linux
+		        #if TargetWindows or TargetLinux
+		          cmdLine = TransitionApps(iVer).NativePath + " " + chr(34) + origFile.NativePath + chr(34)
 		        #else
-		          'for Linux and MacOS assuming using Bash shell
+		          'for MacOS assuming using Bash shell
 		          cmdLine = "cd " ' this changes the directory and drive - must end with a space
 		          cmdLine = cmdLine  + dirOfTransApp.ShellPath 'change to the directory of the transition app because needs to find IDD files in that location - use shellpath to eliminate spaces
 		          cmdLine = cmdLine + " ; ./" 'this is DOS function that joins to commands on the same line and only does the second if the first was successful - need spaces before and after
@@ -696,13 +698,18 @@ End
 		          cmdLine = cmdLine + " " ' leave a space before the argument
 		          cmdLine = cmdLine +  origFile.ShellPath  'pass the name of the file to be transitioned as an argument
 		        #endif
+		        
+		        
+		        ' for debugging
 		        'msgbox cmdLine
+		        'dim clip as new Clipboard
+		        'clip.Text = cmdLine
 		        
 		        s.Execute cmdLine
 		        'MsgBox "transition" + EndOfLine + s.ReadAll
 		        
 		        if s.ErrorCode <>0 then
-		          MsgBox "Error starting Transition-Vx-x-x Program: " + str(s.ErrorCode)
+		          MsgBox "Error starting Transition-Vx-x-x Program: " + str(s.ErrorCode) + EndOfLine + EndOfLine + s.Result
 		        end if
 		        
 		        'collect audit text
@@ -759,7 +766,7 @@ End
 		      
 		      'show summary message
 		      if showSummary then
-		        MsgBox "Completed transition of:" + EndOfLine + EndOfLine + origFile.AbsolutePath + EndOfLine + EndOfLine + "From " + inOrigVersion + " to " + inFinalVersion
+		        MsgBox "Completed transition of:" + EndOfLine + EndOfLine + origFile.NativePath + EndOfLine + EndOfLine + "From " + inOrigVersion + " to " + inFinalVersion
 		      end if
 		    elseif origFile.Exists and origVerIndx=notFound then
 		      ' the file has no VERSION object at all.
@@ -775,6 +782,124 @@ End
 		    end if
 		  end if
 		  s.Close
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub CopyIDDandCSV(inFile as string, inOrigVersion as String, inFinalVersion as String)
+		  ' for Linux and MacOS copy the IDD and report CSV files to the directory with the active file.
+		  dim origFile as FolderItem
+		  dim origFileDirectory as FolderItem
+		  dim origVerIndx as Integer
+		  dim finalVerIndx as Integer
+		  dim iVer as Integer
+		  dim dashVersion as String
+		  dim dirOfTransApp as FolderItem
+		  dim iddName as String
+		  dim iddFileInTrans as FolderItem
+		  dim iddFileInOrig as FolderItem
+		  dim nextDashVersion as String
+		  dim repcsvName as String
+		  dim repcsvFileInTrans as FolderItem
+		  dim repcsvFileInOrig as FolderItem
+		  
+		  origVerIndx = AllNewVersions.IndexOf(inOrigVersion)
+		  if origVerIndx = -1 then origVerIndx = AllNewVersions.FirstIndex 'if not found just start at the beginning
+		  
+		  finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
+		  if finalVerIndx = -1 then finalVerIndx = AllNewVersions.LastIndex 'if not found go until the last
+		  
+		  if inFile<>"" then
+		    origFile = new FolderItem(inFile)
+		    origFileDirectory = origFile.Parent
+		    for iVer = origVerIndx to finalVerIndx
+		      dashVersion = AllNewVersions(iVer).ReplaceAll(".","-") ' Convert "3.1.0" format to "3-1-0"
+		      dirOfTransApp = TransitionApps(iVer).Parent
+		      ' copy the VXX-X-X-Energy+.idd files
+		      iddName = "V" + dashVersion + "-Energy+.idd"
+		      iddFileInTrans = dirOfTransApp.Child(iddName)
+		      iddFileInOrig = origFileDirectory.Child(iddName)
+		      if iddFileInTrans.exists then
+		        try
+		          iddFileInTrans.CopyFileTo(iddFileInOrig)
+		        exception
+		          MsgBox "Cannot copy IDD file to local directory: " + iddFileInOrig.NativePath
+		        end try
+		      end if
+		      ' copy the Report Variables XX-X-X to XX-X-X.csv
+		      ' don't need to do last iteration
+		      if iVer <> finalVerIndx then
+		        nextDashVersion = AllNewVersions(iVer + 1).ReplaceAll(".","-")
+		        repcsvName = "Report Variables "+ dashVersion + " to " + nextDashVersion + ".csv"
+		        repcsvFileInTrans = dirOfTransApp.Child(repcsvName)
+		        repcsvFileInOrig = origFileDirectory.Child(repcsvName)
+		        if repcsvFileInTrans.exists then
+		          try
+		            repcsvFileInTrans.CopyFileTo(repcsvFileInOrig)
+		          exception
+		            MsgBox "Cannot copy report csv file to local directory: " + repcsvFileInOrig.NativePath
+		          end try
+		        end if
+		      end if
+		    next iVer
+		  end if
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub DeleteCopiedIDDandCSV(inFile as string, inOrigVersion as String, inFinalVersion as String)
+		  ' for Linux and MacOS delete the IDD and report CSV files previously copied
+		  dim origFile as FolderItem
+		  dim origFileDirectory as FolderItem
+		  dim origVerIndx as Integer
+		  dim finalVerIndx as Integer
+		  dim iVer as Integer
+		  dim dashVersion as String
+		  dim iddName as String
+		  dim iddFileInOrig as FolderItem
+		  dim nextDashVersion as String
+		  dim repcsvName as String
+		  dim repcsvFileInOrig as FolderItem
+		  
+		  origVerIndx = AllNewVersions.IndexOf(inOrigVersion)
+		  if origVerIndx = -1 then origVerIndx = AllNewVersions.FirstIndex 'if not found just start at the beginning
+		  
+		  finalVerIndx = AllNewVersions.IndexOf(inFinalVersion)
+		  if finalVerIndx = -1 then finalVerIndx = AllNewVersions.LastIndex 'if not found go until the last
+		  
+		  if inFile<>"" then
+		    origFile = new FolderItem(inFile)
+		    origFileDirectory = origFile.Parent
+		    for iVer = origVerIndx to finalVerIndx
+		      dashVersion = AllNewVersions(iVer).ReplaceAll(".","-") ' Convert "3.1.0" format to "3-1-0"
+		      ' delete previously copied VXX-X-X-Energy+.idd files
+		      iddName = "V" + dashVersion + "-Energy+.idd"
+		      iddFileInOrig = origFileDirectory.Child(iddName)
+		      if iddFileInOrig.exists then
+		        try
+		          iddFileInOrig.Remove()
+		        exception
+		          MsgBox "Cannot remove copied IDD file from local directory: " + iddFileInOrig.NativePath
+		        end try
+		      end if
+		      ' delete previously copied Report Variables XX-X-X to XX-X-X.csv files
+		      ' don't need to do last iteration
+		      if iVer <> finalVerIndx then
+		        nextDashVersion = AllNewVersions(iVer + 1).ReplaceAll(".","-")
+		        repcsvName = "Report Variables "+ dashVersion + " to " + nextDashVersion + ".csv"
+		        repcsvFileInOrig = origFileDirectory.Child(repcsvName)
+		        if repcsvFileInOrig.exists then
+		          try
+		            repcsvFileInOrig.Remove()
+		          exception
+		            MsgBox "Cannot remove copied report csv file to local directory: " + repcsvFileInOrig.NativePath
+		          end try
+		        end if
+		      end if
+		    next iVer
+		  end if
 		  
 		End Sub
 	#tag EndMethod
@@ -876,11 +1001,15 @@ End
 		  dim numFiles as Integer  = 0
 		  dim i as integer = 0
 		  dim fileName as String
-		  dim s as String =""
-		  dim t as String =""
-		  dim u as string = ""
+		  'dim s as String =""
+		  'dim t as String =""
+		  dim u as String = ""
+		  'dim v as String = ""
 		  dim newVersionWithDashes as String
 		  dim oldVersionWithDashes as String
+		  Var strParts() as String
+		  dim sortVersion as String
+		  Var allSortVersions() as String
 		  
 		  #if TargetMacOS
 		    transFolder = app.ExecutableFile.Parent.Parent.Parent.Parent
@@ -902,19 +1031,35 @@ End
 		      '1234567890123456789012345678901
 		      ' this is the original line that did not work well with Linux because of use of the extension
 		      'if fileName.Left(12).Lowercase = "transition-v" and filename.right(4).Lowercase = ".exe" then
+		      
+		      ' to fix #9193 which is the lack of support for version numbers in the form 22.1.0
+		      'Transition-V9-6-0-to-V22-1-0.exe
+		      
 		      if fileName.Left(12).Lowercase = "transition-v" then
-		        oldVersionWithDashes = fileName.mid(13,5)
-		        newVersionWithDashes = fileName.mid(23,5)
+		        strParts = fileName.Split("V")
+		        oldVersionWithDashes = strParts(1)
+		        oldVersionWithDashes = oldVersionWithDashes.Replace("-to-","")
+		        newVersionWithDashes = strParts(2)
+		        newVersionWithDashes = newVersionWithDashes.Replace(".exe","")
+		        ' old way of doing this
+		        ' oldVersionWithDashes = fileName.mid(13,5)
+		        ' newVersionWithDashes = fileName.mid(23,5)
+		        sortVersion = newVersionWithDashes
+		        if sortVersion.mid(2,1) = "-" then
+		          sortVersion = "0" + sortVersion
+		        end if
 		        if newVersionWithDashes <> "" then
 		          AllOldVersions.Append  oldVersionWithDashes.ReplaceAll("-",".")
 		          AllNewVersions.Append  newVersionWithDashes.ReplaceAll("-",".")
 		          TransitionApps.Append f
+		          allSortVersions.Append sortVersion
 		        end if
 		      end if
 		    next i
 		  end if
 		  'sort the arrays (usually sorted already but just in case)
-		  AllNewVersions.SortWith(TransitionApps,AllOldVersions)
+		  'AllNewVersions.SortWith(TransitionApps,AllOldVersions)
+		  allSortVersions.SortWith(AllNewVersions,TransitionApps,AllOldVersions)
 		  
 		  ' THE FOLLOWING IS TO HELP DEBUG THE LIST OF TRANSITION EXE FILES
 		  'display the list
@@ -924,9 +1069,13 @@ End
 		  'for i = 0 to TransitionApps.Ubound
 		  't = t + TransitionApps(i).name + EndOfLine
 		  'next i
-		  'MsgBox "Application program location:" + EndOfLine + "  " + transFolder.AbsolutePath + EndOfLine + EndOfLine + "Number of files: "  _
+		  'for i = 0 to TransitionApps.Ubound
+		  'v = v + allSortVersions(i) + EndOfLine
+		  'next i
+		  'MsgBox "Application program location:" + EndOfLine + "  " + transFolder.NativePath + EndOfLine + EndOfLine + "Number of files: "  _
 		  '+ str(numFiles) + EndOfLine + EndOfLine + "Versions found: " + EndOfLine + s +  EndOfLine + "Transition Programs:" _
-		  '+ EndOfLine + t + endofline + "All files: " + EndOfLine + u + EndOfLine
+		  '+ EndOfLine + "AllSortVersions" + EndOfLine + v + EndOfLine 
+		  '+ EndOfLine + t + EndOfline + "All files: " + EndOfLine + u + EndOfLine _
 		  
 		  
 		  
@@ -975,7 +1124,11 @@ End
 		        elseif versionFound.Len = 3 Then
 		          versionFound = versionFound + ".0"
 		        End If
-		        versionFound = versionFound.Left(5) 'trim build number if included, such as: 3.0.0.028 to 3.0.0
+		        if versionFound.instr(".") = 2 then
+		          versionFound = versionFound.Left(5) 'trim build number if included, such as: 3.0.0.028 to 3.0.0
+		        Else
+		          versionFound = versionFound.Left(6) 'trim build number if included, such as: 23.0.0.028 to 23.0.0
+		        End if
 		      Else
 		        versionFound = ""
 		      End If
@@ -1038,29 +1191,23 @@ End
 #tag Events cmdChooseFile
 	#tag Event
 		Sub Action()
-		  dim idfType as new FileType
-		  dim idmType as new FileType
-		  dim lstType as new FileType
 		  dim f as FolderItem
-		  dim dlg as new OpenDialog
 		  dim curVersion as string = ""
+		  dim filepath as string = ""
 		  dim auditFile as FolderItem
-		  idfType.Name = "EnergyPlus Input File"
-		  idfType.MacType = "idf"
-		  idfType.Extensions = "idf"
-		  idmType.Name = "EnergyPlus Macro File"
-		  idmType.MacType = "imf"
-		  idmType.Extensions = "imf"
-		  lstType.Name = "Text File With List of EnergyPlus Files"
-		  lstType.MacType = "lst"
-		  lstType.Extensions = "lst"
-		  dlg.Title = "Select Old EnergyPlus File to Update"
-		  dlg.filter = idfType  + idmType + lstType
-		  f = dlg.ShowModal()
+		  'dlg.Title = "Select Old EnergyPlus File to Update"
+		  f = FolderItem.ShowOpenFileDialog(ReadFileTypeGroup.all)
 		  if f<>nil then
-		    txtFileName.Text = f.AbsolutePath
+		    filepath = f.NativePath
+		    #if TargetMacOS then
+		      if ExtensionOnly(filepath) = "txt" then
+		        filepath = filepath.left(filepath.length - 4)
+		      end if
+		    #EndIf
+		    txtFileName.Text = filepath
+		    'msgbox "cmdChooseFile-Action-1: " + filepath + " extension " + ExtensionOnly(filepath)
 		    txtFileName.Enabled = True
-		    if extensionOnly(f.AbsolutePath) <> "LST" then 'IDF or IDM files are processed
+		    if extensionOnly(filepath) <> "lst" then 'IDF or IDM files are processed
 		      curVersion =  getCurrentFileVersion(f)
 		      if curVersion<>"" then
 		        txtCurrentVersion.Text = curVersion
@@ -1068,7 +1215,7 @@ End
 		        pmnuNewVersion.Enabled = True
 		        call FillLaterVersions(curVersion)
 		        'enable the View Audit button if exists.
-		        auditFile = new FolderItem(fileNameWithoutExtension(f.AbsolutePath) + "_transition.audit" )
+		        auditFile = new FolderItem(fileNameWithoutExtension(f.NativePath) + "_transition.audit" )
 		        if auditFile.Exists then
 		          cmdViewAudit.Enabled = True
 		        else
@@ -1096,15 +1243,31 @@ End
 		  dim curLine as string = ""
 		  dim curFile as FolderItem
 		  dim curVersion as String =""
-		  dim listFile as FolderItem
+		  dim activeFile as FolderItem
+		  dim activeFileName as String = ""
 		  
 		  'Called when the CONVERT button is pressed
 		  me.MouseCursor = system.Cursors.Wait
 		  me.Refresh
-		  if ExtensionOnly(txtFileName.Text) = "LST" then
-		    listFile = new FolderItem(txtFileName.Text )
-		    IF listFile.Exists then
-		      SourceStream = TextInputStream.Open(listFile)
+		  ' for Windows and Linux copy the IDD and CSV to current file location
+		  #if TargetWindows or TargetLinux then
+		    call CopyIDDandCSV(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text)
+		  #EndIf
+		  
+		  activeFileName = txtFileName.Text
+		  activeFile = new FolderItem(activeFileName)
+		  'on MacOS the file name sometime has an extra extension of .txt
+		  #if TargetMacOS then
+		    if not activeFile.Exists then
+		      activeFileName = activeFileName + ".txt"
+		      activeFile = new FolderItem(activeFileName)
+		    end if
+		  #endif
+		  'MsgBox "cmdConvert-Action-2: " + activeFileName + " extension " + ExtensionOnly(activeFileName)
+		  
+		  if ExtensionOnly(txtFileName.Text) = "lst" then
+		    IF activeFile.Exists then
+		      SourceStream = TextInputStream.Open(activeFile)
 		      While Not SourceStream.EOF
 		        curLine = LTrim(SourceStream.ReadLine)
 		        If curLine.Len>0 and  curLine.Left(1) <>"!" then 'skip lines with comments and blank lines
@@ -1124,11 +1287,20 @@ End
 		        end if
 		      wend
 		      MsgBox "All conversions complete"
+		    else
+		      MsgBox "Could not file file: " + txtFileName.Text + " or " + txtFileName.Text + ".txt"
 		    end if
 		  else
-		    call ConvertFile(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text,True)
+		    call ConvertFile(activeFileName, txtCurrentVersion.Text, pmnuNewVersion.Text,True)
 		    cmdViewAudit.Enabled = True
 		  end if
+		  ' for Windows and Linux copy the IDD and CSV to current file location
+		  #if TargetWindows or TargetLinux then
+		    call DeleteCopiedIDDandCSV(txtFileName.Text, txtCurrentVersion.Text, pmnuNewVersion.Text)
+		  #EndIf
+		  
+		  
+		  
 		  me.MouseCursor = system.Cursors.StandardPointer
 		  
 		  Exception
@@ -1168,8 +1340,8 @@ End
 	#tag Event
 		Sub Action()
 		  dim t as String
-		  t = "IDF Version Updater - Version 0.13" + EndOfLine+ EndOfLine
-		  t = t + "Copyright (c) 2011-2015 GARD Analytics, All rights reserved." + EndOfLine+ EndOfLine
+		  t = "IDF Version Updater - Version 0.15" + EndOfLine+ EndOfLine
+		  t = t + "Copyright (c) 2011-2022 GARD Analytics, All rights reserved." + EndOfLine+ EndOfLine
 		  t = t + "NOTICE: The U.S. Government is granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to reproduce, prepare derivativeworks, and perform publicly and display publicly. Beginning five (5) years after permission to assert copyright is granted, subject to two possible five year renewals, the U.S. Government is granted for itself and others acting on its behalf a paid-up, non-exclusive,irrevocable worldwide license in this data to reproduce, prepare derivative works, distribute copies to the public,perform publicly and display publicly,and to permit others to do so." + EndOfLine+ EndOfLine
 		  t = t + "TRADEMARKS: EnergyPlus, DOE-2.1E, DOE-2, and DOE are trademarks of the US Department of Energy." + EndOfLine+ EndOfLine
 		  t = t + "DISCLAIMER OF WARRANTY AND LIMITATION OF LIABILITY: THIS SOFTWARE IS PROVIDED 'AS IS' WITHOUT WARRANTY OF ANY KIND. NEITHER GARD ANALYTICS, THE DEPARTMENT OF ENERGY, THE US GOVERNMENT, THEIR LICENSORS, OR ANY PERSON OR ORGANIZATION ACTING ON BEHALF OF ANY OF THEM:" + EndOfLine+ EndOfLine

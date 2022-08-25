@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -153,6 +153,10 @@ std::string IdfParser::parse_value(std::string const &idf, size_t &index, bool &
     case Token::EXCLAMATION:
     case Token::COMMA:
     case Token::SEMICOLON:
+        break;
+    default:
+        // need to properly fail here at some point for the 'invalid' and 'num' cases
+        // adding 'assert(false)' was causing build errors
         break;
     }
 

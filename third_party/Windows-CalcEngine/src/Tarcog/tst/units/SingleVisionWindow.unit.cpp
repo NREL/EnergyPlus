@@ -15,10 +15,10 @@ protected:
         /////////////////////////////////////////////////////////
         /// Outdoor
         /////////////////////////////////////////////////////////
-        auto airTemperature = 300.0;   // Kelvins
-        auto airSpeed = 5.5;           // meters per second
-        auto tSky = 270.0;             // Kelvins
-        auto solarRadiation = 789.0;
+        auto airTemperature = 305.15;   // Kelvins
+        auto airSpeed = 2.75;           // meters per second
+        auto tSky = 305.15;             // Kelvins
+        auto solarRadiation = 783.0;
 
         auto Outdoor = Tarcog::ISO15099::Environments::outdoor(
           airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);
@@ -28,7 +28,7 @@ protected:
         /// Indoor
         /////////////////////////////////////////////////////////
 
-        auto roomTemperature = 294.15;
+        auto roomTemperature = 297.15;
         auto Indoor = Tarcog::ISO15099::Environments::indoor(roomTemperature);
 
         /////////////////////////////////////////////////////////
@@ -39,10 +39,10 @@ protected:
 
         auto aSolidLayer =
           Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
-        aSolidLayer->setSolarAbsorptance(0.094189159572, solarRadiation);
+        aSolidLayer->setSolarAbsorptance(0.0914, solarRadiation);
 
-        auto windowWidth = 1.0;
-        auto windowHeight = 1.0;
+        auto windowWidth = 2.0;
+        auto windowHeight = 2.0;
         Tarcog::ISO15099::CIGU aIGU(windowWidth, windowHeight);
         aIGU.addLayer(aSolidLayer);
 
@@ -57,29 +57,29 @@ TEST_F(TestSingleVisionWindow, PredefinedCOGValues)
 {
     SCOPED_TRACE("Begin Test: Single vision window with predefined COG values.");
 
-    const double uValue{2.134059};
-    const double edgeUValue{2.251039};
-    const double projectedFrameDimension{0.050813};
-    const double wettedLength{0.05633282};
-    const double absorptance{0.3};
+    const double uValue{5.68};
+    const double edgeUValue{5.575};
+    const double projectedFrameDimension{0.05715};
+    const double wettedLength{0.05715};
+    const double absorptance{0.9};
 
     Tarcog::ISO15099::FrameData frameData{
       uValue, edgeUValue, projectedFrameDimension, wettedLength, absorptance};
 
-    const auto width{1.2};
-    const auto height{1.5};
-    const auto iguUValue{1.667875};
-    const auto shgc{0.430713};
-    const auto tVis{0.638525};
-    const auto tSol{0.3716};
-    const auto hcout{15.0};
+    const auto width{2.0};
+    const auto height{2.0};
+    const auto iguUValue{5.575};
+    const auto shgc{0.86};
+    const auto tVis{0.899};
+    const auto tSol{0.8338};
+    const auto hout{20.42635};
 
     auto window = Tarcog::ISO15099::WindowSingleVision(
       width,
       height,
       tVis,
       tSol,
-      std::make_shared<Tarcog::ISO15099::SimpleIGU>(iguUValue, shgc, hcout));
+      std::make_shared<Tarcog::ISO15099::SimpleIGU>(iguUValue, shgc, hout));
 
     window.setFrameTop(frameData);
     window.setFrameBottom(frameData);
@@ -87,32 +87,32 @@ TEST_F(TestSingleVisionWindow, PredefinedCOGValues)
     window.setFrameRight(frameData);
 
     const double vt{window.vt()};
-    EXPECT_NEAR(0.544853, vt, 1e-6);
+    EXPECT_NEAR(0.799180, vt, 1e-6);
 
     const double uvalue{window.uValue()};
-    EXPECT_NEAR(1.833769, uvalue, 1e-6);
+    EXPECT_NEAR(5.586659, uvalue, 1e-6);
 
     const double windowSHGC{window.shgc()};
-    EXPECT_NEAR(0.373175, windowSHGC, 1e-6);
+    EXPECT_NEAR(0.792299, windowSHGC, 1e-6);
 }
 
 TEST_F(TestSingleVisionWindow, CalculatedCOG)
 {
     SCOPED_TRACE("Begin Test: Single vision window with calculated COG values.");
 
-    const double uValue{2.134059};
-    const double edgeUValue{2.251039};
-    const double projectedFrameDimension{0.050813};
-    const double wettedLength{0.05633282};
-    const double absorptance{0.3};
+    const double uValue{5.68};
+    const double edgeUValue{5.575};
+    const double projectedFrameDimension{0.05715};
+    const double wettedLength{0.05715};
+    const double absorptance{0.9};
 
     Tarcog::ISO15099::FrameData frameData{
       uValue, edgeUValue, projectedFrameDimension, wettedLength, absorptance};
 
-    const auto width{1.2};
-    const auto height{1.5};
-    const auto tVis{0.638525};
-    const auto tSol{0.3716};
+    const auto width{2.0};
+    const auto height{2.0};
+    const auto tVis{0.899};
+    const auto tSol{0.8338};
 
     auto window = Tarcog::ISO15099::WindowSingleVision(width, height, tVis, tSol, getCOG());
 
@@ -122,11 +122,11 @@ TEST_F(TestSingleVisionWindow, CalculatedCOG)
     window.setFrameRight(frameData);
 
     const double vt{window.vt()};
-    EXPECT_NEAR(0.544853, vt, 1e-6);
+    EXPECT_NEAR(0.799181, vt, 1e-6);
 
     const double uvalue{window.uValue()};
-    EXPECT_NEAR(4.377901, uvalue, 1e-6);
+    EXPECT_NEAR(5.255746, uvalue, 1e-6);
 
     const double windowSHGC{window.shgc()};
-    EXPECT_NEAR(0.336182, windowSHGC, 1e-6);
+    EXPECT_NEAR(0.791895, windowSHGC, 1e-6);
 }

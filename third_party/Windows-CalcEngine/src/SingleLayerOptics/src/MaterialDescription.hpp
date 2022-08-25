@@ -9,7 +9,6 @@
 #include "BeamDirection.hpp"   //  Need to include rather than forward declare to default incoming and outgoing directions to CBeamDirection()
 #include "BSDFDirections.hpp"   //  Needed to have CBSDFHemisphere as a member of the BSDF materials.  Could forward declare if BSDF material was changed to hide members using the pimpl ideom.
 
-// Lixing
 namespace FenestrationCommon
 {
     enum class Side;
@@ -45,6 +44,8 @@ namespace SingleLayerOptics
     private:
         std::map<FenestrationCommon::Side, std::shared_ptr<CSurface>> m_Surface;
     };
+
+    static double NIRRatio = 0.49;
 
     //////////////////////////////////////////////////////////////////////////////////////////
     ///   CMaterial
@@ -93,6 +94,8 @@ namespace SingleLayerOptics
         double getMaxLambda() const;
 
         virtual void Flipped(bool flipped);
+
+        [[nodiscard]] bool isWavelengthInRange(double wavelength) const;
 
     protected:
         double m_MinLambda;
@@ -213,7 +216,7 @@ namespace SingleLayerOptics
         // (ratio should be calculated and not quessed)
         IMaterialDualBand(const std::shared_ptr<CMaterial> & t_PartialRange,
                           const std::shared_ptr<CMaterial> & t_FullRange,
-                          double t_Ratio = 0.49);
+                          double t_Ratio = NIRRatio);
 
         // ratio is calculated based on provided solar radiation values
         IMaterialDualBand(const std::shared_ptr<CMaterial> & t_PartialRange,
@@ -252,10 +255,14 @@ namespace SingleLayerOptics
         // Creates all of the required ranges in m_Materials from solar radiation
         void createRangesFromSolarRadiation(const FenestrationCommon::CSeries & t_SolarRadiation);
 
+        std::vector<double> getWavelengthsFromMaterials() const;
+
         // Properties over the rest of range will depend on partial range as well.
         // We do want to keep correct properties of partial range, but will want to update
         // properties for other partial ranges that are not provided by the user.
         // double getModifiedProperty(double t_Range, double t_Solar, double t_Fraction) const;
+
+        std::shared_ptr<CMaterial> getMaterialFromWavelegth(double wavelength) const;
 
         std::shared_ptr<CMaterial> m_MaterialFullRange;
         std::shared_ptr<CMaterial> m_MaterialPartialRange;
@@ -273,7 +280,7 @@ namespace SingleLayerOptics
         // (ratio should be calculated and not quessed)
         CMaterialDualBand(const std::shared_ptr<CMaterial> & t_PartialRange,
                           const std::shared_ptr<CMaterial> & t_FullRange,
-                          double t_Ratio = 0.49);
+                          double t_Ratio = NIRRatio);
 
         // ratio is calculated based on provided solar radiation values
         CMaterialDualBand(const std::shared_ptr<CMaterial> & t_PartialRange,
@@ -303,7 +310,7 @@ namespace SingleLayerOptics
         // (ratio should be calculated and not quessed)
         CMaterialDualBandBSDF(const std::shared_ptr<CMaterialSingleBandBSDF> & t_PartialRange,
                               const std::shared_ptr<CMaterialSingleBandBSDF> & t_FullRange,
-                              double t_Ratio = 0.49);
+                              double t_Ratio = NIRRatio);
 
         // ratio is calculated based on provided solar radiation values
         CMaterialDualBandBSDF(const std::shared_ptr<CMaterialSingleBandBSDF> & t_PartialRange,
@@ -387,8 +394,7 @@ namespace SingleLayerOptics
           FenestrationCommon::MaterialType t_Type,
           FenestrationCommon::WavelengthRange t_Range);
 
-        FenestrationCommon::CSeries PCE(FenestrationCommon::Side t_Side) const;
-        FenestrationCommon::CSeries W(FenestrationCommon::Side t_Side) const;
+        [[nodiscard]] FenestrationCommon::CSeries jscPrime(FenestrationCommon::Side t_Side) const;
 
     private:
         std::shared_ptr<SpectralAveraging::CPhotovoltaicSample> m_PVSample;

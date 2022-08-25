@@ -22,6 +22,11 @@ set(SRC
     InputProcessor.f90
     SimData.f90)
 
+add_library(SlabOptions INTERFACE)
+if(NOT CMAKE_Fortran_COMPILER MATCHES "ifort")
+  target_compile_options(SlabOptions INTERFACE -finit-local-zero)
+endif()
+
 set(CMAKE_SKIP_RPATH ${FORTRAN_SKIP_RPATH})
 set(SKIP_BUILD_RPATH true)
 
@@ -33,10 +38,10 @@ if(NOT UNIX)  # Need to reinclude it on Windows
 endif()
 get_target_property(F_INTERFACE_COMPILE_FLAGS fortran_project_options INTERFACE_COMPILE_OPTIONS)
 message(DEBUG "Slab: F_INTERFACE_COMPILE_FLAGS=${F_INTERFACE_COMPILE_FLAGS}")
-target_link_libraries(Slab PRIVATE fortran_project_options)
+target_link_libraries(Slab PRIVATE SlabOptions fortran_project_options)
 
 install(TARGETS Slab DESTINATION PreProcess/GrndTempCalc)
-if(NOT ${STATIC_EXE})
+if(NOT ${FORTRAN_STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
   install_target_prereqs(Slab PreProcess/GrndTempCalc)
 endif()

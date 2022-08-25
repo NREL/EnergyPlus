@@ -113,7 +113,7 @@ TEST_F(TestDoubleLowESingleVisionUFactorRun, Test1)
     EXPECT_NEAR(UValueCOG, 1.667878, 1e-5);
 
     const auto SHGC{window.shgc()};
-    EXPECT_NEAR(SHGC, 0.003258, 1e-5);
+    EXPECT_NEAR(SHGC, 0.002901, 1e-5);
 
     const auto vt{window.vt()};
     EXPECT_NEAR(vt, 0.544831, 1e-5);

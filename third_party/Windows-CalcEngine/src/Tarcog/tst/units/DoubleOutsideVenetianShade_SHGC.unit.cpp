@@ -133,9 +133,9 @@ TEST_F(TestDoubleOutsideVenetianShade_SHGC, Test1)
     auto aSystem = GetSystem();
 
     const auto uval = aSystem->getUValue();
-    EXPECT_NEAR(3.171199, uval, 1e-6);
+    EXPECT_NEAR(3.352152, uval, 1e-6);
 
-    auto effectiveLayerConductivities{
+    const auto effectiveLayerConductivities{
       aSystem->getSolidEffectiveLayerConductivities(Tarcog::ISO15099::System::Uvalue)};
 
     const std::vector<double> correctEffectConductivites{2.045130, 1};
@@ -147,7 +147,7 @@ TEST_F(TestDoubleOutsideVenetianShade_SHGC, Test1)
 
     auto totSol{0.789689322};
     const auto shgc{aSystem->getSHGC(totSol)};
-    EXPECT_NEAR(0.843802, shgc, 1e-6);
+    EXPECT_NEAR(0.841574, shgc, 1e-6);
 
     const auto heatflow =
       aSystem->getHeatFlow(Tarcog::ISO15099::System::SHGC, Tarcog::ISO15099::Environment::Indoor);

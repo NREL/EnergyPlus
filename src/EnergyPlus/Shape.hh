@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,40 +48,16 @@
 #ifndef EnergyPlus_Shape_hh_INCLUDED
 #define EnergyPlus_Shape_hh_INCLUDED
 
-// Shape Enumerators
-//
-// Project: EnergyPlus
-//
-// Language: C++
-//
-// Copyright (c) ...
-
-// Notes
-
 namespace EnergyPlus {
-
-enum class ShapeType
-{
-    Unknown,
-    Triangle,
-    Quadrilateral,
-    Rectangle,
-    RectangularDoorWindow,
-    RectangularOverhang,
-    RectangularLeftFin,
-    RectangularRightFin,
-    TriangularWindow,
-    Convex,
-    Nonconvex
-};
 
 enum class ShapeCat
 {
-    Unknown,
+    Invalid = -1,
     Triangular,
     Rectangular,
     Convex,
-    Nonconvex
+    Nonconvex,
+    Num
 };
 
 } // namespace EnergyPlus

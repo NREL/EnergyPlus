@@ -127,6 +127,12 @@ In a lot of cases, it is expected that the plugin will be tied closely to a spec
 In these cases, it may be useful to keep plugin files right next to the input file, regardless of the current working directory.
 Turning this field to Yes will add the directory where the input file is located to the list of search paths.
 
+\paragraph{Field: Add epin Environment Variable to Search Path}
+
+Some interfaces to EnergyPlus set an environment variable named "epin" to a path on the system where auxiliary files will be placed for a simulation run.
+If this input field is set to Yes, EnergyPlus will check to see if the "epin" variable has been set, and if the path exists, the path will be added to the list of search paths for Python Plugins.
+This field is defaulted to Yes, so that input files should work with tools like EPLaunch directly.
+
 \paragraph{Field: Search Path N}
 
 There are also some cases, where a user may keep a specific library of plugin scripts that work with a variety of input files.

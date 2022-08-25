@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,10 +124,7 @@ namespace ICEngineElectricGenerator {
         Real64 ElecPowerGenerated;  // Electric Power Generated (W)
         Real64 ElecEnergyGenerated; // Amount of Electric Energy Generated (J)
         Real64 HeatRecMaxTemp;      // Max Temp that can be produced in heat recovery
-        int HRLoopNum;              // cooling water plant loop index number, for heat recovery
-        int HRLoopSideNum;          // cooling water plant loop side index, for heat recovery
-        int HRBranchNum;            // cooling water plant loop branch index, for heat recovery
-        int HRCompNum;              // cooling water plant loop component index, for heat recovery
+        PlantLocation HRPlantLoc;   // cooling water plant loop component index, for heat recovery
         bool MyEnvrnFlag;
         bool MyPlantScanFlag;
         bool MySizeAndNodeInitFlag;
@@ -144,9 +141,8 @@ namespace ICEngineElectricGenerator {
               HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdotDesign(0.0),
               HeatRecMdotActual(0.0), QTotalHeatRecovered(0.0), QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0),
               FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0),
-              FuelMdot(0.0), ExhaustStackTemp(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), HRLoopNum(0),
-              HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true),
-              CheckEquipName(true), myFlag(true)
+              FuelMdot(0.0), ExhaustStackTemp(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), HRPlantLoc{},
+              MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true), myFlag(true)
         {
         }
 

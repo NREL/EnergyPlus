@@ -76,7 +76,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,6;
 
@@ -118,7 +118,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 1 Infil,            !- Name
-    ZONE 1,                  !- Zone or ZoneList Name
+    ZONE 1,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -132,7 +132,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 2 Infil,            !- Name
-    ZONE 2,                  !- Zone or ZoneList Name
+    ZONE 2,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -146,7 +146,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 3 Infil,            !- Name
-    ZONE 3,                  !- Zone or ZoneList Name
+    ZONE 3,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -160,7 +160,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE 4 Infil,            !- Name
-    ZONE 4,                  !- Zone or ZoneList Name
+    ZONE 4,                  !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCHED,             !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -284,7 +284,8 @@
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
-    10;                      !- Minutes per Item
+    10,                      !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     ZONE 2_MeasuredTemperature,  !- Name
@@ -295,7 +296,8 @@
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
-    10;                      !- Minutes per Item
+    10,                      !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     ZONE 3_MeasuredTemperature,  !- Name
@@ -306,7 +308,8 @@
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
-    10;                      !- Minutes per Item
+    10,                      !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Schedule:File,
     ZONE 4_MeasuredTemperature,  !- Name
@@ -317,7 +320,8 @@
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
-    10;                      !- Minutes per Item
+    10,                      !- Minutes per Item
+    ;                        !- Adjust Schedule for Daylight Savings
 
   Output:VariableDictionary,regular;
 

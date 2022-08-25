@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -92,22 +92,24 @@ namespace DataAirSystems {
     // MODULE VARIABLE DECLARATIONS
     // For each type of air path, define an array of DefineAirPaths
 
-    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
+    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const dataFanEnumType, int const dataFanIndex, Real64 const desVolFlow)
     {
         Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
 
-        if (dataFanEnumType < 0 || dataFanIndex < 0 || desVolFlow == 0.0) return fanDesHeatLoad;
+        if (dataFanEnumType < 0 || dataFanIndex < 0 || desVolFlow == 0.0) {
+            return fanDesHeatLoad;
+        }
 
         switch (dataFanEnumType) {
-        case DataAirSystems::structArrayLegacyFanModels: {
+        case DataAirSystems::StructArrayLegacyFanModels: {
             fanDesHeatLoad = Fans::FanDesHeatGain(state, dataFanIndex, desVolFlow);
             break;
         }
-        case DataAirSystems::objectVectorOOFanSystemModel: {
+        case DataAirSystems::ObjectVectorOOFanSystemModel: {
             fanDesHeatLoad = state.dataHVACFan->fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
             break;
         }
-        case DataAirSystems::fanModelTypeNotYetSet: {
+        case DataAirSystems::Invalid: {
             // do nothing
             break;
         }

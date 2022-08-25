@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -224,10 +224,10 @@ namespace OutAirNodeManager {
                                 NodeNums,
                                 ErrInList,
                                 DataLoopNode::NodeFluidType::Air,
+                                DataLoopNode::ConnectionObjectType::OutdoorAirNodeList,
                                 CurrentModuleObject,
-                                CurrentModuleObject,
-                                DataLoopNode::NodeConnectionType::OutsideAir,
-                                static_cast<NodeInputManager::compFluidStream>(NextFluidStreamNum),
+                                DataLoopNode::ConnectionType::OutsideAir,
+                                static_cast<NodeInputManager::CompFluidStream>(NextFluidStreamNum),
                                 ObjectIsNotParent,
                                 IncrementFluidStreamYes,
                                 cAlphaFields(AlphaNum));
@@ -281,10 +281,10 @@ namespace OutAirNodeManager {
                             NodeNums,
                             ErrInList,
                             DataLoopNode::NodeFluidType::Air,
+                            DataLoopNode::ConnectionObjectType::OutdoorAirNode,
                             CurrentModuleObject,
-                            CurrentModuleObject,
-                            DataLoopNode::NodeConnectionType::OutsideAir,
-                            static_cast<NodeInputManager::compFluidStream>(NextFluidStreamNum),
+                            DataLoopNode::ConnectionType::OutsideAir,
+                            static_cast<NodeInputManager::CompFluidStream>(NextFluidStreamNum),
                             ObjectIsNotParent,
                             IncrementFluidStreamYes,
                             cAlphaFields(1));
@@ -413,7 +413,7 @@ namespace OutAirNodeManager {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Provide a entry into the OutAirNode List for checking from other routines.
+        // Provide an entry into the OutAirNode List for checking from other routines.
 
         // METHODOLOGY EMPLOYED:
         // na
@@ -530,10 +530,10 @@ namespace OutAirNodeManager {
                             TmpNums,
                             errFlag,
                             DataLoopNode::NodeFluidType::Air,
+                            DataLoopNode::ConnectionObjectType::OutdoorAirNode,
                             "OutdoorAir:Node",
-                            "OutdoorAir:Node",
-                            DataLoopNode::NodeConnectionType::OutsideAir,
-                            static_cast<NodeInputManager::compFluidStream>(state.dataOutAirNodeMgr->NumOutsideAirNodes),
+                            DataLoopNode::ConnectionType::OutsideAir,
+                            static_cast<NodeInputManager::CompFluidStream>(state.dataOutAirNodeMgr->NumOutsideAirNodes),
                             ObjectIsNotParent,
                             IncrementFluidStreamYes);
                 SetOANodeValues(state, NodeNumber, false);

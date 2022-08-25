@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -133,15 +133,15 @@ class Runtime:
         self.api.callbackEndOfSystemTimeStepAfterHVACReporting.restype = c_void_p
         self.api.callbackEndOfZoneSizing.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackEndOfZoneSizing.restype = c_void_p
-        self.api.callbackEndOfSystemSizing.argtypes = [self.py_state_callback_type]
+        self.api.callbackEndOfSystemSizing.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackEndOfSystemSizing.restype = c_void_p
-        self.api.callbackEndOfAfterComponentGetInput.argtypes = [self.py_state_callback_type]
+        self.api.callbackEndOfAfterComponentGetInput.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackEndOfAfterComponentGetInput.restype = c_void_p
         # self.api.callbackUserDefinedComponentModel.argtypes = [self.py_empty_callback_type]
         # self.api.callbackUserDefinedComponentModel.restype = c_void_p
-        self.api.callbackUnitarySystemSizing.argtypes = [self.py_state_callback_type]
+        self.api.callbackUnitarySystemSizing.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackUnitarySystemSizing.restype = c_void_p
-        self.api.registerExternalHVACManager.argtypes = [self.py_state_callback_type]
+        self.api.registerExternalHVACManager.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.registerExternalHVACManager.restype = c_void_p
 
     @staticmethod

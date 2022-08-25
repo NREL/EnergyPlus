@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,26 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/CommandLineInterface.hh>
-#include <EnergyPlus/Data/CommonIncludes.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 
 int main(int argc, const char *argv[])
 {
-    EnergyPlus::EnergyPlusData state;
-    // these need to be set early to be used in help and version output messaging
-    // this was pulled from EnergyPlusPgm.cc and needs to be removed once the release is done
-    Array1D_int value(8);
-    std::string datestring; // supposedly returns blank when no date available.
-    date_and_time(datestring, _, _, value);
-    if (!datestring.empty()) {
-        state.dataStrGlobals->CurrentDateTime = fmt::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
-    } else {
-        state.dataStrGlobals->CurrentDateTime = " unknown date/time";
-    }
-    state.dataStrGlobals->VerStringVar = EnergyPlus::DataStringGlobals::VerString + "," + state.dataStrGlobals->CurrentDateTime;
-    EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv);
-    return EnergyPlusPgm(state);
+    return EnergyPlusPgm(argc, argv);
 }

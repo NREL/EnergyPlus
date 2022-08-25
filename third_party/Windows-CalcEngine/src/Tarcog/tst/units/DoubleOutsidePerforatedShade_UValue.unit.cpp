@@ -2,9 +2,7 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
 
-#include "WCEGases.hpp"
 #include "WCETarcog.hpp"
-#include "WCECommon.hpp"
 
 class TestDoubleOutsidePerforatedShade_UValue : public testing::Test
 {
@@ -110,16 +108,15 @@ protected:
         /////////////////////////////////////////////////////////
         // System
         /////////////////////////////////////////////////////////
-        m_TarcogSystem = std::unique_ptr<Tarcog::ISO15099::CSystem>(
-          new Tarcog::ISO15099::CSystem(aIGU, Indoor, Outdoor));
+        m_TarcogSystem = std::make_unique<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
         ASSERT_TRUE(m_TarcogSystem != nullptr);
     }
 
 public:
-    Tarcog::ISO15099::CSystem * GetSystem() const
+    [[nodiscard]] Tarcog::ISO15099::CSystem * GetSystem() const
     {
         return m_TarcogSystem.get();
-    };
+    }
 };
 
 TEST_F(TestDoubleOutsidePerforatedShade_UValue, Test1)
@@ -129,12 +126,12 @@ TEST_F(TestDoubleOutsidePerforatedShade_UValue, Test1)
     auto * const aSystem = GetSystem();
 
     const auto uval = aSystem->getUValue();
-    EXPECT_NEAR(2.470794, uval, 1e-6);
+    EXPECT_NEAR(3.213412, uval, 1e-6);
 
-    auto effectiveLayerConductivities{
+    const auto effectiveLayerConductivities{
       aSystem->getSolidEffectiveLayerConductivities(Tarcog::ISO15099::System::Uvalue)};
 
-    const std::vector<double> correctEffectConductivites{0.107643, 1};
+    const std::vector<double> correctEffectConductivites{0.108207, 1};
     EXPECT_EQ(correctEffectConductivites.size(), effectiveLayerConductivities.size());
     for(size_t i = 0u; i < correctEffectConductivites.size(); ++i)
     {
@@ -142,6 +139,6 @@ TEST_F(TestDoubleOutsidePerforatedShade_UValue, Test1)
     }
 
     const auto heatflow =
-      aSystem->getHeatFlow(Tarcog::ISO15099::System::SHGC, Tarcog::ISO15099::Environment::Indoor);
-    EXPECT_NEAR(122.50522908213692, heatflow, 1e-6);
+      aSystem->getHeatFlow(Tarcog::ISO15099::System::Uvalue, Tarcog::ISO15099::Environment::Indoor);
+    EXPECT_NEAR(125.323087, heatflow, 1e-6);
 }

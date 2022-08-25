@@ -13,11 +13,7 @@ How to report problems and/or suggestions:
 
         EnergyPlus-Support@gard.com (please include input file if applicable)
 
-
-        http://energyplus.helpserve.com
-
-Tips for submitting helpdesk requests can be seen here:
-        http://energyplus.helpserve.com/staff/Troubleshooter/Step/ViewSteps/4
+        https://energyplushelp.freshdesk.com/
 
 Minimally, please include the following information and attach relevant input files
 required to reproduce the problem.

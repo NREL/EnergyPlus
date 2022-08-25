@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -794,7 +794,8 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest1)
         "	autosize,              !- Gross Rated Sensible Heat Ratio",
         "	4.40,                  !- Gross Rated Cooling COP { W / W }",
         "	autosize,              !- Rated Air Flow Rate { m3 / s }",
-        "	,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "	,                      !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "	,                      !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "	DOAS Mixed Air Outlet, !- Air Inlet Node Name",
         "	DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
         "	Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -1814,7 +1815,8 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest2)
         "	autosize,              !- Gross Rated Sensible Heat Ratio",
         "	4.40,                  !- Gross Rated Cooling COP { W / W }",
         "	autosize,              !- Rated Air Flow Rate { m3 / s }",
-        "	,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "	,                      !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "	,                      !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "	DOAS Mixed Air Outlet, !- Air Inlet Node Name",
         "	DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
         "	Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -2842,7 +2844,8 @@ TEST_F(EnergyPlusFixture, SimplifiedProcedureTest3)
         "	autosize,              !- Gross Rated Sensible Heat Ratio",
         "	4.40,                  !- Gross Rated Cooling COP { W / W }",
         "	autosize,              !- Rated Air Flow Rate { m3 / s }",
-        "	,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "	,                      !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "	,                      !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "	DOAS Mixed Air Outlet, !- Air Inlet Node Name",
         "	DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
         "	Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",

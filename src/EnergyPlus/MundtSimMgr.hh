@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,29 +64,6 @@ struct EnergyPlusData;
 
 namespace MundtSimMgr {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern Real64 const CpAir;    // Specific heat of air
-    extern Real64 const MinSlope; // Bound on result from Mundt model
-    extern Real64 const MaxSlope; // Bound on result from Mundt Model
-
-    // MODULE DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE MundtSimMgr
-
-    // main subsroutine
-
-    // Routines for transferring data between surface and air domains
-
-    // Routines for actual calculations in Mundt model
-
     // Types
 
     struct DefineLinearModelNode
@@ -99,7 +76,7 @@ namespace MundtSimMgr {
         Array1D_bool SurfMask;                   // Limit of 60 surfaces at current sizing
 
         // Default Constructor
-        DefineLinearModelNode() : ClassType(DataRoomAirModel::AirNodeType::Unassigned), Height(0.0), Temp(0.0)
+        DefineLinearModelNode() : ClassType(DataRoomAirModel::AirNodeType::Invalid), Height(0.0), Temp(0.0)
         {
         }
     };

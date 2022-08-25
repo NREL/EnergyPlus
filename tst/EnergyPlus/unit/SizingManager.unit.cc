@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -103,18 +104,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -134,18 +124,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -165,18 +144,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -196,18 +164,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;              // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -227,18 +184,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -258,18 +204,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Numbers(4) = 0.4;          // Outdoor Air Flow Air Changes per Hour
 
     ErrorsFound = false;
-    ProcessInputOARequirements(*state,
-                               CurrentModuleObject,
-                               OAIndex,
-                               Alphas,
-                               NumAlphas,
-                               Numbers,
-                               NumNumbers,
-                               lNumericBlanks,
-                               lAlphaBlanks,
-                               cAlphaFields,
-                               cNumericFields,
-                               ErrorsFound);
+    ProcessInputOARequirements(*state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -590,4 +525,36 @@ TEST_F(EnergyPlusFixture, SizingManager_ReportTemperatureInputError)
                                                      "   **   ~~~   ** ... incorrect Zone Heating Design Supply Air Temperature=[-2.00] is less than "
                                                      "Zone Cooling Design Supply Air Temperature=[-1.00]",
                                                      "   **   ~~~   ** This is not allowed.  Please check and revise your input."})));
+}
+
+TEST_F(EnergyPlusFixture, SizingManager_OverrideAvgWindowInSizing)
+{
+
+    std::string const idf_objects = delimited_string({
+        "SimulationControl,",
+        "  No,                      !- Do Zone Sizing Calculation",
+        "  No,                      !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  No,                      !- Run Simulation for Sizing Periods",
+        "  Yes;                     !- Run Simulation for Weather File Run Periods",
+        "PerformancePrecisionTradeoffs,",
+        ",                          !- Coil Direct Solutions",
+        ",                          !- Zone Radiant Exchange Algorithm",
+        "Mode01,                    !- Override Mode",
+        ",                          !- MaxZoneTempDiff",
+        ",                          !- MaxAllowedDelTemp",
+        ";                          !- Use Representative Surfaces for Calculations",
+        "Sizing:Parameters,",
+        ",                          !- Heating Sizing Factor",
+        ",                          !- Cooling Sizing Factor",
+        "6;                         !- Timesteps in Averaging Window",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+    EXPECT_TRUE(state->dataGlobal->OverrideTimestep);
+    SizingManager::GetSizingParams(*state);
+    EXPECT_EQ(state->dataGlobal->NumOfTimeStepInHour, 1);
+    EXPECT_EQ(state->dataSize->NumTimeStepsInAvg, 1);
 }

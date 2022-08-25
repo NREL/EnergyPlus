@@ -67,16 +67,21 @@ namespace SingleLayerOptics
                                         double slatTiltAngle,
                                         double curvatureRadius,
                                         size_t numOfSlatSegments,
-                                        DistributionMethod method)
+                                        DistributionMethod method,
+                                        const bool isHorizontal)
     {
         std::shared_ptr<ICellDescription> aCellDescription =
           std::make_shared<CVenetianCellDescription>(
             slatWidth, slatSpacing, slatTiltAngle, curvatureRadius, numOfSlatSegments);
 
+        static const auto horizontalVenetianRotation{0.0};
+        static const auto verticalVenetianRotation{90.0};
+        const auto rotation{isHorizontal ? horizontalVenetianRotation : verticalVenetianRotation};
+
         if(method == DistributionMethod::UniformDiffuse)
         {
             std::shared_ptr<CUniformDiffuseCell> aCell =
-              std::make_shared<CVenetianCell>(t_Material, aCellDescription);
+              std::make_shared<CVenetianCell>(t_Material, aCellDescription, rotation);
             return std::make_shared<CUniformDiffuseBSDFLayer>(aCell, t_BSDF);
         }
         else
@@ -166,7 +171,8 @@ namespace SingleLayerOptics
                                        description->slatSpacing(),
                                        description->curvatureRadius(),
                                        description->numberOfSegments(),
-                                       t_Method);
+                                       t_Method,
+                                       0);
         }
 
         // Perforated cell

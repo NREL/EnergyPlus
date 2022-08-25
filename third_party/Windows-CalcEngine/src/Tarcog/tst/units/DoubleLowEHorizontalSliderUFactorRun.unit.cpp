@@ -114,7 +114,7 @@ TEST_F(TestDoubleLowEHorizontalSliderUFactorRun, Test1)
     EXPECT_NEAR(UValue, 1.891190, 1e-5);
 
     const auto SHGC{window.shgc()};
-    EXPECT_NEAR(SHGC, 0.003947, 1e-5);
+    EXPECT_NEAR(SHGC, 0.003514, 1e-5);
 
     const auto vt{window.vt()};
     EXPECT_NEAR(vt, 0.525034, 1e-5);

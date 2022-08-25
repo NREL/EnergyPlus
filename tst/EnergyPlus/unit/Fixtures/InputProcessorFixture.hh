@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -105,7 +105,7 @@ protected:
     std::string encodeIDF()
     {
         return state->dataInputProcessing->inputProcessor->idf_parser->encode(state->dataInputProcessing->inputProcessor->epJSON,
-                                                                              state->dataInputProcessing->inputProcessor->schema);
+                                                                              state->dataInputProcessing->inputProcessor->schema());
     }
 
     json &getEpJSON()
@@ -138,7 +138,7 @@ protected:
     {
         IdfParser idfParser;
         idfParser.idf_size = idf.size();
-        return idfParser.parse_value(idf, index, success, state->dataInputProcessing->inputProcessor->schema["properties"]);
+        return idfParser.parse_value(idf, index, success, state->dataInputProcessing->inputProcessor->schema()["properties"]);
     }
 
     json parse_value(std::string const &idf, size_t &index, bool &success, json const &field_loc)

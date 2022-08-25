@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -71,58 +71,41 @@ namespace DataBranchNodeConnections {
         std::string InletNodeName;  // Inlet Node ID
         std::string OutletNodeName; // Outlet Node ID
         std::string Description;    // Description of Component List Type
-        bool InfoFilled;            // true when all information has been filled
-
-        // Default Constructor
-        ComponentListData() : InfoFilled(false)
-        {
-        }
     };
 
     struct NodeConnectionDef
     {
         // Members
-        int NodeNumber;                                // Node number of this node connection
-        std::string NodeName;                          // Node Name of this node connection
-        std::string ObjectType;                        // Object/Component Type of this node connection
-        std::string ObjectName;                        // Name of the Object/Component Type of this node connection
-        std::string ConnectionType;                    // Connection Type (must be valid) for this node connection
-        NodeInputManager::compFluidStream FluidStream; // Fluid Stream for this node connection
-        bool ObjectIsParent;                           // Indicator whether the object is a parent or not
-
-        // Default Constructor
-        NodeConnectionDef() : NodeNumber(0), FluidStream(NodeInputManager::compFluidStream::Unassigned), ObjectIsParent(false)
-        {
-        }
+        int NodeNumber = 0;                                                                          // Node number of this node connection
+        std::string NodeName;                                                                        // Node Name of this node connection
+        DataLoopNode::ConnectionObjectType ObjectType = DataLoopNode::ConnectionObjectType::Invalid; // Object/Component Type of this node connection
+        std::string ObjectName; // Name of the Object/Component Type of this node connection
+        DataLoopNode::ConnectionType ConnectionType =
+            DataLoopNode::ConnectionType::Invalid; // Connection Type (must be valid) for this node connection
+        NodeInputManager::CompFluidStream FluidStream = NodeInputManager::CompFluidStream::Invalid; // Fluid Stream for this node connection
+        bool ObjectIsParent = false;                                                                // Indicator whether the object is a parent or not
     };
 
     struct ParentListData
     {
         // Members
-        std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
-        std::string CName;          // Component Name
-        std::string InletNodeName;  // Inlet Node ID
-        std::string OutletNodeName; // Outlet Node ID
-        std::string Description;    // Description of Component List Type
-        bool InfoFilled;            // true when all information has been filled
-
-        // Default Constructor
-        ParentListData() : InfoFilled(false)
-        {
-        }
+        DataLoopNode::ConnectionObjectType ComponentType =
+            DataLoopNode::ConnectionObjectType::Invalid; // Component Type (Cannot be SPLITTER or MIXER)
+        std::string ComponentName;                       // Component Name
+        std::string InletNodeName;                       // Inlet Node ID
+        std::string OutletNodeName;                      // Outlet Node ID
+        std::string Description;                         // Description of Component List Type
     };
 
     struct EqNodeConnectionDef
     {
         // Members
-        std::string NodeName;       // Node Name of this node connection
-        std::string ObjectType;     // Object/Component Type of this node connection
+        std::string NodeName;                                                                        // Node Name of this node connection
+        DataLoopNode::ConnectionObjectType ObjectType = DataLoopNode::ConnectionObjectType::Invalid; // Object/Component Type of this node connection
         std::string ObjectName;     // Name of the Object/Component Type of this node connection
         std::string InputFieldName; // Input Field Name for this connection
-        std::string ConnectionType; // Connection Type (must be valid) for this node connection
-
-        // Default Constructor
-        EqNodeConnectionDef() = default;
+        DataLoopNode::ConnectionType ConnectionType =
+            DataLoopNode::ConnectionType::Invalid; // Connection Type (must be valid) for this node connection
     };
 
 } // namespace DataBranchNodeConnections
@@ -134,11 +117,9 @@ struct BranchNodeConnectionsData : BaseGlobalStruct
     int NumNodeConnectionErrors = 0; // Count of node connection errors
     int NumOfNodeConnections = 0;
     int MaxNumOfNodeConnections = 0;
-    int NodeConnectionAlloc = 1000;
     int NumOfActualParents = 0;
     int NumOfAirTerminalNodes = 0;
     int MaxNumOfAirTerminalNodes = 0;
-    int EqNodeConnectionAlloc = 100;
 
     Array1D<DataBranchNodeConnections::ComponentListData> CompSets;
     Array1D<DataBranchNodeConnections::ParentListData> ParentNodeList;
@@ -148,20 +129,7 @@ struct BranchNodeConnectionsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumCompSets = 0;
-        this->NumNodeConnectionErrors = 0;
-        this->NumOfNodeConnections = 0;
-        this->MaxNumOfNodeConnections = 0;
-        this->NodeConnectionAlloc = 1000;
-        this->NumOfActualParents = 0;
-        this->NumOfAirTerminalNodes = 0;
-        this->MaxNumOfAirTerminalNodes = 0;
-        this->EqNodeConnectionAlloc = 100;
-        this->CompSets.deallocate();
-        this->ParentNodeList.deallocate();
-        this->NodeConnections.deallocate();
-        this->AirTerminalNodeConnections.deallocate();
-        this->NonConnectedNodes.deallocate();
+        *this = BranchNodeConnectionsData();
     }
 };
 

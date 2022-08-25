@@ -24,7 +24,8 @@ namespace SingleLayerOptics
     {
     public:
         CUniformDiffuseCell(const std::shared_ptr<CMaterial> & t_MaterialProperties,
-                            const std::shared_ptr<ICellDescription> & t_Cell);
+                            const std::shared_ptr<ICellDescription> & t_Cell,
+                            double rotation = 0);
 
         // dir_dif and dir_dif_band functions are calculating portion of incoming beam that bounced
         // off material It does not include dir_dir portion of the beam that goes through cell (that

@@ -127,9 +127,30 @@ namespace Tarcog
             return std::make_shared<CIGUSolidLayer>(*this);
         }
 
+        void CIGUSolidLayer::applyDeflection(double meanDeflection, double maxDeflection)
+        {
+            m_IsDeflected = true;
+            for(auto aSide : FenestrationCommon::EnumSide())
+            {
+                m_Surface[aSide]->applyDeflection(meanDeflection, maxDeflection);
+            }
+        }
+
         bool CIGUSolidLayer::isDeflected() const
         {
-            return false;
+            return m_IsDeflected;
+        }
+
+        double CIGUSolidLayer::youngsModulus() const
+        {
+            static const double defaultYoungsModulus{Tarcog::DeflectionConstants::YOUNGSMODULUS};
+            return defaultYoungsModulus;
+        }
+
+        double CIGUSolidLayer::density() const
+        {
+            static const double defaultDensity{Tarcog::MaterialConstants::GLASSDENSITY};
+            return defaultDensity;
         }
 
         double CIGUSolidLayer::getRadiationFlow()

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,37 +60,43 @@ namespace EnergyPlus {
 
 namespace DataPhotovoltaics {
 
+    Real64 constexpr MinIrradiance = 0.3; // [W/m2] Assume no operation if Ic is below this number (W/m2)
+
     enum class PVModel
     {
-        Unassigned,
+        Invalid = -1,
         Simple,
         TRNSYS,
-        Sandia
+        Sandia,
+        Num
     };
 
     enum class CellIntegration
     {
-        Unassigned,               // cell temp method not set
+        Invalid = -1,             // cell temp method not set
         Decoupled,                // cell temp method based on energy balance
         DecoupledUllebergDynamic, // cell temp method based on energy bal with capacity
         SurfaceOutsideFace,       // cell temp method based on coupling to E+'s heat balance
         TranspiredCollector,      // cell temp method based on coupling to unglazed transpired co
         ExteriorVentedCavity,     // cell temp method based on coupling to nat vent exterior cavi
-        PVTSolarCollector         // cell temp method based on coupling to PVT model
+        PVTSolarCollector,        // cell temp method based on coupling to PVT model
+        Num
     };
 
     enum class Efficiency
     {
-        Unassigned,
-        Fixed,    // simple PV, constant efficiency
-        Scheduled // simpel PV, scheduled efficiency
+        Invalid = -1,
+        Fixed,     // simple PV, constant efficiency
+        Scheduled, // simple PV, scheduled efficiency
+        Num
     };
 
     enum class SiPVCells
     {
-        Unassigned,
+        Invalid = -1,
         Crystalline,
-        Amorphous
+        Amorphous,
+        Num
     };
 
     struct SimplePVParamsStruct
@@ -104,7 +110,7 @@ namespace DataPhotovoltaics {
         Real64 PVEfficiency;           // fixed or current PV efficiency
 
         // Default Constructor
-        SimplePVParamsStruct() : AreaCol(0.0), ActiveFraction(0.0), EfficencyInputMode(Efficiency::Unassigned), EffSchedPtr(0), PVEfficiency(0.0)
+        SimplePVParamsStruct() : AreaCol(0.0), ActiveFraction(0.0), EfficencyInputMode(Efficiency::Invalid), EffSchedPtr(0), PVEfficiency(0.0)
         {
         }
     };
@@ -135,9 +141,9 @@ namespace DataPhotovoltaics {
 
         // Default Constructor
         TRNSYSPVModuleParamsStruct()
-            : CellsInSeries(0), CellType(SiPVCells::Unassigned), Area(0.0), TauAlpha(0.0), SemiConductorBandgap(0.0), ShuntResistance(0.0),
-              RefIsc(0.0), RefVoc(0.0), RefTemperature(0.0), RefInsolation(0.0), Imp(0.0), Vmp(0.0), TempCoefIsc(0.0), TempCoefVoc(0.0),
-              NOCTAmbTemp(0.0), NOCTCellTemp(0.0), NOCTInsolation(0.0), HeatLossCoef(0.0), HeatCapacity(0.0)
+            : CellsInSeries(0), CellType(SiPVCells::Invalid), Area(0.0), TauAlpha(0.0), SemiConductorBandgap(0.0), ShuntResistance(0.0), RefIsc(0.0),
+              RefVoc(0.0), RefTemperature(0.0), RefInsolation(0.0), Imp(0.0), Vmp(0.0), TempCoefIsc(0.0), TempCoefVoc(0.0), NOCTAmbTemp(0.0),
+              NOCTCellTemp(0.0), NOCTInsolation(0.0), HeatLossCoef(0.0), HeatCapacity(0.0)
         {
         }
     };
@@ -322,7 +328,7 @@ namespace DataPhotovoltaics {
 
         // Default Constructor
         PVArrayStruct()
-            : SurfacePtr(0), Zone(0), PVModelType(PVModel::Unassigned), CellIntegrationMode(CellIntegration::Unassigned), NumModNSeries(1.0),
+            : SurfacePtr(0), Zone(0), PVModelType(PVModel::Invalid), CellIntegrationMode(CellIntegration::Invalid), NumModNSeries(1.0),
               NumSeriesNParall(1.0), UTSCPtr(0), ExtVentCavPtr(0), PVTPtr(0), SurfaceSink(0.0)
         {
         }
@@ -336,12 +342,12 @@ struct PhotovoltaicsData : BaseGlobalStruct
     std::string const cPVSimplePerfObjectName = "PhotovoltaicPerformance:Simple";
     std::string const cPVEquiv1DiodePerfObjectName = "PhotovoltaicPerformance:EquivalentOne-Diode";
     std::string const cPVSandiaPerfObjectName = "PhotovoltaicPerformance:Sandia";
-    Real64 const MinIrradiance = 0.3; // [W/m2] Assume no operation if Ic is below this number (W/m2)
-    int NumPVs = 0;                   // count of number of PV generators
-    int Num1DiodePVModuleTypes = 0;   // count for Equivalent one-diode model
-    int NumSimplePVModuleTypes = 0;   // count of number of input objs for simple model
-    int NumSNLPVModuleTypes = 0;      // count of number of input objs for Sandia model
-    Real64 ShuntResistance = 0.0;     // old "RSH" in common block of trnsys code
+
+    int NumPVs = 0;                 // count of number of PV generators
+    int Num1DiodePVModuleTypes = 0; // count for Equivalent one-diode model
+    int NumSimplePVModuleTypes = 0; // count of number of input objs for simple model
+    int NumSNLPVModuleTypes = 0;    // count of number of input objs for Sandia model
+    Real64 ShuntResistance = 0.0;   // old "RSH" in common block of trnsys code
     Array1D<DataPhotovoltaics::PVArrayStruct> PVarray;
 
     void clear_state() override

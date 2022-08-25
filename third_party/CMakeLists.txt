@@ -138,8 +138,8 @@ set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
 add_subdirectory(fmt-8.0.1)
 target_compile_definitions(fmt PRIVATE FMT_USE_FULL_CACHE_DRAGONBOX=1)
 set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
-add_subdirectory(cpgfunctionEP-0.6)
-set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP-0.6)
+add_subdirectory(cpgfunctionEP)
+set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP)
 
 # Kiva
 include(cmake/kiva.cmake)
@@ -159,12 +159,15 @@ set_target_properties(Windows-CalcEngine PROPERTIES FOLDER ThirdParty/Windows-Ca
 # Btwxt
 include_directories(${gtest_SOURCE_DIR}/include/ SYSTEM)
 set(BUILD_BTWXT_TESTING
-    ${BUILD_TESTING}
+    OFF
     CACHE BOOL "" FORCE)
 add_subdirectory(btwxt)
 set_target_properties(btwxt PROPERTIES FOLDER ThirdParty/Btwxt)
 
 if(OPENGL_FOUND)
+  set(BUILD_PENUMBRA_TESTING
+      OFF
+      CACHE BOOL "" FORCE)
   add_subdirectory(penumbra)
   set_target_properties(awning PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(glfw PROPERTIES FOLDER ThirdParty/Penumbra/GLFW)
@@ -172,3 +175,12 @@ if(OPENGL_FOUND)
   set_target_properties(penumbra PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(tess2 PROPERTIES FOLDER ThirdParty/Penumbra)
 endif()
+
+# libtk205
+set(LIBTK205_BUILD_TESTING
+        OFF
+        CACHE BOOL "" FORCE)
+set(libtk205_USE_SUBMODULES
+        OFF
+        CACHE BOOL "" FORCE)
+add_subdirectory(libtk205)

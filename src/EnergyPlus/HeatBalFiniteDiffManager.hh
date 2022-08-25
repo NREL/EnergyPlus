@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,19 +70,21 @@ namespace HeatBalFiniteDiffManager {
     Real64 constexpr RhovInitValue(0.0115); // Initialization value for Rhov
     Real64 constexpr EnthInitValue(100.0);  // Initialization value for Enthalpy
     constexpr Real64 smalldiff(1.e-8);      // Used in places where "equality" tests should not be used.
+    constexpr Real64 MinTempLimit = -100.0; // lower limit check, degree C
+    constexpr Real64 MaxTempLimit = 100.0;  // upper limit check, degree C
 
     enum class CondFDScheme
     {
-        Unassigned = -1,
+        Invalid = -1,
         CrankNicholsonSecondOrder, // original CondFD scheme.  semi implicit, second order in time
         FullyImplicitFirstOrder,   // fully implicit scheme, first order in time.
-        NUM
+        Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesCC = {"CrankNicholsonSecondOrder",
-                                                                                                           "FullyImplicitFirstOrder"};
-    constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesUC = {"CRANKNICHOLSONSECONDORDER",
-                                                                                                           "FULLYIMPLICITFIRSTORDER"};
+    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::Num)> CondFDSchemeTypeNamesCC = {"CrankNicholsonSecondOrder",
+                                                                                                                  "FullyImplicitFirstOrder"};
+    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::Num)> CondFDSchemeTypeNamesUC = {"CRANKNICHOLSONSECONDORDER",
+                                                                                                                  "FULLYIMPLICITFIRSTORDER"};
 
     struct ConstructionDataFD
     {
@@ -150,8 +152,15 @@ namespace HeatBalFiniteDiffManager {
         Array1D<Real64> PhaseChangeTemperatureReverse;
         Array1D<MaterialActuatorData> condMaterialActuators;
         Array1D<MaterialActuatorData> specHeatMaterialActuators;
+        Array1D<MaterialActuatorData> heatSourceFluxMaterialActuators;
         Array1D<Real64> condNodeReport;
         Array1D<Real64> specHeatNodeReport;
+        // Includes the internal heat source
+        Array1D<Real64> heatSourceInternalFluxLayerReport;
+        Array1D<Real64> heatSourceInternalFluxEnergyLayerReport;
+        // Includes the EMS heat source
+        Array1D<Real64> heatSourceEMSFluxLayerReport;
+        Array1D<Real64> heatSourceEMSFluxEnergyLayerReport;
 
         // Default Constructor
         SurfaceDataFD()
@@ -314,8 +323,6 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct
     HeatBalFiniteDiffManager::CondFDScheme CondFDSchemeType =
         HeatBalFiniteDiffManager::CondFDScheme::FullyImplicitFirstOrder; // solution scheme for CondFD - default
     Real64 SpaceDescritConstant = 3.0;                                   // spatial descritization constant,
-    Real64 MinTempLimit = -100.0;                                        // lower limit check, degree C
-    Real64 MaxTempLimit = 100.0;                                         // upper limit check, degree C
     int MaxGSiter = 30;                                                  // maximum number of Gauss Seidel iterations
     Real64 fracTimeStepZone_Hour = 0.0;
     bool GetHBFiniteDiffInputFlag = true;
@@ -335,8 +342,6 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct
         this->QHeatOutFlux.deallocate();
         this->CondFDSchemeType = HeatBalFiniteDiffManager::CondFDScheme::FullyImplicitFirstOrder;
         this->SpaceDescritConstant = 3.0;
-        this->MinTempLimit = -100.0;
-        this->MaxTempLimit = 100.0;
         this->MaxGSiter = 30;
         this->fracTimeStepZone_Hour = 0.0;
         this->GetHBFiniteDiffInputFlag = true;

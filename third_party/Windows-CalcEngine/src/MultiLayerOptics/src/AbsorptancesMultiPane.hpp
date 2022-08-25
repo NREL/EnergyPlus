@@ -20,8 +20,10 @@ namespace MultiLayerOptics
                       const FenestrationCommon::CSeries & t_Rb);
 
         FenestrationCommon::CSeries Abs(size_t Index);
-        FenestrationCommon::CSeries Abs(size_t Index, FenestrationCommon::Side side);
         size_t numOfLayers();
+
+        FenestrationCommon::CSeries iplus(size_t Index);
+        FenestrationCommon::CSeries iminus(size_t Index);
 
     private:
         void calculateState();
@@ -40,12 +42,11 @@ namespace MultiLayerOptics
         std::vector<FenestrationCommon::CSeries> m_Rb;
         std::vector<FenestrationCommon::CSeries> m_Abs;
 
-        //! \brief Keeps data on how much of absorptance is coming from front and back sides.
-        //! These data are only important for photovoltaic calculations.
-        std::map<FenestrationCommon::Side, std::vector<FenestrationCommon::CSeries>> m_AbsBySide;
-
         std::vector<FenestrationCommon::CSeries> m_rCoeffs;
         std::vector<FenestrationCommon::CSeries> m_tCoeffs;
+
+        std::vector<FenestrationCommon::CSeries> Iplus;
+        std::vector<FenestrationCommon::CSeries> Iminus;
 
         bool m_StateCalculated;
     };

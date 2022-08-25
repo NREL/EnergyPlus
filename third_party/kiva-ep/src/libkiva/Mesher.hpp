@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Mesher_HPP
@@ -6,6 +6,7 @@
 
 #include "Functions.hpp"
 #include "libkiva_export.h"
+#include "Errors.hpp"
 #include <cmath>
 #include <math.h>
 #include <vector>

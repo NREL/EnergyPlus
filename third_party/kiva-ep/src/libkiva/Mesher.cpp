@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2022 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #ifndef Mesher_CPP
@@ -28,7 +28,7 @@ Mesher::Mesher(MeshData &data) : data(data) {
     double max = data.points[i + 1];
     double length = max - min;
     double cellWidth;
-    int numCells;
+    int numCells{0};
 
     if (isEqual(length, 0.0)) {
       // Zero width cells (used for boundary conditions)
@@ -38,7 +38,7 @@ Mesher::Mesher(MeshData &data) : data(data) {
     } else {
       // Uniform Meshing
       if (data.intervals[i].growthDir == Interval::UNIFORM) {
-        numCells = length / data.intervals[i].minCellDim;
+        numCells = static_cast<int>(length / data.intervals[i].minCellDim);
 
         // Make sure that there is at least one cell
         if (numCells == 0)
@@ -126,7 +126,7 @@ Mesher::Mesher(MeshData &data) : data(data) {
           } else {
             bool search = true;
             int N = 0;
-            double multiplier;
+            double multiplier{0};
 
             while (search) {
               multiplier = 0.0;
@@ -201,7 +201,8 @@ std::size_t Mesher::getNearestIndex(double position) {
           return i;
       }
     }
-    return -1;
+    showMessage(MSG_ERR, "Could not find the nearest Index.");
+    return 0;
   }
 }
 
@@ -216,7 +217,8 @@ std::size_t Mesher::getNextIndex(double position) {
           isLessThan(position, this->centers[i + 1]))
         return i + 1;
     }
-    return -1;
+    showMessage(MSG_ERR, "Could not find the next Index.");
+    return 0;
   }
 }
 
@@ -231,7 +233,8 @@ std::size_t Mesher::getPreviousIndex(double position) {
           isLessOrEqual(position, this->centers[i]))
         return i - 1;
     }
-    return -1;
+    showMessage(MSG_ERR, "Could not find the previous Index.");
+    return 0;
   }
 }
 } // namespace Kiva

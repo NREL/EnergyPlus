@@ -92,7 +92,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,4;
 
@@ -320,8 +320,8 @@
     ZONE ONE IM,             !- Name
     InternalMass,            !- Construction Name
     ZONE ONE,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    42.36;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    42.36;                   !- Surface Area {m2}
 
   Construction,
     InternalMass,            !- Name

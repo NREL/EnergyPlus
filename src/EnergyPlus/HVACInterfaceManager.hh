@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -72,83 +73,81 @@ namespace HVACInterfaceManager {
 
     enum class FlowType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Constant,
-        Variable
+        Variable,
+        Num
     };
 
     struct CommonPipeData
     {
         // Members
-        DataPlant::iCommonPipeType CommonPipeType; // type of common pipe used if any
-        FlowType SupplySideInletPumpType;
-        FlowType DemandSideInletPumpType;
+        DataPlant::CommonPipeType CommonPipeType = DataPlant::CommonPipeType::No; // type of common pipe used if any
+        FlowType SupplySideInletPumpType = FlowType::Invalid;
+        FlowType DemandSideInletPumpType = FlowType::Invalid;
         // Following report variables are used in uncontrolled common pipe
-        int FlowDir; // Direction in which flow is in Common Pipe
-        Real64 Flow; // Flow in the Common Pipe
-        Real64 Temp;
-        // Following report variables are used in two way common pipe
-        Real64 SecCPLegFlow;     // Mass flow in the secondary side Common pipe leg
-        Real64 PriCPLegFlow;     // Mass flow in the primary side Common pipe leg
-        Real64 SecToPriFlow;     // Mass flow in the pipe from Secondary to primary side
-        Real64 PriToSecFlow;     // Mass flow in the pipe from primary to Secondary side
-        Real64 PriInTemp;        // Temperature at primary inlet node
-        Real64 PriOutTemp;       // Temperature at primary outlet node
-        Real64 SecInTemp;        // Temperature at secondary inlet node
-        Real64 SecOutTemp;       // Temperature at secondary outlet node
-        Real64 PriInletSetPoint; // Setpoint at Primary inlet node
-        Real64 SecInletSetPoint; // Setpoint at Secondary inlet node
-        bool PriInletControlled; // True if Primary inlet node is controlled
-        bool SecInletControlled; // True if secondary inlet is controlled
-        Real64 PriFlowRequest;   // total flow request on supply side.
-
-        // Default Constructor
-        CommonPipeData()
-            : CommonPipeType(DataPlant::iCommonPipeType::No), SupplySideInletPumpType(FlowType::Unassigned),
-              DemandSideInletPumpType(FlowType::Unassigned), FlowDir(0), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0), PriCPLegFlow(0.0),
-              SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0), PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0), PriInletSetPoint(0.0),
-              SecInletSetPoint(0.0), PriInletControlled(false), SecInletControlled(false), PriFlowRequest(0.0)
-        {
-        }
+        int FlowDir = 0;   // Direction in which flow is in Common Pipe
+        Real64 Flow = 0.0; // Flow in the Common Pipe
+        Real64 Temp = 0.0;
+        // Following report variables are used in two-way common pipe
+        Real64 SecCPLegFlow = 0.0;       // Mass flow in the secondary side Common pipe leg
+        Real64 PriCPLegFlow = 0.0;       // Mass flow in the primary side Common pipe leg
+        Real64 SecToPriFlow = 0.0;       // Mass flow in the pipe from Secondary to primary side
+        Real64 PriToSecFlow = 0.0;       // Mass flow in the pipe from primary to Secondary side
+        Real64 PriInTemp = 0.0;          // Temperature at primary inlet node
+        Real64 PriOutTemp = 0.0;         // Temperature at primary outlet node
+        Real64 SecInTemp = 0.0;          // Temperature at secondary inlet node
+        Real64 SecOutTemp = 0.0;         // Temperature at secondary outlet node
+        Real64 PriInletSetPoint = 0.0;   // Setpoint at Primary inlet node
+        Real64 SecInletSetPoint = 0.0;   // Setpoint at Secondary inlet node
+        bool PriInletControlled = false; // True if Primary inlet node is controlled
+        bool SecInletControlled = false; // True if secondary inlet is controlled
+        Real64 PriFlowRequest = 0.0;     // total flow request on supply side.
+        bool MyEnvrnFlag = true;
     };
-
-    // Functions
 
     void UpdateHVACInterface(EnergyPlusData &state,
                              int AirLoopNum, // airloop number for which air loop this is
-                             DataConvergParams::iCalledFrom CalledFrom,
+                             DataConvergParams::CalledFrom CalledFrom,
                              int OutletNode,          // Node number for the outlet of the side of the loop just simulated
                              int InletNode,           // Node number for the inlet of the side that needs the outlet node data
                              bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
     );
 
-    //***************
-
     void UpdatePlantLoopInterface(EnergyPlusData &state,
-                                  int LoopNum,                // The 'inlet/outlet node' loop number
-                                  int ThisLoopSideNum,        // The 'outlet node' LoopSide number
-                                  int ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
-                                  int OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
-                                  bool &OutOfToleranceFlag,   // True when the other side of the loop need to be (re)simulated
-                                  DataPlant::iCommonPipeType CommonPipeType);
+                                  PlantLocation const &plantLoc, // The 'outlet node' Location
+                                  int ThisLoopSideOutletNode,    // Node number for the inlet of the side that needs the outlet node data
+                                  int OtherLoopSideInletNode,    // Node number for the outlet of the side of the loop just simulated
+                                  bool &OutOfToleranceFlag,      // True when the other side of the loop need to be (re)simulated
+                                  DataPlant::CommonPipeType CommonPipeType);
 
-    //***************
+    void UpdateHalfLoopInletTemp(EnergyPlusData &state, int LoopNum, DataPlant::LoopSideLocation TankInletLoopSide, Real64 &TankOutletTemp);
 
-    void UpdateHalfLoopInletTemp(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, Real64 &TankOutletTemp);
-
-    void
-    UpdateCommonPipe(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, DataPlant::iCommonPipeType CommonPipeType, Real64 &MixedOutletTemp);
+    void UpdateCommonPipe(EnergyPlusData &state,
+                          const PlantLocation &TankInletPlantLoc,
+                          DataPlant::CommonPipeType CommonPipeType,
+                          Real64 &MixedOutletTemp);
 
     void ManageSingleCommonPipe(EnergyPlusData &state,
-                                int LoopNum,            // plant loop number
-                                int LoopSide,           // plant loop side number
+                                int LoopNum,                          // plant loop number
+                                DataPlant::LoopSideLocation LoopSide, // plant loop side number
                                 Real64 TankOutletTemp,  // inlet temperature to the common pipe passed in from the capacitance calculation
                                 Real64 &MixedOutletTemp // inlet temperature to the common pipe passed in from the capacitance calculation
     );
 
-    void ManageTwoWayCommonPipe(EnergyPlusData &state, int LoopNum, int LoopSide, Real64 TankOutletTemp);
+    void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc, Real64 TankOutletTemp);
 
     void SetupCommonPipes(EnergyPlusData &state);
+
+    // In-Place Right Shift by 1 of Array Elements
+    inline void rshift1(std::array<Real64, DataConvergParams::ConvergLogStackDepth> &a)
+    {
+        Real64 lastVal = a[a.size() - 1];
+        for (unsigned int i = a.size() - 1; i > 0; --i) {
+            a[i] = a[i - 1];
+        }
+        a[0] = lastVal;
+    }
 
 } // namespace HVACInterfaceManager
 
@@ -157,20 +156,12 @@ struct HVACInterfaceManagerData : BaseGlobalStruct
 
     bool CommonPipeSetupFinished = false;
     Array1D<HVACInterfaceManager::CommonPipeData> PlantCommonPipe;
-    Array1D_bool MyEnvrnFlag_SingleCommonPipe;
-    Array1D_bool MyEnvrnFlag_TwoWayCommonPipe;
-    bool OneTimeData_SingleCommonPipe = true;
-    bool OneTimeData_TwoWayCommonPipe = true;
     Array1D<Real64> TmpRealARR = Array1D<Real64>(DataConvergParams::ConvergLogStackDepth); // Tuned Made static
 
     void clear_state() override
     {
         this->CommonPipeSetupFinished = false;
         this->PlantCommonPipe.deallocate();
-        this->MyEnvrnFlag_SingleCommonPipe.deallocate();
-        this->MyEnvrnFlag_TwoWayCommonPipe.deallocate();
-        this->OneTimeData_SingleCommonPipe = true;
-        this->OneTimeData_TwoWayCommonPipe = true;
     }
 };
 

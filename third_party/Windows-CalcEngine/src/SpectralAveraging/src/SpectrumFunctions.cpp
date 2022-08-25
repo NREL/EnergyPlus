@@ -41,7 +41,7 @@ std::vector<std::pair<double, double>>
                     / std::pow(lambda * 1e-9, 5);
         double q1 = 1 / std::expm1(hc / kT / lambda);
         double energy = C1 * q1;
-        result.push_back(std::make_pair(val, energy));
+        result.emplace_back(val, energy);
     }
 
     return result;

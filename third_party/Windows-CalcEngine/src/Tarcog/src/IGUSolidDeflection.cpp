@@ -19,15 +19,18 @@ namespace Tarcog
         CIGUSolidLayerDeflection::CIGUSolidLayerDeflection(CIGUSolidLayer const & t_SolidLayer) :
             CIGUSolidLayer(t_SolidLayer),
             m_YoungsModulus(DeflectionConstants::YOUNGSMODULUS),
-            m_PoisonRatio(DeflectionConstants::POISONRATIO)
+            m_PoisonRatio(DeflectionConstants::POISONRATIO),
+            m_Density(MaterialConstants::GLASSDENSITY)
         {}
 
         CIGUSolidLayerDeflection::CIGUSolidLayerDeflection(CIGUSolidLayer const & t_SolidLayer,
                                                            double const t_YoungsModulus,
-                                                           double const t_PoisonRatio) :
+                                                           double const t_PoisonRatio,
+                                                           double const t_Density) :
             CIGUSolidLayer(t_SolidLayer),
             m_YoungsModulus(t_YoungsModulus),
-            m_PoisonRatio(t_PoisonRatio)
+            m_PoisonRatio(t_PoisonRatio),
+            m_Density(t_Density)
         {}
 
         void CIGUSolidLayerDeflection::calculateConvectionOrConductionFlow()
@@ -45,6 +48,11 @@ namespace Tarcog
             return std::make_shared<CIGUSolidLayerDeflection>(*this);
         }
 
+        double CIGUSolidLayerDeflection::youngsModulus() const
+        {
+            return m_YoungsModulus;
+        }
+
         double CIGUSolidLayerDeflection::pressureDifference() const
         {
             auto P1 = std::dynamic_pointer_cast<CGasLayer>(m_NextLayer)->getPressure();
@@ -55,6 +63,11 @@ namespace Tarcog
         bool CIGUSolidLayerDeflection::isDeflected() const
         {
             return true;
+        }
+
+        double CIGUSolidLayerDeflection::density() const
+        {
+            return m_Density;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////

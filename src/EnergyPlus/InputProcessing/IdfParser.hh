@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -86,12 +86,13 @@ public:
     enum class Token : size_t
     {
         NONE = 0,
-        END = 1,
-        EXCLAMATION = 2,
-        COMMA = 3,
-        SEMICOLON = 4,
-        STRING = 5,
-        NUMBER = 6
+        END,
+        EXCLAMATION,
+        COMMA,
+        SEMICOLON,
+        STRING,
+        NUMBER,
+        INTEGER
     };
 
 private:
@@ -117,6 +118,10 @@ private:
     // parse_number will return integer, double, or string depending on success of parsing
     // success will be false, if number cannot be converted to integer or double and string will be returned.
     json parse_number(std::string_view idf, size_t &index);
+
+    // parse_integer will return integer or string depending on success of parsing
+    // success will be false, if number cannot be converted to an integer then a string will be returned.
+    json parse_integer(std::string_view idf, size_t &index);
 
     std::string parse_string(std::string_view idf, size_t &index);
 

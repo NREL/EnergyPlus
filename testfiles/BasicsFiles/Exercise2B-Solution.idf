@@ -406,7 +406,7 @@
 !
 !
 
-  Version,9.6;
+  Version,22.2;
 
   Building,
     Exercise 2B,             !- Name
@@ -1850,67 +1850,67 @@
 
   People,
     SOUTH PERIMETER People 1,!- Name
-    SOUTH PERIMETER,         !- Zone or ZoneList Name
+    SOUTH PERIMETER,         !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy 2,      !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     EAST PERIMETER People 1, !- Name
-    EAST PERIMETER,          !- Zone or ZoneList Name
+    EAST PERIMETER,          !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy 2,      !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     NORTH PERIMETER People 1,!- Name
-    NORTH PERIMETER,         !- Zone or ZoneList Name
+    NORTH PERIMETER,         !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy 2,      !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     WEST PERIMETER People 1, !- Name
-    WEST PERIMETER,          !- Zone or ZoneList Name
+    WEST PERIMETER,          !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy 2,      !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   People,
     CORE People 1,           !- Name
-    CORE,                    !- Zone or ZoneList Name
+    CORE,                    !- Zone or ZoneList or Space or SpaceList Name
     Office Occupancy 2,      !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     20,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SOUTH PERIMETER Lights 1,!- Name
-    SOUTH PERIMETER,         !- Zone or ZoneList Name
+    SOUTH PERIMETER,         !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1924,7 +1924,7 @@
 
   Lights,
     EAST PERIMETER Lights 1, !- Name
-    EAST PERIMETER,          !- Zone or ZoneList Name
+    EAST PERIMETER,          !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1938,7 +1938,7 @@
 
   Lights,
     NORTH PERIMETER Lights 1,!- Name
-    NORTH PERIMETER,         !- Zone or ZoneList Name
+    NORTH PERIMETER,         !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1952,7 +1952,7 @@
 
   Lights,
     WEST PERIMETER Lights 1, !- Name
-    WEST PERIMETER,          !- Zone or ZoneList Name
+    WEST PERIMETER,          !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1966,7 +1966,7 @@
 
   Lights,
     CORE Lights 1,           !- Name
-    CORE,                    !- Zone or ZoneList Name
+    CORE,                    !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1980,7 +1980,7 @@
 
   ElectricEquipment,
     SOUTH PERIMETER ElecEq 1,!- Name
-    SOUTH PERIMETER,         !- Zone or ZoneList Name
+    SOUTH PERIMETER,         !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1993,7 +1993,7 @@
 
   ElectricEquipment,
     EAST PERIMETER ElecEq 1, !- Name
-    EAST PERIMETER,          !- Zone or ZoneList Name
+    EAST PERIMETER,          !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -2006,7 +2006,7 @@
 
   ElectricEquipment,
     NORTH PERIMETER ElecEq 1,!- Name
-    NORTH PERIMETER,         !- Zone or ZoneList Name
+    NORTH PERIMETER,         !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -2019,7 +2019,7 @@
 
   ElectricEquipment,
     WEST PERIMETER ElecEq 1, !- Name
-    WEST PERIMETER,          !- Zone or ZoneList Name
+    WEST PERIMETER,          !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -2032,7 +2032,7 @@
 
   ElectricEquipment,
     CORE ElecEq 1,           !- Name
-    CORE,                    !- Zone or ZoneList Name
+    CORE,                    !- Zone or ZoneList or Space or SpaceList Name
     Office Lighting 2,       !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1976,                    !- Design Level {W}
@@ -2045,7 +2045,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SOUTH PERIMETER Infil 1, !- Name
-    SOUTH PERIMETER,         !- Zone or ZoneList Name
+    SOUTH PERIMETER,         !- Zone or ZoneList or Space or SpaceList Name
     Constant,                !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.035,                   !- Design Flow Rate {m3/s}
@@ -2059,7 +2059,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     EAST PERIMETER Infil 1,  !- Name
-    EAST PERIMETER,          !- Zone or ZoneList Name
+    EAST PERIMETER,          !- Zone or ZoneList or Space or SpaceList Name
     Constant,                !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.015,                   !- Design Flow Rate {m3/s}
@@ -2073,7 +2073,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     NORTH PERIMETER Infil 1, !- Name
-    NORTH PERIMETER,         !- Zone or ZoneList Name
+    NORTH PERIMETER,         !- Zone or ZoneList or Space or SpaceList Name
     Constant,                !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.035,                   !- Design Flow Rate {m3/s}
@@ -2087,7 +2087,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     WEST PERIMETER Infil 1,  !- Name
-    WEST PERIMETER,          !- Zone or ZoneList Name
+    WEST PERIMETER,          !- Zone or ZoneList or Space or SpaceList Name
     Constant,                !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.015,                   !- Design Flow Rate {m3/s}
@@ -2101,7 +2101,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     CORE Infil 1,            !- Name
-    CORE,                    !- Zone or ZoneList Name
+    CORE,                    !- Zone or ZoneList or Space or SpaceList Name
     Constant,                !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.062,                   !- Design Flow Rate {m3/s}

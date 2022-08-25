@@ -110,7 +110,7 @@ namespace EffectiveLayers
                                              double height,
                                              double thickness,
                                              const ShadeOpenness & openness) :
-        EffectiveLayer(width, height, thickness, openness, {0.05, 1.08, 0.79, 0.50})
+        EffectiveLayer(width, height, thickness, openness, {0.078, 1.2, 1.0, 1.0})
     {}
 
     EffectiveOpenness EffectiveLayerType1::getEffectiveOpenness()

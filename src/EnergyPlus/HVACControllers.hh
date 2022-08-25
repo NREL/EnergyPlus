@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,26 +78,22 @@ namespace HVACControllers {
     using DataRootFinder::RootFinderDataType;
 
     // Parameters for controls used here
-    enum class iCtrl
+    enum class CtrlVarType
     {
+        Invalid = -1,
         NoControlVariable,
         Temperature,
         HumidityRatio,
         TemperatureAndHumidityRatio,
         Flow,
+        Num
     };
 
     struct SolutionTrackerType
     {
-        // Members
-        bool DefinedFlag;     // Flag set to TRUE when tracker is up-to-date. FALSE otherwise.
-        Real64 ActuatedValue; // Actuated value
-        ControllerMode Mode;  // Operational model of controller
-
-        // Default Constructor
-        SolutionTrackerType() : DefinedFlag(true), ActuatedValue(0.0), Mode(ControllerMode::None)
-        {
-        }
+        bool DefinedFlag = true;                    // Flag set to TRUE when tracker is up-to-date. FALSE otherwise.
+        Real64 ActuatedValue = 0.0;                 // Actuated value
+        ControllerMode Mode = ControllerMode::None; // Operational model of controller
     };
 
     struct ControllerPropsType
@@ -106,8 +102,8 @@ namespace HVACControllers {
         std::string ControllerName; // Name of the Controller
         std::string ControllerType; // Type of Controller
         int ControllerType_Num;
-        iCtrl ControlVar;        // The type of control variable being sensed
-        iCtrl ActuatorVar;       // The variable that the controller will act on ie. flow
+        CtrlVarType ControlVar;  // The type of control variable being sensed
+        CtrlVarType ActuatorVar; // The variable that the controller will act on ie. flow
         ControllerAction Action; // Controller Action - Reverse or Normal
         // Controller must be initialized to set MinActuated and MaxActuated
         bool InitFirstPass;
@@ -153,20 +149,18 @@ namespace HVACControllers {
         int ActuatedNode;                   // The node that is acted upon by the controller
         Real64 ActuatedValue;               // Value of actuated variable before change by the controller
         Real64 NextActuatedValue;           // The new control actuated value
-        int ActuatedNodePlantLoopNum;       // the plant loop index for the actuated node
-        int ActuatedNodePlantLoopSide;      // the plant loop side for the actuated node
-        int ActuatedNodePlantLoopBranchNum; // the plant loop branch num for actuated node
+        PlantLocation ActuatedNodePlantLoc; // Location for actuated node
         // --------------------
         // Sensed variable
         // --------------------
         int SensedNode;             // The sensed node number from the grid
         bool IsSetPointDefinedFlag; // If TRUE indicates that the setpoint has been defined and can
         // be used to compute DeltaSensed
-        Real64 SetPointValue;                          // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
-        Real64 SensedValue;                            // The sensed control variable of any type
-        Real64 DeltaSensed;                            // Difference of sensed to setpoint value for calculating proportional gain
-        Real64 Offset;                                 // This is the tolerance or droop from the error
-        SetPointManager::iCtrlVarType HumRatCntrlType; // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
+        Real64 SetPointValue;                         // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
+        Real64 SensedValue;                           // The sensed control variable of any type
+        Real64 DeltaSensed;                           // Difference of sensed to setpoint value for calculating proportional gain
+        Real64 Offset;                                // This is the tolerance or droop from the error
+        SetPointManager::CtrlVarType HumRatCntrlType; // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
         // --------------------
         // Other controller inputs, not yet used
         // --------------------
@@ -191,15 +185,14 @@ namespace HVACControllers {
 
         // Default Constructor
         ControllerPropsType()
-            : ControllerType_Num(ControllerSimple_Type), ControlVar(iCtrl::NoControlVariable), ActuatorVar(iCtrl::NoControlVariable),
+            : ControllerType_Num(ControllerSimple_Type), ControlVar(CtrlVarType::NoControlVariable), ActuatorVar(CtrlVarType::NoControlVariable),
               Action(ControllerAction::NoAction), InitFirstPass(true), NumCalcCalls(0), Mode(ControllerMode::None), DoWarmRestartFlag(false),
               ReuseIntermediateSolutionFlag(false), ReusePreviousSolutionFlag(false), SolutionTrackers(2), MaxAvailActuated(0.0), MaxAvailSensed(0.0),
               MinAvailActuated(0.0), MinAvailSensed(0.0), MaxVolFlowActuated(0.0), MinVolFlowActuated(0.0), MaxActuated(0.0), MinActuated(0.0),
-              ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoopNum(0), ActuatedNodePlantLoopSide(0),
-              ActuatedNodePlantLoopBranchNum(0), SensedNode(0), IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0),
-              Offset(0.0), HumRatCntrlType(SetPointManager::iCtrlVarType::Unknown), Range(0.0), Limit(0.0), FirstTraceFlag(true),
-              BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
-              BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)
+              ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoc{}, SensedNode(0), IsSetPointDefinedFlag(false),
+              SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0), Offset(0.0), HumRatCntrlType(SetPointManager::CtrlVarType::Invalid), Range(0.0),
+              Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
+              FaultyCoilSATOffset(0.0), BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)
         {
         }
     };
@@ -220,29 +213,18 @@ namespace HVACControllers {
 
     struct AirLoopStatsType
     {
-        // Members
-
-        // Shared_ptr because we need to put this into an Array1D which is not
-        // friendly with move-only types
+        // Shared_ptr because we need to put this into an Array1D which is not friendly with move-only types
         SharedFileHandle TraceFile;
         // Used only if > 0. Same size as NumPrimaryAirSys
-        bool FirstTraceFlag;                          // To detect first trace to air loop trace file
-        int NumCalls;                                 // Number of times air loop is simulated (number of calls to SimAirLoop)
-        int NumFailedWarmRestarts;                    // Number of times speculative warm restart was attempted and failed
-        int NumSuccessfulWarmRestarts;                // Number of times speculative warm restart was attempted and succeeded
-        int TotSimAirLoopComponents;                  // Total number of times the SimAirLoopComponents() routine has been invoked
-        int MaxSimAirLoopComponents;                  // Maximum number of times the SimAirLoopComponents() routine has been invoked
-        int TotIterations;                            // Total number of iterations required to solve the controllers on this air loop
-        int MaxIterations;                            // Maximum number of iterations required to solve the controllers on this air loop
-        Array1D<ControllerStatsType> ControllerStats; // Array of statistics for each controller
-        // on this air loop
-
-        // Default Constructor
-        AirLoopStatsType()
-            : FirstTraceFlag(true), NumCalls(0), NumFailedWarmRestarts(0), NumSuccessfulWarmRestarts(0), TotSimAirLoopComponents(0),
-              MaxSimAirLoopComponents(0), TotIterations(0), MaxIterations(0)
-        {
-        }
+        bool FirstTraceFlag = true;                   // To detect first trace to air loop trace file
+        int NumCalls = 0;                             // Number of times air loop is simulated (number of calls to SimAirLoop)
+        int NumFailedWarmRestarts = 0;                // Number of times speculative warm restart was attempted and failed
+        int NumSuccessfulWarmRestarts = 0;            // Number of times speculative warm restart was attempted and succeeded
+        int TotSimAirLoopComponents = 0;              // Total number of times the SimAirLoopComponents() routine has been invoked
+        int MaxSimAirLoopComponents = 0;              // Maximum number of times the SimAirLoopComponents() routine has been invoked
+        int TotIterations = 0;                        // Total number of iterations required to solve the controllers on this air loop
+        int MaxIterations = 0;                        // Maximum number of iterations required to solve the controllers on this air loop
+        Array1D<ControllerStatsType> ControllerStats; // Array of statistics for each controller on this air loop
     };
 
     void ManageControllers(EnergyPlusData &state,
@@ -322,7 +304,7 @@ namespace HVACControllers {
     void TraceIterationStamp(
         EnergyPlusData &state, InputOutputFile &TraceFile, bool FirstHVACIteration, int AirLoopPass, bool AirLoopConverged, int AirLoopNumCalls);
 
-    void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int const ControlNum);
+    void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int ControlNum);
 
     void SetupIndividualControllerTracer(EnergyPlusData &state, int ControlNum);
 
@@ -382,18 +364,7 @@ struct HVACControllersData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumControllers = 0;
-        this->NumAirLoopStats = 0;
-        this->CheckEquipName.deallocate();
-        this->GetControllerInputFlag = true;
-        this->InitControllerOneTimeFlag = true;
-        this->InitControllerSetPointCheckFlag = true;
-        this->ControllerProps.deallocate();
-        this->RootFinders.deallocate();
-        this->AirLoopStats.deallocate();
-        this->MyEnvrnFlag.deallocate();
-        this->MySizeFlag.deallocate();
-        this->MyPlantIndexsFlag.deallocate();
+        *this = HVACControllersData();
     }
 };
 

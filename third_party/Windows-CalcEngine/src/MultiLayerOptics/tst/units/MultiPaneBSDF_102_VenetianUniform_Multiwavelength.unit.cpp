@@ -216,7 +216,8 @@ protected:
                                                            slatTiltAngle,
                                                            curvatureRadius,
                                                            numOfSlatSegments,
-                                                           DistributionMethod::UniformDiffuse);
+                                                           DistributionMethod::UniformDiffuse,
+                                                           true);
 
         auto commonWavelengths = aVenetian->getBandWavelengths();
 

@@ -23,7 +23,7 @@ namespace Tarcog::ISO15099
         m_IGUSystem->setWidthAndHeight(width, height);
         m_IGUSystem->setInteriorAndExteriorSurfacesHeight(m_ExteriorSurfaceHeight);
         m_IGUUvalue = m_IGUSystem->getUValue();
-        m_HcExterior = m_IGUSystem->getHc(System::SHGC, Environment::Outdoor);
+        m_HExterior = m_IGUSystem->getH(System::SHGC, Environment::Outdoor);
     }
 
     double WindowVision::uValue() const
@@ -31,10 +31,11 @@ namespace Tarcog::ISO15099
         auto frameWeightedUValue{0.0};
         auto edgeOfGlassWeightedUValue{0.0};
 
-        for(const auto & frame : m_Frame)
+        for(const auto & [key, frame] : m_Frame)
         {
-            frameWeightedUValue += frame.second.projectedArea() * frame.second.frameData().UValue;
-            edgeOfGlassWeightedUValue += frame.second.edgeOfGlassArea() * frame.second.frameData().EdgeUValue;
+            std::ignore = key;
+            frameWeightedUValue += frame.projectedArea() * frame.frameData().UValue;
+            edgeOfGlassWeightedUValue += frame.edgeOfGlassArea() * frame.frameData().EdgeUValue;
         }
 
         const auto COGWeightedUValue{m_IGUUvalue
@@ -63,9 +64,10 @@ namespace Tarcog::ISO15099
     {
         auto frameWeightedSHGC{0.0};
 
-        for(const auto & frame : m_Frame)
+        for(const auto & [key, frame] : m_Frame)
         {
-            frameWeightedSHGC += frame.second.projectedArea() * frame.second.frameData().shgc(m_HcExterior);
+            std::ignore = key;
+            frameWeightedSHGC += frame.projectedArea() * frame.frameData().shgc(m_HExterior);
         }
 
         const auto COGWeightedSHGC{m_IGUSystem->getSHGC(tSol)
@@ -74,7 +76,7 @@ namespace Tarcog::ISO15099
         auto dividerWeightedSHGC{0.0};
         if(m_Divider.has_value())
         {
-            dividerWeightedSHGC += dividerArea() * m_Divider->shgc(m_HcExterior);
+            dividerWeightedSHGC += dividerArea() * m_Divider->shgc(m_HExterior);
         }
 
         return (COGWeightedSHGC + frameWeightedSHGC + dividerWeightedSHGC) / area();
@@ -102,7 +104,7 @@ namespace Tarcog::ISO15099
 
     double WindowVision::hc() const
     {
-        return m_HcExterior;
+        return m_HExterior;
     }
 
     double WindowVision::uValueCOG() const
@@ -117,7 +119,7 @@ namespace Tarcog::ISO15099
 
     void WindowVision::setHc(double hc)
     {
-        m_HcExterior = hc;
+        m_HExterior = hc;
     }
 
     void WindowVision::setFrameData(FramePosition position, FrameData frameData)
@@ -166,7 +168,7 @@ namespace Tarcog::ISO15099
         m_IGUSystem->setInteriorAndExteriorSurfacesHeight(m_ExteriorSurfaceHeight);
 
         m_IGUUvalue = m_IGUSystem->getUValue();
-        m_HcExterior = m_IGUSystem->getHc(System::SHGC, Environment::Outdoor);
+        m_HExterior = m_IGUSystem->getH(System::SHGC, Environment::Outdoor);
     }
 
     double WindowVision::getIGUWidth() const
@@ -213,7 +215,7 @@ namespace Tarcog::ISO15099
         m_IGUSystem->setWidthAndHeight(width, height);
         m_IGUSystem->setInteriorAndExteriorSurfacesHeight(m_ExteriorSurfaceHeight);
         m_IGUUvalue = m_IGUSystem->getUValue();
-        m_HcExterior = m_IGUSystem->getHc(System::SHGC, Environment::Outdoor);
+        m_HExterior = m_IGUSystem->getH(System::SHGC, Environment::Outdoor);
     }
 
     double WindowVision::dividerArea() const
@@ -272,9 +274,9 @@ namespace Tarcog::ISO15099
     {
         auto area{0.0};
 
-        for(const auto & frame : m_Frame)
+        for(const auto & system : m_Frame)
         {
-            area += frame.second.projectedArea();
+            area += system.second.projectedArea();
         }
 
         return area;
@@ -284,9 +286,10 @@ namespace Tarcog::ISO15099
     {
         auto area{0.0};
 
-        for(const auto & frame : m_Frame)
+        for(const auto & [key, frame] : m_Frame)
         {
-            area += frame.second.edgeOfGlassArea();
+            std::ignore = key;
+            area += frame.edgeOfGlassArea();
         }
 
         return area;

@@ -49,8 +49,8 @@ namespace SpectralAveraging
         // Setting detector spectral properties for the sample
         void setDetectorData(const FenestrationCommon::CSeries & t_DetectorData);
 
-        FenestrationCommon::IntegrationType getIntegrator() const;
-        double getNormalizationCoeff() const;
+        [[nodiscard]] FenestrationCommon::IntegrationType getIntegrator() const;
+        [[nodiscard]] double getNormalizationCoeff() const;
 
         // Integrate sample property over the certain spectrum range
         double getProperty(double const minLambda,
@@ -75,9 +75,9 @@ namespace SpectralAveraging
                          FenestrationCommon::Property const t_Property,
                          FenestrationCommon::Side const t_Side);
 
-        std::vector<double> getWavelengths() const;
+        [[nodiscard]] std::vector<double> getWavelengths() const;
 
-        size_t getBandSize() const;
+        [[nodiscard]] size_t getBandSize() const;
 
     protected:
         virtual void reset();
@@ -160,17 +160,17 @@ namespace SpectralAveraging
                               FenestrationCommon::IntegrationType::Trapezoidal,
                             double NormalizationCoefficient = 1);
 
-        FenestrationCommon::CSeries & pce(const FenestrationCommon::Side side);
-        FenestrationCommon::CSeries & w(const FenestrationCommon::Side side);
+        FenestrationCommon::CSeries & jscPrime(const FenestrationCommon::Side side);
 
     protected:
         void calculateState() override;
-        PhotovoltaicSampleData * getSample() const;
+        [[nodiscard]] PhotovoltaicSampleData * getSample() const;
 
-        double pceCalc(double wavelength, double eqe, double voc, double ff);
+        static double jscPrimeCalc(double wavelength, double eqe);
 
-        std::map<FenestrationCommon::Side, FenestrationCommon::CSeries> m_PCE;
-        std::map<FenestrationCommon::Side, FenestrationCommon::CSeries> m_W;
+        // This values need to be multiplied with incoming radiation in order to give current per
+        // wavelength
+        std::map<FenestrationCommon::Side, FenestrationCommon::CSeries> m_JcsPrime;
     };
 
 }   // namespace SpectralAveraging

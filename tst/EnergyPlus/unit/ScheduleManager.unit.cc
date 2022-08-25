@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -1325,4 +1326,128 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap)
 
         EXPECT_EQ(8760.0, HourOfYear);
     }
+}
+
+TEST_F(EnergyPlusFixture, ScheduleFileDSTtoggleOptionTest)
+{
+    // P. Shrestha and N. Merket - February 2022
+
+    // Create this file with test data in it. This test will fail until you do that.
+
+    // scheduleFile object of class "path" created here in the next line is basically a long string that provides the full path to the file
+    fs::path scheduleFile = configured_source_directory() / "tst/EnergyPlus/unit/Resources/schedule_file1.csv";
+
+    // Adding Schedule:File blocks that test other possibilities to make sure they work right, such as:
+    //          1.) Setting to "Yes"
+    //          2.) Setting to "No"
+    //          3.) Leaving empty (should default to "No")
+    //          4.) Omitting the last field (should default to "No")
+
+    // Defining the idf chunk needed to run the relevant tests - "idf_objects" as a comma-delimited string vector
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:File,",
+        "  Test1,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  " + scheduleFile.string() + ",              !- File Name",
+        "  2,                       !- Column Number",
+        "  1,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Comma,                   !- Column Separator",
+        "  No,                      !- Interpolate to Timestep",
+        "  60,                      !- Minutes per item",
+        "  Yes;                     !- Adjust Schedule for Daylight Savings",
+        " ",
+        "Schedule:File,",
+        "  Test2,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  " + scheduleFile.string() + ",              !- File Name",
+        "  2,                       !- Column Number",
+        "  1,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Comma,                   !- Column Separator",
+        "  No,                      !- Interpolate to Timestep",
+        "  60,                      !- Minutes per item",
+        "  No;                     !- Adjust Schedule for Daylight Savings",
+        " ",
+        "Schedule:File,",
+        "  Test3,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  " + scheduleFile.string() + ",              !- File Name",
+        "  2,                       !- Column Number",
+        "  1,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Comma,                   !- Column Separator",
+        "  No,                      !- Interpolate to Timestep",
+        "  60,                      !- Minutes per item",
+        "  ;                     !- Adjust Schedule for Daylight Savings",
+        " ",
+        "Schedule:File,",
+        "  Test4,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  " + scheduleFile.string() + ",              !- File Name",
+        "  2,                       !- Column Number",
+        "  1,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Comma,                   !- Column Separator",
+        "  No,                      !- Interpolate to Timestep",
+        "  60;                      !- Minutes per item",
+        " ",
+    });
+
+    // This will process the provided idf chunk within the test fixture (must pass this step in order to proceed)
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataGlobal->TimeStep = 1;         // Checking to see if omitting this is OK here
+    state->dataEnvrn->DayOfWeek = 1;         // Sunday
+    state->dataEnvrn->DayOfWeekTomorrow = 2; // Monday
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    state->dataGlobal->HourOfDay = 24;
+
+    // Test 1 condition
+    // "YES" Adjusts schedule for daylight savings
+    const int sch1idx = GetScheduleIndex(*state, "TEST1"); // Index of the IDF schedule object identified and stored into schdl1idx variable
+    ScheduleManager::ScheduleData &sch1 =
+        state->dataScheduleMgr->Schedule(sch1idx); // sch1 reference initialized that points to the specific schedule of interest
+    EXPECT_TRUE(sch1.UseDaylightSaving);           // Checks that the member variable got set correctly.
+
+    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch1idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 0.0);
+    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch1idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
+
+    // Test 2 condition
+    // "NO" Does not adjust for daylight savings
+    const int sch2idx = GetScheduleIndex(*state, "TEST2");
+    ScheduleManager::ScheduleData &sch2 = state->dataScheduleMgr->Schedule(sch2idx);
+    EXPECT_FALSE(sch2.UseDaylightSaving);
+
+    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch2idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
+    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch2idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
+
+    // Test 3 condition
+    // Default: "YES", changes schedule for daylight savings
+    const int sch3idx = GetScheduleIndex(*state, "TEST3");
+    ScheduleManager::ScheduleData &sch3 = state->dataScheduleMgr->Schedule(sch3idx);
+    EXPECT_TRUE(sch3.UseDaylightSaving);
+
+    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch3idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 0.0);
+    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch3idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
+
+    // Test 4 condition
+    // Default: "YES", changes schedule for daylight savings
+    const int sch4idx = GetScheduleIndex(*state, "TEST4");                           // Index of the IDF schedule object identified
+    ScheduleManager::ScheduleData &sch4 = state->dataScheduleMgr->Schedule(sch4idx); // sch1 object initialized of type ScheduleData
+    EXPECT_TRUE(sch4.UseDaylightSaving);                                             // Checks that the member variable got set correctly.
+
+    state->dataEnvrn->DSTIndicator = 1; // Tells the simulation that we're currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch4idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 0.0);
+    state->dataEnvrn->DSTIndicator = 0; // Tells the simulation that we're NOT currently observing daylight savings
+    EXPECT_DOUBLE_EQ(ScheduleManager::LookUpScheduleValue(*state, sch4idx, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep), 1.0);
 }

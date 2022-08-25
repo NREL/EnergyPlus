@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -101,7 +101,7 @@ namespace DataPlant {
         Real64 EMSValue;
         bool FlowRestrictionFlag; // Max available flow at the outlet of the half loop
         // is less than max available flow at inlet
-        DataPlant::iFlowLock FlowLock;
+        DataPlant::FlowLock FlowLock;
         int TotalConnected;                   // total number of other loops connected to this loop side
         Array1D<ConnectedLoopData> Connected; // Other loops connected to this Loop side
         Array1D<BranchData> Branch;           // Branch data
@@ -138,11 +138,7 @@ namespace DataPlant {
         // report variables
         Real64 LoopSetPtDemandAtInlet;
         Real64 ThisSideLoadAlterations;
-        // these are intended to be temporary
-        int myLoopNum;
-        int myLoopSideNum;
-        int myOtherLoopSideNum;
-
+        PlantLocation plantLoc;
         // Default Constructor
         HalfLoopData()
             : SimLoopSideNeeded(true), SimZoneEquipNeeded(true), SimAirLoopsNeeded(true), SimNonZoneEquipNeeded(true), SimElectLoadCentrNeeded(true),
@@ -150,7 +146,7 @@ namespace DataPlant {
               TempSetPoint(DataLoopNode::SensedNodeFlagValue), TempSetPointHi(DataLoopNode::SensedNodeFlagValue),
               TempSetPointLo(DataLoopNode::SensedNodeFlagValue), TempInterfaceTankOutlet(0.0), LastTempInterfaceTankOutlet(0.0), TotalBranches(0),
               NodeNumIn(0), NodeNumOut(0), TotalPumps(0), BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), InletNodeSetPt(false),
-              OutletNodeSetPt(false), EMSCtrl(false), EMSValue(0.0), FlowRestrictionFlag(false), FlowLock(DataPlant::iFlowLock::Unlocked),
+              OutletNodeSetPt(false), EMSCtrl(false), EMSValue(0.0), FlowRestrictionFlag(false), FlowLock(DataPlant::FlowLock::Unlocked),
               TotalConnected(0), HasPressureComponents(false), HasParallelPressComps(false), PressureDrop(0.0), PressureEffectiveK(0.0),
               errCount_LoadWasntDist(0), errIndex_LoadWasntDist(0), errCount_LoadRemains(0), errIndex_LoadRemains(0), LoopSideInlet_TankTemp(0.0),
               LoopSideInlet_MdotCpDeltaT(0.0), LoopSideInlet_McpDTdt(0.0), LoopSideInlet_CapExcessStorageTime(0.0),
@@ -158,7 +154,7 @@ namespace DataPlant {
               flowRequestNeedIfOn(0.0), flowRequestNeedAndTurnOn(0.0), flowRequestFinal(0.0), hasConstSpeedBranchPumps(false),
               InitialDemandToLoopSetPoint(0.0), CurrentAlterationsToDemand(0.0), UpdatedDemandToLoopSetPoint(0.0),
               LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), refrigIndex(0), LoopSetPtDemandAtInlet(0.0),
-              ThisSideLoadAlterations(0.0), myLoopNum(0), myLoopSideNum(0), myOtherLoopSideNum(0)
+              ThisSideLoadAlterations(0.0), plantLoc{}
         {
         }
 
@@ -179,11 +175,11 @@ namespace DataPlant {
 
         void DisableAnyBranchPumpsConnectedToUnloadedEquipment();
 
-        void DoFlowAndLoadSolutionPass(EnergyPlusData &state, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
+        void DoFlowAndLoadSolutionPass(EnergyPlusData &state, LoopSideLocation OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
 
         Real64 CalcOtherSideDemand(EnergyPlusData &state, Real64 ThisLoopSideFlow);
 
-        Real64 SetupLoopFlowRequest(EnergyPlusData &state, int OtherSide);
+        Real64 SetupLoopFlowRequest(EnergyPlusData &state, const LoopSideLocation OtherSide);
 
         Real64 EvaluateLoopSetPointLoad(EnergyPlusData &state, int FirstBranchNum, int LastBranchNum, Real64 ThisLoopSideFlow);
 

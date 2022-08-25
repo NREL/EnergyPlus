@@ -5,23 +5,12 @@
 # Regarding POWER/PowerPC, just as is noted in the Qt source,
 # "There are many more known variants/revisions that we do not handle/detect."
 
-set(archdetect_c_code
-    "
-#if defined(__arm__) || defined(__TARGET_ARCH_ARM) || defined(_M_ARM) || defined(_M_ARM64) || defined(__aarch64__) || defined(__ARM64__)
-    #if defined(__ARM64_ARCH_8__) \\
-        || defined(__aarch64__) \\
-        || defined(__ARMv8__) \\
-        || defined(__ARMv8_A__) \\
-        || defined(_M_ARM64)
-        || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM-0 >= 8)
-        #error cmake_ARCH arm64
-    #elif defined(__ARM_ARCH_7__) \\
+set(archdetect_c_code "
+#if defined(__arm__) || defined(__TARGET_ARCH_ARM)
+    #if defined(__ARM_ARCH_7__) \\
         || defined(__ARM_ARCH_7A__) \\
         || defined(__ARM_ARCH_7R__) \\
         || defined(__ARM_ARCH_7M__) \\
-        || defined(__ARM_ARCH_7S__) \\
-        || defined(_ARM_ARCH_7) \\
-        || defined(__CORE_CORTEXA__) \\
         || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM-0 >= 7)
         #error cmake_ARCH armv7
     #elif defined(__ARM_ARCH_6__) \\
@@ -81,14 +70,12 @@ function(target_architecture output_var)
             elseif("${osx_arch}" STREQUAL "i386")
                 set(osx_arch_i386 TRUE)
             elseif("${osx_arch}" STREQUAL "x86_64")
-        set(osx_arch_x86_64 TRUE)
-      elseif("${osx_arch}" STREQUAL "ppc64" AND ppc_support)
-        set(osx_arch_ppc64 TRUE)
-      elseif("${osx_arch}" STREQUAL "arm64")
-        set(osx_arch_arm64 TRUE)
-      else()
-        message(FATAL_ERROR "Invalid OS X arch name: ${osx_arch}")
-      endif()
+                set(osx_arch_x86_64 TRUE)
+            elseif("${osx_arch}" STREQUAL "ppc64" AND ppc_support)
+                set(osx_arch_ppc64 TRUE)
+            else()
+                message(FATAL_ERROR "Invalid OS X arch name: ${osx_arch}")
+            endif()
         endforeach()
 
         # Now add all the architectures in our normalized order
@@ -107,11 +94,6 @@ function(target_architecture output_var)
         if(osx_arch_ppc64)
             list(APPEND ARCH ppc64)
         endif()
-
-    if(osx_arch_arm64)
-      list(APPEND ARCH arm64)
-    endif()
-
     else()
         file(WRITE "${CMAKE_BINARY_DIR}/arch.c" "${archdetect_c_code}")
 

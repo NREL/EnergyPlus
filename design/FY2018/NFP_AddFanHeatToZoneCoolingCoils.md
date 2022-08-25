@@ -33,17 +33,17 @@ SimAirServingZones::InitAirLoops (within InitAirLoopsOneTimeFlag IF block)
 
     if (supFanModelType == structArrayLegacyFanModels) {
         PrimaryAirSystem(AirLoopNum).SupFanNum = SupFanIndex;
-        PrimaryAirSystem(AirLoopNum).supFanModelTypeEnum = structArrayLegacyFanModels;
+        PrimaryAirSystem(AirLoopNum).supFanModelType = structArrayLegacyFanModels;
     } else if (supFanModelType == objectVectorOOFanSystemModel) {
         PrimaryAirSystem(AirLoopNum).supFanVecIndex = SupFanIndex;
-        PrimaryAirSystem(AirLoopNum).supFanModelTypeEnum = objectVectorOOFanSystemModel;
+        PrimaryAirSystem(AirLoopNum).supFanModelType = objectVectorOOFanSystemModel;
     }
 
     if (retFanModelType == structArrayLegacyFanModels) {
-        PrimaryAirSystem(AirLoopNum).retFanModelTypeEnum = structArrayLegacyFanModels;
+        PrimaryAirSystem(AirLoopNum).retFanModelType = structArrayLegacyFanModels;
         PrimaryAirSystem(AirLoopNum).RetFanNum = RetFanIndex;
     } else if (retFanModelType == objectVectorOOFanSystemModel) {
-        PrimaryAirSystem(AirLoopNum).retFanModelTypeEnum = objectVectorOOFanSystemModel;
+        PrimaryAirSystem(AirLoopNum).retFanModelType = objectVectorOOFanSystemModel;
         PrimaryAirSystem(AirLoopNum).retFanVecIndex = RetFanIndex;
     }
 
@@ -52,10 +52,10 @@ HVACUnitarySystem::SizeUnitarySystem (before sizing occurs)
     if (CurSysNum > 0 && CurOASysNum == 0 && UnitarySystem(UnitarySysNum).FanExists) {
         if (UnitarySystem(UnitarySysNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             PrimaryAirSystem(CurSysNum).supFanVecIndex = UnitarySystem(UnitarySysNum).FanIndex;
-            PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+            PrimaryAirSystem(CurSysNum).supFanModelType = DataAirSystems::objectVectorOOFanSystemModel;
         } else {
             PrimaryAirSystem(CurSysNum).SupFanNum = UnitarySystem(UnitarySysNum).FanIndex;
-            PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            PrimaryAirSystem(CurSysNum).supFanModelType = DataAirSystems::structArrayLegacyFanModels;
         }
     }
 
@@ -64,7 +64,7 @@ HVACDXSystem::InitDXCoolingSystem (
         if (!DXCoolingSystem(DXSystemNum).VSCoilFanInfoSet && AirLoopNum > 0) {
             if (DXCoolingSystem(DXSystemNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
 
-                switch (DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanModelTypeEnum) {
+                switch (DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanModelType) {
                 case DataAirSystems::structArrayLegacyFanModels: {
                     int SupFanNum = DataAirSystems::PrimaryAirSystem(AirLoopNum).SupFanNum;
                     if (SupFanNum > 0) {
@@ -98,7 +98,7 @@ where:
 
     int supFanVecIndex; // index in fan object vector for supply fan when model type is objectVectorOOFanSystemModel, zero-based index
     int SupFanNum;      // index of the supply fan in the Fan data structure when model type is structArrayLegacyFanModels
-    fanModelTypeEnum supFanModelTypeEnum; // indicates which type of fan model to call for supply fan, legacy or new OO
+    fanModelTypeEnum supFanModelType; // indicates which type of fan model to call for supply fan, legacy or new OO
 
 Note that:
 
@@ -115,7 +115,7 @@ ReportSizingManager::RequestSizing
 
       SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
       RetFanNum = PrimaryAirSystem(CurSysNum).RetFanNum;
-      switch (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum) {
+      switch (PrimaryAirSystem(CurSysNum).supFanModelType) {
           case DataAirSystems::structArrayLegacyFanModels: {
               FanCoolLoad = FanDesHeatGain(PrimaryAirSystem(CurSysNum).SupFanNum, DesVolFlow);
               if (coilSelectionReportObj->isCompTypeCoil(CompType) && (SupFanNum > 0)) {
@@ -140,7 +140,7 @@ ReportSizingManager::RequestSizing
           }
           } // end switch
 
-      switch (PrimaryAirSystem(CurSysNum).retFanModelTypeEnum) {
+      switch (PrimaryAirSystem(CurSysNum).retFanModelType) {
           case DataAirSystems::structArrayLegacyFanModels: {
               FanCoolLoad += (1.0 - OutAirFrac) * FanDesHeatGain(PrimaryAirSystem(CurSysNum).RetFanNum, DesVolFlow);
               break;

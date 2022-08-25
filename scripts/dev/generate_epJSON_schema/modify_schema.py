@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -170,6 +170,7 @@ extension_renaming = {
     'Foundation:Kiva': 'blocks',
     'SurfaceProperty:ExposedFoundationPerimeter': 'surfaces',
     'SurfaceProperty:SurroundingSurfaces': 'surfaces',
+    'SurfaceProperty:GroundSurfaces': 'ground_surfaces',
     'ZoneHVAC:HybridUnitaryHVAC': 'modes',
     'ShadowCalculation': 'shading_zone_groups',
     'Schedule:Year': 'schedule_weeks',

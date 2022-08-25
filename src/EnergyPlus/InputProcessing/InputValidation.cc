@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,6 +79,26 @@ std::vector<std::string> const &Validation::warnings()
     return warnings_;
 }
 
+// this is a little bit risky, since it's theoretically
+// possible that the schema could change?
+// But we're trying it to see the impact on the code
+const valijson::Schema &validation_schema(const json *schema)
+{
+    [[maybe_unused]] static const json *last_schema = schema;
+
+    assert(last_schema == schema);
+
+    static const std::unique_ptr<valijson::Schema> retval = [&]() {
+        auto vs = std::make_unique<valijson::Schema>();
+        valijson::SchemaParser parser;
+        valijson::adapters::NlohmannJsonAdapter schema_doc(*schema);
+        parser.populateSchema(schema_doc, *vs);
+        return vs;
+    }();
+
+    return *retval;
+}
+
 bool Validation::validate(json const &parsed_input)
 {
 
@@ -87,15 +107,10 @@ bool Validation::validate(json const &parsed_input)
     static constexpr std::string_view otherError =
         "Object contains a property that could not be validated using 'properties' or 'additionalProperties' constraints";
 
-    valijson::Schema validation_schema;
-    valijson::SchemaParser parser;
-    valijson::adapters::NlohmannJsonAdapter schema_doc(*schema);
-    parser.populateSchema(schema_doc, validation_schema);
-
     valijson::Validator validator;
     valijson::adapters::NlohmannJsonAdapter doc(parsed_input);
     valijson::ValidationResults results;
-    if (!validator.validate(validation_schema, doc, &results)) {
+    if (!validator.validate(validation_schema(schema), doc, &results)) {
         valijson::ValidationResults::Error error;
         size_t max_context = 0;
         while (results.popError(error)) {

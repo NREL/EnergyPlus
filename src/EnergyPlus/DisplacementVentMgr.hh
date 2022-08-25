@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,7 +78,7 @@ namespace DisplacementVentMgr {
 
     void CalcUCSDDV(EnergyPlusData &state, int ZoneNum); // Which Zonenum
 
-    constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
+    static constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
         DataHeatBalance::IntGainType::People,
         DataHeatBalance::IntGainType::WaterHeaterMixed,
         DataHeatBalance::IntGainType::WaterHeaterStratified,
@@ -110,8 +110,8 @@ namespace DisplacementVentMgr {
         DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
         DataHeatBalance::IntGainType::RefrigerationWalkIn};
 
-    constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
-                                                                                      DataHeatBalance::IntGainType::Lights};
+    static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+                                                                                             DataHeatBalance::IntGainType::Lights};
 
 } // namespace DisplacementVentMgr
 

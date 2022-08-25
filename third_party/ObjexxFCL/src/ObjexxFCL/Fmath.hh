@@ -955,24 +955,6 @@ acot( T const & x )
 	return pi_over_2< T >() - std::atan( x );
 }
 
-// Sine of Angle in Degrees
-template< typename T >
-inline
-T
-sind( T const & d )
-{
-	return std::sin( radians( d ) );
-}
-
-// Cosine of Angle in Degrees
-template< typename T >
-inline
-T
-cosd( T const & d )
-{
-	return std::cos( radians( d ) );
-}
-
 // Tangent of Angle in Degrees
 template< typename T >
 inline

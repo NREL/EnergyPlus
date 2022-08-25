@@ -216,6 +216,9 @@ namespace MultiLayerOptics
 
         void calcHemisphericalAbs(FenestrationCommon::Side t_Side);
 
+        [[nodiscard]] std::vector<double> getCommonWavelengths(
+          const std::vector<std::shared_ptr<SingleLayerOptics::CBSDFLayer>> & t_Layer) const;
+
         CEquivalentBSDFLayer m_Layer;
 
         // Solar radiation for initialization

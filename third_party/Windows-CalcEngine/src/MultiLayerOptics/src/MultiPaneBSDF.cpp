@@ -52,6 +52,8 @@ namespace MultiLayerOptics
       const CSeries & t_SolarRadiation,
       const CSeries & t_DetectorData)
     {
+
+        // Detector data needs to be included into solar radiation right away on this place.
         auto solarRadiation{t_SolarRadiation};
         if(t_DetectorData.size() > 0)
         {
@@ -87,14 +89,14 @@ namespace MultiLayerOptics
     CMultiPaneBSDF::CMultiPaneBSDF(
       const std::vector<std::shared_ptr<SingleLayerOptics::CBSDFLayer>> & t_Layer,
       const FenestrationCommon::CSeries & t_SolarRadiation) :
-        CMultiPaneBSDF(t_Layer, t_SolarRadiation, t_Layer[0]->getBandWavelengths())
+        CMultiPaneBSDF(t_Layer, t_SolarRadiation, getCommonWavelengths(t_Layer))
     {}
 
     CMultiPaneBSDF::CMultiPaneBSDF(
       const std::vector<std::shared_ptr<SingleLayerOptics::CBSDFLayer>> & t_Layer,
       const FenestrationCommon::CSeries & t_SolarRadiation,
       const FenestrationCommon::CSeries & t_DetectorData) :
-        CMultiPaneBSDF(t_Layer, t_SolarRadiation, t_DetectorData, t_Layer[0]->getBandWavelengths())
+        CMultiPaneBSDF(t_Layer, t_SolarRadiation, t_DetectorData, getCommonWavelengths(t_Layer))
     {}
 
     SquareMatrix CMultiPaneBSDF::getMatrix(const double minLambda,
@@ -205,6 +207,17 @@ namespace MultiLayerOptics
             double sum = std::accumulate(mult.begin(), mult.end(), 0.0) / WCE_PI;
             m_AbsHem[t_Side]->push_back(sum);
         }
+    }
+
+    std::vector<double> CMultiPaneBSDF::getCommonWavelengths(
+      const std::vector<std::shared_ptr<SingleLayerOptics::CBSDFLayer>> & t_Layer) const
+    {
+        FenestrationCommon::CCommonWavelengths cw;
+        for(const auto & layer: t_Layer)
+        {
+            cw.addWavelength(layer->getBandWavelengths());
+        }
+        return cw.getCombinedWavelengths(FenestrationCommon::Combine::Interpolate);
     }
 
     std::vector<double> & CMultiPaneBSDF::Abs(const double minLambda,

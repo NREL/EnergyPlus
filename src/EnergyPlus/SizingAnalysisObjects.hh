@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -75,7 +75,7 @@ public:
 class ZoneTimestepObject
 {
 public:
-    DataGlobalConstants::KindOfSim kindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+    DataGlobalConstants::KindOfSim kindOfSim = DataGlobalConstants::KindOfSim::Invalid;
     int envrnNum = 0;
     int dayOfSim = 0; // since start of simulation
     int hourOfDay = 0;

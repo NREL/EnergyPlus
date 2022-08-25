@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,6 +48,7 @@
 #ifndef PlantOperationCallingOrder_hh_INCLUDED
 #define PlantOperationCallingOrder_hh_INCLUDED
 
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/MeterData.hh>
 
 namespace EnergyPlus {
@@ -56,12 +57,12 @@ namespace DataPlant {
     struct PlantCallingOrderInfoStruct
     {
         // Members
-        int LoopIndex;              // plant or condenser loop indexes in calling order
-        int LoopSide;               // plant or condenser loop sides in calling order
-        int LoopPumpSimulationType; // type of pump topology on half loop
+        int LoopIndex;                        // plant or condenser loop indexes in calling order
+        DataPlant::LoopSideLocation LoopSide; // plant or condenser loop sides in calling order
+        int LoopPumpSimulationType;           // type of pump topology on half loop
 
         // Default Constructor
-        PlantCallingOrderInfoStruct() : LoopIndex(0), LoopSide(0), LoopPumpSimulationType(0)
+        PlantCallingOrderInfoStruct() : LoopIndex(0), LoopSide(DataPlant::LoopSideLocation::Invalid), LoopPumpSimulationType(0)
         {
         }
     };

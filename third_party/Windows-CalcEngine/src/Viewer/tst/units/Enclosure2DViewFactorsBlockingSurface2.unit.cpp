@@ -58,17 +58,17 @@ TEST_F(TestEnclosure2DViewFactorsBlockingSurface2, Enclosure2DViewFactors)
 
     std::shared_ptr<CGeometry2D> aEnclosure = getEnclosure();
 
-    std::shared_ptr<SquareMatrix> viewFactors = aEnclosure->viewFactors();
+    SquareMatrix viewFactors{aEnclosure->viewFactors()};
 
-    EXPECT_NEAR(0.000000000, (*viewFactors)(0, 0), 1e-6);
-    EXPECT_NEAR(0.391219268, (*viewFactors)(0, 1), 1e-6);
-    EXPECT_NEAR(0.000000000, (*viewFactors)(0, 2), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(0, 0), 1e-6);
+    EXPECT_NEAR(0.391219268, viewFactors(0, 1), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(0, 2), 1e-6);
 
-    EXPECT_NEAR(0.391219268, (*viewFactors)(1, 0), 1e-6);
-    EXPECT_NEAR(0.000000000, (*viewFactors)(1, 1), 1e-6);
-    EXPECT_NEAR(0.117941421, (*viewFactors)(1, 2), 1e-6);
+    EXPECT_NEAR(0.391219268, viewFactors(1, 0), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(1, 1), 1e-6);
+    EXPECT_NEAR(0.117941421, viewFactors(1, 2), 1e-6);
 
-    EXPECT_NEAR(0.000000000, (*viewFactors)(2, 0), 1e-6);
-    EXPECT_NEAR(0.833971787, (*viewFactors)(2, 1), 1e-6);
-    EXPECT_NEAR(0.000000000, (*viewFactors)(2, 2), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(2, 0), 1e-6);
+    EXPECT_NEAR(0.833971787, viewFactors(2, 1), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(2, 2), 1e-6);
 }

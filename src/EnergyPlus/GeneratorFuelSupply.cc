@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -127,16 +127,16 @@ namespace GeneratorFuelSupply {
 
         if (state.dataGeneratorFuelSupply->MyOneTimeFlag) {
             cCurrentModuleObject = "Generator:FuelSupply";
-            state.dataGenerator->NumGeneratorFuelSups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            int NumGeneratorFuelSups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-            if (state.dataGenerator->NumGeneratorFuelSups <= 0) {
+            if (NumGeneratorFuelSups <= 0) {
                 ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
                 ErrorsFound = true;
             }
 
-            state.dataGenerator->FuelSupply.allocate(state.dataGenerator->NumGeneratorFuelSups);
+            state.dataGenerator->FuelSupply.allocate(NumGeneratorFuelSups);
 
-            for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
+            for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          FuelSupNum,
@@ -167,11 +167,11 @@ namespace GeneratorFuelSupply {
                 state.dataGenerator->FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(state,
                                                                                         AlphArray(3),
                                                                                         ErrorsFound,
-                                                                                        cCurrentModuleObject,
+                                                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelSupply,
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Sensor,
-                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                        DataLoopNode::ConnectionType::Sensor,
+                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                         ObjectIsNotParent);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
@@ -195,9 +195,9 @@ namespace GeneratorFuelSupply {
                     e.CompPowerLossFactor = NumArray(1);
 
                 if (UtilityRoutines::SameString(AlphArray(6), "GaseousConstituents")) {
-                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::fuelModeGaseousConstituents;
+                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::GaseousConstituents;
                 } else if (UtilityRoutines::SameString(AlphArray(6), "LiquidGeneric")) {
-                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::fuelModeGenericLiquid;
+                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::GenericLiquid;
                 } else {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -209,20 +209,20 @@ namespace GeneratorFuelSupply {
                 state.dataGenerator->FuelSupply(FuelSupNum).MW = NumArray(4);
                 state.dataGenerator->FuelSupply(FuelSupNum).eCO2 = NumArray(5);
 
-                if (state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGaseousConstituents) {
-                    state.dataGenerator->NumFuelConstit = NumArray(6);
-                    state.dataGenerator->FuelSupply(FuelSupNum).NumConstituents = state.dataGenerator->NumFuelConstit;
+                if (state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode == DataGenerators::FuelMode::GaseousConstituents) {
+                    int NumFuelConstit = NumArray(6);
+                    state.dataGenerator->FuelSupply(FuelSupNum).NumConstituents = NumFuelConstit;
 
-                    if (state.dataGenerator->NumFuelConstit > 12) {
+                    if (NumFuelConstit > 12) {
                         ShowSevereError(state, cCurrentModuleObject + " model not set up for more than 12 fuel constituents");
                         ErrorsFound = true;
                     }
-                    if (state.dataGenerator->NumFuelConstit < 1) {
+                    if (NumFuelConstit < 1) {
                         ShowSevereError(state, cCurrentModuleObject + " model needs at least one fuel constituent");
                         ErrorsFound = true;
                     }
 
-                    for (ConstitNum = 1; ConstitNum <= state.dataGenerator->NumFuelConstit; ++ConstitNum) {
+                    for (ConstitNum = 1; ConstitNum <= NumFuelConstit; ++ConstitNum) {
                         state.dataGenerator->FuelSupply(FuelSupNum).ConstitName(ConstitNum) = AlphArray(ConstitNum + 6);
                         state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract(ConstitNum) = NumArray(ConstitNum + 6);
                     }
@@ -239,7 +239,7 @@ namespace GeneratorFuelSupply {
 
             // now make calls to Setup
 
-            for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
+            for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
                 SetupFuelConstituentData(state, FuelSupNum, ErrorsFound);
             }
 
@@ -598,7 +598,7 @@ namespace GeneratorFuelSupply {
         state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A6 = -0.29663086e+05;
         state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A7 = 0.17289993e+02;
 
-        if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGaseousConstituents) {
+        if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::GaseousConstituents) {
             // now calculate LHV of fuel for entire simulation
 
             // sum over each constituent
@@ -686,7 +686,7 @@ namespace GeneratorFuelSupply {
             state.dataGenerator->FuelSupply(FuelSupplyNum).LHVJperkg =
                 state.dataGenerator->FuelSupply(FuelSupplyNum).LHV * 1000000.0 / state.dataGenerator->FuelSupply(FuelSupplyNum).MW;
 
-        } else if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGenericLiquid) {
+        } else if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::GenericLiquid) {
             state.dataGenerator->FuelSupply(FuelSupplyNum).LHV = state.dataGenerator->FuelSupply(FuelSupplyNum).LHVliquid *
                                                                  state.dataGenerator->FuelSupply(FuelSupplyNum).MW /
                                                                  1000000.0; // J/kg * g/mol (k/1000) (k/10000)

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,6 +47,7 @@
 
 #include <EnergyPlus/FromChars.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <cmath>
 #include <fast_float/fast_float.h>
 #include <fmt/format.h>
 #include <milo/dtoa.h>
@@ -132,6 +133,8 @@ std::string IdfParser::encode(json const &root, json const &schema)
                 auto const &val = obj_in.value()[entry];
                 if (val.is_string()) {
                     encoded += val.get<std::string>();
+                } else if (val.is_number_integer()) {
+                    encoded += std::to_string(val.get<int>());
                 } else {
                     dtoa(val.get<double>(), s);
                     encoded += s;
@@ -532,13 +535,70 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
     return convert_int(value);
 }
 
+json IdfParser::parse_integer(std::string_view idf, size_t &index)
+{
+    eat_whitespace(idf, index);
+
+    size_t save_i = index;
+
+    bool running = true;
+    while (running) {
+        if (save_i == idf_size) {
+            break;
+        }
+
+        char const c = idf[save_i];
+        switch (c) {
+        case '!':
+        case ',':
+        case ';':
+        case '\r':
+        case '\n':
+            running = false;
+            break;
+        default:
+            ++save_i;
+        }
+    }
+
+    auto diff = save_i - index;
+    auto string_value = idf.substr(index, diff);
+    index_into_cur_line += diff;
+    index = save_i;
+
+    auto const string_end = string_value.data() + string_value.size(); // have to do this for MSVC
+    int int_value;
+    // Try using from_chars
+    auto result = FromChars::from_chars(string_value.data(), string_value.data() + string_value.size(), int_value);
+    if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
+        // Failure, return the string
+        return rtrim(string_value);
+    } else if (result.ptr != string_end) {
+        // Didn't use the entire string, try again via double conversion + rounding
+        size_t plus_sign = 0;
+        if (string_value.front() == '+') {
+            plus_sign = 1;
+        }
+        double double_value;
+        auto fresult = fast_float::from_chars(string_value.data() + plus_sign, string_value.data() + string_value.size(), double_value);
+        if (fresult.ec == std::errc::invalid_argument || fresult.ec == std::errc::result_out_of_range) {
+            // Failure, return the string
+            return rtrim(string_value);
+        }
+        int_value = static_cast<int>(std::round(double_value));
+    }
+    return int_value;
+}
+
 json IdfParser::parse_value(std::string_view idf, size_t &index, bool &success, json const &field_loc)
 {
     Token token;
     auto const &field_type = field_loc.find("type");
     if (field_type != field_loc.end()) {
-        if (field_type.value() == "number" || field_type.value() == "integer") {
+        if (field_type.value() == "number") {
             token = Token::NUMBER;
+        } else if (field_type.value() == "integer") {
+            token = Token::INTEGER;
         } else {
             token = Token::STRING;
         }
@@ -578,6 +638,9 @@ json IdfParser::parse_value(std::string_view idf, size_t &index, bool &success, 
     }
     case Token::NUMBER: {
         return parse_number(idf, index);
+    }
+    case Token::INTEGER: {
+        return parse_integer(idf, index);
     }
     case Token::NONE:
     case Token::END:

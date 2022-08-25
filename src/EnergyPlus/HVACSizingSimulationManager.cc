@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -92,7 +92,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
                                                                          std::string const &PlantLoopName,
                                                                          int const PlantSizingIndex)
 {
-    using DataPlant::SupplySide;
     using namespace FluidProperties;
 
     Real64 density;
@@ -115,7 +114,7 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
 
             plantCoincAnalyObjs.emplace_back(PlantLoopName,
                                              i,
-                                             state.dataPlnt->PlantLoop(i).LoopSide(SupplySide).NodeNumIn,
+                                             state.dataPlnt->PlantLoop(i).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn,
                                              density,
                                              cp,
                                              state.dataSize->PlantSizData(PlantSizingIndex).NumTimeStepsInAvg,
@@ -185,7 +184,7 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(EnergyPl
     }
 
     // as more sizing adjustments are added this will need to change to consider all not just plant coincident
-    state.dataGlobal->FinalSizingHVACSizingSimIteration = plantCoinAnalyRequestsAnotherIteration;
+    //    state.dataGlobal->FinalSizingHVACSizingSimIteration = plantCoinAnalyRequestsAnotherIteration;
 }
 void HVACSizingSimulationManager::RedoKickOffAndResize(EnergyPlusData &state)
 {
@@ -274,16 +273,6 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             DisplayString(state, "Initializing New Environment Parameters, HVAC Sizing Simulation");
 
             state.dataGlobal->BeginEnvrnFlag = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) &&
-                (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                     .suppressBegEnvReset)) {
-                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
-                // easily converge fewer warmup days are allowed
-                DisplayString(state, "Suppressing Initialization of New Environment Parameters");
-                state.dataGlobal->beginEnvrnWarmStartFlag = true;
-            } else {
-                state.dataGlobal->beginEnvrnWarmStartFlag = false;
-            }
             state.dataGlobal->EndEnvrnFlag = false;
             // EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
@@ -366,7 +355,6 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                         state.dataGlobal->BeginDayFlag = false;
                         state.dataGlobal->BeginEnvrnFlag = false;
                         state.dataGlobal->BeginSimFlag = false;
-                        state.dataGlobal->BeginFullSimFlag = false;
 
                     } // TimeStep loop
 

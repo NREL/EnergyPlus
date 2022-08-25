@@ -130,7 +130,7 @@ namespace Tarcog
 
         double CIGUGapLayer::averageTemperature() const
         {
-            double aveTemp = 0;
+            double aveTemp = Gases::DefaultTemperature;
             if(areSurfacesInitalized())
             {
                 aveTemp = (getSurface(Side::Front)->getTemperature()

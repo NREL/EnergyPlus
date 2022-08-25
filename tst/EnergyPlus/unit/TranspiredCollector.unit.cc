@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
         "    0.000,                   !- Y Origin {m}",
         "    0.000,                   !- Z Origin {m}",
         "    1,                       !- Type",
-        "    1.000,                   !- Multiplier",
+        "    1,                       !- Multiplier",
         "    3.000,                   !- Ceiling Height {m}",
         "    644.812;                 !- Volume {m3}",
 

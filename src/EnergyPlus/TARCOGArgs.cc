@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -425,10 +425,10 @@ int ArgCheck(EnergyPlusData &state,
             return ArgCheck;
         }
 
-        if BITF_TEST_NONE (BITF(LayerType(i)),
+        if (BITF_TEST_NONE(BITF(LayerType(i)),
                            BITF(TARCOGLayerType::SPECULAR) | BITF(TARCOGLayerType::WOVSHADE) | BITF(TARCOGLayerType::VENETBLIND_HORIZ) |
                                BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::DIFFSHADE) | BITF(TARCOGLayerType::BSDF) |
-                               BITF(TARCOGLayerType::VENETBLIND_VERT))
+                               BITF(TARCOGLayerType::VENETBLIND_VERT)))
 
         {
             ArgCheck = 22;
@@ -637,22 +637,24 @@ void PrepVariablesISO15099(int const nlayer,
     tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
 
     // external radiation term
-    {
-        auto const SELECT_CASE_var(isky);
-        if (SELECT_CASE_var == 3) {
-            Gout = outir;
-            trmout = root_4(Gout / DataGlobalConstants::StefanBoltzmann);
-        } else if (SELECT_CASE_var == 2) { // effective clear sky emittance from swinbank (SPC142/ISO15099 equations 131, 132, ...)
-            Rsky = 5.31e-13 * pow_6(tout);
-            esky = Rsky / (DataGlobalConstants::StefanBoltzmann * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
-        } else if (SELECT_CASE_var == 1) {
-            esky = pow_4(tsky) / pow_4(tout);
-        } else if (SELECT_CASE_var == 0) { // for isky=0 it is assumed that actual values for esky and Tsky are specified
-            esky *= pow_4(tsky) / pow_4(tout);
-        } else {
-            nperr = 1; // error 2010: isky can be: 0(esky,Tsky input), 1(Tsky input), or 2(Swinbank model)
-            return;
-        }
+    switch (isky) {
+    case 3:
+        Gout = outir;
+        trmout = root_4(Gout / DataGlobalConstants::StefanBoltzmann);
+        break;
+    case 2: // effective clear sky emittance from swinbank (SPC142/ISO15099 equations 131, 132, ...)
+        Rsky = 5.31e-13 * pow_6(tout);
+        esky = Rsky / (DataGlobalConstants::StefanBoltzmann * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
+        break;
+    case 1:
+        esky = pow_4(tsky) / pow_4(tout);
+        break;
+    case 0: // for isky=0 it is assumed that actual values for esky and Tsky are specified
+        esky *= pow_4(tsky) / pow_4(tout);
+        break;
+    default:
+        nperr = 1; // error 2010: isky can be: 0(esky,Tsky input), 1(Tsky input), or 2(Swinbank model)
+        return;
     }
 
     // Simon: In this case we do not need to recalculate Gout and Trmout again

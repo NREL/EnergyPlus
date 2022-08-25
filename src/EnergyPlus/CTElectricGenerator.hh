@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -68,77 +69,64 @@ namespace CTElectricGenerator {
     struct CTGeneratorData : PlantComponent
     {
         // Members
-        std::string Name;   // user identifier
-        std::string TypeOf; // Type of Generator
-        GeneratorType CompType_Num;
-        std::string FuelType;      // Type of Fuel - DIESEL, GASOLINE, GAS
-        Real64 RatedPowerOutput;   // W - design nominal capacity of Generator
-        int ElectricCircuitNode;   // Electric Circuit Node
-        Real64 MinPartLoadRat;     // (CT MIN) min allowed operating frac full load
-        Real64 MaxPartLoadRat;     // (CT MAX) max allowed operating frac full load
-        Real64 OptPartLoadRat;     // (CT BEST) optimal operating frac full load
-        Real64 FuelEnergyUseRate;  // (EFUEL) rate of Fuel Energy Required to run COMBUSTION turbine (W)
-        Real64 FuelEnergy;         // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
-        int PLBasedFuelInputCurve; // (FUL1GC) Curve Index for Part Load Ratio Based Fuel Input
+        std::string Name;                                   // user identifier
+        std::string TypeOf = "Generator:CombustionTurbine"; // Type of Generator
+        GeneratorType CompType_Num = GeneratorType::CombTurbine;
+        std::string FuelType;           // Type of Fuel - DIESEL, GASOLINE, GAS
+        Real64 RatedPowerOutput = 0.0;  // W - design nominal capacity of Generator
+        int ElectricCircuitNode = 0;    // Electric Circuit Node
+        Real64 MinPartLoadRat = 0.0;    // (CT MIN) min allowed operating frac full load
+        Real64 MaxPartLoadRat = 0.0;    // (CT MAX) max allowed operating frac full load
+        Real64 OptPartLoadRat = 0.0;    // (CT BEST) optimal operating frac full load
+        Real64 FuelEnergyUseRate = 0.0; // (EFUEL) rate of Fuel Energy Required to run COMBUSTION turbine (W)
+        Real64 FuelEnergy = 0.0;        // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
+        int PLBasedFuelInputCurve = 0;  // (FUL1GC) Curve Index for Part Load Ratio Based Fuel Input
         // Coefficients Poly Fit
-        int TempBasedFuelInputCurve; // (FUL2GC) Curve Index for Ambient Temperature Based Fuel Input
+        int TempBasedFuelInputCurve = 0; // (FUL2GC) Curve Index for Ambient Temperature Based Fuel Input
         // Coeff Poly Fit
-        Real64 ExhaustFlow;          // (FEX) Exhaust Gas Flow Rate cubic meters per second???
-        int ExhaustFlowCurve;        // (FEXGC) Curve Index for Exhaust Gas Flow Rate Input Coef Poly Fit
-        Real64 ExhaustTemp;          // (TEX) Exhaust Gas Temperature in C
-        int PLBasedExhaustTempCurve; // (TEX1GC) Curve Index for Part Load Ratio Based Exhaust Temp Input
+        Real64 ExhaustFlow = 0.0;        // (FEX) Exhaust Gas Flow Rate cubic meters per second???
+        int ExhaustFlowCurve = 0;        // (FEXGC) Curve Index for Exhaust Gas Flow Rate Input Coef Poly Fit
+        Real64 ExhaustTemp = 0.0;        // (TEX) Exhaust Gas Temperature in C
+        int PLBasedExhaustTempCurve = 0; // (TEX1GC) Curve Index for Part Load Ratio Based Exhaust Temp Input
         // Coeffs Poly Fit
-        int TempBasedExhaustTempCurve; // (TEX2GC) Curve Index for Ambient Temperature Based Exhaust Gas Temp to
+        int TempBasedExhaustTempCurve = 0; // (TEX2GC) Curve Index for Ambient Temperature Based Exhaust Gas Temp to
         // Fuel Energy Input Coeffs Poly Fit
-        Real64 QLubeOilRecovered;         // (ELUBE) Recovered Lube Oil Energy (W)
-        Real64 QExhaustRecovered;         // (EEX) Recovered Exhaust heat  (W)
-        Real64 QTotalHeatRecovered;       // total heat recovered (W)
-        Real64 LubeOilEnergyRec;          // Recovered Lube Oil Energy (J)
-        Real64 ExhaustEnergyRec;          // Recovered Exhaust heat  (J)
-        Real64 TotalHeatEnergyRec;        // total heat recovered (J)
-        int QLubeOilRecoveredCurve;       // (ELUBEGC) Curve Index for Recoverable Lube Oil heat Input Coef Poly Fit
-        Real64 UA;                        // (UACGC) exhaust gas Heat Exchanger UA
-        Array1D<Real64> UACoef;           // Heat Exchanger UA  Coeffs Poly Fit
-        Real64 MaxExhaustperCTPower;      // MAX EXHAUST FLOW PER W POWER OUTPUT COEFF
-        Real64 DesignHeatRecVolFlowRate;  // m3/s, Design Water mass flow rate through heat recovery loop
-        Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
-        Real64 DesignMinExitGasTemp;      // Steam Saturation Temperature (C)
-        Real64 DesignAirInletTemp;        // Design Turbine Air Inlet Temperature (C)
-        Real64 ExhaustStackTemp;          // turbine exhaust gas temp (C)
-        bool HeatRecActive;               // true when design max flow rate > 0
-        int HeatRecInletNodeNum;          // Node number on the heat recovery inlet side of the condenser
-        int HeatRecOutletNodeNum;         // Node number on the heat recovery outlet side of the condenser
-        Real64 HeatRecInletTemp;          // Inlet Temperature of the heat recovery fluid
-        Real64 HeatRecOutletTemp;         // Outlet Temperature of the heat recovery fluid
-        Real64 HeatRecMdot;               // reporting: Heat Recovery Loop Mass flow rate
-        int HRLoopNum;                    // cooling water plant loop index number, for heat recovery
-        int HRLoopSideNum;                // cooling water plant loop side index, for heat recovery
-        int HRBranchNum;                  // cooling water plant loop branch index, for heat recovery
-        int HRCompNum;                    // cooling water plant loop component index, for heat recovery
-        Real64 FuelMdot;                  // reporting: Fuel Amount used (kg/s)
-        Real64 FuelHeatingValue;          // Heating Value for Fuel in (kJ/kg)
-        Real64 ElecPowerGenerated;        // reporting: power generated (W)
-        Real64 ElecEnergyGenerated;       // reporting: power generated (W)
-        Real64 HeatRecMaxTemp;            // Max Temp that can be produced in heat recovery
-        int OAInletNode;                  // optional inlet node index pointer for outdoor air for combustion
-        bool MyEnvrnFlag;
-        bool MyPlantScanFlag;
-        bool MySizeAndNodeInitFlag;
-        bool CheckEquipName;
-        bool MyFlag;
+        Real64 QLubeOilRecovered = 0.0;         // (ELUBE) Recovered Lube Oil Energy (W)
+        Real64 QExhaustRecovered = 0.0;         // (EEX) Recovered Exhaust heat  (W)
+        Real64 QTotalHeatRecovered = 0.0;       // total heat recovered (W)
+        Real64 LubeOilEnergyRec = 0.0;          // Recovered Lube Oil Energy (J)
+        Real64 ExhaustEnergyRec = 0.0;          // Recovered Exhaust heat  (J)
+        Real64 TotalHeatEnergyRec = 0.0;        // total heat recovered (J)
+        int QLubeOilRecoveredCurve = 0;         // (ELUBEGC) Curve Index for Recoverable Lube Oil heat Input Coef Poly Fit
+        Real64 UA = 0.0;                        // (UACGC) exhaust gas Heat Exchanger UA
+        std::array<Real64, 2> UACoef = {0.0};   // Heat Exchanger UA  Coeffs Poly Fit
+        Real64 MaxExhaustperCTPower = 0.0;      // MAX EXHAUST FLOW PER W POWER OUTPUT COEFF
+        Real64 DesignHeatRecVolFlowRate = 0.0;  // m3/s, Design Water mass flow rate through heat recovery loop
+        Real64 DesignHeatRecMassFlowRate = 0.0; // kg/s, Design Water mass flow rate through heat recovery loop
+        Real64 DesignMinExitGasTemp = 0.0;      // Steam Saturation Temperature (C)
+        Real64 DesignAirInletTemp = 0.0;        // Design Turbine Air Inlet Temperature (C)
+        Real64 ExhaustStackTemp = 0.0;          // turbine exhaust gas temp (C)
+        bool HeatRecActive = false;             // true when design max flow rate > 0
+        int HeatRecInletNodeNum = 0;            // Node number on the heat recovery inlet side of the condenser
+        int HeatRecOutletNodeNum = 0;           // Node number on the heat recovery outlet side of the condenser
+        Real64 HeatRecInletTemp = 0.0;          // Inlet Temperature of the heat recovery fluid
+        Real64 HeatRecOutletTemp = 0.0;         // Outlet Temperature of the heat recovery fluid
+        Real64 HeatRecMdot = 0.0;               // reporting: Heat Recovery Loop Mass flow rate
+        PlantLocation HRPlantLoc;               // cooling water plant loop component index, for heat recovery
+        Real64 FuelMdot = 0.0;                  // reporting: Fuel Amount used (kg/s)
+        Real64 FuelHeatingValue = 0.0;          // Heating Value for Fuel in (kJ/kg)
+        Real64 ElecPowerGenerated = 0.0;        // reporting: power generated (W)
+        Real64 ElecEnergyGenerated = 0.0;       // reporting: power generated (W)
+        Real64 HeatRecMaxTemp = 0.0;            // Max Temp that can be produced in heat recovery
+        int OAInletNode = 0;                    // optional inlet node index pointer for outdoor air for combustion
+        bool MyEnvrnFlag = true;
+        bool MyPlantScanFlag = true;
+        bool MySizeAndNodeInitFlag = true;
+        bool CheckEquipName = true;
+        bool MyFlag = true;
 
         // Default Constructor
-        CTGeneratorData()
-            : TypeOf("Generator:CombustionTurbine"), CompType_Num(GeneratorType::CombTurbine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
-              MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), FuelEnergyUseRate(0.0), FuelEnergy(0.0), PLBasedFuelInputCurve(0),
-              TempBasedFuelInputCurve(0), ExhaustFlow(0.0), ExhaustFlowCurve(0), ExhaustTemp(0.0), PLBasedExhaustTempCurve(0),
-              TempBasedExhaustTempCurve(0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), QTotalHeatRecovered(0.0), LubeOilEnergyRec(0.0),
-              ExhaustEnergyRec(0.0), TotalHeatEnergyRec(0.0), QLubeOilRecoveredCurve(0), UA(0.0), UACoef(2, 0.0), MaxExhaustperCTPower(0.0),
-              DesignHeatRecVolFlowRate(0.0), DesignHeatRecMassFlowRate(0.0), DesignMinExitGasTemp(0.0), DesignAirInletTemp(0.0),
-              ExhaustStackTemp(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecInletTemp(0.0),
-              HeatRecOutletTemp(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), FuelMdot(0.0),
-              FuelHeatingValue(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), OAInletNode(0), MyEnvrnFlag(true),
-              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true), MyFlag(true)
+        CTGeneratorData() : HRPlantLoc{}
         {
         }
 
@@ -162,16 +150,12 @@ namespace CTElectricGenerator {
 
 struct CTElectricGeneratorData : BaseGlobalStruct
 {
-
-    int NumCTGenerators = 0;
     bool getCTInputFlag = true;
     Array1D<CTElectricGenerator::CTGeneratorData> CTGenerator;
 
     void clear_state() override
     {
-        this->NumCTGenerators = 0;
-        this->getCTInputFlag = true;
-        this->CTGenerator.deallocate();
+        *this = CTElectricGeneratorData();
     }
 };
 

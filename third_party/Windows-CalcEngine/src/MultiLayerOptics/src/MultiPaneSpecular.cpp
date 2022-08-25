@@ -43,10 +43,14 @@ namespace MultiLayerOptics
         return m_Abs.Abs(Index);
     }
 
-    FenestrationCommon::CSeries
-      CEquivalentLayerSingleComponentMWAngle::AbsBySide(size_t Index, FenestrationCommon::Side side)
+    CSeries CEquivalentLayerSingleComponentMWAngle::iplus(size_t Index)
     {
-        return m_Abs.Abs(Index, side);
+        return m_Abs.iplus(Index);
+    }
+
+    CSeries CEquivalentLayerSingleComponentMWAngle::iminus(size_t Index)
+    {
+        return m_Abs.iminus(Index);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,6 +181,10 @@ namespace MultiLayerOptics
 
         if(m_DetectorData.size() > 0)
         {
+            if(m_DetectorData.size() != solarRadiation.size())
+            {
+                m_DetectorData = m_DetectorData.interpolate(solarRadiation.getXArray());    
+            }
             solarRadiation = solarRadiation * m_DetectorData;
         }
 

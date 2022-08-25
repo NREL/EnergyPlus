@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,6 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
@@ -93,47 +92,32 @@ namespace SZVAVModel {
     // Functions
 
     void calcSZVAVModel(EnergyPlusData &state,
-                        PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
-                        Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
-                        Real64 &PartLoadFrac,
-                        int const &CompressorONFlag
-
-    );
-
-    void calcSZVAVModel(EnergyPlusData &state,
                         FanCoilUnits::FanCoilData &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
+                        int SysIndex,
+                        bool FirstHVACIteration,
+                        bool CoolingLoad,
+                        bool HeatingLoad,
+                        Real64 ZoneLoad,
                         Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
+                        bool HXUnitOn,
+                        int AirLoopNum,
                         Real64 &PartLoadFrac,
-                        int const &CompressorONFlag
+                        DataHVACGlobals::CompressorOperation CompressorONFlag
 
     );
 
     void calcSZVAVModel(EnergyPlusData &state,
                         UnitarySystems::UnitarySys &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
+                        int SysIndex,
+                        bool FirstHVACIteration,
+                        bool CoolingLoad,
+                        bool HeatingLoad,
+                        Real64 ZoneLoad,
                         Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
+                        bool HXUnitOn,
+                        int AirLoopNum,
                         Real64 &PartLoadFrac,
-                        int const &CompressorONFlag);
+                        DataHVACGlobals::CompressorOperation CompressorONFlag);
 
 } // namespace SZVAVModel
 

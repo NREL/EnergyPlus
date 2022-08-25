@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,6 +80,17 @@ namespace FileSystem {
     std::string const exeExtension;
 #endif
 
+    static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt{
+        "epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr"};
+    static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExtUC{
+        "EPJSON", "JSON", "GLHE", "CBOR", "MSGPACK", "UBJSON", "BSON", "IDF", "IMF", "CSV", "TSV", "TXT", "ESO", "MTR"};
+
+    static_assert(FileTypesExt.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExt array.");
+    static_assert(FileTypesExtUC.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExtUC array.");
+
+    static_assert(!FileTypesExt.back().empty(), "Likely missing an enum from FileTypes in FileTypesExt array.");
+    static_assert(!FileTypesExtUC.back().empty(), "Likely missing an enum from FileTypes in FileTypesExtUC array.");
+
     fs::path makeNativePath(fs::path const &path)
     {
         // path.make_preferred() on windows will change "/" to "\\", because '/' is a fallback separator
@@ -103,8 +114,10 @@ namespace FileSystem {
     {
         // Note: this is needed because "/a/b/c".parent_path() = "/a/b/c/"
         std::string pathStr = path.string();
-        while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
-            pathStr.erase(pathStr.size() - 1);
+        if (!pathStr.empty()) {
+            while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
+                pathStr.erase(pathStr.size() - 1);
+            }
         }
 
         // If empty, return "./" instead
@@ -221,7 +234,8 @@ namespace FileSystem {
 #endif
 
         extension.remove_prefix(extension.find_last_of('.') + 1);
-        return static_cast<FileTypes>(getEnumerationValue(FileTypesExt, extension));
+        std::string stringExtension = std::string(extension);
+        return static_cast<FileTypes>(getEnumerationValue(FileTypesExtUC, UtilityRoutines::MakeUPPERCase(stringExtension)));
     }
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object
@@ -343,7 +357,7 @@ namespace FileSystem {
         } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
             fopen_mode = "rb";
         } else {
-            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+            throw FatalError("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary");
         }
 
         auto close_file = [](FILE *f) { fclose(f); };
@@ -390,7 +404,7 @@ namespace FileSystem {
         } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
             fopen_mode = "rb";
         } else {
-            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+            throw FatalError("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary");
         }
 
         auto close_file = [](FILE *f) { fclose(f); };

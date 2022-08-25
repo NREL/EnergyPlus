@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -97,7 +97,8 @@ struct EcoRoofManagerData : BaseGlobalStruct
     Real64 CumRunoff; // Cumulative runoff, updated each time step (m) mult by roof area to get volume
     Real64 CumET;     // Cumulative evapotranspiration from soil and plants (m)
     Real64 CumPrecip;
-    Real64 CumIrrigation; // Cumulative irrigation, updated each time step (m) mult by roof area to get volume
+    Real64 CumIrrigation;                             // Cumulative irrigation, updated each time step (m) mult by roof area to get volume
+    std::array<Real64, 12> MonthlyIrrigation = {0.0}; // accumulator for monthly irrigation ActualAmount in mm
     Real64 CurrentRunoff;
     Real64 CurrentET;
     Real64 CurrentPrecipitation; // units of (m) per timestep

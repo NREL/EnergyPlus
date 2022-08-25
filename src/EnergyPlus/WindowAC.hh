@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -216,10 +216,6 @@ struct WindowACData : BaseGlobalStruct
     std::string const cWindowAC_UnitType;
     Array1D_string const cWindowAC_UnitTypes;
 
-    // Compressor operation
-    int const On;  // normal compressor operation
-    int const Off; // signal DXCoil that compressor shouldn't run
-
     bool MyOneTimeFlag;
     bool ZoneEquipmentListChecked;
 
@@ -254,8 +250,8 @@ struct WindowACData : BaseGlobalStruct
 
     // Default Constructor
     WindowACData()
-        : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"), cWindowAC_UnitTypes(1, cWindowAC_UnitType), On(1), Off(0),
-          MyOneTimeFlag(true), ZoneEquipmentListChecked(false), NumWindAC(0), NumWindACCyc(0), GetWindowACInputFlag(true), CoolingLoad(false)
+        : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"), cWindowAC_UnitTypes(1, cWindowAC_UnitType), MyOneTimeFlag(true),
+          ZoneEquipmentListChecked(false), NumWindAC(0), NumWindACCyc(0), GetWindowACInputFlag(true), CoolingLoad(false)
     {
     }
 };

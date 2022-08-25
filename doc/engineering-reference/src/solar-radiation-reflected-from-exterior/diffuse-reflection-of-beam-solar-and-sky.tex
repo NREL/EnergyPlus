@@ -130,6 +130,32 @@ This factor is used in the timestep calculation to find the irradiance on a rece
 
 where \({\rho_{gnd}}\) is the solar reflectance of the ground, which is assumed to be uniform over the ground plane but may vary monthly (because of snow cover, for example).
 
+
+The diffuse irradiance received on a building exterior surface due to sky solar radiation reflected from multiple ground surfaces at each time step is given by:
+
+\begin{equation}
+\begin{array}{l}
+{QRadSWOutIncSkyDiffReflGnd(RecSurfNum)} = \\{DifSolarRad * {\rho_{gnd,avg}} * SurfReflFacSkySolGnd(RecSurfNum)~ (W/m^{2})}
+\end{array}
+\end{equation}
+
+The view factor weighted average reflectance of multiple ground surfaces is calculated from the ground refelctances and view factors of the ground surfaces viewed by an exterior surface and is given by:
+
+\begin{equation}
+{\rho_{gnd,avg}} = \sum\limits_{j = 1}^{{N_{gnd}}} {\rho_{gnd,j}} * {F_{gnd,j}} / \sum\limits_{j = 1}^{{N_{gnd}}} {F_{gnd,j}}
+\end{equation}
+
+where
+
+F\(_{gnd,j}\) = view factor of an exterior surface to ground surface j
+
+N\(_{gnd}\) = number ground surfaces viewed by an exterior surface
+
+\({\rho_{gnd,j}}\) = reflectance of ground surface j viewed by an exterior surface
+
+\({\rho_{gnd,avg}}\) = view factor weighed ground solar reflectance of multiple ground surfaces viewed by an exterior surface
+
+
 \subsection{Beam Solar Radiation Diffusely Reflected from Obstructions}\label{beam-solar-radiation-diffusely-reflected-from-obstructions}
 
 This calculation is similar to that for sky solar reflected from obstructions. However, to find the radiance at a hit point on an obstruction a line is drawn from the hit point to center of the sun. From this line it is determined (1) if there is an obstruction between the hit point and the sun, in which case it is assumed that no beam solar reaches the hit point; and (2) if beam solar does reach the hit point, what the the solar angle of incidence at that point is.
@@ -191,6 +217,33 @@ QRadSWOutIncBmToDiffReflGnd(RecSurfNum) =
 \\+ WeightPreviousHour * SurfReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
 \end{split}
 \end{equation}
+
+The diffuse irradiance received by a building exterior surface due to beam solar diffusely reflected from multiple ground surfaces is given by:
+
+\begin{equation}
+\begin{split}
+QRadSWOutIncBmToDiffReflGnd(RecSurfNum) =
+\\BeamSolarRad * {\rho_{gnd, avg}} * (WeightNow * SurfReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay)
+\\+ WeightPreviousHour * SurfReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
+\end{split}
+\end{equation}
+
+The beam solar radiation is assumed to be reflected uniformaly to all directions. The view factor weighed ground solar reflectance of multiple ground surfaces viewed by an exterior surface is given by:
+
+\begin{equation}
+{\rho_{gnd,avg}} = \sum\limits_{j = 1}^{{N_{gnd}}} {\rho_{gnd,j}} * {F_{gnd,j}} / \sum\limits_{j = 1}^{{N_{gnd}}} {F_{gnd,j}}
+\end{equation}
+
+where
+
+F\(_{gnd,j}\) = view factor of an exterior surface to ground surface j
+
+N\(_{gnd}\) = number ground surfaces viewed by an exterior surface
+
+\({\rho_{gnd,j}}\) = reflectance of ground surface j viewed by an exterior surface
+
+\({\rho_{gnd,avg}}\) = view factor weighed ground solar reflectance of multiple ground surfaces viewed by an exterior surface
+
 
 \subsection{Beam Solar Radiation Specularly Reflected from Obstructions}\label{beam-solar-radiation-specularly-reflected-from-obstructions}
 

@@ -50,7 +50,8 @@ namespace SingleLayerOptics
                            double slatTiltAngle,
                            double curvatureRadius,
                            size_t numOfSlatSegments,
-                           DistributionMethod method = DistributionMethod::DirectionalDiffuse);
+                           DistributionMethod method = DistributionMethod::DirectionalDiffuse,
+                           bool isHorizontal = true);
 
         static std::shared_ptr<CBSDFLayer>
           getPerfectlyDiffuseLayer(const std::shared_ptr<CMaterial> & t_Material,

@@ -66,25 +66,25 @@ TEST_F(TestEnclosure2DViewFactors3, Enclosure2DViewFactors)
 
     std::shared_ptr<CGeometry2D> aEnclosure = getEnclosure();
 
-    std::shared_ptr<SquareMatrix> viewFactors = aEnclosure->viewFactors();
+    SquareMatrix viewFactors{aEnclosure->viewFactors()};
 
-    EXPECT_NEAR(0.000000000, (*viewFactors)(0, 0), 1e-6);
-    EXPECT_NEAR(0.292893219, (*viewFactors)(0, 1), 1e-6);
-    EXPECT_NEAR(0.089072792, (*viewFactors)(0, 2), 1e-6);
-    EXPECT_NEAR(0.618033989, (*viewFactors)(0, 3), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(0, 0), 1e-6);
+    EXPECT_NEAR(0.292893219, viewFactors(0, 1), 1e-6);
+    EXPECT_NEAR(0.089072792, viewFactors(0, 2), 1e-6);
+    EXPECT_NEAR(0.618033989, viewFactors(0, 3), 1e-6);
 
-    EXPECT_NEAR(0.292893219, (*viewFactors)(1, 0), 1e-6);
-    EXPECT_NEAR(0.000000000, (*viewFactors)(1, 1), 1e-6);
-    EXPECT_NEAR(0.000000000, (*viewFactors)(1, 2), 1e-6);
-    EXPECT_NEAR(0.707106781, (*viewFactors)(1, 3), 1e-6);
+    EXPECT_NEAR(0.292893219, viewFactors(1, 0), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(1, 1), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(1, 2), 1e-6);
+    EXPECT_NEAR(0.707106781, viewFactors(1, 3), 1e-6);
 
-    EXPECT_NEAR(0.089072792, (*viewFactors)(2, 0), 1e-6);
-    EXPECT_NEAR(0.000000000, (*viewFactors)(2, 1), 1e-6);
-    EXPECT_NEAR(0.000000000, (*viewFactors)(2, 2), 1e-6);
-    EXPECT_NEAR(0.910927208, (*viewFactors)(2, 3), 1e-6);
+    EXPECT_NEAR(0.089072792, viewFactors(2, 0), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(2, 1), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(2, 2), 1e-6);
+    EXPECT_NEAR(0.910927208, viewFactors(2, 3), 1e-6);
 
-    EXPECT_NEAR(0.276393202, (*viewFactors)(3, 0), 1e-6);
-    EXPECT_NEAR(0.316227766, (*viewFactors)(3, 1), 1e-6);
-    EXPECT_NEAR(0.407379032, (*viewFactors)(3, 2), 1e-6);
-    EXPECT_NEAR(0.000000000, (*viewFactors)(3, 3), 1e-6);
+    EXPECT_NEAR(0.276393202, viewFactors(3, 0), 1e-6);
+    EXPECT_NEAR(0.316227766, viewFactors(3, 1), 1e-6);
+    EXPECT_NEAR(0.407379032, viewFactors(3, 2), 1e-6);
+    EXPECT_NEAR(0.000000000, viewFactors(3, 3), 1e-6);
 }

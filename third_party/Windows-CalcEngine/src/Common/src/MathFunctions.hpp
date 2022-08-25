@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <stdexcept>
 
 namespace FenestrationCommon
 {
@@ -43,4 +44,14 @@ namespace FenestrationCommon
         return tr;
     }
 
+    //! Finds linear interpolation between the points for a given value
+    inline double linearInterpolation(double x1, double x2, double y1, double y2, double x)
+    {
+        double delta{0};
+        if(x1 != x2)
+        {
+            delta = ((y2 - y1) / (x2 - x1)) * (x - x1);
+        }
+        return y1 + delta;
+    }
 }   // namespace FenestrationCommon

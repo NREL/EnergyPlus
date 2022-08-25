@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -95,7 +95,12 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).DesHeatingLoad;
             } else {
-                if (this->zoneEqSizing(this->curZoneEqNum).HeatingCapacity) {
+                if (this->dataCoilIsSuppHeater && this->suppHeatCap > 0.0) {
+                    NominalCapacityDes = this->suppHeatCap;
+                    if (this->dataFlowUsedForSizing > 0.0) {
+                        DesVolFlow = this->dataFlowUsedForSizing;
+                    }
+                } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingCapacity) {
                     NominalCapacityDes = this->zoneEqSizing(this->curZoneEqNum).DesHeatingLoad;
                     if (this->dataFlowUsedForSizing > 0.0) {
                         DesVolFlow = this->dataFlowUsedForSizing;
@@ -117,21 +122,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             CoilInTemp = (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU * MinPriFlowFrac) +
                                          (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - MinPriFlowFrac));
                         }
-                    } else if (this->zoneEqFanCoil) {
-                        // use fan coil flow (i.e., set by parent) or flow used during sizing?
-                        if (DesVolFlow > 0.0) {
-                            DesMassFlow = DesVolFlow * state.dataEnvrn->StdRhoAir;
-                        } else {
-                            DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
-                        }
-                        CoilInTemp = this->setHeatCoilInletTempForZoneEqSizing(
-                            this->setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
-                            zoneEqSizing(this->curZoneEqNum),
-                            finalZoneSizing(this->curZoneEqNum));
-                        CoilInHumRat = this->setHeatCoilInletHumRatForZoneEqSizing(
-                            this->setOAFracForZoneEqSizing(state, DesMassFlow, zoneEqSizing(this->curZoneEqNum)),
-                            zoneEqSizing(this->curZoneEqNum),
-                            finalZoneSizing(this->curZoneEqNum));
                     } else if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
                         CoilInTemp = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneTempAtHeatPeak;
                         CoilInHumRat = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneHumRatAtHeatPeak;
@@ -139,6 +129,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         CoilInTemp = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU;
                         CoilInHumRat = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInHumRatTU;
                     } else {
+                        // all other components calculate coil inlet condition based on actual, not design, OA fraction (e.g., FanCoil)
                         if (DesVolFlow > 0.0) {
                             DesMassFlow = DesVolFlow * state.dataEnvrn->StdRhoAir;
                         } else {
@@ -252,8 +243,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             }
                         } else if (this->curDuctType == DataHVACGlobals::Heating) {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::Other) {
-                            DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         } else {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         }
@@ -281,14 +270,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                    (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetHumRat; // include humrat for coil sizing reports
                 } else if (this->curOASysNum > 0 && this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     CoilInTemp = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
-                    if (this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex > -1 &&
-                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].FanBlowTroughFlag &&
-                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanTypeNum ==
-                            SimAirServingZones::CompType::Fan_System_Object) {
-                        int FanIndex = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex;
-                        Real64 DeltaT = state.dataHVACFan->fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
-                        CoilInTemp += DeltaT;
-                    }
                 } else {
                     CoilInTemp = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp +
                                  (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
@@ -314,7 +295,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 } else {
                     if (this->unitarySysEqSizing(this->curSysNum).HeatingCapacity) {
                         DesCoilLoad = this->unitarySysEqSizing(this->curSysNum).DesHeatingLoad;
-                        // CoilOutTemp = -999.0; // initialized at top
                         CoilOutTemp = this->finalSysSizing(this->curSysNum).HeatSupTemp;
                         CoilOutHumRat = this->finalSysSizing(this->curSysNum).HeatSupHumRat;
                     } else if (this->dataDesicRegCoil) {
@@ -456,12 +436,16 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         if (this->isEpJSON) this->sizingString = "nominal_capacity [W]";
     }
     if (this->dataScalableCapSizingON) {
-        auto const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing));
-        if (SELECT_CASE_var == DataSizing::CapacityPerFloorArea) {
+        switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing)) {
+        case DataSizing::CapacityPerFloorArea: {
             this->sizingStringScalable = "(scaled by capacity / area) ";
-        } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedHeatingCapacity ||
-                   SELECT_CASE_var == DataSizing::FractionOfAutosizedCoolingCapacity) {
+        } break;
+        case DataSizing::FractionOfAutosizedHeatingCapacity:
+        case DataSizing::FractionOfAutosizedCoolingCapacity: {
             this->sizingStringScalable = "(scaled by fractional multiplier) ";
+        } break;
+        default:
+            break;
         }
     }
 

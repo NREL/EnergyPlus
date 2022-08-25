@@ -1,10 +1,8 @@
 #include <cassert>
-#include <algorithm>
 
 #include "Geometry2D.hpp"
 #include "ViewSegment2D.hpp"
 #include "Point2D.hpp"
-#include "WCECommon.hpp"
 #include "ViewerConstants.hpp"
 
 
@@ -14,7 +12,6 @@ namespace Viewer
 {
     CGeometry2D::CGeometry2D() :
         m_Segments(std::make_shared<std::vector<std::shared_ptr<CViewSegment2D>>>()),
-        m_ViewFactors(nullptr),
         m_ViewFactorsCalculated(false)
     {}
 
@@ -33,11 +30,9 @@ namespace Viewer
         m_ViewFactorsCalculated = false;
     }
 
-    std::shared_ptr<SquareMatrix> CGeometry2D::viewFactors()
+    SquareMatrix CGeometry2D::viewFactors()
     {
         checkViewFactors();
-
-        assert(m_ViewFactors != nullptr);
 
         return m_ViewFactors;
     }
@@ -287,7 +282,7 @@ namespace Viewer
             auto size = m_Segments->size();
 
             // View factor matrix. It is already initialized to zeros
-            m_ViewFactors = std::make_shared<SquareMatrix>(size);
+            m_ViewFactors = SquareMatrix(size);
             for(auto i = 0u; i < size; ++i)
             {
                 for(auto j = i; j < size; ++j)
@@ -311,8 +306,8 @@ namespace Viewer
                                 vfCoeff = viewFactorCoeff((*m_Segments)[i], (*m_Segments)[j]);
                             }
 
-                            (*m_ViewFactors)(i, j) = vfCoeff / (2 * (*m_Segments)[i]->length());
-                            (*m_ViewFactors)(j, i) = vfCoeff / (2 * (*m_Segments)[j]->length());
+                            m_ViewFactors(i, j) = vfCoeff / (2 * (*m_Segments)[i]->length());
+                            m_ViewFactors(j, i) = vfCoeff / (2 * (*m_Segments)[j]->length());
                         }
                     }
                 }

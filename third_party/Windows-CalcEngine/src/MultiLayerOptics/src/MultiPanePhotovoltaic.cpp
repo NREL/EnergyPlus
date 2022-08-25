@@ -39,38 +39,10 @@ namespace MultiLayerOptics
                                       const FenestrationCommon::IntegrationType t_IntegrationType,
                                       const double normalizationCoefficient)
     {
-        if(dynamic_cast<SingleLayerOptics::PhotovoltaicLayer *>(m_Layers[Index - 1].get())
-           != nullptr)
-        {
-            CEquivalentLayerSingleComponentMWAngle aAngularProperties = getAngular(t_Angle);
-            auto aLayer =
-              dynamic_cast<SingleLayerOptics::PhotovoltaicLayer *>(m_Layers[Index - 1].get());
-
-            auto testHeat = aAngularProperties.AbsBySide(Index, FenestrationCommon::Side::Front);
-
-            FenestrationCommon::CSeries AbsHeat =
-              aAngularProperties.AbsBySide(Index, FenestrationCommon::Side::Front)
-                * aLayer->W(FenestrationCommon::Side::Front)
-              + aAngularProperties.AbsBySide(Index, FenestrationCommon::Side::Back)
-                  * aLayer->W(FenestrationCommon::Side::Back);
-
-            auto aMult = AbsHeat * m_SolarRadiation;
-
-            auto iIntegrated = aMult.integrate(t_IntegrationType, normalizationCoefficient);
-
-            double totalProperty = iIntegrated->sum(minLambda, maxLambda);
-            double totalSolar =
-              m_SolarRadiation.integrate(t_IntegrationType, normalizationCoefficient)
-                ->sum(minLambda, maxLambda);
-
-            assert(totalSolar > 0);
-            return totalProperty / totalSolar;
-        }
-        else
-        {
-            return Abs(
-              Index, t_Angle, minLambda, maxLambda, t_IntegrationType, normalizationCoefficient);
-        }
+        return Abs(
+                 Index, t_Angle, minLambda, maxLambda, t_IntegrationType, normalizationCoefficient)
+               - AbsElectricity(
+                 Index, t_Angle, minLambda, maxLambda, t_IntegrationType, normalizationCoefficient);
     }
 
     double
@@ -81,13 +53,36 @@ namespace MultiLayerOptics
                                              FenestrationCommon::IntegrationType t_IntegrationType,
                                              double normalizationCoefficient)
     {
-        return Abs(
-                 Index, t_Angle, minLambda, maxLambda, t_IntegrationType, normalizationCoefficient)
-               - AbsHeat(Index,
-                         t_Angle,
-                         minLambda,
-                         maxLambda,
-                         t_IntegrationType,
-                         normalizationCoefficient);
+        if(dynamic_cast<SingleLayerOptics::PhotovoltaicLayer *>(m_Layers[Index - 1].get())
+           != nullptr)
+        {
+            const double totalSolar =
+              m_SolarRadiation.integrate(t_IntegrationType, normalizationCoefficient)
+                ->sum(minLambda, maxLambda);
+
+            CEquivalentLayerSingleComponentMWAngle aAngularProperties = getAngular(t_Angle);
+            auto aLayer =
+              dynamic_cast<SingleLayerOptics::PhotovoltaicLayer *>(m_Layers[Index - 1].get());
+
+            auto frontJscPrime = aLayer->jscPrime(FenestrationCommon::Side::Front);
+            // auto backJscPrime = aLayer->jscPrime(FenestrationCommon::Side::Back);
+
+            // auto IPlus = aAngularProperties.iplus(Index - 1);
+            auto IMinus = aAngularProperties.iminus(Index - 1);
+
+            auto frontJsc = frontJscPrime * IMinus;
+            auto JscIntegrated = frontJsc.integrate(t_IntegrationType, normalizationCoefficient);
+            auto jsc{JscIntegrated->sum() * totalSolar};
+
+            const auto voc{aLayer->voc(jsc)};
+            const auto ff{aLayer->ff(jsc)};
+
+            const auto power{jsc * voc * ff};
+
+            assert(totalSolar > 0);
+            return power / totalSolar;
+        }
+
+        return 0;
     }
 }   // namespace MultiLayerOptics

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,7 +47,6 @@
 
 // C++ Headers
 #include <cmath>
-#include <fstream>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -124,7 +123,7 @@ using namespace GroundTemperatureManager;
 // MODULE PARAMETER DEFINITIONS
 constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
 constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
-constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
+static constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
 
@@ -148,22 +147,22 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                              inletNodeName,
                                                              errorsFound,
-                                                             this->moduleName,
+                                                             DataLoopNode::ConnectionObjectType::GroundHeatExchangerSlinky,
                                                              this->name,
                                                              DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                             NodeInputManager::compFluidStream::Primary,
+                                                             DataLoopNode::ConnectionType::Inlet,
+                                                             NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
     // get outlet node num
     this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                               outletNodeName,
                                                               errorsFound,
-                                                              this->moduleName,
+                                                              DataLoopNode::ConnectionObjectType::GroundHeatExchangerSlinky,
                                                               this->name,
                                                               DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Primary,
+                                                              DataLoopNode::ConnectionType::Outlet,
+                                                              NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
 
     this->available = true;
@@ -286,11 +285,11 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                              inletNodeName,
                                                              errorsFound,
-                                                             this->moduleName,
+                                                             DataLoopNode::ConnectionObjectType::GroundHeatExchangerSystem,
                                                              objName,
                                                              DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                             NodeInputManager::compFluidStream::Primary,
+                                                             DataLoopNode::ConnectionType::Inlet,
+                                                             NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
     // get outlet node num
@@ -298,11 +297,11 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                               outletNodeName,
                                                               errorsFound,
-                                                              this->moduleName,
+                                                              DataLoopNode::ConnectionObjectType::GroundHeatExchangerSystem,
                                                               objName,
                                                               DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Primary,
+                                                              DataLoopNode::ConnectionType::Outlet,
+                                                              NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
     this->available = true;
     this->on = true;
@@ -320,11 +319,6 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
         this->myRespFactors =
             GetResponseFactor(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_responsefactors_object_name"].get<std::string>()));
         this->gFunctionsExist = true;
-
-        if (!this->myRespFactors) {
-            errorsFound = true;
-            ShowSevereError(state, "GroundHeatExchanger:ResponseFactors object not found.");
-        }
     }
 
     // no g-functions in the input file, so they need to be calculated
@@ -348,11 +342,6 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
             // Response factors come from array object
             this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
                 state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_array_object_name"].get<std::string>())));
-
-            if (!this->myRespFactors) {
-                errorsFound = true;
-                ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
-            }
         } else {
             if (j.find("vertical_well_locations") == j.end()) {
                 // No ResponseFactors, GHEArray, or SingleBH object are referenced
@@ -369,14 +358,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                 if (!var.at("ghe_vertical_single_object_name").empty()) {
                     std::shared_ptr<GLHEVertSingle> tempBHptr =
                         GetSingleBH(state, UtilityRoutines::MakeUPPERCase(var.at("ghe_vertical_single_object_name").get<std::string>()));
-                    if (tempBHptr) {
-                        tempVectOfBHObjects.push_back(tempBHptr);
-                    } else {
-                        errorsFound = true;
-                        std::string const tmpName = var.at("ghe_vertical_single_object_name").get<std::string>();
-                        ShowSevereError(state, "Borehole= " + tmpName + " not found.");
-                        break;
-                    }
+                    tempVectOfBHObjects.push_back(tempBHptr);
                 } else {
                     break;
                 }
@@ -589,6 +571,10 @@ std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string c
         }
     }
 
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Properties, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
+
+    // needed to silence compiler, but should never get here
     return nullptr;
 }
 
@@ -604,6 +590,10 @@ std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string c
         }
     }
 
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Single, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
+
+    // needed to silence compiler, but should never get here
     return nullptr;
 }
 
@@ -619,6 +609,10 @@ std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string c
         }
     }
 
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Array, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
+
+    // needed to silence compiler, but should never get here
     return nullptr;
 }
 
@@ -634,6 +628,10 @@ std::shared_ptr<GLHEResponseFactors> GetResponseFactor(EnergyPlusData &state, st
         }
     }
 
+    ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:ResponseFactors, Name={} - not found.", objectName));
+    ShowFatalError(state, "Preceding errors cause program termination");
+
+    // needed to silence compiler, but should never get here
     return nullptr;
 }
 
@@ -821,19 +819,19 @@ void GLHEBase::simulate(EnergyPlusData &state,
 
 //******************************************************************************
 
-PlantComponent *GLHEBase::factory(EnergyPlusData &state, int const objectType, std::string const &objectName)
+PlantComponent *GLHEBase::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     if (state.dataGroundHeatExchanger->GetInput) {
         GetGroundHeatExchangerInput(state);
         state.dataGroundHeatExchanger->GetInput = false;
     }
-    if (objectType == DataPlant::TypeOf_GrndHtExchgSystem) {
+    if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSystem) {
         for (auto &ghx : state.dataGroundHeatExchanger->verticalGLHE) {
             if (ghx.name == objectName) {
                 return &ghx;
             }
         }
-    } else if (objectType == DataPlant::TypeOf_GrndHtExchgSlinky) {
+    } else if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSlinky) {
         for (auto &ghx : state.dataGroundHeatExchanger->slinkyGLHE) {
             if (ghx.name == objectName) {
                 return &ghx;
@@ -876,7 +874,7 @@ std::vector<Real64> GLHEVert::distances(MyCartesian const &point_i, MyCartesian 
 
 //******************************************************************************
 
-Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &currTime)
+Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const currTime)
 {
     Real64 pointToPointResponse = erfc(dists[0] / (2 * sqrt(this->soil.diffusivity * currTime))) / dists[0];
     Real64 pointToReflectedResponse = erfc(dists[1] / (2 * sqrt(this->soil.diffusivity * currTime))) / dists[1];
@@ -886,7 +884,7 @@ Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &cu
 
 //******************************************************************************
 
-Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
+Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const currTime)
 {
 
     // This code could be optimized in a number of ways.
@@ -919,7 +917,7 @@ Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSi
 
 //******************************************************************************
 
-Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
+Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const currTime)
 {
 
     // Similar optimizations as discussed above could happen here
@@ -1111,11 +1109,13 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
     enum class CellType
     {
+        Invalid = -1,
         FLUID,
         CONVECTION,
         PIPE,
         GROUT,
-        SOIL
+        SOIL,
+        Num
     };
 
     struct Cell
@@ -1176,14 +1176,14 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
     Real64 initial_temperature = this->inletTemp;
     Real64 cpFluid_init = GetSpecificHeatGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                 initial_temperature,
-                                                state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                 RoutineName);
     Real64 fluidDensity_init = GetDensityGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                 initial_temperature,
-                                                state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                 RoutineName);
 
     // initialize the fluid cells
@@ -1264,14 +1264,14 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
     }
 
     // set upper limit of time for the short time-step g-function calcs so there is some overlap
-    Real64 const lntts_max_for_short_timestep = -9.0;
+    Real64 constexpr lntts_max_for_short_timestep = -9.0;
     Real64 const t_s = pow_2(this->bhLength) / (9.0 * this->soil.diffusivity);
 
-    Real64 const time_step = 500;
+    Real64 constexpr time_step = 500;
     Real64 const time_max_for_short_timestep = exp(lntts_max_for_short_timestep) * t_s;
     Real64 total_time = 0;
 
-    Real64 const heat_flux = 40.4;
+    Real64 constexpr heat_flux = 40.4;
 
     // time step loop
     while (total_time < time_max_for_short_timestep) {
@@ -2077,8 +2077,11 @@ void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
 
     this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
 
-    Real64 cpFluid = GetSpecificHeatGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, this->inletTemp, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
+    Real64 cpFluid = GetSpecificHeatGlycol(state,
+                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                           this->inletTemp,
+                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                           RoutineName);
 
     Real64 kGroundFactor = 2.0 * DataGlobalConstants::Pi * this->soil.k;
 
@@ -2355,18 +2358,18 @@ void GLHEBase::updateGHX(EnergyPlusData &state)
     state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->outletTemp;
     state.dataLoopNodes->Node(this->outletNodeNum).Enthalpy =
         this->outletTemp * GetSpecificHeatGlycol(state,
-                                                 state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                  this->outletTemp,
-                                                 state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                  RoutineName);
 
     Real64 GLHEdeltaTemp = std::abs(this->outletTemp - this->inletTemp);
 
     if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < state.dataGroundHeatExchanger->numVerticalGLHEs && !state.dataGlobal->WarmupFlag) {
         Real64 fluidDensity = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                this->inletTemp,
-                                               state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                RoutineName);
         this->designMassFlow = this->designFlow * fluidDensity;
         ShowWarningError(state, "Check GLHE design inputs & g-functions for consistency");
@@ -2742,9 +2745,9 @@ Real64 GLHEVert::calcHXResistance(EnergyPlusData &state)
         return 0;
     } else {
         Real64 const cpFluid = GetSpecificHeatGlycol(state,
-                                                     state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                      this->inletTemp,
-                                                     state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                      RoutineName);
         return calcBHAverageResistance(state) +
                1 / (3 * calcBHTotalInternalResistance(state)) * pow_2(this->bhLength / (this->massFlowRate * cpFluid));
@@ -2782,12 +2785,21 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     // Get fluid props
     this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
 
-    Real64 const cpFluid = GetSpecificHeatGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, this->inletTemp, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
-    Real64 const kFluid = GetConductivityGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, this->inletTemp, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
-    Real64 const fluidViscosity = GetViscosityGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, this->inletTemp, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
+    Real64 const cpFluid = GetSpecificHeatGlycol(state,
+                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                 this->inletTemp,
+                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                 RoutineName);
+    Real64 const kFluid = GetConductivityGlycol(state,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                this->inletTemp,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                RoutineName);
+    Real64 const fluidViscosity = GetViscosityGlycol(state,
+                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                     this->inletTemp,
+                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                     RoutineName);
 
     // Smoothing fit limits
     constexpr Real64 lower_limit = 2000;
@@ -2800,7 +2812,7 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     if (reynoldsNum < lower_limit) {
         nusseltNum = 4.01; // laminar mean(4.36, 3.66)
     } else if (lower_limit <= reynoldsNum && reynoldsNum < upper_limit) {
-        Real64 const nu_low = 4.01;                   // laminar
+        Real64 constexpr nu_low = 4.01;               // laminar
         Real64 const f = frictionFactor(reynoldsNum); // turbulent
         Real64 const prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
         Real64 const nu_high = (f / 8) * (reynoldsNum - 1000) * prandtlNum / (1 + 12.7 * std::sqrt(f / 8) * (pow(prandtlNum, 2.0 / 3.0) - 1));
@@ -2888,14 +2900,26 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
     constexpr Real64 B(350);
     constexpr Real64 laminarNusseltNo(4.364);
 
-    Real64 cpFluid = GetSpecificHeatGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, this->inletTemp, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
-    Real64 kFluid = GetConductivityGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, this->inletTemp, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
-    Real64 fluidDensity = GetDensityGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, this->inletTemp, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
-    Real64 fluidViscosity = GetViscosityGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, this->inletTemp, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
+    Real64 cpFluid = GetSpecificHeatGlycol(state,
+                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                           this->inletTemp,
+                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                           RoutineName);
+    Real64 kFluid = GetConductivityGlycol(state,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                          this->inletTemp,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                          RoutineName);
+    Real64 fluidDensity = GetDensityGlycol(state,
+                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                           this->inletTemp,
+                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                           RoutineName);
+    Real64 fluidViscosity = GetViscosityGlycol(state,
+                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                               this->inletTemp,
+                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                               RoutineName);
 
     // calculate mass flow rate
     Real64 singleSlinkyMassFlowRate = this->massFlowRate / this->numTrenches;
@@ -2932,99 +2956,40 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
 
 //******************************************************************************
 
-Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-) const
+Real64 GLHEBase::interpGFunc(Real64 const x_val) const
 {
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Chris L. Marshall, Jeffrey D. Spitler
-    //       DATE WRITTEN   1993
-    //       MODIFIED       August, 2000
-    //       RE-ENGINEERED Dan Fisher
+    // Purpose: interpolate between g-function values, with linear extrapolation above and below range
 
-    // PURPOSE OF THIS SUBROUTINE:
-    //    To interpolate or extrapolate data in GFILE
-    //    to find the correct g-function value for a
-    //    known value of the natural log of (T/Ts)
+    auto const &x = this->myRespFactors->LNTTS;
+    auto const &y = this->myRespFactors->GFNC;
 
-    //  REFERENCE:          Thermal Analysis of Heat Extraction
-    //                      Boreholes.  Per Eskilson, Dept. of
-    //                      Mathematical Physics, University of
-    //                      Lund, Sweden, June 1987.
+    auto const &x_begin = x.begin();
+    auto const &x_end = x.end();
+    auto const &upper_it = std::upper_bound(x_begin, x_end, x_val);
 
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    //          needs to be found for.
-    //          either extrapolation or interpolation
+    int l_idx = 0;
+    int u_idx = 0;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 gFuncVal;
-
-    // Binary Search Algorithms Variables
-    // REFERENCE      :  DATA STRUCTURES AND ALGORITHM ANALYSIS IN C BY MARK ALLEN WEISS
-
-    // The following IF loop determines the g-function for the case
-    // when LnTTsVal is less than the first element of the LnTTs array.
-    // In this case, the g-function must be found by extrapolation.
-
-    if (LnTTsVal <= this->myRespFactors->LNTTS(1)) {
-        gFuncVal = ((LnTTsVal - this->myRespFactors->LNTTS(1)) / (this->myRespFactors->LNTTS(2) - this->myRespFactors->LNTTS(1))) *
-                       (this->myRespFactors->GFNC(2) - this->myRespFactors->GFNC(1)) +
-                   this->myRespFactors->GFNC(1);
-        return gFuncVal;
+    if (upper_it == x_begin) {
+        // Linear extrapolation beyond the lower bound
+        l_idx = 0;
+        u_idx = 1;
+    } else if (upper_it == x_end) {
+        // Linear extrapolation beyond the upper bound
+        u_idx = x.size() - 1;
+        l_idx = u_idx - 1;
+    } else {
+        // In the middle of the range
+        u_idx = std::distance(x.begin(), upper_it);
+        l_idx = u_idx - 1;
     }
 
-    // The following IF loop determines the g-function for the case
-    // when LnTTsVal is greater than the last element of the LnTTs array.
-    // In this case, the g-function must be found by extrapolation.
+    Real64 const x_low = x[l_idx];
+    Real64 const x_high = x[u_idx];
+    Real64 const y_low = y[l_idx];
+    Real64 const y_high = y[u_idx];
 
-    int NPairs = this->myRespFactors->LNTTS.u1();
-
-    if (LnTTsVal > this->myRespFactors->LNTTS(NPairs)) {
-        gFuncVal = ((LnTTsVal - this->myRespFactors->LNTTS(NPairs)) / (this->myRespFactors->LNTTS(NPairs - 1) - this->myRespFactors->LNTTS(NPairs))) *
-                       (this->myRespFactors->GFNC(NPairs - 1) - this->myRespFactors->GFNC(NPairs)) +
-                   this->myRespFactors->GFNC(NPairs);
-        return gFuncVal;
-    }
-
-    // The following DO loop is for the case when LnTTsVal falls within
-    // the first and last elements of the LnTTs array, or is identically
-    // equal to one of the LnTTs elements.  In this case the g-function
-    // must be found by interpolation.
-    // USING BINARY SEARCH TO FIND THE ELEMENT
-    bool Found = false;
-    int Low = 1;
-    int High = NPairs;
-    int Mid;
-    while (Low <= High) {
-        Mid = (Low + High) / 2;
-        if (this->myRespFactors->LNTTS(Mid) < LnTTsVal) {
-            Low = Mid + 1;
-        } else {
-            if (this->myRespFactors->LNTTS(Mid) > LnTTsVal) {
-                High = Mid - 1;
-            } else {
-                Found = true;
-                break;
-            }
-        }
-    }
-    // LnTTsVal is identical to one of the LnTTS array elements return gFuncVal
-    // the gFuncVal after applying the correction
-    if (Found) {
-        gFuncVal = this->myRespFactors->GFNC(Mid);
-        return gFuncVal;
-    }
-
-    // LnTTsVal is in between any of the two LnTTS array elements find the
-    // g-function value by interpolation and apply the correction and return gFuncVal
-    else {
-        if (this->myRespFactors->LNTTS(Mid) < LnTTsVal) ++Mid;
-
-        gFuncVal = ((LnTTsVal - this->myRespFactors->LNTTS(Mid)) / (this->myRespFactors->LNTTS(Mid - 1) - this->myRespFactors->LNTTS(Mid))) *
-                       (this->myRespFactors->GFNC(Mid - 1) - this->myRespFactors->GFNC(Mid)) +
-                   this->myRespFactors->GFNC(Mid);
-
-        return gFuncVal;
-    }
+    return (x_val - x_low) / (x_high - x_low) * (y_high - y_low) + y_low;
 }
 
 //******************************************************************************
@@ -3113,11 +3078,9 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 
     this->tempGround /= 5;
 
-    this->massFlowRate =
-        RegulateCondenserCompFlowReqOp(state, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, this->designMassFlow);
+    this->massFlowRate = RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->designMassFlow);
 
-    SetComponentFlowRate(
-        state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
+    SetComponentFlowRate(state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
@@ -3125,18 +3088,20 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime)
+void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const CurTime)
 {
 
     constexpr const char *RoutineName("initEnvironment");
 
     this->myEnvrnFlag = false;
 
-    Real64 fluidDensity = FluidProperties::GetDensityGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
+    Real64 fluidDensity = FluidProperties::GetDensityGlycol(state,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                            20.0,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                            RoutineName);
     this->designMassFlow = this->designFlow * fluidDensity;
-    PlantUtilities::InitComponentNodes(
-        state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum);
 
     this->lastQnSubHr = 0.0;
     state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->tempGround;
@@ -3158,13 +3123,11 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 {
 
-    using DataPlant::TypeOf_GrndHtExchgSystem;
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(
-        state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    ScanPlantLoopsForObject(state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSystem, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
@@ -3200,11 +3163,9 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 
     this->tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
 
-    this->massFlowRate =
-        RegulateCondenserCompFlowReqOp(state, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, this->designMassFlow);
+    this->massFlowRate = RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->designMassFlow);
 
-    SetComponentFlowRate(
-        state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
+    SetComponentFlowRate(state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
@@ -3212,18 +3173,20 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
+void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
 {
 
     constexpr const char *RoutineName("initEnvironment");
 
     this->myEnvrnFlag = false;
 
-    Real64 fluidDensity = FluidProperties::GetDensityGlycol(
-        state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
+    Real64 fluidDensity = FluidProperties::GetDensityGlycol(state,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                            20.0,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                            RoutineName);
     this->designMassFlow = this->designFlow * fluidDensity;
-    PlantUtilities::InitComponentNodes(
-        state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum);
 
     this->lastQnSubHr = 0.0;
     state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
@@ -3244,13 +3207,11 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
 
 void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
 {
-    using DataPlant::TypeOf_GrndHtExchgSlinky;
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(
-        state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    ScanPlantLoopsForObject(state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSlinky, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }

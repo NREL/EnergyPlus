@@ -85,7 +85,7 @@
 !   Environmental Emissions:        None
 !   Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.2;
 
   Timestep,4;
 
@@ -428,7 +428,7 @@
 
   Lights,
     Light,                   !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Always On,               !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     60,                      !- Lighting Level {W}
@@ -443,7 +443,7 @@
 
   ElectricEquipment,
     Equipment,               !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Always On,               !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}

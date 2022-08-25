@@ -43,6 +43,10 @@ namespace Tarcog
             return 0;
         }
 
+        bool CBaseLayer::isPermeable() const
+        {
+            return false;
+        }
     }   // namespace ISO15099
 
 }   // namespace Tarcog

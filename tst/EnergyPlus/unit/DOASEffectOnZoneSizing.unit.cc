@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -164,9 +164,9 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataGlobal->NumOfZones = 2;
     state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    state->dataAirflowNetwork->AirflowNetworkNumOfExhFan = 0;
-    state->dataHeatBalFanSys->TempControlType(1) = 4;
-    state->dataHeatBalFanSys->TempControlType(2) = 4;
+    state->afn->AirflowNetworkNumOfExhFan = 0;
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(2) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 0.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(2) = 0.0;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.;
@@ -176,8 +176,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataSize->CurOverallSimDay = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = true;
-    state->dataSize->CalcZoneSizing(1, 1).ActualZoneNum = 1;
-    state->dataSize->CalcZoneSizing(1, 2).ActualZoneNum = 2;
+    state->dataSize->CalcZoneSizing(1, 1).ZoneNum = 1;
+    state->dataSize->CalcZoneSizing(1, 2).ZoneNum = 2;
     state->dataSize->CalcZoneSizing(1, 1).AccountForDOAS = true;
     state->dataSize->CalcZoneSizing(1, 2).AccountForDOAS = true;
     state->dataSize->CurOverallSimDay = 1;
@@ -211,8 +211,6 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1) = 8;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASHighSetpoint = 14.4;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASLowSetpoint = 12.2;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASHighSetpoint = 14.4;
