@@ -57,8 +57,10 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -487,7 +489,8 @@ namespace UnitarySystems {
 
     public:
         // SZVAV variables
-        int UnitarySystemType_Num = 0;
+        DataZoneEquipment::ZoneEquip ZoneEqType_Num = DataZoneEquipment::ZoneEquip::Invalid;
+        SimAirServingZones::CompType SimAirCompType_Num = SimAirServingZones::CompType::Invalid;
         int MaxIterIndex = 0;
         int RegulaFalsiFailedIndex = 0;
         int NodeNumOfControlledZone = 0;
@@ -990,7 +993,12 @@ namespace UnitarySystems {
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
     bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
-    bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
+    bool searchTotalComponents(EnergyPlusData &state,
+                               SimAirServingZones::CompType compTypeToFind,
+                               std::string_view objectNameToFind,
+                               int &compIndex,
+                               int &branchIndex,
+                               int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound);
 

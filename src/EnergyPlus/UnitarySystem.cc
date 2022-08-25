@@ -3778,12 +3778,8 @@ namespace UnitarySystems {
         this->m_HeatOutAirVolFlow = input_data.heating_oa_flow_rate;
         this->m_NoCoolHeatOutAirVolFlow = input_data.no_load_oa_flow_rate;
 
-        // UnitarySystemType_Num isn't used anywhere
         if (ZoneEquipment) {
-            this->UnitarySystemType_Num = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
             this->m_OKToPrintSizing = true;
-        } else {
-            this->UnitarySystemType_Num = static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel);
         }
 
         this->m_IterationMode.resize(3);
@@ -4023,7 +4019,7 @@ namespace UnitarySystems {
 
             int compIndex;
             int branchIndex;
-            AirLoopFound = searchTotalComponents(state, thisObjectName, compIndex, branchIndex, AirLoopNumber);
+            AirLoopFound = searchTotalComponents(state, this->SimAirCompType_Num, thisObjectName, compIndex, branchIndex, AirLoopNumber);
             if (AirLoopFound && (this->ControlZoneNum > 0)) {
                 //             Find the controlled zone number for the specified thermostat location
                 this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
@@ -4052,60 +4048,38 @@ namespace UnitarySystems {
                     ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
                     errorsFound = true;
                 }
-            }
 
-            for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-                for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
-                    for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
-                         ++CompNum) {
-                        if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                                        thisObjectName) &&
-                            UtilityRoutines::SameString(
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                cCurrentModuleObject)) {
-                            AirLoopNumber = AirLoopNum;
-                            AirLoopFound = true;
-                            if (this->ControlZoneNum > 0) {
-                                //             Find the controlled zone number for the specified thermostat location
-                                this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
+                if (this->ControlZoneNum > 0) {
+                    //             Find the controlled zone number for the specified thermostat location
+                    this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
 
-                                //             Determine if system is on air loop served by the thermostat location specified
-                                ZoneInletNodeFound = false;
-                                int ZoneInletNum = 0;
-                                ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(state, AirLoopNumber, this->ControlZoneNum, ZoneInletNum);
-                                if (ZoneInletNodeFound) {
-                                    this->m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).InletNode(ZoneInletNum);
-                                    TotalFloorAreaOnAirLoop += state.dataHeatBal->Zone(this->ControlZoneNum).FloorArea;
-                                }
-
-                                // if (this->m_ZoneInletNode == 0) AirLoopFound = false;
-                                for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                                    if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != this->ControlZoneNum) continue;
-                                    AirNodeFound = true;
-                                }
-                                for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
-                                    if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != this->ControlZoneNum) continue;
-                                    AirNodeFound = true;
-                                }
-                                if (!AirNodeFound && this->ControlZoneNum > 0) {
-                                    ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                    ShowContinueError(state, "Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).");
-                                    ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
-                                    errorsFound = true;
-                                }
-                            }
-                        }
-                        if (AirLoopFound) break;
+                    //             Determine if system is on air loop served by the thermostat location specified
+                    ZoneInletNodeFound = false;
+                    int ZoneInletNum = 0;
+                    ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(state, AirLoopNumber, this->ControlZoneNum, ZoneInletNum);
+                    if (ZoneInletNodeFound) {
+                        this->m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).InletNode(ZoneInletNum);
+                        TotalFloorAreaOnAirLoop += state.dataHeatBal->Zone(this->ControlZoneNum).FloorArea;
                     }
-                    if (AirLoopFound) break;
+
+                    // if (this->m_ZoneInletNode == 0) AirLoopFound = false;
+                    for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                        if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != this->ControlZoneNum) continue;
+                        AirNodeFound = true;
+                    }
+                    for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                        if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != this->ControlZoneNum) continue;
+                        AirNodeFound = true;
+                    }
+                    if (!AirNodeFound && this->ControlZoneNum > 0) {
+                        ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                        ShowContinueError(state, "Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).");
+                        ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
+                        errorsFound = true;
+                    }
                 }
-                if (AirLoopFound) break;
             }
 
-            // how can ZoneEquipmentFound be true? this is inside !ZoneEquipmentFound
-            // might this be if (!AirLoopFound && ...) ? and next else if
-            // or these are correct and in the wrong place?
-            // leaving as is based on unit test crashes, but unit tests could be ill formed
             if (ZoneEquipmentFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
                 // Exhaust Node was not found
                 ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
@@ -7860,6 +7834,8 @@ namespace UnitarySystems {
                 UnitarySys thisSys;
                 thisSys.UnitType = cCurrentModuleObject;
                 thisSys.m_sysType = SysType::CoilCoolingDX;
+                thisSys.SimAirCompType_Num = SimAirServingZones::CompType::DXSystem;
+
                 // TODO: figure out another way to set this next variable
                 // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
                 thisSys.m_LastMode = CoolingMode;
@@ -7884,6 +7860,7 @@ namespace UnitarySystems {
     {
         std::string cCurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
         SysType sysTypeNum = SysType::PackagedAC;
+        DataZoneEquipment::ZoneEquip zoneEqTypeNum = DataZoneEquipment::ZoneEquip::Invalid;
         int numPTAC = 0;
         int numPTHP = 0;
         int numPTWSHP = 0;
@@ -7891,9 +7868,11 @@ namespace UnitarySystems {
         for (int getPTUnitType = 1; getPTUnitType <= 3; ++getPTUnitType) {
             if (getPTUnitType == 2) {
                 sysTypeNum = SysType::PackagedHP;
+                zoneEqTypeNum = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
                 cCurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
             } else if (getPTUnitType == 3) {
                 sysTypeNum = SysType::PackagedWSHP;
+                zoneEqTypeNum = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
                 cCurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
             }
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -8010,6 +7989,8 @@ namespace UnitarySystems {
                     }
                     thisSys.UnitType = cCurrentModuleObject;
                     thisSys.m_sysType = sysTypeNum;
+                    thisSys.ZoneEqType_Num = zoneEqTypeNum;
+
                     // TODO: figure out another way to set this next variable
                     // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
                     thisSys.m_LastMode = HeatingMode;
@@ -8137,6 +8118,7 @@ namespace UnitarySystems {
                 // now translate to UnitarySystem
                 thisSys.UnitType = cCurrentModuleObject;
                 thisSys.m_sysType = SysType::CoilCoolingWater;
+                thisSys.SimAirCompType_Num = SimAirServingZones::CompType::CoilSystemWater;
                 input_specs.control_type = "Setpoint";
                 thisSys.m_CoolCoilExists = true; // is always true
                 thisSys.m_LastMode = CoolingMode;
@@ -8238,6 +8220,7 @@ namespace UnitarySystems {
                 auto const &fields = instance.value();
                 thisSys.UnitType = cCurrentModuleObject;
                 thisSys.m_sysType = SysType::Unitary;
+                thisSys.SimAirCompType_Num = SimAirServingZones::CompType::UnitarySystemModel;
 
                 UnitarySysInputSpec input_spec;
                 input_spec.name = thisObjectName;
@@ -18926,12 +18909,19 @@ namespace UnitarySystems {
         }
     }
 
-    bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex)
+    bool searchTotalComponents(EnergyPlusData &state,
+                               SimAirServingZones::CompType compTypeToFind,
+                               std::string_view objectNameToFind,
+                               int &compIndex,
+                               int &branchIndex,
+                               int &airLoopIndex)
     {
         for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                 for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                      ++CompNum) {
+                    if (compTypeToFind != state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num)
+                        continue;
                     if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
                                                     objectNameToFind)) {
                         compIndex = CompNum;
