@@ -3,6 +3,9 @@
 
 #include <hedley.hpp>
 
+namespace nlohmann
+{
+
 inline namespace literals
 {
 inline namespace json_literals
@@ -27,6 +30,14 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
 
 }
 }
+}
+
+#if JSON_USE_GLOBAL_UDLS
+    using nlohmann::literals::json_literals::operator "" _json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+    using nlohmann::literals::json_literals::operator "" _json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+#endif
+
+
 #include <hedley_undef.hpp>
 
 #endif

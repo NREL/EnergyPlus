@@ -50,7 +50,7 @@
 
 #include <string>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <unordered_map>
 
 namespace EnergyPlus {

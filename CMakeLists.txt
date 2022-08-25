@@ -40,7 +40,7 @@ if(ENABLE_PCH)
     "${PROJECT_SOURCE_DIR}/src/EnergyPlus/Data/EnergyPlusData.hh"
     "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array.functions.hh"
     "${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh"
-    "${PROJECT_SOURCE_DIR}/third_party/nlohmann/json.hpp"
+    "${PROJECT_SOURCE_DIR}/third_party/nlohmann/json_fwd.hpp"
     )
 endif()
 

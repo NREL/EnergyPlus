@@ -56,7 +56,7 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Reference.hh>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>

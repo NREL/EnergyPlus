@@ -51,6 +51,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <nlohmann/json.hpp>
 #include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>

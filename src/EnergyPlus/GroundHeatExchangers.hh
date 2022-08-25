@@ -52,7 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // JSON Headers
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>

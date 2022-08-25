@@ -68,7 +68,7 @@
 #include <fmt/ostream.h>
 #include <fmt/printf.h>
 #include <fmt/ranges.h>
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace {
 struct DoubleWrapper

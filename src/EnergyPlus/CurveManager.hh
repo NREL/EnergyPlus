@@ -58,7 +58,7 @@
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Optional.hh>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 // Btwxt Headers
 #include <btwxt.h>

@@ -60,7 +60,7 @@
 #include <ObjexxFCL/Array1S.fwd.hh>
 #include <ObjexxFCL/Optional.hh>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>

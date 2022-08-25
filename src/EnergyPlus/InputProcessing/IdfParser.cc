@@ -52,6 +52,7 @@
 #include <fmt/format.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
