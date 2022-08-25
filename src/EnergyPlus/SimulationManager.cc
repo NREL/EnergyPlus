@@ -2217,15 +2217,7 @@ namespace SimulationManager {
             for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 //  Plant Supply Side Loop
                 // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant
-                const auto LoopString = [&]() {
-                    if (LoopSideNum == DataPlant::LoopSideLocation::Demand) {
-                        return "Demand";
-                    } else if (LoopSideNum == DataPlant::LoopSideLocation::Supply) {
-                        return "Supply";
-                    } else {
-                        return "";
-                    }
-                }();
+                std::string_view const LoopString = DataPlant::DemandSupplyNames[static_cast<int>(LoopSideNum)];
 
                 print(state.files.bnd,
                       " Plant Loop,{},{},{},{},{},{}\n",

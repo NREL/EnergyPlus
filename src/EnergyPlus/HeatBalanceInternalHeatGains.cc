@@ -93,7 +93,7 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 }
 void SetupSpaceInternalGain(EnergyPlusData &state,
                             int const spaceNum,
-                            Real64 spaceGainFraction,               // Fraction of gain value assigned to this space
+                            Real64 spaceGainFraction,              // Fraction of gain value assigned to this space
                             std::string_view const cComponentName, // user unique name for device
                             DataHeatBalance::IntGainType const IntGainCompType,
                             Real64 *ConvectionGainRate, // pointer target for remote convection gain value to be accessed
