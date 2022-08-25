@@ -4152,6 +4152,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN1,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN1,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -4498,6 +4499,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN3,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN3,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -4844,6 +4846,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN5,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN5,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -5190,6 +5193,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN7,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN7,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -5536,6 +5540,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN9,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN9,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -5882,6 +5887,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN11,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN11,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6228,6 +6234,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN13,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN13,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6574,6 +6581,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN15,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN15,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6920,6 +6928,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN17,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN17,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7266,6 +7275,7 @@
     3.1,                     !- Gross Rated Cooling COP {W/W}
     autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Evap Cooler Outlet Node ZN19,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node ZN19,  !- Air Outlet Node Name
     Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name

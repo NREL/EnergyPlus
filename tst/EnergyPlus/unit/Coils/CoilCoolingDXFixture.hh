@@ -72,7 +72,8 @@ protected:
                                                           " 0.9,                           ",
                                                           " 0.9,                           ",
                                                           " 0.5,                           ",
-                                                          " 300,                           ",
+                                                          " 300,                           ", // 2017 Rated Evaporator Fan Power Per Volume Flow Rate
+                                                          " 300,                           ", // 2023 Rated Evaporator Fan Power Per Volume Flow Rate
                                                           " 6.9,                           ",
                                                           " 0.8,                           ",
                                                           " " + speedObjectName + "CapFT,  ",

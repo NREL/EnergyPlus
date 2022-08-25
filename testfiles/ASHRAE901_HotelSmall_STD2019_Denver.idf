@@ -23447,6 +23447,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     101 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     101 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23475,6 +23476,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     102 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     102 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23503,6 +23505,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     103 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     103 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23531,6 +23534,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     104 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     104 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23559,6 +23563,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     105 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     105 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23587,6 +23592,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     201 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     201 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23615,6 +23621,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     202_205 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     202_205 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23643,6 +23650,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.389400049435553,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     206_208 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     206_208 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23671,6 +23679,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     209_212 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     209_212 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23699,6 +23708,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     213 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     213 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23727,6 +23737,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     214 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     214 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23755,6 +23766,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     215_218 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     215_218 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23783,6 +23795,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     219 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     219 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23811,6 +23824,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     220_223 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     220_223 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23839,6 +23853,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     224 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     224 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23867,6 +23882,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     301 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     301 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23895,6 +23911,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     302_305 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     302_305 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23923,6 +23940,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.389400049435553,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     306_308 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     306_308 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23951,6 +23969,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     309_312 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     309_312 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -23979,6 +23998,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     313 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     313 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24007,6 +24027,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     314 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     314 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24035,6 +24056,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     315_318 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     315_318 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24063,6 +24085,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     319 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     319 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24091,6 +24114,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     320_323 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     320_323 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24119,6 +24143,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     324 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     324 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24147,6 +24172,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     401 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     401 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24175,6 +24201,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     402_405 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     402_405 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24203,6 +24230,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.389400049435553,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     406_408 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     406_408 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24231,6 +24259,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     409_412 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     409_412 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24259,6 +24288,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     413 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     413 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24287,6 +24317,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     414 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     414 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24315,6 +24346,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     415_418 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     415_418 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24343,6 +24375,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     419 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     419 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24371,6 +24404,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.519200065914071,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     420_423 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     420_423 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24399,6 +24433,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     424 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     424 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24427,6 +24462,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     CorridorFlr1 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     CorridorFlr1 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24455,6 +24491,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     CorridorFlr2 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     CorridorFlr2 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24483,6 +24520,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     CorridorFlr3 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     CorridorFlr3 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24511,6 +24549,7 @@
     3.81,                    !- Gross Rated Cooling COP {W/W}
     0.129800016478518,       !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     CorridorFlr4 PTAC Mixed Air Outlet,  !- Air Inlet Node Name
     CorridorFlr4 PTAC Cooling Coil Outlet,  !- Air Outlet Node Name
     PTAC Cooling Coil Cap-FT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -24557,6 +24596,7 @@
     4.11713235489972,        !- Speed 1 Gross Rated Cooling COP {W/W}
     0.266766666666667,       !- Speed 1 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SAC DX Cooling Coil Cap-FT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     SAC DX Cooling Coil Cap-FF,  !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     SAC DX Cooling Coil EIR-FT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -24576,6 +24616,7 @@
     4.11713235489972,        !- Speed 2 Gross Rated Cooling COP {W/W}
     0.40015,                 !- Speed 2 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SAC DX Cooling Coil Cap-FT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     SAC DX Cooling Coil Cap-FF,  !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     SAC DX Cooling Coil EIR-FT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -24615,6 +24656,7 @@
     4.11713235489972,        !- Speed 1 Gross Rated Cooling COP {W/W}
     0.644126666666667,       !- Speed 1 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SAC DX Cooling Coil Cap-FT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     SAC DX Cooling Coil Cap-FF,  !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     SAC DX Cooling Coil EIR-FT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -24634,6 +24676,7 @@
     4.11713235489972,        !- Speed 2 Gross Rated Cooling COP {W/W}
     0.96619,                 !- Speed 2 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SAC DX Cooling Coil Cap-FT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     SAC DX Cooling Coil Cap-FF,  !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     SAC DX Cooling Coil EIR-FT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -24673,6 +24716,7 @@
     4.11713235489972,        !- Speed 1 Gross Rated Cooling COP {W/W}
     0.315773333333333,       !- Speed 1 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SAC DX Cooling Coil Cap-FT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     SAC DX Cooling Coil Cap-FF,  !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     SAC DX Cooling Coil EIR-FT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -24692,6 +24736,7 @@
     4.11713235489972,        !- Speed 2 Gross Rated Cooling COP {W/W}
     0.47366,                 !- Speed 2 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SAC DX Cooling Coil Cap-FT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     SAC DX Cooling Coil Cap-FF,  !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     SAC DX Cooling Coil EIR-FT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -24731,6 +24776,7 @@
     3.7988306741603,         !- Speed 1 Gross Rated Cooling COP {W/W}
     0.827333333333333,       !- Speed 1 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SAC DX Cooling Coil Cap-FT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     SAC DX Cooling Coil Cap-FF,  !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     SAC DX Cooling Coil EIR-FT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -24750,6 +24796,7 @@
     3.7988306741603,         !- Speed 2 Gross Rated Cooling COP {W/W}
     1.24100,                 !- Speed 2 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SAC DX Cooling Coil Cap-FT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     SAC DX Cooling Coil Cap-FF,  !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     SAC DX Cooling Coil EIR-FT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
