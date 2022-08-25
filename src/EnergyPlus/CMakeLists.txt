@@ -1062,6 +1062,7 @@ if(UNIX AND NOT APPLE)
     COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${PROJECT_BINARY_DIR}/Products/EnergyPlus")
 
   if (BUILD_PERFORMANCE_TESTS)
+    file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/performance_tests")
     add_custom_command(
       TARGET energyplus
       POST_BUILD
