@@ -1,0 +1,24 @@
+diff --git a/third_party/nlohmann/json.hpp b/third_party/nlohmann/json.hpp
+index 4d1a37ad7c..75291a4514 100644
+--- a/third_party/nlohmann/json.hpp
++++ b/third_party/nlohmann/json.hpp
+@@ -31,6 +31,7 @@
+ #include <string> // string, stoi, to_string
+ #include <utility> // declval, forward, move, pair, swap
+ #include <vector> // vector
++#include <doj/alphanum.hpp>
+ 
+ // #include <nlohmann/adl_serializer.hpp>
+ //     __ _____ _____ _____
+@@ -19501,9 +19502,9 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
+ #if defined(JSON_HAS_CPP_14)
+     // use of transparent comparator avoids unnecessary repeated construction of temporaries
+     // in functions involving lookup by key with types other than object_t::key_type (aka. StringType)
+-    using default_object_comparator_t = std::less<>;
++    using default_object_comparator_t = doj::alphanum_less<>;
+ #else
+-    using default_object_comparator_t = std::less<StringType>;
++    using default_object_comparator_t = doj::alphanum_less<StringType>;
+ #endif
+ 
+     /// @brief a type for an object
