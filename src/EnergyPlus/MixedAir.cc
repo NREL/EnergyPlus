@@ -161,6 +161,50 @@ constexpr std::array<std::string_view, static_cast<int>(DataSizing::SysOAMethod:
                                                                                                    "STANDARD62.1SIMPLIFIEDPROCEDURE",
                                                                                                    "STANDARD62.1VENTILATIONRATEPROCEDUREWITHLIMIT"};
 
+constexpr std::array<std::string_view, static_cast<int>(SimAirServingZones::CompType::Num)> CompTypeNamesUC{
+    "OUTDOORAIR:MIXER",
+    "FAN:CONSTANTVOLUME",
+    "FAN:VARIABLEVOLUME",
+    "COIL:COOLING:WATER",
+    "COIL:HEATING:WATER",
+    "COIL:HEATING:STEAM",
+    "COIL:COOLING:WATER:DETAILEDGEOMETRY",
+    "COIL:HEATING:ELECTRIC",
+    "COIL:HEATING:FUEL",
+    "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED",
+    "COIL:HEATING:DESUPERHEATER",
+    "COILSYSTEM:COOLING:DX",
+    "HEATEXCHANGER:AIRTOAIR:FLATPLATE",
+    "DEHUMIDIFIER:DESICCANT:NOFANS",
+    "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED",
+    "EVAPORATIVECOOLER:DIRECT:CELDEKPAD",
+    "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY",
+    "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",
+    "HUMIDIFIER:STEAM:ELECTRIC",
+    "DUCT",
+    "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS",
+    "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED",
+    "FAN:COMPONENTMODEL",
+    "COILSYSTEM:HEATING:DX",
+    "COIL:USERDEFINED",
+    "FAN:SYSTEMMODEL",
+    "AIRLOOPHVAC:UNITARYSYSTEM",
+    "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
+    "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL",
+    "COILSYSTEM:COOLING:WATER"};
+
+static constexpr std::array<std::string_view, static_cast<int>(DataSizing::SysOAMethod::Num)> printSysOAMethod{
+    "ZoneSum,",
+    "Standard62.1VentilationRateProcedure,",
+    "IndoorAirQualityProcedure,",
+    "ProportionalControlBasedOnOccupancySchedule,",
+    "IndoorAirQualityGenericContaminant,",
+    "IndoorAirQualityProcedureCombined,",
+    "ProportionalControlBasedOnDesignOccupancy,",
+    "ProportionalControlBasedOnDesignOARate,",
+    "Standard62.1SimplifiedProcedure,",
+    "Standard62.1VentilationRateProcedureWithLimit,"};
+
 Real64 OAGetFlowRate(EnergyPlusData &state, int OAPtr)
 {
     Real64 FlowRate(0);
@@ -1126,9 +1170,8 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
 
     for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
         for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
-            state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(
-                getEnumerationValue(SimAirServingZones::CompTypeNamesUC,
-                                    UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum))));
+            state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(getEnumerationValue(
+                CompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum))));
             if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Fan_System_Object) {
                 // construct fan object
                 state.dataHVACFan->fanObjs.emplace_back(
@@ -1889,25 +1932,8 @@ void GetOAControllerInputs(EnergyPlusData &state)
                 print(state.files.eio, "No,");
             }
 
-            if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SysOAMethod::ZoneSum) {
-                print(state.files.eio, "ZoneSum,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SysOAMethod::VRP) {
-                print(state.files.eio, "Standard62.1VentilationRateProcedure,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SysOAMethod::VRPL) {
-                print(state.files.eio, "Standard62.1VentilationRateProcedureWithLimit,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SysOAMethod::IAQP) {
-                print(state.files.eio, "IndoorAirQualityProcedure,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlSchOcc) {
-                print(state.files.eio, "ProportionalControlBasedOnOccupancySchedule,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlDesOcc) {
-                print(state.files.eio, "ProportionalControlBasedOnDesignOccupancy,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod ==
-                       DataSizing::SysOAMethod::ProportionalControlDesOARate) {
-                print(state.files.eio, "ProportionalControlBasedOnDesignOARate,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SysOAMethod::IAQPGC) {
-                print(state.files.eio, "IndoorAirQualityGenericContaminant,");
-            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == DataSizing::SysOAMethod::IAQPCOM) {
-                print(state.files.eio, "IndoorAirQualityProcedureCombined,");
+            if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod != DataSizing::SysOAMethod::Invalid) {
+                print(state.files.eio, printSysOAMethod[static_cast<int>(state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod)]);
             } else {
                 print(state.files.eio, "Invalid/Unknown,");
             }
