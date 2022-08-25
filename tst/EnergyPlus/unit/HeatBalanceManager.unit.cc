@@ -96,6 +96,7 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataHVACGlobals;
+using namespace nlohmann::literals::json_literals;
 
 namespace EnergyPlus {
 

@@ -295,6 +295,7 @@ namespace doj {
 
   template <>
     struct alphanum_less<void> {
+      typedef void is_transparent;
       template<typename LHS, typename RHS>
       bool operator()(const LHS& left, const RHS& right) const {
         return alphanum_comp(left, right) < 0;

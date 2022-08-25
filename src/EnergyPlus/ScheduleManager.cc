@@ -491,7 +491,7 @@ namespace ScheduleManager {
                 }
             }
 
-            auto const &column_json = schedule_file_shading_result->second["values"].at(0); // assume there is at least 1 column
+            auto const &column_json = schedule_file_shading_result->second["values"].at(static_cast<size_t>(0)); // assume there is at least 1 column
             rowCnt = column_json.size();
             NumCSVAllColumnsSchedules =
                 schedule_file_shading_result->second["header"].get<std::set<std::string>>().size() - 1; // -1 to account for timestamp column
@@ -1693,7 +1693,7 @@ namespace ScheduleManager {
                     }
                 }
 
-                auto const &column_json = result->second["values"][curcolCount - 1];
+                auto const &column_json = result->second["values"][static_cast<size_t>(curcolCount - 1)];
                 rowCnt = column_json.size();
                 auto const column_values = column_json.get<std::vector<Real64>>();
 

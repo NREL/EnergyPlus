@@ -65,6 +65,8 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
+using namespace nlohmann::literals::json_literals;
+
 namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)

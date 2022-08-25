@@ -131,9 +131,9 @@ public:
 
     Real64 getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName);
 
-    int getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName);
+    int getIntFieldValue(json const &ep_object, json const &schema_obj_props, const std::string_view fieldName);
 
-    const json &getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord);
+    const json &getObjectSchemaProps(EnergyPlusData &state, const std::string_view objectWord);
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
@@ -150,9 +150,9 @@ public:
                        Optional<Array1D_string> AlphaFieldNames = _,
                        Optional<Array1D_string> NumericFieldNames = _);
 
-    int getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
+    int getIDFObjNum(EnergyPlusData &state, const std::string_view Object, int const Number);
 
-    int getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
+    int getJSONObjNum(EnergyPlusData &state, const std::string_view Object, int const Number);
 
     int getObjectItemNum(EnergyPlusData &state,
                          std::string_view ObjType, // Object Type (ref: IDD Objects)
@@ -160,9 +160,9 @@ public:
     );
 
     int getObjectItemNum(EnergyPlusData &state,
-                         std::string const &ObjType,     // Object Type (ref: IDD Objects)
-                         std::string const &NameTypeVal, // Object "name" field type ( used as search key )
-                         std::string const &ObjName      // Name of the object type
+                         const std::string_view ObjType,     // Object Type (ref: IDD Objects)
+                         const std::string_view NameTypeVal, // Object "name" field type ( used as search key )
+                         const std::string_view ObjName      // Name of the object type
     );
 
     void lowerRangeCheck(EnergyPlusData &state,
@@ -206,7 +206,7 @@ public:
 
     void reportOrphanRecordObjects(EnergyPlusData &state);
 
-    const json &getObjectInstances(std::string const &ObjType);
+    const json &getObjectInstances(const std::string_view ObjType);
 
     bool checkForUnsupportedObjects(EnergyPlusData &state);
 
@@ -266,7 +266,7 @@ private:
     };
 
     MaxFields findMaxFields(
-        EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd, std::size_t const min_fields);
+        EnergyPlusData &state, json const &ep_object, const std::string_view extension_key, json const &legacy_idd, std::size_t const min_fields);
 
     void setObjectItemValue(EnergyPlusData &state,
                             json const &ep_object,

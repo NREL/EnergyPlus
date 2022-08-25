@@ -241,7 +241,7 @@ void CsvParser::parse_header(std::string_view csv, size_t &index, bool &success,
 void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
 {
     Token token;
-    int column_num = 0;
+    std::size_t column_num = 0;
 
     while (true) {
         token = look_ahead(csv, index);

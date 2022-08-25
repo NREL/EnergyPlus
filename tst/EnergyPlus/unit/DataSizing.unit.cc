@@ -65,6 +65,7 @@
 #include <nlohmann/json_literals.hpp>
 
 using namespace EnergyPlus;
+using namespace nlohmann::literals::json_literals;
 
 TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
 {

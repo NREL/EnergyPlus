@@ -687,7 +687,7 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
     return value;
 }
 
-int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, const std::string_view fieldName)
 {
     // Return the value of fieldName in ep_object as an integer.
     // If the field value is a string, then assume autosize or autocalulate and return DataGlobalConstants::AutoCalculate(-99999).
@@ -722,7 +722,7 @@ int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_o
     return value;
 }
 
-const json &InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
+const json &InputProcessor::getObjectSchemaProps(EnergyPlusData &state, const std::string_view objectWord)
 {
     auto const &schema_properties = schema().at("properties");
     const json &object_schema = schema_properties.at(objectWord);
@@ -748,13 +748,13 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
     return output;
 }
 
-const json &InputProcessor::getObjectInstances(std::string const &ObjType)
+const json &InputProcessor::getObjectInstances(const std::string_view ObjType)
 {
     return epJSON.find(ObjType).value();
 }
 
 InputProcessor::MaxFields InputProcessor::findMaxFields(
-    EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd, std::size_t const min_fields)
+    EnergyPlusData &state, json const &ep_object, const std::string_view extension_key, json const &legacy_idd, std::size_t const min_fields)
 {
     InputProcessor::MaxFields maxFields;
     if (!state.dataGlobal->isEpJSON) {
@@ -1087,7 +1087,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     Status = 1;
 }
 
-int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number)
+int InputProcessor::getIDFObjNum(EnergyPlusData &state, const std::string_view Object, int const Number)
 {
     // Given the number (index) of an object in JSON order, return it's number in original idf order
 
@@ -1098,7 +1098,7 @@ int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string const &Objec
     json *obj;
     auto obj_iter = epJSON.find(Object);
     if (obj_iter == epJSON.end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string{Object}));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             return idfOrderNumber;
         }
@@ -1130,7 +1130,7 @@ int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string const &Objec
     return idfOrderNumber;
 }
 
-int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number)
+int InputProcessor::getJSONObjNum(EnergyPlusData &state, const std::string_view Object, int const Number)
 {
     // Given the number (index) of an object in original idf order, return it's number in JSON order
 
@@ -1141,7 +1141,7 @@ int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Obje
     json *obj;
     auto obj_iter = epJSON.find(Object);
     if (obj_iter == epJSON.end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string{Object}));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             return jSONOrderNumber;
         }
@@ -1211,9 +1211,9 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 }
 
 int InputProcessor::getObjectItemNum(EnergyPlusData &state,
-                                     std::string const &ObjType,     // Object Type (ref: IDD Objects)
-                                     std::string const &NameTypeVal, // Object "name" field type ( used as search key )
-                                     std::string const &ObjName      // Name of the object type
+                                     const std::string_view ObjType,     // Object Type (ref: IDD Objects)
+                                     const std::string_view NameTypeVal, // Object "name" field type ( used as search key )
+                                     const std::string_view ObjName      // Name of the object type
 )
 {
     // PURPOSE OF THIS SUBROUTINE:
@@ -1222,7 +1222,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     json *obj;
     auto obj_iter = epJSON.find(ObjType);
     if (epJSON.find(ObjType) == epJSON.end() || obj_iter.value().find(ObjName) == obj_iter.value().end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string{ObjType}));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             return -1; // indicates object type not found, see function GeneralRoutines::ValidateComponent
         }

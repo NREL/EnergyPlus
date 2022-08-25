@@ -70,6 +70,8 @@ using namespace EnergyPlus::SimulationManager;
 using namespace EnergyPlus::DataOutputs;
 using namespace EnergyPlus::NodeInputManager;
 
+using namespace nlohmann::literals::json_literals;
+
 namespace EnergyPlus {
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject1)
