@@ -1351,7 +1351,7 @@ struct SizingData : BaseGlobalStruct
 
     void clear_state() override
     {
-        new(this) SizingData();
+        new (this) SizingData();
     }
 };
 
