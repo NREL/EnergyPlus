@@ -361,19 +361,18 @@ void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
     if (NumItemsInAvg <= 1) return; // no need to average/smooth
 
-    Array1D<Real64> TempData(2 * DataIn.size()); // a scratch array
-    int const NumDataMinusNumInAvg = DataIn.size() - NumItemsInAvg;
+    Array1D<Real64> TempData(2 * DataIn.size()); // a scratch array twice the size, bottom end duplicate of top end
 
-    for (int i = 1; i <= DataIn.size(); ++i) {
-        TempData(i) = TempData(DataIn.size() + i) = DataIn(i);
+    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
+        TempData(i) = TempData(DataIn.size() + i) = DataIn(i); // initialize both bottom and top end
         DataIn(i) = 0.0;
     }
 
-    for (int i = 1; i <= DataIn.size(); ++i) {
+    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
         for (int j = 1; j <= NumItemsInAvg; ++j) {
-            DataIn(i) += TempData(NumDataMinusNumInAvg + i + j);
+            DataIn(i) += TempData(DataIn.size() - NumItemsInAvg + i + j); // sum top end including NumItemsInAvg history terms
         }
-        DataIn(i) /= NumItemsInAvg;
+        DataIn(i) /= NumItemsInAvg; // average to smooth over NumItemsInAvg window
     }
 }
 
