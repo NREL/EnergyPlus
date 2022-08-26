@@ -116,10 +116,10 @@ enum GeneralRoutinesEquipNums
 enum class AirLoopHVACCompType
 {
     Invalid = -1,
-    Supplyplenum,
-    Zonesplitter,
-    Zonemixer,
-    Returnplenum,
+    SupplyPlenum,
+    ZoneSplitter,
+    ZoneMixer,
+    ReturnPlenum,
     Num
 };
 
@@ -1452,7 +1452,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                 AirLoopHVACCompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count))));
 
             switch (CompType) {
-            case AirLoopHVACCompType::Supplyplenum: {
+            case AirLoopHVACCompType::SupplyPlenum: {
                 for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneSupplyPlenums; ++Count2) {
                     if (state.dataZonePlenum->ZoneSupPlenCond(Count2).ZonePlenumName !=
                         state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count))
@@ -1483,7 +1483,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                     }
                 }
             } break;
-            case AirLoopHVACCompType::Zonesplitter: {
+            case AirLoopHVACCompType::ZoneSplitter: {
                 for (Count2 = 1; Count2 <= state.dataSplitterComponent->NumSplitters; ++Count2) {
                     if (state.dataSplitterComponent->SplitterCond(Count2).SplitterName !=
                         state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count))
@@ -1783,7 +1783,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                 AirLoopHVACCompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp))));
 
             switch (CompType) {
-            case AirLoopHVACCompType::Zonemixer: {
+            case AirLoopHVACCompType::ZoneMixer: {
                 for (Count2 = 1; Count2 <= state.dataMixerComponent->NumMixers; ++Count2) {
                     if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) != state.dataMixerComponent->MixerCond(Count2).MixerName)
                         continue;
@@ -1820,7 +1820,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                     }
                 }
             } break;
-            case AirLoopHVACCompType::Returnplenum: {
+            case AirLoopHVACCompType::ReturnPlenum: {
                 for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count2) {
                     if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(NumComp) !=
                         state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
@@ -1870,7 +1870,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                     AirLoopHVACCompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count3))));
 
                 switch (CompType) {
-                case AirLoopHVACCompType::Zonemixer: {
+                case AirLoopHVACCompType::ZoneMixer: {
                     for (Count2 = 1; Count2 <= state.dataMixerComponent->NumMixers; ++Count2) {
                         if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) != state.dataMixerComponent->MixerCond(Count2).MixerName)
                             continue;
@@ -1880,7 +1880,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                         }
                     }
                 } break;
-                case AirLoopHVACCompType::Returnplenum: {
+                case AirLoopHVACCompType::ReturnPlenum: {
                     for (Count2 = 1; Count2 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count2) {
                         if (state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count3) !=
                             state.dataZonePlenum->ZoneRetPlenCond(Count2).ZonePlenumName)
