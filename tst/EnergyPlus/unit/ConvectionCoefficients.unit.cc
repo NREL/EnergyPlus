@@ -3613,7 +3613,7 @@ TEST_F(ConvectionCoefficientsFixture, testTARPNaturalConvectionAlgorithm)
     surfT = 1.0;
     ambT = 0.0;
     cosTilt = 0.0;
-    expectedResult = 1.309696;
+    expectedResult = 1.31;
     actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
     EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
 
@@ -3622,7 +3622,7 @@ TEST_F(ConvectionCoefficientsFixture, testTARPNaturalConvectionAlgorithm)
     surfT = -1.0;
     ambT = 0.0;
     cosTilt = 0.0;
-    expectedResult = 1.309696;
+    expectedResult = 1.31;
     actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
     EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
 
