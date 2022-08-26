@@ -108,9 +108,9 @@ constexpr std::array<std::string_view, static_cast<int>(DataSizing::OAFlowCalcMe
     "AIRCHANGES/HOUR",
     "SUM",
     "MAXIMUM",
-    "IndoorAirQualityProcedure",
-    "ProportionalControlBasedOnOccupancySchedule",
-    "ProportionalControlBasedOnDesignOccupancy"};
+    "INDOORAIRQUALITYPROCEDURE",
+    "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE",
+    "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY"};
 
 void ManageSizing(EnergyPlusData &state)
 {
