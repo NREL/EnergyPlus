@@ -2472,11 +2472,11 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     // DERIVED TYPE DEFINITIONS
     // na
 
-    auto &thisOARequirements(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
+    auto &thisOARequirements(state.dataSize->OARequirements(OAIndex));
 
     if (NumAlphas > 1) {
-        thisOARequirements = static_cast<OAFlowCalcMethod>(getEnumerationValue(OAFlowCalcMethodNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(2))));
-        if (thisOARequirements == OAFlowCalcMethod::Invalid) {
+        thisOARequirements.OAFlowMethod = static_cast<OAFlowCalcMethod>(getEnumerationValue(OAFlowCalcMethodNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(2))));
+        if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Invalid) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
             ShowContinueError(state, "...Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\",");
             ShowContinueError(state,
@@ -2486,7 +2486,7 @@ void ProcessInputOARequirements(EnergyPlusData &state,
         }
     } else {
         // default value for Outdoor Air Method
-        thisOARequirements = OAFlowCalcMethod::PerPerson;
+        thisOARequirements.OAFlowMethod = OAFlowCalcMethod::PerPerson;
     }
     if (NumNumbers > 0) {
         state.dataSize->OARequirements(OAIndex).OAFlowPerPerson = Numbers(1);
@@ -2496,26 +2496,26 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     }
     // if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it
     // being counted later #4378
-    if (thisOARequirements != OAFlowCalcMethod::PerPerson && thisOARequirements != OAFlowCalcMethod::Sum &&
-        thisOARequirements != OAFlowCalcMethod::Max && thisOARequirements != OAFlowCalcMethod::PCOccSch &&
-        thisOARequirements != OAFlowCalcMethod::PCDesOcc && thisOARequirements != OAFlowCalcMethod::IAQProcedure) {
+    if (thisOARequirements.OAFlowMethod != OAFlowCalcMethod::PerPerson && thisOARequirements.OAFlowMethod != OAFlowCalcMethod::Sum &&
+        thisOARequirements.OAFlowMethod != OAFlowCalcMethod::Max && thisOARequirements.OAFlowMethod != OAFlowCalcMethod::PCOccSch &&
+        thisOARequirements.OAFlowMethod != OAFlowCalcMethod::PCDesOcc && thisOARequirements.OAFlowMethod != OAFlowCalcMethod::IAQProcedure) {
         state.dataSize->OARequirements(OAIndex).OAFlowPerPerson = 0.0;
     }
     // remaining fields default to 0
     if (NumNumbers > 1) {
-        if (thisOARequirements == OAFlowCalcMethod::PerArea || thisOARequirements == OAFlowCalcMethod::Sum ||
-            thisOARequirements == OAFlowCalcMethod::Max) {
+        if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::PerArea || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Sum ||
+            thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Max) {
             state.dataSize->OARequirements(OAIndex).OAFlowPerArea = Numbers(2);
-        } else if (thisOARequirements == OAFlowCalcMethod::PCOccSch || thisOARequirements == OAFlowCalcMethod::PCDesOcc ||
-                   thisOARequirements == OAFlowCalcMethod::IAQProcedure) {
+        } else if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::PCOccSch || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::PCDesOcc ||
+                   thisOARequirements.OAFlowMethod == OAFlowCalcMethod::IAQProcedure) {
             state.dataSize->OARequirements(OAIndex).OAFlowPerArea = Numbers(2);
         } else {
             state.dataSize->OARequirements(OAIndex).OAFlowPerArea = 0.0;
         }
     }
     if (NumNumbers > 2) {
-        if (thisOARequirements == OAFlowCalcMethod::PerZone || thisOARequirements == OAFlowCalcMethod::Sum ||
-            thisOARequirements == OAFlowCalcMethod::Max || thisOARequirements == OAFlowCalcMethod::IAQProcedure) {
+        if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::PerZone || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Sum ||
+            thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Max || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::IAQProcedure) {
             state.dataSize->OARequirements(OAIndex).OAFlowPerZone = Numbers(3);
         } else {
             state.dataSize->OARequirements(OAIndex).OAFlowPerZone = 0.0;
@@ -2523,8 +2523,8 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     }
 
     if (NumNumbers > 3) {
-        if (thisOARequirements == OAFlowCalcMethod::ACH || thisOARequirements == OAFlowCalcMethod::Sum ||
-            thisOARequirements == OAFlowCalcMethod::Max || thisOARequirements == OAFlowCalcMethod::IAQProcedure) {
+        if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::ACH || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Sum ||
+            thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Max || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::IAQProcedure) {
             state.dataSize->OARequirements(OAIndex).OAFlowACH = Numbers(4);
         } else {
             state.dataSize->OARequirements(OAIndex).OAFlowACH = 0.0;
