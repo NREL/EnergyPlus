@@ -141,7 +141,7 @@ namespace UnitarySystems {
         // temporarily open up flow limits while simulating, and then set this same value at the INLET after this parent has simulated
         Real64 tempMassFlowRateMaxAvail = state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail;
         // this is not working for CoilSystem simulated with UnitarySystem. Try to protect when this happens.
-        if (this->m_sysType != SysType::CoilCoolingDX && this->m_sysType != SysType::CoilCoolingWater) {
+        if (AirLoopNum > 0 && this->m_ControlType != UnitarySysCtrlType::Setpoint) {
             state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail = this->m_DesignMassFlowRate;
         }
 
