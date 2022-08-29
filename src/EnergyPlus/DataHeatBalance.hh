@@ -2224,6 +2224,8 @@ struct HeatBalanceData : BaseGlobalStruct
     // (considered diffuse)
     // Originally QD, now used only for EnclSolQSDifSol calc for daylighting
 
+    bool EnclRadAlwaysReCalc = false; // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
+
     Array1D<Real64> SurfCosIncidenceAngle;       // Cosine of beam solar incidence angle (for reporting)
     Array2D<Real64> SurfSunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     Array2D<Real64> SurfCosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface

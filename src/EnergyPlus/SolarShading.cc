@@ -10120,24 +10120,22 @@ void WindowShadingManager(EnergyPlusData &state)
 
 void CheckGlazingShadingStatusChange(EnergyPlusData &state)
 {
-    bool enclRadAlwaysReCalc = false; // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
-
     if (state.dataGlobal->BeginSimFlag) {
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
-            enclRadAlwaysReCalc = true;
+            state.dataHeatBal->EnclRadAlwaysReCalc = true;
         } else {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
                      ++SurfNum) {
                     if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TCFlag == 1 ||
                         state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
-                        enclRadAlwaysReCalc = true;
+                        state.dataHeatBal->EnclRadAlwaysReCalc = true;
                         break;
                     }
                 }
             }
         }
-        if (enclRadAlwaysReCalc) {
+        if (state.dataHeatBal->EnclRadAlwaysReCalc) {
             for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
                 state.dataViewFactor->EnclSolInfo(enclosureNum).radReCalc = true;
             }
@@ -10146,7 +10144,7 @@ void CheckGlazingShadingStatusChange(EnergyPlusData &state)
             }
         }
     }
-    if (enclRadAlwaysReCalc) return;
+    if (state.dataHeatBal->EnclRadAlwaysReCalc) return;
 
     if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel || state.dataGlobal->AnySurfPropOverridesInModel) {
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {

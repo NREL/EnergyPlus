@@ -4158,7 +4158,6 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
     // BLAST Routine - CIVAF - Compute Surface Absorption Factors For Short Wave Radiation
     //                         From Zone Lights And Diffuse Solar.
 
-    auto &Surface(state.dataSurface->Surface);
     // Avoid a division by zero of the user has entered a bunch of surfaces with zero absorptivity on the inside
     Real64 constexpr SmallestAreaAbsProductAllowed(0.01);
 
