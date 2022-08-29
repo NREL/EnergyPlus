@@ -306,16 +306,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
 
     state->dataViewFactor->NumOfRadiantEnclosures = 1;
     state->dataViewFactor->EnclRadInfo.allocate(1);
-    state->dataHeatBal->EnclRadReCalc.allocate(1);
-    state->dataHeatBal->EnclRadReCalc(1) = true;
-    state->dataHeatBal->EnclRadThermAbsMult.allocate(1);
+    state->dataViewFactor->EnclRadInfo(1).radReCalc = true;
     state->dataViewFactor->EnclRadInfo(1).SurfacePtr.allocate(1);
     state->dataViewFactor->EnclRadInfo(1).SurfacePtr(1) = 1;
 
     ComputeIntThermalAbsorpFactors(*state);
 
     EXPECT_EQ(0.2, state->dataHeatBalSurf->SurfAbsThermalInt(1));
-    EXPECT_EQ(5, state->dataHeatBal->EnclRadThermAbsMult(1));
+    EXPECT_EQ(5, state->dataViewFactor->EnclRadInfo(1).radThermAbsMult);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
@@ -3164,11 +3162,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
-    state->dataHeatBal->EnclSolVMULT.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataConstruction->Construct(1).TransDiff = 0.1;
-    state->dataHeatBal->EnclSolVMULT(1) = 1.0;
-    state->dataHeatBal->EnclSolVMULT(2) = 1.0;
+    state->dataViewFactor->EnclSolInfo(1).solVMULT = 1.0;
+    state->dataViewFactor->EnclSolInfo(2).solVMULT = 1.0;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Construction = 1;
