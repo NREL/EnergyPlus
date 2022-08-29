@@ -18,7 +18,7 @@ In a different building, such as a theater/playhouse, the building may only have
 
 \subsection{ScheduleTypeLimits}\label{scheduletypelimits}
 
-Schedule types can be used to validate portions of the other schedules. Hourly day schedules, for example, are validated by range -- minimum/maximum (if entered) -- as well as numeric type (continuous or discrete). Annual schedules, on the other hand, are only validated for range -- as the numeric type validation has already been done.
+Schedule types can be used to validate portions of the other schedules. Hourly day schedules, for example, are validated by range---minimum/maximum (if entered)---as well as numeric type (continuous or discrete). Annual schedules, on the other hand, are only validated for range---as the numeric type validation has already been done.
 
 \subsubsection{Inputs}\label{inputs-042}
 
@@ -130,9 +130,9 @@ This field contains a reference to the Schedule Type Limits object. If found in 
 
 Three possible inputs are available for this field: Average, Linear, and No. The default value is No.
 
-If ``Average'' is entered, it is used to apply values that aren't coincident with the given timestep (ref: Timestep) intervals. If ``Average'' is entered, then any intervals entered here will be interpolated/averaged and that value will be used at the appropriate minute in the hour. For example, if ``Average'' is entered and the interval is every 15 minutes (say a value of 0 for the first 15 minutes, then .5 for the second 15 minutes) AND there is a 10 minute timestep for the simulation: the value at 10 minutes will be 0 and the value at 20 minutes will be .25. In earlier versions of EnergyPlus, this was the Yes option for the field.
+If ``Average'' is entered, it is used to apply values that aren't coincident with the given timestep (ref: Timestep) intervals. If ``Average'' is entered, then any intervals entered here will be interpolated/averaged and that value will be used at the appropriate minute in the hour. For example, if ``Average'' is entered and the interval is every 15 minutes (say a value of 0 for the first 15 minutes, then 0.5 for the second 15 minutes) AND there is a 10 minute timestep for the simulation: the value at 10 minutes will be 0 and the value at 20 minutes will be 0.25. In earlier versions of EnergyPlus, this was the Yes option for the field.
 
-If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5. No is the default for this field.
+If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be 0.5. No is the default for this field.
 
 If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5.
 
@@ -177,16 +177,15 @@ This field contains a reference to the Schedule Type Limits object. If found in 
 
 Three possible inputs are available for this field: Average, Linear, and No. The default value is No.
 
-If ``Average'' is entered, it is used to apply values that aren't coincident with the given timestep (ref: Timestep) intervals. If ``Average'' is entered, then any intervals entered here will be interpolated/averaged and that value will be used at the appropriate minute in the hour. For example, if ``Average'' is entered and the interval is every 15 minutes (say a value of 0 for the first 15 minutes, then .5 for the second 15 minutes) AND there is a 10 minute timestep for the simulation: the value at 10 minutes will be 0 and the value at 20 minutes will be .25. In earlier versions of EnergyPlus, this was the Yes option for the field.
+If ``Average'' is entered, it is used to apply values that aren't coincident with the given timestep (ref: Timestep) intervals. If ``Average'' is entered, then any intervals entered here will be interpolated/averaged and that value will be used at the appropriate minute in the hour. For example, if ``Average'' is entered and the interval is every 15 minutes (say a value of 0 for the first 15 minutes, then 0.5 for the second 15 minutes) AND there is a 10 minute timestep for the simulation: the value at 10 minutes will be 0 and the value at 20 minutes will be 0.25. In earlier versions of EnergyPlus, this was the Yes option for the field.
 
-If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5. No is the default for this field.
+If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be 0.5. No is the default for this field.
 
 If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5.
 
-
 \paragraph{Field: Minutes Per Item}\label{field-minutes-per-item}
 
-This field allows the ``list'' interval to be specified in the number of minutes for each item. The value here must be \textless{} = 60 and evenly divisible into 60 (same as the timestep limits).
+This field allows the ``list'' interval to be specified in the number of minutes for each item. The value here must be \textless{}= 60 and evenly divisible into 60 (same as the timestep limits).
 
 \paragraph{Field Value 1 (same definition for each value -- up to 1440 (24*60) allowed)}\label{field-value-1-same-definition-for-each-value-up-to-1440-2460-allowed}
 
@@ -365,8 +364,6 @@ If ``No'' is entered, then the value that occurs on the appropriate minute in th
 
 If ``Linear'' is entered, then the value that is used is based on the linear interpolation between successive values. With linear, if the value at 1:00 is 0.0 and the value at 2:00 is 10.0, with fifteen minute timesteps, the value at 1:15 would be 2.5, the value at 1:30 would be 5.0 and the value at 1:45 would be 7.5.
 
-
-
 \paragraph{Field: Until}\label{field-until}
 
 This field contains the ending time (again, reference the interval day schedule discussion above) for the current days and day schedule being defined.
@@ -497,7 +494,7 @@ This field specifies the character used to separate columns of data if the file 
 
 The value contained in this field directs how to apply values that aren't coincident with the given timestep (ref: TimeStep object) intervals. If ``Yes'' is entered, then any intervals entered here will be interpolated/averaged and that value will be used at the appropriate minute in the hour. If ``No'' is entered, then the value that occurs on the appropriate minute in the hour will be used as the schedule value.
 
-For example, if ``yes'' is entered and the minutes per item is 15 minutes (say a value of 0 for the first 15 minutes, then .5 for the second 15 minutes) AND there is a 10 minute timestep for the simulation: the value at 10 minutes will be 0 and the value at 20 minutes will be .25. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be .5.
+For example, if ``yes'' is entered and the minutes per item is 15 minutes (say a value of 0 for the first 15 minutes, then 0.5 for the second 15 minutes) AND there is a 10 minute timestep for the simulation: the value at 10 minutes will be 0 and the value at 20 minutes will be 0.25. For the same input entries but ``no'' for this field, the value at 10 minutes will be 0 and the value at 20 minutes will be 0.5.
 
 \paragraph{Field: Minutes Per Item}\label{field-minutes-per-item-1}
 
@@ -544,7 +541,7 @@ Schedule:File,
 
 \paragraph{Field: Adjust Schedule for Daylight Savings}\label{adjust-schedule-for-daylight-savings-1}
 
-This field indicates whether or not to shift the schedule forward an hour during daylight savings time. If ``Yes" the schedule skips forward an hour in the CSV on the ``spring forward" day and repeats an hour on the ``fall back" day. If  ``No", the schedule is read and applied in standard time, without adjusting for daylight savings time (\textbf{\hyperref[runperiodcontroldaylightsavingtime]{RunPeriodControl:DaylightSavingTime}}). This indicator is defaulted to ``Yes" if no input is provided. 
+This field indicates whether or not to shift the schedule forward an hour during daylight savings time. If ``Yes'' the schedule skips forward an hour in the CSV on the ``spring forward'' day and repeats an hour on the ``fall back'' day. If  ``No'', the schedule is read and applied in standard time, without adjusting for daylight savings time (\textbf{\hyperref[runperiodcontroldaylightsavingtime]{RunPeriodControl:DaylightSavingTime}}). This indicator is defaulted to ``Yes'' if no input is provided. 
 
 Here is an IDF example:
 
@@ -564,7 +561,7 @@ Here is an IDF example:
 
 \subsubsection{Outputs}\label{outputs-031}
 
-An optional report can be used to gain the values described in the previous Schedule objects. This is a condensed reporting that illustrates the full range of schedule values -- in the style of input: DaySchedule, WeekSchedule, Annual Schedule.
+An optional report can be used to gain the values described in the previous Schedule objects. This is a condensed reporting that illustrates the full range of schedule values---in the style of input: DaySchedule, WeekSchedule, Annual Schedule.
 
 \begin{lstlisting}
 ! will give them on hourly increments (day schedule resolution)
@@ -599,9 +596,9 @@ Output:Variable,*,Schedule Value,hourly;
 
 The \textbf{Schedule:File:Shading} object allows shading schedules to be imported altogether from a file exported using \hyperref[shadowcalculation]{ShadowCalculation} Output External Shading Calculation Results. The object can also be used to read in hourly or sub-hourly schedules of the sunlit fraction of all exterior surfaces computed by other software or developed in a spreadsheet or other utility.
 
-The format for the data file is Comma-separated values (CSV). The CSV file referenced is a text file with values separated by commas (or other optional delimiters) with one line per timestep. Each column stores the annual shading sunlit fraction schedule data of an exterior surface. The sunlit fraction is only overwritten and used when the sun is above horizon at a certain time step. To map to the surface, each column should name its column header exactly the same with the surface name defined in the \textbf{Surface:Detailed} object. If any surface name is missing, the sunlit fraction of this surface will be set to 1.0 during the run period, which means no shading will be assigned for this surface, and a warning message will be issued. The file should contain values for an entire year with the exact same number of rows as the total number of time steps in a year (number of days in a year * number of hours per day * number of time steps per hour). Time step should be consistent with the setting in the \textbf{Timestep} object. Otherwise, an error will be issued.
+The format for the data file is Comma-separated values (CSV). The CSV file referenced is a text file with values separated by commas (or other optional delimiters) with one line per timestep. Each column stores the annual shading sunlit fraction schedule data of an exterior surface. The sunlit fraction is only overwritten and used when the sun is above horizon at a certain time step. To map to the surface, each column should name its column header exactly the same with the surface name defined in the \textbf{Surface:Detailed} object. If any surface name is missing, the sunlit fraction of this surface will be set to 1.0 during the run period, which means no shading will be assigned for this surface, and a warning message will be issued. The file should contain values for an entire year with the exact same number of rows as the total number of time steps in a year (number of days in a year $\times$ number of hours per day $\times$ number of time steps per hour). Time step should be consistent with the setting in the \textbf{Timestep} object. Otherwise, an error will be issued.
 
-The first row of the CSV file should be the header, and the first column of the CSV file should be the timestamp and is not imported. 
+The first row of the CSV file should be the header, and the first column of the CSV file should be the timestamp and is not imported.
 
 With a \textbf{Schedule:File:Shading} object defined, the shading schedules for all exterior surfaces (if defined) can be imported altogether without repeatedly defining \hyperref[schedulefile]{Schedule:File} objects.
 
