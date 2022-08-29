@@ -4180,21 +4180,18 @@ namespace UnitarySystems {
             this->m_FanCompNotSetYet = false;
         }
 
-        std::string const &loc_supFanPlace = input_data.fan_placement;
-        if (UtilityRoutines::SameString(loc_supFanPlace, "BlowThrough")) this->m_FanPlace = FanPlace::BlowThru;
-        if (UtilityRoutines::SameString(loc_supFanPlace, "DrawThrough")) this->m_FanPlace = FanPlace::DrawThru;
+        if (UtilityRoutines::SameString(input_data.fan_placement, "BlowThrough")) this->m_FanPlace = FanPlace::BlowThru;
+        if (UtilityRoutines::SameString(input_data.fan_placement, "DrawThrough")) this->m_FanPlace = FanPlace::DrawThru;
         if (this->m_FanPlace == FanPlace::NotYetSet && this->m_FanExists) {
             ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
-            ShowContinueError(state, format("Illegal Fan Placement = {}", loc_supFanPlace));
+            ShowContinueError(state, format("Illegal Fan Placement = {}", input_data.fan_placement));
             errorsFound = true;
         }
 
-        std::string const &loc_supFanOpMode = input_data.supply_air_fan_operating_mode_schedule_name;
-
-        this->m_FanOpModeSchedPtr = ScheduleManager::GetScheduleIndex(state, loc_supFanOpMode);
-        if (!loc_supFanOpMode.empty() && this->m_FanOpModeSchedPtr == 0) {
+        this->m_FanOpModeSchedPtr = ScheduleManager::GetScheduleIndex(state, input_data.supply_air_fan_operating_mode_schedule_name);
+        if (!input_data.supply_air_fan_operating_mode_schedule_name.empty() && this->m_FanOpModeSchedPtr == 0) {
             ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
-            ShowContinueError(state, format("Illegal Fan Operating Mode Schedule Name = {}", loc_supFanOpMode));
+            ShowContinueError(state, format("Illegal Fan Operating Mode Schedule Name = {}", input_data.supply_air_fan_operating_mode_schedule_name));
             // ShowContinueError(state, "Illegal " + cAlphaFields(iFanSchedAlphaNum) + " = " + Alphas(iFanSchedAlphaNum));
             errorsFound = true;
         } else if (this->m_FanOpModeSchedPtr == 0) {
@@ -4220,7 +4217,9 @@ namespace UnitarySystems {
                 ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                 ShowContinueError(state, format("For {} = {}", loc_fanType, loc_m_FanName));
                 ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                ShowContinueError(state, format("Error found in Supply Air Fan Operating Mode Schedule Name {}", loc_supFanOpMode));
+                ShowContinueError(
+                    state,
+                    format("Error found in Supply Air Fan Operating Mode Schedule Name {}", input_data.supply_air_fan_operating_mode_schedule_name));
                 ShowContinueError(state, "...schedule values must be (>0., <=1.)");
                 errorsFound = true;
             }
@@ -4231,7 +4230,9 @@ namespace UnitarySystems {
             if (!ScheduleManager::CheckScheduleValueMinMax(state, this->m_FanOpModeSchedPtr, ">", 0.0, "<=", 1.0)) {
                 ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                 ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                ShowContinueError(state, format("Error found in Supply Air Fan Operating Mode Schedule Name {}", loc_supFanOpMode));
+                ShowContinueError(
+                    state,
+                    format("Error found in Supply Air Fan Operating Mode Schedule Name {}", input_data.supply_air_fan_operating_mode_schedule_name));
                 ShowContinueError(state, "...schedule values must be (>0., <=1.)");
                 errorsFound = true;
             }
@@ -4265,44 +4266,17 @@ namespace UnitarySystems {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                     errFlag = false;
+                } else {
+                    auto &thisHeatCoil = state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex);
+                    this->m_HeatingCoilAvailSchPtr = thisHeatCoil.SchedPtr;
+                    this->m_DesignHeatingCapacity = thisHeatCoil.RatedTotCap(1);
+                    if (this->m_DesignHeatingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                    this->m_MaxHeatAirVolFlow = thisHeatCoil.RatedAirVolFlowRate(1);
+                    if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                    HeatingCoilInletNode = thisHeatCoil.AirInNode;
+                    HeatingCoilOutletNode = thisHeatCoil.AirOutNode;
+                    thisHeatCoil.HeatSizeRatio = this->m_HeatingSizingRatio;
                 }
-
-                this->m_HeatingCoilAvailSchPtr = DXCoils::GetDXCoilAvailSchPtr(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get DX heating coil capacity
-                this->m_DesignHeatingCapacity = DXCoils::GetCoilCapacity(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (this->m_DesignHeatingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get DX coil air flow rate.
-                this->m_MaxHeatAirVolFlow = DXCoils::GetDXCoilAirFlow(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil Nodes
-                HeatingCoilInletNode = DXCoils::GetCoilInletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                HeatingCoilOutletNode = DXCoils::GetCoilOutletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                DXCoils::SetDXCoolingCoilData(
-                    state, this->m_HeatingCoilIndex, errorsFound, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, this->m_HeatingSizingRatio);
             }
 
         } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
@@ -4316,193 +4290,102 @@ namespace UnitarySystems {
                 ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                 errorsFound = true;
             } else {
-
                 this->m_HeatingCoilIndex =
                     VariableSpeedCoils::GetCoilIndexVariableSpeed(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                     errFlag = false;
-                }
-
-                this->m_NumOfSpeedHeating = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                this->m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
-
-                this->m_MaxHeatAirVolFlow =
-                    VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                HeatingCoilInletNode =
-                    VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                HeatingCoilOutletNode =
-                    VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-                // Get DX heating coil capacity
-                this->m_DesignHeatingCapacity =
-                    VariableSpeedCoils::GetCoilCapacityVariableSpeed(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (this->m_DesignHeatingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
+                } else {
+                    auto &thisHeatCoil = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex);
+                    this->m_NumOfSpeedHeating = thisHeatCoil.NumOfSpeeds;
+                    this->m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    this->m_MaxHeatAirVolFlow = thisHeatCoil.RatedAirVolFlowRate;
+                    if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
+                        this->m_RequestAutoSize = true;
+                    } else {
+                        this->m_MaxHeatAirVolFlow = thisHeatCoil.MSRatedAirVolFlowRate(thisHeatCoil.NumOfSpeeds) /
+                                                    thisHeatCoil.MSRatedAirVolFlowRate(thisHeatCoil.NormSpedLevel) * thisHeatCoil.RatedAirVolFlowRate;
+                    }
+                    HeatingCoilInletNode = thisHeatCoil.AirInletNodeNum;
+                    HeatingCoilOutletNode = thisHeatCoil.AirOutletNodeNum;
+                    this->m_DesignHeatingCapacity = thisHeatCoil.RatedCapHeat;
+                    if (this->m_DesignHeatingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
                 }
             }
         } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
             this->m_DXHeatingCoil = true;
             errFlag = false;
-            DXCoils::GetDXCoilIndex(state, this->m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, this->m_HeatingCoilTypeName);
-            if (errFlag) {
+            ValidateComponent(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, isNotOK, cCurrentModuleObject);
+            if (isNotOK) {
                 ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                 errorsFound = true;
-                errFlag = false;
+            } else {
+                DXCoils::GetDXCoilIndex(state, this->m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, this->m_HeatingCoilTypeName);
+                if (errFlag) {
+                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
+                    errorsFound = true;
+                    errFlag = false;
+                } else {
+                    auto &thisHeatCoil = state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex);
+                    this->m_HeatingCoilAvailSchPtr = thisHeatCoil.SchedPtr;
+                    this->m_MaxHeatAirVolFlow = thisHeatCoil.MSRatedAirVolFlowRate(1);
+                    if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                    HeatingCoilInletNode = thisHeatCoil.AirInNode;
+                    HeatingCoilOutletNode = thisHeatCoil.AirOutNode;
+                    this->m_DesignHeatingCapacity = thisHeatCoil.MSRatedTotCap(thisHeatCoil.NumOfSpeeds);
+                }
             }
-
-            this->m_HeatingCoilAvailSchPtr = DXCoils::GetDXCoilAvailSchPtr(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-
-            // Get DX coil air flow rate.
-            this->m_MaxHeatAirVolFlow = DXCoils::GetDXCoilAirFlow(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-            if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-            if (errFlag) {
-                ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                errorsFound = true;
-                errFlag = false;
-            }
-
-            HeatingCoilInletNode = DXCoils::GetCoilInletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                errorsFound = true;
-                errFlag = false;
-            }
-            HeatingCoilOutletNode = DXCoils::GetCoilOutletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                errorsFound = true;
-                errFlag = false;
-            }
-
-            this->m_DesignHeatingCapacity = DXCoils::GetCoilCapacity(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-
         } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
-
             errFlag = false;
-            HeatingCoils::GetCoilIndex(state, this->m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag);
-            if (errFlag) {
+            ValidateComponent(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, isNotOK, cCurrentModuleObject);
+            if (isNotOK) {
                 ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                 errorsFound = true;
-                errFlag = false;
+            } else {
+                HeatingCoils::GetCoilIndex(state, this->m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag);
+                if (errFlag) {
+                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
+                    errorsFound = true;
+                    errFlag = false;
+                } else {
+                    auto &thisHeatCoil = state.dataHeatingCoils->HeatingCoil(this->m_HeatingCoilIndex);
+                    HeatingCoilInletNode = thisHeatCoil.AirInletNodeNum;
+                    HeatingCoilOutletNode = thisHeatCoil.AirOutletNodeNum;
+                    this->m_HeatingCoilAvailSchPtr = thisHeatCoil.SchedPtr;
+                    this->m_DesignHeatingCapacity = thisHeatCoil.MSNominalCapacity(thisHeatCoil.NumOfStages);
+                    if (this->m_DesignHeatingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                }
             }
-            HeatingCoilInletNode = HeatingCoils::GetCoilInletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                errorsFound = true;
-                errFlag = false;
-            }
-            HeatingCoilOutletNode = HeatingCoils::GetCoilOutletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                errorsFound = true;
-                errFlag = false;
-            }
-
-            this->m_HeatingCoilAvailSchPtr =
-                HeatingCoils::GetCoilAvailScheduleIndex(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-
-            this->m_DesignHeatingCapacity = HeatingCoils::GetCoilCapacity(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-
-            if (this->m_DesignHeatingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-
         } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel ||
                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric ||
                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingDesuperheater) {
-            errFlag = false;
-            if (errFlag) {
+            ValidateComponent(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, isNotOK, cCurrentModuleObject);
+            if (isNotOK) {
                 ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                 errorsFound = true;
+            } else { // mine data from heating coil
                 errFlag = false;
-            } else {
-
-                ValidateComponent(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, isNotOK, cCurrentModuleObject);
-                if (isNotOK) {
+                HeatingCoils::GetCoilIndex(state, this->m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag);
+                if (errFlag) {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
-
-                } else { // mine data from heating coil
-
-                    // Get heating coil index
                     errFlag = false;
-                    HeatingCoils::GetCoilIndex(state, this->m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the design heating capacity
-                    this->m_DesignHeatingCapacity =
-                        HeatingCoils::GetCoilCapacity(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
+                } else {
+                    auto &thisHeatCoil = state.dataHeatingCoils->HeatingCoil(this->m_HeatingCoilIndex);
+                    this->m_DesignHeatingCapacity = thisHeatCoil.NominalCapacity;
                     if (this->m_DesignHeatingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    this->m_HeatingCoilAvailSchPtr =
-                        HeatingCoils::GetCoilAvailScheduleIndex(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-
-                    // Get the Heating Coil Inlet Node
-                    HeatingCoilInletNode = HeatingCoils::GetCoilInletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Heating Coil Outlet Node
-                    HeatingCoilOutletNode = HeatingCoils::GetCoilOutletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Heating Coil PLF Curve Index
-                    HeatingCoilPLFCurveIndex =
-                        HeatingCoils::GetHeatingCoilPLFCurveIndex(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
+                    this->m_HeatingCoilAvailSchPtr = thisHeatCoil.SchedPtr;
+                    HeatingCoilInletNode = thisHeatCoil.AirInletNodeNum;
+                    HeatingCoilOutletNode = thisHeatCoil.AirOutletNodeNum;
+                    HeatingCoilPLFCurveIndex = thisHeatCoil.PLFCurveIndex;
                     // These heating coil types do not have an air flow input field
                     if (this->m_RequestAutoSize) {
                         this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
                     }
-                } // IF (IsNotOK) THEN
-            }
+                }
+            } // IF (IsNotOK) THEN
 
         } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
             ValidateComponent(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, isNotOK, cCurrentModuleObject);
@@ -4510,65 +4393,23 @@ namespace UnitarySystems {
                 ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                 errorsFound = true;
             } else { // mine data from heating coil object
-
                 errFlag = false;
-                this->m_HeatingCoilAvailSchPtr =
-                    WaterCoils::GetWaterCoilAvailScheduleIndex(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
                 this->m_HeatingCoilIndex = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", this->m_HeatingCoilName, errFlag);
-                if (this->m_HeatingCoilIndex == 0) {
-                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
-                    // ShowContinueError(state, "Illegal " + cAlphaFields(iHeatingCoilNameAlphaNum) + " = " + HeatingCoilName);
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
                 if (errFlag) {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                     errFlag = false;
-                }
-
-                // Get the Heating Coil water Inlet or control Node number
-                this->HeatCoilFluidInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil hot water max volume flow rate
-                this->MaxHeatCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_HeatingCoilName, errFlag);
-                if (this->MaxHeatCoilFluidFlow == DataSizing::AutoSize) {
-                    this->m_RequestAutoSize = true;
-                    this->m_DesignHeatingCapacity = DataSizing::AutoSize;
-                }
-
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil Inlet Node
-                HeatingCoilInletNode = WaterCoils::GetCoilInletNode(state, "Coil:Heating:Water", this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil Outlet Node
-                HeatingCoilOutletNode = WaterCoils::GetCoilOutletNode(state, "Coil:Heating:Water", this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
+                } else {
+                    auto &thisHeatCoil = state.dataWaterCoils->WaterCoil(this->m_HeatingCoilIndex);
+                    this->m_HeatingCoilAvailSchPtr = thisHeatCoil.SchedPtr;
+                    this->HeatCoilFluidInletNode = thisHeatCoil.WaterInletNodeNum;
+                    this->MaxHeatCoilFluidFlow = thisHeatCoil.MaxWaterVolFlowRate;
+                    if (this->MaxHeatCoilFluidFlow == DataSizing::AutoSize) {
+                        this->m_RequestAutoSize = true;
+                        this->m_DesignHeatingCapacity = DataSizing::AutoSize;
+                    }
+                    HeatingCoilInletNode = thisHeatCoil.AirInletNodeNum;
+                    HeatingCoilOutletNode = thisHeatCoil.AirOutletNodeNum;
                 }
             }
 
@@ -4578,68 +4419,35 @@ namespace UnitarySystems {
                 ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                 errorsFound = true;
             } else { // mine data from heating coil object
-
                 errFlag = false;
-                this->m_HeatingCoilAvailSchPtr =
-                    SteamCoils::GetSteamCoilAvailScheduleIndex(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
                 this->m_HeatingCoilIndex = SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", this->m_HeatingCoilName, errFlag);
-                if (this->m_HeatingCoilIndex == 0) {
+                if (errFlag) {
                     ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                     ShowContinueError(state, "Illegal Heating Coil Name = " + this->m_HeatingCoilName);
                     errorsFound = true;
                     errFlag = false;
-                }
-
-                // Get the Heating Coil steam inlet node number
-                errFlag = false;
-                this->HeatCoilFluidInletNode = SteamCoils::GetCoilSteamInletNode(state, "Coil:Heating:Steam", this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil steam max volume flow rate
-                this->MaxHeatCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, this->m_HeatingCoilIndex, errFlag);
-                if (this->MaxHeatCoilFluidFlow == DataSizing::AutoSize) {
-                    this->m_RequestAutoSize = true;
-                    this->m_DesignHeatingCapacity = DataSizing::AutoSize;
-                }
-
-                if (this->MaxHeatCoilFluidFlow > 0.0) {
-                    int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                    Real64 TempSteamIn = 100.0;
-                    Real64 SteamDensity =
-                        FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, "getUnitarySystemInputData");
-                    this->MaxHeatCoilFluidFlow *= SteamDensity;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil Inlet Node
-                errFlag = false;
-                HeatingCoilInletNode = SteamCoils::GetCoilAirInletNode(state, this->m_HeatingCoilIndex, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil Outlet Node
-                HeatingCoilOutletNode = SteamCoils::GetCoilAirOutletNode(state, this->m_HeatingCoilIndex, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                if (this->m_RequestAutoSize) {
-                    this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
+                } else {
+                    auto &thisHeatCoil = state.dataSteamCoils->SteamCoil(this->m_HeatingCoilIndex);
+                    this->m_HeatingCoilAvailSchPtr = thisHeatCoil.SchedPtr;
+                    this->HeatCoilFluidInletNode = thisHeatCoil.SteamInletNodeNum;
+                    this->MaxHeatCoilFluidFlow = thisHeatCoil.MaxSteamVolFlowRate;
+                    if (this->MaxHeatCoilFluidFlow == DataSizing::AutoSize) {
+                        this->m_RequestAutoSize = true;
+                        this->m_DesignHeatingCapacity = DataSizing::AutoSize;
+                    }
+                    if (this->MaxHeatCoilFluidFlow > 0.0) {
+                        int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                        Real64 TempSteamIn = 100.0;
+                        Real64 SteamDensity =
+                            FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, "getUnitarySystemInputData");
+                        this->MaxHeatCoilFluidFlow *= SteamDensity;
+                        errFlag = false;
+                    }
+                    HeatingCoilInletNode = thisHeatCoil.AirInletNodeNum;
+                    HeatingCoilOutletNode = thisHeatCoil.AirOutletNodeNum;
+                    if (this->m_RequestAutoSize) {
+                        this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
+                    }
                 }
             }
 
@@ -4650,59 +4458,22 @@ namespace UnitarySystems {
                 ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                 errorsFound = true;
             } else { // mine data from heating coil object
-
                 errFlag = false;
-                this->m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
                 this->m_HeatingCoilIndex =
                     WaterToAirHeatPumpSimple::GetCoilIndex(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (this->m_HeatingCoilIndex == 0) {
+                if (errFlag) {
                     ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                     ShowContinueError(state, "Illegal Heating Coil Name = " + this->m_HeatingCoilName);
                     errorsFound = true;
                     errFlag = false;
-                }
-
-                this->m_DesignHeatingCapacity =
-                    WaterToAirHeatPumpSimple::GetCoilCapacity(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
-                errFlag = false;
-                this->m_MaxHeatAirVolFlow =
-                    WaterToAirHeatPumpSimple::GetCoilAirFlowRate(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                }
-
-                // Get the Heating Coil Inlet Node
-                errFlag = false;
-                HeatingCoilInletNode =
-                    WaterToAirHeatPumpSimple::GetCoilInletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil Outlet Node
-                HeatingCoilOutletNode =
-                    WaterToAirHeatPumpSimple::GetCoilOutletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
+                } else {
+                    auto &thisHeatCoil = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(this->m_HeatingCoilIndex);
+                    this->m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    this->m_DesignHeatingCapacity = thisHeatCoil.RatedCapHeat;
+                    this->m_MaxHeatAirVolFlow = thisHeatCoil.RatedAirVolFlowRate;
+                    if (this->m_MaxHeatAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                    HeatingCoilInletNode = thisHeatCoil.AirInletNodeNum;
+                    HeatingCoilOutletNode = thisHeatCoil.AirOutletNodeNum;
                 }
             }
 
@@ -4713,46 +4484,19 @@ namespace UnitarySystems {
                 ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                 errorsFound = true;
             } else { // mine data from heating coil object
-
                 errFlag = false;
-                this->m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
                 this->m_HeatingCoilIndex = WaterToAirHeatPump::GetCoilIndex(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (this->m_HeatingCoilIndex == 0) {
+                if (errFlag) {
                     ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                     ShowContinueError(state, "Illegal Heating Coil Name = " + this->m_HeatingCoilName);
                     errorsFound = true;
                     errFlag = false;
-                }
-
-                this->m_DesignHeatingCapacity =
-                    WaterToAirHeatPump::GetCoilCapacity(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil Inlet Node
-                errFlag = false;
-                HeatingCoilInletNode = WaterToAirHeatPump::GetCoilInletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Heating Coil Outlet Node
-                HeatingCoilOutletNode = WaterToAirHeatPump::GetCoilOutletNode(state, this->m_HeatingCoilTypeName, this->m_HeatingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
+                } else {
+                    auto &thisHeatCoil = state.dataWaterToAirHeatPump->WatertoAirHP(this->m_HeatingCoilIndex);
+                    this->m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    this->m_DesignHeatingCapacity = thisHeatCoil.HeatingCapacity;
+                    HeatingCoilInletNode = thisHeatCoil.AirInletNodeNum;
+                    HeatingCoilOutletNode = thisHeatCoil.AirOutletNodeNum;
                 }
             }
 
@@ -4762,51 +4506,22 @@ namespace UnitarySystems {
                 ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                 errorsFound = true;
             } else { // mine data from Heating coil object
-
                 errFlag = false;
-                this->m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
                 UserDefinedComponents::GetUserDefinedCoilIndex(
                     state, this->m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, cCurrentModuleObject);
-                if (this->m_HeatingCoilIndex == 0) {
+                if (errFlag) {
                     ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                     ShowContinueError(state, "Illegal Heating Coil Name = " + this->m_HeatingCoilName);
                     errorsFound = true;
                     errFlag = false;
-                }
-
-                // **** How to get this info ****
-                // UnitarySystem( UnitarySysNum ).DesignHeatingCapacity =
-                //     GetWtoAHPCoilCapacity(CoolingCoilType, this->m_CoolingCoilName,  errFlag );
-                // if ( errFlag ) {
-                //    ShowContinueError(state,  "Occurs in " + CurrentModuleObject + " = " +
-                //         UnitarySystem(UnitarySysNum.Name);
-                //    ErrorsFound = true;
-                //    errFlag = false;
-                //  }
-
-                // Get the Cooling Coil Inlet Node
-                errFlag = false;
-                UserDefinedComponents::GetUserDefinedCoilAirInletNode(
-                    state, this->m_HeatingCoilName, HeatingCoilInletNode, errFlag, cCurrentModuleObject);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                // Get the Cooling Coil Outlet Node
-                UserDefinedComponents::GetUserDefinedCoilAirOutletNode(
-                    state, this->m_HeatingCoilName, HeatingCoilOutletNode, errFlag, cCurrentModuleObject);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
+                } else {
+                    auto &thisHeatCoil = state.dataUserDefinedComponents->UserCoil(this->m_HeatingCoilIndex);
+                    this->m_HeatingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    // **** How to get this info ****
+                    // UnitarySystem( UnitarySysNum ).DesignHeatingCapacity =
+                    //     GetWtoAHPCoilCapacity(CoolingCoilType, this->m_CoolingCoilName,  errFlag );
+                    HeatingCoilInletNode = thisHeatCoil.Air(1).InletNodeNum;
+                    HeatingCoilOutletNode = thisHeatCoil.Air(1).OutletNodeNum;
                 }
             }
 
@@ -4882,39 +4597,20 @@ namespace UnitarySystems {
                         this->m_CondenserNodeNum = thisCoolCoil.CondenserInletNodeNum(1);
 
                         if (this->m_FanExists) {
-                            errFlag = false;
-                            DXCoils::SetDXCoolingCoilData(
-                                state, this->m_CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, loc_m_FanName);
-                            DXCoils::SetDXCoolingCoilData(
-                                state, this->m_CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, this->m_FanIndex);
-                            DXCoils::SetDXCoolingCoilData(state,
-                                                          this->m_CoolingCoilIndex,
-                                                          errFlag,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          _,
-                                                          this->m_FanType_Num);
-                            if (errFlag) {
-                                ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                                errorsFound = true;
+                            thisCoolCoil.SupplyFanName = loc_m_FanName;
+                            thisCoolCoil.SupplyFanIndex = this->m_FanIndex;
+                            thisCoolCoil.SupplyFan_TypeNum = this->m_FanType_Num;
+                            if (this->m_FanType_Num > -1) {
+                                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                                    state,
+                                    thisCoolCoil.Name,
+                                    thisCoolCoil.DXCoilType,
+                                    (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject)
+                                        ? state.dataHVACFan->fanObjs[thisCoolCoil.SupplyFanIndex]->name
+                                        : state.dataFans->Fan(thisCoolCoil.SupplyFanIndex).FanName,
+                                    (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) ? DataAirSystems::ObjectVectorOOFanSystemModel
+                                                                                                        : DataAirSystems::StructArrayLegacyFanModels,
+                                    thisCoolCoil.SupplyFanIndex);
                             }
                         }
                         if (this->m_HeatCoilExists) {
@@ -4930,7 +4626,7 @@ namespace UnitarySystems {
 
                         // Push heating coil PLF curve index to DX coil
                         if (HeatingCoilPLFCurveIndex > 0) {
-                            DXCoils::SetDXCoolingCoilData(state, this->m_CoolingCoilIndex, errorsFound, HeatingCoilPLFCurveIndex);
+                            thisCoolCoil.HeatingCoilPLFCurvePTR = HeatingCoilPLFCurveIndex;
                         }
                     }
                 } // IF (IsNotOK) THEN
@@ -5031,7 +4727,7 @@ namespace UnitarySystems {
 
                         // Push heating coil PLF curve index to DX coil
                         if (HeatingCoilPLFCurveIndex > 0) {
-                            DXCoils::SetDXCoolingCoilData(state, this->m_CoolingCoilIndex, errorsFound, HeatingCoilPLFCurveIndex);
+                            thisCoolCoil.HeatingCoilPLFCurvePTR = HeatingCoilPLFCurveIndex;
                         }
 
                         if (this->m_HeatCoilExists) {
@@ -5116,11 +4812,11 @@ namespace UnitarySystems {
 
                         // Get Outdoor condenser node from heat exchanger assisted DX coil object
                         errFlag = false;
-                        this->m_CondenserNodeNum =
-                            DXCoils::GetCoilCondenserInletNode(state,
-                                                               "COIL:COOLING:DX:SINGLESPEED",
-                                                               HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag),
-                                                               errFlag);
+                        this->m_CondenserNodeNum = DXCoils::GetCoilCondenserInletNode(
+                            state,
+                            "COIL:COOLING:DX:SINGLESPEED",
+                            HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag),
+                            errFlag);
 
                         if (errFlag) {
                             ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
@@ -5155,8 +4851,10 @@ namespace UnitarySystems {
 
                     // Get the Cooling Coil Nodes
                     errFlag = false;
-                    CoolingCoilInletNode = HVACHXAssistedCoolingCoil::GetCoilInletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    CoolingCoilOutletNode = HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
+                    CoolingCoilInletNode =
+                        HVACHXAssistedCoolingCoil::GetCoilInletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
+                    CoolingCoilOutletNode =
+                        HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                         errorsFound = true;
@@ -5230,15 +4928,18 @@ namespace UnitarySystems {
 
                     // Get the Cooling Coil Nodes
                     errFlag = false;
-                    CoolingCoilInletNode = HVACHXAssistedCoolingCoil::GetCoilInletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    CoolingCoilOutletNode = HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
+                    CoolingCoilInletNode =
+                        HVACHXAssistedCoolingCoil::GetCoilInletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
+                    CoolingCoilOutletNode =
+                        HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                         errorsFound = true;
                     }
 
                     errFlag = false;
-                    this->m_MaxCoolAirVolFlow = HVACHXAssistedCoolingCoil::GetHXCoilAirFlowRate(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
+                    this->m_MaxCoolAirVolFlow =
+                        HVACHXAssistedCoolingCoil::GetHXCoilAirFlowRate(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
                     if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
                         this->m_RequestAutoSize = true;
                         this->m_DesignCoolingCapacity = DataSizing::AutoSize;
@@ -5273,75 +4974,38 @@ namespace UnitarySystems {
                     errorsFound = true;
                 } else {
                     errFlag = false;
-                    this->m_CoolingCoilIndex = VariableSpeedCoils::GetCoilIndexVariableSpeed(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
+                    this->m_CoolingCoilIndex =
+                        VariableSpeedCoils::GetCoilIndexVariableSpeed(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                         errorsFound = true;
                         errFlag = false;
+                    } else {
+                        auto &thisCoolCoil = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex);
+                        CoolingCoilInletNode = thisCoolCoil.AirInletNodeNum;
+                        CoolingCoilOutletNode = thisCoolCoil.AirOutletNodeNum;
+                        this->m_CondenserNodeNum = thisCoolCoil.CondenserInletNodeNum;
+                        this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        this->m_NumOfSpeedCooling = thisCoolCoil.NumOfSpeeds;
+                        if (this->m_NumOfSpeedCooling > 1) {
+                            this->m_MultiOrVarSpeedCoolCoil = true;
+                        }
+                        this->m_DesignCoolingCapacity = thisCoolCoil.RatedCapCoolTotal;
+                        if (this->m_DesignCoolingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                        this->m_MaxCoolAirVolFlow = thisCoolCoil.RatedAirVolFlowRate;
+                        if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
+                            this->m_RequestAutoSize = true;
+                        } else {
+                            this->m_MaxCoolAirVolFlow = thisCoolCoil.MSRatedAirVolFlowRate(thisCoolCoil.NumOfSpeeds) /
+                                                        thisCoolCoil.MSRatedAirVolFlowRate(thisCoolCoil.NormSpedLevel) *
+                                                        thisCoolCoil.RatedAirVolFlowRate;
+                        }
+                        if (this->m_FanExists) { // Set fan info
+                            thisCoolCoil.SupplyFanIndex = this->m_FanIndex;
+                            thisCoolCoil.SupplyFan_TypeNum = this->m_FanType_Num;
+                            thisCoolCoil.SupplyFanName = loc_m_FanName;
+                        }
                     }
-
-                    CoolingCoilInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(
-                        state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    CoolingCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
-                        state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    this->m_CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode(state, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
-
-                    this->m_NumOfSpeedCooling = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-                    if (this->m_NumOfSpeedCooling > 1) {
-                        this->m_MultiOrVarSpeedCoolCoil = true;
-                    }
-
-                    errFlag = false;
-                    this->m_DesignCoolingCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
-                        state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (this->m_DesignCoolingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                    }
-
-                    errFlag = false;
-                    this->m_MaxCoolAirVolFlow = VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed(
-                        state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                    }
-
-                    // Set fan info
-                    if (this->m_FanExists) {
-                        VariableSpeedCoils::setVarSpeedFanInfo(state, this->m_CoolingCoilIndex, loc_m_FanName, this->m_FanIndex, this->m_FanType_Num);
-                    }
-                }
-
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
                 }
 
                 if (this->m_HeatCoilExists) {
@@ -5356,49 +5020,27 @@ namespace UnitarySystems {
                 }
 
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
-                errFlag = false;
-                DXCoils::GetDXCoilIndex(state, this->m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, input_data.cooling_coil_object_type);
-                if (errFlag) {
+                ValidateComponent(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, isNotOK, cCurrentModuleObject);
+                if (isNotOK) {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
+                } else {
                     errFlag = false;
-                }
-
-                this->m_CoolingCoilAvailSchPtr =
-                    DXCoils::GetDXCoilAvailSchPtr(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-
-                errFlag = false;
-                CoolingCoilInletNode = DXCoils::GetCoilInletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                errFlag = false;
-                CoolingCoilOutletNode = DXCoils::GetCoilOutletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                    errFlag = false;
-                }
-
-                errFlag = false;
-                this->m_DesignCoolingCapacity =
-                    DXCoils::GetCoilCapacity(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                if (this->m_DesignCoolingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                }
-
-                // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
-                errFlag = false;
-                this->m_MaxCoolAirVolFlow = DXCoils::GetDXCoilAirFlow(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                if (errFlag) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
+                    DXCoils::GetDXCoilIndex(state, this->m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, input_data.cooling_coil_object_type);
+                    if (errFlag) {
+                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
+                        errorsFound = true;
+                        errFlag = false;
+                    } else {
+                        auto &thisCoolCoil = state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex);
+                        this->m_CoolingCoilAvailSchPtr = thisCoolCoil.SchedPtr;
+                        CoolingCoilInletNode = thisCoolCoil.AirInNode;
+                        CoolingCoilOutletNode = thisCoolCoil.AirOutNode;
+                        this->m_DesignCoolingCapacity = thisCoolCoil.MSRatedTotCap(thisCoolCoil.NumOfSpeeds);
+                        if (this->m_DesignCoolingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                        this->m_MaxCoolAirVolFlow = thisCoolCoil.MSRatedAirVolFlowRate(1);
+                        if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                    }
                 }
 
                 if (this->m_HeatCoilExists) {
@@ -5420,88 +5062,40 @@ namespace UnitarySystems {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                 } else { // mine data from Cooling coil object
-
                     errFlag = false;
-                    this->m_CoolingCoilAvailSchPtr =
-                        WaterCoils::GetWaterCoilAvailScheduleIndex(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
                     this->m_CoolingCoilIndex =
                         WaterCoils::GetWaterCoilIndex(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (this->m_CoolingCoilIndex == 0) {
+                    if (errFlag) {
                         ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                         ShowContinueError(state, format("Illegal Cooling Coil Name = {}", this->m_CoolingCoilName));
                         errorsFound = true;
                         errFlag = false;
-                    }
-
-                    // call for air flow rate not valid for other water coil types
-                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater) {
-                        this->m_MaxCoolAirVolFlow =
-                            WaterCoils::GetWaterCoilDesAirFlow(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                        if (errFlag) {
-                            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                            errorsFound = true;
-                            errFlag = false;
+                    } else {
+                        auto &thisCoolCoil = state.dataWaterCoils->WaterCoil(this->m_CoolingCoilIndex);
+                        this->m_CoolingCoilAvailSchPtr = thisCoolCoil.SchedPtr;
+                        if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater) {
+                            this->m_MaxCoolAirVolFlow = thisCoolCoil.DesAirVolFlowRate;
                         }
-                    }
-
-                    // Get the Cooling Coil water Inlet Node number
-                    this->CoolCoilFluidInletNode =
-                        WaterCoils::GetCoilWaterInletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    bool InletNodeNotControlled = true;
-                    //  CALL CheckCoilWaterInletNode(this->CoolCoilFluidInletNode,InletNodeNotControlled)
-                    if (!InletNodeNotControlled) {
-                        ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
-                        ShowContinueError(state,
-                                          format("{} found for {} = \"{}.\"",
-                                                 state.dataHVACCtrl->ControllerTypes(DataHVACControllers::ControllerSimple_Type),
-                                                 input_data.cooling_coil_object_type,
-                                                 this->m_CoolingCoilName));
-                        ShowContinueError(state, "...water coil controllers are not used with " + this->UnitType);
-                        errorsFound = true;
-                    }
-
-                    // Get the Cooling Coil chilled water max volume flow rate
-                    errFlag = false;
-                    this->MaxCoolCoilFluidFlow =
-                        WaterCoils::GetCoilMaxWaterFlowRate(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (this->MaxCoolCoilFluidFlow == DataSizing::AutoSize) {
-                        this->m_RequestAutoSize = true;
-                        this->m_DesignCoolingCapacity = DataSizing::AutoSize; // water coils don't have a capacity field, need other logic?
-                    }
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Cooling Coil Inlet Node
-                    CoolingCoilInletNode =
-                        WaterCoils::GetCoilInletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Cooling Coil Outlet Node
-                    CoolingCoilOutletNode =
-                        WaterCoils::GetCoilOutletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
+                        this->CoolCoilFluidInletNode = thisCoolCoil.WaterInletNodeNum;
+                        bool InletNodeNotControlled = true;
+                        //  CALL CheckCoilWaterInletNode(this->CoolCoilFluidInletNode,InletNodeNotControlled)
+                        if (!InletNodeNotControlled) {
+                            ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
+                            ShowContinueError(state,
+                                              format("{} found for {} = \"{}.\"",
+                                                     state.dataHVACCtrl->ControllerTypes(DataHVACControllers::ControllerSimple_Type),
+                                                     input_data.cooling_coil_object_type,
+                                                     this->m_CoolingCoilName));
+                            ShowContinueError(state, "...water coil controllers are not used with " + this->UnitType);
+                            errorsFound = true;
+                        }
+                        this->MaxCoolCoilFluidFlow = thisCoolCoil.MaxWaterVolFlowRate;
+                        if (this->MaxCoolCoilFluidFlow == DataSizing::AutoSize) {
+                            this->m_RequestAutoSize = true;
+                            this->m_DesignCoolingCapacity = DataSizing::AutoSize; // water coils don't have a capacity field, need other logic?
+                        }
+                        CoolingCoilInletNode = thisCoolCoil.AirInletNodeNum;
+                        CoolingCoilOutletNode = thisCoolCoil.AirOutletNodeNum;
                     }
                 }
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
@@ -5510,59 +5104,37 @@ namespace UnitarySystems {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                 } else { // mine data from Cooling coil object
-
                     errFlag = false;
-                    this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
                     this->m_CoolingCoilIndex =
                         WaterToAirHeatPumpSimple::GetCoilIndex(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (this->m_CoolingCoilIndex == 0) {
+                    if (errFlag) {
                         ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                         ShowContinueError(state, format("Illegal Cooling Coil Name = {}", this->m_CoolingCoilName));
                         errorsFound = true;
                         errFlag = false;
-                    }
+                    } else {
+                        auto &thisCoolCoil = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(this->m_CoolingCoilIndex);
+                        this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        this->m_DesignCoolingCapacity = thisCoolCoil.RatedCapCoolTotal;
 
-                    this->m_DesignCoolingCapacity =
-                        WaterToAirHeatPumpSimple::GetCoilCapacity(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
+                        // this isn't likely to work on getInput calls but is what happened before
+                        int CompanionHeatingCoil = thisCoolCoil.CompanionHeatingCoilNum;
+                        if (CompanionHeatingCoil > 0) {
+                            if (this->m_DesignCoolingCapacity == DataSizing::AutoSize &&
+                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CompanionHeatingCoil).WAHPPlantType ==
+                                    DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit &&
+                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CompanionHeatingCoil).RatedCapHeat == DataSizing::AutoSize &&
+                                state.dataSize->DXCoolCap > 0) {
+                                // Heating coil has not yet been sized, returning the temporary cooling capacity
+                                this->m_DesignCoolingCapacity = state.dataSize->DXCoolCap;
+                            }
+                        }
 
-                    // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
-                    errFlag = false;
-                    this->m_MaxCoolAirVolFlow = WaterToAirHeatPumpSimple::GetCoilAirFlowRate(
-                        state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                    }
-
-                    // Get the Cooling Coil Inlet Node
-                    errFlag = false;
-                    CoolingCoilInletNode =
-                        WaterToAirHeatPumpSimple::GetCoilInletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Cooling Coil Outlet Node
-                    CoolingCoilOutletNode = WaterToAirHeatPumpSimple::GetCoilOutletNode(
-                        state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
+                        // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
+                        this->m_MaxCoolAirVolFlow = thisCoolCoil.RatedAirVolFlowRate;
+                        if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                        CoolingCoilInletNode = thisCoolCoil.AirInletNodeNum;
+                        CoolingCoilOutletNode = thisCoolCoil.AirOutletNodeNum;
                     }
                 }
 
@@ -5583,15 +5155,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                 } else { // mine data from Cooling coil object
-
                     errFlag = false;
-                    this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
                     this->m_CoolingCoilIndex =
                         WaterToAirHeatPump::GetCoilIndex(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
                     if (this->m_CoolingCoilIndex == 0) {
@@ -5599,33 +5163,12 @@ namespace UnitarySystems {
                         ShowContinueError(state, format("Illegal Cooling Coil Name = {}", this->m_CoolingCoilName));
                         errorsFound = true;
                         errFlag = false;
-                    }
-
-                    this->m_DesignCoolingCapacity =
-                        WaterToAirHeatPump::GetCoilCapacity(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Cooling Coil Inlet Node
-                    errFlag = false;
-                    CoolingCoilInletNode =
-                        WaterToAirHeatPump::GetCoilInletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Cooling Coil Outlet Node
-                    CoolingCoilOutletNode =
-                        WaterToAirHeatPump::GetCoilOutletNode(state, input_data.cooling_coil_object_type, this->m_CoolingCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
+                    } else {
+                        auto &thisCoolCoil = state.dataWaterToAirHeatPump->WatertoAirHP(this->m_CoolingCoilIndex);
+                        this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        this->m_DesignCoolingCapacity = thisCoolCoil.CoolingCapacity;
+                        CoolingCoilInletNode = thisCoolCoil.AirInletNodeNum;
+                        CoolingCoilOutletNode = thisCoolCoil.AirOutletNodeNum;
                     }
                 }
 
@@ -5646,51 +5189,22 @@ namespace UnitarySystems {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                 } else { // mine data from Cooling coil object
-
                     errFlag = false;
-                    this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
                     UserDefinedComponents::GetUserDefinedCoilIndex(
                         state, this->m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, cCurrentModuleObject);
-                    if (this->m_CoolingCoilIndex == 0) {
+                    if (errFlag) {
                         ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                         ShowContinueError(state, format("Illegal Cooling Coil Name = {}", this->m_CoolingCoilName));
                         errorsFound = true;
                         errFlag = false;
-                    }
-
-                    // **** How to get this info ****
-                    //                        UnitarySystem( UnitarySysNum ).DesignCoolingCapacity =
-                    // GetWtoAHPCoilCapacity(
-                    // CoolingCoilType, this->m_CoolingCoilName, errFlag );                   if ( errFlag ) {
-                    //                            ShowContinueError(state,  "Occurs in " + CurrentModuleObject + " = "
-                    //+
-                    // UnitarySystem( UnitarySysNum ).Name );                             ErrorsFound = true;
-                    //                            errFlag = false;
-                    //                        }
-
-                    // Get the Cooling Coil Inlet Node
-                    errFlag = false;
-                    UserDefinedComponents::GetUserDefinedCoilAirInletNode(
-                        state, this->m_CoolingCoilName, CoolingCoilInletNode, errFlag, cCurrentModuleObject);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Cooling Coil Outlet Node
-                    UserDefinedComponents::GetUserDefinedCoilAirOutletNode(
-                        state, this->m_CoolingCoilName, CoolingCoilOutletNode, errFlag, cCurrentModuleObject);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
+                    } else {
+                        auto &thisCoolCoil = state.dataUserDefinedComponents->UserCoil(this->m_CoolingCoilIndex);
+                        this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        // **** How to get this info ****
+                        //  UnitarySystem( UnitarySysNum ).DesignCoolingCapacity =
+                        // GetWtoAHPCoilCapacity(CoolingCoilType, this->m_CoolingCoilName, errFlag );
+                        CoolingCoilInletNode = thisCoolCoil.Air(1).InletNodeNum;
+                        CoolingCoilOutletNode = thisCoolCoil.Air(1).OutletNodeNum;
                     }
                 }
 
@@ -5700,57 +5214,29 @@ namespace UnitarySystems {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                 } else { // mine data from Cooling coil object
-
                     errFlag = false;
-                    this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
                     PackagedThermalStorageCoil::GetTESCoilIndex(
                         state, this->m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, cCurrentModuleObject);
-                    if (this->m_CoolingCoilIndex == 0) {
+                    if (errFlag) {
                         ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                         ShowContinueError(state, format("Illegal Cooling Coil Name = {}", this->m_CoolingCoilName));
                         errorsFound = true;
                         errFlag = false;
-                    }
-
-                    PackagedThermalStorageCoil::GetTESCoilCoolingAirFlowRate(
-                        state, this->m_CoolingCoilName, this->m_MaxCoolAirVolFlow, errFlag, cCurrentModuleObject);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    PackagedThermalStorageCoil::GetTESCoilCoolingCapacity(
-                        state, this->m_CoolingCoilName, this->m_DesignCoolingCapacity, errFlag, cCurrentModuleObject);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Cooling Coil Inlet Node
-                    errFlag = false;
-                    PackagedThermalStorageCoil::GetTESCoilAirInletNode(
-                        state, this->m_CoolingCoilName, CoolingCoilInletNode, errFlag, cCurrentModuleObject);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the Cooling Coil Outlet Node
-                    PackagedThermalStorageCoil::GetTESCoilAirOutletNode(
-                        state, this->m_CoolingCoilName, CoolingCoilOutletNode, errFlag, cCurrentModuleObject);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
+                    } else {
+                        auto &thisCoolCoil = state.dataPackagedThermalStorageCoil->TESCoil(this->m_CoolingCoilIndex);
+                        this->m_CoolingCoilAvailSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        this->m_MaxCoolAirVolFlow = thisCoolCoil.RatedEvapAirVolFlowRate;
+                        if (thisCoolCoil.CoolingOnlyModeIsAvailable) {
+                            this->m_DesignCoolingCapacity = thisCoolCoil.CoolingOnlyRatedTotCap;
+                        } else if (thisCoolCoil.CoolingAndChargeModeAvailable) {
+                            this->m_DesignCoolingCapacity = thisCoolCoil.CoolingAndChargeRatedTotCap;
+                        } else if (thisCoolCoil.CoolingAndDischargeModeAvailable) {
+                            this->m_DesignCoolingCapacity = thisCoolCoil.CoolingAndDischargeRatedTotCap;
+                        } else {
+                            this->m_DesignCoolingCapacity = 0.0;
+                        }
+                        CoolingCoilInletNode = thisCoolCoil.EvapAirInletNodeNum;
+                        CoolingCoilOutletNode = thisCoolCoil.EvapAirOutletNodeNum;
                     }
                 }
 
