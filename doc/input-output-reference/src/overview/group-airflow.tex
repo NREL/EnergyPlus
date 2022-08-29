@@ -439,9 +439,9 @@ Object level outputs include:
 \item
   HVAC,Sum,Infiltration Mass {[}kg{]}
 \item
-  HVAC,Sum,Infiltration Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Infiltration Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Infiltration Air Change Rate {[}ach{]}
+  HVAC,Average,Infiltration Air Change Rate {[}ACH{]}
 \end{itemize}
 
 Zone level outputs include:
@@ -470,9 +470,9 @@ Zone level outputs include:
 \item
   HVAC,Sum,Zone Infiltration Mass {[}kg{]}
 \item
-  HVAC,Sum,Zone Infiltration Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Zone Infiltration Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Zone Infiltration Air Change Rate {[}ach{]}
+  HVAC,Average,Zone Infiltration Air Change Rate {[}ACH{]}
 \end{itemize}
 
 Note: If ZoneInfiltration:* objects and ZoneAirBalance:OutdoorAir (with Air Balance Method = Quadrature) objects reference the same Zone Name, the above infiltration output variables will not be reported for that zone. Instead, output variables for zone outdoor air flow will be reported by the corresponding ZoneAirBalance:OutdoorAir object.
