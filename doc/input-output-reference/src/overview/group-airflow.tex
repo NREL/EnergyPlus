@@ -16,7 +16,7 @@ More advanced infiltration calculations are possible using the EnergyPlus Airflo
 
 The question of typical values for these coefficients is subject to debate. Ideally, one should do a detailed analysis of the infiltration situation and then determine a custom set of coefficients using methods such as those laid out in Chapter 26 of the ASHRAE Handbook of Fundamentals. The EnergyPlus defaults are 1,0,0,0 which give a constant volume flow of infiltration under all conditions.
 
-BLAST (one of the EnergyPlus predecessors) used the following values as defaults: 0.606, 0.03636, 0.1177, 0. These coefficients produce a value of 1.0 at 0C deltaT and 3.35 m/s (7.5 mph) windspeed, which corresponds to a typical summer condition. At a winter condition of 40C deltaT and 6 m/s (13.4 mph) windspeed, these coefficients would increase the infiltration rate by a factor of 2.75.
+BLAST (one of the EnergyPlus predecessors) used the following values as defaults: 0.606, 0.03636, 0.1177, 0. These coefficients produce a value of 1.0 at 0$^\circ$C deltaT and 3.35 m/s (7.5 mph) windspeed, which corresponds to a typical summer condition. At a winter condition of 40$^\circ$C deltaT and 6 m/s (13.4 mph) windspeed, these coefficients would increase the infiltration rate by a factor of 2.75.
 
 In DOE-2 (the other EnergyPlus predecessor), the air change method defaults are (adjusted to SI units) 0, 0, 0.224 (windspeed), 0. With these coefficients, the summer conditions above would give a factor of 0.75, and the winter conditions would give 1.34. A windspeed of 4.47 m/s (10 mph) gives a factor of 1.0.
 
@@ -98,7 +98,7 @@ With this choice, the method used will be the number of air changes per hour for
 
 \paragraph{Field: Design Flow Rate}\label{field-design-flow-rate}
 
-This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as I\(_{design}\) in the above equation) is the maximum amount of infiltration expected at design conditions. The design value is modified by the schedule fraction (see Field:Schedule Name) and user specified coefficients (see ''coefficient'' fields below). The resulting volume flow rate is converted to mass flow using the current outdoor air density at each time step.
+This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as I\(_{design}\) in the above equation) is the maximum amount of infiltration expected at design conditions. The design value is modified by the schedule fraction (see Field:Schedule Name) and user specified coefficients (see ``coefficient'' fields below). The resulting volume flow rate is converted to mass flow using the current outdoor air density at each time step.
 
 \paragraph{Field: Flow Rate per Floor Area}\label{field-flow-per-zone-floor-area}
 
@@ -333,7 +333,7 @@ This field is the value of the pressure exponent, \emph{n} in the equation above
 
 \paragraph{Field: Wind Coefficient}\label{field-wind-coefficient-1}
 
-This field is the value of the wind coefficient, \({C_w}\) ~in the equation above.~ The coefficient has units of (Pa·s\(^{2}\)/m\(^{2}\))\(^{n}\) .~ Values for the ``Enhanced Model Wind Coefficient'' listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
+This field is the value of the wind coefficient, \({C_w}\) ~in the equation above.~ The coefficient has units of (Pa$\cdot$s\(^{2}\)/m\(^{2}\))\(^{n}\).~ Values for the ``Enhanced Model Wind Coefficient'' listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
 \toprule
@@ -511,7 +511,7 @@ These outputs are the total volume and volume flow rate of infiltration air base
 
 \paragraph{Zone Infiltration Standard Density Volume Flow Rate {[}m3/s{]}}\label{zone-infiltration-standard-density-volume-flow-rate-m3s}
 
-These outputs are the total volume and volume flow rate of infiltration air based on the standard density of air.~ Standard density in EnergyPlus corresponds to 20ºC drybulb, dry air, and nominally adjusted for elevation.
+These outputs are the total volume and volume flow rate of infiltration air based on the standard density of air. Standard density in EnergyPlus corresponds to 20$^\circ$C drybulb, dry air, and nominally adjusted for elevation.
 
 \paragraph{Zone Infiltration Mass {[}kg{]}}\label{zone-infiltration-mass-kg}
 
@@ -633,7 +633,7 @@ This is the pressure rise experienced across the fan in Pascals (N/m\(^{2}\)). T
 
 \paragraph{Field: Fan Total Efficiency}\label{field-fan-total-efficiency}
 
-This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1."
+This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.
 
 \paragraph{Field: Constant Term Coefficient}\label{field-constant-term-coefficient-1}
 
@@ -653,23 +653,23 @@ This number is the ``D'' parameter in the above ventilation equation. It is part
 
 \paragraph{Field: Minimum Indoor Temperature}\label{field-minimum-indoor-temperature}
 
-This is the indoor temperature (in Celsius) below which ventilation is shutoff. The minimum value for this field is -100.0°C and the maximum value is 100.0°C. The default value is -100.0°C if the field is left blank. This lower temperature limit is intended to avoid overcooling a space and thus result in a heating load. For example, if the user specifies a minimum temperature of 20°C, ventilation is assumed to be available if the zone air temperature is above 20°C. If the zone air temperature drops below 20°C, then ventilation is automatically turned off.
+This is the indoor temperature (in Celsius) below which ventilation is shutoff. The minimum value for this field is -100.0$^\circ$C and the maximum value is 100.0$^\circ$C. The default value is -100.0$^\circ$C if the field is left blank. This lower temperature limit is intended to avoid overcooling a space and thus result in a heating load. For example, if the user specifies a minimum temperature of 20$^\circ$C, ventilation is assumed to be available if the zone air temperature is above 20$^\circ$C. If the zone air temperature drops below 20$^\circ$C, then ventilation is automatically turned off.
 
 \paragraph{Field: Minimum Indoor Temperature Schedule Name}\label{field-minimum-indoor-temperature-schedule-name}
 
-This alpha field defines the name of a schedule (ref. Schedule objects) which contains the minimum indoor temperature (in Celsius) below which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field and has the same functionality as the Minimum Indoor Temperature field. If the user enters a valid schedule name, the minimum temperature values specified in this schedule will override the constant value specified in the Minimum Indoor Temperature field.
+This alpha field defines the name of a schedule (ref. Schedule objects) which contains the minimum indoor temperature (in Celsius) below which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field and has the same functionality as the Minimum Indoor Temperature field. If the user enters a valid schedule name, the minimum temperature values specified in this schedule will override the constant value specified in the Minimum Indoor Temperature field.
 
 \paragraph{Field: Maximum Indoor Temperature}\label{field-maximum-indoor-temperature}
 
-This is the indoor temperature (in Celsius) above which ventilation is shutoff. The minimum value for this field is -100.0°C and the maximum value is 100.0°C. The default value is 100.0°C if the field is left blank. This upper temperature limit is intended to avoid overheating a space and thus result in a cooling load. For example, if the user specifies a maximum temperature of 28°C, ventilation is assumed to be available if the zone air temperature is below 28°C. If the zone air temperature increases to 28°C, then ventilation is automatically turned off.
+This is the indoor temperature (in Celsius) above which ventilation is shutoff. The minimum value for this field is -100.0$^\circ$C and the maximum value is 100.0$^\circ$C. The default value is 100.0$^\circ$C if the field is left blank. This upper temperature limit is intended to avoid overheating a space and thus result in a cooling load. For example, if the user specifies a maximum temperature of 28$^\circ$C, ventilation is assumed to be available if the zone air temperature is below 28$^\circ$C. If the zone air temperature increases to 28$^\circ$C, then ventilation is automatically turned off.
 
 \paragraph{Field: Maximum Indoor Temperature Schedule Name}\label{field-maximum-indoor-temperature-schedule-name}
 
-This alpha field defines the name of a schedule (ref. Schedule objects) which contains the maximum indoor temperature (in Celsius) above which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field and has the same functionality as the Maximum Indoor Temperature field. If the user enters a valid schedule name, the maximum temperature values specified in this schedule will override the constant value specified in the Maximum Indoor Temperature field.
+This alpha field defines the name of a schedule (ref. Schedule objects) which contains the maximum indoor temperature (in Celsius) above which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field and has the same functionality as the Maximum Indoor Temperature field. If the user enters a valid schedule name, the maximum temperature values specified in this schedule will override the constant value specified in the Maximum Indoor Temperature field.
 
 \paragraph{Field: Delta Temperature}\label{field-delta-temperature}
 
-This is the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which ventilation is shutoff. The minimum value for this field is -100.0°C and thedefault value is also -100.0°C if the field is left blank. This field allows ventilation to be stopped if the temperature outside is too warm and could potentially heat the space. For example, if the user specifies a delta temperature of 2°C, ventilation is assumed to be available if the outside air temperature is at least 2°C cooler than the zone air temperature. If the outside air dry-bulb temperature is less than 2°C cooler than the indoor dry-bulb temperature, then ventilation is automatically turned off.
+This is the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which ventilation is shutoff. The minimum value for this field is -100.0$^\circ$C and the default value is also -100.0$^\circ$C if the field is left blank. This field allows ventilation to be stopped if the temperature outside is too warm and could potentially heat the space. For example, if the user specifies a delta temperature of 2$^\circ$C, ventilation is assumed to be available if the outside air temperature is at least 2$^\circ$C cooler than the zone air temperature. If the outside air dry-bulb temperature is less than 2$^\circ$C cooler than the indoor dry-bulb temperature, then ventilation is automatically turned off.
 
 The values for this field can include negative numbers. This allows ventilation to occur even if the outdoor temperature is above the indoor temperature. The Delta Temperature is used in the code in the following way:
 
@@ -679,23 +679,23 @@ Thus, if a large negative number is input for DeltaTemperature, the ventilation 
 
 \paragraph{Field: Delta Temperature Schedule Name}\label{field-delta-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which ventilation is shutoff as a function of time. The minimum temperature difference value in the schedule can be -100°C. This field is an optional field and has the same functionality as the Delta Temperature field. If the user enters a valid schedule name, the delta temperature values specified in this schedule will override the constant value specified in the Delta Temperature field.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which ventilation is shutoff as a function of time. The minimum temperature difference value in the schedule can be -100$^\circ$C. This field is an optional field and has the same functionality as the Delta Temperature field. If the user enters a valid schedule name, the delta temperature values specified in this schedule will override the constant value specified in the Delta Temperature field.
 
 \paragraph{Field: Minimum Outdoor Temperature}\label{field-minimum-outdoor-temperature}
 
-This is the outdoor temperature (in Celsius) below which ventilation is shut off. The minimum value for this field is -100.0°C and the maximum value is 100.0°C. The default value is~~~~~~~~~~ -100.0°C if the field is left blank. This lower temperature limit is intended to avoid overcooling a space, which could result in a heating load.
+This is the outdoor temperature (in Celsius) below which ventilation is shut off. The minimum value for this field is -100.0$^\circ$C and the maximum value is 100.0$^\circ$C. The default value is -100.0$^\circ$C if the field is left blank. This lower temperature limit is intended to avoid overcooling a space, which could result in a heating load.
 
 \paragraph{Field: Minimum Outdoor Temperature Schedule Name}\label{field-minimum-outdoor-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) below which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field and has the same functionality as the Minimum Outdoor Temperature field. If the user enters a valid schedule name, the temperature values in this schedule will override the constant value specified in the Minimum Outdoor Temperature field.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) below which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field and has the same functionality as the Minimum Outdoor Temperature field. If the user enters a valid schedule name, the temperature values in this schedule will override the constant value specified in the Minimum Outdoor Temperature field.
 
 \paragraph{Field: Maximum Outdoor Temperature}\label{field-maximum-outdoor-temperature}
 
-This is the outdoor temperature (in Celsius) above which ventilation is shut off. The minimum value for this field is -100.0°C and the maximum value is 100.0°C. The default value is 100.0°C if the field is left blank. This upper temperature limit is intended to avoid overheating a space, which could result in a cooling load.
+This is the outdoor temperature (in Celsius) above which ventilation is shut off. The minimum value for this field is -100.0$^\circ$C and the maximum value is 100.0$^\circ$C. The default value is 100.0$^\circ$C if the field is left blank. This upper temperature limit is intended to avoid overheating a space, which could result in a cooling load.
 
 \paragraph{Field: Maximum Outdoor Temperature Schedule Name}\label{field-maximum-outdoor-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) above which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field and has the same functionality as the Maximum Outdoor Temperature field. If the user enters a valid schedule name, the temperature values in this schedule will override the constant value specified in the Maximum Outdoor Temperature field.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) above which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field and has the same functionality as the Maximum Outdoor Temperature field. If the user enters a valid schedule name, the temperature values in this schedule will override the constant value specified in the Maximum Outdoor Temperature field.
 
 \paragraph{Field: Maximum Wind Speed}\label{field-maximum-wind-speed}
 
@@ -894,23 +894,23 @@ This is the discharge coefficient for the opening (C\(_{D}\)). The value must be
 
 \paragraph{Field: Minimum Indoor Temperature}\label{field-minimum-indoor-temperature-1}
 
-This is the indoor temperature (in Celsius) below which ventilation is shutoff. The minimum value for this field is -100.0°C and the maximum value is 100.0°C. The default value is~~~~~~~~~~ -100.0°C if the field is left blank. This lower temperature limit is intended to avoid overcooling a space and thus result in a heating load. For example, if the user specifies a minimum temperature of 20°C, ventilation is assumed to be available if the zone air temperature is above 20°C. If the zone air temperature drops below 20°C, then ventilation is automatically turned off.
+This is the indoor temperature (in Celsius) below which ventilation is shutoff. The minimum value for this field is -100.0$^\circ$C and the maximum value is 100.0$^\circ$C. The default value is -100.0$^\circ$C if the field is left blank. This lower temperature limit is intended to avoid overcooling a space and thus result in a heating load. For example, if the user specifies a minimum temperature of 20$^\circ$C, ventilation is assumed to be available if the zone air temperature is above 20$^\circ$C. If the zone air temperature drops below 20$^\circ$C, then ventilation is automatically turned off.
 
 \paragraph{Field: Minimum Indoor Temperature Schedule Name}\label{field-minimum-indoor-temperature-schedule-name-1}
 
-This alpha field defines the name of a schedule (ref. Schedule objects) which contains the minimum indoor temperature (in Celsius) below which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field and has the same functionality as the Minimum Indoor Temperature field. If the user enters a valid schedule name, the minimum temperature values specified in this schedule will override the constant value specified in the Minimum Indoor Temperature field.
+This alpha field defines the name of a schedule (ref. Schedule objects) which contains the minimum indoor temperature (in Celsius) below which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field and has the same functionality as the Minimum Indoor Temperature field. If the user enters a valid schedule name, the minimum temperature values specified in this schedule will override the constant value specified in the Minimum Indoor Temperature field.
 
 \paragraph{Field: Maximum Indoor Temperature}\label{field-maximum-indoor-temperature-1}
 
-This is the indoor temperature (in Celsius) above which ventilation is shutoff. The minimum value for this field is -100.0°C and the maximum value is 100.0°C. The default value is 100.0°C if the field is left blank. This upper temperature limit is intended to avoid overheating a space and thus result in a cooling load. For example, if the user specifies a maximum temperature of 28°C, ventilation is assumed to be available if the zone air temperature is below 28°C. If the zone air temperature increases to 28°C, then ventilation is automatically turned off.
+This is the indoor temperature (in Celsius) above which ventilation is shutoff. The minimum value for this field is -100.0$^\circ$C and the maximum value is 100.0$^\circ$C. The default value is 100.0$^\circ$C if the field is left blank. This upper temperature limit is intended to avoid overheating a space and thus result in a cooling load. For example, if the user specifies a maximum temperature of 28$^\circ$C, ventilation is assumed to be available if the zone air temperature is below 28$^\circ$C. If the zone air temperature increases to 28$^\circ$C, then ventilation is automatically turned off.
 
 \paragraph{Field: Maximum Indoor Temperature Schedule Name}\label{field-maximum-indoor-temperature-schedule-name-1}
 
-This alpha field defines the name of a schedule (ref. Schedule objects) which contains the maximum indoor temperature (in Celsius) above which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field and has the same functionality as the Maximum Indoor Temperature field. If the user enters a valid schedule name, the maximum temperature values specified in this schedule will override the constant value specified in the Maximum Indoor Temperature field.
+This alpha field defines the name of a schedule (ref. Schedule objects) which contains the maximum indoor temperature (in Celsius) above which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field and has the same functionality as the Maximum Indoor Temperature field. If the user enters a valid schedule name, the maximum temperature values specified in this schedule will override the constant value specified in the Maximum Indoor Temperature field.
 
 \paragraph{Field: Delta Temperature}\label{field-delta-temperature-1}
 
-This is the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which ventilation is shutoff. The minimum value for this field is -100.0°C and the default value is also -100.0°C if the field is left blank. This field allows ventilation to be stopped if the temperature outside is too warm and could potentially heat the space. For example, if the user specifies a delta temperature of 2°C, ventilation is assumed to be available if the outside air temperature is at least 2°C cooler than the zone air temperature. If the outside air dry-bulb temperature is less than 2°C cooler than the indoor dry-bulb temperature, then ventilation is automatically turned off.
+This is the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which ventilation is shutoff. The minimum value for this field is -100.0$^\circ$C and the default value is also -100.0$^\circ$C if the field is left blank. This field allows ventilation to be stopped if the temperature outside is too warm and could potentially heat the space. For example, if the user specifies a delta temperature of 2$^\circ$C, ventilation is assumed to be available if the outside air temperature is at least 2$^\circ$C cooler than the zone air temperature. If the outside air dry-bulb temperature is less than 2$^\circ$C cooler than the indoor dry-bulb temperature, then ventilation is automatically turned off.
 
 The values for this field can include negative numbers. This allows ventilation to occur even if the outdoor temperature is above the indoor temperature. The Delta Temperature is used in the code in the following way:
 
@@ -920,23 +920,23 @@ Thus, if a large negative number is input for DeltaTemperature, the ventilation 
 
 \paragraph{Field: Delta Temperature Schedule Name}\label{field-delta-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which ventilation is shutoff as a function of time. The minimum temperature difference value in the schedule can be -100°C. This field is an optional field and has the same functionality as the Delta Temperature field. If the user enters a valid schedule name, the delta temperature values specified in this schedule will override the constant value specified in the Delta Temperature field.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which ventilation is shutoff as a function of time. The minimum temperature difference value in the schedule can be -100$^\circ$C. This field is an optional field and has the same functionality as the Delta Temperature field. If the user enters a valid schedule name, the delta temperature values specified in this schedule will override the constant value specified in the Delta Temperature field.
 
 \paragraph{Field: Minimum Outdoor Temperature}\label{field-minimum-outdoor-temperature-1}
 
-This is the outdoor temperature (in Celsius) below which ventilation is shut off. The minimum value for this field is -100.0°C and the maximum value is 100.0°C. The default value is~~~~~~~~~~ -100.0°C if the field is left blank. This lower temperature limit is intended to avoid overcooling a space, which could result in a heating load.
+This is the outdoor temperature (in Celsius) below which ventilation is shut off. The minimum value for this field is -100.0$^\circ$C and the maximum value is 100.0$^\circ$C. The default value is -100.0$^\circ$C if the field is left blank. This lower temperature limit is intended to avoid overcooling a space, which could result in a heating load.
 
 \paragraph{Field: Minimum Outdoor Temperature Schedule Name}\label{field-minimum-outdoor-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) below which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field and has the same functionality as the Minimum Outdoor Temperature field. If the user enters a valid schedule name, the temperature values in this schedule will override the constant value specified in the Minimum Outdoor Temperature field.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) below which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field and has the same functionality as the Minimum Outdoor Temperature field. If the user enters a valid schedule name, the temperature values in this schedule will override the constant value specified in the Minimum Outdoor Temperature field.
 
 \paragraph{Field: Maximum Outdoor Temperature}\label{field-maximum-outdoor-temperature-1}
 
-This is the outdoor temperature (in Celsius) above which ventilation is shut off. The minimum value for this field is -100.0°C and the maximum value is 100.0°C. The default value is 100.0°C if the field is left blank. This upper temperature limit is intended to avoid overheating a space, which could result in a cooling load.
+This is the outdoor temperature (in Celsius) above which ventilation is shut off. The minimum value for this field is -100.0$^\circ$C and the maximum value is 100.0$^\circ$C. The default value is 100.0$^\circ$C if the field is left blank. This upper temperature limit is intended to avoid overheating a space, which could result in a cooling load.
 
 \paragraph{Field: Maximum Outdoor Temperature Schedule Name}\label{field-maximum-outdoor-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) above which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field and has the same functionality as the Maximum Outdoor Temperature field. If the user enters a valid schedule name, the temperature values in this schedule will override the constant value specified in the Maximum Outdoor Temperature field.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) above which ventilation is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field and has the same functionality as the Maximum Outdoor Temperature field. If the user enters a valid schedule name, the temperature values in this schedule will override the constant value specified in the Maximum Outdoor Temperature field.
 
 \paragraph{Field: Maximum Wind Speed}\label{field-maximum-wind-speed-1}
 
@@ -1292,31 +1292,31 @@ This alpha field contains the name of a schedule (ref. Schedule objects) which c
 
 \paragraph{Field: Minimum Receiving Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone or space temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum receiving temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone or space temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the minimum receiving temperature control is not applied.
 
 \paragraph{Field: Maximum Receiving Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone or space temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum receiving temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone or space temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the maximum receiving temperature control is not applied.
 
 \textbf{Note:} The maximum receiving temperature when mixing is shutoff must be greater than or equal to the minimum receiving temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum shutoff temperature will be set to the minimum shutoff temperature.
 
 \paragraph{Field: Minimum Source Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone or space temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone or space temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the minimum source temperature control is not applied.
 
 \paragraph{Field: Maximum Source Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone or space temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone or space temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the maximum source temperature control is not applied.
 
 \textbf{Note:} The maximum source temperature when mixing is shutoff must be greater than or equal to the minimum source temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source shutoff temperature will be set to the minimum source shutoff temperature.
 
 \paragraph{Field: Minimum Outdoor Temperature Schedule Name}\label{field-minimum-outdoor-temperature-schedule-name-2}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum outdoor temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the minimum outdoor temperature control is not applied.
 
 \paragraph{Field: Maximum Outdoor Temperature Schedule Name}\label{field-maximum-outdoor-temperature-schedule-name-2}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum outdoor temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum outdoor temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum outdoor temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the maximum outdoor temperature control is not applied.
 
 \textbf{Note:} The maximum outdoor temperature when mixing is shutoff must be greater than or equal to the minimum outdoor temperature which mixing is shutoff at any given time. Otherwise, a warning will be issued and the maximum outdoor shutoff temperature will be set to the minimum outdoor shutoff temperature.
 
@@ -1490,31 +1490,31 @@ This alpha field contains the name of a schedule (ref. Schedule objects) which c
 
 \paragraph{Field: Minimum Receiving Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone or space temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum receiving temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone or space temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the minimum receiving temperature control is not applied.
 
 \paragraph{Field: Maximum Receiving Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone or space temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum receiving temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone or space temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the maximum receiving temperature control is not applied.
 
 \textbf{Note:} The maximum receiving temperature when cross mixing is shutoff must be greater than or equal to the minimum receiving temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum shutoff temperature will be set to the minimum shutoff temperature.
 
 \paragraph{Field: Minimum Source Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone or space temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone or space temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the minimum source temperature control is not applied.
 
 \paragraph{Field: Maximum Source Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone or space temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone or space temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the maximum source temperature control is not applied.
 
 \textbf{Note:} The maximum source temperature when cross mixing is shutoff must be greater than or equal to the minimum source temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source shutoff temperature will be set to the minimum source shutoff temperature.
 
 \paragraph{Field: Minimum Outdoor Temperature Schedule Name}\label{field-minimum-outdoor-temperature-schedule-name-3}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum outdoor temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum outdoor temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the minimum outdoor temperature control is not applied.
 
 \paragraph{Field: Maximum Outdoor Temperature Schedule Name}\label{field-maximum-outdoor-temperature-schedule-name-3}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum outdoor temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum outdoor temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum outdoor temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100$^\circ$C and the maximum value can be 100$^\circ$C. This field is an optional field. If this field is not entered, the maximum outdoor temperature control is not applied.
 
 \textbf{Note:} The maximum outdoor temperature when cross mixing is shutoff must be greater than or equal to the minimum outdoor temperature which cross mixing is shutoff at any given time. Otherwise, a warning will be issued and the maximum outdoor shutoff temperature will be set to the minimum outdoor shutoff temperature.
 
@@ -1764,15 +1764,15 @@ This number (noted as E\(_{design}\) in the above equation) is the maximum amoun
 
 \subsubsection{Field: Minimum Zone Temperature when Cooling}\label{field-minimum-zone-temperature-when-cooling}
 
-This is the indoor temperature (in Celsius) below which the earth tube is shut off. This lower temperature limit is intended to avoid overcooling a space and thus result in a heating load. For example, if the user specifies a minimum temperature of 20°C, earth tube is assumed to be available if the zone air temperature is above 20°C. If the zone air temperature drops below 20°C, then earth tube is automatically turned off.
+This is the indoor temperature (in Celsius) below which the earth tube is shut off. This lower temperature limit is intended to avoid overcooling a space and thus result in a heating load. For example, if the user specifies a minimum temperature of 20$^\circ$C, earth tube is assumed to be available if the zone air temperature is above 20$^\circ$C. If the zone air temperature drops below 20$^\circ$C, then earth tube is automatically turned off.
 
 \subsubsection{Field: Maximum Zone Temperature when Heating}\label{field-maximum-zone-temperature-when-heating}
 
-This is the indoor temperature (in Celsius) above which the earth tube is shut off. This higher temperature limit is intended to avoid overheating a space and thus result in a cooling load. For example, if the user specifies a maximum temperature of 20°C, earth tube is assumed to be available if the zone air temperature is below 20°C. If the zone air temperature rises above 20°C, then earth tube is automatically turned off.
+This is the indoor temperature (in Celsius) above which the earth tube is shut off. This higher temperature limit is intended to avoid overheating a space and thus result in a cooling load. For example, if the user specifies a maximum temperature of 20$^\circ$C, earth tube is assumed to be available if the zone air temperature is below 20$^\circ$C. If the zone air temperature rises above 20$^\circ$C, then earth tube is automatically turned off.
 
 \subsubsection{Field: Delta Temperature}\label{field-delta-temperature-4}
 
-This is the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which the earth tube is shut off. This is to allow the earth tube to be stopped either if the temperature outside is too warm and could potentially heat the space or if the temperature outside is too cold and could potentially cool the space. For example, if the user specifies a delta temperature of 2°C, earth tube is assumed to be available if the temperature difference between indoor and outdoor temperature is at least 2°C. If the outside air dry-bulb temperature is less than 2°C cooler or warmer than the indoor dry-bulb temperature, then the earth tube is automatically turned off.
+This is the temperature difference (in Celsius) between the indoor and outdoor air dry-bulb temperatures below which the earth tube is shut off. This is to allow the earth tube to be stopped either if the temperature outside is too warm and could potentially heat the space or if the temperature outside is too cold and could potentially cool the space. For example, if the user specifies a delta temperature of 2$^\circ$C, earth tube is assumed to be available if the temperature difference between indoor and outdoor temperature is at least 2$^\circ$C. If the outside air dry-bulb temperature is less than 2$^\circ$C cooler or warmer than the indoor dry-bulb temperature, then the earth tube is automatically turned off.
 
 \subsubsection{Field: Earthtube Type}\label{field-earthtube-type}
 
@@ -1806,7 +1806,7 @@ This is the total length of the pipe (in meters). This plays a role in determini
 
 \subsubsection{Field: Pipe Thermal Conductivity}\label{field-pipe-thermal-conductivity}
 
-This is the thermal conductivity of the pipe (in W/m°C). This plays a role in determining the amount of heat transferred from the surrounding soil to the air passing along the pipe.
+This is the thermal conductivity of the pipe (in W/m-C). This plays a role in determining the amount of heat transferred from the surrounding soil to the air passing along the pipe.
 
 \subsubsection{Field: Pipe Depth Under Ground Surface}\label{field-pipe-depth-under-ground-surface}
 
@@ -2028,7 +2028,7 @@ This field is the maximum volumetric flow rate of the air leaving the tower in m
 
 \paragraph{Field: Minimum Indoor Temperature}\label{field-minimum-indoor-temperature-2}
 
-This field is the minimum indoor temperature in Celsius below which cooltower is shutoff. ~This lower temperature limit is intended to avoid overcooling a space and thus result in a heating load. ~For example, if the user specifies a minimum temperature of 20°C, cooltower is assumed to be available if the zone air temperature is above 20°C. ~If the zone air temperature drops below 20°C, then cooltower is automatically turned off.
+This field is the minimum indoor temperature in Celsius below which cooltower is shutoff. ~This lower temperature limit is intended to avoid overcooling a space and thus result in a heating load. ~For example, if the user specifies a minimum temperature of 20$^\circ$C, cooltower is assumed to be available if the zone air temperature is above 20$^\circ$C. ~If the zone air temperature drops below 20$^\circ$C, then cooltower is automatically turned off.
 
 \paragraph{Field: Fraction of Water Loss}\label{field-fraction-of-water-loss}
 
