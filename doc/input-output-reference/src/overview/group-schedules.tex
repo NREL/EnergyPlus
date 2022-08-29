@@ -590,6 +590,11 @@ Output:Variable,People_Shopping_Sch,Schedule Value,hourly;
 Output:Variable,Activity_Shopping_Sch,Schedule Value,hourly;
 \end{lstlisting}
 
+A wild card $*$ would also work in place of the schedule name. For example, the following syntax would report all the schedule values for all the schedules in an IDF file:
+\begin{lstlisting}
+Output:Variable,*,Schedule Value,hourly;
+\end{lstlisting}
+
 \subsection{Schedule:File:Shading}\label{schedulefileshading}
 
 The \textbf{Schedule:File:Shading} object allows shading schedules to be imported altogether from a file exported using \hyperref[shadowcalculation]{ShadowCalculation} Output External Shading Calculation Results. The object can also be used to read in hourly or sub-hourly schedules of the sunlit fraction of all exterior surfaces computed by other software or developed in a spreadsheet or other utility.
