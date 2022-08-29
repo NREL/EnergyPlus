@@ -219,7 +219,7 @@ namespace ThermalComfort {
 
     Real64 CalcAngleFactorMRT(EnergyPlusData &state, int const AngleFacNum);
 
-    Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum, bool AveragewithSurface = true);
+    Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const SurfNum, bool AveragewithSurface = true);
 
     Real64 CalcSatVapPressFromTemp(Real64 const Temp);
 
@@ -374,9 +374,9 @@ struct ThermalComfortsData : BaseGlobalStruct
     Array1D<Real64> Coeff = Array1D<Real64>(2);      // Coefficients used in Range-Kutta's Method
     Array1D<Real64> Temp = Array1D<Real64>(2);       // Temperature
     Array1D<Real64> TempChange = Array1D<Real64>(2); // Change of temperature
-    Array1D<Real64> SurfaceAE;                       // Product of area and emissivity for each surface
-    Array1D<Real64> ZoneAESum;                       // Sum of area times emissivity for all zone surfaces
-    bool FirstTimeError;                             // Only report the error message one time
+    EPVector<Real64> SurfaceAE;                      // Product of area and emissivity for each surface
+    EPVector<Real64> SurfaceEnclAESum;               // Sum of area times emissivity for all other surfaces in enclosure
+    bool FirstTimeError = true;                      // Only report the error message one time
     Real64 avgDryBulbASH = 0.0;
     Array1D<Real64> monthlyTemp = Array1D<Real64>(12, 0.0);
     bool useStatData = false;
@@ -387,115 +387,7 @@ struct ThermalComfortsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->FirstTimeFlag = true;
-        this->FirstTimeSurfaceWeightedFlag = true;
-        this->runningAverageASH = 0.0;
-        this->AbsAirTemp = 0.0;
-        this->AbsCloSurfTemp = 0.0;
-        this->AbsRadTemp = 0.0;
-        this->AcclPattern = 0.0;
-        this->ActLevel = 0.0;
-        this->ActMet = 0.0;
-        this->AirVel = 0.0;
-        this->AirTemp = 0.0;
-        this->CloBodyRat = 0.0;
-        this->CloInsul = 0.0;
-        this->CloPermeatEff = 0.0;
-        this->CloSurfTemp = 0.0;
-        this->CloThermEff = 0.0;
-        this->CloUnit = 0.0;
-        this->ConvHeatLoss = 0.0;
-        this->CoreTempChange = 0.0;
-        this->CoreTemp = 0.0;
-        this->CoreTempNeut = 0.0;
-        this->CoreThermCap = 0.0;
-        this->DryHeatLoss = 0.0;
-        this->DryHeatLossET = 0.0;
-        this->DryHeatLossSET = 0.0;
-        this->DryRespHeatLoss = 0.0;
-        this->EvapHeatLoss = 0.0;
-        this->EvapHeatLossDiff = 0.0;
-        this->EvapHeatLossMax = 0.0;
-        this->EvapHeatLossRegComf = 0.0;
-        this->EvapHeatLossRegSweat = 0.0;
-        this->EvapHeatLossSweat = 0.0;
-        this->EvapHeatLossSweatPrev = 0.0;
-        this->H = 0.0;
-        this->Hc = 0.0;
-        this->HcFor = 0.0;
-        this->HcNat = 0.0;
-        this->HeatFlow = 0.0;
-        this->Hr = 0.0;
-        this->IntHeatProd = 0.0;
-        this->IterNum = 0;
-        this->LatRespHeatLoss = 0.0;
-        this->MaxZoneNum = 0;
-        this->MRTCalcType = 0;
-        this->OpTemp = 0.0;
-        this->EffTemp = 0.0;
-        this->PeopleNum = 0;
-        this->RadHeatLoss = 0.0;
-        this->RadTemp = 0.0;
-        this->RelHum = 0.0;
-        this->RespHeatLoss = 0.0;
-        this->SatSkinVapPress = 0.0;
-        this->ShivResponse = 0.0;
-        this->SkinComfTemp = 0.0;
-        this->SkinComfVPress = 0.0;
-        this->SkinTemp = 0.0;
-        this->SkinTempChange = 0.0;
-        this->SkinTempNeut = 0.0;
-        this->SkinThermCap = 0.0;
-        this->SkinWetDiff = 0.0;
-        this->SkinWetSweat = 0.0;
-        this->SkinWetTot = 0.0;
-        this->SkinVapPress = 0.0;
-        this->SurfaceTemp = 0.0;
-        this->AvgBodyTemp = 0.0;
-        this->ThermCndct = 0.0;
-        this->ThermSensTransCoef = 0.0;
-        this->Time = 0.0;
-        this->TimeChange = 0.0;
-        this->VapPress = 0.0;
-        this->VasoconstrictFac = 0.0;
-        this->VasodilationFac = 0.0;
-        this->WorkEff = 0.0;
-        this->ZoneNum = 0;
-        this->TemporarySixAMTemperature = 0.0;
-        this->AnyZoneTimeNotSimpleASH55Summer = 0.0;
-        this->AnyZoneTimeNotSimpleASH55Winter = 0.0;
-        this->AnyZoneTimeNotSimpleASH55Either = 0.0;
-        this->AnyZoneNotMetHeating = 0.0;
-        this->AnyZoneNotMetCooling = 0.0;
-        this->AnyZoneNotMetHeatingOccupied = 0.0;
-        this->AnyZoneNotMetCoolingOccupied = 0.0;
-        this->AnyZoneNotMetOccupied = 0.0;
-        this->TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;
-        this->TotalAnyZoneTimeNotSimpleASH55Winter = 0.0;
-        this->TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
-        this->TotalAnyZoneNotMetHeating = 0.0;
-        this->TotalAnyZoneNotMetCooling = 0.0;
-        this->TotalAnyZoneNotMetHeatingOccupied = 0.0;
-        this->TotalAnyZoneNotMetCoolingOccupied = 0.0;
-        this->TotalAnyZoneNotMetOccupied = 0.0;
-        this->ZoneOccHrs.deallocate();
-        this->ThermalComfortInASH55.deallocate();
-        this->ThermalComfortSetPoint.deallocate();
-        this->ThermalComfortData.deallocate();
-        this->AngleFactorList.deallocate();
-
-        this->Coeff.clear();
-        this->Temp.clear();
-        this->TempChange.clear();
-        this->SurfaceAE.clear(); // Product of area and emissivity for each surface
-        this->ZoneAESum.clear(); // Sum of area times emissivity for all zone surfaces
-        this->avgDryBulbASH = 0.0;
-        this->monthlyTemp.clear();
-        this->useStatData = false;
-        this->avgDryBulbCEN = 0.0;
-        this->runningAverageCEN = 0.0;
-        this->useEpwDataCEN = false;
-        this->firstDaySet = false; // first day is set with initiate -- so do not update
+        *this = ThermalComfortsData();
     }
 
     // Default Constructor

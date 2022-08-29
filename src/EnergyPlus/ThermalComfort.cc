@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
@@ -2092,7 +2093,7 @@ namespace ThermalComfort {
         return CalcAngleFactorMRT;
     }
 
-    Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum, bool AverageWithSurface)
+    Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const SurfNum, bool AverageWithSurface)
     {
 
         // Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
@@ -2107,50 +2108,49 @@ namespace ThermalComfort {
         // Return value
         Real64 CalcSurfaceWeightedMRT = 0.0;
 
-        // Local variables
-        int SurfNum2;  // surface number used in "for" loop
-        int ZoneNum2;  // zone number index
-        Real64 SumAET; // Intermediate calculational variable (area*emissivity*T) sum
-
         // Initialize ZoneAESum for all zones and SurfaceAE for all surfaces at the start of the simulation
         if (state.dataThermalComforts->FirstTimeSurfaceWeightedFlag) {
             state.dataThermalComforts->FirstTimeError = true;
             state.dataThermalComforts->FirstTimeSurfaceWeightedFlag = false;
             state.dataThermalComforts->SurfaceAE.allocate(state.dataSurface->TotSurfaces);
-            state.dataThermalComforts->ZoneAESum.allocate(state.dataGlobal->NumOfZones);
-            state.dataThermalComforts->SurfaceAE = 0.0;
-            state.dataThermalComforts->ZoneAESum = 0.0;
-            for (SurfNum2 = 1; SurfNum2 <= state.dataSurface->TotSurfaces; ++SurfNum2) {
-                if (state.dataSurface->Surface(SurfNum2).HeatTransSurf) {
-                    state.dataThermalComforts->SurfaceAE(SurfNum2) =
-                        state.dataSurface->Surface(SurfNum2).Area *
-                        state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
-                    ZoneNum2 = state.dataSurface->Surface(SurfNum2).Zone;
-                    // Do NOT include the contribution of the Surface that is being surface weighted in this calculation since it will already be
-                    // accounted for
-                    if ((ZoneNum2 > 0) && (SurfNum2 != SurfNum))
-                        state.dataThermalComforts->ZoneAESum(ZoneNum2) += state.dataThermalComforts->SurfaceAE(SurfNum2);
+            state.dataThermalComforts->SurfaceEnclAESum.allocate(state.dataSurface->TotSurfaces);
+            for (auto const &thisRadEnclosure : state.dataViewFactor->EnclRadInfo) {
+                Real64 sumSurfaceAE = 0.0;
+                for (int const SurfNum2 : thisRadEnclosure.SurfacePtr) {
+                    auto &thisSurfaceAE = state.dataThermalComforts->SurfaceAE(SurfNum2);
+                    thisSurfaceAE = state.dataSurface->Surface(SurfNum2).Area *
+                                    state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                    sumSurfaceAE += thisSurfaceAE; // total all surfaces here
+                }
+                // Do NOT include the contribution of the Surface that is being surface weighted in this calculation since it will already be
+                // accounted for
+                for (int const SurfNum2 : thisRadEnclosure.SurfacePtr) {
+                    state.dataThermalComforts->SurfaceEnclAESum(SurfNum2) = sumSurfaceAE - state.dataThermalComforts->SurfaceAE(SurfNum2);
                 }
             }
         }
 
         // Calculate the sum of area*emissivity and area*emissivity*temperature for all surfaces in the zone EXCEPT the surface being weighted
-        // Note that area*emissivity needs to be recalculated because of the possibility of changes to the emissivity via the EMS
-        SumAET = 0.0;
-        state.dataThermalComforts->ZoneAESum(ZoneNum) = 0.0;
-        for (SurfNum2 = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum2 <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum2) {
+        Real64 SumAET = 0.0; // Intermediate calculational variable (area*emissivity*T) sum
+
+        auto &thisRadEnclosure = state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(SurfNum).RadEnclIndex);
+        // Recalc SurfaceEnclAESum only if needed due to window shades or EMS
+        if (thisRadEnclosure.radReCalc) state.dataThermalComforts->SurfaceEnclAESum(SurfNum) = 0.0;
+        for (int const SurfNum2 : thisRadEnclosure.SurfacePtr) {
             if (SurfNum2 != SurfNum) {
-                state.dataThermalComforts->SurfaceAE(SurfNum2) =
-                    state.dataSurface->Surface(SurfNum2).Area *
-                    state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                if (thisRadEnclosure.radReCalc) {
+                    state.dataThermalComforts->SurfaceAE(SurfNum2) =
+                        state.dataSurface->Surface(SurfNum2).Area *
+                        state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                    state.dataThermalComforts->SurfaceEnclAESum(SurfNum) += state.dataThermalComforts->SurfaceAE(SurfNum2);
+                }
                 SumAET += state.dataThermalComforts->SurfaceAE(SurfNum2) * state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum2);
-                state.dataThermalComforts->ZoneAESum(ZoneNum) += state.dataThermalComforts->SurfaceAE(SurfNum2);
             }
         }
 
         // Now weight the MRT
-        if (state.dataThermalComforts->ZoneAESum(ZoneNum) > 0.01) {
-            CalcSurfaceWeightedMRT = SumAET / state.dataThermalComforts->ZoneAESum(ZoneNum);
+        if (state.dataThermalComforts->SurfaceEnclAESum(SurfNum) > 0.01) {
+            CalcSurfaceWeightedMRT = SumAET / state.dataThermalComforts->SurfaceEnclAESum(SurfNum);
             // if averaged with surface--half comes from the surface used for weighting (SurfNum) and the rest from the calculated MRT that excludes
             // this surface
             if (AverageWithSurface) {
@@ -2158,6 +2158,7 @@ namespace ThermalComfort {
             }
         } else {
             if (state.dataThermalComforts->FirstTimeError) {
+                int ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
                 ShowWarningError(
                     state, "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\"");
                 ShowContinueError(state, "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone.");

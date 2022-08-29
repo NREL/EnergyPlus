@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -795,35 +796,42 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     state->dataHeatBalSurf->SurfInsideTempHist(1)(2) = 15.0;
     state->dataHeatBalSurf->SurfInsideTempHist(1)(3) = 10.0;
 
+    state->dataViewFactor->EnclRadInfo.allocate(state->dataGlobal->NumOfZones);
+    state->dataViewFactor->EnclRadInfo(1).SurfacePtr.dimension(3);
+    state->dataViewFactor->EnclRadInfo(1).SurfacePtr = {1, 2, 3};
+    state->dataSurface->Surface(1).RadEnclIndex = 1;
+    state->dataSurface->Surface(2).RadEnclIndex = 1;
+    state->dataSurface->Surface(3).RadEnclIndex = 1;
+
     SurfNum = 1;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum);
     EXPECT_NEAR(RadTemp, 16.6, 0.1);
 
     SurfNum = 2;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum);
     EXPECT_NEAR(RadTemp, 16.1, 0.1);
 
     SurfNum = 3;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum);
     EXPECT_NEAR(RadTemp, 14.0, 0.1);
 
     // set AverageWithSurface to false for Kiva surfaces
     SurfNum = 1;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, false);
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum, false);
     EXPECT_NEAR(RadTemp, 13.1, 0.1);
 
     SurfNum = 2;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, false);
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum, false);
     EXPECT_NEAR(RadTemp, 17.1, 0.1);
 
     SurfNum = 3;
     state->dataThermalComforts->clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum, false);
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum, false);
     EXPECT_NEAR(RadTemp, 18.0, 0.1);
 }
 
