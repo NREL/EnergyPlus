@@ -237,7 +237,7 @@ namespace UnitarySystems {
             Num,
         };
 
-        UnitarySysInputSpec original_input_specs;
+        UnitarySysInputSpec input_specs;
         int m_UnitarySysNum = -1;
         SysType m_sysType = SysType::Invalid;
         bool m_ThisSysInputShouldBeGotten = true;
@@ -1021,7 +1021,6 @@ struct UnitarySystemsData : BaseGlobalStruct
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
 
-    bool myOneTimeFlag = true;
     bool getInputFlag = true;
 
     void clear_state() override
@@ -1057,7 +1056,6 @@ struct UnitarySystemsData : BaseGlobalStruct
         reportVariablesAreSetup = false;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
-        myOneTimeFlag = true;
         getInputFlag = true;
     }
 
