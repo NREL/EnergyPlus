@@ -605,7 +605,7 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
         // This is a DesignSpecification:OutdoorAir:SpaceList
         Real64 sumAreaOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
-            auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
+            auto const &thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
             if (thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerPerson && thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerZone &&
                 thisDSOA.OAFlowMethod != OAFlowCalcMethod::ACH) {
                 Real64 spaceArea = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).floorArea;
@@ -634,7 +634,7 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
         // This is a DesignSpecification:OutdoorAir:SpaceList
         Real64 sumPeopleOA = 0.0;
         for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
-            auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
+            auto const &thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
             if (thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerArea && thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerZone &&
                 thisDSOA.OAFlowMethod != OAFlowCalcMethod::ACH) {
                 Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).totOccupants;
@@ -871,7 +871,7 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                             if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCOccSch) {
                                 if (this->CO2MaxMinLimitErrorCount < 2) {
                                     ShowSevereError(state,
-                                                    "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + this->Name + "\".");
+                                                    format("CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"{}\".", this->Name));
                                     ShowContinueError(
                                         state,
                                         format("For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, maximum target "
@@ -885,16 +885,17 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(
                                         state,
-                                        "DesignSpecification:OutdoorAir = \"" + this->Name +
-                                            "\", For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, maximum target "
-                                            "CO2 concentration is not greater than minimum target CO2 concentration. Error continues...",
+                                        format("DesignSpecification:OutdoorAir = \"{}\", For System Outdoor Air Method = "
+                                               "ProportionalControlBasedOnOccupancySchedule, maximum target CO2 concentration is not greater than "
+                                               "minimum target CO2 concentration. Error continues...",
+                                               this->Name),
                                         this->CO2MaxMinLimitErrorIndex);
                                 }
                             }
                             if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCDesOcc) {
                                 if (this->CO2MaxMinLimitErrorCount < 2) {
                                     ShowSevereError(state,
-                                                    "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + this->Name + "\".");
+                                                    format("CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"{}\".", this->Name));
                                     ShowContinueError(
                                         state,
                                         format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, maximum target "
@@ -908,9 +909,10 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(
                                         state,
-                                        "DesignSpecification:OutdoorAir = \"" + this->Name +
-                                            "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, maximum target "
-                                            "CO2 concentration is not greater than minimum target CO2 concentration. Error continues...",
+                                        format("DesignSpecification:OutdoorAir = \"{}\", For System Outdoor Air Method = "
+                                               "ProportionalControlBasedOnDesignOccupancy, maximum target CO2 concentration is not greater than "
+                                               "minimum target CO2 concentration. Error continues...",
+                                               this->Name),
                                         this->CO2MaxMinLimitErrorIndex);
                                 }
                             }
@@ -940,42 +942,42 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                             if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCOccSch) {
                                 if (this->CO2GainErrorCount < 2) {
                                     ShowSevereError(state,
-                                                    "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + this->Name + "\".");
+                                                    format("CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"{}\".", this->Name));
                                     ShowContinueError(state,
-                                                      "For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, CO2 "
-                                                      "generation from people is not greater than zero. Occurs in Zone =\"" +
-                                                          thisZone.Name + "\". ");
+                                                      format("For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, CO2 "
+                                                             "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
+                                                             thisZone.Name));
                                     ShowContinueError(state,
                                                       "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
                                                       "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(state,
-                                                                   "DesignSpecification:OutdoorAir = \"" + this->Name +
-                                                                       "\", For System Outdoor Air Method = "
-                                                                       "ProportionalControlBasedOnOccupancySchedule, CO2 generation from "
-                                                                       "people is not greater than zero. Error continues...",
+                                                                   format("DesignSpecification:OutdoorAir = \"{}\", For System Outdoor Air Method = "
+                                                                          "ProportionalControlBasedOnOccupancySchedule, CO2 generation from people "
+                                                                          "is not greater than zero. Error continues...",
+                                                                          this->Name),
                                                                    this->CO2GainErrorIndex);
                                 }
                             }
                             if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCDesOcc) {
                                 if (this->CO2GainErrorCount < 2) {
                                     ShowSevereError(state,
-                                                    "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + this->Name + "\".");
+                                                    format("CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"{}\".", this->Name));
                                     ShowContinueError(state,
-                                                      "For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, CO2 "
-                                                      "generation from people is not greater than zero. Occurs in Zone =\"" +
-                                                          thisZone.Name + "\". ");
+                                                      format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, CO2 "
+                                                             "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
+                                                             thisZone.Name));
                                     ShowContinueError(state,
                                                       "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
                                                       "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(state,
-                                                                   "DesignSpecification:OutdoorAir = \"" + this->Name +
-                                                                       "\", For System Outdoor Air Method = "
-                                                                       "ProportionalControlBasedOnDesignOccupancy, CO2 generation from "
-                                                                       "people is not greater than zero. Error continues...",
+                                                                   format("DesignSpecification:OutdoorAir = \"{}\", For System Outdoor Air Method = "
+                                                                          "ProportionalControlBasedOnDesignOccupancy, CO2 generation from people is "
+                                                                          "not greater than zero. Error continues...",
+                                                                          this->Name),
                                                                    this->CO2GainErrorIndex);
                                 }
                             }
