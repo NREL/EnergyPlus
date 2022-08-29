@@ -58,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -72,15 +73,15 @@ namespace CTElectricGenerator {
         std::string Name;                                   // user identifier
         std::string TypeOf = "Generator:CombustionTurbine"; // Type of Generator
         GeneratorType CompType_Num = GeneratorType::CombTurbine;
-        std::string FuelType;           // Type of Fuel - DIESEL, GASOLINE, GAS
-        Real64 RatedPowerOutput = 0.0;  // W - design nominal capacity of Generator
-        int ElectricCircuitNode = 0;    // Electric Circuit Node
-        Real64 MinPartLoadRat = 0.0;    // (CT MIN) min allowed operating frac full load
-        Real64 MaxPartLoadRat = 0.0;    // (CT MAX) max allowed operating frac full load
-        Real64 OptPartLoadRat = 0.0;    // (CT BEST) optimal operating frac full load
-        Real64 FuelEnergyUseRate = 0.0; // (EFUEL) rate of Fuel Energy Required to run COMBUSTION turbine (W)
-        Real64 FuelEnergy = 0.0;        // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
-        int PLBasedFuelInputCurve = 0;  // (FUL1GC) Curve Index for Part Load Ratio Based Fuel Input
+        UtilityRoutines::FuelType1 FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
+        Real64 RatedPowerOutput = 0.0;       // W - design nominal capacity of Generator
+        int ElectricCircuitNode = 0;         // Electric Circuit Node
+        Real64 MinPartLoadRat = 0.0;         // (CT MIN) min allowed operating frac full load
+        Real64 MaxPartLoadRat = 0.0;         // (CT MAX) max allowed operating frac full load
+        Real64 OptPartLoadRat = 0.0;         // (CT BEST) optimal operating frac full load
+        Real64 FuelEnergyUseRate = 0.0;      // (EFUEL) rate of Fuel Energy Required to run COMBUSTION turbine (W)
+        Real64 FuelEnergy = 0.0;             // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
+        int PLBasedFuelInputCurve = 0;       // (FUL1GC) Curve Index for Part Load Ratio Based Fuel Input
         // Coefficients Poly Fit
         int TempBasedFuelInputCurve = 0; // (FUL2GC) Curve Index for Ambient Temperature Based Fuel Input
         // Coeff Poly Fit
