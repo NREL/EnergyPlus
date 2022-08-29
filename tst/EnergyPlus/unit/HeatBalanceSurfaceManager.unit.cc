@@ -299,6 +299,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Window;
     state->dataSurface->Surface(1).Area = 1;
     state->dataSurface->SurfWinShadingFlag(1) = DataSurfaces::WinShadingType::IntBlind;
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
@@ -3172,12 +3173,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     state->dataSurface->Surface(1).ExtBoundCond = 2;
     state->dataSurface->Surface(1).Area = 1.0;
     state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->AllHTWindowSurfaceList.push_back(1);
 
     state->dataSurface->Surface(2).HeatTransSurf = true;
     state->dataSurface->Surface(2).Construction = 1;
     state->dataSurface->Surface(2).ExtBoundCond = 1;
     state->dataSurface->Surface(2).Area = 1.0;
     state->dataSurface->Surface(2).Zone = 2;
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->AllHTWindowSurfaceList.push_back(2);
 
     state->dataSurface->Surface(1).SolarEnclIndex = 1;
     state->dataSurface->Surface(2).SolarEnclIndex = 2;
@@ -5345,13 +5350,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
     state->dataEnvrn->BeamSolarRad = 50;
     state->dataEnvrn->GndSolarRad = 50;
     state->dataEnvrn->DifSolarRad = 0;
-    state->dataSurface->Surface(1).SolarEnclIndex = 1;
-    state->dataSurface->Surface(2).SolarEnclIndex = 1;
-    state->dataSurface->Surface(3).SolarEnclIndex = 1;
-    state->dataSurface->Surface(4).SolarEnclIndex = 1;
-    state->dataSurface->Surface(5).SolarEnclIndex = 1;
-    state->dataSurface->Surface(6).SolarEnclIndex = 1;
-    state->dataSurface->Surface(7).SolarEnclIndex = 1;
+    for (auto &thisSurf : state->dataSurface->Surface) {
+        thisSurf.SolarEnclIndex = 1;
+        thisSurf.RadEnclIndex = 1;
+    }
     state->dataViewFactor->EnclSolInfo(1).TotalEnclosureDaylRefPoints = 1;
     state->dataDaylightingData->enclDaylight.allocate(1);
     state->dataDaylightingData->enclDaylight(1).hasSplitFluxDaylighting = true;
