@@ -14312,7 +14312,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
 
     // Issue 7777
     std::string const error_string = delimited_string({
-        "   ** Warning ** getUnitarySystemInputDataAirLoopHVAC:UnitarySystem=\"UNITARY SYSTEM MODEL\", invalid Availability Schedule Name = "
+        "   ** Warning ** getUnitarySystemInputData AirLoopHVAC:UnitarySystem=\"UNITARY SYSTEM MODEL\", invalid Availability Schedule Name = "
         "FANANDCOILAVAILTEST",
         "   **   ~~~   ** Set the default as Always On. Simulation continues.",
     });
