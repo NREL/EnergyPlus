@@ -7389,6 +7389,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:01_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:01_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7405,6 +7406,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:02_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:02_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7421,6 +7423,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:03_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:03_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7437,6 +7440,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:04_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:04_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7453,6 +7457,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:05_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:05_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7469,6 +7474,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:06_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:06_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7485,6 +7491,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:07_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:07_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7501,6 +7508,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:08_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:08_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7517,6 +7525,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:09_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:09_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7533,6 +7542,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:10_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:10_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7549,6 +7559,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:11_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:11_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7565,6 +7576,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:12_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:12_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7581,6 +7593,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:13_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:13_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7597,6 +7610,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:14_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:14_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7613,6 +7627,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:15_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:15_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7629,6 +7644,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:16_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:16_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7645,6 +7661,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:17_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:17_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7661,6 +7678,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:18_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:18_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7677,6 +7695,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:19_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:19_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7693,6 +7712,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:20_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:20_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7709,6 +7729,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:21_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:21_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7725,6 +7746,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:22_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:22_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7741,6 +7763,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:23_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:23_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7757,6 +7780,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPLITSYSTEMAC:24_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:24_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name

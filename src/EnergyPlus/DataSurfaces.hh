@@ -153,28 +153,31 @@ namespace DataSurfaces {
     enum class WindowShadingControlType : int
     {
         Invalid = -1,
-        UnControlled = 0,
-        AlwaysOn = 1,
-        AlwaysOff = 2,
-        OnIfScheduled = 3,
-        HiSolar = 4,
-        HiHorzSolar = 5,
-        HiOutAirTemp = 6,
-        HiZoneAirTemp = 7,
-        HiZoneCooling = 8,
-        HiGlare = 9,
-        MeetDaylIlumSetp = 10,
-        OnNightLoOutTemp_OffDay = 11,
-        OnNightLoInTemp_OffDay = 12,
-        OnNightIfHeating_OffDay = 13,
-        OnNightLoOutTemp_OnDayCooling = 14,
-        OnNightIfHeating_OnDayCooling = 15,
-        OffNight_OnDay_HiSolarWindow = 16,
-        OnNight_OnDay_HiSolarWindow = 17,
-        OnHiOutTemp_HiSolarWindow = 18,
-        OnHiOutTemp_HiHorzSolar = 19,
-        OnHiZoneTemp_HiSolarWindow = 20,
-        OnHiZoneTemp_HiHorzSolar = 21,
+        UnControlled,
+        AlwaysOn,
+        AlwaysOff,
+        OnIfScheduled,
+        HiSolar,
+        HiHorzSolar,
+        HiOutAirTemp,
+        HiZoneAirTemp,
+        HiZoneCooling,
+        HiGlare,
+        MeetDaylIlumSetp,
+        OnNightLoOutTemp_OffDay,
+        OnNightLoInTemp_OffDay,
+        OnNightIfHeating_OffDay,
+        OnNightLoOutTemp_OnDayCooling,
+        OnNightIfHeating_OnDayCooling,
+        OffNight_OnDay_HiSolarWindow,
+        OnNight_OnDay_HiSolarWindow,
+        OnHiOutTemp_HiSolarWindow,
+        OnHiOutTemp_HiHorzSolar,
+        OnHiZoneTemp_HiSolarWindow,
+        OnHiZoneTemp_HiHorzSolar,
+        HiSolar_HiLumin_OffMidNight,
+        HiSolar_HiLumin_OffSunset,
+        HiSolar_HiLumin_OffNextMorning,
         Num
     };
 
@@ -347,29 +350,6 @@ namespace DataSurfaces {
     constexpr int WSC_ST_BetweenGlassShade(6);
     constexpr int WSC_ST_BetweenGlassBlind(7);
     constexpr int WSC_ST_ExteriorScreen(8);
-
-    // WindowShadingControl Control Types
-    constexpr int WSCT_AlwaysOn(1);                       // AlwaysOn
-    constexpr int WSCT_AlwaysOff(2);                      // AlwaysOff
-    constexpr int WSCT_OnIfScheduled(3);                  // OnIfScheduleAllows
-    constexpr int WSCT_HiSolar(4);                        // OnIfHighSolarOnWindow
-    constexpr int WSCT_HiHorzSolar(5);                    // OnIfHighHorizontalSolar
-    constexpr int WSCT_HiOutAirTemp(6);                   // OnIfHighOutsideAirTemp
-    constexpr int WSCT_HiZoneAirTemp(7);                  // OnIfHighZoneAirTemp
-    constexpr int WSCT_HiZoneCooling(8);                  // OnIfHighZoneCooling
-    constexpr int WSCT_HiGlare(9);                        // OnIfHighGlare
-    constexpr int WSCT_MeetDaylIlumSetp(10);              // MeetDaylightIlluminanceSetpoint
-    constexpr int WSCT_OnNightLoOutTemp_OffDay(11);       // OnNightIfLowOutsideTemp/OffDay
-    constexpr int WSCT_OnNightLoInTemp_OffDay(12);        // OnNightIfLowInsideTemp/OffDay
-    constexpr int WSCT_OnNightIfHeating_OffDay(13);       // OnNightIfHeating/OffDay
-    constexpr int WSCT_OnNightLoOutTemp_OnDayCooling(14); // OnNightIfLowOutsideTemp/OnDayIfCooling
-    constexpr int WSCT_OnNightIfHeating_OnDayCooling(15); // OnNightIfHeating/OnDayIfCooling
-    constexpr int WSCT_OffNight_OnDay_HiSolarWindow(16);  // OffNight/OnDayIfCoolingAndHighSolarOnWindow
-    constexpr int WSCT_OnNight_OnDay_HiSolarWindow(17);   // OnNight/OnDayIfCoolingAndHighSolarOnWindow
-    constexpr int WSCT_OnHiOutTemp_HiSolarWindow(18);     // OnIfHighOutsideAirTempAndHighSolarOnWindow
-    constexpr int WSCT_OnHiOutTemp_HiHorzSolar(19);       // OnIfHighOutsideAirTempAndHighHorizontalSolar
-    constexpr int WSCT_OnHiZoneTemp_HiSolarWindow(20);    // OnIfHighZoneAirTempAndHighSolarOnWindow
-    constexpr int WSCT_OnHiZoneTemp_HiHorzSolar(21);      // OnIfHighZoneAirTempAndHighHorizontalSolar
 
     // WindowShadingControl Slat Angle Control for Blinds
     constexpr int WSC_SAC_FixedSlatAngle(1);
