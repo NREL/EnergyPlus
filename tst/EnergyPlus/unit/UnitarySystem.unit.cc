@@ -305,7 +305,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataSize->NumPltSizInput = 2;
     state->dataSize->PlantSizData(1).PlantLoopName = "ColdWaterLoop";
     state->dataSize->PlantSizData(2).PlantLoopName = "HotWaterLoop";
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
@@ -14312,7 +14312,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
 
     // Issue 7777
     std::string const error_string = delimited_string({
-        "   ** Warning ** getUnitarySystemInputDataAirLoopHVAC:UnitarySystem=\"UNITARY SYSTEM MODEL\", invalid Availability Schedule Name = "
+        "   ** Warning ** getUnitarySystemInputData AirLoopHVAC:UnitarySystem=\"UNITARY SYSTEM MODEL\", invalid Availability Schedule Name = "
         "FANANDCOILAVAILTEST",
         "   **   ~~~   ** Set the default as Always On. Simulation continues.",
     });
@@ -19695,7 +19695,7 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
     state->dataSize->NumPltSizInput = 2;
     state->dataSize->PlantSizData(1).PlantLoopName = "ColdWaterLoop";
     state->dataSize->PlantSizData(2).PlantLoopName = "HotWaterLoop";
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
@@ -20097,7 +20097,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_LowerSpeedFlowSizingTest)
     state->dataSize->CurOASysNum = 0;
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurZoneEqNum = 1;
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 27.0;
