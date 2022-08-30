@@ -237,7 +237,7 @@ namespace UnitarySystems {
             Num,
         };
 
-        UnitarySysInputSpec original_input_specs;
+        UnitarySysInputSpec input_specs;
         int m_UnitarySysNum = -1;
         SysType m_sysType = SysType::Invalid;
         bool m_ThisSysInputShouldBeGotten = true;
@@ -914,20 +914,6 @@ namespace UnitarySystems {
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        void simulateSys(EnergyPlusData &state,
-                         std::string_view Name,
-                         bool const firstHVACIteration,
-                         int AirLoopNum,
-                         int &CompIndex,
-                         bool &HeatActive,
-                         bool &CoolActive,
-                         int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-                         Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-                         bool const ZoneEquipment,    // TRUE if called as zone equipment
-                         Real64 &sysOutputProvided,   // sensible output at supply air node
-                         Real64 &latOutputProvided    // latent output at supply air node
-        );
-
         void calcUnitarySystemToLoad(EnergyPlusData &state,
                                      int const AirLoopNum,          // index to air loop
                                      bool const FirstHVACIteration, // True when first HVAC iteration
@@ -1035,7 +1021,6 @@ struct UnitarySystemsData : BaseGlobalStruct
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
 
-    bool myOneTimeFlag = true;
     bool getInputFlag = true;
 
     void clear_state() override
@@ -1071,7 +1056,6 @@ struct UnitarySystemsData : BaseGlobalStruct
         reportVariablesAreSetup = false;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
-        myOneTimeFlag = true;
         getInputFlag = true;
     }
 
