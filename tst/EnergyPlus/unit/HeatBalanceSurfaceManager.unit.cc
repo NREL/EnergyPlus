@@ -735,6 +735,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
+    HeatBalanceIntRadExchange::InitInteriorRadExchange(*state);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
@@ -822,22 +823,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(1));
     EXPECT_EQ(23.0, state->dataHeatBal->SurfTempEffBulkAir(2));
     EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(3));
-
-    state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    state->dataSize->ZoneEqSizing.deallocate();
-    state->dataHeatBalFanSys->MAT.deallocate(); // Zone temperature C
-    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    state->dataLoopNodes->Node.deallocate();
-    state->dataGlobal->KickOffSimulation = false;
-    state->dataHeatBalSurf->SurfTempInTmp.deallocate();
-    state->dataHeatBalSurf->SurfHConvInt.deallocate();
-    state->dataMstBal->HConvInFD.deallocate();
-    state->dataMstBal->RhoVaporAirIn.deallocate();
-    state->dataMstBal->HMassConvInFD.deallocate();
-    state->dataHeatBalFanSys->ZoneLatentGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGain.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
-    state->dataHeatBal->ZoneWinHeatGainRepEnergy.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurfKiva)
@@ -5920,6 +5905,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
 
     SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound); // this calls GetSurfaceData()
     EXPECT_FALSE(ErrorsFound);                               // expect no errors
+    HeatBalanceIntRadExchange::InitInteriorRadExchange(*state);
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(2);
@@ -6001,6 +5987,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataConstruction->Construct(state->dataSurface->Surface(8).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
     DaylightingDevices::GetTDDInput(*state);
 
+    state->dataGlobal->TimeStepZoneSec = 600.0;
     CalcHeatBalanceInsideSurf(*state);
     EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(7), 0.1);
     EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(8), 0.1);
