@@ -1163,8 +1163,7 @@ namespace HVACHXAssistedCoolingCoil {
                     mCoolingSpeedNum,
                     mCoolingSpeedRatio,
                     FanOpMode,
-                    singleMode); //,
-                                 // LoadSHR);
+                    singleMode); //
 
             } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
                 SimDXCoil(state,

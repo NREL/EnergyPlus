@@ -62,6 +62,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -1440,20 +1441,20 @@ namespace UnitarySystems {
         static constexpr std::string_view RoutineName("SizeUnitarySystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Iter;                  // iteration count
-        int MSHPIndex;             // Index to design Specification object
-        int BranchNum;             // Index to branch on air loop
-        Real64 SystemFlow;         // AirloopHVAC flow rate [m3/s]
-        Real64 BranchFanFlow;      // branch fan flow rate [m3/s]
-        bool ErrFound;             // logical error flag
-        std::string FanType;       // fan type
-        std::string m_FanName;     // fan name
-        std::string SystemType;    // type of air loop equipment
-        std::string HXCoilName;    // cooling coil name in HXAssisted parent
-        int ActualCoolCoilType;    // cooling coil type in HXAssisted parent
-        int SaveCurDuctType;       // used during sizing to save the current duct type
-        Real64 QActual;            // water coil output [W]
-        Real64 capacityMultiplier; // used for ASHRAE model sizing
+        int Iter;                                     // iteration count
+        int MSHPIndex;                                // Index to design Specification object
+        int BranchNum;                                // Index to branch on air loop
+        Real64 SystemFlow;                            // AirloopHVAC flow rate [m3/s]
+        Real64 BranchFanFlow;                         // branch fan flow rate [m3/s]
+        bool ErrFound;                                // logical error flag
+        std::string FanType;                          // fan type
+        std::string m_FanName;                        // fan name
+        std::string SystemType;                       // type of air loop equipment
+        std::string HXCoilName;                       // cooling coil name in HXAssisted parent
+        int ActualCoolCoilType;                       // cooling coil type in HXAssisted parent
+        DataHVACGlobals::AirDuctType SaveCurDuctType; // used during sizing to save the current duct type
+        Real64 QActual;                               // water coil output [W]
+        Real64 capacityMultiplier;                    // used for ASHRAE model sizing
 
         Real64 TempSize;  // DataSizing::AutoSized value of input field
         int FieldNum = 2; // IDD numeric field number where input field description is found
@@ -1641,7 +1642,7 @@ namespace UnitarySystems {
             // might want to rethink this method. Tries to find the larger of cooling or heating capcity
             // however, if there is no heating coil the cooling air flow rate is used, not the main flow rate
             // this is fine if there are no other systems on the branch. CoilSystem does not do this (#8761).
-            if (this->m_sysType == SysType::Unitary) state.dataSize->CurDuctType = DataHVACGlobals::Cooling;
+            if (this->m_sysType == SysType::Unitary) state.dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
             bool errorsFound = false;
             if ((CoolingSAFlowMethod == DataSizing::SupplyAirFlowRate) || (CoolingSAFlowMethod == DataSizing::None)) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -1800,7 +1801,7 @@ namespace UnitarySystems {
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = this->m_MaxHeatAirVolFlow;
             SaveCurDuctType = state.dataSize->CurDuctType;
-            state.dataSize->CurDuctType = DataHVACGlobals::Heating;
+            state.dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Heating;
             if ((HeatingSAFlowMethod == DataSizing::SupplyAirFlowRate) || (HeatingSAFlowMethod == DataSizing::None)) {
                 bool errorsFound = false;
                 HeatingAirFlowSizer sizingHeatingAirFlow;

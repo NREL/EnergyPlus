@@ -1759,23 +1759,23 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 } else if (UnitarySysEqSizing(curSysNum).HeatingAirFlow) {
                     c->coilDesVolFlow = UnitarySysEqSizing(curSysNum).HeatingAirVolFlow;
                 } else {
-                    if (state.dataSize->CurDuctType == DataHVACGlobals::Main) {
+                    if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Main) {
                         if (state.dataSize->FinalSysSizing(curSysNum).SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {
                             c->coilDesVolFlow =
                                 state.dataSize->FinalSysSizing(curSysNum).SysAirMinFlowRat * state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
                         } else {
                             c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
                         }
-                    } else if (state.dataSize->CurDuctType == DataHVACGlobals::Cooling) {
+                    } else if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Cooling) {
                         if (state.dataSize->FinalSysSizing(curSysNum).SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {
                             c->coilDesVolFlow =
                                 state.dataSize->FinalSysSizing(curSysNum).SysAirMinFlowRat * state.dataSize->FinalSysSizing(curSysNum).DesCoolVolFlow;
                         } else {
                             c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesCoolVolFlow;
                         }
-                    } else if (state.dataSize->CurDuctType == DataHVACGlobals::Heating) {
+                    } else if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Heating) {
                         c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesHeatVolFlow;
-                    } else if (state.dataSize->CurDuctType == DataHVACGlobals::Other) {
+                    } else if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Other) {
                         c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
                     } else {
                         c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
