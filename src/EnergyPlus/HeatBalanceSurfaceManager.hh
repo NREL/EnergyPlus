@@ -126,16 +126,16 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+    void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, int const ZoneToResimulate = 0);
 
-    void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+    void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, int const ZoneToResimulate = 0);
 
     void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
     void UpdateThermalHistories(EnergyPlusData &state);
 
-    void CalculateZoneMRT(EnergyPlusData &state,
-                          Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+    void CalculateMRT(EnergyPlusData &state,
+                      int const ZoneToResimulate = 0); // if passed in, then only calculate surfaces that have this zone
 
     // End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
@@ -162,27 +162,27 @@ namespace HeatBalanceSurfaceManager {
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
     void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
-                                    Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+                                    int const ZoneToResimulate = 0); // if passed in, then only calculate surfaces that have this zone
 
     Real64 GetSurfQdotRadHVACInPerArea(EnergyPlusData &state, int SurfNum);
 
     Real64 GetQdotConvOutPerArea(EnergyPlusData &state, const int SurfNum);
 
     void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
-                                   Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+                                   int const ZoneToResimulate = 0); // if passed in, then only calculate surfaces that have this zone
 
     void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                     const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
                                     const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                     const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
-                                    Optional_int_const ZoneToResimulate = _);
+                                    int const ZoneToResimulate = 0);
 
     void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                            const int FirstZone,             // First zone to simulate
                                            const int LastZone,              // Last zone to simulate
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
-                                           Optional_int_const ZoneToResimulate = _);
+                                           int const ZoneToResimulate = 0);
 
     void
     TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, int const SurfNum, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
@@ -224,8 +224,9 @@ struct HeatBalSurfMgr : BaseGlobalStruct
     Array1D<Real64> Tuser1;   // Temperature at the user specified location (during first time step/series)
     Array1D<Real64> SumTime;  // Amount of time that has elapsed from start of master history to
 
-    Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
-    Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
+    EPVector<Real64> SurfaceAE;  // Product of area and emissivity for each surface
+    EPVector<Real64> ZoneAESum;  // Sum of area times emissivity for all zone surfaces
+    EPVector<Real64> ZoneAETSum; // Sum of area times emissivity times temperature for all zone surfaces
 
     Array2D<Real64> DiffuseArray;
 
@@ -235,7 +236,7 @@ struct HeatBalSurfMgr : BaseGlobalStruct
     bool ManageSurfaceHeatBalancefirstTime = true;
     bool InitSurfaceHeatBalancefirstTime = true;
     bool UpdateThermalHistoriesFirstTimeFlag = true;
-    bool CalculateZoneMRTfirstTime = true; // Flag for first time calculations
+    bool CalculateMRTfirstTime = true; // Flag for first time calculations
     bool reportThermalResilienceFirstTime = true;
     bool reportVarHeatIndex = false;
     bool reportVarHumidex = false;
@@ -262,46 +263,7 @@ struct HeatBalSurfMgr : BaseGlobalStruct
 
     void clear_state() override
     {
-        QExt1.clear();
-        QInt1.clear();
-        TempInt1.clear();
-        TempExt1.clear();
-        Qsrc1.clear();
-        Tsrc1.clear();
-        Tuser1.clear();
-        SumTime.clear();
-
-        SurfaceAE.clear();
-        ZoneAESum.clear();
-
-        DiffuseArray.clear();
-        curQL = 0.0;
-        adjQL = 0.0;
-
-        ManageSurfaceHeatBalancefirstTime = true;
-        InitSurfaceHeatBalancefirstTime = true;
-        UpdateThermalHistoriesFirstTimeFlag = true;
-        CalculateZoneMRTfirstTime = true;
-        reportThermalResilienceFirstTime = true;
-        reportVarHeatIndex = false;
-        reportVarHumidex = false;
-        hasPierceSET = true;
-        reportCO2ResilienceFirstTime = true;
-        reportVisualResilienceFirstTime = true;
-        lowSETLongestHours.clear();
-        highSETLongestHours.clear();
-        lowSETLongestStart.clear();
-        highSETLongestStart.clear();
-        calcHeatBalInsideSurfFirstTime = true;
-        calcHeatBalInsideSurfCTFOnlyFirstTime = true;
-        calcHeatBalInsideSurfErrCount = 0;
-        calcHeatBalInsideSurfErrPointer = 0;
-        calcHeatBalInsideSurfWarmupErrCount = 0;
-        calcHeatBalInsideSurEnvrnFlag = true;
-        RefAirTemp.clear();
-        AbsDiffWin = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
-        AbsDiffWinGnd = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
-        AbsDiffWinSky = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL);
+        new (this) HeatBalSurfMgr();
     }
 };
 

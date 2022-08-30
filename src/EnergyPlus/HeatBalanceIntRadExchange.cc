@@ -110,10 +110,10 @@ namespace HeatBalanceIntRadExchange {
     using namespace DataViewFactorInformation;
 
     void CalcInteriorRadExchange(EnergyPlusData &state,
-                                 Array1S<Real64> const SurfaceTemp,   // Current surface temperatures
-                                 int const SurfIterations,            // Number of iterations in calling subroutine
-                                 Array1D<Real64> &NetLWRadToSurf,     // Net long wavelength radiant exchange from other surfaces
-                                 Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
+                                 Array1S<Real64> const SurfaceTemp, // Current surface temperatures
+                                 int const SurfIterations,          // Number of iterations in calling subroutine
+                                 Array1D<Real64> &NetLWRadToSurf,   // Net long wavelength radiant exchange from other surfaces
+                                 int const ZoneToResimulate,        // if passed in, then only calculate for this zone
 #ifdef EP_Count_Calls
                                  std::string_view const CalledFrom)
 #else
@@ -163,7 +163,7 @@ namespace HeatBalanceIntRadExchange {
 
         if (state.dataGlobal->KickOffSimulation || state.dataGlobal->KickOffSizing) return;
 
-        bool const PartialResimulate(present(ZoneToResimulate));
+        bool const PartialResimulate(ZoneToResimulate !=0);
 
 #ifdef EP_Count_Calls
         if (!PartialResimulate) {

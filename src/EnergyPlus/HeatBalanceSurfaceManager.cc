@@ -412,7 +412,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     DaylightingManager::initDaylighting(state, state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime);
 
-    CalcInteriorRadExchange(state, state.dataHeatBalSurf->SurfInsideTempHist(1), 0, state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea, _, "Main");
+    CalcInteriorRadExchange(state, state.dataHeatBalSurf->SurfInsideTempHist(1), 0, state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea, 0, "Main");
 
     if (state.dataSurface->AirflowWindows) WindowGapAirflowControl(state);
 
@@ -2086,6 +2086,10 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         state.dataHeatBalFanSys->SumHmARa(zoneNum) = 0.0;
         state.dataHeatBalFanSys->SumHmARaW(zoneNum) = 0.0;
         state.dataHeatBalFanSys->TempTstatAir(zoneNum) = ZoneInitialTemp;
+    }
+
+    for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
+        thisEnclosure.MRT = DataHeatBalance::ZoneInitialTemp;
     }
 
     // "Bulk" initializations of arrays sized to TotSurfaces
@@ -4741,12 +4745,12 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 // Beginning of Record Keeping subroutines for the HB Module
 // *****************************************************************************
 
-void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate)
+void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, int const ZoneToResimulate)
 {
     int firstZone = 1;
     int lastZone = state.dataGlobal->NumOfZones;
 
-    if (present(ZoneToResimulate)) {
+    if (ZoneToResimulate != 0) {
         firstZone = ZoneToResimulate;
         lastZone = ZoneToResimulate;
     }
@@ -4803,12 +4807,12 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
     }
 }
 
-void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate)
+void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, int const ZoneToResimulate)
 {
     int firstZone = 1;
     int lastZone = state.dataGlobal->NumOfZones;
 
-    if (present(ZoneToResimulate)) {
+    if (ZoneToResimulate != 0) {
         firstZone = ZoneToResimulate;
         lastZone = ZoneToResimulate;
     }
@@ -5345,60 +5349,94 @@ void UpdateThermalHistories(EnergyPlusData &state)
     }     // ...end of AnyInternalHeatSourceInInput
 }
 
-void CalculateZoneMRT(EnergyPlusData &state,
-                      Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+void CalculateMRT(EnergyPlusData &state,
+                  int const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   November 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the current zone MRT for thermal comfort and radiation
     // calculation purposes.
 
-    Real64 SumAET; // Intermediate calculational variable (area*emissivity*T) sum
-    int SurfNum;   // Surface number
-    int ZoneNum;   // Zone number
-
-    auto &Surface(state.dataSurface->Surface);
-
-    if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
-        state.dataHeatBalSurfMgr->SurfaceAE.allocate(state.dataSurface->TotSurfaces);
-        state.dataHeatBalSurfMgr->ZoneAESum.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBalSurfMgr->SurfaceAE = 0.0;
-        state.dataHeatBalSurfMgr->ZoneAESum = 0.0;
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).HeatTransSurf) {
+    if (state.dataHeatBalSurfMgr->CalculateMRTfirstTime) {
+        // TODO: Keep these for now, because the ZoneMRT function never update the surface emissivities for window shades and EMS
+        // But this should use Surface.AE the same as CalcSurfaceWeightedMRT
+        // These two functions are also using different surface temperature varieabls, SurfTempIn here, SurfInsideTempHist(1)(SurfNum) there
+        // These are equivalent at some points in the iteration loop, but perhaps not always?
+        state.dataHeatBalSurfMgr->SurfaceAE.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBalSurfMgr->ZoneAESum.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalSurfMgr->ZoneAETSum.dimension(state.dataGlobal->NumOfZones, 0.0);
+        for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
+            for (int const SurfNum : thisEnclosure.SurfacePtr) {
+                auto &thisSurface = state.dataSurface->Surface(SurfNum);
                 state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) =
-                    Surface(SurfNum).Area * state.dataConstruction->Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
-                ZoneNum = Surface(SurfNum).Zone;
-                if (ZoneNum > 0) state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum);
+                    thisSurface.Area * state.dataConstruction->Construct(thisSurface.Construction).InsideAbsorpThermal;
+                int const zoneNum = thisSurface.Zone;
+                state.dataHeatBalSurfMgr->ZoneAESum(zoneNum) += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum);
+                thisEnclosure.sumAE += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum);
+                if (thisEnclosure.sumAE <= 0.01) {
+                    ShowWarningError(
+                        state, format("Enclosure areas*inside surface emissivities are summing to zero, for Enclosure=\"{}\"", thisEnclosure.Name));
+                    ShowContinueError(state, "As a result, MRT will be set to average MAT for that enclosure");
+                }
             }
         }
-    }
-
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        if (present(ZoneToResimulate) && (ZoneNum != ZoneToResimulate)) continue;
-        SumAET = 0.0;
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-            SumAET += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
-        }
-        if (state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) > 0.01) {
-            state.dataHeatBal->ZoneMRT(ZoneNum) = SumAET / state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum);
-        } else {
-            if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) <= 0.01) {
                 ShowWarningError(
-                    state, "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\"");
+                    state,
+                    format("Zone areas*inside surface emissivities are summing to zero, for Zone=\"{}\"", state.dataHeatBal->Zone(ZoneNum).Name));
                 ShowContinueError(state, "As a result, MRT will be set to MAT for that zone");
             }
-            state.dataHeatBal->ZoneMRT(ZoneNum) = state.dataHeatBalFanSys->MAT(ZoneNum);
         }
+        state.dataHeatBalSurfMgr->CalculateMRTfirstTime = false;
     }
 
-    state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime = false;
+    if (ZoneToResimulate != 0) {
+        if (state.dataHeatBalSurfMgr->ZoneAESum(ZoneToResimulate) <= 0.01) {
+            state.dataHeatBal->ZoneMRT(ZoneToResimulate) = state.dataHeatBalFanSys->MAT(ZoneToResimulate);
+        } else {
+            state.dataHeatBalSurfMgr->ZoneAETSum(ZoneToResimulate) = 0.0;
+            for (int SurfNum = state.dataHeatBal->Zone(ZoneToResimulate).HTSurfaceFirst;
+                 SurfNum <= state.dataHeatBal->Zone(ZoneToResimulate).HTSurfaceLast;
+                 ++SurfNum) {
+                state.dataHeatBalSurfMgr->ZoneAETSum(ZoneToResimulate) +=
+                    state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
+            }
+            state.dataHeatBal->ZoneMRT(ZoneToResimulate) =
+                state.dataHeatBalSurfMgr->ZoneAETSum(ZoneToResimulate) / state.dataHeatBalSurfMgr->ZoneAESum(ZoneToResimulate);
+        }
+    } else {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            state.dataHeatBalSurfMgr->ZoneAETSum(ZoneNum) = 0.0;
+        }
+        for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
+            Real64 enclAETSum = 0.0;
+            for (int const SurfNum : thisEnclosure.SurfacePtr) {
+                int const ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
+                Real64 const surfAET = state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                state.dataHeatBalSurfMgr->ZoneAETSum(ZoneNum) += surfAET;
+                enclAETSum += surfAET;
+            }
+            if (thisEnclosure.sumAE > 0.01) {
+                thisEnclosure.MRT = enclAETSum / thisEnclosure.sumAE;
+            } else {
+                // TODO: Should this even be allowed to run? For now, use MAT of the first zone in the enclosure
+                int const zoneNum = state.dataSurface->Surface(thisEnclosure.SurfacePtr[0]).Zone;
+                thisEnclosure.MRT = state.dataHeatBalFanSys->MAT(zoneNum);
+            }
+        }
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) > 0.01) {
+                state.dataHeatBal->ZoneMRT(ZoneNum) = state.dataHeatBalSurfMgr->ZoneAETSum(ZoneNum) / state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum);
+            } else {
+                state.dataHeatBal->ZoneMRT(ZoneNum) = state.dataHeatBalFanSys->MAT(ZoneNum);
+            }
+        }
+    }
 }
 
 // End of Record Keeping subroutines for the HB Module
@@ -6618,7 +6656,7 @@ void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state)
 // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) now moved into namespace
 
 void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
-                                Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+                                int const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
 {
 
     // SUBROUTINE INFORMATION:
@@ -6705,17 +6743,13 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
         }
     }
 
-    if (present(ZoneToResimulate)) {
-        CalcInteriorRadExchange(
-            state, state.dataHeatBalSurf->SurfInsideTempHist(1), 0, state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea, ZoneToResimulate, Outside);
-    } else {
-        CalcInteriorRadExchange(state, state.dataHeatBalSurf->SurfInsideTempHist(1), 0, state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea, _, Outside);
-    }
+    CalcInteriorRadExchange(
+        state, state.dataHeatBalSurf->SurfInsideTempHist(1), 0, state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea, ZoneToResimulate, Outside);
 
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) { // Loop through all surfaces...
         for (int SurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(zoneNum).HTSurfaceLast; ++SurfNum) {
             if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
-            if (present(ZoneToResimulate)) {
+            if (ZoneToResimulate != 0) {
                 if ((zoneNum != ZoneToResimulate) && (state.dataSurface->SurfAdjacentZone(SurfNum) != ZoneToResimulate)) {
                     continue; // skip surfaces that are not associated with this zone
                 }
@@ -7331,7 +7365,7 @@ Real64 GetQdotConvOutPerArea(EnergyPlusData &state, int const SurfNum)
 }
 
 void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
-                               Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+                               int const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
 {
     auto &Surface(state.dataSurface->Surface);
     if (state.dataHeatBalSurfMgr->calcHeatBalInsideSurfFirstTime) {
@@ -7380,7 +7414,7 @@ void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
     }
 
     // Pass correct list of surfaces to CalcHeatBalanceInsideSurf2
-    bool const PartialResimulate(present(ZoneToResimulate));
+    bool const PartialResimulate(ZoneToResimulate != 0);
 
     if (!PartialResimulate) {
 
@@ -7401,7 +7435,7 @@ void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
         // Cannot use CalcHeatBalanceInsideSurf2CTFOnly because resimulated zone includes adjacent interzone surfaces
         CalcHeatBalanceInsideSurf2(state, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
     }
-    CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
+    CalculateMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
     UpdateIntermediateSurfaceHeatBalanceResults(state, ZoneToResimulate);
 }
 
@@ -7410,7 +7444,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                 const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
                                 const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
                                 const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
-                                Optional_int_const ZoneToResimulate)
+                                int const ZoneToResimulate)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         George Walton
@@ -8231,7 +8265,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                        const int FirstZone,             // First zone to simulate
                                        const int LastZone,              // Last zone to simulate
                                        const std::vector<int> &IZSurfs, // Last zone to simulate
-                                       Optional_int_const ZoneToResimulate)
+                                       int const ZoneToResimulate)
 {
 
     // This function performs a heat balance on the inside face of each
