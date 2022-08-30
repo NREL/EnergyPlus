@@ -5362,6 +5362,7 @@ void CalculateMRT(EnergyPlusData &state,
     // calculation purposes.
 
     if (state.dataHeatBalSurfMgr->CalculateMRTfirstTime) {
+        // For some reason this didn't work, abandoning ship
         // TODO: Keep these for now, because the ZoneMRT function never update the surface emissivities for window shades and EMS
         // But this should use Surface.AE the same as CalcSurfaceWeightedMRT
         // These two functions are also using different surface temperature varieabls, SurfTempIn here, SurfInsideTempHist(1)(SurfNum) there
