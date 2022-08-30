@@ -3429,8 +3429,8 @@ namespace UnitarySystems {
         static constexpr std::string_view unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
         std::string const &cCurrentModuleObject = input_data.system_type;
-        auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC,
-                                                                               UtilityRoutines::MakeUPPERCase(input_data.system_type));
+        DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
+            getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(input_data.system_type)));
         std::string const &thisObjectName = input_data.name;
         this->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
         sysNum = getUnitarySystemIndex(state, thisObjectName);
@@ -3439,10 +3439,9 @@ namespace UnitarySystems {
         if (ZoneEquipment) {
             this->m_IsZoneEquipment = true;
         }
-        std::string const &loc_AirInNodeName = input_data.air_inlet_node_name;
         if (state.dataUnitarySystems->getInputOnceFlag) {
             this->AirInNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                  loc_AirInNodeName,
+                                                                  input_data.air_inlet_node_name,
                                                                   errorsFound,
                                                                   objType,
                                                                   thisObjectName,
@@ -3451,13 +3450,12 @@ namespace UnitarySystems {
                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                   DataLoopNode::ObjectIsParent);
         } else {
-            this->AirInNode = UtilityRoutines::FindItemInList(loc_AirInNodeName, state.dataLoopNodes->NodeID);
+            this->AirInNode = UtilityRoutines::FindItemInList(input_data.air_inlet_node_name, state.dataLoopNodes->NodeID);
         }
 
-        std::string const &loc_AirOutNodeName = input_data.air_outlet_node_name;
         if (state.dataUnitarySystems->getInputOnceFlag) {
             this->AirOutNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                   loc_AirOutNodeName,
+                                                                   input_data.air_outlet_node_name,
                                                                    errorsFound,
                                                                    objType,
                                                                    thisObjectName,
@@ -3466,7 +3464,7 @@ namespace UnitarySystems {
                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                    DataLoopNode::ObjectIsParent);
         } else {
-            this->AirOutNode = UtilityRoutines::FindItemInList(loc_AirOutNodeName, state.dataLoopNodes->NodeID);
+            this->AirOutNode = UtilityRoutines::FindItemInList(input_data.air_outlet_node_name, state.dataLoopNodes->NodeID);
         }
 
         // need to read in all information needed to SetupOutputVariable in setupAllOutputVars
@@ -3476,15 +3474,13 @@ namespace UnitarySystems {
         bool errFlag = false;
         bool PrintMessage = false;
 
-        std::string const &loc_m_DesignSpecMultispeedHPType = input_data.design_specification_multispeed_object_type;
-        std::string const &loc_m_DesignSpecMultispeedHPName = input_data.design_specification_multispeed_object_name;
-        if (loc_m_DesignSpecMultispeedHPType != "" && loc_m_DesignSpecMultispeedHPName != "") {
-            this->m_DesignSpecMultispeedHPType = loc_m_DesignSpecMultispeedHPType;
-            this->m_DesignSpecMultispeedHPName = loc_m_DesignSpecMultispeedHPName;
+        if (!input_data.design_specification_multispeed_object_type.empty() && !input_data.design_specification_multispeed_object_name.empty()) {
+            this->m_DesignSpecMultispeedHPType = input_data.design_specification_multispeed_object_type;
+            this->m_DesignSpecMultispeedHPName = input_data.design_specification_multispeed_object_name;
             int designSpecType_Num = 1;
 
             DesignSpecMSHP thisDesignSpec;
-            this->m_CompPointerMSHP = thisDesignSpec.factory(state, designSpecType_Num, loc_m_DesignSpecMultispeedHPName);
+            this->m_CompPointerMSHP = thisDesignSpec.factory(state, designSpecType_Num, this->m_DesignSpecMultispeedHPName);
             this->m_DesignSpecMSHPIndex = getDesignSpecMSHPIndex(state, this->m_DesignSpecMultispeedHPName);
         }
 
@@ -3634,12 +3630,11 @@ namespace UnitarySystems {
             this->m_FanExists = true;
         }
 
-        if (UtilityRoutines::SameString(input_data.control_type, "Load")) {
-            this->m_ControlType = UnitarySysCtrlType::Load;
-        } else if (UtilityRoutines::SameString(input_data.control_type, "SetPoint")) {
-            this->m_ControlType = UnitarySysCtrlType::Setpoint;
-        } else if (UtilityRoutines::SameString(input_data.control_type, "SingleZoneVAV")) {
-            this->m_ControlType = UnitarySysCtrlType::CCMASHRAE;
+        constexpr static std::array<std::string_view, static_cast<int>(UnitarySysCtrlType::Num)> UnitarySysCtrlTypeNamesUC = {
+            "NONE", "LOAD", "SETPOINT", "SINGLEZONEVAV"};
+        this->m_ControlType =
+            static_cast<UnitarySysCtrlType>(getEnumerationValue(UnitarySysCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(input_data.control_type)));
+        if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
             this->m_ValidASHRAECoolCoil = true;
             this->m_ValidASHRAEHeatCoil = true;
         }
@@ -4006,11 +4001,13 @@ namespace UnitarySystems {
                 // Exhaust Node was not found
                 ShowSevereError(state, format("Input errors for {}:{}", cCurrentModuleObject, thisObjectName));
                 ShowContinueError(state,
-                                  "Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name or Induced Node Name. = " + loc_AirInNodeName);
-                ShowContinueError(state,
-                                  "Air Inlet Node " + loc_AirInNodeName +
-                                      " name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
-                                      "object inputs.");
+                                  format("Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name or Induced Node Name. = {}",
+                                         input_data.air_inlet_node_name));
+                ShowContinueError(
+                    state,
+                    format("Air Inlet Node {} name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
+                           "object inputs.",
+                           input_data.air_inlet_node_name));
                 ShowContinueError(state, "or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.");
                 errorsFound = true;
             } else if (ZoneEquipmentFound && !ZoneInletNodeFound) {
@@ -4020,7 +4017,7 @@ namespace UnitarySystems {
                 ZoneInletNodeExists = searchZoneInletNodes(state, this->AirOutNode, InletControlledZoneNum, ZoneInletNum);
                 if (!ZoneInletNodeExists) {
                     ShowSevereError(state, format("Input errors for {}:{}", cCurrentModuleObject, thisObjectName));
-                    ShowContinueError(state, "Incorrect or misspelled Air Outlet Node Name = " + loc_AirOutNodeName);
+                    ShowContinueError(state, format("Incorrect or misspelled Air Outlet Node Name = {}", input_data.air_outlet_node_name));
                     ShowContinueError(state,
                                       "Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections "
                                       "object inputs.");
@@ -4090,8 +4087,12 @@ namespace UnitarySystems {
         }
 
         if (!ZoneEquipmentFound)
-            BranchNodeConnections::TestCompSet(
-                state, cCurrentModuleObject, UtilityRoutines::MakeUPPERCase(thisObjectName), loc_AirInNodeName, loc_AirOutNodeName, "Air Nodes");
+            BranchNodeConnections::TestCompSet(state,
+                                               cCurrentModuleObject,
+                                               UtilityRoutines::MakeUPPERCase(thisObjectName),
+                                               input_data.air_inlet_node_name,
+                                               input_data.air_outlet_node_name,
+                                               "Air Nodes");
 
         std::string const &loc_fanType = input_data.supply_fan_object_type;
         std::string const &loc_m_FanName = input_data.supply_fan_name;
@@ -4180,9 +4181,9 @@ namespace UnitarySystems {
             this->m_FanCompNotSetYet = false;
         }
 
-        if (UtilityRoutines::SameString(input_data.fan_placement, "BlowThrough")) this->m_FanPlace = FanPlace::BlowThru;
-        if (UtilityRoutines::SameString(input_data.fan_placement, "DrawThrough")) this->m_FanPlace = FanPlace::DrawThru;
-        if (this->m_FanPlace == FanPlace::NotYetSet && this->m_FanExists) {
+        constexpr static std::array<std::string_view, static_cast<int>(FanPlace::Num)> FanPlaceNamesUC = {"NOTYETSET", "BLOWTHROUGH", "DRAWTHROUGH"};
+        this->m_FanPlace = static_cast<FanPlace>(getEnumerationValue(FanPlaceNamesUC, UtilityRoutines::MakeUPPERCase(input_data.fan_placement)));
+        if ((this->m_FanPlace == FanPlace::NotYetSet || this->m_FanPlace == FanPlace::Invalid) && this->m_FanExists) {
             ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
             ShowContinueError(state, format("Illegal Fan Placement = {}", input_data.fan_placement));
             errorsFound = true;
@@ -5359,8 +5360,6 @@ namespace UnitarySystems {
             ShowContinueError(state, "The minimum supply air temperature will be limited to 7.5C and the simulation continues.");
             this->DesignMinOutletTemp = 7.5;
         }
-        //}
-        //}
 
         // Get Latent Load Control flag
         if (!input_data.latent_load_control.empty()) {
@@ -5424,70 +5423,32 @@ namespace UnitarySystems {
                 this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                 this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingDesuperheater) {
 
-                this->m_SuppHeatCoilType_Num =
-                    HeatingCoils::GetHeatingCoilTypeNum(state, this->m_SuppHeatCoilTypeName, this->m_SuppHeatCoilName, errFlag);
-                if (errFlag) {
+                ValidateComponent(state, this->m_SuppHeatCoilTypeName, this->m_SuppHeatCoilName, isNotOK, cCurrentModuleObject);
+                if (isNotOK) {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
-                } else {
 
-                    ValidateComponent(state, this->m_SuppHeatCoilTypeName, this->m_SuppHeatCoilName, isNotOK, cCurrentModuleObject);
-                    if (isNotOK) {
+                } else { // mine data from reheat coil
+                    errFlag = false;
+                    this->m_SuppHeatCoilIndex =
+                        HeatingCoils::GetHeatingCoilIndex(state, this->m_SuppHeatCoilTypeName, this->m_SuppHeatCoilName, errFlag);
+                    if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                         errorsFound = true;
-
-                    } else { // mine data from reheat coil
-
-                        // Get the heating coil index
-                        this->m_SuppHeatCoilIndex =
-                            HeatingCoils::GetHeatingCoilIndex(state, this->m_SuppHeatCoilTypeName, this->m_SuppHeatCoilName, isNotOK);
-                        if (isNotOK) {
-                            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                            errorsFound = true;
-                        }
-
-                        // Get the design supplemental heating capacity
                         errFlag = false;
-                        this->m_DesignSuppHeatingCapacity =
-                            HeatingCoils::GetCoilCapacity(state, this->m_SuppHeatCoilTypeName, this->m_SuppHeatCoilName, errFlag);
-                        if (this->m_DesignSuppHeatingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-
-                        if (errFlag) {
-                            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                            errorsFound = true;
-                        }
-
-                        // Get the number of speeds
+                    } else {
+                        auto &thisSuppCoil = state.dataHeatingCoils->HeatingCoil(this->m_SuppHeatCoilIndex);
                         if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage) {
-                            errFlag = false;
-                            this->m_NumOfSpeedSuppHeating =
-                                HeatingCoils::GetHeatingCoilNumberOfStages(state, this->m_SuppHeatCoilTypeName, this->m_SuppHeatCoilName, errFlag);
-
-                            if (errFlag) {
-                                ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                                errorsFound = true;
-                            }
+                            this->m_DesignSuppHeatingCapacity = thisSuppCoil.MSNominalCapacity(thisSuppCoil.NumOfStages);
+                            this->m_NumOfSpeedSuppHeating = thisSuppCoil.NumOfStages;
+                        } else {
+                            this->m_DesignSuppHeatingCapacity = thisSuppCoil.NominalCapacity;
                         }
-
-                        // Get the Reheat Coil Inlet Node
-                        errFlag = false;
-                        SupHeatCoilInletNode = HeatingCoils::GetCoilInletNode(state, this->m_SuppHeatCoilTypeName, this->m_SuppHeatCoilName, errFlag);
-                        if (errFlag) {
-                            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                            errorsFound = true;
-                        }
-
-                        // Get the Reheat Coil Outlet Node
-                        errFlag = false;
-                        SupHeatCoilOutletNode =
-                            HeatingCoils::GetCoilOutletNode(state, this->m_SuppHeatCoilTypeName, this->m_SuppHeatCoilName, errFlag);
-                        if (errFlag) {
-                            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                            errorsFound = true;
-                        }
-
-                    } // IF (IsNotOK) THEN
-                }
+                        if (this->m_DesignSuppHeatingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                        SupHeatCoilInletNode = thisSuppCoil.AirInletNodeNum;
+                        SupHeatCoilOutletNode = thisSuppCoil.AirOutletNodeNum;
+                    }
+                } // IF (IsNotOK) THEN
 
                 this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
                 this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
@@ -5499,46 +5460,24 @@ namespace UnitarySystems {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                 } else { // mine data from heating coil object
-
-                    // Get the Heating Coil water Inlet or control Node number
                     errFlag = false;
-                    this->m_SuppCoilFluidInletNode =
-                        WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, errFlag);
+                    this->m_SuppHeatCoilIndex = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", this->m_SuppHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                         errorsFound = true;
-                    }
-
-                    // Get the ReHeat Coil hot water max volume flow rate
-                    errFlag = false;
-                    this->m_MaxSuppCoilFluidFlow =
-                        WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, errFlag);
-                    if (this->m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
-                        this->m_RequestAutoSize = true;
-                        this->m_DesignSuppHeatingCapacity = DataSizing::AutoSize;
-                    }
-
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                    }
-
-                    // Get the ReHeat Coil Inlet Node
-                    errFlag = false;
-                    SupHeatCoilInletNode = WaterCoils::GetCoilInletNode(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, errFlag);
-                    this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                    }
-
-                    // Get the ReHeat Coil Outlet Node
-                    errFlag = false;
-                    SupHeatCoilOutletNode = WaterCoils::GetCoilOutletNode(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, errFlag);
-                    this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
+                        errFlag = false;
+                    } else {
+                        auto &thisSuppCoil = state.dataWaterCoils->WaterCoil(this->m_SuppHeatCoilIndex);
+                        this->m_SuppCoilFluidInletNode = thisSuppCoil.WaterInletNodeNum;
+                        this->m_MaxSuppCoilFluidFlow = thisSuppCoil.MaxWaterVolFlowRate;
+                        if (this->m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
+                            this->m_RequestAutoSize = true;
+                            this->m_DesignSuppHeatingCapacity = DataSizing::AutoSize;
+                        }
+                        SupHeatCoilInletNode = thisSuppCoil.AirInletNodeNum;
+                        this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
+                        SupHeatCoilOutletNode = thisSuppCoil.AirOutletNodeNum;
+                        this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
                     }
                 }
 
@@ -5549,54 +5488,32 @@ namespace UnitarySystems {
                     ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
                     errorsFound = true;
                 } else { // mine data from heating coil object
-
                     errFlag = false;
                     this->m_SuppHeatCoilIndex = SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", this->m_SuppHeatCoilName, errFlag);
-                    if (this->m_SuppHeatCoilIndex == 0) {
+                    if (errFlag) {
                         ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                         ShowSevereError(state, format("Illegal Supplemental Heating Coil Name = {}", this->m_SuppHeatCoilName));
                         errorsFound = true;
-                    }
-
-                    // Get the Heating Coil steam inlet node number
-                    errFlag = false;
-                    this->m_SuppCoilFluidInletNode =
-                        SteamCoils::GetCoilSteamInletNode(state, "Coil:Heating:Steam", this->m_SuppHeatCoilName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                    }
-                    // Get the Heating Coil steam max volume flow rate
-                    this->m_MaxSuppCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, this->m_SuppHeatCoilIndex, errFlag);
-                    if (this->m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
-                        this->m_RequestAutoSize = true;
-                        this->m_DesignSuppHeatingCapacity = DataSizing::AutoSize; // not sure if steam coil needs this
-                    }
-
-                    if (this->m_MaxSuppCoilFluidFlow > 0.0) {
-                        int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        Real64 TempSteamIn = 100.0;
-                        Real64 SteamDensity =
-                            FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, "getUnitarySystemInputData");
-                        this->m_MaxSuppCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, this->m_SuppHeatCoilIndex, errFlag) * SteamDensity;
-                    }
-
-                    // Get the Heating Coil Inlet Node
-                    errFlag = false;
-                    SupHeatCoilInletNode = SteamCoils::GetCoilAirInletNode(state, this->m_SuppHeatCoilIndex, this->m_SuppHeatCoilName, errFlag);
-                    this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                    }
-
-                    // Get the Heating Coil Outlet Node
-                    errFlag = false;
-                    SupHeatCoilOutletNode = SteamCoils::GetCoilAirOutletNode(state, this->m_SuppHeatCoilIndex, this->m_SuppHeatCoilName, errFlag);
-                    this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
+                        errFlag = false;
+                    } else {
+                        auto &thisSuppCoil = state.dataSteamCoils->SteamCoil(this->m_SuppHeatCoilIndex);
+                        this->m_SuppCoilFluidInletNode = thisSuppCoil.SteamInletNodeNum;
+                        this->m_MaxSuppCoilFluidFlow = thisSuppCoil.MaxSteamVolFlowRate;
+                        if (this->m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
+                            this->m_RequestAutoSize = true;
+                            this->m_DesignSuppHeatingCapacity = DataSizing::AutoSize; // not sure if steam coil needs this
+                        }
+                        if (this->m_MaxSuppCoilFluidFlow > 0.0) {
+                            int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            Real64 TempSteamIn = 100.0;
+                            Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
+                                state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, "getUnitarySystemInputData");
+                            this->m_MaxSuppCoilFluidFlow = this->m_MaxSuppCoilFluidFlow * SteamDensity;
+                        }
+                        SupHeatCoilInletNode = thisSuppCoil.AirInletNodeNum;
+                        this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
+                        SupHeatCoilOutletNode = thisSuppCoil.AirOutletNodeNum;
+                        this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
                     }
                 }
 
@@ -5609,32 +5526,17 @@ namespace UnitarySystems {
                     errFlag = false;
                     UserDefinedComponents::GetUserDefinedCoilIndex(
                         state, this->m_SuppHeatCoilName, this->m_SuppHeatCoilIndex, errFlag, cCurrentModuleObject);
-                    if (this->m_SuppHeatCoilIndex == 0) {
+                    if (errFlag) {
                         ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                         ShowSevereError(state, format("Illegal Supplemental Heating Coil Name = {}", this->m_SuppHeatCoilName));
                         errorsFound = true;
                         errFlag = false;
-                    }
-
-                    // Get the supplemental heating Coil Inlet Node
-                    errFlag = false;
-                    UserDefinedComponents::GetUserDefinedCoilAirInletNode(
-                        state, this->m_SuppHeatCoilName, SupHeatCoilInletNode, errFlag, cCurrentModuleObject);
-                    this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
-                    }
-
-                    // Get the supplemenatal heating Coil Outlet Node
-                    UserDefinedComponents::GetUserDefinedCoilAirOutletNode(
-                        state, this->m_SuppHeatCoilName, SupHeatCoilOutletNode, errFlag, cCurrentModuleObject);
-                    this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                        errFlag = false;
+                    } else {
+                        auto &thisSuppCoil = state.dataUserDefinedComponents->UserCoil(this->m_SuppHeatCoilIndex);
+                        SupHeatCoilInletNode = thisSuppCoil.Air(1).InletNodeNum;
+                        this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
+                        SupHeatCoilOutletNode = thisSuppCoil.Air(1).OutletNodeNum;
+                        this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
                     }
                 }
 
@@ -6829,14 +6731,7 @@ namespace UnitarySystems {
             }
         }
 
-        if (loc_m_DesignSpecMultispeedHPType != "" && loc_m_DesignSpecMultispeedHPName != "") {
-            this->m_DesignSpecMultispeedHPType = loc_m_DesignSpecMultispeedHPType;
-            this->m_DesignSpecMultispeedHPName = loc_m_DesignSpecMultispeedHPName;
-            int designSpecType_Num = 1;
-
-            DesignSpecMSHP thisDesignSpec;
-            this->m_CompPointerMSHP = thisDesignSpec.factory(state, designSpecType_Num, loc_m_DesignSpecMultispeedHPName);
-            this->m_DesignSpecMSHPIndex = getDesignSpecMSHPIndex(state, this->m_DesignSpecMultispeedHPName);
+        if (!this->m_DesignSpecMultispeedHPType.empty() && !this->m_DesignSpecMultispeedHPName.empty()) {
 
             if (this->m_DesignSpecMSHPIndex > -1) {
 
@@ -6881,8 +6776,8 @@ namespace UnitarySystems {
                 ShowContinueError(state, format("Field Design Specification Multispeed Object Name = {}", this->m_DesignSpecMultispeedHPName));
                 errorsFound = true;
             }
-        } else if ((loc_m_DesignSpecMultispeedHPType == "" && loc_m_DesignSpecMultispeedHPName != "") ||
-                   (loc_m_DesignSpecMultispeedHPType != "" && loc_m_DesignSpecMultispeedHPName == "")) {
+        } else if ((this->m_DesignSpecMultispeedHPType.empty() && !this->m_DesignSpecMultispeedHPName.empty()) ||
+                   (!this->m_DesignSpecMultispeedHPType.empty() && this->m_DesignSpecMultispeedHPName.empty())) {
             ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
             ShowContinueError(state, "... one or both of the following inputs are invalid.");
             ShowContinueError(state, format("Field Design Specification Multispeed Object Type = {}", this->m_DesignSpecMultispeedHPType));
@@ -7539,7 +7434,6 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("supply_fan_object_type").get<std::string>());
                 }
 
-                std::string loc_m_FanName;
                 if (fields.find("supply_fan_name") != fields.end()) { // not required field
                     thisSys.input_specs.supply_fan_name = UtilityRoutines::MakeUPPERCase(fields.at("supply_fan_name").get<std::string>());
                 }
