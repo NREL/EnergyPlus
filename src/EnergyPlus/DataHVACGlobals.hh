@@ -112,12 +112,21 @@ namespace DataHVACGlobals {
         Num
     };
 
+    enum class AirDuctType
     // parameters describing air duct type
-    int constexpr Main(1);
+    {
+        Invalid = -1,
+        Main,
+        Cooling,
+        Heating,
+        Other,
+        RAB,
+        Num
+    };
+
     int constexpr Cooling(2);
     int constexpr Heating(3);
-    int constexpr Other(4);
-    int constexpr RAB(5);
+
     // parameters describing fan types
     int constexpr NumAllFanTypes(6);
 

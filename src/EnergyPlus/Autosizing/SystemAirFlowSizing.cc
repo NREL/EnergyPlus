@@ -755,16 +755,16 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                         } else {
                             switch (this->curDuctType) {
-                            case DataHVACGlobals::Main: {
+                            case DataHVACGlobals::AirDuctType::Main: {
                                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             } break;
-                            case DataHVACGlobals::Cooling: {
+                            case DataHVACGlobals::AirDuctType::Cooling: {
                                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             } break;
-                            case DataHVACGlobals::Heating: {
+                            case DataHVACGlobals::AirDuctType::Heating: {
                                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                             } break;
-                            case DataHVACGlobals::Other: {
+                            case DataHVACGlobals::AirDuctType::Other: {
                                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             } break;
                             default: {
@@ -774,17 +774,17 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                         }
                     } else {
                         switch (this->curDuctType) {
-                        case DataHVACGlobals::Main: {
+                        case DataHVACGlobals::AirDuctType::Main: {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         } break;
-                        case DataHVACGlobals::Cooling: {
+                        case DataHVACGlobals::AirDuctType::Cooling: {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                         } break;
-                        case DataHVACGlobals::Heating: {
+                        case DataHVACGlobals::AirDuctType::Heating: {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                         } break;
 
-                        case DataHVACGlobals::Other: {
+                        case DataHVACGlobals::AirDuctType::Other: {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         } break;
                         default: {

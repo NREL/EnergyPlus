@@ -10,11 +10,11 @@ IF ( CMAKE_COMPILER_IS_GNUCXX OR "x${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) 
 
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-pipe") # Faster compiler processing
-    # set (CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
+    # set (CMAKE_CXX_FLAGS "-std=c++17 -stdlib=libc++")
     if( MINGW )
-        ADD_CXX_DEFINITIONS("-std=gnu++11") # Enable C++11 features in g++
+        ADD_CXX_DEFINITIONS("-std=gnu++17") # Enable C++17 features in g++
     else()
-        ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
+        ADD_CXX_DEFINITIONS("-std=c++17") # Enable C++17 features in g++
         ADD_CXX_DEFINITIONS("-fPIC")
     endif()
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
@@ -32,7 +32,7 @@ IF ( CMAKE_COMPILER_IS_GNUCXX OR "x${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) 
       ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
       ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
     endif ()
-  
+
   ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
 ENDIF ()
 
