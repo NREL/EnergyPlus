@@ -170,7 +170,7 @@ constexpr std::array<std::string_view, static_cast<int>(SurfacesType::Num)> Surf
                                                                                                 "ALLINTERIORFLOORS"};
 void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                                   const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-                                  Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
+                                  int const ZoneToResimulate                  // if passed in, then only calculate surfaces that have this zone
 )
 {
 
@@ -307,7 +307,7 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 
         for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
-            if (present(ZoneToResimulate)) {
+            if (ZoneToResimulate != 0) {
                 if ((ZoneNum != ZoneToResimulate) && (state.dataSurface->SurfAdjacentZone(SurfNum) != ZoneToResimulate)) {
                     continue; // skip surfaces that are not associated with this zone
                 }
