@@ -2099,7 +2099,7 @@ namespace ThermalComfort {
         // Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
         //          This is necessary for the surface weighted option to not in essence
         //          double count SurfNum in the MRT calculation when averaged with the Surface( SurfNum ).
-        //          Other than that, the method here is the same as CalculateZoneMRT.  Once a modified zone
+        //          Other than that, the method here is the same as CalculateMRT.  Once a modified zone
         //          MRT is calculated, the subroutine then calculates and returns the
         //          RadTemp (radiant temperature) for use by the thermal comfort routines
         //          that is the average of the surface temperature to be weighted and
@@ -2113,7 +2113,6 @@ namespace ThermalComfort {
             state.dataThermalComforts->FirstTimeError = true;
             state.dataThermalComforts->FirstTimeSurfaceWeightedFlag = false;
             for (auto const &thisRadEnclosure : state.dataViewFactor->EnclRadInfo) {
-                Real64 sumAllSurfaceAE = 0.0;
                 for (int const SurfNum2 : thisRadEnclosure.SurfacePtr) {
                     auto &thisSurface2 = state.dataSurface->Surface(SurfNum2);
                     thisSurface2.AE = thisSurface2.Area * state.dataConstruction->Construct(thisSurface2.Construction).InsideAbsorpThermal;
