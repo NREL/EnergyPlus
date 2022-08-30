@@ -6128,6 +6128,15 @@ namespace HeatBalanceManager {
                                 OutputProcessor::SOVStoreType::State,
                                 state.dataHeatBal->Zone(loop).Name);
         }
+        for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
+            SetupOutputVariable(state,
+                                "Enclosure Mean Radiant Temperature",
+                                OutputProcessor::Unit::C,
+                                thisEnclosure.MRT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                thisEnclosure.Name);
+        }
     }
 
     // End Initialization Section of the Module
