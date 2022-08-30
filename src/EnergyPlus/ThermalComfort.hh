@@ -374,8 +374,6 @@ struct ThermalComfortsData : BaseGlobalStruct
     Array1D<Real64> Coeff = Array1D<Real64>(2);      // Coefficients used in Range-Kutta's Method
     Array1D<Real64> Temp = Array1D<Real64>(2);       // Temperature
     Array1D<Real64> TempChange = Array1D<Real64>(2); // Change of temperature
-    EPVector<Real64> SurfaceAE;                      // Product of area and emissivity for each surface
-    EPVector<Real64> SurfaceEnclAESum;               // Sum of area times emissivity for all other surfaces in enclosure
     bool FirstTimeError = true;                      // Only report the error message one time
     Real64 avgDryBulbASH = 0.0;
     Array1D<Real64> monthlyTemp = Array1D<Real64>(12, 0.0);
@@ -387,7 +385,7 @@ struct ThermalComfortsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        *this = ThermalComfortsData();
+        new (this) ThermalComfortsData();
     }
 
     // Default Constructor

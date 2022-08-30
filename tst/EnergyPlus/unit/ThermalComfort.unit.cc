@@ -762,7 +762,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
 {
 
-    int ZoneNum(1);
     int SurfNum(1);
     Real64 RadTemp;
 
