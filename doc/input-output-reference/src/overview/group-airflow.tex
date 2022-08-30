@@ -2349,9 +2349,9 @@ An IDF example is shown below:
 \begin{lstlisting}
 
 ZoneAirMassFlowConservation,
-    Yes,                       !- Adjust Zone Mixing For Zone Air Mass Flow Balance
+    AdjustReturnOnly,          !- Adjust Zone Mixing and Return For Air Mass Flow Balance
     AdjustInfiltrationFlow;    !- Infiltration Balancing Method
-  AllZones;                  !- Infiltration Balancing Zones
+    AllZones;                  !- Infiltration Balancing Zones
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-7-000}
