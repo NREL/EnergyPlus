@@ -838,9 +838,9 @@ Following are some suggestions that might be applicable:
 
 \subsection{ComfortViewFactorAngles}\label{comfortviewfactorangles}
 
-When requesting EnergyPlus to do a thermal comfort calculation, the program user has three options for defining how the mean radiant temperature will be calculated. The user may select ``zoneaveraged'' which results in a mean radiant temperature that is characteristic of an ``average'' location near the center of the zone. The user may also elect to place the person near a particular surface by selecting ``surfaceweighted'' in the \hyperref[people]{People} statement. This takes the average of the zone mean radiant temperature and the temperature of the surface that the person is near and uses this value as the mean radiant temperature when calculating thermal comfort.
+When requesting EnergyPlus to do a thermal comfort calculation, the program user has three options for defining how the mean radiant temperature will be calculated. The user may select ``zoneaveraged'' which results in a mean radiant temperature that is characteristic of an ``average'' location near the center of the zone. The user may also elect to place the person near a particular surface by selecting ``surfaceweighted'' in the \hyperref[people]{People} statement. This takes the average of the enclosure mean radiant temperature and the temperature of the surface that the person is near and uses this value as the mean radiant temperature when calculating thermal comfort.
 
-The third option is for the user to more explicitly position the person within the space by defining the angle factors from the person to the various surfaces in the zone. This option requires the user to list the surfaces that the person can see from a radiation standpoint and also define the angle (or view) factor for each surface. The AngleFactorList input line is intended to give the user this opportunity.
+The third option is for the user to more explicitly position the person within the space by defining the angle factors from the person to the various surfaces in the same radiant enclosure. This option requires the user to list the surfaces that the person can see from a radiation standpoint and also define the angle (or view) factor for each surface. The AngleFactorList input line is intended to give the user this opportunity.
 
 \subsubsection{Inputs}\label{inputs-1-023}
 
@@ -850,11 +850,11 @@ This field is an unique user assigned name for the list of surfaces that can be 
 
 \paragraph{Field: Zone Name}\label{field-zone-name-007}
 
-Zone Name for this surface list. Each of the surfaces listed must be in this zone.
+Zone name is ignored.
 
 \paragraph{Field: Surface \textless{}\#\textgreater{} Name}\label{field-surface-name-002}
 
-This field is the name of a surface in the zone seen by the person.
+This field is the name of a surface in the radiant enclosure seen by the person. All surfaces listed should be in the same radiant enclosure. This should also be the same radiant enclosure as the People instance which references this ComfortViewFactorAngles object. If not, a warning will be issued, but the simulation will proceed with the specified surfaces.
 
 \paragraph{Field: Angle Factor \textless{}\#\textgreater{}}\label{field-angle-factor}
 
@@ -868,7 +868,7 @@ An example IDF with an electric low temperature radiant system is shown below.
 \begin{lstlisting}
 ComfortViewFactorAngles,
   South Zone Angle Factors, !- name of angle factor list
-  South Zone,           !- Zone Name
+  ,                     !- Zone Name
   Zn001:Flr001,         !- Surface name 1
   0.75,                 !- Angle factor for surface 1
   Zn001:Wall001,        !- Surface name 2
