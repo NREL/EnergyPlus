@@ -578,7 +578,7 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
     std::string heatingOrCooling = "Heating";
     std::string_view meterTypeKey = "DistrictHeatingWater";
     if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
-        reportVarPrefix = "District Cooling ";
+        reportVarPrefix = "District Cooling Water ";
         heatingOrCooling = "Cooling";
         meterTypeKey = "DistrictCooling";
     } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) {

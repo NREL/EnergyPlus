@@ -2108,8 +2108,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchLeedPerfOtherFuel2Dem = 0;
         this->pdchLeedPerfDisClEneUse = 0;
         this->pdchLeedPerfDisClDem = 0;
-        this->pdchLeedPerfDisHtEneUse = 0;
-        this->pdchLeedPerfDisHtDem = 0;
+        this->pdchLeedPerfDisHtWtrEneUse = 0;
+        this->pdchLeedPerfDisHtWtrDem = 0;
+        this->pdchLeedPerfDisHtStEneUse = 0;
+        this->pdchLeedPerfDisHtStDem = 0;
         this->pdstLeedEneUseSum = 0;
         this->pdchLeedEusUnt = 0;
         this->pdchLeedEusProc = 0;
