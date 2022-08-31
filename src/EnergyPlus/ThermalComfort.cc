@@ -1984,11 +1984,12 @@ namespace ThermalComfort {
                         ShowContinueError(
                             state,
                             format("... Surface=\"{}\" is in enclosure=\"{}\"",
-                                   thisSurf.Name,
+                                   state.dataSurface->Surface(thisAngFacList.SurfacePtr(1)).Name,
                                    state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(thisAngFacList.SurfacePtr(1)).RadEnclIndex).Name));
-                        ShowContinueError(
-                            state,
-                            format("... Surface=\"{}\" is in enclosure=\"{}\"", state.dataViewFactor->EnclRadInfo(thisSurf.RadEnclIndex).Name));
+                        ShowContinueError(state,
+                                          format("... Surface=\"{}\" is in enclosure=\"{}\"",
+                                                 thisSurf.Name,
+                                                 state.dataViewFactor->EnclRadInfo(thisSurf.RadEnclIndex).Name));
                     }
                 }
 
