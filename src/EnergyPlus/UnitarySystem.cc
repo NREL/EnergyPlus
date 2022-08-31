@@ -3908,7 +3908,7 @@ namespace UnitarySystems {
 
             int compIndex;
             int branchIndex;
-            AirLoopFound = searchTotalComponents(state, this->SimAirCompType_Num, thisObjectName, compIndex, branchIndex, AirLoopNumber);
+            AirLoopFound = searchTotalComponents(state, this->AirloopEqType, thisObjectName, compIndex, branchIndex, AirLoopNumber);
             if (AirLoopFound && (this->ControlZoneNum > 0)) {
                 //             Find the controlled zone number for the specified thermostat location
                 this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
@@ -7018,7 +7018,7 @@ namespace UnitarySystems {
                 // now translate to UnitarySystem
                 thisSys.UnitType = cCurrentModuleObject;
                 thisSys.m_sysType = SysType::CoilCoolingDX;
-                thisSys.SimAirCompType_Num = SimAirServingZones::CompType::DXSystem;
+                thisSys.AirloopEqType = SimAirServingZones::CompType::DXSystem;
 
                 // TODO: figure out another way to set this next variable
                 // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
@@ -7044,7 +7044,7 @@ namespace UnitarySystems {
     {
         std::string cCurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
         SysType sysTypeNum = SysType::PackagedAC;
-        DataZoneEquipment::ZoneEquip zoneEqTypeNum = DataZoneEquipment::ZoneEquip::Invalid;
+        DataZoneEquipment::ZoneEquip zoneEqType = DataZoneEquipment::ZoneEquip::Invalid;
         int numPTAC = 0;
         int numPTHP = 0;
         int numPTWSHP = 0;
@@ -7052,11 +7052,11 @@ namespace UnitarySystems {
         for (int getPTUnitType = 1; getPTUnitType <= 3; ++getPTUnitType) {
             if (getPTUnitType == 2) {
                 sysTypeNum = SysType::PackagedHP;
-                zoneEqTypeNum = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
+                zoneEqType = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
                 cCurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
             } else if (getPTUnitType == 3) {
                 sysTypeNum = SysType::PackagedWSHP;
-                zoneEqTypeNum = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
+                zoneEqType = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
                 cCurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
             }
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -7162,7 +7162,7 @@ namespace UnitarySystems {
 
                     thisSys.UnitType = cCurrentModuleObject;
                     thisSys.m_sysType = sysTypeNum;
-                    thisSys.ZoneEqType_Num = zoneEqTypeNum;
+                    thisSys.ZoneEqType = zoneEqType;
 
                     // TODO: figure out another way to set this next variable
                     // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
@@ -7291,7 +7291,7 @@ namespace UnitarySystems {
                 // now translate to UnitarySystem
                 thisSys.UnitType = cCurrentModuleObject;
                 thisSys.m_sysType = SysType::CoilCoolingWater;
-                thisSys.SimAirCompType_Num = SimAirServingZones::CompType::CoilSystemWater;
+                thisSys.AirloopEqType = SimAirServingZones::CompType::CoilSystemWater;
                 thisSys.input_specs.control_type = "Setpoint";
                 thisSys.m_CoolCoilExists = true; // is always true
                 thisSys.m_LastMode = CoolingMode;
@@ -7391,7 +7391,7 @@ namespace UnitarySystems {
                 auto const &fields = instance.value();
                 thisSys.UnitType = cCurrentModuleObject;
                 thisSys.m_sysType = SysType::Unitary;
-                thisSys.SimAirCompType_Num = SimAirServingZones::CompType::UnitarySystemModel;
+                thisSys.AirloopEqType = SimAirServingZones::CompType::UnitarySystemModel;
 
                 thisSys.input_specs.name = thisObjectName;
                 thisSys.input_specs.system_type = cCurrentModuleObject;

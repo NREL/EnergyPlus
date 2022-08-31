@@ -489,8 +489,8 @@ namespace UnitarySystems {
 
     public:
         // SZVAV variables
-        DataZoneEquipment::ZoneEquip ZoneEqType_Num = DataZoneEquipment::ZoneEquip::Invalid;
-        SimAirServingZones::CompType SimAirCompType_Num = SimAirServingZones::CompType::Invalid;
+        DataZoneEquipment::ZoneEquip ZoneEqType = DataZoneEquipment::ZoneEquip::Invalid;
+        SimAirServingZones::CompType AirloopEqType = SimAirServingZones::CompType::Invalid;
         int MaxIterIndex = 0;
         int RegulaFalsiFailedIndex = 0;
         int NodeNumOfControlledZone = 0;
