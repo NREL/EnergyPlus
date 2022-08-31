@@ -1918,35 +1918,22 @@ namespace ThermalComfort {
         //     AUTHOR         Jaewook Lee
         //     DATE WRITTEN   July 2001
 
-        // Using/Aliasing
-        using namespace DataHeatBalance;
+        static constexpr std::string_view routineName("GetAngleFactorList: "); // include trailing blank space
+        Real64 constexpr AngleFacLimit(0.01);                                  // To set the limit of sum of angle factors
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr AngleFacLimit(0.01); // To set the limit of sum of angle factors
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AllAngleFacSummed; // Sum of angle factors in each zone
-        bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int IOStatus;
-        int Item;                  // Item to be "gotten"
-        int NumAlphas;             // Number of Alphas from InputProcessor
-        int NumNumbers;            // Number of Numbers from Input Processor
-        int NumOfAngleFactorLists; // Number of Angle Factor Lists found in IDF
-        int SurfNum;               // Surface number DO loop counter
-        int WhichAFList;           // Used in validating AngleFactorList
+        int NumAlphas;  // Number of Alphas from InputProcessor
+        int NumNumbers; // Number of Numbers from Input Processor
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+
         cCurrentModuleObject = "ComfortViewFactorAngles";
-        NumOfAngleFactorLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumOfAngleFactorLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataThermalComforts->AngleFactorList.allocate(NumOfAngleFactorLists);
-        for (auto &e : state.dataThermalComforts->AngleFactorList) {
-            e.Name.clear();
-            e.ZoneName.clear();
-            e.ZonePtr = 0;
-        }
 
-        for (Item = 1; Item <= NumOfAngleFactorLists; ++Item) {
+        for (int Item = 1; Item <= NumOfAngleFactorLists; ++Item) {
 
-            AllAngleFacSummed = 0.0;
+            Real64 AllAngleFacSummed = 0.0; // Sum of angle factors in each zone
             auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(Item));
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -1963,21 +1950,14 @@ namespace ThermalComfort {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             thisAngFacList.Name = state.dataIPShortCut->cAlphaArgs(1); // no need for verification/uniqueness.
-            thisAngFacList.ZoneName = state.dataIPShortCut->cAlphaArgs(2);
-            thisAngFacList.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
-            if (thisAngFacList.ZonePtr == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - not found");
-                ShowContinueError(state,
-                                  "...invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
-                ErrorsFound = true;
-            }
+            // Ignore ZoneName cAlphaArgs(2)
 
             thisAngFacList.TotAngleFacSurfaces = NumNumbers;
             thisAngFacList.SurfaceName.allocate(thisAngFacList.TotAngleFacSurfaces);
             thisAngFacList.SurfacePtr.allocate(thisAngFacList.TotAngleFacSurfaces);
             thisAngFacList.AngleFactor.allocate(thisAngFacList.TotAngleFacSurfaces);
 
-            for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
                 thisAngFacList.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 2);
                 thisAngFacList.SurfacePtr(SurfNum) =
                     UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 2), state.dataSurface->Surface);
@@ -1991,21 +1971,23 @@ namespace ThermalComfort {
                                       "ref " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
                                           " not found in " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
                     ErrorsFound = true;
-                } else if (thisAngFacList.ZonePtr != 0) { // don't look at invalid zones
-                    // Found Surface, is it in same zone tagged for Angle Factor List?
-                    if (thisAngFacList.ZonePtr != state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Zone) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - mismatch " +
-                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\"");
+                } else {
+                    // Found Surface, is it in same enclosure?
+                    auto &thisSurf = state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum));
+                    if (SurfNum == 1) thisAngFacList.EnclosurePtr = thisSurf.RadEnclIndex; // Save enclosure num of first surface
+                    if (thisAngFacList.EnclosurePtr != thisSurf.RadEnclIndex) {
+                        ShowWarningError(state,
+                                         format("{}: For {}=\"{}\", surfaces are not all in the same radiant enclosure.",
+                                                routineName,
+                                                cCurrentModuleObject,
+                                                thisAngFacList.Name));
                         ShowContinueError(
                             state,
-                            "... does not match " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                state.dataHeatBal
-                                    ->Zone(state.dataSurface->Surface(state.dataThermalComforts->AngleFactorList(Item).SurfacePtr(SurfNum)).Zone)
-                                    .Name +
-                                "\" for " + state.dataIPShortCut->cAlphaFieldNames(SurfNum + 2) + "=\"" +
-                                state.dataIPShortCut->cAlphaArgs(SurfNum + 2) + "\".");
-                        ErrorsFound = true;
+                            format("... Surface=\"{}\" is in enclosure=\"{}\"",
+                                   state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(thisAngFacList.SurfacePtr(1)).RadEnclIndex).Name));
+                        ShowContinueError(
+                            state,
+                            format("... Surface=\"{}\" is in enclosure=\"{}\"", state.dataViewFactor->EnclRadInfo(thisSurf.RadEnclIndex).Name));
                     }
                 }
 
@@ -2026,25 +2008,29 @@ namespace ThermalComfort {
             ShowFatalError(state, "GetAngleFactorList: Program terminated due to preceding errors.");
         }
 
-        for (Item = 1; Item <= state.dataHeatBal->TotPeople; ++Item) {
-            if (state.dataHeatBal->People(Item).MRTCalcType != DataHeatBalance::CalcMRT::AngleFactor) continue;
-            state.dataHeatBal->People(Item).AngleFactorListPtr =
-                UtilityRoutines::FindItemInList(state.dataHeatBal->People(Item).AngleFactorListName, state.dataThermalComforts->AngleFactorList);
-            WhichAFList = state.dataHeatBal->People(Item).AngleFactorListPtr;
-            if (WhichAFList == 0 &&
-                (state.dataHeatBal->People(Item).Fanger || state.dataHeatBal->People(Item).Pierce || state.dataHeatBal->People(Item).KSU)) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataHeatBal->People(Item).AngleFactorListName + "\", invalid");
-                ShowSevereError(state, "... Angle Factor List Name not found for PEOPLE= " + state.dataHeatBal->People(Item).Name);
+        for (int Item = 1; Item <= state.dataHeatBal->TotPeople; ++Item) {
+            auto &thisPeople = state.dataHeatBal->People(Item);
+            if (thisPeople.MRTCalcType != DataHeatBalance::CalcMRT::AngleFactor) continue;
+            thisPeople.AngleFactorListPtr =
+                UtilityRoutines::FindItemInList(thisPeople.AngleFactorListName, state.dataThermalComforts->AngleFactorList);
+            int WhichAFList = thisPeople.AngleFactorListPtr;
+            if (WhichAFList == 0 && (thisPeople.Fanger || thisPeople.Pierce || thisPeople.KSU)) {
+                ShowSevereError(state, format("{}{}=\"{}\", invalid", routineName, cCurrentModuleObject, thisPeople.AngleFactorListName));
+                ShowSevereError(state, format("... Angle Factor List Name not found for PEOPLE=\"{}\"", thisPeople.Name));
                 ErrorsFound = true;
-            } else if (state.dataHeatBal->People(Item).ZonePtr != state.dataThermalComforts->AngleFactorList(WhichAFList).ZonePtr &&
-                       (state.dataHeatBal->People(Item).Fanger || state.dataHeatBal->People(Item).Pierce || state.dataHeatBal->People(Item).KSU)) {
-                ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).Name + " mismatch Zone Name");
-                ShowContinueError(state,
-                                  "...Zone=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).ZoneName + " does not match Zone=\"" +
-                                      state.dataHeatBal->Zone(state.dataHeatBal->People(Item).ZonePtr).Name + "\" in PEOPLE=\"" +
-                                      state.dataHeatBal->People(Item).Name + "\".");
-                ErrorsFound = true;
+            } else {
+                auto &thisAngFacList = state.dataThermalComforts->AngleFactorList(WhichAFList);
+                if (state.dataHeatBal->space(thisPeople.spaceIndex).radiantEnclosureNum != thisAngFacList.EnclosurePtr &&
+                    (thisPeople.Fanger || thisPeople.Pierce || thisPeople.KSU)) {
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\", radiant enclosure mismatch.", routineName, cCurrentModuleObject, thisAngFacList.Name));
+                    ShowContinueError(
+                        state,
+                        format("...Enclosure=\"{}\" doe not match enclosure=\"{}\" for PEOPLE=\"{}\"",
+                               state.dataViewFactor->EnclRadInfo(thisAngFacList.EnclosurePtr).Name,
+                               state.dataViewFactor->EnclRadInfo(state.dataHeatBal->space(thisPeople.spaceIndex).radiantEnclosureNum).Name,
+                               thisPeople.Name));
+                }
             }
         }
 
@@ -2064,24 +2050,14 @@ namespace ThermalComfort {
         // Return value
         Real64 CalcAngleFactorMRT;
 
-        // Locals
-        Real64 SurfaceTemp;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;
-        Real64 SurfTempEmissAngleFacSummed;
-        Real64 SumSurfaceEmissAngleFactor;
-        Real64 SurfEAF;
-
-        SurfTempEmissAngleFacSummed = 0.0;
-        SumSurfaceEmissAngleFactor = 0.0;
-        SurfEAF = 0.0;
+        Real64 SurfTempEmissAngleFacSummed = 0.0;
+        Real64 SumSurfaceEmissAngleFactor = 0.0;
 
         auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(AngleFacNum));
 
-        for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-            SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv;
-            SurfEAF =
+        for (int SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
+            Real64 SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv;
+            Real64 SurfEAF =
                 state.dataConstruction->Construct(state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal *
                 thisAngFacList.AngleFactor(SurfNum);
             SurfTempEmissAngleFacSummed += SurfEAF * pow_4(SurfaceTemp);
@@ -2113,7 +2089,6 @@ namespace ThermalComfort {
             state.dataThermalComforts->FirstTimeError = true;
             state.dataThermalComforts->FirstTimeSurfaceWeightedFlag = false;
             for (auto const &thisRadEnclosure : state.dataViewFactor->EnclRadInfo) {
-                Real64 sumAllSurfaceAE = 0.0;
                 for (int const SurfNum2 : thisRadEnclosure.SurfacePtr) {
                     auto &thisSurface2 = state.dataSurface->Surface(SurfNum2);
                     thisSurface2.AE = thisSurface2.Area * state.dataConstruction->Construct(thisSurface2.Construction).InsideAbsorpThermal;

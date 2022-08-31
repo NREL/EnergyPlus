@@ -161,18 +161,12 @@ namespace ThermalComfort {
     struct AngleFactorData
     {
         // Members
-        Array1D<Real64> AngleFactor; // Angle factor of each surface
-        std::string Name;            // Angle factor list name
-        Array1D_string SurfaceName;  // Names of the Surfces
-        Array1D_int SurfacePtr;      // ALLOCATABLE to the names of the Surfces
-        int TotAngleFacSurfaces;     // Total number of surfaces
-        std::string ZoneName;        // Name of zone the system is serving
-        int ZonePtr;                 // Point to this zone in the Zone derived type
-
-        // Default Constructor
-        AngleFactorData() : TotAngleFacSurfaces(0), ZonePtr(0)
-        {
-        }
+        EPVector<Real64> AngleFactor;      // Angle factor of each surface
+        std::string Name;                  // Angle factor list name
+        EPVector<std::string> SurfaceName; // Names of the Surfces
+        EPVector<int> SurfacePtr;          // Surface indexes
+        int TotAngleFacSurfaces = 0;       // Total number of surfaces
+        int EnclosurePtr = 0;              // Enclosure index for the first surface
     };
 
     void ManageThermalComfort(EnergyPlusData &state,
