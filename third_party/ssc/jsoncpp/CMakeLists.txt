@@ -142,16 +142,16 @@ endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # using regular Clang or AppleClang
     if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.12.0)
-      add_compile_options(-Wall -Wconversion -Wshadow -Werror=conversion -Werror=sign-compare)
+      add_compile_options(-Wall -Wconversion -Wshadow -Werror=conversion -Werror=sign-compare -Wno-deprecated-declarations)
     else()
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wconversion -Wshadow -Werror=conversion -Werror=sign-compare")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wconversion -Wshadow -Werror=conversion -Werror=sign-compare -Wno-deprecated-declarations")
     endif()
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using GCC
     if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.12.0)
-      add_compile_options(-Wall -Wconversion -Wshadow -Wextra)
+      add_compile_options(-Wall -Wconversion -Wshadow -Wextra -Wno-deprecated-declarations)
     else()
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wconversion -Wshadow -Wextra")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wconversion -Wshadow -Wextra -Wno-deprecated-declarations")
     endif()
     # not yet ready for -Wsign-conversion
 
