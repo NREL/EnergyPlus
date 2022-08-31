@@ -11,7 +11,7 @@ This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole buildin
  - The Department of Energy maintains a [public website for EnergyPlus](https://energyplus.net) where you can find much more information about the program.
  - For detailed developer information, consult the [wiki](https://github.com/nrel/EnergyPlusTeam/wiki).
  - Many users (and developers) of EnergyPlus are active on [Unmet Hours](https://unmethours.com/), so that's a great place to start if you have a question about EnergyPlus or building simulation.
- - For more in-depth, developer-driven support, please utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
+ - For more in-depth, developer-driven support, please utilize the [EnergyPlus Helpdesk](https://energyplushelp.freshdesk.com/).
 
 ## Testing
 

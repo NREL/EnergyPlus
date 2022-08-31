@@ -80,6 +80,19 @@ The name of the People object. Must be unique across all People objects.
 
 This field applies this People object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the people/area and area/person options of the Number of People Calculation Method to place a varying number of people at the same density in each zone or space. The names of the actual people objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}People Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
+When multiple people objects are defined for the same zone, and they have
+different SET, PMV, Heat/Cold Stress Temperature Threshold, a warning message
+will be produced to caution users that zone-level resilience metrics results
+will only be meaningful if each zone has at most one People object defined. This
+is especially true for SET Degree-Hours and Discomfort-Weighted Exceedance Hours
+tables. In the SET Degree-Hour case, this is because in the calculation of zone
+level Heating/Cooling SET Degree-Hours, if multiple People objects are defined
+for one zone, EnergyPlus will only use the SET of one People object to compute
+the zone level SET Degree-Hours, and neglecting the SET of other people object
+defined in the same zone. As a result, when multiple people objects with
+different SET, PMV, or Heat/Cold Stress Temperature are linked to one zone, the
+corresponding zone-level resilience metrics results might be invalid.
+
 \paragraph{Field: Number of People Schedule Name}\label{field-number-of-people-schedule-name}
 
 This field is the name of the schedule (ref: Schedules) that modifies the number of people parameter (see Number of People Calculation Method and related fields). The schedule values can be any positive number. The actual number of people in a zone as defined by this statement is the product of the number of people field and the value of the schedule specified by name in this field.
@@ -143,6 +156,22 @@ Values for activity level can range anywhere from approximately 100-150 Watts pe
 This numeric input field specifies carbon dioxide generation rate per person with units of m3/s-W. The total carbon dioxide generation rate from this object is:
 
 Number of People * People Schedule * People Activity * Carbon Dioxide Generation Rate. The default value is 3.82E-8 m3/s-W (obtained from ASHRAE Standard 62.1-2007 value at 0.0084 cfm/met/person over the general adult population). The maximum value can be 10 times the default value.
+
+\paragraph{Field: Cold Stress Temperature Threshold}\label{cold-stress-temperature-threshold}
+
+This field is used in the calculation of hours of safety for cold events, which
+is defined as the longest duration (number of hours), starting from the
+beginning time of the risk period (e.g., the start time of a power outage), to
+not below a certain temperature threshold (specified in this field). If not
+specified, 60F (or 15.56C) will be used as the default temperature threshold.
+
+\paragraph{Field: Heat Stress Temperature Threshold}\label{heat-stress-temperature-threshold}
+
+This field is used in the calculation of hours of safety for hot events, which
+is defined as the longest duration (number of hours), starting from the
+beginning time of the risk period (e.g., the start time of a power outage), to
+not above a certain temperature threshold (specified in this field). If not
+specified, 86F (or 30C) will be used as the default temperature threshold.
 
 \paragraph{Field: Enable ASHRAE 55 comfort warnings}\label{field-enable-ashrae-55-comfort-warnings}
 
@@ -649,19 +678,19 @@ If the .epw file is used, the field reports the simple running average of the da
 
 \paragraph{Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature {[}C{]}}\label{zone-thermal-comfort-ashrae-55-adaptive-model-temperature-c}
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80\% acceptability limits for indoor operative temperature are defined as no greater than 3.5 degrees C from the adaptive comfort temperature. The 90\% acceptability limits are defined as no greater than 2.5 degrees C from the adaptive comfort temperature. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 33.5C).
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the ASHRAE-55 adaptive comfort model. The 80\% acceptability limits for indoor operative temperature are defined as no greater than 3.5$^\circ$C from the adaptive comfort temperature. The 90\% acceptability limits are defined as no greater than 2.5$^\circ$C from the adaptive comfort temperature. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 33.5$^\circ$C).
 
 \paragraph{Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status}\label{zone-thermal-comfort-cen-15251-adaptive-model-category-i-status}
 
-This field is to report whether the operative temperature falls into the Category I (90\% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
+This field is to report whether the operative temperature falls into the Category I (90\% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0$^\circ$C).
 
 \paragraph{Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status}\label{zone-thermal-comfort-cen-15251-adaptive-model-category-ii-status}
 
-This field is to report whether the operative temperature falls into the Category II (80\% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
+This field is to report whether the operative temperature falls into the Category II (80\% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0$^\circ$C).
 
 \paragraph{Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status}\label{zone-thermal-comfort-cen-15251-adaptive-model-category-iii-status}
 
-This field is to report whether the operative temperature falls into the Category III (65\% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0C).
+This field is to report whether the operative temperature falls into the Category III (65\% acceptability) limits of the adaptive comfort in the European Standard EN15251-2007. A value of 1 means within (inclusive) the limits, a value of 0 means outside the limits, and a value of -1 means not applicable (when unoccupied or running average outdoor temp is outside the range of 10.0 to 30.0$^\circ$C).
 
 \paragraph{Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature}\label{zone-thermal-comfort-cen-15251-adaptive-model-running-average-outdoor-air-temperature}
 
@@ -669,7 +698,7 @@ This field reports the weighted average of the outdoor air temperature of the pr
 
 \paragraph{Zone Thermal Comfort CEN 15251 Adaptive Model Temperature}\label{zone-thermal-comfort-cen-15251-adaptive-model-temperature}
 
-This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 30.0C).
+This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 30.0$^\circ$C).
 
 \paragraph{Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect}\label{zone-thermal-comfort-ashrae55-elevated-air-speed-cooling-effect}
 
@@ -912,7 +941,7 @@ This factor (watts/person) is used, along with the number of occupants (people) 
 
 The electrical input to lighting ultimately appears as heat that contributes to zone loads or to return air heat gains. In EnergyPlus this heat is divided into four different fractions. Three of these are given by the input fields Return Air Fraction, Fraction Radiant and Fraction Visible. A fourth, defined as the fraction of the heat from lights convected to the zone air, is calculated by the program as:
 
-f\(_{convected}\) = 1.0 -- (Return Air Fraction + Fraction Radiant + Fraction Visible)
+$$ f_{\textrm{convected}} = 1.0 - (\textrm{Return Air Fraction} + \textrm{Fraction Radiant} + \textrm{Fraction Visible}) $$
 
 You will get an error message if Return Air Fraction + Fraction Radiant + Fraction Visible exceeds 1.0.
 
@@ -1016,7 +1045,7 @@ The coefficient C\(_{1}\) in the equation for (Return Air Fraction)\(_{calculate
 
 \paragraph{Field: Return Air Fraction Function of Plenum Temperature Coefficient 2}\label{field-return-air-fraction-function-of-plenum-temperature-coefficient-2}
 
-The coefficient C\(_{2}\) in the equation for (Return Air Fraction)\(_{calculated}\). Its units are 1/\(^{O}\)C.
+The coefficient C\(_{2}\) in the equation for (Return Air Fraction)\(_{calculated}\). Its units are 1/$^\circ$C.
 
 \paragraph{Field: Return Air Heat Gain Node Name}\label{field-return-air-heat-gain-node-name}
 
@@ -2251,7 +2280,7 @@ InteriorEquipment:NaturalGas:SpaceType:<Space Type Name>
 
 \paragraph{Space or Zone Hot Water Equipment District Heating Energy {[}J{]}}\label{zone-hot-water-equipment-district-heating-energy-j}
 
-The hot water equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Hot Water Equipment District Heating Energy is added to the following district heating meters:.
+The hot water equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Hot Water Equipment District Heating Energy is added to the following district heating meters:
 
 \begin{lstlisting}
 DistrictHeating:Facility
@@ -2274,7 +2303,7 @@ InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
 
 \paragraph{Space or Zone Steam Equipment District Heating Energy {[}J{]}}\label{zone-steam-equipment-district-heating-energy-j}
 
-The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Steam Equipment District Heating Energy is added to the following :
+The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Steam Equipment District Heating Energy is added to the following:
 
 \begin{lstlisting}
 DistrictHeating:Facility
@@ -2375,7 +2404,7 @@ The name of this object.
 
 \paragraph{Field: Zone or Space Name}\label{iteq-field-zone-or-space-name-000}
 
-This field applies this ElectricEquipment:ITE:AirCooled object to a thermal zones or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual IT equipment objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ITEquipment Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
+This field applies this ElectricEquipment:ITE:AirCooled object to a thermal zone or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual IT equipment objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ITEquipment Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Air Flow Calculation Method}\label{field-air-flow-calculation-method}
 
@@ -2383,7 +2412,7 @@ This field specifies the method used to calculate the IT inlet temperature and z
 
 If \textbf{FlowFromSystem} is chosen, the zone is assumed to be well-mixed.
 
-If \textbf{FlowControlWithApproachTemperatures} is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution.The inputs of \textit{Air Inlet Connection Type}, \textit{Design Recirculation Fraction} and \textit{Recirculation Function of Loading and Supply Temperature Curve Name} are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. The \textbf{FlowControlWithApproachTemperatures} only applies to ITE zones with single duct VAV terminal unit. Other return air heat gains from window or lights are not allowed when \textbf{FlowControlWithApproachTemperatures} is chosen.
+If \textbf{FlowControlWithApproachTemperatures} is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution. The inputs of \textit{Air Inlet Connection Type}, \textit{Design Recirculation Fraction} and \textit{Recirculation Function of Loading and Supply Temperature Curve Name} are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. The \textbf{FlowControlWithApproachTemperatures} only applies to ITE zones with single duct VAV terminal unit. Other return air heat gains from window or lights are not allowed when \textbf{FlowControlWithApproachTemperatures} is chosen.
 
 The default method is FlowFromSystem.
 
@@ -2391,13 +2420,11 @@ The default method is FlowFromSystem.
 
 This field is a key/choice field that tells which of the next two fields are filled and is descriptive of the method for calculating the nominal electric power input to the ITE. The key/choices are:
 
-Watts/Unit
-
-With this choice, the design power input will be the product of Design Level per Unit and Number of Units. (Both of these fields should be filled.) This is the default.
-
-Watts/Area
-
-With this choice, the design power input will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
+\begin{description}
+	\item[Watts/Unit:] With this choice, the design power input will be the product of Design Level per Unit and Number of Units. (Both of these fields should be filled.) This is the default.
+	
+	\item[Watts/Area:] With this choice, the design power input will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
+\end{description}
 
 \paragraph{Field: Watts per Unit}\label{field-watts-per-unit}
 
@@ -2421,7 +2448,7 @@ This field is the name of the schedule that specifies the CPU loading for this e
 
 \paragraph{Field: CPU Power Input Function of Loading and Air Temperature Curve Name}\label{field-cpu-power-input-function-of-loading-and-air-temperature-curve-name}
 
-The name of a two-variable curve or table lookup object which modifies the CPU power input as a function of CPU loading (x) and air inlet node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
+The name of a two-variable curve or table lookup object which modifies the CPU power input as a function of CPU loading ($x$) and air inlet node temperature ($y$). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
 
 \paragraph{Field: Design Fan Power Input Fraction}\label{field-design-fan-power-input-fraction}
 
@@ -2429,35 +2456,62 @@ This field is a decimal number between 0.0 and 1.0 and is used to specify the fr
 
 \paragraph{Field: Design Fan Air Flow Rate per Power Input}\label{field-design-fan-air-flow-rate-per-power-input}
 
-Specifies the cooling fan air flow rate in m3/s per Watt of total electric power input at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
+Specifies the cooling fan air flow rate in m$^3$/s per Watt of total electric power input at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
 
 This is normalized by power input to allow the design power input to be changed without needing to change this value.
 
 \paragraph{Field: Air Flow Function of Loading and Air Temperature Curve Name}\label{field-air-flow-function-of-loading-and-air-temperature-curve-name}
 
-The name of a two-variable curve or table lookup object which modifies the cooling air flow rate as a function of CPU loading (x) and air inlet node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
+The name of a two-variable curve or table lookup object which modifies the cooling air flow rate as a function of CPU loading ($x$) and air inlet node temperature ($y$). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
 
 \paragraph{Field: Fan Power Input Function of Flow Curve Name}\label{field-fan-power-input-function-of-flow-curve-name}
 
-The name of a single-variable curve or table lookup object which modifies the fan power input as a function of airflow fraction (x). This curve (table) should equal 1.0 at the design air flow rate (flow fraction = 1.0).
+The name of a single-variable curve or table lookup object which modifies the fan power input as a function of airflow fraction ($x$). This curve (table) should equal 1.0 at the design air flow rate (flow fraction = 1.0).
 
 \paragraph{Field: Design Entering Air Temperature}\label{field-design-entering-air-temperature}
 
-Specifies the entering air temperature in deg. C at design conditions. The default is 15C.
+Specifies the entering air temperature in $^\circ$C at design conditions. The default is 15$^\circ$C.
 
 \paragraph{Field: Environmental Class}\label{field-environmental-class}
 
-Specifies the allowable operating conditions for the air inlet conditions. The available inputs are A1, A2, A3, A4, B, C, or None. This is used to report the ``ITE Air Inlet Operating Range Exceeded Time'' If None is specified (the default), then no reporting of time outside allowable conditions will be done.
+Specifies the allowable operating conditions for the air inlet conditions. The available inputs are A1, A2, A3, A4, B, C, H1, or None. This is used to report the ``ITE Air Inlet Operating Range Exceeded Time.'' If None is specified (the default), then no reporting of time outside allowable conditions will be done.
+
+The related reporting variables (such as ``ITE Air Inlet Operating Range Exceeded Time'') are based on the following limits\footnote{Sources: [1]. ASHRAE, 2021. ``Thermal Guidelines for Data Processing Environments (5$^{\textrm{th}}$ Edition),'' Peachtree Corners: ASHRAE; [2]. Quirk, Davidson, and Schmidt, 2022. ``ASHRAE's Data Center Thermal Guidelines---Air-Cooled Evolution,'' ASHRAE Journal, May 2022.} on the air inlet temperature and humidity conditions shown in Table \ref{table:ite-aircooled-air-inlet-code-specification-limits}: 
+
+\begin{longtable}[c]{@{}lrrrrrrr@{}}
+	\caption{ElectricEquipment:ITE:AirCooled Air Inlet Limiting Temperature and Humidity Levels} \label{table:ite-aircooled-air-inlet-code-specification-limits} \tabularnewline
+	\toprule
+	Environmental Class $\rightarrow$ &  A1 &  A2 &  A3 &  A4 &  B &  C &  H1 \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{ElectricEquipment:ITE:AirCooled Air Inlet Limiting Temperature and Humidity Levels} \tabularnewline
+	\toprule
+	Environmental Class $\rightarrow$ &  A1 &  A2 &  A3 &  A4 &  B &  C &  H1 \tabularnewline
+	\midrule
+	\endhead
+	
+	Dry-Bulb$_{min}$ [$^{\circ}$C]    &  15 &  10 &   5 &   5 &  5 &  5 &   5 \tabularnewline
+	Dry-Bulb$_{max}$ [$^{\circ}$C]    &  32 &  35 &  40 &  45 & 35 & 40 &  25 \tabularnewline
+	Dew-Point$_{min}$ [$^{\circ}$C]   & -12 & -12 & -12 & -12 & -- & -- & -12 \tabularnewline
+	Dew-Point$_{max}$ [$^{\circ}$C]   &  17 &  21 &  24 &  24 & 28 & 28 &  17 \tabularnewline
+	Relative Humidity$_{min}$ [$\%$]  &   8 &   8 &   8 &   8 &  8 &  8 &   8 \tabularnewline
+	Relative Humidity$_{max}$ [$\%$]  &  80 &  80 &  85 &  90 & 80 & 80 &  80 \tabularnewline
+	\bottomrule
+
+\end{longtable}
 
 \paragraph{Field: Air Inlet Connection Type}\label{field-air-inlet-connection-type}
 
 Specifies the type of connection between the zone and the ITE air inlet node. The choices are:
 
-AdjustedSupply = This option is used to apply a recirculation adjustment to the ITE inlet conditions. If this option is specified, then the Supply Air Node Name is required and the air inlet temperature to the ITE will be the current supply air node temperature adjusted by the current recirculation fraction. All heat output is added to the zone air heat balance as a convective gain. AdjustedSupply is the default.
-
-ZoneAirNode = This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain.
-
-RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. \hyperref[roomairmodeltype]{RoomAirModelType} and \hyperref[roomairnode]{RoomAir:Node}).  Currently in EnergyPlus, this option has not been fully implemented.  If the user chooses this option, the program will issue a warning message and this field will be adjusted to ZoneAirNode.
+\begin{description}
+	\item[AdjustedSupply:] This option is used to apply a recirculation adjustment to the ITE inlet conditions. If this option is specified, then the Supply Air Node Name is required and the air inlet temperature to the ITE will be the current supply air node temperature adjusted by the current recirculation fraction. All heat output is added to the zone air heat balance as a convective gain. AdjustedSupply is the default.
+	
+	\item[ZoneAirNode:] This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain.
+	
+	\item[RoomAirModel:] This option connects the ITE air inlet and outlet nodes to a room air model (Ref. \hyperref[roomairmodeltype]{RoomAirModelType} and \hyperref[roomairnode]{RoomAir:Node}).  Currently in EnergyPlus, this option has not been fully implemented.  If the user chooses this option, the program will issue a warning message and this field will be adjusted to ZoneAirNode.
+\end{description}
 
 This field is only used when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
@@ -2479,7 +2533,7 @@ Specifies the recirculation fraction for this equipment at design conditions. Th
 
 \paragraph{Field: Recirculation Function of Loading and Supply Temperature Curve Name}\label{field-recirculation-function-of-loading-and-supply-temperature-curve-name}
 
-The name of a two-variable curve or table lookup object which modifies the Design Recirculation Fraction as a function of CPU loading (x) and supply air node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature). This field is used only if the Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve is assumed to always equal 1.0. This field is only used when Air Flow Calculation Method = \textbf{FlowFromSystem}.
+The name of a two-variable curve or table lookup object which modifies the Design Recirculation Fraction as a function of CPU loading ($x$) and supply air node temperature ($y$). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature). This field is used only if the Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve is assumed to always equal 1.0. This field is only used when Air Flow Calculation Method = \textbf{FlowFromSystem}.
 
 \paragraph{Field: Design Electric Power Supply Efficiency}\label{field-design-electric-power-supply-efficiency}
 
@@ -2487,7 +2541,7 @@ This field is a decimal number used to specify the efficiency of the power suppl
 
 \paragraph{Field: Electric Power Supply Efficiency Function of Part Load Ratio Curve Name}\label{field-electric-power-supply-efficiency-function-of-part-load-ratio-curve-name}
 
-The name of a single-variable curve or table lookup object which modifies the electric power supply efficiency as a function of part load ratio (x). This curve (table) should equal 1.0 at the design power consumption (part load ratio = 1.0). If this curve is left blank, then the curve is assumed to always equal 1.0.
+The name of a single-variable curve or table lookup object which modifies the electric power supply efficiency as a function of part load ratio ($x$). This curve (table) should equal 1.0 at the design power consumption (part load ratio = 1.0). If this curve is left blank, then the curve is assumed to always equal 1.0.
 
 \paragraph{Field: Fraction of Electric Power Supply Losses to Zone}\label{field-fraction-of-electric-power-supply-losses-to-zone}
 
@@ -2499,7 +2553,7 @@ This equipment is metered on the Interior Equipment end-use category for Electri
 
 \paragraph{Field: Fan End-Use Subcategory}\label{field-fan-end-use-subcategory}
 
-This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the fan power consumption. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-Fans
+This equipment is metered on the Interior Equipment end-use category for Electricity. This field allows you to specify a user-defined end-use subcategory for the fan power consumption. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. The default is ITE-Fans.
 
 \paragraph{Field: Electric Power Supply End-Use Subcategory}\label{field-electric-power-supply-end-use-subcategory}
 
@@ -2507,19 +2561,19 @@ This equipment is metered on the Interior Equipment end-use category for Electri
 
 \paragraph{Field: Supply Temperature Difference}\label{field-supply-temperature-difference}
 
-The difference of the IT inlet temperature from the AHU supply air temperature ($\delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference of the IT inlet temperature from the AHU supply air temperature (${\Delta}T_{\textrm{supply}} = T_{\textrm{in}}-T_{\textrm{supply}}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Supply Temperature Difference Schedule}\label{field-supply-temperature-difference-schedule}
 
-The difference schedule of the IT inlet temperature from the AHU supply air temperature ($\delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference schedule of the IT inlet temperature from the AHU supply air temperature (${\Delta}T_{\textrm{supply}} = T_{\textrm{in}}-T_{\textrm{supply}}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference}\label{field-return-temperature-difference}
 
-The difference of the actual AHU return air temperature to the IT equipment outlet temperature ($\delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference of the actual AHU return air temperature to the IT equipment outlet temperature (${\Delta}T_{\textrm{return}} = T_{\textrm{return}}-T_{\textrm{out}}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference Schedule}\label{field-return-temperature-difference-schedule}
 
-The difference schedule of the actual AHU return air temperature to the IT equipment outlet temperature ($\delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference schedule of the actual AHU return air temperature to the IT equipment outlet temperature (${\Delta}T_{\textrm{return}} = T_{\textrm{return}}-T_{\textrm{out}}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 An IDF example:
 
@@ -2594,7 +2648,9 @@ Another IDF example when Air Flow Calculation Method = FlowControlWithApproachTe
     ;                        !- field Return Approach Temperature Schedule
 \end{lstlisting}
 
-ElectricEquipment:ITE:AirCooled Outputs
+\subsubsection{Outputs}
+
+ElectricEquipment:ITE:AirCooled Outputs:
 
 \begin{itemize}
 \tightlist
@@ -2858,7 +2914,7 @@ The heat gain rate (or energy) to the zone from the UPS and from the CPU and fan
 
 \paragraph{ITE Standard Density Air Volume Flow Rate {[}m3/s{]}}\label{ite-standard-density-air-volume-flow-rate-m3s}
 
-Reports the average air volume flow rate through the ITE over the reporting interval. Standard density in EnergyPlus corresponds to 20ºC dry bulb, dry air, and nominally adjusted for elevation.
+Reports the average air volume flow rate through the ITE over the reporting interval. Standard density in EnergyPlus corresponds to 20$^\circ$C dry bulb, dry air, and nominally adjusted for elevation.
 
 \paragraph{Space or Zone ITE Current Density Air Volume Flow Rate {[}m3/s{]}}\label{zone-ite-current-density-air-volume-flow-rate-m3s}
 
@@ -2892,7 +2948,7 @@ The dry-bulb temperature of the air leaving the ITE.
 
 \paragraph{ITE Supply Heat Index {[]}}\label{ite-supply-heat-index}
 
-The supply heat index (SHI) for this equipment. SHI is a dimensionless measure of recirculation of hot air into the cold air intake of the ITE. SHI = (Tin -- Tsupply)/(Tout-Tsupply) where Tin is the dry-bulb temperature of the air entering the ITE, Tout is the dry-bulb temperature of the air leaving the ITE, and Tsupply is the dry-bulb temperature at the Supply Air Node. If a Supply Air Node Name is not specified for this object, then this output will not be reported.
+The supply heat index (SHI) for this equipment. SHI is a dimensionless measure of recirculation of hot air into the cold air intake of the ITE. $\textrm{SHI} = (T_{\textrm{in}} - T_{\textrm{supply}})/(T_{\textrm{out}}-T_{\textrm{supply}})$ where $T_{\textrm{in}}$ is the dry-bulb temperature of the air entering the ITE, Tout is the dry-bulb temperature of the air leaving the ITE, and $T_{\textrm{supply}}$ is the dry-bulb temperature at the Supply Air Node. If a Supply Air Node Name is not specified for this object, then this output will not be reported.
 
 \paragraph{Space or Zone ITE Any Air Inlet Operating Range Exceeded Time {[}hr{]}}\label{zone-ite-any-air-inlet-operating-range-exceeded-time-hr}
 
@@ -2908,7 +2964,7 @@ Hours when the dry-bulb temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range {[}deltaC{]}}\label{ite-air-inlet-dry-bulb-temperature-difference-above-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dry-bulb temperature and the maximum allowable dry-bulb temperature specified by the ITE Environmental Class. Only positive values are reported. When the dry-bulb temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in $\Delta^\circ$C) between the air inlet dry-bulb temperature and the maximum allowable dry-bulb temperature specified by the ITE Environmental Class. Only positive values are reported. When the dry-bulb temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Space or Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dry-bulb-temperature-below-operating-range-time-hr}
 
@@ -2918,7 +2974,7 @@ Hours when the dry-bulb temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range {[}deltaC{]}}\label{ite-air-inlet-dry-bulb-temperature-difference-below-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dry-bulb temperature and the minimum allowable dry-bulb temperature specified by the ITE Environmental Class. Only negative values are reported. When the dry-bulb temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in $\Delta^{\circ}$C) between the air inlet dry-bulb temperature and the minimum allowable dry-bulb temperature specified by the ITE Environmental Class. Only negative values are reported. When the dry-bulb temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Space or Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-above-operating-range-time-hr}
 
@@ -2928,7 +2984,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Difference Above Operating Range {[}deltaC{]}}\label{ite-air-inlet-dewpoint-temperature-difference-above-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Environmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in $\Delta^{\circ}$C) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Environmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Space or Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-below-operating-range-time-hr}
 
@@ -2938,7 +2994,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Difference Below Operating Range {[}deltaC{]}}\label{ite-air-inlet-dewpoint-temperature-difference-below-operating-range-deltac}
 
-The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Environmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in $\Delta^{\circ}$C) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Environmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Space or Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-above-operating-range-time-hr}
 
@@ -2948,7 +3004,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 \paragraph{ITE Air Inlet Relative Humidity Difference Above Operating Range {[}\%{]}}\label{ite-air-inlet-relative-humidity-difference-above-operating-range}
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Environmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+The temperature difference (in $\Delta^{\circ}$C) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Environmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Space or Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-below-operating-range-time-hr}
 
@@ -2958,7 +3014,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 \paragraph{ITE Air Inlet Relative Humidity Difference Below Operating Range {[}\%{]}}\label{ite-air-inlet-relative-humidity-difference-below-operating-range}
 
-The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Environmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+The difference (in $\Delta\%$) between the air inlet relative humidity and the minimum allowable relative humidity (RH) specified by the ITE Environmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 \paragraph{Zone ITE Adjusted Return Air Temperature [C]}
 
@@ -2981,13 +3037,13 @@ This object specifies outside temperature-controlled (OTC) baseboard heating. Th
 \begin{longtable}[c]{@{}ll@{}}
 \caption{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity \label{table:outdoor-temperature-controlled-baseboard-heat}} \tabularnewline
 \toprule
-Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
+Outdoor Dry-bulb(C) & Baseboard Output(W) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity} \tabularnewline
 \toprule
-Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
+Outdoor Dry-bulb(C) & Baseboard Output(W) \tabularnewline
 \midrule
 \endhead
 
@@ -3014,7 +3070,7 @@ This field applies this ZoneBaseboard:OutdoorTemperatureControlled object to one
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-11}
 
-This field is the name of the schedule that modifies the capacities (high and low) for baseboard heat equipment (see next four fields). The schedule values can be any positive number. The actual energy input for the baseboard equipment in a zone as defined by this statement depends on the actual outdoor temperature and where that temperature is in the range of Low Temperature to High Temperature..
+This field is the name of the schedule that modifies the capacities (high and low) for baseboard heat equipment (see next four fields). The schedule values can be any positive number. The actual energy input for the baseboard equipment in a zone as defined by this statement depends on the actual outdoor temperature and where that temperature is in the range of Low Temperature to High Temperature.
 
 \paragraph{Field: Capacity at Low Temperature}\label{field-capacity-at-low-temperature}
 
@@ -3042,7 +3098,7 @@ Allows you to specify a user-defined end-use subcategory, e.g., ``Perimeter Base
 
 \paragraph{Field: Design Zone Heating Setpoint}\label{field-design-zone-heating-setpoint}
 
-This is heating setpoint temperature in the zone where the unit serves. This is used to autosize high temperature and capacity at high temperature fields. The default value is 20°C.
+This is heating setpoint temperature in the zone where the unit serves. This is used to autosize high temperature and capacity at high temperature fields. The default value is 20$^\circ$C.
 
 An IDF example:
 
@@ -3187,10 +3243,10 @@ The Indoor Swimming Pool object is used to describe the indoor swimming pools th
 
 As pools attempt to achieve a particular water temperature and have a variety of heat losses, heating equipment is necessary to maintain the proper setpoint temperature. In EnergyPlus, the pool itself becomes part of the demand side of a plant loop with heating equipment on the supply side providing whatever heating is needed to maintain the desired temperature. This heating equipment as well as the loop connections must be entered separately and the input shown in this section only details what is needed to specify the pool itself.
 
-There are a variety of rules that limit the application of indoor swimming pools in EnergyPlus.  The following are a list of these rules:
+There are a variety of rules that limit the application of indoor swimming pools in EnergyPlus. The following are a list of these rules:
 
 \begin{itemize}
-  \item The pool must reference a valid surface in the input file.  This surface must be a floor and cannot be other surface types like ceilings, walls, windows, etc.
+  \item The pool must reference a valid surface in the input file. This surface must be a floor and cannot be other surface types like ceilings, walls, windows, etc.
   \item The pool cannot refer to a surface that is also a radiant system, ventilated slab, or another pool.
   \item The surface that the pool references must be modeled using conduction transfer functions (CTF).
   \item The pool cannot utilize movable insulation or have a heat source or sink associated with it (something used to model low temperature radiant systems).
@@ -3487,18 +3543,18 @@ This output is the net carbon dioxide internal gain/loss in \si{\volumeFlowRate}
 The ZoneContaminantSourceAndSink:Generic:Constant object specifies the generic contaminant generation rate and removal rate coefficient in a zone. The associated fraction schedules are required for allowing users to change the magnitude of sources and sinks. The object is equivalent to the combination of the constant coefficient model and the burst source model defined in the sources and sinks element types of CONTAM 3.0. The basic equation used to calculate generic contaminant source and sink for the constant model is given below:
 
 \begin{equation}
-{S_f}(t) = {G_f}(t)*{F_G} - {R_f}(t){C_f}(t)*1.0E - 6*{F_R}
+{S_f}(t) = {G_f}(t)\cdot{F_G} - {R_f}(t)\cdot{C_f}(t)\cdot 10^{-6}\cdot{F_R}
 \end{equation}
 
 where
 
-\emph{S\(_{f}\)} = Contaminant generic contaminant source strength {[}m\(^{3}\)/s{]}
+$S_{f}$ = Contaminant generic contaminant source strength {[}m\(^{3}\)/s{]}
 
-\emph{G\(_{f}\)} = Generic contaminant generation rate {[}m\(^{3}\)/s{]}
+$G_{f}$ = Generic contaminant generation rate {[}m\(^{3}\)/s{]}
 
-\emph{F\(_{G}\)} = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
+$F_{G}$ = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
 
-\emph{R\(_{f}\)} = Generic contaminant effective removal rate {[}m\(^{3}\)/s{]}
+$R_{f}$ = Generic contaminant effective removal rate {[}m\(^{3}\)/s{]}
 
 \emph{F\(_{R}\)} = Fraction value from the sink fraction schedule at a given time {[}dimensionless{]}
 
@@ -3559,22 +3615,22 @@ This output is the average generic contaminant generation rate from each ZoneCon
 The Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Pressure\-Driven object specifies the generic contaminant generation rate coefficient, which is used to calculate the generation rate due to the pressure difference across the surface. The object is equivalent to the pressure driven model defined in the sources and sinks element types of CONTAM 3.0. This object assumes to work with the AirflowNetwork model. The surface has to be defined in the AirflowNetwork:Multizone:Surface. Although the model is designed to be applied to radon and soil gas entry, it is expanded to be applied to all contaminant transport, including generic contaminant. However, it should be used in caution. The basic equation used to calculate generic contaminant source for the pressure driven constant model is provided below:
 
 \begin{equation}
-{S_f}(t) = {H_f}(t)*{F_G}*{\left( {{P_j} - {P_i}} \right)^n}
+{S_f}(t) = {H_f}(t)\cdot{F_G}\cdot{\left( {{P_j} - {P_i}} \right)^n}
 \end{equation}
 
 where
 
-\emph{S\(_{f}\)} = Generic contaminant source strength {[}m\(^{3}\)/s{]}
+$S_{f}$ = Generic contaminant source strength {[}m\(^{3}\)/s{]}
 
-\emph{H\(_{f}\)} = Generic contaminant generation rate coefficient {[}m\(^{3}\)/s{]}
+$H_{f}$ = Generic contaminant generation rate coefficient {[}m\(^{3}\)/s{]}
 
-\emph{F\(_{G}\)} = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
+$F_{G}$ = Fraction value from the source fraction schedule at a given time {[}dimensionless{]}
 
-\emph{n} = Flow power exponent
+${n}$ = Flow power exponent
 
-P\emph{\(_{i}\)} = Zone pressure {[}Pa{]}
+$P_{i}$ = Zone pressure {[}Pa{]}
 
-P\emph{\(_{j}\)} = Pressure in an adjacent zone for a interior surface or outdoor for an exterior surface {[}Pa{]}
+$P_{j}$ = Pressure in an adjacent zone for a interior surface or outdoor for an exterior surface {[}Pa{]}
 
 \subsubsection{Inputs}\label{inputs-12-007}
 
@@ -3592,7 +3648,7 @@ This field denotes the generic contaminant design generation coefficient (m\(^{3
 
 \paragraph{Field: Generation Exponent}\label{field-generation-exponent}
 
-This field denotes the flow power exponent,* n*, in the contaminant source equation. The valid range is 0.0 to 1.0,
+This field denotes the flow power exponent, $n$, in the contaminant source equation. The valid range is 0.0 to 1.0,
 
 An IDF example is provided below:
 
@@ -3768,7 +3824,7 @@ The Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Boundary\-Layer\-Diffusi
 The boundary layer diffusion controlled reversible sink/source model with a linear sorption isotherm follows the descriptions presented in {[}Axley 1991{]}. The boundary layer refers to the region above the surface of a material through which a concentration gradient exists between the near-surface concentration and the air-phase concentration. The rate at which a contaminant is transferred onto a surface (sink) is defined as:
 
 \begin{equation}
-{S_f} = h*\rho *A\left( {{C_f} - \frac{{{C_s}}}{k}} \right)*1.0E - 6
+{S_f} = h \cdot \rho \cdot A\left( {{C_f} - \frac{{{C_s}}}{k}} \right)*10^{-6}
 \end{equation}
 
 where
@@ -3845,7 +3901,7 @@ The Sur\-face\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Velocity\-
 The deposition velocity model provides for the input of a sink's characteristic in the familiar term of deposition velocity. The removal stops when the sink concentration level is higher than the zone air concentration level. The deposition velocity model equation is:
 
 \begin{equation}
-{S_f}(t) = {\nu_d}{A_s}m*{C_f}(t)*1.0E - 6*F{}_R
+{S_f}(t) = {\nu_d}{A_s}m \cdot {C_f}(t)\cdot 10^{-6} \cdot F{}_R
 \end{equation}
 
 where
@@ -3911,7 +3967,7 @@ The Zone\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Rate\-Sink obje
 The deposition rate model provides for the input of a sink's characteristic in the familiar term of deposition rate in a zone. The removal stops when the sink concentration level is higher than the zone air concentration level. The deposition rate model equation is:
 
 \begin{equation}
-{S_f}(t) = {k_d}{V_z}*{C_f}(t)*1.0E - 6*{F_R}m
+{S_f}(t) = {k_d}{V_z} \cdot {C_f}(t) \cdot 10^{-6} \cdot {F_R} \cdot m
 \end{equation}
 
 Where

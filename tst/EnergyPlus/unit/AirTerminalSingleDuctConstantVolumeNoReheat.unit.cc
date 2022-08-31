@@ -332,7 +332,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
 
     int constexpr SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-    int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
+    int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
     state->dataScheduleMgr->Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
 
@@ -524,7 +524,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
 
     int constexpr SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-    int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
+    int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
 
     // design maximum air mass flow rate
@@ -707,7 +707,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
 
     int constexpr SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-    int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
+    int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
     state->dataScheduleMgr->Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
     // design maximum air mass flow rate
@@ -905,7 +905,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     auto &thisAirLoop = state->dataAirLoop->AirLoopFlow(1);
 
     int const InletNode = thisAirTerminal.InletNodeNum;
-    int const ZonePtr = thisAirTerminal.ActualZoneNum;
+    int const ZonePtr = thisAirTerminal.CtrlZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
     state->dataZoneEquip->ZoneEquipConfig(ZonePtr).InletNodeAirLoopNum(1) = 1;
     thisAirTerminal.AirLoopNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).InletNodeAirLoopNum(1);
@@ -1080,7 +1080,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
 
     int const InletNode = thisAirTerminal.InletNodeNum;
     int const OutletNode = thisAirTerminal.OutletNodeNum;
-    int const ZonePtr = thisAirTerminal.ActualZoneNum;
+    int const ZonePtr = thisAirTerminal.CtrlZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
 
     state->dataScheduleMgr->Schedule(thisAirTerminal.SchedPtr).CurrentValue = 1.0; // unit is always available
@@ -1113,7 +1113,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     Real64 NonAirSysOutput = 0.0;
     Real64 LatOutputProvided = 0.0;
     // run single duct simulation
-    SimZoneAirLoopEquipment(*state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
+    SimZoneAirLoopEquipment(*state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr);
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminal.AirMassFlowRateMax);         // design maximum mass flow rate
     EXPECT_EQ(0.0, thisAirTerminal.sd_airterminalInlet.AirMassFlowRateMaxAvail); // maximum available mass flow rate
@@ -1128,7 +1128,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     Real64 SensHeatRateProvided =
         MassFlowRateMaxAvail * CpAir * (state->dataLoopNodes->Node(OutletNode).Temp - state->dataLoopNodes->Node(ZoneAirNodeNum).Temp);
     // run SimulateSingleDuct() function
-    SimZoneAirLoopEquipment(*state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
+    SimZoneAirLoopEquipment(*state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr);
     // check air terminal unit air mass flow rates and delivered sensible heating rate
     EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminal.sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminal.sd_airterminalOutlet.AirMassFlowRate);
@@ -1161,7 +1161,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     NonAirSysOutput = 0.0;
     LatOutputProvided = 0.0;
     // run single duct simulation
-    SimZoneAirLoopEquipment(*state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
+    SimZoneAirLoopEquipment(*state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr);
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminal.AirMassFlowRateMax);         // design maximum mass flow rate
     EXPECT_EQ(0.0, thisAirTerminal.sd_airterminalInlet.AirMassFlowRateMaxAvail); // maximum available mass flow rate
@@ -1177,7 +1177,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     Real64 SensCoolRateProvided =
         MassFlowRateMaxAvail * CpAir * (state->dataLoopNodes->Node(OutletNode).Temp - state->dataLoopNodes->Node(ZoneAirNodeNum).Temp);
     // run SimulateSingleDuct() function
-    SimZoneAirLoopEquipment(*state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
+    SimZoneAirLoopEquipment(*state, AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr);
     // check air terminal unit air mass flow rates and delivered sensible cooling rate
     EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminal.sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminal.sd_airterminalOutlet.AirMassFlowRate);

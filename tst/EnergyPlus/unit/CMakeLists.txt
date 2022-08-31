@@ -22,9 +22,9 @@ set(test_src
     AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
     AirTerminalSingleDuctMixer.unit.cc
     AirTerminalSingleDuctPIUReheat.unit.cc
-    AirflowNetworkBalanceManager.unit.cc
-    AirflowNetworkSimulationControl.unit.cc
-    AirflowNetworkSolver.unit.cc
+    AirflowNetworkHVAC.unit.cc
+    AirflowNetworkConditions.unit.cc
+    AirflowNetworkComponents.unit.cc
     Autosizing/All_Simple_Sizing.unit.cc
     Autosizing/AutosizingFixture.hh
     Autosizing/BaseClassSizing.unit.cc
@@ -49,6 +49,7 @@ set(test_src
     Autosizing/SystemAirFlowSizing.unit.cc
     Autosizing/WaterHeatingCapacitySizing.unit.cc
     Autosizing/WaterHeatingCoilUASizing.unit.cc
+    BaseboardElectric.unit.cc
     BaseboardRadiator.unit.cc
     BoilerHotWater.unit.cc
     BoilerSteam.unit.cc
@@ -71,6 +72,7 @@ set(test_src
     CondenserLoopTowers.unit.cc
     ConstructionInternalSource.unit.cc
     ConvectionCoefficients.unit.cc
+    CoolTower.unit.cc
     CrossVentMgr.unit.cc
     CurveManager.unit.cc
     DElightManager.unit.cc
@@ -80,6 +82,7 @@ set(test_src
     DataGlobalConstants.unit.cc
     DataHeatBalance.unit.cc
     DataPlant.unit.cc
+    DataRuntimeLanguage.unit.cc
     DataSizing.unit.cc
     DataSurfaceColors.unit.cc
     DataSurfaces.unit.cc
@@ -118,6 +121,7 @@ set(test_src
     GroundHeatExchangers.unit.cc
     HVACControllers.unit.cc
     HVACDXSystem.unit.cc
+    HVACDXHeatPumpSystem.unit.cc
     HVACFan.unit.cc
     HVACFourPipeBeam.unit.cc
     HVACHXAssistedCoolingCoil.unit.cc
@@ -243,6 +247,7 @@ set(test_src
     WeatherManager.unit.cc
     WinCalcEngine.unit.cc
     WindowAC.unit.cc
+    WindTurbine.unit.cc
     WindowEquivalentLayer.unit.cc
     WindowLayerEffectiveMultipliers.unit.cc
     WindowManagerExteriorThermal.unit.cc

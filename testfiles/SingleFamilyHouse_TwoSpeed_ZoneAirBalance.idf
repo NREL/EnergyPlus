@@ -99,7 +99,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,22.1;
+  Version,22.2;
 
   Building,
     Single family House,     !- Name
@@ -1116,12 +1116,12 @@
 
   People,
     LIVING ZONE People,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE OCCUPANCY,         !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     3.000000,                !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000000,               !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch,            !- Activity Level Schedule Name
@@ -1138,7 +1138,7 @@
 
   Lights,
     LIVING ZONE Lights,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     HOUSE LIGHTING,          !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1000,                    !- Lighting Level {W}
@@ -1152,7 +1152,7 @@
 
   ZoneVentilation:DesignFlowRate,
     LIVING ZONE Ventl 1,     !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     6.131944,                !- Design Flow Rate {m3/s}
@@ -1174,7 +1174,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     LIVING ZONE Infil 1,     !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.01,                    !- Design Flow Rate {m3/s}
@@ -1195,7 +1195,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ATTIC ZONE Infil 1,      !- Name
-    ATTIC ZONE,              !- Zone or ZoneList Name
+    ATTIC ZONE,              !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.05,                    !- Design Flow Rate {m3/s}
@@ -1209,7 +1209,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     GARAGE ZONE Infil 1,     !- Name
-    GARAGE ZONE,             !- Zone or ZoneList Name
+    GARAGE ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.05,                    !- Design Flow Rate {m3/s}
@@ -1223,7 +1223,7 @@
 
   ElectricEquipment,
     LIVING ZONE ElecEq,      !- Name
-    LIVING ZONE,             !- Zone or ZoneList Name
+    LIVING ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INTERMITTENT,            !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     500,                     !- Design Level {W}
@@ -1526,6 +1526,7 @@
     4.32,                    !- Speed 1 Gross Rated Cooling COP {W/W}
     0.6135,                  !- Speed 1 Rated Air Flow Rate {m3/s}
     573.3,                   !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     HPACCoolCapFT Speed 1,   !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     HPACCoolCapFF Speed 1,   !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     HPACCOOLEIRFT Speed 1,   !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -1545,6 +1546,7 @@
     3.98,                    !- Speed 2 Gross Rated Cooling COP {W/W}
     0.7551,                  !- Speed 2 Rated Air Flow Rate {m3/s}
     673.3,                   !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     HPACCoolCapFT Speed 2,   !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     HPACCoolCapFF Speed 2,   !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     HPACCOOLEIRFT Speed 2,   !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -1727,6 +1729,7 @@
     4.235,                   !- Speed 1 Gross Rated Heating COP {W/W}
     0.6135,                  !- Speed 1 Rated Air Flow Rate {m3/s}
     573.3,                   !- Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     HPACHeatCapFT Speed 1,   !- Speed 1 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFF Speed 1,   !- Speed 1 Heating Capacity Function of Flow Fraction Curve Name
     HPACHeatEIRFT Speed 1,   !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -1738,6 +1741,7 @@
     3.9,                     !- Speed 2 Gross Rated Heating COP {W/W}
     0.7551,                  !- Speed 2 Rated Air Flow Rate {m3/s}
     673.3,                   !- Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     HPACHeatCapFT Speed 2,   !- Speed 2 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFF Speed 2,   !- Speed 2 Heating Capacity Function of Flow Fraction Curve Name
     HPACHeatEIRFT Speed 2,   !- Speed 2 Energy Input Ratio Function of Temperature Curve Name

@@ -992,6 +992,8 @@ namespace DaylightingDevices {
                         // Normally this would be done during initialization, but that's not early enough for some shading calculations
                         state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
                         state.dataSurface->Surface(SurfNum).HeatTransSurf = true;
+                        state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
+                        // Is this needed? surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                         state.dataSurface->Surface(SurfNum).Construction = ConstrNum; // Kludge to allow shading surface to be a heat transfer surface
                         state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
                         state.dataConstruction->Construct(ConstrNum).IsUsed = true;

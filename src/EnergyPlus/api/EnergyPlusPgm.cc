@@ -267,10 +267,7 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state)
 #endif
 #endif
 
-    state.dataSysVars->Time_Start = DataTimings::epElapsedTime();
-#ifdef EP_Detailed_Timings
-    epStartTime("EntireRun=");
-#endif
+    state.dataSysVars->Time_Start = UtilityRoutines::epElapsedTime();
 
     state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
 

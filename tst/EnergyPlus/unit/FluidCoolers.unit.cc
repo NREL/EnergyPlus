@@ -365,3 +365,132 @@ TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
 
     thisFluidCooler.size(*state);
 }
+
+TEST_F(EnergyPlusFixture, ExerciseSingleSpeedFluidCooler)
+{
+    std::string const idf_objects = delimited_string({
+        "   FluidCooler:SingleSpeed,",
+        "     Dry Cooler,              !- Name",
+        "     Dry Cooler Inlet Node,   !- Water Inlet Node Name",
+        "     Dry Cooler Outlet Node,  !- Water Outlet Node Name",
+        "     NominalCapacity,         !- Performance Input Method",
+        "     ,                        !- Design Air Flow Rate U-factor Times Area Value {W/K}",
+        "     58601,                   !- Nominal Capacity {W}",
+        "     50,                      !- Design Entering Water Temperature {C}",
+        "     35,                      !- Design Entering Air Temperature {C}",
+        "     25,                      !- Design Entering Air Wetbulb Temperature {C}",
+        "     0.001262,                !- Design Water Flow Rate {m3/s}",
+        "     2.124,                   !- Design Air Flow Rate {m3/s}",
+        "     1491;                    !- Design Air Flow Rate Fan Power {W}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    FluidCoolerspecs *ptr = FluidCoolerspecs::factory(*state, DataPlant::PlantEquipmentType::FluidCooler_SingleSpd, "DRY COOLER");
+
+    PlantLocation pl{1, EnergyPlus::DataPlant::LoopSideLocation::Demand, 1, 1};
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+
+    Real64 max, opt, min = 0.0;
+    ptr->getDesignCapacities(*state, pl, max, min, opt);
+    EXPECT_NEAR(max, 58601.0, 1.0);
+    EXPECT_NEAR(min, 0.0, 1.0);
+    EXPECT_NEAR(opt, 58601.0, 1.0);
+
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TempSetPoint = 2.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).MyLoad = 1000;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).ON = true;
+    state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 3;
+    state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 3;
+
+    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMaxAvail = 5;
+    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMax = 5;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).Temp = 20;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
+
+    bool firstHVAC = true;
+    Real64 curLoad = 0.0;
+    ptr->plantLoc.loopNum = 1;
+    ptr->plantLoc.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
+    ptr->plantLoc.branchNum = 1;
+    ptr->plantLoc.compNum = 1;
+    ptr->DesWaterMassFlowRate = 3.141;
+    ptr->WaterMassFlowRate = 3.141;
+    ptr->onInitLoopEquip(*state, pl);
+    ptr->HighSpeedFluidCoolerUA = 10;
+    ptr->simulate(*state, pl, firstHVAC, curLoad, true);
+}
+
+TEST_F(EnergyPlusFixture, ExerciseTwoSpeedFluidCooler)
+{
+    std::string const idf_objects = delimited_string({"FluidCooler:TwoSpeed,",
+                                                      "Big FluidCooler,         !- Name",
+                                                      "Condenser FluidCooler Inlet Node,  !- Water Inlet Node Name",
+                                                      "Condenser FluidCooler Outlet Node,  !- Water Outlet Node Name",
+                                                      "NominalCapacity,         !- Performance Input Method",
+                                                      ",                        !- High Fan Speed U-factor Times Area Value {W/K}",
+                                                      ",                        !- Low Fan Speed U-factor Times Area Value {W/K}",
+                                                      ",                        !- Low Fan Speed U-Factor Times Area Sizing Factor",
+                                                      "58601.,                  !- High Speed Nominal Capacity {W}",
+                                                      "28601.,                  !- Low Speed Nominal Capacity {W}",
+                                                      ",                        !- Low Speed Nominal Capacity Sizing Factor",
+                                                      "51.67,                   !- Design Entering Water Temperature {C}",
+                                                      "35,                      !- Design Entering Air Temperature {C}",
+                                                      "25.6,                    !- Design Entering Air Wet-bulb Temperature {C}",
+                                                      "Autosize,                !- Design Water Flow Rate {m3/s}",
+                                                      "Autosize,                !- High Fan Speed Air Flow Rate {m3/s}",
+                                                      "Autosize,                !- High Fan Speed Fan Power {W}",
+                                                      "autocalculate,           !- Low Fan Speed Air Flow Rate {m3/s}",
+                                                      ",                        !- Low Fan Speed Air Flow Rate Sizing Factor",
+                                                      "autocalculate,           !- Low Fan Speed Fan Power {W}",
+                                                      ";                        !- Low Fan Speed Fan Power Sizing Factor"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    FluidCoolerspecs *ptr = FluidCoolerspecs::factory(*state, DataPlant::PlantEquipmentType::FluidCooler_TwoSpd, "BIG FLUIDCOOLER");
+
+    PlantLocation pl{1, EnergyPlus::DataPlant::LoopSideLocation::Demand, 1, 1};
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+
+    Real64 max, opt, min = 0.0;
+    ptr->getDesignCapacities(*state, pl, max, min, opt);
+    EXPECT_NEAR(max, 58601.0, 1.0);
+    EXPECT_NEAR(min, 0.0, 1.0);
+    EXPECT_NEAR(opt, 58601.0, 1.0);
+
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).TempSetPoint = 2.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).MyLoad = 1000;
+    state->dataPlnt->PlantLoop(1).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).ON = true;
+    state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 3;
+    state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 3;
+
+    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMaxAvail = 5;
+    state->dataLoopNodes->Node(ptr->WaterOutletNodeNum).MassFlowRateMax = 5;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).Temp = 20;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMaxAvail = 5;
+    state->dataLoopNodes->Node(ptr->WaterInletNodeNum).MassFlowRateMax = 5;
+
+    bool firstHVAC = true;
+    Real64 curLoad = 0.0;
+    ptr->plantLoc.loopNum = 1;
+    ptr->plantLoc.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
+    ptr->plantLoc.branchNum = 1;
+    ptr->plantLoc.compNum = 1;
+    ptr->DesWaterMassFlowRate = 3.141;
+    ptr->WaterMassFlowRate = 3.141;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).ExitTemp = 25.0;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    ptr->onInitLoopEquip(*state, pl);
+    ptr->HighSpeedFluidCoolerUA = 10;
+    ptr->simulate(*state, pl, firstHVAC, curLoad, true);
+    state->dataPlnt->PlantLoop(pl.loopNum).LoopSide(pl.loopSideNum).FlowLock = DataPlant::FlowLock::Locked;
+    ptr->simulate(*state, pl, firstHVAC, curLoad, true);
+}

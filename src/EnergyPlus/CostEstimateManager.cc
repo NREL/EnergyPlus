@@ -320,40 +320,36 @@ namespace CostEstimateManager {
                 // test if too many pricing methods are set in user input
                 if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) &&
                     (state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0)) {
-                    ShowSevereError(
-                        state,
-                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
-                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                               format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                    ShowSevereError(state,
+                                    format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                           state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                           ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                     ErrorsFound = true;
                 }
                 if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) &&
                     (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                    ShowSevereError(
-                        state,
-                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
-                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                               format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                    ShowSevereError(state,
+                                    format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                           state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                           ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                     ErrorsFound = true;
                 }
                 if ((state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0) &&
                     (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                    ShowSevereError(
-                        state,
-                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
-                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                               format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                    ShowSevereError(state,
+                                    format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                           state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                           ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                     ErrorsFound = true;
                 }
                 //  check for wildcard * in object name..
                 if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
 
                 } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    ShowSevereError(
-                        state,
-                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
-                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                               format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                    ShowSevereError(state,
+                                    format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                           state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                           ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                     ErrorsFound = true;
 
                 } else { // assume name is probably useful
@@ -372,7 +368,7 @@ namespace CostEstimateManager {
                             state,
                             format("ComponentCost:LineItem: \"{}\", {}, invalid coil specified",
                                    state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                                   format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                                   ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                         ShowContinueError(state,
                                           format("Coil Specified=\"{}\", calculations will not be completed for this item.",
                                                  state.dataCostEstimateManager->CostLineItem(Item).ParentObjName));

@@ -176,8 +176,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataSize->CurOverallSimDay = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = true;
-    state->dataSize->CalcZoneSizing(1, 1).ActualZoneNum = 1;
-    state->dataSize->CalcZoneSizing(1, 2).ActualZoneNum = 2;
+    state->dataSize->CalcZoneSizing(1, 1).ZoneNum = 1;
+    state->dataSize->CalcZoneSizing(1, 2).ZoneNum = 2;
     state->dataSize->CalcZoneSizing(1, 1).AccountForDOAS = true;
     state->dataSize->CalcZoneSizing(1, 2).AccountForDOAS = true;
     state->dataSize->CurOverallSimDay = 1;
@@ -211,8 +211,6 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1) = 8;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASHighSetpoint = 14.4;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASLowSetpoint = 12.2;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASHighSetpoint = 14.4;

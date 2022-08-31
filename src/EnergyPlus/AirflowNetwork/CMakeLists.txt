@@ -1,6 +1,10 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.17)
 
 project(AirflowNetwork)
+
+if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
+  cmake_policy(SET CMP0054 NEW) # CMake 3.1 added this policy
+endif()
 
 set(HDRS include/AirflowNetwork/Solver.hpp include/AirflowNetwork/Elements.hpp include/AirflowNetwork/Properties.hpp)
 
@@ -10,7 +14,7 @@ set(SRCS src/Solver.cpp src/Elements.cpp src/Properties.cpp)
 # this will be linked statically to create the DLL and also the unit tests
 add_library(airflownetworklib STATIC ${SRCS} ${HDRS})
 
-if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang") # g++/Clang
   target_compile_options(airflownetworklib PRIVATE -Wno-attributes) # Don't warn on attributes that g++ and Clang don't know
 endif()
 

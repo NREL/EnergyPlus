@@ -170,6 +170,7 @@ extension_renaming = {
     'Foundation:Kiva': 'blocks',
     'SurfaceProperty:ExposedFoundationPerimeter': 'surfaces',
     'SurfaceProperty:SurroundingSurfaces': 'surfaces',
+    'SurfaceProperty:GroundSurfaces': 'ground_surfaces',
     'ZoneHVAC:HybridUnitaryHVAC': 'modes',
     'ShadowCalculation': 'shading_zone_groups',
     'Schedule:Year': 'schedule_weeks',

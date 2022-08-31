@@ -48,33 +48,7 @@
 #ifndef EnergyPlus_Shape_hh_INCLUDED
 #define EnergyPlus_Shape_hh_INCLUDED
 
-// Shape Enumerators
-//
-// Project: EnergyPlus
-//
-// Language: C++
-//
-// Copyright (c) ...
-
-// Notes
-
 namespace EnergyPlus {
-
-enum class ShapeType
-{
-    Invalid = -1,
-    Triangle,
-    Quadrilateral,
-    Rectangle,
-    RectangularDoorWindow,
-    RectangularOverhang,
-    RectangularLeftFin,
-    RectangularRightFin,
-    TriangularWindow,
-    Convex,
-    Nonconvex,
-    Num
-};
 
 enum class ShapeCat
 {

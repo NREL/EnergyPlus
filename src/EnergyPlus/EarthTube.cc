@@ -82,6 +82,20 @@ namespace EnergyPlus::EarthTube {
 // 2. K. Labs In: J. Cook, editor, "Passive Cooling",
 // Cambridge Massachusetts, MIT Press, 1989, pp 206-212
 
+// This is an interesting one.  The actual members of the enum are never explicitly used
+// The enum is used in a getEnumerationValue call to determine what was found in GetInput
+// The value is then used as an array index to lookup thermal conductivity and such from some std::arrays
+// So the IDE thinks these are unused, and I'm not sure the best way to hint that they sorta aren't
+enum class SoilType
+{
+    Invalid = -1,
+    HeavyAndSat,
+    HeavyAndDamp,
+    HeavyAndDry,
+    LightAndDry,
+    Num
+};
+
 constexpr std::array<std::string_view, static_cast<int>(Ventilation::Num)> ventilationNamesUC = {"NATURAL", "INTAKE", "EXHAUST"};
 constexpr std::array<std::string_view, static_cast<int>(SoilType::Num)> soilTypeNamesUC = {
     "HEAVYANDSATURATED", "HEAVYANDDAMP", "HEAVYANDDRY", "LIGHTANDDRY"};

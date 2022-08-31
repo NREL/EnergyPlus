@@ -560,9 +560,9 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.MaterialMovInsulInt = state.dataSurface->SurfMaterialMovInsulInt(SurfNum);
     calcHashKey.SchedMovInsulExt = state.dataSurface->SurfSchedMovInsulExt(SurfNum);
     calcHashKey.SchedMovInsulInt = state.dataSurface->SurfSchedMovInsulInt(SurfNum);
-    calcHashKey.ExternalShadingSchInd = state.dataSurface->SurfExternalShadingSchInd(SurfNum);
-    calcHashKey.SurroundingSurfacesNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-    calcHashKey.LinkedOutAirNode = state.dataSurface->SurfLinkedOutAirNode(SurfNum);
+    calcHashKey.ExternalShadingSchInd = state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd;
+    calcHashKey.SurroundingSurfacesNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    calcHashKey.LinkedOutAirNode = state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode;
     calcHashKey.OutsideHeatSourceTermSchedule = OutsideHeatSourceTermSchedule;
     calcHashKey.InsideHeatSourceTermSchedule = InsideHeatSourceTermSchedule;
 }

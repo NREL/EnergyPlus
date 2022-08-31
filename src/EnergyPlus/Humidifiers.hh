@@ -75,16 +75,6 @@ namespace Humidifiers {
         Num
     };
 
-    // Humidifier normalized thermal efficiency curve types
-    enum class EfficiencyCurve
-    {
-        Invalid = -1,
-        Linear,
-        Quadratic,
-        Cubic,
-        Num
-    };
-
     enum class InletWaterTemp
     {
         Invalid = -1,

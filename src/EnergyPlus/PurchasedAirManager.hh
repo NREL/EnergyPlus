@@ -339,16 +339,11 @@ namespace PurchasedAirManager {
                          Real64 &MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
                          bool FirstHVACIteration,
                          int ControlledZoneNum,
-                         int ActualZoneNum,
                          int &CompIndex);
 
     void GetPurchasedAir(EnergyPlusData &state);
 
-    void InitPurchasedAir(EnergyPlusData &state,
-                          int PurchAirNum,
-                          bool FirstHVACIteration, // unused1208
-                          int ControlledZoneNum,
-                          int ActualZoneNum);
+    void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum, int const ControlledZoneNum);
 
     void SizePurchasedAir(EnergyPlusData &state, int PurchAirNum);
 
@@ -356,12 +351,11 @@ namespace PurchasedAirManager {
                            int PurchAirNum,
                            Real64 &SysOutputProvided,   // Sensible output provided [W] cooling = negative
                            Real64 &MoistOutputProvided, // Moisture output provided [kg/s] dehumidification = negative
-                           int ControlledZoneNum,
-                           int ActualZoneNum);
+                           int ControlledZoneNum);
 
     void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
                                    int PurchAirNum,       // index to ideal loads unit
-                                   int ActualZoneNum,     // index to actual zone number
+                                   int ZoneNum,           // index to zone
                                    Real64 &OAMassFlowRate // outside air mass flow rate [kg/s] from volume flow using std density
     );
 

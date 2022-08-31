@@ -111,6 +111,13 @@ namespace EnergyPlus::PipeHeatTransfer {
 
 // OTHER NOTES: Equation Numbers listed in buried pipe routines are from Piechowski's thesis
 
+enum class PipeIndoorBoundaryType
+{
+    Invalid = -1,
+    Zone,
+    Schedule,
+    Num
+};
 constexpr std::array<std::string_view, static_cast<int>(PipeIndoorBoundaryType::Num)> pipeIndoorBoundaryTypeNamesUC = {"ZONE", "SCHEDULE"};
 
 // Using/Aliasing

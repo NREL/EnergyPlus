@@ -67,14 +67,6 @@ struct EnergyPlusData;
 
 namespace IceThermalStorage {
 
-    enum class IceStorageType
-    {
-        Invalid = -1,
-        Simple,
-        Detailed,
-        Num
-    };
-
     enum class CurveVars
     {
         Invalid = -1,

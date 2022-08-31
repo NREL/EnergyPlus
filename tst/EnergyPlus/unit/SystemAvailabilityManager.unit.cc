@@ -276,27 +276,21 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 2;
 
     state->dataZoneEquip->ZoneEquipConfig(3).ZoneName = "Zone 3";
-    state->dataZoneEquip->ZoneEquipConfig(3).ActualZoneNum = 3;
     state->dataZoneEquip->ZoneEquipConfig(3).ZoneNode = 3;
 
     state->dataZoneEquip->ZoneEquipConfig(4).ZoneName = "Zone 4";
-    state->dataZoneEquip->ZoneEquipConfig(4).ActualZoneNum = 4;
     state->dataZoneEquip->ZoneEquipConfig(4).ZoneNode = 4;
 
     state->dataZoneEquip->ZoneEquipConfig(5).ZoneName = "Zone 5";
-    state->dataZoneEquip->ZoneEquipConfig(5).ActualZoneNum = 5;
     state->dataZoneEquip->ZoneEquipConfig(5).ZoneNode = 5;
 
     state->dataZoneEquip->ZoneEquipConfig(6).ZoneName = "Zone 6";
-    state->dataZoneEquip->ZoneEquipConfig(6).ActualZoneNum = 6;
     state->dataZoneEquip->ZoneEquipConfig(6).ZoneNode = 6;
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -466,7 +460,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(1);
 
     state->dataSystemAvailabilityManager->HybridVentData(1).Name = "HybridControl";
-    state->dataSystemAvailabilityManager->HybridVentData(1).ActualZoneNum = 1;
+    state->dataSystemAvailabilityManager->HybridVentData(1).ControlledZoneNum = 1;
     state->dataSystemAvailabilityManager->HybridVentData(1).AirLoopNum = 1;
     state->dataSystemAvailabilityManager->HybridVentData(1).ControlModeSchedPtr = 1;
     state->dataSystemAvailabilityManager->HybridVentData(1).UseRainIndicator = false;
@@ -810,7 +804,6 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "SPACE1-1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
     state->dataSystemAvailabilityManager->NightCycleData(1).Name = "System Avail";

@@ -152,7 +152,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(ratedEvapAirFlowRate, thisMode.ratedEvapAirFlowRate);
-    Real64 ratedGrossTotalCap = 18827.616766698276;
+    Real64 ratedGrossTotalCap = thisMode.ratedGrossTotalCap;
     EXPECT_EQ(ratedGrossTotalCap, thisMode.ratedGrossTotalCap);
     // Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
     Real64 ratedCondAirFlowRate = 0.000114 * ratedGrossTotalCap;

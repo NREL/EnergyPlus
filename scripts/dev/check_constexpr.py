@@ -484,15 +484,12 @@ def constexpr_check(search_path: Path) -> int:
 
 
 if __name__ == "__main__":
-    print("**** Verifying script regexes ****")
-    unittest.main(exit=False)
-    print("**** DONE ****")
-    print("")
-    print("**** Checking EnergyPlus code for Constexprness ****")
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        del sys.argv[1:]
+        unittest.main(exit=False, verbosity=0)
     root_path = Path(__file__).parent.parent.parent
     src_path = root_path / "src" / "EnergyPlus"
     tst_path = root_path / "tst" / "EnergyPlus" / "unit"
     errors_found = constexpr_check(src_path) + constexpr_check(tst_path)
-    print("**** DONE ****")
     if errors_found > 0:
         raise sys.exit(1)

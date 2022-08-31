@@ -44,15 +44,13 @@ One or more infiltration objects can be defined for each zone, and the resulting
 
 The name of the ZoneInfiltration:DesignFlowRate object. This needs to be unique across all different ZoneInfiltration objects.
 
-\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{field-zone-or-zonelist-name}
 
-This field is the name of the zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: ZoneLIst) and attaches a particular infiltration statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this infiltration definition is applied to each of the zones in the zone list effecting a global definition for the amount of infiltration flow rate in the zone. The Zonelist option can be used effectively with the flow/area, flow/exteriorarea, flow/exteriorwallarea, or airchanges/hour of the Design Flow Rate Calculation Method.
-
-The name of the actual infiltration object becomes \textless{}Zone Name\textgreater{} \textless{}ZoneInfiltration:DesignFlowRate Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+This field applies this ZoneInfiltration:DesignFlowRate object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method to place a varying equipment load at the same density in each zone or space. The names of the actual ZoneInfiltration:DesignFlowRate objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneInfiltration:DesignFlowRate Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-000}
 
-This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (I\(_{design}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
+This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (I\(_{design}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation. If left blank, the schedule defaults to always 1.0.
 
 \paragraph{Field: Design Flow Rate Calculation Method}\label{field-design-flow-rate-calculation-method}
 
@@ -72,7 +70,7 @@ With this choice, the method used will be a straight insertion of the design vol
   Flow/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The flow per Zone Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone. (The Flow Rate per Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -80,7 +78,7 @@ With this choice, the method used will be a factor per floor area of the zone. (
   Flow/ExteriorArea
 \end{itemize}
 
-With this choice, the method used will be a factor per exterior surface area of the zone. (The flow per Exterior Surface Area field should be filled).
+With this choice, the method used will be a factor per exterior surface area of the zone. (The Flow Rate per Exterior Surface Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -88,7 +86,7 @@ With this choice, the method used will be a factor per exterior surface area of 
   Flow/ExteriorWallArea
 \end{itemize}
 
-With this choice, the method used will be a factor per exterior wall surface area of the zone. (The flow per Exterior Surface Area field should be filled).
+With this choice, the method used will be a factor per exterior wall surface area of the zone. (The Flow Rate per Exterior Surface Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -102,13 +100,13 @@ With this choice, the method used will be the number of air changes per hour for
 
 This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as I\(_{design}\) in the above equation) is the maximum amount of infiltration expected at design conditions. The design value is modified by the schedule fraction (see Field:Schedule Name) and user specified coefficients (see ''coefficient'' fields below). The resulting volume flow rate is converted to mass flow using the current outdoor air density at each time step.
 
-\paragraph{Field: Flow per Zone Floor Area}\label{field-flow-per-zone-floor-area}
+\paragraph{Field: Flow Rate per Floor Area}\label{field-flow-per-zone-floor-area}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone Area to determine the maximum Design Flow Rate as described in the Design Flow Rate field. The choice from the method field should be ``Flow/Area''.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone or Space Floor Area to determine the maximum Design Flow Rate as described in the Design Flow Rate field. The choice from the method field should be ``Flow/Area''.
 
-\paragraph{Field: Flow per Exterior Surface Area}\label{field-flow-per-exterior-surface-area}
+\paragraph{Field: Flow Rate per Exterior Surface Area}\label{field-flow-per-exterior-surface-area}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Exterior Surface Area in the Zone to determine the maximum Design Flow Rate as described in the Design Flow Rate field. The choice from the method field should be ``Flow/Exteriorarea'' or ``Flow/ExteriorWallArea''.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Exterior Surface Area in the Zone or Space to determine the maximum Design Flow Rate as described in the Design Flow Rate field. The choice from the method field should be ``Flow/Exteriorarea'' or ``Flow/ExteriorWallArea''.
 
 \paragraph{Field: Air Changes per Hour}\label{field-air-changes-per-hour}
 
@@ -140,8 +138,8 @@ ZoneInfiltration:DesignFlowRate,
     Infiltration Sch, !- Schedule Name
     Flow/Zone,      !- Design Flow Rate Calculation Method
     2.831685,       !- Design Flow Rate {m3/s}
-    ,               !- Flow per Zone Floor Area {m3/s/m2}
-    ,               !- Flow per Exterior Surface Area {m3/s/m2}
+    ,               !- Flow Rate per Floor Area {m3/s/m2}
+    ,               !- Flow Rate per Exterior Surface Area {m3/s/m2}
     ,               !- Air Changes per Hour
     0.6060000    ,  !- Constant Term Coefficient
     3.6359996E-02,  !- Temperature Term Coefficient
@@ -162,8 +160,8 @@ Global Infiltration example:
       Infiltration Sch,        !- Schedule Name
       AirChanges/Hour,         !- Design Flow Rate Calculation Method
       ,                        !- Design Flow Rate {m3/s}
-      ,                        !- Flow per Zone Floor Area {m3/s-m2}
-      ,                        !- Flow per Exterior Surface Area {m3/s-m2}
+      ,                        !- Flow Rate per Floor Area {m3/s-m2}
+      ,                        !- Flow Rate per Exterior Surface Area {m3/s-m2}
       4.7,                     !- Air Changes per Hour
       0.6060000,               !- Constant Term Coefficient
       3.6359996E-02,           !- Temperature Term Coefficient
@@ -191,13 +189,13 @@ One or more infiltration objects of different types can be defined for each zone
 
 The name of the ZoneInfiltration:EffectiveLeakageArea object.~ This needs to be unique across all different ZoneInfiltration objects.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-002}
+\paragraph{Field: Zone or Space Name}\label{field-zone-name-002}
 
-This field is the name of the zone (ref: Zone) and attaches a particular infiltration statement to a thermal zone in the building.
+This field applies this ZoneInfiltration:EffectiveLeakageArea object to a thermal zone or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual ZoneInfiltration:EffectiveLeakageArea objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneInfiltration:EffectiveLeakageArea Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-1}
 
-This field is the name of a schedule (ref: Schedule) that modifies the volume flow rate calculated by the model. This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
+This field is the name of a schedule (ref: Schedule) that modifies the volume flow rate calculated by the model. This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation. If left blank, the schedule defaults to always 1.0.
 
 \paragraph{Field: Effective Air Leakage Area}\label{field-effective-air-leakage-area}
 
@@ -297,13 +295,13 @@ One or more infiltration objects of different types can be defined for each zone
 
 The name of the ZoneInfiltration:FlowCoefficient object. This needs to be unique across all different ZoneInfiltration objects.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-1-001}
+\paragraph{Field: Zone or Space Name}\label{field-zone-name-1-001}
 
-This field is the name of the zone (ref: Zone) and attaches a particular infiltration statement to a thermal zone in the building.
+This field applies this ZoneInfiltration:FlowCoefficient object to a thermal zone or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual ZoneInfiltration:FlowCoefficient objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneInfiltration:FlowCoefficient Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-2}
 
-This field is the name of a schedule (ref: Schedule) that modifies the volume flow rate calculated by the model. This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
+This field is the name of a schedule (ref: Schedule) that modifies the volume flow rate calculated by the model. This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation. If left blank, the schedule defaults to always 1.0.
 
 \paragraph{Field: Flow Coefficient}\label{field-flow-coefficient}
 
@@ -563,15 +561,15 @@ More advanced ventilation calculations are possible using the EnergyPlus Airflow
 
 The name of the ZoneVentilation:DesignFlowRate object.
 
-\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-1}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{field-zone-or-zonelist-name-1}
 
-This field is the name of the zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and attaches a particular ventilation statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this ventilation definition is applied to each of the zones in the zone list effecting a global definition for the amount of infiltration flow rate in the zone. The Zonelist option can be used effectively with the flow/area, flow/person, or airchanges/hour of the Design Flow Rate Calculation Method.
+This field applies this ZoneVentilation:DesignFlowRate object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method to place a varying equipment load at the same density in each zone or space. The names of the actual ZoneVentilation:DesignFlowRate objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneVentilation:DesignFlowRate Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 The name of the actual ventilation object becomes \textless{}Zone Name\textgreater{} \textless{}ZoneVentilation:DesignFlowRate Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-2016-06-16}
 
-This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (V\(_{design}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation.
+This field is the name of the schedule (ref: Schedule) that modifies the maximum design volume flow rate (V\(_{design}\)) (see Design Flow Rate Calculation Method field and related subsequent fields). This fraction between 0.0 and 1.0 is noted as F\(_{schedule}\) in the above equation. If left blank, the schedule defaults to always 1.0.
 
 \paragraph{Field: Design Flow Rate Calculation Method}\label{field-design-flow-rate-calculation-method-1}
 
@@ -591,7 +589,7 @@ With this choice, the method used will be a straight insertion of the design vol
   Flow/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Flow per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone or space. (The Flow Rate per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -599,7 +597,7 @@ With this choice, the method used will be a factor per floor area of the zone. (
   Flow/Person
 \end{itemize}
 
-With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow per Person field should be filled).
+With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow Rate per Person field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -613,13 +611,13 @@ With this choice, the method used will be the number of air changes per hour for
 
 This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate (noted as V\(_{design}\) in the above equation) is the maximum amount of ventilation expected at design conditions. The design value is modified by the schedule fraction (see Field: Schedule Name) and user specified coefficients (see four ``coefficient'' fields below).
 
-\paragraph{Field: Flow Rate per Zone Floor Area}\label{field-flow-rate-per-zone-floor-area}
+\paragraph{Field: Flow Rate per Floor Area}\label{field-flow-rate-per-zone-floor-area}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``flow/area''.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone or Space Floor Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``flow/area''.
 
 \paragraph{Field: Flow Rate per Person}\label{field-flow-rate-per-person}
 
-This factor (m\(^{3}\)/s-person) is used, along with the nominal (maximum) number of occupants (people) in the Zone to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``flow/person''.
+This factor (m\(^{3}\)/s-person) is used, along with the nominal (maximum) number of occupants (people) in the Zone or Space to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``flow/person''.
 
 \paragraph{Field: Air Changes per Hour}\label{field-air-changes-per-hour-1}
 
@@ -713,9 +711,9 @@ ZoneVentilation:DesignFlowRate,
     Simple Vent,    !- Schedule Name
     Flow/Zone,      !- Design Volume Flow Rate calculation method
     6.131944,       !- Design Volume Flow Rate {m3/s}
-    ,               !- Volume Flow Rate per area {m3/s/m2}
-    ,               !- Volume Flow Rate per person {m3/s/person}
-    ,               !- Air Changes Per Hour
+    ,               !- Flow Rate per Floor Area {m3/s-m2}
+    ,               !- Flow Rate per Person {m3/s-person}
+    ,               !- Air Changes per Hour
     INTAKE,         !- Ventilation Type
     400.0,          !- Fan Pressure Rise{Pa}
     0.9,            !- Fan Total Efficiency
@@ -735,9 +733,9 @@ ZoneVentilation:DesignFlowRate,
       NightVentSched,          !- SCHEDULE Name
       Flow/Zone,               !- Design Volume Flow Rate calculation method
       .05295,                  !- Design Volume Flow Rate {m3/s}
-      ,                        !- Volume Flow Rate per area {m3/s/m2}
-      ,                        !- Volume Flow Rate per person {m3/s/person}
-      ,                        !- Air Changes Per Hour
+      ,                        !- Flow Rate per Floor Area {m3/s-m2}
+      ,                        !- Flow Rate per Person {m3/s-person}
+      ,                        !- Air Changes per Hour
       Intake,                  !- Ventilation Type
       67.,                     !- Fan Pressure Rise
       .7,                      !- Fan Total Efficiency
@@ -771,9 +769,9 @@ Global Ventilation example:
       VentSched,               !- Schedule Name
       AirChanges/Hour,         !- Design Flow Rate Calculation Method
       ,                        !- Design Flow Rate {m3/s}
-      ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+      ,                        !- Flow Rate per Floor Area {m3/s-m2}
       ,                        !- Flow Rate per Person {m3/s-person}
-      1.7,                        !- Air Changes per Hour
+      1.7,                     !- Air Changes per Hour
       Intake,                  !- Ventilation Type
       67.,                     !- Fan Pressure Rise {Pa}
       0.7,                     !- Fan Total Efficiency
@@ -860,17 +858,17 @@ More advanced ventilation calculations are possible using the EnergyPlus Airflow
 
 The name of the ZoneVentilation:WindandStackOpenArea object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-2016-06-16}
+\paragraph{Field: Zone or Space Name}\label{field-zone-name-2016-06-16}
 
-This field is the name of the zone (ref: Zone) and attaches a particular ventilation statement to a thermal zone in the building.
+This field applies this ZoneVentilation:WindandStackOpenArea object to a thermal zone or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual ZoneVentilation:WindandStackOpenArea objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneVentilation:WindandStackOpenArea Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Opening Area}\label{field-opening-area}
 
-This is the opening area exposed to outdoors (m\(^{2}\)) in a zone.
+This is the opening area exposed to outdoors (m\(^{2}\)) in a zone or space.
 
 \paragraph{Field: Opening Area Fraction Schedule Name}\label{field-opening-area-fraction-schedule-name}
 
-This field is the name of the schedule (ref: Schedule) which modifies the Opening Area value (see previous field). The schedule values must be any positive number between 0 and 1 as a fraction. The actual opening area in a zone for a particular simulation time step is defined as the product of the Opening Area input field and the value specified by the schedule named in this input field.
+This field is the name of the schedule (ref: Schedule) which modifies the Opening Area value (see previous field). The schedule values must be any positive number between 0 and 1 as a fraction. The actual opening area in a zone or space for a particular simulation time step is defined as the product of the Opening Area input field and the value specified by the schedule named in this input field. If left blank, the schedule defaults to always 1.0.
 
 \paragraph{Field: Opening Effectiveness}\label{field-opening-effectiveness}
 
@@ -1220,9 +1218,9 @@ ZoneMixing is intended to allow simplified treatment of air exchange between zon
 
 The name of the ZoneMixing object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-3}
+\paragraph{Field: Zone or Space Name}\label{field-zone-name-3}
 
-This field is the name of the zone (ref: Zone) receiving the amount of air being exchanged and attaches a particular mixing statement to a thermal zone in the building.
+This field applies this ZoneMixing object to a thermal zone or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual ZoneMixing objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneMixing Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-3}
 
@@ -1246,7 +1244,7 @@ With this choice, the method used will be a straight insertion of the design vol
   Flow/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Flow per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone. (The Flow Rate per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1254,7 +1252,7 @@ With this choice, the method used will be a factor per floor area of the zone. (
   Flow/Person
 \end{itemize}
 
-With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow per Person field should be filled).
+With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow Rate per Person field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1268,9 +1266,9 @@ With this choice, the method used will be the number of air changes per hour for
 
 This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate is the maximum amount of mixing air expected. The design value is modified by the schedule fraction (see Field: Schedule Name) and user specified coefficients (see four ``coefficient'' fields below).
 
-\paragraph{Field: Flow Rate per Zone Floor Area}\label{field-flow-rate-per-zone-floor-area-1}
+\paragraph{Field: Flow Rate per Floor Area}\label{field-flow-rate-per-zone-floor-area-1}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``Flow/Area''.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone of Space Floor  Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``Flow/Area''.
 
 \paragraph{Field: Flow Rate per Person}\label{field-flow-rate-per-person-1}
 
@@ -1280,9 +1278,9 @@ This factor (m\(^{3}\)/s-person) is used, along with the nominal (maximum) numbe
 
 With this choice, the method used will be the number of air changes per hour for the mixing amount. This factor, along with the Zone Volume, will be used to determine the Design Flow Rate. The choice from the method field should be ``AirChanges/Hour''.
 
-\paragraph{Field: Source Zone Name}\label{field-source-zone-name}
+\paragraph{Field: Source Zone or Space Name}\label{field-source-zone-name}
 
-This field is the name of the ``source'' zone (ref: Zone) that exhausts the amount of air specified by the design level and schedule fields to the zone named in the zone name field.
+This field is the name of the ``source'' zone or space that exhausts the amount of air specified by the design level and schedule fields to the receiving zone or space.
 
 \paragraph{Field: Delta Temperature}\label{field-delta-temperature-2}
 
@@ -1292,25 +1290,25 @@ This number controls when mixing air from the source zone is sent to the receivi
 
 This alpha field contains the name of a schedule (ref. Schedule objects) which contains the temperature difference (in Celsius) between the source zone and receiving zone air dry-bulb temperatures as a function of time. This field is an optional field and has the same functionality as the Delta Temperature field. If the user enters a valid schedule name, the delta temperature values specified in this schedule will supersede the constant value specified in the Delta Temperature field.
 
-\paragraph{Field: Minimum Zone Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name}
+\paragraph{Field: Minimum Receiving Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone or space temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum receiving temperature control is not applied.
 
-\paragraph{Field: Maximum Zone Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name}
+\paragraph{Field: Maximum Receiving Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone or space temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum receiving temperature control is not applied.
 
-\textbf{Note:} The maximum zone temperature when mixing is shutoff must be greater than or equal to the minimum zone temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum zone shutoff temperature will be set to the minimum zone shutoff temperature.
+\textbf{Note:} The maximum receiving temperature when mixing is shutoff must be greater than or equal to the minimum receiving temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum shutoff temperature will be set to the minimum shutoff temperature.
 
-\paragraph{Field: Minimum Source Zone Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name}
+\paragraph{Field: Minimum Source Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone or space temperature (in Celsius) below which mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source temperature control is not applied.
 
-\paragraph{Field: Maximum Source Zone Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name}
+\paragraph{Field: Maximum Source Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone or space temperature (in Celsius) above which mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source temperature control is not applied.
 
-\textbf{Note:} The maximum source zone temperature when mixing is shutoff must be greater than or equal to the minimum source zone temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source zone shutoff temperature will be set to the minimum source zone shutoff temperature.
+\textbf{Note:} The maximum source temperature when mixing is shutoff must be greater than or equal to the minimum source temperature when mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source shutoff temperature will be set to the minimum source shutoff temperature.
 
 \paragraph{Field: Minimum Outdoor Temperature Schedule Name}\label{field-minimum-outdoor-temperature-schedule-name-2}
 
@@ -1328,15 +1326,15 @@ An IDF Example:
 
 ZoneMixing,
     Kitchen_ZN_1_FLR_1 Exhaust Fanmixing_0,  !- Name
-    Kitchen_ZN_1_FLR_1,  !- Zone Name
-    Hours_of_operation,  !- Schedule Name
-    Flow/Zone,  !- Design Flow Rate Calculation Method
-    1.4540,  !- Design Level
-    ,  !- Volume Flow Rate per Area {m3/s/m2}
-    ,  !- Volume Flow Rate Per Person {m3/s/person}
-    ,  !- Air Changes per Hour {ACH}
-    CAFETERIA_ZN_1_FLR_1,  !- Source Zone Name
-    0.0;  !- Delta Temperature
+    Kitchen_ZN_1_FLR_1,   !- Zone or Space Name
+    Hours_of_operation,   !- Schedule Name
+    Flow/Zone,            !- Design Flow Rate Calculation Method
+    1.4540,               !- Design Flow Rate {m3/s}
+    ,                     !- Flow Rate per Floor Area {m3/s-m2}
+    ,                     !- Flow Rate per Person {m3/s-person}
+    ,                     !- Air Changes Per Hour
+    CAFETERIA_ZN_1_FLR_1, !- Source Zone or Space Name
+    0.0;                  !- Delta Temperature
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-3-000}
@@ -1418,9 +1416,9 @@ ZoneCrossMixing can be entered once (in one of the mixing zones), twice (once fo
 
 The name of the ZoneCrossMixing object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-4}
+\paragraph{Field: Zone or Space Name}\label{field-zone-name-4}
 
-This field is the name of the zone (ref: Zone) receiving the amount of air being exchanged and attaches a particular cross mixing statement to a thermal zone in the building.
+This field applies this ZoneCrossMixing object to a thermal zone or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual ZoneCrossMixing objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneCrossMixing Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-4}
 
@@ -1444,7 +1442,7 @@ With this choice, the method used will be a straight insertion of the design vol
   Flow/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Flow per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone. (The Flow Rate per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1452,7 +1450,7 @@ With this choice, the method used will be a factor per floor area of the zone. (
   Flow/Person
 \end{itemize}
 
-With this choice, the method used will be a factor per nominal number of people in the zone. (The flow per person field should be filled).
+With this choice, the method used will be a factor per nominal number of people in the zone. (The Flow Rate per Person field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1466,9 +1464,9 @@ With this choice, the method used will be the number of air changes per hour for
 
 This field denotes the full design volume flow rate (m\(^{3}\)/s). The previous field should choose ``flow/zone'' as the choice. The design volume flow rate is the maximum amount of mixing air expected. The design value is modified by the schedule fraction (see Field: Schedule Name) and user specified coefficients (see four ``coefficient'' fields below).
 
-\paragraph{Field: Flow Rate per Zone Floor Area}\label{field-flow-rate-per-zone-floor-area-2}
+\paragraph{Field: Flow Rate per Floor Area}\label{field-flow-rate-per-zone-floor-area-2}
 
-This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``Flow/Area''.
+This factor (m\(^{3}\)/s-m\(^{2}\)) is used, along with the Zone or Space Floor Area to determine the maximum Design Volume Flow Rate as described in the Design Volume Flow Rate field. The choice from the method field should be ``Flow/Area''.
 
 \paragraph{Field: Flow Rate per Person}\label{field-flow-rate-per-person-2}
 
@@ -1478,9 +1476,9 @@ This factor (m\(^{3}\)/s-person) is used, along with the nominal (maximum) numbe
 
 With this choice, the method used will be the number of air changes per hour for the mixing amount. This factor, along with the Zone Volume, will be used to determine the Design Flow Rate. The choice from the method field should be ``AirChanges/Hour''.
 
-\paragraph{Field: Source Zone Name}\label{field-source-zone-name-1}
+\paragraph{Field: Source Zone or Space Name}\label{field-source-zone-name-1}
 
-This field is the name of the ``source'' zone (ref: Zone) that exhausts the amount of air specified by the design level and schedule fields to the zone named in the zone name field. In reality, the ``source'' and ``receiving'' zones are interchangeable since the cross-mixed air affects both zones.
+This field is the name of the ``source'' zone or space that exhausts the amount of air specified by the design level and schedule fields to the zone named in the zone name field. In reality, the ``source'' and ``receiving'' zones or spaces are interchangeable since the cross-mixed air affects both zones.
 
 \paragraph{Field: Delta Temperature}\label{field-delta-temperature-3}
 
@@ -1490,25 +1488,25 @@ This number controls when mixing air from the source zone is sent to the receivi
 
 This alpha field contains the name of a schedule (ref. Schedule objects) which contains the temperature difference (in Celsius) between the source zone and receiving zone air dry-bulb temperatures as a function of time. This field is an optional field and has the same functionality as the Delta Temperature field. If the user enters a valid schedule name, the delta temperature values specified in this schedule will supersede the constant value specified in the Delta Temperature field.
 
-\paragraph{Field: Minimum Zone Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name-1}
+\paragraph{Field: Minimum Receiving Temperature Schedule Name}\label{field-minimum-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum receiving zone or space temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum receiving temperature control is not applied.
 
-\paragraph{Field: Maximum Zone Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name-1}
+\paragraph{Field: Maximum Receiving Temperature Schedule Name}\label{field-maximum-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum receiving zone or space temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum receiving temperature control is not applied.
 
-\textbf{Note:} The maximum zone temperature when cross mixing is shutoff must be greater than or equal to the minimum zone temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum zone shutoff temperature will be set to the minimum zone shutoff temperature.
+\textbf{Note:} The maximum receiving temperature when cross mixing is shutoff must be greater than or equal to the minimum receiving temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum shutoff temperature will be set to the minimum shutoff temperature.
 
-\paragraph{Field: Minimum Source Zone Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name-1}
+\paragraph{Field: Minimum Source Temperature Schedule Name}\label{field-minimum-source-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the minimum source zone or space temperature (in Celsius) below which cross mixing is shutoff as a function of time. The minimum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the minimum source temperature control is not applied.
 
-\paragraph{Field: Maximum Source Zone Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name-1}
+\paragraph{Field: Maximum Source Temperature Schedule Name}\label{field-maximum-source-zone-temperature-schedule-name-1}
 
-This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source zone temperature control is not applied.
+This alpha field contains the name of a schedule (ref. Schedule objects) which contains the maximum source zone or space temperature (in Celsius) above which cross mixing is shutoff as a function of time. The maximum temperature value in the schedule can be -100°C and the maximum value can be 100°C. This field is an optional field. If this field is not entered, the maximum source temperature control is not applied.
 
-\textbf{Note:} The maximum source zone temperature when cross mixing is shutoff must be greater than or equal to the minimum source zone temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source zone shutoff temperature will be set to the minimum source zone shutoff temperature.
+\textbf{Note:} The maximum source temperature when cross mixing is shutoff must be greater than or equal to the minimum source temperature when cross mixing is shutoff at any given time. Otherwise, warnings will be issued and the maximum source shutoff temperature will be set to the minimum source shutoff temperature.
 
 \paragraph{Field: Minimum Outdoor Temperature Schedule Name}\label{field-minimum-outdoor-temperature-schedule-name-3}
 
@@ -1526,27 +1524,15 @@ An IDF Example:
 
 ZoneCrossMixing,
       1stFloor-Garage,  !- Name
-      GARAGE,      !- Zone Name
-      Always On,   !- SCHEDULE Name
-      Flow/Zone,               !- Design Flow Rate calculation method
-      0.1,                     !- Design Flow Rate {m3/s}
-      ,                        !- Flow Rate per Area {m3/s/m2}
-      ,                        !- Flow Rate per Person {m3/s/person}
-      ,                        !- Air Changes Per Hour
-      1ST-FLOOR,   !- Source Zone Name
+      GARAGE,      !- Zone or Space Name
+      Always On,   !- Schedule Name
+      Flow/Zone,   !- Design Flow Rate Calculation Method
+      0.1,         !- Design Flow Rate {m3/s}
+      ,            !- Flow Rate per Floor Area {m3/s-m2}
+      ,            !- Flow Rate per Person {m3/s-person}
+      ,            !- Air Changes Per Hour
+      1ST-FLOOR,   !- Source Zone or Space Name
       1.0;         !- Delta temp
-
-  ZoneCrossMixing,
-      Garage-1stFloor,  !- Name
-      1ST-FLOOR,   ! Zone Name
-      Always On,   !- SCHEDULE Name
-      flow/zone,               !- Design Flow Rate calculation method
-      0.1,                     !- Design Flow Rate {m3/s}
-      ,                        !- Flow Rate per area {m3/s/m2}
-      ,                        !- Flow Rate per person {m3/s/person}
-      ,                        !- Air Changes Per Hour
-      GARAGE,      ! Source Zone Name
-      1.0;         ! Delta temp
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-000}

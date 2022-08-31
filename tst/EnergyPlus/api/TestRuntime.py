@@ -62,6 +62,11 @@ def environment_handler(_state) -> None:
     sys.stdout.flush()
 
 
+def common_callback_handler(_state) -> None:
+    print("OH HAI SOMETHING")
+    sys.stdout.flush()
+
+
 def progress_handler(progress: int) -> None:
     if 49 < progress < 51:
         print("HALFWAY THERE!!")
@@ -79,6 +84,9 @@ state = api.state_manager.new_state()
 api.runtime.callback_begin_new_environment(state, environment_handler)
 api.runtime.callback_progress(state, progress_handler)
 api.functional.callback_error(state, error_handler)
+api.runtime.callback_end_system_sizing(state, common_callback_handler)
+api.runtime.callback_after_component_get_input(state, common_callback_handler)
+api.runtime.callback_unitary_system_sizing(state, common_callback_handler)
 v = api.runtime.run_energyplus(state, sys.argv[1:])
 if v != 0:
     print("EnergyPlus Failed!")

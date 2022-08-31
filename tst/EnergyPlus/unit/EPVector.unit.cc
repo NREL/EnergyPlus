@@ -59,6 +59,7 @@ TEST_F(EnergyPlusFixture, EPVectorTest_Basic)
 {
     EPVector<int> v;
     v.allocate(4);
+    EXPECT_TRUE(v.allocated());
     v[0] = 1;
     v[1] = 2;
     v[2] = 3;
@@ -71,12 +72,44 @@ TEST_F(EnergyPlusFixture, EPVectorTest_Basic)
     ASSERT_THROW(v[4] = 5, std::out_of_range);
     ASSERT_THROW(v(5) = 5, std::out_of_range);
 #endif // !NDEBUG
+    v.resize(2);
+    EXPECT_EQ(2, v.size());
+    EXPECT_EQ(1, v(1));
+    EXPECT_EQ(2, v(2));
+    v.resize(4);
+    EXPECT_EQ(1, v(1));
+    EXPECT_EQ(2, v(2));
+    EXPECT_EQ(0, v(3));
+    EXPECT_EQ(0, v(4));
+    v.clear();
+    EXPECT_FALSE(v.allocated());
+    EXPECT_TRUE(v.empty());
+    v.resize(4);
+    EXPECT_EQ(0, v(1));
+    EXPECT_EQ(0, v(2));
+    EXPECT_EQ(0, v(3));
+    EXPECT_EQ(0, v(4));
+    v.clear();
+    v.resize(4, true);
+    EXPECT_EQ(1, v(1));
+    EXPECT_EQ(1, v(2));
+    EXPECT_EQ(1, v(3));
+    EXPECT_EQ(1, v(4));
+    v.deallocate();
+    EXPECT_FALSE(v.allocated());
+    EXPECT_TRUE(v.empty());
+    v.resize(3, 2);
+    EXPECT_EQ(2, v(1));
+    EXPECT_EQ(2, v(2));
+    EXPECT_EQ(2, v(3));
+    EXPECT_TRUE(v.allocated());
 }
 
 TEST_F(EnergyPlusFixture, EPVectorTest_Bools)
 {
     EPVector<bool> v;
     v.allocate(4);
+    EXPECT_TRUE(v.allocated());
     v[0] = true;
     v[1] = false;
     v[2] = false;
@@ -89,4 +122,35 @@ TEST_F(EnergyPlusFixture, EPVectorTest_Bools)
     ASSERT_THROW(v[4] = true, std::out_of_range);
     ASSERT_THROW(v(5) = false, std::out_of_range);
 #endif // !NDEBUG
+    v.resize(2);
+    EXPECT_EQ(2, v.size());
+    EXPECT_TRUE(v(1));
+    EXPECT_FALSE(v(2));
+    v.resize(4);
+    EXPECT_TRUE(v(1));
+    EXPECT_FALSE(v(2));
+    EXPECT_FALSE(v(3));
+    EXPECT_FALSE(v(4));
+    v.clear();
+    EXPECT_FALSE(v.allocated());
+    EXPECT_TRUE(v.empty());
+    v.resize(4);
+    EXPECT_FALSE(v(1));
+    EXPECT_FALSE(v(2));
+    EXPECT_FALSE(v(3));
+    EXPECT_FALSE(v(4));
+    v.clear();
+    v.resize(4, true);
+    EXPECT_TRUE(v(1));
+    EXPECT_TRUE(v(2));
+    EXPECT_TRUE(v(3));
+    EXPECT_TRUE(v(4));
+    v.deallocate();
+    EXPECT_FALSE(v.allocated());
+    EXPECT_TRUE(v.empty());
+    v.resize(3, true);
+    EXPECT_TRUE(v(1));
+    EXPECT_TRUE(v(2));
+    EXPECT_TRUE(v(3));
+    EXPECT_TRUE(v.allocated());
 }

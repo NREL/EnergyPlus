@@ -35,7 +35,7 @@ namespace Gases
         m_Pressure(t_Gas.m_Pressure)
     {
         m_GasItem.clear();
-        for(auto item : t_Gas.m_GasItem)
+        for(const auto & item : t_Gas.m_GasItem)
         {
             m_GasItem.push_back(item);
         }
@@ -347,7 +347,7 @@ namespace Gases
     CGas & CGas::operator=(CGas const & t_Gas)
     {
         m_GasItem.clear();
-        for(auto const item : t_Gas.m_GasItem)
+        for(auto const& item : t_Gas.m_GasItem)
         {
             m_GasItem.push_back(item);
         }

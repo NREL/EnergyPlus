@@ -52,6 +52,8 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Solver.hpp>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -60,6 +62,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/Furnaces.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -352,7 +355,8 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     state->dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
     state->dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
 
-    state->afn->SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControlMultiADS;
+    state->afn->simulation_control.type = AirflowNetwork::ControlType::MultizoneWithDistribution;
+    state->afn->distribution_simulated = true;
     ReportFurnace(*state, FurnaceNum, 1);
 
     EXPECT_EQ(2.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
@@ -370,7 +374,6 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 
     EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
-    state->afn->SimulateAirflowNetwork = 0;
     state->dataFurnaces->Furnace.deallocate();
 }
 
@@ -1111,7 +1114,8 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "    autosize,                !- Gross Rated Sensible Heat Ratio",
         "    3.0,                     !- Gross Rated Cooling COP {W/W}",
         "    autosize,                !- Rated Air Flow Rate {m3/s}",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "    Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -1126,7 +1130,8 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "    autosize,                !- Gross Rated Heating Capacity {W}",
         "    2.75,                    !- Gross Rated Heating COP {W/W}",
         "    autosize,                !- Rated Air Flow Rate {m3/s}",
-        "    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
         "    SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "    HPACHeatCapFT,           !- Heating Capacity Function of Temperature Curve Name",
@@ -1177,6 +1182,76 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     EXPECT_FALSE(state->dataFurnaces->CoolingLoad);
     // check if the air-to-air heat pump outlet temperature is capped at 45.0C
     EXPECT_NEAR(45.0, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(1).FurnaceOutletNodeNum).Temp, 0.000001);
+}
+
+TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
+{
+    state->dataFurnaces->Furnace.allocate(1);
+    state->dataFurnaces->Furnace(1).CoolingCoilIndex = 1;
+    state->dataFurnaces->Furnace(1).HeatingCoilIndex = 2;
+    state->dataVariableSpeedCoils->VarSpeedCoil.allocate(2);
+    state->dataVariableSpeedCoils->GetCoilsInputFlag = false;
+    state->dataVariableSpeedCoils->VarSpeedCoil(1).MinOATCompressor = 30.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(2).MinOATCompressor = 30.0;
+    state->dataDXCoils->DXCoil.allocate(2);
+    state->dataDXCoils->GetCoilsInputFlag = false;
+    state->dataDXCoils->DXCoil(1).MinOATCompressor = 30.0;
+    state->dataDXCoils->DXCoil(2).MinOATCompressor = 30.0;
+
+    state->dataHVACAssistedCC->HXAssistedCoil.allocate(1);
+    state->dataHVACAssistedCC->HXAssistedCoil(1).CoolingCoilType = "COIL:COOLING:DX";
+    state->dataHVACAssistedCC->HXAssistedCoil(1).CoolingCoilName = "Dummy_Name";
+
+    state->dataCoilCooingDX->coilCoolingDXGetInputFlag = false;
+    CoilCoolingDX thisCoil;
+    thisCoil.name = "Dummy_Name";
+    state->dataCoilCooingDX->coilCoolingDXs.push_back(thisCoil);
+
+    int FurnaceNum = 1;
+    std::string cCurModObj = "Furnace_Test";
+    bool ErrFound = false;
+
+    // Test HXAsssisted type with new coil
+    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = CoilDX_CoolingHXAssisted;
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 0.0, 1e-6);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
+    // reset once as test
+    state->dataFurnaces->Furnace(1).MinOATCompressorCooling = -999.0;
+    state->dataFurnaces->Furnace(1).MinOATCompressorHeating = -999.0;
+
+    // Check that each coil type returns correctly
+    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
+    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = Coil_HeatingElectric;
+    // Each test should return 30 for cooling coil (limited) and -1000 for heating coil (no limit)
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
+    // reset once as test
+    state->dataFurnaces->Furnace(1).MinOATCompressorCooling = -999.0;
+    state->dataFurnaces->Furnace(1).MinOATCompressorHeating = -999.0;
+
+    state->dataFurnaces->Furnace(1).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, -1000.0, 1e-6);
+
+    // check heating coil types
+    // should return 30 in each case since cooling and heating coil now have limit
+    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6); // same as above
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, 30.0, 1e-6); // now returns 30
+
+    state->dataFurnaces->Furnace(1).HeatingCoilType_Num = CoilDX_HeatingEmpirical;
+    SetMinOATCompressor(*state, FurnaceNum, cCurModObj, ErrFound);
+    EXPECT_FALSE(ErrFound);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorCooling, 30.0, 1e-6);
+    EXPECT_NEAR(state->dataFurnaces->Furnace(1).MinOATCompressorHeating, 30.0, 1e-6);
 }
 
 } // namespace EnergyPlus

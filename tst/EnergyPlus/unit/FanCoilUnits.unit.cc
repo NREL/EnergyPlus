@@ -744,7 +744,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    int ControlledZoneNum(1);
     bool FirstHVACIteration(true);
     bool ErrorsFound(false);
     Real64 QZnReq(0.0);
@@ -1069,7 +1068,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     UpdateScheduleValues(*state);
 
     // Normal heating simulation for fan coil with constant fan, variable water flow
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
@@ -1078,7 +1077,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRate = 0.2;
     // Simulate with flow lock on and locked flow > demand flow; bypass extra flow
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     EXPECT_NEAR(55.31, state->dataLoopNodes->Node(10).Temp, 0.1);
     // expect inlet and outlet node air mass flow rates are equal
@@ -1086,7 +1085,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
               state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
     // heating simulation with flow lock on and locked flow < flow required for load; use locked flow
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRate = 0.05;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(3780.0, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
@@ -1095,7 +1094,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     QZnReq = 5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Unlocked;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(4420.0, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
@@ -1105,7 +1104,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     QZnReq = 80.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 80.00;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Unlocked;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     // FC hits the 80 W target load
     EXPECT_NEAR(80.0, QUnitOut, 1.0);
     EXPECT_NEAR(75.0, state->dataFanCoilUnits->FanCoil(1).QUnitOutNoHC, 1.0);
@@ -1120,7 +1119,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Temp =
         25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
     state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 39000;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     // FC does not hit the 80 W target load since flow is locked at a low value
     EXPECT_NEAR(52.0, QUnitOut, 1.0);
     // off coil capacity is same as just prior to flow being locked
@@ -1133,7 +1132,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
 
     // Coil Off Capacity Test #3 - unlock plant flow to ensure that water flow rate would have been different had flow not been locked
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Unlocked;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     // FC hits the 80 W target load
     EXPECT_NEAR(80.0, QUnitOut, 1.0);
     // actual coil off output when inlet air temp = 25 C and h = 39000 J/kg
@@ -1152,7 +1151,6 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    int ControlledZoneNum(1);
     bool FirstHVACIteration(true);
     bool ErrorsFound(false);
     Real64 QZnReq(0.0);
@@ -1440,7 +1438,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     UpdateScheduleValues(*state);
 
     // Normal heating simulation for fan coil with constant fan, electric heating
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
@@ -1448,7 +1446,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     // normal heating, heating capacity exceeded
     QZnReq = 5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(4575.0, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
@@ -1469,7 +1467,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    int ControlledZoneNum(1);
     bool FirstHVACIteration(true);
     bool ErrorsFound(false);
     Real64 QZnReq(0.0);
@@ -1796,7 +1793,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     UpdateScheduleValues(*state);
     // normal cooling simulation for constant fan variable flow fan coil
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
@@ -1806,7 +1803,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRate = 0.2;
     // cooling simulation with flow lock on and locked flow > flow that meets load; bypass extra flow
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     EXPECT_NEAR(10.86, state->dataLoopNodes->Node(13).Temp, 0.1);
     // expect inlet and outlet node air mass flow rates are equal
@@ -1815,7 +1812,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
 
     // cooling simulation with flow lock on and locked flow < flow required for load; use locked flow
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRate = 0.05;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(-3000.0, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
@@ -1825,7 +1822,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     QZnReq = -5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.00;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Unlocked;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
     EXPECT_NEAR(-4420.0, QUnitOut, 5.0);
     // expect inlet and outlet node air mass flow rates are equal
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
@@ -2165,8 +2162,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     state->dataEnvrn->StdRhoAir = 1.2;
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
 
     // expect full flow and meet capacity
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2178,7 +2175,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     // expect minimum flow and meet capacity
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
     QZnReq = 1000.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
                 state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio,
@@ -2190,7 +2187,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     // expect modulated flow and meet capacity
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
     QZnReq = 2500.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate,
               state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio);
@@ -2203,7 +2200,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
     QZnReq = -4000.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
     // expect inlet and outlet node air mass flow rates are equal
@@ -2214,7 +2211,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4255.0;
     QZnReq = -4255.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow, 0.0000000001);
     // expect inlet and outlet node air mass flow rates are equal
@@ -2224,7 +2221,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     // expect minimum flow and meet capacity
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
     QZnReq = -1000.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate,
                 state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio,
@@ -2236,7 +2233,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     // expect modulated flow and meet capacity
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
     QZnReq = -2500.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
     EXPECT_GT(state->dataLoopNodes->Node(1).MassFlowRate,
               state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow * state->dataFanCoilUnits->FanCoil(1).LowSpeedRatio);
@@ -2907,8 +2904,8 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     state->dataEnvrn->StdRhoAir = 1.2;
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 3 and near full air and water flow and meet capacity
     EXPECT_EQ(3, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
     EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.95);
@@ -2922,7 +2919,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
     QZnReq = 1000.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 1 and moderate air and water flow and meet capacity
     EXPECT_EQ(1, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
     EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.6);
@@ -2938,7 +2935,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
     QZnReq = 2500.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 2 and moderate air and water flow and meet capacity
     EXPECT_EQ(2, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
     EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.8);
@@ -2955,7 +2952,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
     QZnReq = -4000.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 3 and near full air and water flow and meet capacity
     EXPECT_EQ(3, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
     EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.9);
@@ -2970,7 +2967,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
     QZnReq = -1000.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 1 and moderate air and water flow and meet capacity
     EXPECT_EQ(1, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
     EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.5);
@@ -2986,7 +2983,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
     QZnReq = -2500.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 2 and moderate air and water flow and meet capacity
     EXPECT_EQ(2, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
     EXPECT_GT(state->dataFanCoilUnits->FanCoil(1).PLR, 0.75);
@@ -3336,8 +3333,8 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     state->dataEnvrn->StdRhoAir = 1.2;
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 3 and near full air and water flow and meet capacity
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
     EXPECT_NEAR(thisFanCoil.PLR, 0.961, 0.001);
@@ -3348,7 +3345,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
     QZnReq = 1000.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 1 and moderate air and water flow and meet capacity
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
     EXPECT_NEAR(thisFanCoil.PLR, 0.632, 0.001);
@@ -3359,7 +3356,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
     QZnReq = 2500.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 2 and moderate air and water flow and meet capacity
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 2);
     EXPECT_NEAR(thisFanCoil.PLR, 0.850, 0.001);
@@ -3373,7 +3370,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
     QZnReq = -4000.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 3 and near full air and water flow and meet capacity
     EXPECT_EQ(3, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
     EXPECT_NEAR(state->dataFanCoilUnits->FanCoil(1).PLR, 0.950, 0.001);
@@ -3384,7 +3381,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
     QZnReq = -1000.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 1 and moderate air and water flow and meet capacity
     EXPECT_EQ(1, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
     EXPECT_NEAR(state->dataFanCoilUnits->FanCoil(1).PLR, 0.501, 0.001);
@@ -3395,7 +3392,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
     QZnReq = -2500.0;
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 2 and moderate air and water flow and meet capacity
     EXPECT_EQ(2, state->dataFanCoilUnits->FanCoil(1).SpeedFanSel);
     EXPECT_NEAR(state->dataFanCoilUnits->FanCoil(1).PLR, 0.756, 0.001);
@@ -3706,8 +3703,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     QUnitOut = 0.0;
     QLatOut = 0.0;
     state->dataGlobal->BeginEnvrnFlag = true;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     Real64 expectedAirFlowRate = thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
     // expect fan speed 1 and fan and coil cycling to meet load
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
@@ -3723,8 +3720,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     QZnReq = 4000.0;
     QUnitOut = 0.0;
     QLatOut = 0.0;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) +
                           thisFanCoil.SpeedRatio * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow);
     // expect fan speed 2 and fan and fancoil cycling b/n speed 1 and 2
@@ -3741,8 +3738,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     QZnReq = 8000.0;
     QUnitOut = 0.0;
     QLatOut = 0.0;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) +
                           thisFanCoil.SpeedRatio * (1.0 * thisFanCoil.MaxAirMassFlow);
     // expect fan speed 3 and fan and fancoil cycling b/n speed 2 and 3
@@ -3759,8 +3756,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     QZnReq = 10200;
     QUnitOut = 0.0;
     QLatOut = 0.0;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     expectedAirFlowRate = thisFanCoil.MaxAirMassFlow;
     // expect fan speed 3 and fancoil running at max speed
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
@@ -4073,8 +4070,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     QUnitOut = 0.0;
     QLatOut = 0.0;
     state->dataGlobal->BeginEnvrnFlag = true;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     Real64 expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
     // expect fan speed 1, fan runs continuously and only heating coil cycle on/off to meet load
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
@@ -4090,8 +4087,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     QZnReq = 4000.0;
     QUnitOut = 0.0;
     QLatOut = 0.0;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.LowSpeedRatio * thisFanCoil.MaxAirMassFlow) +
                           thisFanCoil.SpeedRatio * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow);
     // expect fan speed 2 and fan and fancoil cycling b/n speed 1 and 2
@@ -4108,8 +4105,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     QZnReq = 8000.0;
     QUnitOut = 0.0;
     QLatOut = 0.0;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     expectedAirFlowRate = (1.0 - thisFanCoil.SpeedRatio) * (thisFanCoil.MedSpeedRatio * thisFanCoil.MaxAirMassFlow) +
                           thisFanCoil.SpeedRatio * (1.0 * thisFanCoil.MaxAirMassFlow);
     // expect fan speed 3 and fan and fancoil cycling b/n speed 2 and 3
@@ -4126,8 +4123,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     QZnReq = 10200;
     QUnitOut = 0.0;
     QLatOut = 0.0;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     expectedAirFlowRate = thisFanCoil.MaxAirMassFlow;
     // expect fan speed 3 and fancoil running at max speed
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 3);
@@ -4439,8 +4436,8 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     int InletNode = thisFanCoil.AirInNode;
     Real64 QUnitOutMaxLS = 0.0; // low speed maximum output
 
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
 
     state->dataFanCoilUnits->FanCoil(FanCoilNum).SpeedFanSel = 1;
     state->dataFanCoilUnits->FanCoil(FanCoilNum).SpeedFanRatSel = state->dataFanCoilUnits->FanCoil(FanCoilNum).LowSpeedRatio;
@@ -4740,8 +4737,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElectricHeatingCoilASHRAE90VariableFan)
     QUnitOut = 0.0;
     QLatOut = 0.0;
     state->dataGlobal->BeginEnvrnFlag = true;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect output full capacity
     EXPECT_EQ(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate, thisFanCoil.MaxAirMassFlow);
     EXPECT_EQ(thisFanCoil.PLR, 1.0);
@@ -4755,8 +4752,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElectricHeatingCoilASHRAE90VariableFan)
     QUnitOut = 0.0;
     QLatOut = 0.0;
     state->dataGlobal->BeginEnvrnFlag = true;
-    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect part load operation with about 3000W output
     EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate, thisFanCoil.MaxAirMassFlow, 0.00001);
     EXPECT_NEAR(thisFanCoil.PLR, 0.487, 0.001);

@@ -89,7 +89,7 @@ namespace BoilerSteam {
 
     const char *fluidNameSteam = "STEAM";
 
-    PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+    BoilerSpecs *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
         if (state.dataBoilerSteam->getSteamBoilerInput) {
