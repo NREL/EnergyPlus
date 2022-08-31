@@ -675,7 +675,8 @@ namespace HeatingCoils {
             heatingCoil.HeatingCoilModel = "Fuel";
             heatingCoil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
-            heatingCoil.FuelType_Num = AssignResourceTypeNum(Alphas(3));
+            heatingCoil.FuelType_Num = static_cast<DataGlobalConstants::ResourceType>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(3))));
             if (!(heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::NaturalGas ||
                   heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::Propane ||
                   heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::Diesel ||

@@ -7458,7 +7458,8 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes.at(NumVariables) = AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType));
+            ResourceTypes.at(NumVariables) = static_cast<DataGlobalConstants::ResourceType>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
 
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
@@ -7541,7 +7542,8 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes.at(NumVariables) = AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType));
+            ResourceTypes.at(NumVariables) = static_cast<DataGlobalConstants::ResourceType>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {

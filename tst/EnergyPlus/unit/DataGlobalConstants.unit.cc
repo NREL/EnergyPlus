@@ -61,58 +61,144 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
 {
 
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Electricity, DataGlobalConstants::AssignResourceTypeNum("Electricity")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NaturalGas, DataGlobalConstants::AssignResourceTypeNum("NaturalGas")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Gasoline, DataGlobalConstants::AssignResourceTypeNum("Gasoline")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Diesel, DataGlobalConstants::AssignResourceTypeNum("Diesel")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Coal, DataGlobalConstants::AssignResourceTypeNum("Coal")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::FuelOilNo1, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo1")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::FuelOilNo2, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo2")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Propane, DataGlobalConstants::AssignResourceTypeNum("Propane")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::OtherFuel1, DataGlobalConstants::AssignResourceTypeNum("OtherFuel1")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::OtherFuel2, DataGlobalConstants::AssignResourceTypeNum("OtherFuel2")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Water, DataGlobalConstants::AssignResourceTypeNum("Water")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::OnSiteWater, DataGlobalConstants::AssignResourceTypeNum("OnSiteWater")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::MainsWater, DataGlobalConstants::AssignResourceTypeNum("MainsWater")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::RainWater, DataGlobalConstants::AssignResourceTypeNum("RainWater")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::WellWater, DataGlobalConstants::AssignResourceTypeNum("WellWater")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Condensate, DataGlobalConstants::AssignResourceTypeNum("Condensate")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::EnergyTransfer, DataGlobalConstants::AssignResourceTypeNum("EnergyTransfer")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Steam, DataGlobalConstants::AssignResourceTypeNum("Steam")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictCooling, DataGlobalConstants::AssignResourceTypeNum("DistrictCooling")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictHeating, DataGlobalConstants::AssignResourceTypeNum("DistrictHeating")));
-    EXPECT_TRUE(
-        compare_enums(DataGlobalConstants::ResourceType::ElectricityProduced, DataGlobalConstants::AssignResourceTypeNum("ElectricityProduced")));
-    EXPECT_TRUE(
-        compare_enums(DataGlobalConstants::ResourceType::ElectricityPurchased, DataGlobalConstants::AssignResourceTypeNum("ElectricityPurchased")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Electricity,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Electricity")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NaturalGas,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("NaturalGas")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Gasoline,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Gasoline")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Diesel,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Diesel")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Coal,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Coal")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::FuelOilNo1,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("FuelOilNo1")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::FuelOilNo2,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("FuelOilNo2")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Propane,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Propane")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::OtherFuel1,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("OtherFuel1")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::OtherFuel2,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("OtherFuel2")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Water,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Water")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::OnSiteWater,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("OnSiteWater")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::MainsWater,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("MainsWater")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::RainWater,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("RainWater")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::WellWater,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("WellWater")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Condensate,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Condensate")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::EnergyTransfer,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("EnergyTransfer")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Steam,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Steam")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictCooling,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("DistrictCooling")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictHeating,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("DistrictHeating")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricityProduced,
+                              static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+                                  DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("ElectricityProduced")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricityPurchased,
+                              static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+                                  DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("ElectricityPurchased")))));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricitySurplusSold,
-                              DataGlobalConstants::AssignResourceTypeNum("ElectricitySurplusSold")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricityNet, DataGlobalConstants::AssignResourceTypeNum("ElectricityNet")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::SolarWater, DataGlobalConstants::AssignResourceTypeNum("SolarWater")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::SolarAir, DataGlobalConstants::AssignResourceTypeNum("SolarAir")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::SO2, DataGlobalConstants::AssignResourceTypeNum("SO2")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NOx, DataGlobalConstants::AssignResourceTypeNum("NOx")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::N2O, DataGlobalConstants::AssignResourceTypeNum("N2O")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PM, DataGlobalConstants::AssignResourceTypeNum("PM")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PM2_5, DataGlobalConstants::AssignResourceTypeNum("PM2.5")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PM10, DataGlobalConstants::AssignResourceTypeNum("PM10")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::CO, DataGlobalConstants::AssignResourceTypeNum("CO")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::CO2, DataGlobalConstants::AssignResourceTypeNum("CO2")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::CH4, DataGlobalConstants::AssignResourceTypeNum("CH4")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NH3, DataGlobalConstants::AssignResourceTypeNum("NH3")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NMVOC, DataGlobalConstants::AssignResourceTypeNum("NMVOC")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Hg, DataGlobalConstants::AssignResourceTypeNum("Hg")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Pb, DataGlobalConstants::AssignResourceTypeNum("Pb")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NuclearHigh, DataGlobalConstants::AssignResourceTypeNum("Nuclear High")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NuclearLow, DataGlobalConstants::AssignResourceTypeNum("Nuclear Low")));
+                              static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+                                  DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("ElectricitySurplusSold")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricityNet,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("ElectricityNet")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::SolarWater,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("SolarWater")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::SolarAir,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("SolarAir")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::SO2,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("SO2")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NOx,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("NOx")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::N2O,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("N2O")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PM,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("PM")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PM2_5,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("PM2.5")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PM10,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("PM10")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::CO,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("CO")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::CO2,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("CO2")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::CH4,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("CH4")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NH3,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("NH3")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NMVOC,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("NMVOC")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Hg,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Hg")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Pb,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Pb")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NuclearHigh,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Nuclear High")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NuclearLow,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Nuclear Low")))));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::WaterEnvironmentalFactors,
-                              DataGlobalConstants::AssignResourceTypeNum("WaterEnvironmentalFactors")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::CarbonEquivalent, DataGlobalConstants::AssignResourceTypeNum("Carbon Equivalent")));
+                              static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+                                  DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("WaterEnvironmentalFactors")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::CarbonEquivalent,
+                              static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+                                  DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("Carbon Equivalent")))));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PlantLoopHeatingDemand,
-                              DataGlobalConstants::AssignResourceTypeNum("PlantLoopHeatingDemand")));
+                              static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+                                  DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("PlantLoopHeatingDemand")))));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PlantLoopCoolingDemand,
-                              DataGlobalConstants::AssignResourceTypeNum("PlantLoopCoolingDemand")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Invalid, DataGlobalConstants::AssignResourceTypeNum("XYZ")));
+                              static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+                                  DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("PlantLoopCoolingDemand")))));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Invalid,
+                              static_cast<DataGlobalConstants::ResourceType>(
+                                  getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase("XYZ")))));
 }
 
 TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)

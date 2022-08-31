@@ -138,7 +138,6 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
     // It will be the right conversion factors based on the associated meter resource type
     // meaning if "CCF" is picked, the conversion factor isn't the same whether it's a water meter or a fuel meter.
 
-    using DataGlobalConstants::AssignResourceTypeNum;
     using OutputReportTabular::AddTOCEntry;
 
     static constexpr std::string_view RoutineName("GetInputEconomicsTariff: ");
@@ -635,7 +634,9 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         }
         // associate the resource number with each tariff
         if (tariff(iInObj).reportMeterIndx >= 1) {
-            tariff(iInObj).resourceNum = AssignResourceTypeNum(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType);
+            tariff(iInObj).resourceNum = static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+                DataGlobalConstants::ResourceTypeNamesUC,
+                UtilityRoutines::MakeUPPERCase(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
         }
     }
 }
