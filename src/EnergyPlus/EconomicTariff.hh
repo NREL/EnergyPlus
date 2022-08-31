@@ -471,7 +471,7 @@ namespace EconomicTariff {
 
         // Default Constructor
         TariffType()
-            : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(DataGlobalConstants::ResourceType::None),
+            : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(DataGlobalConstants::ResourceType::Invalid),
               convChoice(EconConv::USERDEF), energyConv(0.0), demandConv(0.0), periodSchIndex(0), seasonSchIndex(0), monthSchIndex(0),
               demandWindow(DemandWindow::Invalid), demWinTime(0.0), monthChgVal(0.0), monthChgPt(0), minMonthChgVal(0.0), minMonthChgPt(0),
               chargeSchIndex(0), baseUseSchIndex(0), buyOrSell(0), firstCategory(0), lastCategory(0), ptEnergyCharges(0), ptDemandCharges(0),

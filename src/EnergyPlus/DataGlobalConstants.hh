@@ -82,14 +82,13 @@ namespace DataGlobalConstants {
     enum class ResourceType
     {
         Invalid = -1,
-        None,
         Electricity,
-        Natural_Gas,
+        NaturalGas,
         Gasoline,
         Diesel,
         Coal,
-        FuelOil_1,
-        FuelOil_2,
+        FuelOilNo1,
+        FuelOilNo2,
         Propane,
         Water,
         EnergyTransfer,
@@ -210,14 +209,14 @@ struct DataGlobalConstantsData : BaseGlobalStruct
     };
     static int constexpr iEndUseSize = 14;
 
-    std::vector<DataGlobalConstants::ResourceType> AllResourceTypes = {DataGlobalConstants::ResourceType::None,
+    std::vector<DataGlobalConstants::ResourceType> AllResourceTypes = {DataGlobalConstants::ResourceType::Invalid,
                                                                        DataGlobalConstants::ResourceType::Electricity,
-                                                                       DataGlobalConstants::ResourceType::Natural_Gas,
+                                                                       DataGlobalConstants::ResourceType::NaturalGas,
                                                                        DataGlobalConstants::ResourceType::Gasoline,
                                                                        DataGlobalConstants::ResourceType::Diesel,
                                                                        DataGlobalConstants::ResourceType::Coal,
-                                                                       DataGlobalConstants::ResourceType::FuelOil_1,
-                                                                       DataGlobalConstants::ResourceType::FuelOil_2,
+                                                                       DataGlobalConstants::ResourceType::FuelOilNo1,
+                                                                       DataGlobalConstants::ResourceType::FuelOilNo2,
                                                                        DataGlobalConstants::ResourceType::Propane,
                                                                        DataGlobalConstants::ResourceType::Water,
                                                                        DataGlobalConstants::ResourceType::EnergyTransfer,

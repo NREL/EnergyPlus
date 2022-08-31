@@ -1206,12 +1206,12 @@ void ExpressAsCashFlows(EnergyPlusData &state)
                 elcc->CashFlow[cashFlowCounter].Category = CostCategory::Water;
                 break;
             case DataGlobalConstants::ResourceType::Electricity:
-            case DataGlobalConstants::ResourceType::Natural_Gas:
+            case DataGlobalConstants::ResourceType::NaturalGas:
             case DataGlobalConstants::ResourceType::Gasoline:
             case DataGlobalConstants::ResourceType::Diesel:
             case DataGlobalConstants::ResourceType::Coal:
-            case DataGlobalConstants::ResourceType::FuelOil_1:
-            case DataGlobalConstants::ResourceType::FuelOil_2:
+            case DataGlobalConstants::ResourceType::FuelOilNo1:
+            case DataGlobalConstants::ResourceType::FuelOilNo2:
             case DataGlobalConstants::ResourceType::Propane:
             case DataGlobalConstants::ResourceType::EnergyTransfer:
             case DataGlobalConstants::ResourceType::Steam:
@@ -1340,7 +1340,7 @@ void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
                  elcc->CashFlow[iCashFlow].Resource <= DataGlobalConstants::ResourceType::Condensate)) {
                 continue;
             }
-            if ((curResource != DataGlobalConstants::ResourceType::None)) {
+            if ((curResource != DataGlobalConstants::ResourceType::Invalid)) {
                 int found = 0;
                 for (nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
                     if (elcc->UsePriceEscalation(nUsePriceEsc).resource == curResource) {
@@ -1472,7 +1472,7 @@ void ComputePresentValue(EnergyPlusData &state)
     // loop through the resources and if they match a UseEscalation use those values instead
     for (nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
         auto curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
-        if (curResource != DataGlobalConstants::ResourceType::None) {
+        if (curResource != DataGlobalConstants::ResourceType::Invalid) {
             for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 // the following is based on UPV* formula from NIST 135 supplement but is for a single year
                 effectiveYear = double(jYear) - DiscConv2EffectiveYearAdjustment[static_cast<int>(elcc->discountConvention)];
@@ -1494,7 +1494,7 @@ void ComputePresentValue(EnergyPlusData &state)
         }
         case PrValKind::Energy: {
             auto curResource = elcc->CashFlow[iCashFlow].Resource;
-            if (curResource != DataGlobalConstants::ResourceType::None) {
+            if (curResource != DataGlobalConstants::ResourceType::Invalid) {
                 totalPV = 0.0;
                 for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                     elcc->CashFlow[iCashFlow].yrPresVal(jYear) =

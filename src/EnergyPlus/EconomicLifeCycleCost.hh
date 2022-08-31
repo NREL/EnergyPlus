@@ -364,7 +364,7 @@ namespace EconomicLifeCycleCost {
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UsePriceEscalationType() : resource(DataGlobalConstants::ResourceType::None), escalationStartYear(0), escalationStartMonth(0)
+        UsePriceEscalationType() : resource(DataGlobalConstants::ResourceType::Invalid), escalationStartYear(0), escalationStartMonth(0)
         {
         }
     };
@@ -378,7 +378,7 @@ namespace EconomicLifeCycleCost {
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UseAdjustmentType() : resource(DataGlobalConstants::ResourceType::None)
+        UseAdjustmentType() : resource(DataGlobalConstants::ResourceType::Invalid)
         {
         }
     };
@@ -400,7 +400,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         CashFlowType()
-            : SourceKind(SourceKindType::Invalid), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Invalid),
+            : SourceKind(SourceKindType::Invalid), Resource(DataGlobalConstants::ResourceType::Invalid), Category(CostCategory::Invalid),
               pvKind(PrValKind::Invalid), presentValue(0.), orginalCost(0.)
         {
         }

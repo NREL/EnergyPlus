@@ -73,7 +73,7 @@ ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
             return ResourceType::Electricity;
 
         } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS")) {
-            return ResourceType::Natural_Gas;
+            return ResourceType::NaturalGas;
 
         } else if (SELECT_CASE_var == "GASOLINE") {
             return ResourceType::Gasoline;
@@ -85,10 +85,10 @@ ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
             return ResourceType::Coal;
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            return ResourceType::FuelOil_1;
+            return ResourceType::FuelOilNo1;
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            return ResourceType::FuelOil_2;
+            return ResourceType::FuelOilNo2;
 
         } else if (SELECT_CASE_var == "PROPANE") {
             return ResourceType::Propane;
@@ -208,7 +208,7 @@ ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
             return ResourceType::PlantLoopCoolingDemand;
 
         } else {
-            return ResourceType::None;
+            return ResourceType::Invalid;
         }
     }
 }
@@ -229,7 +229,7 @@ std::string GetResourceTypeChar(ResourceType const ResourceTypeNum)
     case ResourceType::Electricity: {
         return "Electricity";
     } break;
-    case ResourceType::Natural_Gas: {
+    case ResourceType::NaturalGas: {
         return "NaturalGas";
     } break;
     case ResourceType::Gasoline: {
@@ -241,10 +241,10 @@ std::string GetResourceTypeChar(ResourceType const ResourceTypeNum)
     case ResourceType::Coal: {
         return "Coal";
     } break;
-    case ResourceType::FuelOil_1: {
+    case ResourceType::FuelOilNo1: {
         return "FuelOilNo1";
     } break;
-    case ResourceType::FuelOil_2: {
+    case ResourceType::FuelOilNo2: {
         return "FuelOilNo2";
     } break;
     case ResourceType::Propane: {

@@ -2798,7 +2798,7 @@ namespace SimulationManager {
             unitsForVar.allocate(NumVariables);
 
             for (int idx = 1; idx <= NumVariables; ++idx) {
-                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
             }
 
             EndUses.allocate(NumVariables);

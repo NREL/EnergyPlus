@@ -465,7 +465,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     Array1D_string Names(NumVariables);                              // Variable Names for each variable
 
     for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::Invalid));
     }
 
     GetMeteredVariables(
@@ -490,7 +490,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_EQ(Groups(4), "HVAC");
     EXPECT_TRUE(compare_enums(
         ResourceTypes.at(5),
-        DataGlobalConstants::ResourceType::Natural_Gas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+        DataGlobalConstants::ResourceType::NaturalGas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
     EXPECT_EQ(EndUses(5), "COOLING");
     EXPECT_EQ(Groups(5), "HVAC");
     EXPECT_TRUE(compare_enums(

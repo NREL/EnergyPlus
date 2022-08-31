@@ -2369,7 +2369,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         unitsForVar.allocate(NumVariables);
 
                         for (int idx = 1; idx <= NumVariables; ++idx) {
-                            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+                            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                         }
 
                         EndUses.allocate(NumVariables);
@@ -2438,7 +2438,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             unitsForVar.allocate(NumVariables);
                             ResourceTypes.clear();
                             for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                             }
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
@@ -2510,7 +2510,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 ResourceTypes.clear();
                                 for (int idx = 1; idx <= NumVariables; ++idx) {
                                     ResourceTypes.insert(
-                                        std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+                                        std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                                 }
                                 EndUses.allocate(NumVariables);
                                 Groups.allocate(NumVariables);
@@ -2623,7 +2623,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     unitsForVar.allocate(NumVariables);
                     ResourceTypes.clear();
                     for (int idx = 1; idx <= NumVariables; ++idx) {
-                        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+                        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                     }
                     EndUses.allocate(NumVariables);
                     Groups.allocate(NumVariables);
@@ -2785,7 +2785,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         unitsForVar.allocate(NumVariables);
                         ResourceTypes.clear();
                         for (int idx = 1; idx <= NumVariables; ++idx) {
-                            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+                            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                         }
                         EndUses.allocate(NumVariables);
                         Groups.allocate(NumVariables);
@@ -2855,7 +2855,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             unitsForVar.allocate(NumVariables);
                             ResourceTypes.clear();
                             for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                             }
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
@@ -3087,7 +3087,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             unitsForVar.allocate(NumVariables);
                             ResourceTypes.clear();
                             for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                             }
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
@@ -3157,7 +3157,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 ResourceTypes.clear();
                                 for (int idx = 1; idx <= NumVariables; ++idx) {
                                     ResourceTypes.insert(
-                                        std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
+                                        std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                                 }
                                 EndUses.allocate(NumVariables);
                                 Groups.allocate(NumVariables);
@@ -3328,7 +3328,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                                                                Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
                 CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 CompEnergyUse = 0.0;
-                EnergyType = DataGlobalConstants::ResourceType::None;
+                EnergyType = DataGlobalConstants::ResourceType::Invalid;
                 CompLoadFlag = true;
                 CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                 CompLoadFlag = false;
@@ -3349,7 +3349,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                                                                    Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
                     CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                     CompEnergyUse = 0.0;
-                    EnergyType = DataGlobalConstants::ResourceType::None;
+                    EnergyType = DataGlobalConstants::ResourceType::Invalid;
                     CompLoadFlag = true;
                     CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     CompLoadFlag = false;
@@ -3371,7 +3371,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                                                                 Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
                         CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                         CompEnergyUse = 0.0;
-                        EnergyType = DataGlobalConstants::ResourceType::None;
+                        EnergyType = DataGlobalConstants::ResourceType::Invalid;
                         CompLoadFlag = true;
                         CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         CompLoadFlag = false;
@@ -3450,7 +3450,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                 }
                 CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 CompEnergyUse = 0.0;
-                EnergyType = DataGlobalConstants::ResourceType::None;
+                EnergyType = DataGlobalConstants::ResourceType::Invalid;
                 CompLoadFlag = true;
                 CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                 CompLoadFlag = false;
@@ -3469,7 +3469,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                                                                   Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
                     CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                     CompEnergyUse = 0.0;
-                    EnergyType = DataGlobalConstants::ResourceType::None;
+                    EnergyType = DataGlobalConstants::ResourceType::Invalid;
                     CompLoadFlag = true;
                     CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     CompLoadFlag = false;
@@ -3489,7 +3489,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                                                                Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
                         CompLoad *= state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                         CompEnergyUse = 0.0;
-                        EnergyType = DataGlobalConstants::ResourceType::None;
+                        EnergyType = DataGlobalConstants::ResourceType::Invalid;
                         CompLoadFlag = true;
                         CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         CompLoadFlag = false;
@@ -3811,7 +3811,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
             thisSysLoadRepVars.HCCompSteam += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             thisSysLoadRepVars.HCCompElec += CompEnergy;
-        } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
+        } else if (EnergyType == DataGlobalConstants::ResourceType::NaturalGas) {
             thisSysLoadRepVars.HCCompNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
             thisSysLoadRepVars.HCCompPropane += CompEnergy;
@@ -3850,7 +3850,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
             } else {
                 thisSysLoadRepVars.HCCompElec += CompEnergy;
             }
-        } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
+        } else if (EnergyType == DataGlobalConstants::ResourceType::NaturalGas) {
             thisSysLoadRepVars.HCCompNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
             thisSysLoadRepVars.HCCompPropane += CompEnergy;
@@ -3904,7 +3904,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
             thisSysLoadRepVars.DomesticH2O += std::abs(CompEnergy);
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             thisSysLoadRepVars.HumidElec += CompEnergy;
-        } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
+        } else if (EnergyType == DataGlobalConstants::ResourceType::NaturalGas) {
             thisSysLoadRepVars.HumidNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
             thisSysLoadRepVars.HumidPropane += CompEnergy;
@@ -4017,7 +4017,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
             } else {
                 thisSysLoadRepVars.HCCompElec += CompEnergy;
             }
-        } else if (EnergyType == DataGlobalConstants::ResourceType::Natural_Gas) {
+        } else if (EnergyType == DataGlobalConstants::ResourceType::NaturalGas) {
             thisSysLoadRepVars.HCCompNaturalGas += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Propane) {
             thisSysLoadRepVars.HCCompPropane += CompEnergy;

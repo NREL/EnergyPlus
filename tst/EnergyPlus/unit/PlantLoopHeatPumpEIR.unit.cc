@@ -2800,7 +2800,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     Array1D_string Names(NumVariables);                              // Variable Names for each variable
 
     for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::Invalid));
     }
 
     GetMeteredVariables(
@@ -2901,7 +2901,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     Array1D_string Names(NumVariables);                              // Variable Names for each variable
 
     for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::Invalid));
     }
 
     GetMeteredVariables(

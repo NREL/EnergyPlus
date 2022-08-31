@@ -70,7 +70,7 @@ namespace DataPlant {
 
         // Default Constructor
         MeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
+            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::Invalid),
               EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0), ReportVarIndexType(OutputProcessor::TimeStepType::Zone),
               ReportVarType(OutputProcessor::VariableType::NotFound), CurMeterReading(0.0)
         {

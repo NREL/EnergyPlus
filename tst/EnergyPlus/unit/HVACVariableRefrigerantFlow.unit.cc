@@ -8242,7 +8242,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     state->dataHeatingCoils->CoilIsSuppHeater = true;
     state->dataHeatingCoils->HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     state->dataHeatingCoils->HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
-    state->dataHeatingCoils->HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::NaturalGas;
     state->dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;

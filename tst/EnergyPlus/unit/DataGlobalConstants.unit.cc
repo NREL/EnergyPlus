@@ -62,12 +62,12 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
 {
 
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Electricity, DataGlobalConstants::AssignResourceTypeNum("Electricity")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Natural_Gas, DataGlobalConstants::AssignResourceTypeNum("NaturalGas")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NaturalGas, DataGlobalConstants::AssignResourceTypeNum("NaturalGas")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Gasoline, DataGlobalConstants::AssignResourceTypeNum("Gasoline")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Diesel, DataGlobalConstants::AssignResourceTypeNum("Diesel")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Coal, DataGlobalConstants::AssignResourceTypeNum("Coal")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::FuelOil_1, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo1")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::FuelOil_2, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo2")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::FuelOilNo1, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo1")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::FuelOilNo2, DataGlobalConstants::AssignResourceTypeNum("FuelOilNo2")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Propane, DataGlobalConstants::AssignResourceTypeNum("Propane")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::OtherFuel1, DataGlobalConstants::AssignResourceTypeNum("OtherFuel1")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::OtherFuel2, DataGlobalConstants::AssignResourceTypeNum("OtherFuel2")));
@@ -112,19 +112,19 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
                               DataGlobalConstants::AssignResourceTypeNum("PlantLoopHeatingDemand")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PlantLoopCoolingDemand,
                               DataGlobalConstants::AssignResourceTypeNum("PlantLoopCoolingDemand")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::None, DataGlobalConstants::AssignResourceTypeNum("XYZ")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Invalid, DataGlobalConstants::AssignResourceTypeNum("XYZ")));
 }
 
 TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)
 {
 
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Electricity), "Electricity");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Natural_Gas), "NaturalGas");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::NaturalGas), "NaturalGas");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Gasoline), "Gasoline");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Diesel), "Diesel");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Coal), "Coal");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::FuelOil_1), "FuelOilNo1");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::FuelOil_2), "FuelOilNo2");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::FuelOilNo1), "FuelOilNo1");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::FuelOilNo2), "FuelOilNo2");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Propane), "Propane");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::OtherFuel1), "OtherFuel1");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::OtherFuel2), "OtherFuel2");
@@ -163,6 +163,6 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::CarbonEquivalent), "Carbon Equivalent");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::PlantLoopHeatingDemand), "PlantLoopHeatingDemand");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::PlantLoopCoolingDemand), "PlantLoopCoolingDemand");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::None), "Unknown");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::None), "Unknown");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Invalid), "Unknown");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::ResourceType::Invalid), "Unknown");
 }
