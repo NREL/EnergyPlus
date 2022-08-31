@@ -54,7 +54,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include "rs0001.h"
 #include "rs0001_factory.h"
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
