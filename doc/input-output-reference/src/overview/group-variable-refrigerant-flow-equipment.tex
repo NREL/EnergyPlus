@@ -783,11 +783,10 @@ This numeric field defines the rated compressor power per Watt of rated evaporat
 \paragraph{Field: Minimum Outdoor Air Temperature in Cooling Mode}\label{field-minimum-outdoor-air-temperature-in-cooling-mode}
 
 This numeric field defines the minimum outdoor temperature allowed for cooling operations. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6$^\circ$C.
- If this field is left blank, the default value is -20$^\circ$C.
 
 \paragraph{Field: Maximum Outdoor Air Temperature in Cooling Mode}\label{field-maximum-outdoor-air-temperature-in-cooling-mode}
 
-This numeric field defines the maximum outdoor temperature allowed for cooling operations. Above this temperature, heating is disabled. If this field is left blank, the default value is 16$^\circ$C.
+This numeric field defines the maximum outdoor temperature allowed for cooling operations. Above this temperature, heating is disabled. If this field is left blank, the default value is 43$^\circ$C.
 
 \paragraph{Field: Minimum Outdoor Air Temperature in Heating Mode}\label{field-minimum-outdoor-air-temperature-in-heating-mode}
 
@@ -803,7 +802,7 @@ This numeric field defines the reference superheating degrees of the outdoor uni
 
 \paragraph{Field: Outdoor Unit Reference Subcooling}\label{field-outdoor-unit-reference-subcooling}
 
-This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 3.0$^\circ$C is used.
+This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 5.0$^\circ$C is used.
 
 \paragraph{Field: Refrigerant Temperature Control Algorithm for Indoor Unit}\label{field-refrigerant-temperature-control-algorithm-for-indoor-unit}
 
@@ -863,7 +862,7 @@ This numeric field defines the equivalent length of main pipe connecting the out
 
 \paragraph{Field: Height Difference Between Outdoor Unit and Indoor Units}\label{field-height-difference-between-outdoor-unit-and-indoor-units}
 
-This numeric field defines the height difference between the outdoor unit node and indoor unit node of the main pipe. This value is used to calculate the piping loss of the refrigerant when going through the main pipe. The value can be positive, zero, or negative. Positive means outdoor unit is higher than indoor unit, while negative means outdoor unit is lower than indoor unit.
+This numeric field defines the height difference between the outdoor unit node and indoor unit node of the main pipe. This value is used to calculate the piping loss of the refrigerant when going through the main pipe. The value can be positive, zero, or negative. Positive means outdoor unit is higher than indoor unit, while negative means outdoor unit is lower than indoor unit. If this field is blank, the default value of 5m is used.
 
 \paragraph{Field: Main Pipe Insulation Thickness}\label{field-main-pipe-insulation-thickness}
 
