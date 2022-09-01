@@ -1640,77 +1640,77 @@
 
   ZoneMixing,
     SPACE5-1 Zone Mixing1,   !- Name
-    SPACE5-1,                !- Zone Name
+    SPACE5-1,                !- Zone or Space Name
     ZoneMixing-SCH,          !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.07,                    !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    SPACE1-1,                !- Source Zone Name
+    SPACE1-1,                !- Source Zone or Space Name
     0.0,                     !- Delta Temperature {deltaC}
     ,                        !- Delta Temperature Schedule Name
-    ,                        !- Minimum Zone Temperature Schedule Name
-    ,                        !- Maximum Zone Temperature Schedule Name
-    ,                        !- Minimum Source Zone Temperature Schedule Name
-    ,                        !- Maximum Source Zone Temperature Schedule Name
+    ,                        !- Minimum Receiving Temperature Schedule Name
+    ,                        !- Maximum Receiving Temperature Schedule Name
+    ,                        !- Minimum Source Temperature Schedule Name
+    ,                        !- Maximum Source Temperature Schedule Name
     ,                        !- Minimum Outdoor Temperature Schedule Name
     ;                        !- Maximum Outdoor Temperature Schedule Name
 
   ZoneMixing,
     SPACE5-1 Zone Mixing2,   !- Name
-    SPACE5-1,                !- Zone Name
+    SPACE5-1,                !- Zone or Space Name
     ZoneMixing-SCH,          !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.03,                    !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    SPACE2-1,                !- Source Zone Name
+    SPACE2-1,                !- Source Zone or Space Name
     0.0,                     !- Delta Temperature {deltaC}
     ,                        !- Delta Temperature Schedule Name
-    ,                        !- Minimum Zone Temperature Schedule Name
-    ,                        !- Maximum Zone Temperature Schedule Name
-    ,                        !- Minimum Source Zone Temperature Schedule Name
-    ,                        !- Maximum Source Zone Temperature Schedule Name
+    ,                        !- Minimum Receiving Temperature Schedule Name
+    ,                        !- Maximum Receiving Temperature Schedule Name
+    ,                        !- Minimum Source Temperature Schedule Name
+    ,                        !- Maximum Source Temperature Schedule Name
     ,                        !- Minimum Outdoor Temperature Schedule Name
     ;                        !- Maximum Outdoor Temperature Schedule Name
 
   ZoneMixing,
     SPACE5-1 Zone Mixing3,   !- Name
-    SPACE5-1,                !- Zone Name
+    SPACE5-1,                !- Zone or Space Name
     ZoneMixing-SCH,          !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.07,                    !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    SPACE3-1,                !- Source Zone Name
+    SPACE3-1,                !- Source Zone or Space Name
     0.0,                     !- Delta Temperature {deltaC}
     ,                        !- Delta Temperature Schedule Name
-    ,                        !- Minimum Zone Temperature Schedule Name
-    ,                        !- Maximum Zone Temperature Schedule Name
-    ,                        !- Minimum Source Zone Temperature Schedule Name
-    ,                        !- Maximum Source Zone Temperature Schedule Name
+    ,                        !- Minimum Receiving Temperature Schedule Name
+    ,                        !- Maximum Receiving Temperature Schedule Name
+    ,                        !- Minimum Source Temperature Schedule Name
+    ,                        !- Maximum Source Temperature Schedule Name
     ,                        !- Minimum Outdoor Temperature Schedule Name
     ;                        !- Maximum Outdoor Temperature Schedule Name
 
   ZoneMixing,
     SPACE5-1 Zone Mixing4,   !- Name
-    SPACE5-1,                !- Zone Name
+    SPACE5-1,                !- Zone or Space Name
     ZoneMixing-SCH,          !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.03,                    !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    SPACE4-1,                !- Source Zone Name
+    SPACE4-1,                !- Source Zone or Space Name
     0.0,                     !- Delta Temperature {deltaC}
     ,                        !- Delta Temperature Schedule Name
-    ,                        !- Minimum Zone Temperature Schedule Name
-    ,                        !- Maximum Zone Temperature Schedule Name
-    ,                        !- Minimum Source Zone Temperature Schedule Name
-    ,                        !- Maximum Source Zone Temperature Schedule Name
+    ,                        !- Minimum Receiving Temperature Schedule Name
+    ,                        !- Maximum Receiving Temperature Schedule Name
+    ,                        !- Minimum Source Temperature Schedule Name
+    ,                        !- Maximum Source Temperature Schedule Name
     ,                        !- Minimum Outdoor Temperature Schedule Name
     ;                        !- Maximum Outdoor Temperature Schedule Name
 

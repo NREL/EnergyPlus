@@ -23440,362 +23440,362 @@
 
   ZoneMixing,
     Floor 1 Electrical Room Transfer Air,  !- Name
-    Floor 1 Electrical Room, !- Zone Name
+    Floor 1 Electrical Room, !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00025,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00025,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Lobby Hall,      !- Source Zone Name
+    Floor 1 Lobby Hall,      !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 1 Elevator Pump Room Transfer Air,  !- Name
-    Floor 1 Elevator Pump Room,  !- Zone Name
+    Floor 1 Elevator Pump Room,  !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00025,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00025,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 IT Hall,         !- Source Zone Name
+    Floor 1 IT Hall,         !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 1 Lobby Toilet Transfer Air,  !- Name
-    Floor 1 Lobby Toilet,    !- Zone Name
+    Floor 1 Lobby Toilet,    !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.04248,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Lobby,           !- Source Zone Name
+    Floor 1 Lobby,           !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 1 MRI Toilet Transfer Air,  !- Name
-    Floor 1 MRI Toilet,      !- Zone Name
+    Floor 1 MRI Toilet,      !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.04248,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 MRI Room,        !- Source Zone Name
+    Floor 1 MRI Room,        !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 1 Nurse Janitor Transfer Air,  !- Name
-    Floor 1 Nurse Janitor,   !- Zone Name
+    Floor 1 Nurse Janitor,   !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Nurse Station,   !- Source Zone Name
+    Floor 1 Nurse Station,   !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 1 Nurse Toilet Transfer Air,  !- Name
-    Floor 1 Nurse Toilet,    !- Zone Name
+    Floor 1 Nurse Toilet,    !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.04248,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Nurse Hall,      !- Source Zone Name
+    Floor 1 Nurse Hall,      !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 1 Pre-Op Toilet Transfer Air,  !- Name
-    Floor 1 Pre-Op Toilet,   !- Zone Name
+    Floor 1 Pre-Op Toilet,   !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.04248,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Pre-Op Hall,     !- Source Zone Name
+    Floor 1 Pre-Op Hall,     !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 1 Storage Transfer Air,  !- Name
-    Floor 1 Storage,         !- Zone Name
+    Floor 1 Storage,         !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Step Down,       !- Source Zone Name
+    Floor 1 Step Down,       !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 1 Utility Janitor Transfer Air,  !- Name
-    Floor 1 Utility Janitor, !- Zone Name
+    Floor 1 Utility Janitor, !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Utility Hall,    !- Source Zone Name
+    Floor 1 Utility Hall,    !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 1 Utility Room Transfer Air,  !- Name
-    Floor 1 Utility Room,    !- Zone Name
+    Floor 1 Utility Room,    !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Utility Hall,    !- Source Zone Name
+    Floor 1 Utility Hall,    !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 2 Conference Toilet Transfer Air,  !- Name
-    Floor 2 Conference Toilet,  !- Zone Name
+    Floor 2 Conference Toilet,  !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.05034,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 2 Conference,      !- Source Zone Name
+    Floor 2 Conference,      !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 2 Janitor Transfer Air,  !- Name
-    Floor 2 Janitor,         !- Zone Name
+    Floor 2 Janitor,         !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 2 Lounge,          !- Source Zone Name
+    Floor 2 Lounge,          !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 2 Reception Toilet Transfer Air,  !- Name
-    Floor 2 Reception Toilet,!- Zone Name
+    Floor 2 Reception Toilet,!- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.09911,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 2 Reception,       !- Source Zone Name
+    Floor 2 Reception,       !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 2 Storage 1 Transfer Air,  !- Name
-    Floor 2 Storage 1,       !- Zone Name
+    Floor 2 Storage 1,       !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 2 Office,          !- Source Zone Name
+    Floor 2 Office,          !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 2 Storage 2 Transfer Air,  !- Name
-    Floor 2 Storage 2,       !- Zone Name
+    Floor 2 Storage 2,       !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 2 Office,          !- Source Zone Name
+    Floor 2 Office,          !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 2 Storage 3 Transfer Air,  !- Name
-    Floor 2 Storage 3,       !- Zone Name
+    Floor 2 Storage 3,       !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 2 Office,          !- Source Zone Name
+    Floor 2 Office,          !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 2 Utility Transfer Air,  !- Name
-    Floor 2 Utility,         !- Zone Name
+    Floor 2 Utility,         !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 2 Work Hall,       !- Source Zone Name
+    Floor 2 Work Hall,       !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 2 Work Toilet Transfer Air,  !- Name
-    Floor 2 Work Toilet,     !- Zone Name
+    Floor 2 Work Toilet,     !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.04248,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 2 Work,            !- Source Zone Name
+    Floor 2 Work,            !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 3 Janitor Transfer Air,  !- Name
-    Floor 3 Janitor,         !- Zone Name
+    Floor 3 Janitor,         !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 3 Office Hall,     !- Source Zone Name
+    Floor 3 Office Hall,     !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 3 Lounge Toilet Transfer Air,  !- Name
-    Floor 3 Lounge Toilet,   !- Zone Name
+    Floor 3 Lounge Toilet,   !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.15102,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 3 Lounge,          !- Source Zone Name
+    Floor 3 Lounge,          !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 3 Mechanical Transfer Air,  !- Name
-    Floor 3 Mechanical,      !- Zone Name
+    Floor 3 Mechanical,      !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00025,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00025,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 3 Mechanical Hall, !- Source Zone Name
+    Floor 3 Mechanical Hall, !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 3 Office Toilet Transfer Air,  !- Name
-    Floor 3 Office Toilet,   !- Zone Name
+    Floor 3 Office Toilet,   !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.04248,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 3 Office,          !- Source Zone Name
+    Floor 3 Office,          !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 3 Physical Therapy Toilet Transfer Air,  !- Name
-    Floor 3 Physical Therapy Toilet,  !- Zone Name
+    Floor 3 Physical Therapy Toilet,  !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.06607,                 !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 3 Physical Therapy 1,  !- Source Zone Name
+    Floor 3 Physical Therapy 1,  !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 3 Storage 1 Transfer Air,  !- Name
-    Floor 3 Storage 1,       !- Zone Name
+    Floor 3 Storage 1,       !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 3 Work,            !- Source Zone Name
+    Floor 3 Work,            !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 3 Storage 2 Transfer Air,  !- Name
-    Floor 3 Storage 2,       !- Zone Name
+    Floor 3 Storage 2,       !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 3 Work,            !- Source Zone Name
+    Floor 3 Work,            !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     Floor 3 Utility Transfer Air,  !- Name
-    Floor 3 Utility,         !- Zone Name
+    Floor 3 Utility,         !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00075,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00075,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 3 Work,            !- Source Zone Name
+    Floor 3 Work,            !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     NE Stair Transfer Air,   !- Name
-    NE Stair,                !- Zone Name
+    NE Stair,                !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00025,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00025,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Cafe,            !- Source Zone Name
+    Floor 1 Cafe,            !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     NW Elevator Transfer Air,!- Name
-    NW Elevator,             !- Zone Name
+    NW Elevator,             !- Zone or Space Name
     AHU-2_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00025,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00025,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 3 Elevator Hall,   !- Source Zone Name
+    Floor 3 Elevator Hall,   !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     NW Stair Transfer Air,   !- Name
-    NW Stair,                !- Zone Name
+    NW Stair,                !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00025,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00025,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 Lobby,           !- Source Zone Name
+    Floor 1 Lobby,           !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
   ZoneMixing,
     SW Stair Transfer Air,   !- Name
-    SW Stair,                !- Zone Name
+    SW Stair,                !- Zone or Space Name
     AHU-1_Fan_Sch,           !- Schedule Name
     Flow/Area,               !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
-    0.00025,                 !- Flow Rate per Zone Floor Area {m3/s-m2}
+    0.00025,                 !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Floor 1 PACU,            !- Source Zone Name
+    Floor 1 PACU,            !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
 ! ***HVAC EQUIPMENT***

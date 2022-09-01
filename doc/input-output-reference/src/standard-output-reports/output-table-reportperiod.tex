@@ -1,0 +1,98 @@
+\section{Output:Table:ReportPeriod}\label{outputtablereportperiod}
+
+The Output:Table:ReportPeriod object allows the user to create a series of
+tabular reports over a certain subset of a simulation run period. Multiple such
+reporting periods may be defined, each with a unique ``Name''. Currently, it only
+supports resilience reporting tables.
+
+When it is defined, a series of reporting-period-specific resilience summary
+reports will be generated at the end of all tabular reports. The results will be
+based on aggregations over the intersection between the start date to the end
+date defined here and a run period. Multiple reporting periods may be input.
+
+If the report is used for the evaluation of the thermal resilience properties
+during a power outage, the model configuration needs to consider common
+behavioral adaptations like increased air exchange from opening windows during
+hot events, or the use of alternative heating fuels (fireplaces, stoves) during
+cold events. Without taking these into considerations, the model output might
+be misleading.
+
+In each table, a row corresponds to a zone or space. Four additional rows are
+appended to the bottom of each table to provide summary statistics (min, max,
+average, and sum) across zones/spaces in a building. Each column is a reporting
+variable.
+
+\subsection{Inputs}\label{inputs-074}
+
+\paragraph{Field: Name}\label{field-name-066}
+
+This required field allows the ReportPeriod to be named and will appear in the
+header at the beginning of a series of resilience tables for this reporting
+period.
+
+\paragraph{Field: Report Name}\label{report-name-1}
+
+This field specifies the group of reports to generate for this reporting period.
+Currently, only ThermalResilienceSummary, CO2ResilienceSummary,
+VisualResilienceSummary, and AllResilienceSummaries are allowed. It could be
+extended to other tables in the future.
+
+\paragraph{Field: Begin Year}\label{field-begin-year-2}
+
+This optional numeric field may contain the beginning year for the range. If not
+specified, the year will be zero, and will not be used in the determination of the
+reporting period.
+
+\paragraph{Field: Begin Month}\label{field-begin-month-3}
+
+This numeric field should contain the starting month number (1 = January, 2 =
+February, etc.) for the reporting period desired.
+
+\paragraph{Field: Begin Day of Month}\label{field-begin-day-of-month-3}
+
+This numeric field should contain the starting day of the starting month (must
+be valid for month) for the reporting period desired.
+
+\paragraph{Field: Begin Hour of Day}\label{field-begin-hour-of-day}
+
+This numeric field should contain the starting hour of day for the reporting
+period desired.
+
+\paragraph{Field: End Year}\label{field-end-year-2}
+
+This optional numeric field may contain the end year for the range. If not
+specified, the year will be zero, and will not be used in the determination of the
+reporting period.
+
+\paragraph{Field: End Month}\label{field-end-month-3}
+
+This numeric field should contain the ending month number (1 = January, 2 =
+February, etc.) for the reporting period desired.
+
+\paragraph{Field: End Day of Month}\label{field-end-day-of-month-3}
+
+This numeric field should contain the ending day of the ending month (must be
+valid for month) for the reporting period desired.
+
+\paragraph{Field: End Hour of Day}\label{field-end-hour-of-day}
+
+This numeric field should contain the end hour of day for the reporting period
+desired.
+
+The following is an example of this object
+
+\begin{lstlisting}
+
+Output:Table:ReportPeriod,
+ ThermalResilienceReportTimeWinter,  !- field Name,
+ ThermalResilienceSummary,           !- field Report Name,
+ ,                                   !- Begin Year
+ 1,                                  !- Begin Month
+ 1,                                  !- Begin Day of Month
+ 8,                                  !- Begin Hour of Day
+ ,                                   !- End Year
+ 1,                                  !- End Month
+ 3,                                  !- End Day of Month
+ 18;                                 !- End Hour of Day
+
+\end{lstlisting}

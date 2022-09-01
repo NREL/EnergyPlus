@@ -526,6 +526,7 @@ namespace FluidProperties {
 
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
+        DISABLE_WARNING_UNINITIALIZED
         std::uint64_t const T_tag(*reinterpret_cast<std::uint64_t const *>(&t) >> Grid_Shift);
         DISABLE_WARNING_POP
 

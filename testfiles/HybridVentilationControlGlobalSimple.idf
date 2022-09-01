@@ -1315,7 +1315,7 @@
     ,                        !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     West Zone_DaylCtrl,      !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn001:Wall001:Win001;    !- Fenestration Surface 1 Name
@@ -1867,39 +1867,39 @@
 
   ZoneMixing,
     NORTH ZONE Mixng,        !- Name
-    NORTH ZONE,              !- Zone Name
+    NORTH ZONE,              !- Zone or Space Name
     MixingAvailSched,        !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.1059,                  !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    West Zone,               !- Source Zone Name
+    West Zone,               !- Source Zone or Space Name
     ,                        !- Delta Temperature {deltaC}
     DeltaTemp,               !- Delta Temperature Schedule Name
-    MinIndoorTemp,           !- Minimum Zone Temperature Schedule Name
-    MaxIndoorTemp,           !- Maximum Zone Temperature Schedule Name
-    MinIndoorTemp,           !- Minimum Source Zone Temperature Schedule Name
-    MaxIndoorTemp,           !- Maximum Source Zone Temperature Schedule Name
+    MinIndoorTemp,           !- Minimum Receiving Temperature Schedule Name
+    MaxIndoorTemp,           !- Maximum Receiving Temperature Schedule Name
+    MinIndoorTemp,           !- Minimum Source Temperature Schedule Name
+    MaxIndoorTemp,           !- Maximum Source Temperature Schedule Name
     MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name
     MaxOutdoorTemp;          !- Maximum Outdoor Temperature Schedule Name
 
   ZoneMixing,
     EAST ZONE Mixng,         !- Name
-    EAST ZONE,               !- Zone Name
+    EAST ZONE,               !- Zone or Space Name
     MixingAvailSched,        !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.1059,                  !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    West Zone,               !- Source Zone Name
+    West Zone,               !- Source Zone or Space Name
     ,                        !- Delta Temperature {deltaC}
     DeltaTemp,               !- Delta Temperature Schedule Name
-    MinIndoorTemp,           !- Minimum Zone Temperature Schedule Name
-    MaxIndoorTemp,           !- Maximum Zone Temperature Schedule Name
-    MinIndoorTemp,           !- Minimum Source Zone Temperature Schedule Name
-    MaxIndoorTemp,           !- Maximum Source Zone Temperature Schedule Name
+    MinIndoorTemp,           !- Minimum Receiving Temperature Schedule Name
+    MaxIndoorTemp,           !- Maximum Receiving Temperature Schedule Name
+    MinIndoorTemp,           !- Minimum Source Temperature Schedule Name
+    MaxIndoorTemp,           !- Maximum Source Temperature Schedule Name
     MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name
     MaxOutdoorTemp;          !- Maximum Outdoor Temperature Schedule Name
 
@@ -2360,6 +2360,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     1.9,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
