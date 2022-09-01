@@ -135,6 +135,11 @@ namespace EIRPlantLoopHeatPumps {
         bool oneTimeInitFlag = true;
         bool envrnInit = true;
 
+        // recurrent warning messages index integers
+        int capModFTErrorIndex = 0;
+        int eirModFTErrorIndex = 0;
+        int eirModFPLRErrorIndex = 0;
+
         // a couple worker functions to easily allow merging of cooling and heating operations
         std::function<Real64(Real64, Real64)> calcLoadOutletTemp;
         std::function<Real64(Real64, Real64)> calcQsource;

@@ -244,6 +244,28 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // evaluate capacity modifier curve and determine load side heat transfer
     Real64 capacityModifierFuncTemp =
         CurveManager::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
+
+    if (capacityModifierFuncTemp < 0.0) {
+        if (this->capModFTErrorIndex == 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(state,
+                              format(" Capacity Modifier curve (function of Temperatures) output is negative ({:.3T}).", capacityModifierFuncTemp));
+            ShowContinueError(state,
+                              format(" Negative value occurs using a water temperature of {:.2T}C and an outdoor air temperature of {:.2T}C.",
+                                     loadSideOutletSetpointTemp,
+                                     this->sourceSideInletTemp));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(state,
+                                       format("{} \"{}\": Capacity Modifier curve (function of Temperatures) output is negative warning continues...",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                              this->name),
+                                       this->capModFTErrorIndex,
+                                       capacityModifierFuncTemp,
+                                       capacityModifierFuncTemp);
+        capacityModifierFuncTemp = 0.0;
+    }
+
     Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
     Real64 partLoadRatio = 0.0;
     if (availableCapacity > 0) {
@@ -267,7 +289,46 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp =
         CurveManager::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+
+    if (eirModifierFuncTemp < 0.0) {
+        if (this->eirModFTErrorIndex == 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(state, format(" EIR Modifier curve (function of Temperatures) output is negative ({:.3T}).", eirModifierFuncTemp));
+            ShowContinueError(state,
+                              format(" Negative value occurs using a water temperature of {:.2T}C and an outdoor air temperature of {:.2T}C.",
+                                     this->loadSideOutletTemp,
+                                     this->sourceSideInletTemp));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(state,
+                                       format("{} \"{}\": EIR Modifier curve (function of Temperatures) output is negative warning continues...",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                              this->name),
+                                       this->eirModFTErrorIndex,
+                                       eirModifierFuncTemp,
+                                       eirModifierFuncTemp);
+        eirModifierFuncTemp = 0.0;
+    }
+
     Real64 eirModifierFuncPLR = CurveManager::CurveValue(state, this->powerRatioFuncPLRCurveIndex, partLoadRatio);
+
+    if (eirModifierFuncPLR < 0.0) {
+        if (this->eirModFPLRErrorIndex == 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(state, format(" EIR Modifier curve (function of PLR) output is negative ({:.3T}).", eirModifierFuncPLR));
+            ShowContinueError(state, format(" Negative value occurs using a Part Load Ratio of {:.2T}", partLoadRatio));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(state,
+                                       format("{} \"{}\": EIR Modifier curve (function of PLR) output is negative warning continues...",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                              this->name),
+                                       this->eirModFPLRErrorIndex,
+                                       eirModifierFuncPLR,
+                                       eirModifierFuncPLR);
+        eirModifierFuncPLR = 0.0;
+    }
+
     this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp;
     this->powerEnergy = this->powerUsage * reportingInterval;
 
