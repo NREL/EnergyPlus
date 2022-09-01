@@ -895,7 +895,7 @@ Coil:Heating:Steam,
   ZoneLoadControl;         !- field Coil Control Type
 \end{lstlisting}
 
-\subsection{Heating Coil (Steam) Outputs:}\label{heating-coil-steam-outputs}
+\subsubsection{Outputs}\label{heating-coil-steam-outputs}
 
 \begin{itemize}
 \item
@@ -912,23 +912,23 @@ Coil:Heating:Steam,
   HVAC, Average, Heating Coil Steam Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\subsubsection{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-1}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-1}
 
 Heating Coil Heating Energy is the total amount of heat transfer taking place in the coil at the operating conditions.
 
-\subsubsection{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-1}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-heating-rate-w-1}
 
 Heating Coil Heating Rate is the Rate of heat transfer taking place in the coil at the operating conditions. The units are (J/sec) or Watts.
 
-\subsubsection{Heating Coil Steam Trap Loss Rate {[}W{]}}\label{heating-coil-steam-trap-loss-rate-w}
+\paragraph{Heating Coil Steam Trap Loss Rate {[}W{]}}\label{heating-coil-steam-trap-loss-rate-w}
 
 Loop losses represent the unavoidable loss due to degree of sub cooling in the condensate return piping back to the boiler and the loss occurring due to flashing of steam across the steam trap due to pressure differential between the steam and the condensate side.
 
-\subsubsection{Heating Coil Steam Inlet Temperature {[}C{]}}\label{heating-coil-steam-inlet-temperature-c}
+\paragraph{Heating Coil Steam Inlet Temperature {[}C{]}}\label{heating-coil-steam-inlet-temperature-c}
 
-\subsubsection{Heating Coil Steam Outlet Temperature {[}C{]}}\label{heating-coil-steam-outlet-temperature-c}
+\paragraph{Heating Coil Steam Outlet Temperature {[}C{]}}\label{heating-coil-steam-outlet-temperature-c}
 
-\subsubsection{Heating Coil Steam Mass Flow Rate {[}kg/s{]}}\label{heating-coil-steam-mass-flow-rate-kgs}
+\paragraph{Heating Coil Steam Mass Flow Rate {[}kg/s{]}}\label{heating-coil-steam-mass-flow-rate-kgs}
 
 These outputs are the Steam inlet and condensate outlet temperatures and steam flow rate for the boiler.
 
@@ -2123,7 +2123,7 @@ The name of a performance curve (ref: Performance Curves) that parameterizes the
 
 \paragraph{Field: Energy Input Ratio Function of Flow Fraction Curve Name}\label{field-energy-input-ratio-function-of-flow-fraction-curve-name}
 
-The name of a performance curve (Ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 when the actual air flow rate equals the rated air flow rate. This curve is typically a quadratic or cubic but any curve or table with one independent variablecan be used.
+The name of a performance curve (Ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 when the actual air flow rate equals the rated air flow rate. This curve is typically a quadratic or cubic but any curve or table with one independent variable can be used.
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-2}
 
@@ -9263,7 +9263,9 @@ Applications of this technology include: inter-zone heat pump in NTED (Dixon, 20
 
 \textbf{Cooling Operating Mode}: the primary DX cooling coil of a DX system serving a primary zone is active and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects. This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in \protect\hyperlink{SecondaryCoilsFigure2}{Figure}. Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked. The only input field required to invoke the secondary DX coil in cooling operating model is to add a zone name in the input field \emph{Zone Name for Condenser Placement} in the DX cooling coil object.
 
-\subsubsection{Field: Zone Name for Condenser Placement}\label{field-zone-name-for-condenser-placement-3}
+\subsubsection{Inputs}
+
+\paragraph{Field: Zone Name for Condenser Placement}\label{field-zone-name-for-condenser-placement-3}
 
 This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed. This is an optional input field specified only when user desires to reject the condenser heat into this zone. The heat rejected is modeled as sensible internal gain of a secondary zone.
 
@@ -9466,27 +9468,27 @@ Coil:Cooling:DX:MultiSpeed,
 
 \textbf{Heating Operating Mode}: When a heat pump operates in heating mode then energy is extracted from the secondary zone. Total energy extracted from a secondary zone may contain sensible and latent components. The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction. If the coil operation is dry, then the SHR is set to 1.0. In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside. Thus, defrosting energy is not included in the zone energy balance. The six optional input fields required in the DX heating coils are the following. This object is extensible by repeating the last five input fields depending on the speed of the heating DX coil:
 
-\subsubsection{Field: Zone Name for Evaporator Placement}\label{field-zone-name-for-evaporator-placement-2}
+\paragraph{Field: Zone Name for Evaporator Placement}\label{field-zone-name-for-evaporator-placement-2}
 
 This input field is name of a conditioned or unconditioned zone where the secondary coil (evaporator) of a heat pump is installed. This is an optional input field specified only when user desires to extract heat from the zone via secondary coil. Heat extracted is modeled as internal gain. If the primary DX system is a heat pump, then the zone name should be the same as the zone name specified for placing the secondary cooling DX coil.
 
-\subsubsection{Field: Speed Secondary Coil Air Flow Rate}\label{field-speed-secondary-coil-air-flow-rate}
+\paragraph{Field: Speed Secondary Coil Air Flow Rate}\label{field-speed-secondary-coil-air-flow-rate}
 
 This input value is the secondary coil (evaporator) air flow rate when the heat pump is working in heating mode or the secondary coil (condenser) air flow rate when the heat pump is working in cooling mode. This input field is auto-sizable.
 
-\subsubsection{Field: Speed Secondary Coil Fan Flow Scaling Factor}\label{field-speed-secondary-coil-fan-flow-scaling-factor}
+\paragraph{Field: Speed Secondary Coil Fan Flow Scaling Factor}\label{field-speed-secondary-coil-fan-flow-scaling-factor}
 
 This input field is scaling factor for autosizing the secondary DX coil fan flow rate. The secondary air flow rate is determined by multiplying the primary DX coil rated air flow rate by the fan flow scaling factor. Default value is 1.25. If the secondary coil fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set to 1.0.
 
-\subsubsection{Field: Speed Nominal Sensible Heat Ratio of Secondary Coil}\label{field-speed-nominal-sensible-heat-ratio-of-secondary-coil}
+\paragraph{Field: Speed Nominal Sensible Heat Ratio of Secondary Coil}\label{field-speed-nominal-sensible-heat-ratio-of-secondary-coil}
 
 This input value is the nominal sensible heat ratio used to split the heat extracted by a secondary DX coil (evaporator) of a heat pump into sensible and latent components. This is an optional input field. If this input field is left blank, then pure sensible internal heat gain is assumed, i.e., sensible heat ratio of 1.0.
 
-\subsubsection{Field: Speed Sensible Heat Ratio Modifier Function of Temperature Curve Name}\label{field-speed-sensible-heat-ratio-modifier-function-of-temperature-curve-name}
+\paragraph{Field: Speed Sensible Heat Ratio Modifier Function of Temperature Curve Name}\label{field-speed-sensible-heat-ratio-modifier-function-of-temperature-curve-name}
 
 This input field is name of sensible heat ratio modifier biquadratic curve. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary zone air node wet-bulb temperature and the heating DX coil entering air dry-bulb temperature. This is an optional input field. If this input field is left blank, then the nominal sensible heat ratio modifier curve value for temperature is set to 1.0.
 
-\subsubsection{Field: Speed Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name}\label{field-speed-sensible-heat-ratio-modifier-function-of-flow-fraction-curve-name}
+\paragraph{Field: Speed Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name}\label{field-speed-sensible-heat-ratio-modifier-function-of-flow-fraction-curve-name}
 
 This input field is name of sensible heat ratio modifier curve as function of secondary air flow fraction. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary coil air flow fraction. This is an optional input field. If this input field is left blank, then the sensible heat ratio modifier curve value for flow fraction is set to 1.0.
 
@@ -9623,7 +9625,7 @@ Coil:Heating:DX:MultiSpeed,
   DXSecondaryCoilSHRFFF;   !- Speed 4 Sensible Heat Ratio Function of Flow Fraction Curve Name
 \end{lstlisting}
 
-\subsection{Secondary DX Coil Output}\label{secondary-dx-coil-output}
+\subsubsection{Outputs}\label{secondary-dx-coil-output}
 
 \begin{itemize}
 \item
@@ -9640,27 +9642,27 @@ Coil:Heating:DX:MultiSpeed,
   HVAC, Average, Secondary Coil Compressor Part Load Ratio {[]}
 \end{itemize}
 
-\subsubsection{Secondary Coil Heat Rejection Rate {[}W{]}}\label{secondary-coil-heat-rejection-rate-w}
+\paragraph{Secondary Coil Heat Rejection Rate {[}W{]}}\label{secondary-coil-heat-rejection-rate-w}
 
 This is the sensible heat rejected to a zone by a secondary DX coil (condenser) in Watts. This is sum of the total cooling rate of a DX cooling coil and cooling electric power of the primary DX coil. This heat is applied as an internal gain to the secondary zone where the condenser is installed.
 
-\subsubsection{Secondary Coil Total Heat Removal Rate {[}W{]}}\label{secondary-coil-total-heat-removal-rate-w}
+\paragraph{Secondary Coil Total Heat Removal Rate {[}W{]}}\label{secondary-coil-total-heat-removal-rate-w}
 
 This is the total energy removed from a a zone by a secondary DX coil (evaporator) in Watts. This is the total heating rate of the primary DX cooling coil minus the heating electric power of the primary DX coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that heat is removed from the zone.
 
-\subsubsection{Secondary Coil Sensible Heat Removal Rate {[}W{]}}\label{secondary-coil-sensible-heat-removal-rate-w}
+\paragraph{Secondary Coil Sensible Heat Removal Rate {[}W{]}}\label{secondary-coil-sensible-heat-removal-rate-w}
 
 This is the sensible heat removed from a a zone by a secondary DX coil (evaporator) in Watts. This is determined by multiplying the total heat removed with sensible heat ratio of the secondary coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that sensible heat is removed from the zone.
 
-\subsubsection{Secondary Coil Latent Heat Removal Rate {[}W{]}}\label{secondary-coil-latent-heat-removal-rate-w}
+\paragraph{Secondary Coil Latent Heat Removal Rate {[}W{]}}\label{secondary-coil-latent-heat-removal-rate-w}
 
 This is the latent heat removed from a a zone by a secondary DX coil (evaporator) in Watts. This is the difference between the total heat removal rate and the sensible heat removal rate of the secondary coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that moisture is removed from the zone.
 
-\subsubsection{Secondary Coil Sensible Heat Ratio {[]}}\label{secondary-coil-sensible-heat-ratio}
+\paragraph{Secondary Coil Sensible Heat Ratio {[]}}\label{secondary-coil-sensible-heat-ratio}
 
 This is the operating sensible heat ratio the secondary DX coil (condenser) when the heat pump is operating in heating mode.
 
-\subsubsection{Secondary Coil Compressor Part Load Ratio {[]}}\label{secondary-coil-compressor-part-load-ratio}
+\paragraph{Secondary Coil Compressor Part Load Ratio {[]}}\label{secondary-coil-compressor-part-load-ratio}
 
 This is the compressor part load ratio when the heat pump is operating in heating mode and the secondary coil is extracting heat from a zone where the coil is installed. The secondary coil DX coil compressor part load ratio can be different from the primary DX coil compressor part load ratio in that the later may include the defrosting load.
 
