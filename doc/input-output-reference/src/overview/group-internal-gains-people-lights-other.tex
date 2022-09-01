@@ -80,18 +80,7 @@ The name of the People object. Must be unique across all People objects.
 
 This field applies this People object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the people/area and area/person options of the Number of People Calculation Method to place a varying number of people at the same density in each zone or space. The names of the actual people objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}People Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
-When multiple people objects are defined for the same zone, and they have
-different SET, PMV, Heat/Cold Stress Temperature Threshold, a warning message
-will be produced to caution users that zone-level resilience metrics results
-will only be meaningful if each zone has at most one People object defined. This
-is especially true for SET Degree-Hours and Discomfort-Weighted Exceedance Hours
-tables. In the SET Degree-Hour case, this is because in the calculation of zone
-level Heating/Cooling SET Degree-Hours, if multiple People objects are defined
-for one zone, EnergyPlus will only use the SET of one People object to compute
-the zone level SET Degree-Hours, and neglecting the SET of other people object
-defined in the same zone. As a result, when multiple people objects with
-different SET, PMV, or Heat/Cold Stress Temperature are linked to one zone, the
-corresponding zone-level resilience metrics results might be invalid.
+When multiple people objects are defined for the same zone, and they have different SET, PMV, Heat/Cold Stress Temperature Threshold, a warning message will be produced to caution users that zone-level resilience metrics results will only be meaningful if each zone has at most one People object defined. This is especially true for SET Degree-Hours and Discomfort-Weighted Exceedance Hours tables. In the SET Degree-Hour case, this is because in the calculation of zone level Heating/Cooling SET Degree-Hours, if multiple People objects are defined for one zone, EnergyPlus will only use the SET of one People object to compute the zone level SET Degree-Hours, and neglecting the SET of other people object defined in the same zone. As a result, when multiple people objects with different SET, PMV, or Heat/Cold Stress Temperature are linked to one zone, the corresponding zone-level resilience metrics results might be invalid.
 
 \paragraph{Field: Number of People Schedule Name}\label{field-number-of-people-schedule-name}
 
@@ -101,29 +90,15 @@ This field is the name of the schedule (ref: Schedules) that modifies the number
 
 This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal number of occupants (people) in the Zone. The key/choices are:
 
-\begin{itemize}
-\tightlist
-\item
-  People
-\end{itemize}
+\begin{description}
+	
+\item[People] With this choice, the method used will be a straight insertion of the number of occupants (people).~ (The Number of People field should be filled.)
 
-With this choice, the method used will be a straight insertion of the number of occupants (people).~ (The Number of People field should be filled.)
+\item[People/Area] With this choice, the method used will be a factor per floor area of the zone. (The People per Zone Floor Area field should be filled).
 
-\begin{itemize}
-\tightlist
-\item
-  People/Area
-\end{itemize}
+\item[Area/Person] With this choice, the method used will be a factor of floor area per person. (The Zone Floor Area per Person field should be filled).
 
-With this choice, the method used will be a factor per floor area of the zone. (The People per Zone Floor Area field should be filled).
-
-\begin{itemize}
-\tightlist
-\item
-  Area/Person
-\end{itemize}
-
-With this choice, the method used will be a factor of floor area per person. (The Zone Floor Area per Person field should be filled).
+\end{description}
 
 \paragraph{Field: Number of People}\label{field-number-of-people}
 
@@ -827,13 +802,13 @@ Following are some suggestions that might be applicable:
 \item
   Eliminate occupancy when conditioning equipment is off.
 \item
-  Note that the ASHRAE graph lower limit is (19.6C to 21.7C) -- heating setpoints may need to be nearer 22.2C (72F) than 21.1C (70F).
+  Note that the ASHRAE graph lower limit is (19.6$^\circ$C to 21.7$^\circ$C)---heating setpoints may need to be nearer 22.2$^\circ$C (72$^\circ$F) than 21.1$^\circ$C (70$^\circ$F).
 \item
-  Unoccupied heating setpoint should be nearer 16.7C (62F) rather than 12.8C (55F) to reduce the start up recovery.
+  Unoccupied heating setpoint should be nearer 16.7$^\circ$C (62$^\circ$F) rather than 12.8$^\circ$C (55$^\circ$F) to reduce the start up recovery.
 \item
   Start the occupied setpoint schedule, fan availability schedule, cooling pump availability schedule, reheat coil availability, one hour before occupancy. Seasonal turn on and off of equipment may cause more warnings (but potentially more energy consumption).
 \item
-  Unoccupied cooling setpoint should be nearer 29.4C (85F) rather than 40.0 (104F) to reduce the start up recovery.
+  Unoccupied cooling setpoint should be nearer 29.4$^\circ$C (85$^\circ$F) rather than 40.0$^\circ$C (104$^\circ$F) to reduce the start up recovery.
 \end{itemize}
 
 \subsection{ComfortViewFactorAngles}\label{comfortviewfactorangles}
@@ -860,8 +835,7 @@ This field is the name of a surface in the radiant enclosure seen by the person.
 
 This field is the fraction that this surface contributes to the total mean radiant temperature. This can be thought of as a weighting factor for this surface and the actual mean radiant temperature used in the thermal comfort model is simply the sum of all angle factors multiplied by the corresponding inside surface temperature, weighted by the surface emissivity. The sum of all angle factors within any angle factor list must equal unity, otherwise the program will not accept the input as valid.
 
-Note that the Surface Name/Angle Factor pair is extensible to accommodate as many
-surfaces as required.
+Note that the Surface Name/Angle Factor pair is extensible to accommodate as many surfaces as required.
 
 An example IDF with an electric low temperature radiant system is shown below.
 
@@ -899,31 +873,17 @@ The name of the schedule that modifies the lighting power design level (see Desi
 
 \paragraph{Field: Design Level Calculation Method}\label{field-design-level-calculation-method}
 
-This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal lighting level in the Zone. The key/choices are:
+This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal lighting level in the Zone. The key/choice options are:
 
-\begin{itemize}
-\tightlist
-\item
-  LightingLevel
-\end{itemize}
+\begin{description}
+	
+\item[LightingLevel] With this choice, the method used will be a straight insertion of the lighting level (Watts) for the Zone.~ (The Lighting Level field should be filled.)
 
-With this choice, the method used will be a straight insertion of the lighting level (Watts) for the Zone.~ (The Lighting Level field should be filled.)
+\item[Watts/Area] With this choice, the method used will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
 
-\begin{itemize}
-\tightlist
-\item
-  Watts/Area
-\end{itemize}
+\item[Watts/Person] With this choice, the method used will be a factor of lighting level (watts) per person. (The Watts per person field should be filled).
 
-With this choice, the method used will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
-
-\begin{itemize}
-\tightlist
-\item
-  Watts/Person
-\end{itemize}
-
-With this choice, the method used will be a factor of lighting level (watts) per person. (The Watts per person field should be filled).
+\end{description}
 
 \paragraph{Field: Lighting Level}\label{field-lighting-level}
 
@@ -1008,7 +968,6 @@ This field defines the daylighting control for the LIGHTS object.
 
 If \textbf{\hyperref[daylightingcontrols-000]{Daylighting:Controls}} is specified for the space or zone, this field is used as an on/off flag for dimming controls. If set to 0.0, the lights are not dimmed by the daylighting controls. If set to 1.0, the lights are allowed to be dimmed by the applicable daylighting control. If daylighting controls are operating in the space or zone, all of the applicable Lights objects with a Fraction Replaceable greater than zero will be reduced by a multiplicative factor that accounts for how much the electric lighting is lowered due to daylighting (ref. \hyperref[daylighting-lighting-power-multiplier-1]{Daylighting Lighting Power Multiplier}).
 
-
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-002}
 
 Allows you to specify a user-defined end-use subcategory, e.g., ``Task Lights'', ``Hall Lights'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the lights will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED EAp2-4/5. Performance Rating Method Compliance table.
@@ -1053,12 +1012,12 @@ Name of the return air node for this heat gain. If left blank, it defaults to th
 
 \paragraph{Field:Exhaust Air Heat Gain Node Name}\label{field-exhaust-air-heat-gain-node-name}
 
-Name of the exhaust air node for this heat gain. If left blank, no heat gain from retun air fraction will be added to the zone exhast node. When the exhaust node name is entered, the return air heat gain will be shared by both return and exhast nodes. The equipment can draw air from the exhaust node, but the inlet air properties is combined properties with mixing mass flow rates of both nodes and added lights heat gain.
+Name of the exhaust air node for this heat gain. If left blank, no heat gain from return air fraction will be added to the zone exhaust node. When the exhaust node name is entered, the return air heat gain will be shared by both return and exhaust nodes. The equipment can draw air from the exhaust node, but the inlet air properties is combined properties with mixing mass flow rates of both nodes and added lights heat gain.
 
 \begin{figure}[hbtp] % fig 52
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image087.png}
-\caption{Vertical section through a zone and its return air plenum showing recessed lighting (not to scale). The heat from lights is divided into four fractions, three of which --- ReturnAirFraction, FractionRadiant and FractionConvected --- depend on plenum air temperature. \protect \label{fig:vertical-section-through-a-zone-and-its}}
+\caption{Vertical section through a zone and its return air plenum showing recessed lighting (not to scale). The heat from lights is divided into four fractions, three of which---ReturnAirFraction, FractionRadiant and FractionConvected---depend on plenum air temperature. \protect \label{fig:vertical-section-through-a-zone-and-its}}
 \end{figure}
 
 An IDF example:
