@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AllDirectionsCursor</key>
+	<string>{7, 7}</string>
+	<key>EastWestCursor</key>
+	<string>{7, 7}</string>
+	<key>MacWaitCursor</key>
+	<string>{8, 8}</string>
+	<key>MagnifyLargerCursor</key>
+	<string>{5, 5}</string>
+	<key>MagnifySmallerCursor</key>
+	<string>{5, 5}</string>
+	<key>NorthEastSouthWestCursor</key>
+	<string>{7, 7}</string>
+	<key>NorthSouthCursor</key>
+	<string>{7, 7}</string>
+	<key>InvisibleCursor</key>
+	<string>{0, 0}</string>
+	<key>NorthWestSouthEastCursor</key>
+	<string>{7, 7}</string>
+</dict>
+</plist>
