@@ -1148,26 +1148,26 @@ void KivaManager::calcKivaInstances(EnergyPlusData &state)
         kv.setBoundaryConditions(state);
         kv.instance.calculate(timestep);
         kv.instance.calculate_surface_averages();
+#ifdef GROUND_PLOT
         if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
             kv.plotDomain(state);
         }
+#endif
     }
 
     calcKivaSurfaceResults(state);
 }
 
+#ifdef GROUND_PLOT
 void KivaInstanceMap::plotDomain(EnergyPlusData &state)
 {
-
-#ifdef GROUND_PLOT
-
     gp.createFrame(*instance.ground, format("{}/{} {}:00", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay));
 
     instance.ground->writeCSV(format("{}/{}.csv", debugDir, plotNum));
 
     plotNum++;
-#endif
 }
+#endif
 
 void KivaManager::calcKivaSurfaceResults(EnergyPlusData &state)
 {
