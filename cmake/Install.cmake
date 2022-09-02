@@ -268,6 +268,7 @@ install(FILES "${PROJECT_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DES
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/Boilers.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/California_Title_24-2008.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/Chillers.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/CodeCompliantEquipment.idf.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/CompositeWallConstructions.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/DXCoolingCoil.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/ElectricGenerators.idf" DESTINATION "./DataSets" COMPONENT Datasets)
