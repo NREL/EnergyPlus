@@ -1096,3 +1096,82 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setThicknessPerpendicularTest)
     actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
     EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
 }
+
+TEST_F(EnergyPlusFixture, DataHeatBalance_ComputeNominalUwithConvCoeffsTest)
+{
+    Real64 expectedAnswer;
+    Real64 actualAnswer;
+    Real64 allowableTolerance = 0.00001;
+    bool isWithConvCoefValid;
+
+    state->dataSurface->Surface.allocate(1);
+    state->dataHeatBal->NominalU.allocate(1);
+    auto &thisSurf(state->dataSurface->Surface(1));
+    auto &thisUval(state->dataHeatBal->NominalU(1));
+
+    // Test 1: Exterior Wall Surface with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.869797;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 2: Wall Surface in contact with Ground with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::Ground;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.893053;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 3: Surface is an interior wall with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.806771;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 4: Surface is an interior wall with an invalid U-value
+    thisUval = -1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    expectedAnswer = -1.0;
+    isWithConvCoefValid = true;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_FALSE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 5: Surface is an interior floor with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Floor;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.755263;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 6: Surface is an interior ceiling (roof) with a valid U-value
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = 1;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Roof;
+    thisSurf.Construction = 1;
+    expectedAnswer = 0.823144;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+}

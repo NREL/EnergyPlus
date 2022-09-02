@@ -1294,13 +1294,12 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
     //      Interior horizontal surfaces, heat flow up     IP: 0.61  SI: 0.1074
     //      Interior horizontal surfaces, heat flow down   IP: 0.92  SI: 0.1620
     //      Interior vertical surfaces                     IP: 0.68  SI: 0.1198
-    // This section shows the same value in 90.1-2007 and 90.2-2010
-
-    // Using/Aliasing
-    using DataSurfaces::ExternalEnvironment;
-    using DataSurfaces::Ground;
-    using DataSurfaces::GroundFCfactorMethod;
-    using DataSurfaces::SurfaceClass;
+    // This section shows the same value in 90.1-2010 and 90.2-2010
+    // Note that this report does not use the semi-exterior surface value because
+    // EnergyPlus does not have a way to specifically tell whether or not a surface
+    // is connected to a semi-exterior area of the building.  Users can always use
+    // the Nominal U-Value to manually calculated this.  The values calculated here
+    // are simply reported to the EIO file and not used for any calculations.
 
     // Return value
     Real64 NominalUwithConvCoeffs; // return value
@@ -1309,52 +1308,58 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
     Real64 outsideFilm;
 
     isValid = true;
+
+    auto &thisSurface = state.dataSurface->Surface(numSurf);
+
     // exterior conditions
-    switch (state.dataSurface->Surface(numSurf).ExtBoundCond) {
-    case ExternalEnvironment: {
-        outsideFilm = 0.0299387; // All exterior conditions
+    switch (thisSurface.ExtBoundCond) {
+    case DataSurfaces::ExternalEnvironment: { // ExtBoundCond = 0
+        outsideFilm = 0.0299387;              // All exterior conditions
     } break;
-    case Ground:
-    case GroundFCfactorMethod: {
-        outsideFilm = 0.0; // No outside film when underground
+    case DataSurfaces::Ground:
+    case DataSurfaces::OtherSideCoefNoCalcExt:
+    case DataSurfaces::OtherSideCoefCalcExt:
+    case DataSurfaces::OtherSideCondModeledExt:
+    case DataSurfaces::GroundFCfactorMethod:
+    case DataSurfaces::KivaFoundation: { // All these cases have a negative ExtBoundCond so don't use film coefficients
+        outsideFilm = 0.0;
     } break;
-    default: {
-        if (state.dataSurface->Surface(numSurf).ExtBoundCond > 0) { // interzone partition
-            // use companion surface in adjacent zone
-            switch (state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class) {
-            case SurfaceClass::Wall:
-            case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-                outsideFilm = 0.1197548;
-            } break;
-            case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-                outsideFilm = 0.1620212;
-            } break;
-            case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-                outsideFilm = 0.1074271;
-            } break;
-            default: {
-                outsideFilm = 0.0810106; // All semi-exterior surfaces
-            } break;
-            }
-        } else {
-            outsideFilm = 0.0810106; // All semi-exterior surfaces
+    default: { // Interior Surface Attached to a Zone (ExtBoundCond is a surface)
+        switch (state.dataSurface->Surface(thisSurface.ExtBoundCond).Class) {
+        case DataSurfaces::SurfaceClass::Wall:
+        case DataSurfaces::SurfaceClass::Door:
+        case DataSurfaces::SurfaceClass::Window:
+        case DataSurfaces::SurfaceClass::GlassDoor: {
+            outsideFilm = 0.1197548; // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+        } break;
+        case DataSurfaces::SurfaceClass::Floor: {
+            outsideFilm = 0.1620212; // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+        } break;
+        case DataSurfaces::SurfaceClass::Roof: {
+            outsideFilm = 0.1074271; // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+        } break;
+        default: {
+            outsideFilm = 0.0; // Surface is internal mass or something else where the U-value won't mean anything
+        } break;
         }
     } break;
     }
-    // interior conditions
-    if (state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction) > 0.0) {
-        switch (state.dataSurface->Surface(numSurf).Class) {
-        case SurfaceClass::Wall:
-        case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-            insideFilm = 0.1197548;
+    // interior conditions and calculate the return value
+    if (state.dataHeatBal->NominalU(thisSurface.Construction) > 0.0) {
+        switch (thisSurface.Class) {
+        case DataSurfaces::SurfaceClass::Wall:
+        case DataSurfaces::SurfaceClass::Door:
+        case DataSurfaces::SurfaceClass::Window:
+        case DataSurfaces::SurfaceClass::GlassDoor: {
+            insideFilm = 0.1197548; // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
         } break;
-        case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-            insideFilm = 0.1620212;
+        case DataSurfaces::SurfaceClass::Floor: {
+            insideFilm = 0.1620212; // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
         } break;
-        case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-            insideFilm = 0.1074271;
+        case DataSurfaces::SurfaceClass::Roof: {
+            insideFilm = 0.1074271; // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
         } break;
-        default: {
+        default: { // Surface is internal mass or something else where the U-value won't mean anything
             insideFilm = 0.0;
             outsideFilm = 0.0;
         } break;

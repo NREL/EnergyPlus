@@ -1793,39 +1793,39 @@ This field contains the number of building attached shading surfaces (e.g.~Overh
 
 \subsection{Surface Details Report}\label{surface-details-report}
 
-A good example of this is the surface details report(s) (\textbf{Output:Surfaces:List, Details;} \textbf{Output:Surfaces:List, Vertices; Output:Surfaces:List, DetailsWithVertices;}). Excerpt from the file:
+A good example of this is the surface details report(s) (\textbf{Output:Surfaces:List, Details, Output:Surfaces:List, Vertices; Output:Surfaces:List, DetailsWithVertices;}). It should be noted that the Nominal U-values with film coefficients that are listed in this report do not account for whether or not the surface in question is considered a "semi-exterior" surface. For such "semi-exterior" surfaces, use the Nominal U-value without film coefficients listed and then factor in the film coefficients for such surfaces listed in the literature (e.g., ASHRAE Standard 90.1). An example excerpt of this report from the EIO file is shown below:
 
-\textbf{Line 1:}! \textless{}Zone/Shading Surfaces\textgreater{}\textbf{,}\textless{}Zone Name\textgreater{}/\#Shading Surfaces,\# Surfaces, Vertices are shown starting at Upper-Left-Corner = \textgreater{} Counter-Clockwise = \textgreater{} World Coordinates
+\textbf{Line 1:}! \textless{}Zone/Shading Surfaces\textgreater{}\textbf{,}\textless{}Zone Name\textgreater{}/\#Shading Surfaces, \# Surfaces, Vertices are shown starting at Upper-Left-Corner = \textgreater{} Counter-Clockwise = \textgreater{} World Coordinates
 
-\textbf{Line 2:}! \textless{}HeatTransfer/Shading/Frame/Divider\_Surface\textgreater{},Surface Name,Surface Class, Base Surface,Construction,Nominal U (w/o film coefs),Nominal U (with film coefs),Area (Net), Area (Gross), Area (Sunlit Calc), Aimuth, Tilt, \textasciitilde{}Width, \textasciitilde{}Height, Reveal, \textless{}ExtBoundCondition\textgreater{}, \textless{}ExtConvCoeffCalc\textgreater{}, \textless{}IntConvCoeffCalc\textgreater{},\textless{}SunExposure\textgreater{},\textless{}WindExposure\textgreater{},ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,\#Sides, \{Vertex 1\},,, \{Vertex 2\},,, \{Vertex 3\},,, \{Vertex 4\}, ,,\{etc\}
+\textbf{Line 2:}! \textless{}HeatTransfer/Shading/Frame/Divider\_Surface\textgreater{}, Surface Name, Surface Class, Base Surface, Construction, Nominal U (w/o film coefs), Nominal U (with film coefs), Area (Net), Area (Gross), Area (Sunlit Calc), Azimuth, Tilt, Width, Height, Reveal, \textless{}ExtBoundCondition\textgreater{}, \textless{}ExtConvCoeffCalc\textgreater{}, \textless{}IntConvCoeffCalc\textgreater{}, \textless{}SunExposure\textgreater{}, \textless{}WindExposure\textgreater{}, ViewFactorToGround, ViewFactorToSky, ViewFactorToGround-IR, ViewFactorToSky-IR,\#Sides, \{Vertex 1\}, , , \{Vertex 2\}, , , \{Vertex 3\},,, \{Vertex 4\}, ,,\{etc\}
 
-\textbf{Line 3:} ! \textless{}Units\textgreater{},,,,,\{W/m2-K\},\{W/m2-K\},\{m2\},\{m2\},\{m2\},\{deg\},\{deg\},\{m\},\{m\},\{m\},,,,,,,,,,X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\}
+\textbf{Line 3:} ! \textless{}Units\textgreater{}, , , , , \{W/m2-K\}, \{W/m2-K\}, \{m2\}, \{m2\}, \{m2\}, \{deg\}, \{deg\}, \{m\}, \{m\}, \{m\}, , , , , , , , , , X \{m\}, Y \{m\}, Z \{m\}, X \{m\}, Y \{m\}, Z \{m\}, X \{m\}, Y \{m\}, Z \{m\}, X \{m\}, Y \{m\}, Z \{m\}
 
-\textbf{Ex Line 1:} Shading\_Surfaces,Number of Shading Surfaces,~~ 10
+\textbf{Ex Line 1:} Shading\_Surfaces,Number of Shading Surfaces, 10
 
-\textbf{Ex Line 2:} Shading\_Surface,WEST SIDE BUSHES,Detached Shading:Building,,,,, 180.0, 180.0, 180.0, 90.0, 90.0, 60.00, 3.00,,,,,,,,,,, 4, -5.00, 0.00, 3.00, -5.00, 0.00, 0.00, -5.00, 60.00, 0.00, -5.00, 60.00, 3.00
+\textbf{Ex Line 2:} Shading\_Surface,WEST SIDE BUSHES,Detached Shading:Building,,,,, 180.0, 180.0, 180.0, 90.0, 90.0, 60.00, 3.00, , , , , , , , , , , 4, -5.00, 0.00, 3.00, -5.00, 0.00, 0.00, -5.00, 60.00, 0.00, -5.00, 60.00, 3.00
 
-\textbf{Ex Line 2:} Shading\_Surface,EAST SIDE TREE1,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 270.0, 90.0, 20.00, 50.99,,,,,,,,,,, 3, 70.00, 30.00, 50.00, 70.00, 40.00, 0.00, 70.00, 20.00, 0.00
+\textbf{Ex Line 2:} Shading\_Surface,EAST SIDE TREE1,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 270.0, 90.0, 20.00, 50.99, , , , , , , , , , , 3, 70.00, 30.00, 50.00, 70.00, 40.00, 0.00, 70.00, 20.00, 0.00
 
-\textbf{Ex Line 2:} Shading\_Surface,EAST SIDE TREE2,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 0.0, 90.0, 20.00, 50.99,,,,,,,,,,, 3, 70.00, 30.00, 50.00, 80.00, 30.00, 0.00, 60.00, 30.00, 0.00
+\textbf{Ex Line 2:} Shading\_Surface,EAST SIDE TREE2,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 0.0, 90.0, 20.00, 50.99, , , , , , , , , , , 3, 70.00, 30.00, 50.00, 80.00, 30.00, 0.00, 60.00, 30.00, 0.00
 
-\textbf{Ex Line 1:} Zone\_Surfaces,HEARTLAND AREA,~~ 35
+\textbf{Ex Line 1:} Zone\_Surfaces,HEARTLAND AREA, 35
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL001,Wall,,EXTERIOR,0.644, 0.588, 136.0, 200.0, 136.0, 180.0, 90.0, 20.0, 10.0, 0.00,ExternalEnvironment,ASHRAEDetailed,ASHRAEDetailed,SunExposed,WindExposed, 0.50, 0.50, 0.67,~ 0.33, 4, 20.00, 10.00, 10.00, 20.00, 10.00, 0.00, 40.00, 10.00, 0.00, 40.00, 10.00, 10.00
+\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL001,Wall,,EXTERIOR,0.644, 0.588, 136.0, 200.0, 136.0, 180.0, 90.0, 20.0, 10.0, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.67, 0.33, 4, 20.00, 10.00, 10.00, 20.00, 10.00, 0.00, 40.00, 10.00, 0.00, 40.00, 10.00, 10.00
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL001:WIN001,Window,ZN001:WALL001,SINGLE PANE HW WINDOW,N/A,6.121, 64.00000, 64.00000, 64.00000,180.0, 90.0, 8.00, 8.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,~ 0.50,~ 0.50,~ 0.71,~ 0.29, 4, 26.00, 10.00, 8.10, 26.00, 10.00, 0.10, 34.00, 10.00, 0.10, 34.00, 10.00, 8.10
+\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN001:WALL001:WIN001, Window, ZN001:WALL001, SINGLE PANE HW WINDOW, N/A, 6.121, 64.00000, 64.00000, 64.00000,180.0, 90.0, 8.00, 8.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.71, 0.29, 4, 26.00, 10.00, 8.10, 26.00, 10.00, 0.10, 34.00, 10.00, 0.10, 34.00, 10.00, 8.10
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL002,Wall,,EXTERIOR,0.644,0.588, 155.0, 200.0, 155.0, 90.0, 90.0, 20.00, 10.00, 0.00,ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50,~ 0.50,~ 0.73,~ 0.27, 4, 50.00, 20.00, 10.00, 50.00, 20.00, 0.00, 50.00, 40.00, 0.00, 50.00, 40.00, 10.00
+\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN001:WALL002, Wall, , EXTERIOR, 0.644, 0.588, 155.0, 200.0, 155.0, 90.0, 90.0, 20.00, 10.00, 0.00,ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.73, 0.27, 4, 50.00, 20.00, 10.00, 50.00, 20.00, 0.00, 50.00, 40.00, 0.00, 50.00, 40.00, 10.00
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL002:WIN001,Window,ZN001:WALL002,SINGLE PANE HW WINDOW,N/A,6.121, 15.0, 15.0, 15.0, 90.0, 90.0, 3.00, 5.00,~ 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,~ 0.50,~ 0.50,~ 0.76,~ 0.24, 4, 50.00, 22.20, 7.30, 50.00, 22.20, 2.30, 50.00, 25.20, 2.30, 50.00, 25.20, 7.30
+\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN001:WALL002:WIN001, Window, ZN001:WALL002, SINGLE PANE HW WINDOW, N/A, 6.121, 15.0, 15.0, 15.0, 90.0, 90.0, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.76, 0.24, 4, 50.00, 22.20, 7.30, 50.00, 22.20, 2.30, 50.00, 25.20, 2.30, 50.00, 25.20, 7.30
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL002:WIN002,Window,ZN001:WALL002,SINGLE PANE HW WINDOW, N/A, 6.121, 15.00, 15.00, 15.00, 90.00, 90.00, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.71, 0.29, 4, 50.00, 28.50, 7.30, 50.00, 28.50, 2.30, 50.00, 31.50, 2.30, 50.00, 31.50, 7.30
+\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN001:WALL002:WIN002, Window, ZN001:WALL002, SINGLE PANE HW WINDOW, N/A, 6.121, 15.00, 15.00, 15.00, 90.00, 90.00, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.71, 0.29, 4, 50.00, 28.50, 7.30, 50.00, 28.50, 2.30, 50.00, 31.50, 2.30, 50.00, 31.50, 7.30
 
 \textbf{Ex Line 2:} HeatTransfer\_Surface, ZN001:WALL002:WIN003, Window, ZN001:WALL002, SINGLE PANE HW WINDOW, N/A, 6.121, 15.00, 15.00, 15.00, 90.00, 90.00, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.77, 0.23, 4, 50.00, 35.30, 7.30, 50.00, 35.30, 2.30, 50.00, 38.30, 2.30, 50.00, 38.30, 7.30
 
 \textless{}reduced for brevity\textgreater{}
 
-\textbf{Ex Line 1:} Zone\_Surfaces,MAINE WING,~~ 12
+\textbf{Ex Line 1:} Zone\_Surfaces,MAINE WING, 12
 
 \textbf{Ex Line 2:} HeatTransfer\_Surface, ZN005:WALL001, Wall, , EXTERIOR, 0.644, 0.588, 100.00, 100.00, 100.00, 180.00, 90.00, 10.00, 10.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.74, 0.26, 4, 50.00, 40.00, 10.00, 50.00, 40.00, 0.00, 60.00, 40.00, 0.00, 60.00, 40.00, 10.00
 
