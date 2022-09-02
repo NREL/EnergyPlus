@@ -51,7 +51,7 @@
 !-                                      35.0 deg. C for air-cooled chillers
 !-
 !- NOTE: each set of curves presented is applicable for both AHRI 551/591 (IPLV.SI)
-!- and AHRI 550/590 (IPLV.IP). At the beginning of each set, the curve names for 
+!- and AHRI 550/590 (IPLV.IP). At the beginning of each set, the curve names for
 !- IPLV.SI is presented. This is followed by the corresponding IPLV.IP requirements.
 !-
 !- The dataset includes three curves for each requirement:
@@ -78,8 +78,8 @@ Curve:Biquadratic,
     -0.000247454342732314,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
-    40;                                                                                 !- Maximum Value of y
+    12.8,                                                                                 !- Minimum Value of y
+    52;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
     ASHRAE901_AppJ_air_A_lt528kW_2.96COP_4.01IPLV.SI_eir-f-t,                           !- Name
@@ -91,8 +91,8 @@ Curve:Biquadratic,
     -0.000372832883092795,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
-    40;                                                                                 !- Maximum Value of y
+    12.8,                                                                                 !- Minimum Value of y
+    52;                                                                                 !- Maximum Value of y
 
 Curve:Cubic,
     ASHRAE901_AppJ_air_A_lt528kW_2.96COP_4.01IPLV.SI_eir-f-plr,                      !- Name
@@ -116,8 +116,8 @@ Curve:Biquadratic,
     -0.000183160453325751,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
-    40;                                                                                 !- Maximum Value of y
+    12.8,                                                                                 !- Minimum Value of y
+    52;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
     ASHRAE901_AppJ_air_B_gt528kW_2.96COP_4.1IPLV.SI_eir-f-t,                            !- Name
@@ -129,8 +129,8 @@ Curve:Biquadratic,
     -0.000278364987198579,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
-    40;                                                                                 !- Maximum Value of y
+    12.8,                                                                                 !- Minimum Value of y
+    52;                                                                                 !- Maximum Value of y
 
 Curve:Cubic,
     ASHRAE901_AppJ_air_B_gt528kW_2.96COP_4.1IPLV.SI_eir-f-plr,                       !- Name
@@ -154,7 +154,7 @@ Curve:Biquadratic,
     2.04308942679377e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -167,7 +167,7 @@ Curve:Biquadratic,
     -0.000406520528637203,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -191,7 +191,7 @@ Curve:Biquadratic,
     3.97038399881581e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -204,7 +204,7 @@ Curve:Biquadratic,
     -0.00040447879206189,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -228,7 +228,7 @@ Curve:Biquadratic,
     0.000187301997660962,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -241,7 +241,7 @@ Curve:Biquadratic,
     -0.000425380344127481,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -265,7 +265,7 @@ Curve:Biquadratic,
     0.000267673853186553,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -278,7 +278,7 @@ Curve:Biquadratic,
     -0.000332214011089973,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -302,7 +302,7 @@ Curve:Biquadratic,
     0.00037744800140267,                                                                !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -315,7 +315,7 @@ Curve:Biquadratic,
     -0.00031353176777099,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -339,7 +339,7 @@ Curve:Biquadratic,
     0.000805505797030761,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -352,7 +352,7 @@ Curve:Biquadratic,
     0.000305261372231888,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -376,7 +376,7 @@ Curve:Biquadratic,
     0.000805505797030761,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -389,7 +389,7 @@ Curve:Biquadratic,
     0.000305261372231888,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -413,7 +413,7 @@ Curve:Biquadratic,
     0.000478586994824346,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -426,7 +426,7 @@ Curve:Biquadratic,
     7.65077445644722e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -450,7 +450,7 @@ Curve:Biquadratic,
     0.000470326605286581,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -463,7 +463,7 @@ Curve:Biquadratic,
     9.55658515401239e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -488,7 +488,7 @@ Curve:Biquadratic,
     0.000470326605286581,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -501,7 +501,7 @@ Curve:Biquadratic,
     9.55658515401239e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -525,8 +525,8 @@ Curve:Biquadratic,
     -0.000222414965753283,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
-    40;                                                                                 !- Maximum Value of y
+    12.8,                                                                                 !- Minimum Value of y
+    52;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
     ASHRAE901_AppJ_air_K_lt528kW_2.84COP_4.63IPLV.SI_eir-f-t,                           !- Name
@@ -538,8 +538,8 @@ Curve:Biquadratic,
     -0.000302768261242289,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
-    40;                                                                                 !- Maximum Value of y
+    12.8,                                                                                 !- Minimum Value of y
+    52;                                                                                 !- Maximum Value of y
 
 Curve:Cubic,
     ASHRAE901_AppJ_air_K_lt528kW_2.84COP_4.63IPLV.SI_eir-f-plr,                      !- Name
@@ -563,8 +563,8 @@ Curve:Biquadratic,
     -0.00015518502663619,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
-    40;                                                                                 !- Maximum Value of y
+    12.8,                                                                                 !- Minimum Value of y
+    52;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
     ASHRAE901_AppJ_air_L_gt528kW_2.84COP_4.72IPLV.SI_eir-f-t,                           !- Name
@@ -576,8 +576,8 @@ Curve:Biquadratic,
     -0.000272144039845811,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
-    40;                                                                                 !- Maximum Value of y
+    12.8,                                                                                 !- Minimum Value of y
+    52;                                                                                 !- Maximum Value of y
 
 Curve:Cubic,
     ASHRAE901_AppJ_air_L_gt528kW_2.84COP_4.72IPLV.SI_eir-f-plr,                      !- Name
@@ -601,7 +601,7 @@ Curve:Biquadratic,
     1.91890945678171e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -614,7 +614,7 @@ Curve:Biquadratic,
     -0.000402017116390411,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -638,7 +638,7 @@ Curve:Biquadratic,
     2.34106633043157e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -651,7 +651,7 @@ Curve:Biquadratic,
     -0.00039769975426097,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -675,7 +675,7 @@ Curve:Biquadratic,
     0.000163610563197599,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -688,7 +688,7 @@ Curve:Biquadratic,
     -0.000438845920809658,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -712,7 +712,7 @@ Curve:Biquadratic,
     0.000232069229103176,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -725,7 +725,7 @@ Curve:Biquadratic,
     -0.00034831230484849,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -749,7 +749,7 @@ Curve:Biquadratic,
     0.000375529208860862,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -762,7 +762,7 @@ Curve:Biquadratic,
     -0.000324776825190598,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -786,7 +786,7 @@ Curve:Biquadratic,
     0.000328140258926951,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -799,7 +799,7 @@ Curve:Biquadratic,
     2.41144705371036e-06,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -823,7 +823,7 @@ Curve:Biquadratic,
     0.000709461042757423,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -836,7 +836,7 @@ Curve:Biquadratic,
     0.000216037231668705,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -860,7 +860,7 @@ Curve:Biquadratic,
     0.000632602866390414,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -873,7 +873,7 @@ Curve:Biquadratic,
     4.76067012284652e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -897,7 +897,7 @@ Curve:Biquadratic,
     0.00051045264594837,                                                                !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -910,11 +910,48 @@ Curve:Biquadratic,
     8.69309521963594e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
     ASHRAE901_AppJ_wtr_U_cent_gt1407lt2110kW_6.01COP_9.28IPLV.SI_eir-f-plr,               !- Name
+    0.0585829703893892,                                                                   !- Coefficient1 Constant
+    0.205485686772911,                                                                    !- Coefficient2 x
+    0.736344937637699,                                                                    !- Coefficient3 x**2
+    0.0,                                                                                  !- Minimum Value of x
+    1.0;                                                                                  !- Maximum Value of x
+
+!- Set of performance curves for ASHRAE901_AppJ_wtr_U_cent_gt2110kW_6.01COP_9.28IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_U_cent_gt600ton_0.585kWpton_0.379IPLV.IP)
+
+Curve:Biquadratic,
+    ASHRAE901_AppJ_wtr_U_cent_gt2110kW_6.01COP_9.28IPLV.SI_cap-f-t,               !- Name
+    0.953579582863989,                                                                  !- Coefficient1 Constant
+    0.0530095768947128,                                                                 !- Coefficient2 x
+    -0.00238693256378436,                                                               !- Coefficient3 x**2
+    -0.00716453170776147,                                                               !- Coefficient4 y
+    -0.000104155022915777,                                                              !- Coefficient5 y**2
+    0.00051045264594837,                                                                !- Coefficient6 x*y
+    4.0,                                                                                !- Minimum Value of x
+    15.6,                                                                               !- Maximum Value of x
+    12.8,                                                                                 !- Minimum Value of y
+    40;                                                                                 !- Maximum Value of y
+
+Curve:Biquadratic,
+    ASHRAE901_AppJ_wtr_U_cent_gt2110kW_6.01COP_9.28IPLV.SI_eir-f-t,               !- Name
+    0.569569226633626,                                                                  !- Coefficient1 Constant
+    -0.0246997814063844,                                                                !- Coefficient2 x
+    0.000727341321689694,                                                               !- Coefficient3 x**2
+    0.0305690943144771,                                                                 !- Coefficient4 y
+    -0.000408675502080077,                                                              !- Coefficient5 y**2
+    8.69309521963594e-05,                                                               !- Coefficient6 x*y
+    4.0,                                                                                !- Minimum Value of x
+    15.6,                                                                               !- Maximum Value of x
+    12.8,                                                                                 !- Minimum Value of y
+    40;                                                                                 !- Maximum Value of y
+
+Curve:Quadratic,
+    ASHRAE901_AppJ_wtr_U_cent_gt2110kW_6.01COP_9.28IPLV.SI_eir-f-plr,               !- Name
     0.0585829703893892,                                                                   !- Coefficient1 Constant
     0.205485686772911,                                                                    !- Coefficient2 x
     0.736344937637699,                                                                    !- Coefficient3 x**2
@@ -934,7 +971,7 @@ Curve:Biquadratic,
     2.00123738299338e-05,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -947,7 +984,7 @@ Curve:Biquadratic,
     -0.00038887658149239,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -971,7 +1008,7 @@ Curve:Biquadratic,
     0.000118196271088028,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -984,7 +1021,7 @@ Curve:Biquadratic,
     -0.0005145783938772,                                                                !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -1008,7 +1045,7 @@ Curve:Biquadratic,
     0.000177891933315607,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -1021,7 +1058,7 @@ Curve:Biquadratic,
     -0.000318321132184388,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -1045,7 +1082,7 @@ Curve:Biquadratic,
     0.000326967712730548,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -1058,7 +1095,7 @@ Curve:Biquadratic,
     2.36450275390337e-06,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -1082,7 +1119,7 @@ Curve:Biquadratic,
     0.000648407755606432,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -1095,7 +1132,7 @@ Curve:Biquadratic,
     0.000277015931844547,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
@@ -1119,7 +1156,7 @@ Curve:Biquadratic,
     0.000502974958539996,                                                               !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
@@ -1132,7 +1169,7 @@ Curve:Biquadratic,
     -2.52410848639146e-05,                                                              !- Coefficient6 x*y
     4.0,                                                                                !- Minimum Value of x
     15.6,                                                                               !- Maximum Value of x
-    10,                                                                                 !- Minimum Value of y
+    12.8,                                                                                 !- Minimum Value of y
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
