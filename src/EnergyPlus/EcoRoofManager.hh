@@ -68,6 +68,16 @@ namespace EcoRoofManager {
                      Real64 &TempExt      // Exterior temperature boundary condition
     );
 
+    void initEcoRoofFirstTime(EnergyPlusData &state,
+                              int const SurfNum,
+                              int const ConstrNum
+    );
+
+    void initEcoRoof(EnergyPlusData &state,
+                     int const SurfNum,
+                     int const ConstrNum
+    );
+
     void UpdateSoilProps(EnergyPlusData &state,
                          Real64 &Moisture,
                          Real64 &MeanRootMoisture,
