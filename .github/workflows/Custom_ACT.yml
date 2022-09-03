@@ -1,0 +1,111 @@
+name: Custom ACT workflow for nektos/act (Compiler for Github Workflows locally)
+
+on:
+  push:
+    tags:
+      - '*'
+#on:
+#  push:
+#    branches: [ develop ]
+#    # Sequence of patterns matched against refs/tags
+#    tags:
+#      - 'v*' # Push events matching v*, i.e. v1.0, v20.15.10
+#  pull_request:
+#    branches: [ develop ]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  BUILD_TYPE: Release
+  Python_REQUIRED_VERSION: 3.8
+
+jobs:
+  linux_release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+    permissions:
+      # Needed permission to upload the release asset
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
+      id: setup-python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ env.Python_REQUIRED_VERSION }}
+
+    - name: Setup QtIFW 4.x
+      uses: jmarrec/setup-qtifw@v1
+      with:
+        qtifw-version: '4.x'
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install aqtinstall --user
+    - name: "Install Latest CMake"
+      shell: bash
+      run: |
+        sudo apt remove cmake
+        wget https://github.com/Kitware/CMake/releases/download/v3.24.1/cmake-3.24.1-linux-x86_64.sh
+        sudo mv cmake-3.24.1-linux-x86_64.sh /opt
+        chmod +x /opt/cmake-3.24.1-linux-x86_64.sh
+        sudo bash /opt/cmake-3.24.1-linux-x86_64.sh --skip-license --prefix=/root
+        sudo ln -sf /root/bin/* /usr/local/bin
+        ls /root/bin/
+        cmake --version 
+    - name: Install System dependencies and LaTeX
+      shell: bash
+      run: |
+        set -x
+        echo "Using Apt to install dependencies"
+        sudo apt update
+        sudo apt install -y gfortran texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
+    - name: Create Build Directory
+      run: cmake -E make_directory ./build/
+
+    - name: Configure CMake
+      working-directory: ./build
+      shell: bash
+      run: |
+        cmake -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/x64/ \
+              -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" -DENABLE_PCH:BOOL=OFF \
+              ../
+    - name: Build Package
+      working-directory: ./build
+      shell: bash
+      run: cmake --build . --target package -j 2
+
+    - name: Upload Tarball to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build/EnergyPlus-*-x86_64.tar.gz
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+
+    - name: Upload IFW to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build/EnergyPlus-*-x86_64.run
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+
+    - name: Upload SH to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build/EnergyPlus-*-x86_64.sh
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+        asset_name: ${{ matrix.os }}_LinuxShellInstaller
