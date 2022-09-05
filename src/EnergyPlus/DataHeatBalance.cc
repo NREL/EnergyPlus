@@ -1304,6 +1304,24 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
     // Return value
     Real64 NominalUwithConvCoeffs; // return value
 
+    static constexpr std::array<Real64, static_cast<int>(DataSurfaces::SurfaceClass::Num)> interiorFilmCoefs = {
+        0.0,       // None
+        0.1197584, // Wall
+        0.1620212, // Floor
+        0.1074271, // Roof
+        0.0,       // IntMass
+        0.0,       // Detached_B
+        0.0,       // Detached_F
+        0.1197584, // Window
+        0.1197584, // GlassDoor
+        0.1197584, // Door
+        0.0,       // Shading
+        0.0,       // Overhang
+        0.0,       // Fin
+        0.0,       // TDD_Dome
+        0.0        // TDD_Diffuser
+    };
+
     Real64 insideFilm;
     Real64 outsideFilm;
 
@@ -1325,45 +1343,13 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
         outsideFilm = 0.0;
     } break;
     default: { // Interior Surface Attached to a Zone (ExtBoundCond is a surface)
-        switch (state.dataSurface->Surface(thisSurface.ExtBoundCond).Class) {
-        case DataSurfaces::SurfaceClass::Wall:
-        case DataSurfaces::SurfaceClass::Door:
-        case DataSurfaces::SurfaceClass::Window:
-        case DataSurfaces::SurfaceClass::GlassDoor: {
-            outsideFilm = 0.1197548; // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-        } break;
-        case DataSurfaces::SurfaceClass::Floor: {
-            outsideFilm = 0.1620212; // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-        } break;
-        case DataSurfaces::SurfaceClass::Roof: {
-            outsideFilm = 0.1074271; // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-        } break;
-        default: {
-            outsideFilm = 0.0; // Surface is internal mass or something else where the U-value won't mean anything
-        } break;
-        }
+        outsideFilm = interiorFilmCoefs[static_cast<int>(state.dataSurface->Surface(thisSurface.ExtBoundCond).Class)];
     } break;
     }
     // interior conditions and calculate the return value
     if (state.dataHeatBal->NominalU(thisSurface.Construction) > 0.0) {
-        switch (thisSurface.Class) {
-        case DataSurfaces::SurfaceClass::Wall:
-        case DataSurfaces::SurfaceClass::Door:
-        case DataSurfaces::SurfaceClass::Window:
-        case DataSurfaces::SurfaceClass::GlassDoor: {
-            insideFilm = 0.1197548; // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-        } break;
-        case DataSurfaces::SurfaceClass::Floor: {
-            insideFilm = 0.1620212; // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-        } break;
-        case DataSurfaces::SurfaceClass::Roof: {
-            insideFilm = 0.1074271; // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-        } break;
-        default: { // Surface is internal mass or something else where the U-value won't mean anything
-            insideFilm = 0.0;
-            outsideFilm = 0.0;
-        } break;
-        }
+        insideFilm = interiorFilmCoefs[static_cast<int>(thisSurface.Class)];
+        if (insideFilm == 0.0) outsideFilm = 0.0;
         NominalUwithConvCoeffs =
             1.0 / (insideFilm + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction)) + outsideFilm);
     } else {
