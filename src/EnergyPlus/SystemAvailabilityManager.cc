@@ -641,7 +641,7 @@ namespace SystemAvailabilityManager {
                                                    cCurrentModuleObject,
                                                    cAlphaArgs(1),
                                                    cAlphaFieldNames(6),
-                                                   cAlphaArgs(4)));
+                                                   cAlphaArgs(6)));
                             ErrorsFound = true;
                         }
                     }
