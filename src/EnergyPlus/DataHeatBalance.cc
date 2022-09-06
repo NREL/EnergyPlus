@@ -1304,7 +1304,7 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
     // Return value
     Real64 NominalUwithConvCoeffs; // return value
 
-    static constexpr std::array<Real64, static_cast<int>(DataSurfaces::SurfaceClass::Num)> interiorFilmCoefs = {
+    static constexpr std::array<Real64, static_cast<int>(DataSurfaces::SurfaceClass::Num)> filmCoefs = {
         0.0,       // None
         0.1197584, // Wall
         0.1620212, // Floor
@@ -1343,12 +1343,12 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
         outsideFilm = 0.0;
     } break;
     default: { // Interior Surface Attached to a Zone (ExtBoundCond is a surface)
-        outsideFilm = interiorFilmCoefs[static_cast<int>(state.dataSurface->Surface(thisSurface.ExtBoundCond).Class)];
+        outsideFilm = filmCoefs[static_cast<int>(state.dataSurface->Surface(thisSurface.ExtBoundCond).Class)];
     } break;
     }
     // interior conditions and calculate the return value
     if (state.dataHeatBal->NominalU(thisSurface.Construction) > 0.0) {
-        insideFilm = interiorFilmCoefs[static_cast<int>(thisSurface.Class)];
+        insideFilm = filmCoefs[static_cast<int>(thisSurface.Class)];
         if (insideFilm == 0.0) outsideFilm = 0.0;
         NominalUwithConvCoeffs =
             1.0 / (insideFilm + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction)) + outsideFilm);
