@@ -13,9 +13,23 @@ env:
 jobs:
   linux_release:
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.allow_failure }}
     strategy:
+      # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
+      fail-fast: false
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04]
+        # TODO: ubuntu-18.04 is EOL since 8/8/22 and will be removed on 12/1/2022
+        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04]
+        include:
+        - os: ubuntu-18.04
+          allow_failure: true
+        - os: ubuntu-20.04
+          allow_failure: false
+        - os: ubuntu-22.04
+          allow_failure: false
+    permissions:
+      # Needed permission to upload the release asset
+      contents: write
 
     steps:
     - uses: actions/checkout@v2

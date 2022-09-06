@@ -2696,7 +2696,7 @@
     WindowCoolingShade,      !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     WindowNorth;             !- Fenestration Surface 1 Name
@@ -2715,7 +2715,7 @@
     WindowCoolingShade,      !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     WindowSouth;             !- Fenestration Surface 1 Name
@@ -2734,7 +2734,7 @@
     WindowCoolingShade,      !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     WindowEast;              !- Fenestration Surface 1 Name
@@ -2753,7 +2753,7 @@
     WindowCoolingShade,      !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     WindowWest;              !- Fenestration Surface 1 Name
@@ -2772,7 +2772,7 @@
     WindowHeatingShade,      !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     WindowNorth;             !- Fenestration Surface 1 Name
@@ -2791,7 +2791,7 @@
     WindowHeatingShade,      !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     WindowSouth;             !- Fenestration Surface 1 Name
@@ -2810,7 +2810,7 @@
     WindowHeatingShade,      !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     WindowEast;              !- Fenestration Surface 1 Name
@@ -2829,7 +2829,7 @@
     WindowHeatingShade,      !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     WindowWest;              !- Fenestration Surface 1 Name
@@ -10874,6 +10874,7 @@
     4.03878394144749,        !- Gross Rated Cooling COP {W/W}
     0.744166728437762,       !- Rated Air Flow Rate {m3/s}
     773.3912012006,          !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     central ac and furnace unitary system Fan - Cooling Coil Node,  !- Air Inlet Node Name
     central ac and furnace unitary system Cooling Coil - Heating Coil Node,  !- Air Outlet Node Name
     Cool-Cap-fT1,            !- Total Cooling Capacity Function of Temperature Curve Name

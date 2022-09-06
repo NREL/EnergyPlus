@@ -153,28 +153,31 @@ namespace DataSurfaces {
     enum class WindowShadingControlType
     {
         Invalid = -1,
-        UnControlled,                  // "UNCONTROLLED",
-        AlwaysOn,                      // "ALWAYSON",
-        AlwaysOff,                     // "ALWAYSOFF",
-        OnIfScheduled,                 // "ONIFSCHEDULEALLOWS",
-        HiSolar,                       // "ONIFHIGHSOLARONWINDOW",
-        HiHorzSolar,                   // "ONIFHIGHHORIZONTALSOLAR",
-        HiOutAirTemp,                  // "ONIFHIGHOUTDOORAIRTEMPERATURE",
-        HiZoneAirTemp,                 // "ONIFHIGHZONEAIRTEMPERATURE",
-        HiZoneCooling,                 // "ONIFHIGHZONECOOLING",
-        HiGlare,                       // "ONIFHIGHGLARE",
-        MeetDaylIlumSetp,              // "MEETDAYLIGHTILLUMINANCESETPOINT",
-        OnNightLoOutTemp_OffDay,       // "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY",
-        OnNightLoInTemp_OffDay,        // "ONNIGHTIFLOWINSIDETEMPANDOFFDAY",
-        OnNightIfHeating_OffDay,       // "ONNIGHTIFHEATINGANDOFFDAY",
-        OnNightLoOutTemp_OnDayCooling, // "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING",
-        OnNightIfHeating_OnDayCooling, // "ONNIGHTIFHEATINGANDONDAYIFCOOLING",
-        OffNight_OnDay_HiSolarWindow,  // "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-        OnNight_OnDay_HiSolarWindow,   // "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-        OnHiOutTemp_HiSolarWindow,     // "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
-        OnHiOutTemp_HiHorzSolar,       // "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
-        OnHiZoneTemp_HiSolarWindow,    // "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
-        OnHiZoneTemp_HiHorzSolar,      // "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"};
+        UnControlled,                   // "UNCONTROLLED",
+        AlwaysOn,                       // "ALWAYSON",
+        AlwaysOff,                      // "ALWAYSOFF",
+        OnIfScheduled,                  // "ONIFSCHEDULEALLOWS",
+        HiSolar,                        // "ONIFHIGHSOLARONWINDOW",
+        HiHorzSolar,                    // "ONIFHIGHHORIZONTALSOLAR",
+        HiOutAirTemp,                   // "ONIFHIGHOUTDOORAIRTEMPERATURE",
+        HiZoneAirTemp,                  // "ONIFHIGHZONEAIRTEMPERATURE",
+        HiZoneCooling,                  // "ONIFHIGHZONECOOLING",
+        HiGlare,                        // "ONIFHIGHGLARE",
+        MeetDaylIlumSetp,               // "MEETDAYLIGHTILLUMINANCESETPOINT",
+        OnNightLoOutTemp_OffDay,        // "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY",
+        OnNightLoInTemp_OffDay,         // "ONNIGHTIFLOWINSIDETEMPANDOFFDAY",
+        OnNightIfHeating_OffDay,        // "ONNIGHTIFHEATINGANDOFFDAY",
+        OnNightLoOutTemp_OnDayCooling,  // "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING",
+        OnNightIfHeating_OnDayCooling,  // "ONNIGHTIFHEATINGANDONDAYIFCOOLING",
+        OffNight_OnDay_HiSolarWindow,   // "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
+        OnNight_OnDay_HiSolarWindow,    // "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
+        OnHiOutTemp_HiSolarWindow,      // "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
+        OnHiOutTemp_HiHorzSolar,        // "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
+        OnHiZoneTemp_HiSolarWindow,     // "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
+        OnHiZoneTemp_HiHorzSolar,       // "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR",
+        HiSolar_HiLumin_OffMidNight,    // "ONIFHIGHSOLARANDHIGHLUMINOFFMIDNIGHT",
+        HiSolar_HiLumin_OffSunset,      // "ONIFHIGHSOLARANDHIGHLUMINOFFSUNSET",
+        HiSolar_HiLumin_OffNextMorning, // "ONIFHIGHSOLARANDHIGHLUMINOFFNEXTMORNING"};
         Num
     };
 
@@ -227,7 +230,6 @@ namespace DataSurfaces {
         None, // shading surfaces
         CTF,
         EMPD,
-
         CondFD,
         HAMT,
         Window5,             // original detailed layer-by-layer based on window 4 and window 5

@@ -487,7 +487,6 @@ namespace PlantChillers {
 
         void oneTimeInit(EnergyPlusData &state) override;
     };
-
 } // namespace PlantChillers
 
 struct PlantChillersData : BaseGlobalStruct

@@ -116,7 +116,7 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
 
     state->dataSize->NumOARequirements = 1;
     state->dataSize->OARequirements(1).Name = "ZONE OA";
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::ZOAM_ProportionalControlSchOcc;
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowCalcMethod::PCOccSch;
     state->dataSize->OARequirements(1).OAFlowPerPerson = 0.002;
     state->dataSize->OARequirements(1).OAFlowPerArea = 0.003;
     state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.5;
@@ -135,12 +135,12 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
 
     // Test ZOAM_ProportionalControlDesOcc
     state->dataContaminantBalance->ZoneAirCO2(1) = 500.0;
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::ZOAM_ProportionalControlDesOcc;
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowCalcMethod::PCDesOcc;
     OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
     EXPECT_NEAR(0.0315879, OAVolumeFlowRate, 0.00001);
 
     // Test ZOAM_IAQP
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::ZOAM_IAQP;
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowCalcMethod::IAQProcedure;
     state->dataContaminantBalance->ZoneSysContDemand(1).OutputRequiredToCO2SP = 0.2 * state->dataEnvrn->StdRhoAir;
     OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(*state, 1, 1, false, false);
     EXPECT_NEAR(0.2, OAVolumeFlowRate, 0.00001);

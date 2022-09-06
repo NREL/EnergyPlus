@@ -29,6 +29,9 @@ jobs:
           allow_failure: false
           vs-generator: Win32
           package-arch: i386
+    permissions:
+      # Needed permission to upload the release asset
+      contents: write
 
     steps:
     - uses: actions/checkout@v2

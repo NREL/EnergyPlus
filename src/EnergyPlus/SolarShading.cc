@@ -9742,6 +9742,69 @@ void WindowShadingManager(EnergyPlusData &state)
                 }
                 break;
 
+            case WindowShadingControlType::HiSolar_HiLumin_OffMidNight:
+                // 'OnIfHighSolarOrHighLuminanceTillMidnight'
+                // if shade is already on, then keep it on until midnight, otherwise check thresholds
+                if (SchedAllowsControl && IS_SHADED(state.dataSurface->SurfWinExtIntShadePrevTS(ISurf))) {
+                    shadingOn = true;
+                } else if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
+                    if (SolarOnWindow > SetPoint) {
+                        shadingOn = true;
+                    } else {
+                        // pass to DayltgInteriorIllum to check for luminance
+                        shadingOn = false;
+                        shadingOffButGlareControlOn = true;
+                    }
+                }
+                // if it is the beginning of the day, then shades off
+                if (state.dataGlobal->BeginDayFlag) {
+                    shadingOn = false;
+                    shadingOffButGlareControlOn = false;
+                }
+                break;
+
+            case WindowShadingControlType::HiSolar_HiLumin_OffSunset:
+                // 'OnIfHighSolarOrHighLuminanceTillSunset'
+                // if shade is already on, then keep it on until sunset, otherwise check thresholds
+                if (SchedAllowsControl && IS_SHADED(state.dataSurface->SurfWinExtIntShadePrevTS(ISurf))) {
+                    shadingOn = true;
+                } else if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
+                    if (SolarOnWindow > SetPoint) {
+                        shadingOn = true;
+                    } else {
+                        // pass to DayltgInteriorIllum to check for luminance
+                        shadingOn = false;
+                        shadingOffButGlareControlOn = true;
+                    }
+                }
+                // if sunset, then shades off
+                if (!state.dataEnvrn->SunIsUp) {
+                    shadingOn = false;
+                    shadingOffButGlareControlOn = false;
+                }
+                break;
+
+            case WindowShadingControlType::HiSolar_HiLumin_OffNextMorning:
+                // 'OnIfHighSolarOrHighLuminanceTillNextMorning'
+                // if shade is already on, then keep it on until next day when sun is up, otherwise check thresholds
+                if (SchedAllowsControl && IS_SHADED(state.dataSurface->SurfWinExtIntShadePrevTS(ISurf))) {
+                    shadingOn = true;
+                } else if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
+                    if (SolarOnWindow > SetPoint) {
+                        shadingOn = true;
+                    } else {
+                        // pass to DayltgInteriorIllum to check for luminance
+                        shadingOn = false;
+                        shadingOffButGlareControlOn = true;
+                    }
+                }
+                // if next morning (identified by sun is not up in previous time step and is up now), then shades off
+                if (!state.dataEnvrn->SunIsUpPrevTS && state.dataEnvrn->SunIsUp) {
+                    shadingOn = false;
+                    shadingOffButGlareControlOn = false;
+                }
+                break;
+
             case WindowShadingControlType::OnNightLoOutTemp_OffDay: // 'OnNightIfLowOutdoorTempAndOffDay'
                 if (!state.dataEnvrn->SunIsUp && state.dataSurface->SurfOutDryBulbTemp(ISurf) < SetPoint && SchedAllowsControl) {
                     shadingOn = true;
