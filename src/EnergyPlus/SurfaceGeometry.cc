@@ -5016,10 +5016,11 @@ namespace SurfaceGeometry {
                 state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
 
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction == 0) {
-                ErrorsFound = true;
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                ErrorsFound = true;
+                continue;
             } else {
                 state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).IsUsed = true;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ConstructionStoredInputValue =
