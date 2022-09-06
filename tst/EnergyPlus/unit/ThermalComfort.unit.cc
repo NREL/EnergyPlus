@@ -1880,3 +1880,175 @@ TEST_F(EnergyPlusFixture, ThermalComfort_GetAngleFactorListTest)
 
     ASSERT_EQ(state->dataThermalComforts->AngleFactorList(1).TotAngleFacSurfaces, 100);
 }
+
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT_Enclosure_Based)
+{
+    // Test Issue 9377 fix via PR 9628: Enclosure based MRT calculation
+
+    int SurfNum(1);
+    Real64 RadTemp;
+
+    state->dataThermalComforts->AngleFactorList.allocate(1);
+    state->dataSurface->TotSurfaces = 12;
+    state->dataGlobal->NumOfZones = 2;
+    state->dataHeatBalSurf->SurfInsideTempHist.allocate(1);
+    state->dataHeatBalSurf->SurfInsideTempHist(1).allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+
+    state->dataSurface->Surface(1).Area = 10.0;
+    state->dataSurface->Surface(2).Area = 10.0;
+    state->dataSurface->Surface(3).Area = 10.0;
+    state->dataSurface->Surface(4).Area = 10.0;
+    state->dataSurface->Surface(5).Area = 10.0;
+    state->dataSurface->Surface(6).Area = 10.0;
+
+    state->dataSurface->Surface(7).Area = 10.0;
+    state->dataSurface->Surface(8).Area = 10.0;
+    state->dataSurface->Surface(9).Area = 10.0;
+    state->dataSurface->Surface(10).Area = 10.0;
+    state->dataSurface->Surface(11).Area = 10.0;
+    state->dataSurface->Surface(12).Area = 10.0;
+
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(5).HeatTransSurf = true;
+    state->dataSurface->Surface(6).HeatTransSurf = false;
+
+    state->dataSurface->Surface(7).HeatTransSurf = false;
+    state->dataSurface->Surface(8).HeatTransSurf = true;
+    state->dataSurface->Surface(9).HeatTransSurf = true;
+    state->dataSurface->Surface(10).HeatTransSurf = true;
+    state->dataSurface->Surface(11).HeatTransSurf = true;
+    state->dataSurface->Surface(12).HeatTransSurf = true;
+
+    state->dataSurface->Surface(1).Construction = 1; // floor
+    state->dataSurface->Surface(2).Construction = 2; // roof
+    state->dataSurface->Surface(3).Construction = 3; // wall
+    state->dataSurface->Surface(4).Construction = 3; // wall
+    state->dataSurface->Surface(5).Construction = 3; // wall
+    state->dataSurface->Surface(6).Construction = 4; // air boundary
+
+    state->dataSurface->Surface(7).Construction = 4;  // air boundary
+    state->dataSurface->Surface(8).Construction = 3;  // wall
+    state->dataSurface->Surface(9).Construction = 3;  // wall
+    state->dataSurface->Surface(10).Construction = 3; // wall
+    state->dataSurface->Surface(11).Construction = 2; // roof
+    state->dataSurface->Surface(12).Construction = 1; // floor
+
+    state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
+    state->dataConstruction->Construct(2).InsideAbsorpThermal = 0.9;
+    state->dataConstruction->Construct(3).InsideAbsorpThermal = 0.9;
+    state->dataConstruction->Construct(4).InsideAbsorpThermal = 0.9;
+
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(3).Zone = 1;
+    state->dataSurface->Surface(4).Zone = 1;
+    state->dataSurface->Surface(5).Zone = 1;
+    state->dataSurface->Surface(6).Zone = 1;
+
+    state->dataSurface->Surface(7).Zone = 2;
+    state->dataSurface->Surface(8).Zone = 2;
+    state->dataSurface->Surface(9).Zone = 2;
+    state->dataSurface->Surface(10).Zone = 2;
+    state->dataSurface->Surface(11).Zone = 2;
+    state->dataSurface->Surface(12).Zone = 2;
+
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 6;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(1) = 10.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(2) = 10.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(3) = 10.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(4) = 10.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(5) = 10.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(6) = 10.0; // this should air boundary
+
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(7) = 20.0; // this should air boundary
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(8) = 20.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(9) = 20.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(10) = 20.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(11) = 20.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(12) = 20.0;
+
+    state->dataViewFactor->EnclRadInfo.allocate(1); // (state->dataGlobal->NumOfZones);
+    state->dataViewFactor->EnclRadInfo(1).SurfacePtr.dimension(12);
+    state->dataViewFactor->EnclRadInfo(1).SurfacePtr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+    state->dataSurface->Surface(1).RadEnclIndex = 1;
+    state->dataSurface->Surface(2).RadEnclIndex = 1;
+    state->dataSurface->Surface(3).RadEnclIndex = 1;
+    state->dataSurface->Surface(4).RadEnclIndex = 1;
+    state->dataSurface->Surface(5).RadEnclIndex = 1;
+    state->dataSurface->Surface(6).RadEnclIndex = 1;
+
+    state->dataSurface->Surface(7).RadEnclIndex = 1;
+    state->dataSurface->Surface(8).RadEnclIndex = 1;
+    state->dataSurface->Surface(9).RadEnclIndex = 1;
+    state->dataSurface->Surface(10).RadEnclIndex = 1;
+    state->dataSurface->Surface(11).RadEnclIndex = 1;
+    state->dataSurface->Surface(12).RadEnclIndex = 1;
+
+    SurfNum = 1;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum);
+    EXPECT_NEAR(RadTemp, 12.727, 0.1);
+
+    SurfNum = 3;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum);
+    EXPECT_NEAR(RadTemp, 12.727, 0.1);
+
+    SurfNum = 5;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum);
+    EXPECT_NEAR(RadTemp, 12.727, 0.1);
+
+    SurfNum = 8;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum);
+    EXPECT_NEAR(RadTemp, 17.273, 0.1);
+
+    SurfNum = 10;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum);
+    EXPECT_NEAR(RadTemp, 17.273, 0.1);
+
+    SurfNum = 12;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum);
+    EXPECT_NEAR(RadTemp, 17.273, 0.1);
+
+    // set AverageWithSurface to false for Kiva surfaces
+    SurfNum = 1;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 15.455, 0.1);
+
+    SurfNum = 2;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 15.455, 0.1);
+
+    SurfNum = 3;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 15.455, 0.1);
+
+    SurfNum = 8;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 14.545, 0.1);
+
+    SurfNum = 10;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 14.545, 0.1);
+
+    SurfNum = 12;
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, SurfNum, false);
+    EXPECT_NEAR(RadTemp, 14.545, 0.1);
+}
