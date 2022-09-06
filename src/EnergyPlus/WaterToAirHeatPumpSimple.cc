@@ -1626,7 +1626,7 @@ namespace WaterToAirHeatPumpSimple {
                             ShowSevereError(state, "Autosizing of total cooling capacity requires a loop Sizing:Plant object");
                             ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
                             ShowContinueError(state,
-                                              format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object=",
+                                              format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
                                                      simpleWatertoAirHP.WatertoAirHPType,
                                                      simpleWatertoAirHP.Name));
                             ErrorsFound = true;
