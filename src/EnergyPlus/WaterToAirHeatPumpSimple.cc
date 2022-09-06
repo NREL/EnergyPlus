@@ -149,6 +149,8 @@ namespace WaterToAirHeatPumpSimple {
         int HPNum;                // The WatertoAirHP that you are currently loading input into
         Real64 OnOffAirFlowRatio; // ratio of comp on to comp off air flow rate
 
+        auto &simpleWAHP(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
+
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataWaterToAirHeatPumpSimple->GetCoilsInputFlag) { // First time subroutine has been entered
             GetSimpleWatertoAirHPInput(state);
@@ -170,13 +172,13 @@ namespace WaterToAirHeatPumpSimple {
                                       state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs,
                                       CompName));
             }
-            if (!CompName.empty() && CompName != state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name) {
+            if (!CompName.empty() && CompName != simpleWAHP.Name) {
                 ShowFatalError(
                     state,
                     format("SimWatertoAirHPSimple: Invalid CompIndex passed={}, WaterToAir HP name={}, stored WaterToAir HP Name for that index={}",
                            HPNum,
                            CompName,
-                           state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name));
+                           simpleWAHP.Name));
             }
         }
 
@@ -186,8 +188,7 @@ namespace WaterToAirHeatPumpSimple {
             OnOffAirFlowRatio = 1.0;
         }
 
-        if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType ==
-            DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
+        if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
             // Cooling mode
             InitSimpleWatertoAirHP(state,
                                    HPNum,
@@ -201,8 +202,7 @@ namespace WaterToAirHeatPumpSimple {
                                    FirstHVACIteration);
             CalcHPCoolingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
-        } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType ==
-                   DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
+        } else if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
             // Heating mode
             InitSimpleWatertoAirHP(state,
                                    HPNum,
@@ -272,6 +272,7 @@ namespace WaterToAirHeatPumpSimple {
         NumHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:EquationFit");
         state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs = NumCool + NumHeat;
         HPNum = 0;
+        auto &simpleWAHP(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
 
         if (state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs <= 0) {
             ShowSevereError(state, "No Equipment found in SimWatertoAirHPSimple");
@@ -321,96 +322,89 @@ namespace WaterToAirHeatPumpSimple {
                                                                      cNumericFields);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate = NumArray(1);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate = NumArray(2);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal = NumArray(3);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens = NumArray(4);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCOPCoolAtRatedCdts = NumArray(5);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedEntWaterTemp = NumArray(6);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedEntAirDrybulbTemp = NumArray(7);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedEntAirWetbulbTemp = NumArray(8);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex =
-                CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex =
-                CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex =
-                CurveManager::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
-            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex > 0) {
+            simpleWAHP.Name = AlphArray(1);
+            simpleWAHP.WatertoAirHPType = "COOLING";
+            simpleWAHP.WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
+            simpleWAHP.RatedAirVolFlowRate = NumArray(1);
+            simpleWAHP.RatedWaterVolFlowRate = NumArray(2);
+            simpleWAHP.RatedCapCoolTotal = NumArray(3);
+            simpleWAHP.RatedCapCoolSens = NumArray(4);
+            simpleWAHP.RatedCOPCoolAtRatedCdts = NumArray(5);
+            simpleWAHP.RatedEntWaterTemp = NumArray(6);
+            simpleWAHP.RatedEntAirDrybulbTemp = NumArray(7);
+            simpleWAHP.RatedEntAirWetbulbTemp = NumArray(8);
+            simpleWAHP.TotalCoolCapCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
+            simpleWAHP.SensCoolCapCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(7));  // convert curve name to number
+            simpleWAHP.CoolPowCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(8));      // convert curve name to number
+            if (simpleWAHP.TotalCoolCapCurveIndex > 0) {
                 ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex,
+                                                            simpleWAHP.TotalCoolCapCurveIndex,
                                                             {4},
                                                             RoutineName,
                                                             CurrentModuleObject,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            simpleWAHP.Name,
                                                             "Total Cooling Capacity Curve Name");
             }
-            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex > 0) {
+            if (simpleWAHP.SensCoolCapCurveIndex > 0) {
                 ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex,
+                                                            simpleWAHP.SensCoolCapCurveIndex,
                                                             {5},
                                                             RoutineName,
                                                             CurrentModuleObject,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            simpleWAHP.Name,
                                                             "Sensible Cooling Capacity Curve Name");
             }
-            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex > 0) {
+            if (simpleWAHP.CoolPowCurveIndex > 0) {
                 ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex,
+                                                            simpleWAHP.CoolPowCurveIndex,
                                                             {4},
                                                             RoutineName,
                                                             CurrentModuleObject,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            simpleWAHP.Name,
                                                             "Cooling Power Consumption Curve Name");
             }
-            CheckSimpleWAHPRatedCurvesOutputs(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Twet_Rated = NumArray(9);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Gamma_Rated = NumArray(10);
-            state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
+            CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
+            simpleWAHP.Twet_Rated = NumArray(9);
+            simpleWAHP.Gamma_Rated = NumArray(10);
+            state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = simpleWAHP.Name;
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum =
-                GetOnlySingleNode(state,
-                                  AlphArray(2),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
-                                  AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Water,
-                                  DataLoopNode::ConnectionType::Inlet,
-                                  NodeInputManager::CompFluidStream::Secondary,
-                                  DataLoopNode::ObjectIsNotParent);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterOutletNodeNum =
-                GetOnlySingleNode(state,
-                                  AlphArray(3),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
-                                  AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Water,
-                                  DataLoopNode::ConnectionType::Outlet,
-                                  NodeInputManager::CompFluidStream::Secondary,
-                                  DataLoopNode::ObjectIsNotParent);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum =
-                GetOnlySingleNode(state,
-                                  AlphArray(4),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
-                                  AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Inlet,
-                                  NodeInputManager::CompFluidStream::Primary,
-                                  DataLoopNode::ObjectIsNotParent);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirOutletNodeNum =
-                GetOnlySingleNode(state,
-                                  AlphArray(5),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
-                                  AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Outlet,
-                                  NodeInputManager::CompFluidStream::Primary,
-                                  DataLoopNode::ObjectIsNotParent);
+            simpleWAHP.WaterInletNodeNum = GetOnlySingleNode(state,
+                                                             AlphArray(2),
+                                                             ErrorsFound,
+                                                             DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
+                                                             AlphArray(1),
+                                                             DataLoopNode::NodeFluidType::Water,
+                                                             DataLoopNode::ConnectionType::Inlet,
+                                                             NodeInputManager::CompFluidStream::Secondary,
+                                                             DataLoopNode::ObjectIsNotParent);
+            simpleWAHP.WaterOutletNodeNum = GetOnlySingleNode(state,
+                                                              AlphArray(3),
+                                                              ErrorsFound,
+                                                              DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
+                                                              AlphArray(1),
+                                                              DataLoopNode::NodeFluidType::Water,
+                                                              DataLoopNode::ConnectionType::Outlet,
+                                                              NodeInputManager::CompFluidStream::Secondary,
+                                                              DataLoopNode::ObjectIsNotParent);
+            simpleWAHP.AirInletNodeNum = GetOnlySingleNode(state,
+                                                           AlphArray(4),
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
+                                                           AlphArray(1),
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::ConnectionType::Inlet,
+                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           DataLoopNode::ObjectIsNotParent);
+            simpleWAHP.AirOutletNodeNum = GetOnlySingleNode(state,
+                                                            AlphArray(5),
+                                                            ErrorsFound,
+                                                            DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
+                                                            AlphArray(1),
+                                                            DataLoopNode::NodeFluidType::Air,
+                                                            DataLoopNode::ConnectionType::Outlet,
+                                                            NodeInputManager::CompFluidStream::Primary,
+                                                            DataLoopNode::ObjectIsNotParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Air Nodes");
@@ -420,10 +414,10 @@ namespace WaterToAirHeatPumpSimple {
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Energy,
+                                simpleWAHP.Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                simpleWAHP.Name,
                                 _,
                                 "Electricity",
                                 "Cooling",
@@ -432,10 +426,10 @@ namespace WaterToAirHeatPumpSimple {
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLoadTotal,
+                                simpleWAHP.EnergyLoadTotal,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                simpleWAHP.Name,
                                 _,
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
@@ -444,24 +438,24 @@ namespace WaterToAirHeatPumpSimple {
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergySensible,
+                                simpleWAHP.EnergySensible,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                simpleWAHP.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLatent,
+                                simpleWAHP.EnergyLatent,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                simpleWAHP.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Source Side Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergySource,
+                                simpleWAHP.EnergySource,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                simpleWAHP.Name,
                                 _,
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
@@ -469,38 +463,19 @@ namespace WaterToAirHeatPumpSimple {
                                 "System");
 
             // create predefined report entries
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchCoolCoilType,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     CurrentModuleObject);
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchCoolCoilTotCap,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchCoolCoilSensCap,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchCoolCoilLatCap,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal -
-                                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchCoolCoilSHR,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens /
-                                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchCoolCoilNomEff,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedPowerCool /
-                                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, simpleWAHP.Name, CurrentModuleObject);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchCoolCoilTotCap, simpleWAHP.Name, simpleWAHP.RatedCapCoolTotal);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchCoolCoilSensCap, simpleWAHP.Name, simpleWAHP.RatedCapCoolSens);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchCoolCoilLatCap, simpleWAHP.Name, simpleWAHP.RatedCapCoolTotal - simpleWAHP.RatedCapCoolSens);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchCoolCoilSHR, simpleWAHP.Name, simpleWAHP.RatedCapCoolSens / simpleWAHP.RatedCapCoolTotal);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchCoolCoilNomEff, simpleWAHP.Name, simpleWAHP.RatedPowerCool / simpleWAHP.RatedCapCoolTotal);
 
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWAHPType,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     CurrentModuleObject);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPType, simpleWAHP.Name, CurrentModuleObject);
         }
 
         // Get the data for heating coil
@@ -525,79 +500,68 @@ namespace WaterToAirHeatPumpSimple {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType = "HEATING";
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate = NumArray(1);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate = NumArray(2);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat = NumArray(3);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCOPHeatAtRatedCdts = NumArray(4);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedEntWaterTemp = NumArray(5);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedEntAirDrybulbTemp = NumArray(6);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatioRatedHeatRatedTotCoolCap = NumArray(7);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex =
-                CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex =
-                CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
-            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex > 0) {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex,
-                                                            {4},
-                                                            RoutineName,
-                                                            CurrentModuleObject,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                            "Heating Capacity Curve Name");
+            simpleWAHP.Name = AlphArray(1);
+            simpleWAHP.WatertoAirHPType = "HEATING";
+            simpleWAHP.WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
+            simpleWAHP.RatedAirVolFlowRate = NumArray(1);
+            simpleWAHP.RatedWaterVolFlowRate = NumArray(2);
+            simpleWAHP.RatedCapHeat = NumArray(3);
+            simpleWAHP.RatedCOPHeatAtRatedCdts = NumArray(4);
+            simpleWAHP.RatedEntWaterTemp = NumArray(5);
+            simpleWAHP.RatedEntAirDrybulbTemp = NumArray(6);
+            simpleWAHP.RatioRatedHeatRatedTotCoolCap = NumArray(7);
+            simpleWAHP.HeatCapCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
+            simpleWAHP.HeatPowCurveIndex = CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
+            if (simpleWAHP.HeatCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(
+                    state, simpleWAHP.HeatCapCurveIndex, {4}, RoutineName, CurrentModuleObject, simpleWAHP.Name, "Heating Capacity Curve Name");
             }
-            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex > 0) {
+            if (simpleWAHP.HeatPowCurveIndex > 0) {
                 ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex,
+                                                            simpleWAHP.HeatPowCurveIndex,
                                                             {4},
                                                             RoutineName,
                                                             CurrentModuleObject,
-                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            simpleWAHP.Name,
                                                             "Heating Power Consumption Curve Name");
             }
-            CheckSimpleWAHPRatedCurvesOutputs(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum =
-                GetOnlySingleNode(state,
-                                  AlphArray(2),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
-                                  AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Water,
-                                  DataLoopNode::ConnectionType::Inlet,
-                                  NodeInputManager::CompFluidStream::Secondary,
-                                  DataLoopNode::ObjectIsNotParent);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterOutletNodeNum =
-                GetOnlySingleNode(state,
-                                  AlphArray(3),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
-                                  AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Water,
-                                  DataLoopNode::ConnectionType::Outlet,
-                                  NodeInputManager::CompFluidStream::Secondary,
-                                  DataLoopNode::ObjectIsNotParent);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum =
-                GetOnlySingleNode(state,
-                                  AlphArray(4),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
-                                  AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Inlet,
-                                  NodeInputManager::CompFluidStream::Primary,
-                                  DataLoopNode::ObjectIsNotParent);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirOutletNodeNum =
-                GetOnlySingleNode(state,
-                                  AlphArray(5),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
-                                  AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Outlet,
-                                  NodeInputManager::CompFluidStream::Primary,
-                                  DataLoopNode::ObjectIsNotParent);
+            CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
+            simpleWAHP.WaterInletNodeNum = GetOnlySingleNode(state,
+                                                             AlphArray(2),
+                                                             ErrorsFound,
+                                                             DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
+                                                             AlphArray(1),
+                                                             DataLoopNode::NodeFluidType::Water,
+                                                             DataLoopNode::ConnectionType::Inlet,
+                                                             NodeInputManager::CompFluidStream::Secondary,
+                                                             DataLoopNode::ObjectIsNotParent);
+            simpleWAHP.WaterOutletNodeNum = GetOnlySingleNode(state,
+                                                              AlphArray(3),
+                                                              ErrorsFound,
+                                                              DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
+                                                              AlphArray(1),
+                                                              DataLoopNode::NodeFluidType::Water,
+                                                              DataLoopNode::ConnectionType::Outlet,
+                                                              NodeInputManager::CompFluidStream::Secondary,
+                                                              DataLoopNode::ObjectIsNotParent);
+            simpleWAHP.AirInletNodeNum = GetOnlySingleNode(state,
+                                                           AlphArray(4),
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
+                                                           AlphArray(1),
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::ConnectionType::Inlet,
+                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           DataLoopNode::ObjectIsNotParent);
+            simpleWAHP.AirOutletNodeNum = GetOnlySingleNode(state,
+                                                            AlphArray(5),
+                                                            ErrorsFound,
+                                                            DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
+                                                            AlphArray(1),
+                                                            DataLoopNode::NodeFluidType::Air,
+                                                            DataLoopNode::ConnectionType::Outlet,
+                                                            NodeInputManager::CompFluidStream::Primary,
+                                                            DataLoopNode::ObjectIsNotParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Air Nodes");
@@ -606,10 +570,10 @@ namespace WaterToAirHeatPumpSimple {
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Energy,
+                                simpleWAHP.Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                simpleWAHP.Name,
                                 _,
                                 "Electricity",
                                 "Heating",
@@ -618,10 +582,10 @@ namespace WaterToAirHeatPumpSimple {
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLoadTotal,
+                                simpleWAHP.EnergyLoadTotal,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                simpleWAHP.Name,
                                 _,
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
@@ -630,10 +594,10 @@ namespace WaterToAirHeatPumpSimple {
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergySource,
+                                simpleWAHP.EnergySource,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                simpleWAHP.Name,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
@@ -641,24 +605,12 @@ namespace WaterToAirHeatPumpSimple {
                                 "System");
 
             // create predefined report entries
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchHeatCoilType,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     CurrentModuleObject);
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchHeatCoilNomCap,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat);
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchHeatCoilNomEff,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedPowerHeat /
-                                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, simpleWAHP.Name, CurrentModuleObject);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, simpleWAHP.Name, simpleWAHP.RatedCapHeat);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilNomEff, simpleWAHP.Name, simpleWAHP.RatedPowerHeat / simpleWAHP.RatedCapHeat);
 
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWAHPType,
-                                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     CurrentModuleObject);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPType, simpleWAHP.Name, CurrentModuleObject);
         }
 
         AlphArray.deallocate();
@@ -669,224 +621,222 @@ namespace WaterToAirHeatPumpSimple {
         NumArray.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + "Errors found getting input. Program terminates.");
+            ShowFatalError(state, format("{} Errors found getting input. Program terminates.", std::string{RoutineName}));
         }
 
         for (HPNum = 1; HPNum <= state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs; ++HPNum) {
 
-            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType ==
-                DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
+            if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
                 // COOLING COIL  Setup Report variables for the Heat Pump
                 SetupOutputVariable(state,
                                     "Cooling Coil Electricity Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Power,
+                                    simpleWAHP.Power,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Total Cooling Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal,
+                                    simpleWAHP.QLoadTotal,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Sensible Cooling Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible,
+                                    simpleWAHP.QSensible,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Latent Cooling Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLatent,
+                                    simpleWAHP.QLatent,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSource,
+                                    simpleWAHP.QSource,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Part Load Ratio",
                                     OutputProcessor::Unit::None,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).PartLoadRatio,
+                                    simpleWAHP.PartLoadRatio,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Runtime Fraction",
                                     OutputProcessor::Unit::None,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RunFrac,
+                                    simpleWAHP.RunFrac,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
 
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate,
+                                    simpleWAHP.AirMassFlowRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirDBTemp,
+                                    simpleWAHP.InletAirDBTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Inlet Humidity Ratio",
                                     OutputProcessor::Unit::kgWater_kgDryAir,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirHumRat,
+                                    simpleWAHP.InletAirHumRat,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp,
+                                    simpleWAHP.OutletAirDBTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Outlet Humidity Ratio",
                                     OutputProcessor::Unit::kgWater_kgDryAir,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirHumRat,
+                                    simpleWAHP.OutletAirHumRat,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate,
+                                    simpleWAHP.WaterMassFlowRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp,
+                                    simpleWAHP.InletWaterTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp,
+                                    simpleWAHP.OutletWaterTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
 
-            } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType ==
-                       DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
+            } else if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
                 // HEATING COIL Setup Report variables for the Heat Pump
                 SetupOutputVariable(state,
                                     "Heating Coil Electricity Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Power,
+                                    simpleWAHP.Power,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Heating Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal,
+                                    simpleWAHP.QLoadTotal,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Sensible Heating Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible,
+                                    simpleWAHP.QSensible,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSource,
+                                    simpleWAHP.QSource,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Part Load Ratio",
                                     OutputProcessor::Unit::None,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).PartLoadRatio,
+                                    simpleWAHP.PartLoadRatio,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Runtime Fraction",
                                     OutputProcessor::Unit::None,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RunFrac,
+                                    simpleWAHP.RunFrac,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Air Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate,
+                                    simpleWAHP.AirMassFlowRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirDBTemp,
+                                    simpleWAHP.InletAirDBTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Inlet Humidity Ratio",
                                     OutputProcessor::Unit::kgWater_kgDryAir,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirHumRat,
+                                    simpleWAHP.InletAirHumRat,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp,
+                                    simpleWAHP.OutletAirDBTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Outlet Humidity Ratio",
                                     OutputProcessor::Unit::kgWater_kgDryAir,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirHumRat,
+                                    simpleWAHP.OutletAirHumRat,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate,
+                                    simpleWAHP.WaterMassFlowRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp,
+                                    simpleWAHP.InletWaterTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp,
+                                    simpleWAHP.OutletWaterTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
+                                    simpleWAHP.Name);
             }
         }
     }
@@ -1207,6 +1157,9 @@ namespace WaterToAirHeatPumpSimple {
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
         auto &simpleWatertoAirHP(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
+        auto &FinalZoneSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
+        auto &CompanionCoolingCoil(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum));
+        auto &CompanionHeatingCoil(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum));
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("SizeWaterToAirCoil");
@@ -1345,8 +1298,8 @@ namespace WaterToAirHeatPumpSimple {
                 }
             } else {
                 CheckSysSizing(state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT", simpleWatertoAirHP.Name);
-                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
-                    RatedAirVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                if (FinalZoneSizing.DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
+                    RatedAirVolFlowRateDes = FinalZoneSizing.DesMainVolFlow;
                     CoolingAirVolFlowRateDes = state.dataSize->CalcSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                     HeatingAirVolFlowRateDes = state.dataSize->CalcSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                 } else {
@@ -1440,18 +1393,18 @@ namespace WaterToAirHeatPumpSimple {
                     // cooling design day calculations
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
-                            MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
-                            MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak;
-                            SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp;
-                            SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat;
+                            MixTemp = FinalZoneSizing.OutTempAtCoolPeak;
+                            MixHumRat = FinalZoneSizing.OutHumRatAtCoolPeak;
+                            SupTemp = FinalZoneSizing.PrecoolTemp;
+                            SupHumRat = FinalZoneSizing.PrecoolHumRat;
                             MixTempSys = MixTemp;
                             MixHumRatSys = MixHumRat;
                         } else { // coil is on the main air loop
-                            SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupTemp;
-                            SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat;
+                            SupTemp = FinalZoneSizing.CoolSupTemp;
+                            SupHumRat = FinalZoneSizing.CoolSupHumRat;
                             if (VolFlowRate > 0.0) {
-                                OutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
-                                OutAirFracSys = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / RatedAirVolFlowRateDes;
+                                OutAirFrac = FinalZoneSizing.DesOutAirVolFlow / VolFlowRate;
+                                OutAirFracSys = FinalZoneSizing.DesOutAirVolFlow / RatedAirVolFlowRateDes;
                             } else {
                                 OutAirFrac = 1.0;
                                 OutAirFracSys = OutAirFrac;
@@ -1460,23 +1413,20 @@ namespace WaterToAirHeatPumpSimple {
                             OutAirFracSys = min(1.0, max(0.0, OutAirFracSys));
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils ==
                                 0) { // there is no precooling of the OA stream
-                                MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak;
-                                MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak;
+                                MixTemp = FinalZoneSizing.MixTempAtCoolPeak;
+                                MixHumRat = FinalZoneSizing.MixHumRatAtCoolPeak;
                                 // calculate mixed air temperature with system airflow
-                                MixTempSys = OutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak +
-                                             (1.0 - OutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
-                                MixHumRatSys = OutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak +
-                                               (1.0 - OutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
+                                MixTempSys =
+                                    OutAirFracSys * FinalZoneSizing.OutTempAtCoolPeak + (1.0 - OutAirFracSys) * FinalZoneSizing.RetTempAtCoolPeak;
+                                MixHumRatSys =
+                                    OutAirFracSys * FinalZoneSizing.OutHumRatAtCoolPeak + (1.0 - OutAirFracSys) * FinalZoneSizing.RetHumRatAtCoolPeak;
                             } else { // there is precooling of OA stream
-                                MixTemp = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp +
-                                          (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
-                                MixHumRat = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat +
-                                            (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
+                                MixTemp = OutAirFrac * FinalZoneSizing.PrecoolTemp + (1.0 - OutAirFrac) * FinalZoneSizing.RetTempAtCoolPeak;
+                                MixHumRat = OutAirFrac * FinalZoneSizing.PrecoolHumRat + (1.0 - OutAirFrac) * FinalZoneSizing.RetHumRatAtCoolPeak;
                                 // calculate mixed air temperature with system airflow
-                                MixTempSys = OutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp +
-                                             (1.0 - OutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
-                                MixHumRatSys = OutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat +
-                                               (1.0 - OutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
+                                MixTempSys = OutAirFracSys * FinalZoneSizing.PrecoolTemp + (1.0 - OutAirFracSys) * FinalZoneSizing.RetTempAtCoolPeak;
+                                MixHumRatSys =
+                                    OutAirFracSys * FinalZoneSizing.PrecoolHumRat + (1.0 - OutAirFracSys) * FinalZoneSizing.RetHumRatAtCoolPeak;
                             }
                         }
                         // supply air condition is capped with that of mixed air to avoid SHR > 1.0
@@ -1535,8 +1485,9 @@ namespace WaterToAirHeatPumpSimple {
                             ShowSevereError(state, "Autosizing of total cooling capacity requires a loop Sizing:Plant object");
                             ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
                             ShowContinueError(state,
-                                              "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
-                                                  ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                                              format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
+                                                     simpleWatertoAirHP.WatertoAirHPType,
+                                                     simpleWatertoAirHP.Name));
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at rated conditions
@@ -1553,12 +1504,7 @@ namespace WaterToAirHeatPumpSimple {
                         // note: the rated total capacity can be different than the total capacity at
                         // rated conditions if the capacity curve isn't normalized at the rated
                         // conditions
-                        if (PeakTotCapTempModFac > 0.0) {
-                            RatedCapCoolTotalDes = CoolCapAtPeak / PeakTotCapTempModFac;
-                        } else {
-                            RatedCapCoolTotalDes = CoolCapAtPeak;
-                        }
-
+                        RatedCapCoolTotalDes = (PeakTotCapTempModFac > 0.0) ? CoolCapAtPeak / PeakTotCapTempModFac : CoolCapAtPeak;
                         // reporting
                         state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(
                             state, simpleWatertoAirHP.Name, CompType, MixTemp, state.dataSize->CurSysNum, state.dataSize->CurZoneEqNum);
@@ -1680,8 +1626,9 @@ namespace WaterToAirHeatPumpSimple {
                             ShowSevereError(state, "Autosizing of total cooling capacity requires a loop Sizing:Plant object");
                             ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
                             ShowContinueError(state,
-                                              "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
-                                                  ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                                              format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object=",
+                                                     simpleWatertoAirHP.WatertoAirHPType,
+                                                     simpleWatertoAirHP.Name));
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at rated conditions
@@ -1698,12 +1645,7 @@ namespace WaterToAirHeatPumpSimple {
                         // note: the rated total capacity can be different than the total capacity at
                         // rated conditions if the capacity curve isn't normalized at the rated
                         // conditions
-                        if (PeakTotCapTempModFac > 0.0) {
-                            RatedCapCoolTotalDes = CoolCapAtPeak / PeakTotCapTempModFac;
-                        } else {
-                            RatedCapCoolTotalDes = CoolCapAtPeak;
-                        }
-
+                        RatedCapCoolTotalDes = (PeakTotCapTempModFac > 0.0) ? CoolCapAtPeak / PeakTotCapTempModFac : CoolCapAtPeak;
                         // reporting
                         state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(
                             state, simpleWatertoAirHP.Name, CompType, MixTemp, state.dataSize->CurSysNum, state.dataSize->CurZoneEqNum);
@@ -1742,34 +1684,32 @@ namespace WaterToAirHeatPumpSimple {
                     }
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
-                            MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
-                            MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak;
-                            SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp;
-                            SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat;
+                            MixTemp = FinalZoneSizing.OutTempAtCoolPeak;
+                            MixHumRat = FinalZoneSizing.OutHumRatAtCoolPeak;
+                            SupTemp = FinalZoneSizing.PrecoolTemp;
+                            SupHumRat = FinalZoneSizing.PrecoolHumRat;
                         } else { // coil is on the main air loop
-                            SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupTemp;
-                            SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat;
+                            SupTemp = FinalZoneSizing.CoolSupTemp;
+                            SupHumRat = FinalZoneSizing.CoolSupHumRat;
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils ==
                                 0) { // there is no precooling of the OA stream
-                                MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak;
-                                MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak;
+                                MixTemp = FinalZoneSizing.MixTempAtCoolPeak;
+                                MixHumRat = FinalZoneSizing.MixHumRatAtCoolPeak;
                             } else { // there is precooling of OA stream
                                 if (VolFlowRate > 0.0) {
-                                    OutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
+                                    OutAirFrac = FinalZoneSizing.DesOutAirVolFlow / VolFlowRate;
                                 } else {
                                     OutAirFrac = 1.0;
                                 }
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                                MixTemp = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp +
-                                          (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
-                                MixHumRat = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat +
-                                            (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
+                                MixTemp = OutAirFrac * FinalZoneSizing.PrecoolTemp + (1.0 - OutAirFrac) * FinalZoneSizing.RetTempAtCoolPeak;
+                                MixHumRat = OutAirFrac * FinalZoneSizing.PrecoolHumRat + (1.0 - OutAirFrac) * FinalZoneSizing.RetHumRatAtCoolPeak;
                             }
                         }
                         // supply air condition is capped with that of mixed air to avoid SHR > 1.0
                         SupTemp = min(MixTemp, SupTemp);
                         SupHumRat = min(MixHumRat, SupHumRat);
-                        OutTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
+                        OutTemp = FinalZoneSizing.OutTempAtCoolPeak;
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, MixHumRat);
@@ -1825,8 +1765,9 @@ namespace WaterToAirHeatPumpSimple {
                             ShowSevereError(state, "Autosizing of sensible cooling capacity requires a loop Sizing:Plant object");
                             ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
                             ShowContinueError(state,
-                                              "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
-                                                  ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                                              format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
+                                                     simpleWatertoAirHP.WatertoAirHPType,
+                                                     simpleWatertoAirHP.Name));
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at rated conditions
@@ -1842,11 +1783,7 @@ namespace WaterToAirHeatPumpSimple {
                         // note: the rated sensible capacity can be different than the sensible capacity
                         // at rated conditions if the capacity curve isn't normalized at the rated
                         // conditions
-                        if (PeakSensCapTempModFac > 0.0) {
-                            RatedCapCoolSensDes = SensCapAtPeak / PeakSensCapTempModFac;
-                        } else {
-                            RatedCapCoolSensDes = SensCapAtPeak;
-                        }
+                        RatedCapCoolSensDes = (PeakSensCapTempModFac > 0.0) ? SensCapAtPeak / PeakSensCapTempModFac : SensCapAtPeak;
                     } else {
                         RatedCapCoolSensDes = 0.0;
                     }
@@ -1947,8 +1884,9 @@ namespace WaterToAirHeatPumpSimple {
                             ShowSevereError(state, "Autosizing of sensible cooling capacity requires a loop Sizing:Plant object");
                             ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
                             ShowContinueError(state,
-                                              "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
-                                                  ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                                              format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
+                                                     simpleWatertoAirHP.WatertoAirHPType,
+                                                     simpleWatertoAirHP.Name));
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at rated conditions
@@ -1964,11 +1902,7 @@ namespace WaterToAirHeatPumpSimple {
                         // note: the rated sensible capacity can be different than the sensible capacity
                         // at rated conditions if the capacity curve isn't normalized at the rated
                         // conditions
-                        if (PeakSensCapTempModFac > 0.0) {
-                            RatedCapCoolSensDes = SensCapAtPeak / PeakSensCapTempModFac;
-                        } else {
-                            RatedCapCoolSensDes = SensCapAtPeak;
-                        }
+                        RatedCapCoolSensDes = (PeakSensCapTempModFac > 0.0) ? SensCapAtPeak / PeakSensCapTempModFac : SensCapAtPeak;
                     } else {
                         RatedCapCoolSensDes = 0.0;
                     }
@@ -1985,16 +1919,12 @@ namespace WaterToAirHeatPumpSimple {
             if (!HardSizeNoDesRun) {
                 if (RatedCapCoolTotalAutoSized) {
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
-                        if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).WAHPPlantType ==
-                                DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit &&
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).RatedCapHeat > 0) {
+                        if (CompanionHeatingCoil.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit &&
+                            CompanionHeatingCoil.RatedCapHeat > 0) {
                             // case 1: companion heating coil has a user-specified capacity
                             // or has already been sized
                             RatedCapCoolTotalDesCDD = RatedCapCoolTotalDes;
-                            RatedCapCoolHeatDD = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
-                                                     .RatedCapHeatAtRatedCdts /
-                                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum)
-                                                     .RatioRatedHeatRatedTotCoolCap /
+                            RatedCapCoolHeatDD = CompanionHeatingCoil.RatedCapHeatAtRatedCdts / CompanionHeatingCoil.RatioRatedHeatRatedTotCoolCap /
                                                  RatedTotCapTempModFac;
                             if (RatedCapCoolHeatDD > RatedCapCoolTotalDesCDD) {
                                 // re-base the cooling capacity
@@ -2010,27 +1940,21 @@ namespace WaterToAirHeatPumpSimple {
                                 }
 
                                 simpleWatertoAirHP.RatedCapCoolTotal = RatedCapCoolTotalDes;
-                                OutputReportPredefined::PreDefTableEntry(state,
-                                                                         state.dataOutRptPredefined->pdchWAHPDD,
-                                                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                                         "Heating");
+                                OutputReportPredefined::PreDefTableEntry(
+                                    state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Heating");
                             } else {
                                 // adjust for system air flow -- capacity is based on cooling design day calcs
                                 // adjust by ratio of system to cooling air flow rate and enthalpy delta across the coil at these different airflow
                                 RatedCapCoolTotalDes *= (RatedAirVolFlowRateDes / CoolingAirVolFlowRateDes) * dHratio;
 
                                 simpleWatertoAirHP.RatedCapCoolTotal = RatedCapCoolTotalDes;
-                                OutputReportPredefined::PreDefTableEntry(state,
-                                                                         state.dataOutRptPredefined->pdchWAHPDD,
-                                                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                                         "Cooling");
+                                OutputReportPredefined::PreDefTableEntry(
+                                    state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Cooling");
                             }
                             // Set the global DX cooling coil capacity variable for use by other objects
                             state.dataSize->DXCoolCap = simpleWatertoAirHP.RatedCapCoolTotal;
-                        } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).WAHPPlantType ==
-                                       DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit &&
-                                   state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).RatedCapHeat ==
-                                       DataSizing::AutoSize) {
+                        } else if (CompanionHeatingCoil.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit &&
+                                   CompanionHeatingCoil.RatedCapHeat == DataSizing::AutoSize) {
                             // case 2: companion heating coil has not already been sized
                             // we only pass the rated total cooling capacity determined
                             // based on cooling design day which is used to decide if the
@@ -2039,8 +1963,7 @@ namespace WaterToAirHeatPumpSimple {
                             // no capcity adjustment based on system flow because the capacity could change
                             // once the heating coil has been sized
                             state.dataSize->DXCoolCap = RatedCapCoolTotalDes;
-                        } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).WAHPPlantType !=
-                                   DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
+                        } else if (CompanionHeatingCoil.WAHPPlantType != DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
                             // case 3: companion heating coil is not of the "equationfit" type and hence doesn't use the rated heating to cooling
                             // coil capacity ratio
                             // adjust for system air flow -- capacity is based on cooling design day calcs
@@ -2072,14 +1995,10 @@ namespace WaterToAirHeatPumpSimple {
                     }
                     OutputReportPredefined::PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWAHPRatedAirDBT, simpleWatertoAirHP.Name, RatedMixDryBulb);
-                    OutputReportPredefined::PreDefTableEntry(state,
-                                                             state.dataOutRptPredefined->pdchWAHPRatedAirWBT,
-                                                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                             RatedMixWetBulb);
-                    OutputReportPredefined::PreDefTableEntry(state,
-                                                             state.dataOutRptPredefined->pdchWAHPRatedWtrT,
-                                                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                             simpleWatertoAirHP.RatedEntWaterTemp);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchWAHPRatedAirWBT, simpleWatertoAirHP.Name, RatedMixWetBulb);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchWAHPRatedWtrT, simpleWatertoAirHP.Name, simpleWatertoAirHP.RatedEntWaterTemp);
                 } else { // Hardsized with sizing data
                     if (simpleWatertoAirHP.RatedCapCoolTotal > 0.0 && RatedCapCoolTotalDes > 0.0) {
                         RatedCapCoolTotalUser = simpleWatertoAirHP.RatedCapCoolTotal;
@@ -2095,10 +2014,11 @@ namespace WaterToAirHeatPumpSimple {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(RatedCapCoolTotalDes - RatedCapCoolTotalUser) / RatedCapCoolTotalUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state,
-                                            "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
-                                                simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + simpleWatertoAirHP.Name +
-                                                "\"");
+                                ShowMessage(
+                                    state,
+                                    format("SizeHVACWaterToAir: Potential issue with equipment sizing for coil {}:WATERTOAIRHEATPUMP:EQUATIONFIT {}",
+                                           simpleWatertoAirHP.WatertoAirHPType,
+                                           simpleWatertoAirHP.Name));
                                 ShowContinueError(state, format("User-Specified Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalUser));
                                 ShowContinueError(
                                     state, format("differs from Design Size Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalDes));
@@ -2133,11 +2053,7 @@ namespace WaterToAirHeatPumpSimple {
                                                              simpleWatertoAirHP.Name,
                                                              simpleWatertoAirHP.RatedCapCoolAtRatedCdts);
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
-                        OutputReportPredefined::PreDefTableEntry(
-                            state,
-                            state.dataOutRptPredefined->pdchWAHPDD,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).Name,
-                            "Cooling");
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, CompanionHeatingCoil.Name, "Cooling");
                     }
                 }
             } else {
@@ -2185,10 +2101,11 @@ namespace WaterToAirHeatPumpSimple {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(RatedCapCoolSensDes - RatedCapCoolSensUser) / RatedCapCoolSensUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state,
-                                            "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
-                                                simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + simpleWatertoAirHP.Name +
-                                                "\"");
+                                ShowMessage(
+                                    state,
+                                    format("SizeHVACWaterToAir: Potential issue with equipment sizing for coil {}:WATERTOAIRHEATPUMP:EQUATIONFIT {}",
+                                           simpleWatertoAirHP.WatertoAirHPType,
+                                           simpleWatertoAirHP.Name));
                                 ShowContinueError(state,
                                                   format("User-Specified Rated Sensible Cooling Capacity of {:.2R} [W]", RatedCapCoolSensUser));
                                 ShowContinueError(
@@ -2210,7 +2127,7 @@ namespace WaterToAirHeatPumpSimple {
 
                 OutputReportPredefined::PreDefTableEntry(state,
                                                          state.dataOutRptPredefined->pdchWAHPRatedSensCapAtRatedCdts,
-                                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                         simpleWatertoAirHP.Name,
                                                          simpleWatertoAirHP.RatedCapCoolSensDesAtRatedCdts);
             }
             if (simpleWatertoAirHP.RatedCapCoolTotal != 0.0) {
@@ -2225,8 +2142,8 @@ namespace WaterToAirHeatPumpSimple {
             if ((RatedCapCoolSensAutoSized && RatedCapCoolTotalAutoSized) || RatedCapCoolSensAutoSized) {
                 if (simpleWatertoAirHP.RatedCapCoolSensDesAtRatedCdts > simpleWatertoAirHP.RatedCapCoolAtRatedCdts) {
                     ShowWarningError(
-                        state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + simpleWatertoAirHP.Name + "\"");
-                    ShowContinueError(state, std::string{RoutineName} + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
+                        state, format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT {}", simpleWatertoAirHP.WatertoAirHPType, simpleWatertoAirHP.Name));
+                    ShowContinueError(state, format("{}: Rated Sensible Cooling Capacity > Rated Total Cooling Capacity", std::string{RoutineName}));
                     ShowContinueError(state, "Both of these capacity inputs have been autosized.");
                     ShowContinueError(
                         state,
@@ -2267,8 +2184,8 @@ namespace WaterToAirHeatPumpSimple {
             } else if (RatedCapCoolTotalAutoSized) {
                 if (simpleWatertoAirHP.RatedCapCoolSensDesAtRatedCdts > simpleWatertoAirHP.RatedCapCoolAtRatedCdts) {
                     ShowWarningError(
-                        state, "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + simpleWatertoAirHP.Name + "\"");
-                    ShowContinueError(state, std::string{RoutineName} + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
+                        state, format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT {}", simpleWatertoAirHP.WatertoAirHPType, simpleWatertoAirHP.Name));
+                    ShowContinueError(state, format("{}: Rated Sensible Cooling Capacity > Rated Total Cooling Capacity", std::string{RoutineName}));
                     ShowContinueError(state, "Only the Rated total capacity input is autosized, consider autosizing both inputs.");
                     ShowContinueError(state, format("Rated Sensible Cooling Capacity = {:.2T} W", simpleWatertoAirHP.RatedCapCoolSensDesAtRatedCdts));
                     ShowContinueError(state, format("Rated Total Cooling Capacity    = {:.2T} W", simpleWatertoAirHP.RatedCapCoolAtRatedCdts));
@@ -2323,45 +2240,40 @@ namespace WaterToAirHeatPumpSimple {
                     // heating design day calculations
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
-                            HeatMixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutTemp;
-                            HeatMixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutHumRat;
-                            HeatSupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PreheatTemp;
+                            HeatMixTemp = FinalZoneSizing.HeatOutTemp;
+                            HeatMixHumRat = FinalZoneSizing.HeatOutHumRat;
+                            HeatSupTemp = FinalZoneSizing.PreheatTemp;
                         } else { // coil is on the main air loop
                             if (VolFlowRate > 0.0) {
-                                HeatOutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
-                                HeatOutAirFracSys =
-                                    state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / RatedAirVolFlowRateDes;
+                                HeatOutAirFrac = FinalZoneSizing.DesOutAirVolFlow / VolFlowRate;
+                                HeatOutAirFracSys = FinalZoneSizing.DesOutAirVolFlow / RatedAirVolFlowRateDes;
                             } else {
                                 HeatOutAirFrac = 1.0;
                                 HeatOutAirFracSys = HeatOutAirFrac;
                             }
                             HeatOutAirFrac = min(1.0, max(0.0, HeatOutAirFrac));
                             HeatOutAirFracSys = min(1.0, max(0.0, HeatOutAirFracSys));
-                            HeatSupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
+                            HeatSupTemp = FinalZoneSizing.HeatSupTemp;
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOAHeatCoils ==
                                 0) { // there is no preheating of the OA stream
-                                HeatMixTemp = HeatOutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutTemp +
-                                              (1.0 - HeatOutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
-                                HeatMixHumRat = HeatOutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutHumRat +
-                                                (1.0 - HeatOutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetHumRat;
+                                HeatMixTemp = HeatOutAirFrac * FinalZoneSizing.HeatOutTemp + (1.0 - HeatOutAirFrac) * FinalZoneSizing.HeatRetTemp;
+                                HeatMixHumRat =
+                                    HeatOutAirFrac * FinalZoneSizing.HeatOutHumRat + (1.0 - HeatOutAirFrac) * FinalZoneSizing.HeatRetHumRat;
                                 // calculate mixed air temperature with system airflow
-                                HeatMixTempSys = HeatOutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutTemp +
-                                                 (1.0 - HeatOutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
+                                HeatMixTempSys =
+                                    HeatOutAirFracSys * FinalZoneSizing.HeatOutTemp + (1.0 - HeatOutAirFracSys) * FinalZoneSizing.HeatRetTemp;
                                 HeatMixHumRatSys =
-                                    HeatOutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutHumRat +
-                                    (1.0 - HeatOutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetHumRat;
+                                    HeatOutAirFracSys * FinalZoneSizing.HeatOutHumRat + (1.0 - HeatOutAirFracSys) * FinalZoneSizing.HeatRetHumRat;
                             } else { // there is preheating of OA stream
                                 HeatOutAirFrac = min(1.0, max(0.0, HeatOutAirFrac));
-                                HeatMixTemp = HeatOutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PreheatTemp +
-                                              (1.0 - HeatOutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
-                                HeatMixHumRat = HeatOutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PreheatHumRat +
-                                                (1.0 - HeatOutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetHumRat;
+                                HeatMixTemp = HeatOutAirFrac * FinalZoneSizing.PreheatTemp + (1.0 - HeatOutAirFrac) * FinalZoneSizing.HeatRetTemp;
+                                HeatMixHumRat =
+                                    HeatOutAirFrac * FinalZoneSizing.PreheatHumRat + (1.0 - HeatOutAirFrac) * FinalZoneSizing.HeatRetHumRat;
                                 // calculate mixed air temperature with system airflow
-                                HeatMixTempSys = HeatOutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PreheatTemp +
-                                                 (1.0 - HeatOutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
+                                HeatMixTempSys =
+                                    HeatOutAirFracSys * FinalZoneSizing.PreheatTemp + (1.0 - HeatOutAirFracSys) * FinalZoneSizing.HeatRetTemp;
                                 HeatMixHumRatSys =
-                                    HeatOutAirFracSys * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PreheatHumRat +
-                                    (1.0 - HeatOutAirFracSys) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetHumRat;
+                                    HeatOutAirFracSys * FinalZoneSizing.PreheatHumRat + (1.0 - HeatOutAirFracSys) * FinalZoneSizing.HeatRetHumRat;
                             }
                             // determine the coil ratio of coil dT with system air flow to design heating air flow
                             HeatdTratio = (HeatSupTemp - HeatMixTempSys) / (HeatSupTemp - HeatMixTemp);
@@ -2395,11 +2307,7 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         HeatCapAtPeak -= FanHeatLoad; // remove fan heat from heating coil load
                         HeatCapAtPeak = max(0.0, HeatCapAtPeak);
-                        if (simpleWatertoAirHP.RatedEntAirDrybulbTemp == DataSizing::AutoSize) {
-                            RatedHeatMixDryBulb = HeatMixTemp;
-                        } else {
-                            RatedHeatMixDryBulb = simpleWatertoAirHP.RatedEntAirDrybulbTemp;
-                        }
+                        RatedHeatMixDryBulb = simpleWatertoAirHP.RatedEntAirDrybulbTemp;
                         // calculate temperatue ratio at design day peak conditions
                         HeatratioTDB = (HeatMixTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         PltSizNum =
@@ -2417,8 +2325,9 @@ namespace WaterToAirHeatPumpSimple {
                             ShowSevereError(state, "Autosizing of heating capacity requires a loop Sizing:Plant object");
                             ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
                             ShowContinueError(state,
-                                              "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
-                                                  ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                                              format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
+                                                     simpleWatertoAirHP.WatertoAirHPType,
+                                                     simpleWatertoAirHP.Name));
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at refrence conditions
@@ -2432,9 +2341,9 @@ namespace WaterToAirHeatPumpSimple {
                         // Check curve output when rated mixed air wetbulb is the design mixed air wetbulb
                         if (RatedHeatMixDryBulb == HeatMixTemp) {
                             if (RatedHeatCapTempModFac > 1.02 || RatedHeatCapTempModFac < 0.98) {
-                                ShowWarningError(state,
-                                                 std::string{RoutineName} + "Coil:Heating:WaterToAirHeatPump:EquationFit" + "=\"" +
-                                                     simpleWatertoAirHP.Name + "\"");
+                                ShowWarningError(
+                                    state,
+                                    format("{} Coil:Heating:WaterToAirHeatPump:EquationFit={}", std::string{RoutineName}, simpleWatertoAirHP.Name));
                                 ShowContinueError(state,
                                                   "Heating capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
                                                   "rated conditions.");
@@ -2445,11 +2354,7 @@ namespace WaterToAirHeatPumpSimple {
                         // note: the rated capacity can be different than the capacity at
                         // rated conditions if the capacity curve isn't normalized at the
                         // rated conditions
-                        if (PeakHeatCapTempModFac > 0.0) {
-                            RatedCapHeatDes = HeatCapAtPeak / PeakHeatCapTempModFac;
-                        } else {
-                            RatedCapHeatDes = HeatCapAtPeak;
-                        }
+                        RatedCapHeatDes = (PeakHeatCapTempModFac > 0.0) ? HeatCapAtPeak / PeakHeatCapTempModFac : HeatCapAtPeak;
                     } else {
                         RatedCapHeatDes = 0.0;
                     }
@@ -2517,11 +2422,7 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         HeatCapAtPeak -= FanHeatLoad; // remove fan heat from heating coil load
                         HeatCapAtPeak = max(0.0, HeatCapAtPeak);
-                        if (simpleWatertoAirHP.RatedEntAirDrybulbTemp == DataSizing::AutoSize) {
-                            RatedHeatMixDryBulb = HeatMixTemp;
-                        } else {
-                            RatedHeatMixDryBulb = simpleWatertoAirHP.RatedEntAirDrybulbTemp;
-                        }
+                        RatedHeatMixDryBulb = simpleWatertoAirHP.RatedEntAirDrybulbTemp;
                         // calculate temperatue ratio at design day peak conditions
                         HeatratioTDB = (HeatMixTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref;
                         PltSizNum =
@@ -2539,8 +2440,9 @@ namespace WaterToAirHeatPumpSimple {
                             ShowSevereError(state, "Autosizing of heating capacity requires a loop Sizing:Plant object");
                             ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
                             ShowContinueError(state,
-                                              "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
-                                                  ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                                              format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
+                                                     simpleWatertoAirHP.WatertoAirHPType,
+                                                     simpleWatertoAirHP.Name));
                             ErrorsFound = true;
                         }
                         // calculate temperatue ratio at refrence conditions
@@ -2556,18 +2458,18 @@ namespace WaterToAirHeatPumpSimple {
                         // Check curve output when rated mixed air wetbulb is the design mixed air wetbulb
                         if (RatedHeatMixDryBulb == HeatMixTemp) {
                             if (RatedHeatCapTempModFac > 1.02 || RatedHeatCapTempModFac < 0.98) {
-                                ShowWarningError(state,
-                                                 std::string{RoutineName} + "Coil:Heating:WaterToAirHeatPump:EquationFit" + "=\"" +
-                                                     simpleWatertoAirHP.Name + "\"");
+                                ShowWarningError(
+                                    state,
+                                    format("{} Coil:Heating:WaterToAirHeatPump:EquationFit={}", std::string{RoutineName}, simpleWatertoAirHP.Name));
                                 ShowContinueError(state,
                                                   "Heating capacity as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
                                                   "rated conditions.");
                                 ShowContinueError(state, format("Curve output at rated conditions = {:.3T}", RatedHeatCapTempModFac));
                             }
                             if (RatedHeatPowerTempModFac > 1.02 || RatedHeatPowerTempModFac < 0.98) {
-                                ShowWarningError(state,
-                                                 std::string{RoutineName} + "Coil:Cooling:WaterToAirHeatPump:EquationFit" + "=\"" +
-                                                     simpleWatertoAirHP.Name + "\"");
+                                ShowWarningError(
+                                    state,
+                                    format("{} Coil:Heating:WaterToAirHeatPump:EquationFit={}", std::string{RoutineName}, simpleWatertoAirHP.Name));
                                 ShowContinueError(
                                     state,
                                     "Heating power consumption as a function of temperature curve output is not equal to 1.0 (+ or - 2%) at "
@@ -2579,11 +2481,7 @@ namespace WaterToAirHeatPumpSimple {
                         // note: the rated capacity can be different than the capacity at
                         // rated conditions if the capacity curve isn't normalized at the
                         // rated conditions
-                        if (PeakHeatCapTempModFac > 0.0) {
-                            RatedCapHeatDes = HeatCapAtPeak / PeakHeatCapTempModFac;
-                        } else {
-                            RatedCapHeatDes = HeatCapAtPeak;
-                        }
+                        RatedCapHeatDes = (PeakHeatCapTempModFac > 0.0) ? HeatCapAtPeak / PeakHeatCapTempModFac : HeatCapAtPeak;
                     } else {
                         RatedCapHeatDes = 0.0;
                     }
@@ -2591,20 +2489,14 @@ namespace WaterToAirHeatPumpSimple {
 
                 // determine adjusted cooling and heating coil capacity
                 simpleWatertoAirHP.RatedCapHeatAtRatedCdts = RatedCapHeatDes * RatedHeatCapTempModFac;
-                if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WAHPPlantType ==
-                        DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit &&
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal ==
-                        DataSizing::AutoSize) {
+                if (CompanionCoolingCoil.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit &&
+                    CompanionCoolingCoil.RatedCapCoolTotal == DataSizing::AutoSize) {
                     // case 1: companion coil is also of EquationFit type and is being autosized
                     RatedCapCoolTotalDes = state.dataSize->DXCoolCap;
-                    RatedTotCapTempModFac =
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolAtRatedCdts /
-                        RatedCapCoolTotalDes;
+                    RatedTotCapTempModFac = CompanionCoolingCoil.RatedCapCoolAtRatedCdts / RatedCapCoolTotalDes;
                     RatedCapCoolHeatDD =
                         simpleWatertoAirHP.RatedCapHeatAtRatedCdts / simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap / RatedTotCapTempModFac;
-                    RatedCoolPowerTempModFac =
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedPowerCoolAtRatedCdts /
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedPowerCool;
+                    RatedCoolPowerTempModFac = CompanionCoolingCoil.RatedPowerCoolAtRatedCdts / CompanionCoolingCoil.RatedPowerCool;
                     if (RatedCapCoolHeatDD > RatedCapCoolTotalDes) {
                         // total cooling capacity
                         RatedCapCoolTotalDes = RatedCapCoolHeatDD;
@@ -2616,96 +2508,60 @@ namespace WaterToAirHeatPumpSimple {
                         // update cooling coil rated capacity after adjustments based on heating coil size
                         state.dataSize->DXCoolCap = RatedCapCoolTotalDes;
                         // sensible cooling capacity
-                        RatedCapCoolSensDes =
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolSens *
-                            CapCoolAdjFac; // Assume that SHR stays the same
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
-                            .RatedCapCoolSensDesAtRatedCdts *= CapCoolAdjFac;
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolSens =
-                            RatedCapCoolSensDes;
+                        RatedCapCoolSensDes = CompanionCoolingCoil.RatedCapCoolSens * CapCoolAdjFac; // Assume that SHR stays the same
+                        CompanionCoolingCoil.RatedCapCoolSensDesAtRatedCdts *= CapCoolAdjFac;
+                        CompanionCoolingCoil.RatedCapCoolSens = RatedCapCoolSensDes;
                         // update Water-to-Air Heat Pumps output reports
-                        OutputReportPredefined::PreDefTableEntry(
-                            state,
-                            state.dataOutRptPredefined->pdchWAHPRatedSensCapAtRatedCdts,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
-                                .RatedCapCoolSensDesAtRatedCdts);
-                        OutputReportPredefined::PreDefTableEntry(
-                            state,
-                            state.dataOutRptPredefined->pdchWAHPDD,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                            "Heating");
+                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                 state.dataOutRptPredefined->pdchWAHPRatedSensCapAtRatedCdts,
+                                                                 CompanionCoolingCoil.Name,
+                                                                 CompanionCoolingCoil.RatedCapCoolSensDesAtRatedCdts);
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, CompanionCoolingCoil.Name, "Heating");
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Heating");
                         // update Cooling Coils output reports
+                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                 state.dataOutRptPredefined->pdchCoolCoilLatCap,
+                                                                 CompanionCoolingCoil.Name,
+                                                                 RatedCapCoolTotalDes - RatedCapCoolSensDes);
+                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                 state.dataOutRptPredefined->pdchCoolCoilSHR,
+                                                                 CompanionCoolingCoil.Name,
+                                                                 RatedCapCoolSensDes / RatedCapCoolTotalDes);
                         OutputReportPredefined::PreDefTableEntry(
-                            state,
-                            state.dataOutRptPredefined->pdchCoolCoilLatCap,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                            RatedCapCoolTotalDes - RatedCapCoolSensDes);
-                        OutputReportPredefined::PreDefTableEntry(
-                            state,
-                            state.dataOutRptPredefined->pdchCoolCoilSHR,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                            RatedCapCoolSensDes / RatedCapCoolTotalDes);
-                        OutputReportPredefined::PreDefTableEntry(
-                            state,
-                            state.dataOutRptPredefined->pdchCoolCoilSensCap,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                            RatedCapCoolSensDes);
+                            state, state.dataOutRptPredefined->pdchCoolCoilSensCap, CompanionCoolingCoil.Name, RatedCapCoolSensDes);
                     } else {
-                        OutputReportPredefined::PreDefTableEntry(
-                            state,
-                            state.dataOutRptPredefined->pdchWAHPDD,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                            "Cooling");
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, CompanionCoolingCoil.Name, "Cooling");
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchWAHPDD, simpleWatertoAirHP.Name, "Cooling");
                     }
                     RatedCapHeatDes =
                         RatedCapCoolTotalDes * RatedTotCapTempModFac * simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap / RatedHeatCapTempModFac;
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal =
-                        RatedCapCoolTotalDes;
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolAtRatedCdts =
-                        RatedCapCoolTotalDes * RatedTotCapTempModFac;
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedPowerCoolAtRatedCdts =
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolAtRatedCdts /
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCOPCoolAtRatedCdts;
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedPowerCool =
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedPowerCoolAtRatedCdts /
-                        RatedCoolPowerTempModFac;
+                    CompanionCoolingCoil.RatedCapCoolTotal = RatedCapCoolTotalDes;
+                    CompanionCoolingCoil.RatedCapCoolAtRatedCdts = RatedCapCoolTotalDes * RatedTotCapTempModFac;
+                    CompanionCoolingCoil.RatedPowerCoolAtRatedCdts =
+                        CompanionCoolingCoil.RatedCapCoolAtRatedCdts / CompanionCoolingCoil.RatedCOPCoolAtRatedCdts;
+                    CompanionCoolingCoil.RatedPowerCool = CompanionCoolingCoil.RatedPowerCoolAtRatedCdts / RatedCoolPowerTempModFac;
                     // update Water-to-Air Heat Pumps output reports
-                    OutputReportPredefined::PreDefTableEntry(
-                        state,
-                        state.dataOutRptPredefined->pdchWAHPRatedCapAtRatedCdts,
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolAtRatedCdts);
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchWAHPRatedCapAtRatedCdts,
+                                                             CompanionCoolingCoil.Name,
+                                                             CompanionCoolingCoil.RatedCapCoolAtRatedCdts);
                     // update Cooling Coils output reports
                     OutputReportPredefined::PreDefTableEntry(
-                        state,
-                        state.dataOutRptPredefined->pdchCoolCoilTotCap,
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                        RatedCapCoolTotalDes);
-                    BaseSizer::reportSizerOutput(
-                        state,
-                        "COIL:" +
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WatertoAirHPType +
-                            ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                        "Design Size Rated Total Cooling Capacity [W]",
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal);
-                    BaseSizer::reportSizerOutput(
-                        state,
-                        "COIL:" +
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WatertoAirHPType +
-                            ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                        "Design Size Rated Sensible Cooling Capacity [W]",
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolSens);
-                } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WAHPPlantType ==
+                        state, state.dataOutRptPredefined->pdchCoolCoilTotCap, CompanionCoolingCoil.Name, RatedCapCoolTotalDes);
+                    BaseSizer::reportSizerOutput(state,
+                                                 "COIL:" + CompanionCoolingCoil.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                 CompanionCoolingCoil.Name,
+                                                 "Design Size Rated Total Cooling Capacity [W]",
+                                                 CompanionCoolingCoil.RatedCapCoolTotal);
+                    BaseSizer::reportSizerOutput(state,
+                                                 "COIL:" + CompanionCoolingCoil.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                 CompanionCoolingCoil.Name,
+                                                 "Design Size Rated Sensible Cooling Capacity [W]",
+                                                 CompanionCoolingCoil.RatedCapCoolSens);
+                } else if (CompanionCoolingCoil.WAHPPlantType ==
                            DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) { // case 2: companion coil is of EquationFit type but is
                                                                                         // not autosized
-                    RatedCapHeatDes =
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal *
-                        simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap;
+                    RatedCapHeatDes = CompanionCoolingCoil.RatedCapCoolTotal * simpleWatertoAirHP.RatioRatedHeatRatedTotCoolCap;
                 } else { // case 3: companion type is different than EquationFit
                     RatedCapHeatDes = state.dataSize->DXCoolCap;
                 }
@@ -2755,9 +2611,11 @@ namespace WaterToAirHeatPumpSimple {
                                                  RatedCapHeatUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(RatedCapHeatDes - RatedCapHeatUser) / RatedCapHeatUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                            ShowMessage(state,
-                                        "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " + simpleWatertoAirHP.WatertoAirHPType +
-                                            ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + simpleWatertoAirHP.Name + "\"");
+                            ShowMessage(
+                                state,
+                                format("SizeHVACWaterToAir: Potential issue with equipment sizing for coil {}:WATERTOAIRHEATPUMP:EQUATIONFIT {}",
+                                       simpleWatertoAirHP.WatertoAirHPType,
+                                       simpleWatertoAirHP.Name));
                             ShowContinueError(state, format("User-Specified Rated Heating Capacity of {:.2R} [W]", RatedCapHeatUser));
                             ShowContinueError(state, format("differs from Design Size Rated Heating Capacity of {:.2R} [W]", RatedCapHeatDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -2783,29 +2641,20 @@ namespace WaterToAirHeatPumpSimple {
             // Check that heat pump heating capacity is within 20% of cooling capacity. Check only for heating coil and report both.
             if (simpleWatertoAirHP.WatertoAirHPType == "HEATING" && simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
 
-                if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal > 0.0) {
+                if (CompanionCoolingCoil.RatedCapCoolTotal > 0.0) {
 
-                    if (std::abs(
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal -
-                            simpleWatertoAirHP.RatedCapHeat) /
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal >
+                    if (std::abs(CompanionCoolingCoil.RatedCapCoolTotal - simpleWatertoAirHP.RatedCapHeat) / CompanionCoolingCoil.RatedCapCoolTotal >
                         0.2) {
 
-                        ShowWarningError(state,
-                                         "COIL:" + simpleWatertoAirHP.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
-                                             simpleWatertoAirHP.Name + "\"");
-                        ShowContinueError(
-                            state,
-                            "...used with COIL:" +
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WatertoAirHPType +
-                                ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name + "\"");
+                        ShowWarningError(
+                            state, format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT {}", simpleWatertoAirHP.WatertoAirHPType, simpleWatertoAirHP.Name));
+                        ShowContinueError(state,
+                                          format("...used with COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT {}",
+                                                 CompanionCoolingCoil.WatertoAirHPType,
+                                                 CompanionCoolingCoil.Name));
                         ShowContinueError(state, "...heating capacity is disproportionate (> 20% different) to total cooling capacity");
                         ShowContinueError(state, format("...heating capacity = {:.3T} W", simpleWatertoAirHP.RatedCapHeat));
-                        ShowContinueError(state,
-                                          format("...cooling capacity = {:.3T} W",
-                                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
-                                                     .RatedCapCoolTotal));
+                        ShowContinueError(state, format("...cooling capacity = {:.3T} W", CompanionCoolingCoil.RatedCapCoolTotal));
                     }
                 }
             }
@@ -2871,33 +2720,24 @@ namespace WaterToAirHeatPumpSimple {
             }
             // re-calculate companion coil power
             if (simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
-                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedPowerCoolAtRatedCdts =
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolAtRatedCdts /
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCOPCoolAtRatedCdts;
-                if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal > 0) {
-                    OutputReportPredefined::PreDefTableEntry(
-                        state,
-                        state.dataOutRptPredefined->pdchCoolCoilNomEff,
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedCapCoolTotal /
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedPowerCool);
+                CompanionCoolingCoil.RatedPowerCoolAtRatedCdts =
+                    CompanionCoolingCoil.RatedCapCoolAtRatedCdts / CompanionCoolingCoil.RatedCOPCoolAtRatedCdts;
+                if (CompanionCoolingCoil.RatedCapCoolTotal > 0) {
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchCoolCoilNomEff,
+                                                             CompanionCoolingCoil.Name,
+                                                             CompanionCoolingCoil.RatedCapCoolTotal / CompanionCoolingCoil.RatedPowerCool);
                     if (IsAutoSize) {
-                        OutputReportPredefined::PreDefTableEntry(
-                            state,
-                            state.dataOutRptPredefined->pdchWAHPRatedPowerAtRatedCdts,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
-                                .RatedPowerCoolAtRatedCdts);
-                        if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
-                                .RatedPowerCoolAtRatedCdts > 0) {
-                            OutputReportPredefined::PreDefTableEntry(
-                                state,
-                                state.dataOutRptPredefined->pdchWAHPRatedCOPAtRatedCdts,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
-                                        .RatedCapCoolAtRatedCdts /
-                                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum)
-                                        .RatedPowerCoolAtRatedCdts);
+                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                 state.dataOutRptPredefined->pdchWAHPRatedPowerAtRatedCdts,
+                                                                 CompanionCoolingCoil.Name,
+                                                                 CompanionCoolingCoil.RatedPowerCoolAtRatedCdts);
+                        if (CompanionCoolingCoil.RatedPowerCoolAtRatedCdts > 0) {
+                            OutputReportPredefined::PreDefTableEntry(state,
+                                                                     state.dataOutRptPredefined->pdchWAHPRatedCOPAtRatedCdts,
+                                                                     CompanionCoolingCoil.Name,
+                                                                     CompanionCoolingCoil.RatedCapCoolAtRatedCdts /
+                                                                         CompanionCoolingCoil.RatedPowerCoolAtRatedCdts);
                         }
                     }
                 }
@@ -2939,12 +2779,10 @@ namespace WaterToAirHeatPumpSimple {
                 } else if (simpleWatertoAirHP.WatertoAirHPType == "COOLING") {
                     //       use companion heating coil capacity to calculate volumetric flow rate
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
-                        if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).RatedCapHeat ==
-                            DataSizing::AutoSize) {
+                        if (CompanionHeatingCoil.RatedCapHeat == DataSizing::AutoSize) {
                             SystemCapacity = simpleWatertoAirHP.RatedCapCoolTotal;
                         } else {
-                            SystemCapacity =
-                                state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).RatedCapHeat;
+                            SystemCapacity = CompanionHeatingCoil.RatedCapHeat;
                         }
                     } else {
                         SystemCapacity = simpleWatertoAirHP.RatedCapCoolAtRatedCdts;
@@ -2956,8 +2794,9 @@ namespace WaterToAirHeatPumpSimple {
                 ShowSevereError(state, "Autosizing of water flow requires a loop Sizing:Plant object");
                 ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
                 ShowContinueError(state,
-                                  "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
-                                      ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
+                                  format("Occurs in COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT Object={}",
+                                         simpleWatertoAirHP.WatertoAirHPType,
+                                         simpleWatertoAirHP.Name));
                 ErrorsFound = true;
             }
 
@@ -2969,27 +2808,19 @@ namespace WaterToAirHeatPumpSimple {
                                              "Design Size Rated Water Flow Rate [m3/s]",
                                              RatedWaterVolFlowRateDes);
                 if (simpleWatertoAirHP.WatertoAirHPType == "HEATING" && simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).RatedWaterVolFlowRate =
-                        RatedWaterVolFlowRateDes;
-                    BaseSizer::reportSizerOutput(
-                        state,
-                        "COIL:" +
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WatertoAirHPType +
-                            ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).Name,
-                        "Design Size Rated Water Flow Rate [m3/s]",
-                        RatedWaterVolFlowRateDes);
+                    CompanionCoolingCoil.RatedWaterVolFlowRate = RatedWaterVolFlowRateDes;
+                    BaseSizer::reportSizerOutput(state,
+                                                 "COIL:" + CompanionCoolingCoil.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                 CompanionCoolingCoil.Name,
+                                                 "Design Size Rated Water Flow Rate [m3/s]",
+                                                 RatedWaterVolFlowRateDes);
                 } else if (simpleWatertoAirHP.WatertoAirHPType == "COOLING" && simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
-                    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).RatedWaterVolFlowRate =
-                        RatedWaterVolFlowRateDes;
-                    BaseSizer::reportSizerOutput(
-                        state,
-                        "COIL:" +
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).WatertoAirHPType +
-                            ":WATERTOAIRHEATPUMP:EQUATIONFIT",
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).Name,
-                        "Design Size Rated Water Flow Rate [m3/s]",
-                        RatedWaterVolFlowRateDes);
+                    CompanionHeatingCoil.RatedWaterVolFlowRate = RatedWaterVolFlowRateDes;
+                    BaseSizer::reportSizerOutput(state,
+                                                 "COIL:" + CompanionHeatingCoil.WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                                 CompanionHeatingCoil.Name,
+                                                 "Design Size Rated Water Flow Rate [m3/s]",
+                                                 RatedWaterVolFlowRateDes);
                 }
             }
         } else {
@@ -3006,8 +2837,9 @@ namespace WaterToAirHeatPumpSimple {
                     if ((std::abs(RatedWaterVolFlowRateDes - RatedWaterVolFlowRateUser) / RatedWaterVolFlowRateUser) >
                         state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state,
-                                    "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " + simpleWatertoAirHP.WatertoAirHPType +
-                                        ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + simpleWatertoAirHP.Name + "\"");
+                                    format("SizeHVACWaterToAir: Potential issue with equipment sizing for coil {}:WATERTOAIRHEATPUMP:EQUATIONFIT {}",
+                                           simpleWatertoAirHP.WatertoAirHPType,
+                                           simpleWatertoAirHP.Name));
                         ShowContinueError(state, format("User-Specified Rated Water Flow Rate of {:.5R} [m3/s]", RatedWaterVolFlowRateUser));
                         ShowContinueError(state, format("differs from Design Size Rated Water Flow Rate of {:.5R} [m3/s]", RatedWaterVolFlowRateDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -3025,9 +2857,7 @@ namespace WaterToAirHeatPumpSimple {
                     state, simpleWatertoAirHP.WaterInletNodeNum, 0.5 * simpleWatertoAirHP.RatedWaterVolFlowRate);
                 if (simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
                     PlantUtilities::RegisterPlantCompDesignFlow(
-                        state,
-                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WaterInletNodeNum,
-                        0.5 * simpleWatertoAirHP.RatedWaterVolFlowRate);
+                        state, CompanionCoolingCoil.WaterInletNodeNum, 0.5 * simpleWatertoAirHP.RatedWaterVolFlowRate);
                 }
             } else if (simpleWatertoAirHP.WatertoAirHPType == "COOLING") {
                 PlantUtilities::RegisterPlantCompDesignFlow(
