@@ -261,6 +261,7 @@ void GetPumpInput(EnergyPlusData &state)
     Real64 SteamDensity;
     Real64 TempWaterDensity;
     int DummyWaterIndex(1);
+    Real64 const minToMaxRatioMax = 0.99;
 
     ErrorsFound = false;
 
@@ -377,21 +378,21 @@ void GetPumpInput(EnergyPlusData &state)
         if (state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate == AutoSize) {
             state.dataPumps->PumpEquip(PumpNum).minVolFlowRateWasAutosized = true;
         } else if (!state.dataPumps->PumpEquip(PumpNum).NomVolFlowRateWasAutoSized &&
-                   (state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate > state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate)) {
+                   (state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate > (minToMaxRatioMax * state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate))) {
             // Check that the minimum isn't greater than the maximum
             ShowWarningError(state,
                              std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid '" +
                                  state.dataIPShortCut->cNumericFieldNames(10) + "'");
             ShowContinueError(state,
-                              format("Entered Value=[{:.5T}] is above the {}=[{:.5T}].",
+                              format("Entered Value=[{:.5T}] is above or too close (equal) to the {}=[{:.5T}].",
                                      state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate,
                                      state.dataIPShortCut->cNumericFieldNames(1),
                                      state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate));
             ShowContinueError(state,
-                              "Reseting value of '" + state.dataIPShortCut->cNumericFieldNames(10) + "' to the value of '" +
+                              "Reseting value of '" + state.dataIPShortCut->cNumericFieldNames(10) + "' to the value of 99% of '" +
                                   state.dataIPShortCut->cNumericFieldNames(1) + "'.");
             // Set min to roughly max, but not quite, otherwise it can't turn on, ever
-            state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate = 0.99 * state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate;
+            state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate = minToMaxRatioMax * state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate;
         }
         // Probably the following two lines will be used if the team agrees on changing the F10 value from min flow rate to
         // minimum flow as a fraction of nominal flow.

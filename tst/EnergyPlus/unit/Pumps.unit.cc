@@ -651,14 +651,69 @@ TEST_F(EnergyPlusFixture, VariableSpeedPump_MinFlowGreaterThanMax)
 
     std::string const error_string = delimited_string({
         "   ** Warning ** GetPumpInput: Pump:VariableSpeed=\"SUPPLY INLET PUMP\", Invalid 'Design Minimum Flow Rate'",
-        "   **   ~~~   ** Entered Value=[2.00000E-003] is above the Design Maximum Flow Rate=[1.00000E-003].",
-        "   **   ~~~   ** Reseting value of 'Design Minimum Flow Rate' to the value of 'Design Maximum Flow Rate'.",
+        "   **   ~~~   ** Entered Value=[2.00000E-003] is above or too close (equal) to the Design Maximum Flow Rate=[1.00000E-003].",
+        "   **   ~~~   ** Reseting value of 'Design Minimum Flow Rate' to the value of 99% of 'Design Maximum Flow Rate'.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     // Should have reset the min to 99% of the the max
     EXPECT_NEAR(state->dataPumps->PumpEquip(1).MinVolFlowRate, 0.001 * 0.99, 0.00001);
+}
+
+// Test for https://github.com/NREL/EnergyPlus/issues/9427
+// The 'Design Minimum Flow Rate' is equal to the 'Design Maximum Flow Rate' or greater than 99% of max
+TEST_F(EnergyPlusFixture, VariableSpeedPump_MinFlowEqualToMax)
+{
+    std::string const idf_objects = delimited_string({
+        "Pump:VariableSpeed,",
+        "  supply inlet pump,       !- Name",
+        "  Node supply inlet in,    !- Inlet Node Name",
+        "  Node supply inlet out,   !- Outlet Node Name",
+        "  0.001,                   !- Design Maximum Flow Rate {m3/s}",
+        "  1793520,                 !- Design Pump Head {Pa}",
+        "  2237,                    !- Design Power Consumption {W}",
+        "  0.9,                     !- Motor Efficiency",
+        "  ,                        !- Fraction of Motor Inefficiencies to Fluid Stream",
+        "  ,                        !- Coefficient 1 of the Part Load Performance Curve",
+        "  1,                       !- Coefficient 2 of the Part Load Performance Curve",
+        "  ,                        !- Coefficient 3 of the Part Load Performance Curve",
+        "  ,                        !- Coefficient 4 of the Part Load Performance Curve",
+        "  0.000995,                !- Design Minimum Flow Rate {m3/s}",
+        "  Intermittent,            !- Pump Control Type",
+        "  ,                        !- Pump Flow Rate Schedule Name",
+        "  ,                        !- Pump Curve Name",
+        "  ,                        !- Impeller Diameter {m}",
+        "  ,                        !- VFD Control Type",
+        "  ,                        !- Pump rpm Schedule Name",
+        "  ,                        !- Minimum Pressure Schedule",
+        "  ,                        !- Maximum Pressure Schedule",
+        "  ,                        !- Minimum RPM Schedule",
+        "  ,                        !- Maximum RPM Schedule",
+        "  ,                        !- Zone Name",
+        "  ,                        !- Skin Loss Radiative Fraction",
+        "  PowerPerFlowPerPressure, !- Design Power Sizing Method",
+        "  348701.1,                !- Design Electric Power per Unit Flow Rate {W/(m3/s)}",
+        "  1.282051282,             !- Design Shaft Power per Unit Flow Rate per Unit Head {W/((m3/s)-Pa)}",
+        "  ;                        !- Design Minimum Flow Rate Fraction",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    Pumps::GetPumpInput(*state);
+
+    std::string const error_string = delimited_string({
+        "   ** Warning ** GetPumpInput: Pump:VariableSpeed=\"SUPPLY INLET PUMP\", Invalid 'Design Minimum Flow Rate'",
+        "   **   ~~~   ** Entered Value=[9.95000E-004] is above or too close (equal) to the Design Maximum Flow Rate=[1.00000E-003].",
+        "   **   ~~~   ** Reseting value of 'Design Minimum Flow Rate' to the value of 99% of 'Design Maximum Flow Rate'.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Should have reset the min to 99% of the the max, max not impacted
+    Real64 expectedAnswer = 0.99 * 0.001;
+    Real64 const allowableTolerance = 0.00001;
+    EXPECT_NEAR(state->dataPumps->PumpEquip(1).MinVolFlowRate, expectedAnswer, allowableTolerance);
+    expectedAnswer = 0.001;
+    EXPECT_NEAR(state->dataPumps->PumpEquip(1).NomVolFlowRate, expectedAnswer, allowableTolerance);
 }
 
 } // namespace EnergyPlus
