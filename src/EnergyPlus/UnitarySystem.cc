@@ -1093,6 +1093,13 @@ namespace UnitarySystems {
                     int ControlNode = this->m_SystemCoolControlNodeNum;
                     if (ControlNode > 0) {
                         this->checkNodeSetPoint(state, AirLoopNum, ControlNode, CoolingCoil, OAUCoilOutTemp);
+                    } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
+                        ShowSevereError(state, format("Missing set point in {} = {}", this->UnitType, this->Name));
+                        ShowContinueError(state,
+                                          format("...Setpoint is required at system air outlet node = {} or cooling coil air outlet node = {}",
+                                                 state.dataLoopNodes->NodeID(this->AirOutNode),
+                                                 state.dataLoopNodes->NodeID(this->CoolCoilOutletNodeNum)));
+                        state.dataUnitarySystems->initUnitarySystemsErrorsFound = true;
                     }
                 }
 
@@ -1100,6 +1107,13 @@ namespace UnitarySystems {
                     int ControlNode = this->m_SystemHeatControlNodeNum;
                     if (ControlNode > 0) {
                         this->checkNodeSetPoint(state, AirLoopNum, ControlNode, HeatingCoil, OAUCoilOutTemp);
+                    } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
+                        ShowSevereError(state, format("Missing set point in {} = {}", this->UnitType, this->Name));
+                        ShowContinueError(state,
+                                          format("...Setpoint is required at system air outlet node = {} or heating coil air outlet node = {}",
+                                                 state.dataLoopNodes->NodeID(this->AirOutNode),
+                                                 state.dataLoopNodes->NodeID(this->HeatCoilOutletNodeNum)));
+                        state.dataUnitarySystems->initUnitarySystemsErrorsFound = true;
                     }
                 }
 
@@ -1107,6 +1121,14 @@ namespace UnitarySystems {
                     int ControlNode = this->m_SuppHeatControlNodeNum;
                     if (ControlNode > 0) {
                         this->checkNodeSetPoint(state, AirLoopNum, ControlNode, SuppHeatCoil, OAUCoilOutTemp);
+                    } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
+                        ShowSevereError(state, format("Missing set point in {} = {}", this->UnitType, this->Name));
+                        ShowContinueError(
+                            state,
+                            format("...Setpoint is required at system air outlet node = {} or supplemental heating coil air outlet node = {}",
+                                   state.dataLoopNodes->NodeID(this->AirOutNode),
+                                   state.dataLoopNodes->NodeID(this->m_SuppCoilAirOutletNode)));
+                        state.dataUnitarySystems->initUnitarySystemsErrorsFound = true;
                     }
                 }
 
@@ -1205,6 +1227,9 @@ namespace UnitarySystems {
             state.dataHVACGlobal->DXElecCoolingPower = 0.0;
             state.dataHVACGlobal->DXElecHeatingPower = 0.0;
             state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
+        }
+        if (state.dataUnitarySystems->initUnitarySystemsErrorsFound) {
+            ShowFatalError(state, "Previous errors cause termination.");
         }
     }
 
