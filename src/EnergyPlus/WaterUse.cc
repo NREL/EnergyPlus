@@ -1101,7 +1101,7 @@ namespace WaterUse {
             } else if (this->ColdTemp > (this->HotTemp + EPSILON)) { //(HWCWTempDiff > EPSILON) {
                 // Cold temp is hotter than the hot water temp; bad user input
                 TempDiff = this->ColdTemp - this->HotTemp;
-                this->HotMassFlowRate = 0;
+                this->HotMassFlowRate = this->TotalMassFlowRate;
                 if (!state.dataGlobal->WarmupFlag) {
                     // print error for variables of hot water temperature
                     ++this->CWHWTempErrorCount;
