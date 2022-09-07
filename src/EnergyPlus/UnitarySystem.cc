@@ -1094,7 +1094,7 @@ namespace UnitarySystems {
                     if (ControlNode > 0) {
                         this->checkNodeSetPoint(state, AirLoopNum, ControlNode, CoolingCoil, OAUCoilOutTemp);
                     } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
-                        ShowSevereError(state, format("Missing set point in {} = {}", this->UnitType, this->Name));
+                        ShowSevereError(state, format("{}: Missing set point in {} = {}", routineName, this->UnitType, this->Name));
                         ShowContinueError(state,
                                           format("...Setpoint is required at system air outlet node = {} or cooling coil air outlet node = {}",
                                                  state.dataLoopNodes->NodeID(this->AirOutNode),
@@ -1108,7 +1108,7 @@ namespace UnitarySystems {
                     if (ControlNode > 0) {
                         this->checkNodeSetPoint(state, AirLoopNum, ControlNode, HeatingCoil, OAUCoilOutTemp);
                     } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
-                        ShowSevereError(state, format("Missing set point in {} = {}", this->UnitType, this->Name));
+                        ShowSevereError(state, format("{}: Missing set point in {} = {}", routineName, this->UnitType, this->Name));
                         ShowContinueError(state,
                                           format("...Setpoint is required at system air outlet node = {} or heating coil air outlet node = {}",
                                                  state.dataLoopNodes->NodeID(this->AirOutNode),
@@ -1122,7 +1122,7 @@ namespace UnitarySystems {
                     if (ControlNode > 0) {
                         this->checkNodeSetPoint(state, AirLoopNum, ControlNode, SuppHeatCoil, OAUCoilOutTemp);
                     } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
-                        ShowSevereError(state, format("Missing set point in {} = {}", this->UnitType, this->Name));
+                        ShowSevereError(state, format("{}: Missing set point in {} = {}", routineName, this->UnitType, this->Name));
                         ShowContinueError(
                             state,
                             format("...Setpoint is required at system air outlet node = {} or supplemental heating coil air outlet node = {}",
