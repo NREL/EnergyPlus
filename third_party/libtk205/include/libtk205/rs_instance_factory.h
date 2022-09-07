@@ -67,7 +67,7 @@ namespace tk205  {
       static bool register_factory(std::string const &RS_ID,
                                    std::shared_ptr<RSInstanceFactory> factory);
 
-      // Universal factory interface create(). Factory::create() will, through delegation,
+      // Universal factory interface create(). Factory::create() will, through factory lookup and delegation,
       // actually return the requested object.
       static std::shared_ptr<RSInstanceBase> create(std::string const &RS_ID,
                                                     const char* RS_instance_file);

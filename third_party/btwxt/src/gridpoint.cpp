@@ -53,7 +53,7 @@ void GridPoint::set_target(const std::vector<double> &v) {
                 stringify("Target and Gridded Data do not have the same dimensions."));
   }
   if (target_is_set) {
-    if (std::equal(v.begin(), v.end(), target.begin())) {
+    if (std::equal(v.begin(), v.end(), target.begin()) && (methods == grid_data->get_interp_methods())) {
       return;
     }
   }
