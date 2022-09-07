@@ -149,8 +149,6 @@ namespace WaterToAirHeatPumpSimple {
         int HPNum;                // The WatertoAirHP that you are currently loading input into
         Real64 OnOffAirFlowRatio; // ratio of comp on to comp off air flow rate
 
-        auto &simpleWAHP(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
-
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataWaterToAirHeatPumpSimple->GetCoilsInputFlag) { // First time subroutine has been entered
             GetSimpleWatertoAirHPInput(state);
@@ -172,15 +170,17 @@ namespace WaterToAirHeatPumpSimple {
                                       state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs,
                                       CompName));
             }
-            if (!CompName.empty() && CompName != simpleWAHP.Name) {
+            if (!CompName.empty() && CompName != state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name) {
                 ShowFatalError(
                     state,
                     format("SimWatertoAirHPSimple: Invalid CompIndex passed={}, WaterToAir HP name={}, stored WaterToAir HP Name for that index={}",
                            HPNum,
                            CompName,
-                           simpleWAHP.Name));
+                           state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name));
             }
         }
+
+        auto &simpleWAHP(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
 
         if (present(OnOffAirFlowRat)) {
             OnOffAirFlowRatio = OnOffAirFlowRat;
