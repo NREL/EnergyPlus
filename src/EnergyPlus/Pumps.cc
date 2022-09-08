@@ -523,172 +523,159 @@ void GetPumpInput(EnergyPlusData &state)
 
     for (NumConstPump = 1; NumConstPump <= NumConstSpeedPumps; ++NumConstPump) {
         PumpNum = NumVarSpeedPumps + NumConstPump;
+        auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  NumConstPump,
-                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 thisInput->cAlphaArgs,
                                                                  NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 thisInput->rNumericArgs,
                                                                  NumNums,
                                                                  IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                 thisInput->lNumericFieldBlanks,
+                                                                 thisInput->lAlphaFieldBlanks,
+                                                                 thisInput->cAlphaFieldNames,
+                                                                 thisInput->cNumericFieldNames);
 
-        GlobalNames::VerifyUniqueInterObjectName(state,
-                                                 state.dataPumps->PumpUniqueNames,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 cCurrentModuleObject,
-                                                 state.dataIPShortCut->cAlphaFieldNames(1),
-                                                 ErrorsFound);
-        state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::ConSpeed; //'Pump:ConstantSpeed'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = DataPlant::PlantEquipmentType::PumpConstantSpeed;
+        GlobalNames::VerifyUniqueInterObjectName(
+            state, state.dataPumps->PumpUniqueNames, thisInput->cAlphaArgs(1), cCurrentModuleObject, thisInput->cAlphaFieldNames(1), ErrorsFound);
+        thisPump.Name = thisInput->cAlphaArgs(1);
+        thisPump.pumpType = PumpType::ConSpeed; //'Pump:ConstantSpeed'
+        thisPump.TypeOf_Num = DataPlant::PlantEquipmentType::PumpConstantSpeed;
 
-        state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
-                                                                             state.dataIPShortCut->cAlphaArgs(2),
-                                                                             ErrorsFound,
-                                                                             DataLoopNode::ConnectionObjectType::PumpConstantSpeed,
-                                                                             state.dataIPShortCut->cAlphaArgs(1),
-                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                             DataLoopNode::ConnectionType::Inlet,
-                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                             ObjectIsNotParent);
+        thisPump.InletNodeNum = GetOnlySingleNode(state,
+                                                  thisInput->cAlphaArgs(2),
+                                                  ErrorsFound,
+                                                  DataLoopNode::ConnectionObjectType::PumpConstantSpeed,
+                                                  thisInput->cAlphaArgs(1),
+                                                  DataLoopNode::NodeFluidType::Water,
+                                                  DataLoopNode::ConnectionType::Inlet,
+                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  ObjectIsNotParent);
 
-        state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                                              state.dataIPShortCut->cAlphaArgs(3),
-                                                                              ErrorsFound,
-                                                                              DataLoopNode::ConnectionObjectType::PumpConstantSpeed,
-                                                                              state.dataIPShortCut->cAlphaArgs(1),
-                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                              DataLoopNode::ConnectionType::Outlet,
-                                                                              NodeInputManager::CompFluidStream::Primary,
-                                                                              ObjectIsNotParent);
-        TestCompSet(state,
-                    cCurrentModuleObject,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(2),
-                    state.dataIPShortCut->cAlphaArgs(3),
-                    "Water Nodes");
+        thisPump.OutletNodeNum = GetOnlySingleNode(state,
+                                                   thisInput->cAlphaArgs(3),
+                                                   ErrorsFound,
+                                                   DataLoopNode::ConnectionObjectType::PumpConstantSpeed,
+                                                   thisInput->cAlphaArgs(1),
+                                                   DataLoopNode::NodeFluidType::Water,
+                                                   DataLoopNode::ConnectionType::Outlet,
+                                                   NodeInputManager::CompFluidStream::Primary,
+                                                   ObjectIsNotParent);
+        TestCompSet(state, cCurrentModuleObject, thisInput->cAlphaArgs(1), thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
-        state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate == AutoSize) {
-            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRateWasAutoSized = true;
+        thisPump.NomVolFlowRate = thisInput->rNumericArgs(1);
+        if (thisPump.NomVolFlowRate == AutoSize) {
+            thisPump.NomVolFlowRateWasAutoSized = true;
         }
-        state.dataPumps->PumpEquip(PumpNum).NomPumpHead = state.dataIPShortCut->rNumericArgs(2);
-        state.dataPumps->PumpEquip(PumpNum).NomPowerUse = state.dataIPShortCut->rNumericArgs(3);
-        if (state.dataPumps->PumpEquip(PumpNum).NomPowerUse == AutoSize) {
-            state.dataPumps->PumpEquip(PumpNum).NomPowerUseWasAutoSized = true;
+        thisPump.NomPumpHead = thisInput->rNumericArgs(2);
+        thisPump.NomPowerUse = thisInput->rNumericArgs(3);
+        if (thisPump.NomPowerUse == AutoSize) {
+            thisPump.NomPowerUseWasAutoSized = true;
         }
-        state.dataPumps->PumpEquip(PumpNum).MotorEffic = state.dataIPShortCut->rNumericArgs(4);
-        state.dataPumps->PumpEquip(PumpNum).FracMotorLossToFluid = state.dataIPShortCut->rNumericArgs(5);
-        state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(1) = 1.0;
-        state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(2) = 0.0;
-        state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(3) = 0.0;
-        state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(4) = 0.0;
+        thisPump.MotorEffic = thisInput->rNumericArgs(4);
+        thisPump.FracMotorLossToFluid = thisInput->rNumericArgs(5);
+        thisPump.PartLoadCoef(1) = 1.0;
+        thisPump.PartLoadCoef(2) = 0.0;
+        thisPump.PartLoadCoef(3) = 0.0;
+        thisPump.PartLoadCoef(4) = 0.0;
         // In a constant volume pump we previously set the minimum to the nominal capacity
         // Now we model the pump as constant speed and set flow by riding the pump curve.
-        state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate = 0.0;
-        state.dataPumps->PumpEquip(PumpNum).Energy = 0.0;
-        state.dataPumps->PumpEquip(PumpNum).Power = 0.0;
+        thisPump.MinVolFlowRate = 0.0;
+        thisPump.Energy = 0.0;
+        thisPump.Power = 0.0;
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Continuous")) {
-            state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Intermittent")) {
-            state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
+        if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Continuous")) {
+            thisPump.PumpControl = PumpControlType::Continuous;
+        } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Intermittent")) {
+            thisPump.PumpControl = PumpControlType::Intermittent;
         } else {
-            ShowWarningError(state,
-                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
-                                 state.dataIPShortCut->cAlphaFieldNames(4));
+            ShowWarningError(
+                state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisPump.Name + "\", Invalid " + thisInput->cAlphaFieldNames(4));
             ShowContinueError(state,
-                              "Entered Value=[" + state.dataIPShortCut->cAlphaArgs(4) + "]. " + state.dataIPShortCut->cAlphaFieldNames(4) +
+                              "Entered Value=[" + thisInput->cAlphaArgs(4) + "]. " + thisInput->cAlphaFieldNames(4) +
                                   " has been set to Continuous for this pump.");
-            state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
+            thisPump.PumpControl = PumpControlType::Continuous;
         }
 
         // Input the optional schedule for the pump
-        state.dataPumps->PumpEquip(PumpNum).PumpSchedule = state.dataIPShortCut->cAlphaArgs(5);
-        state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(5) && !(state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
-                                 state.dataIPShortCut->cAlphaFieldNames(5));
-            ShowContinueError(state, "Schedule named =[" + state.dataIPShortCut->cAlphaArgs(5) + "]. was not found and will not be used.");
+        thisPump.PumpSchedule = thisInput->cAlphaArgs(5);
+        thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(5));
+        if (!thisInput->lAlphaFieldBlanks(5) && !(thisPump.PumpScheduleIndex > 0)) {
+            ShowWarningError(
+                state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisPump.Name + "\", Invalid " + thisInput->cAlphaFieldNames(5));
+            ShowContinueError(state, "Schedule named =[" + thisInput->cAlphaArgs(5) + "]. was not found and will not be used.");
         }
 
         // Input pressure related data such as pressure curve and impeller size/rotational speed
-        state.dataPumps->PumpEquip(PumpNum).PressureCurve_Name = state.dataIPShortCut->cAlphaArgs(6);
-        if (state.dataPumps->PumpEquip(PumpNum).PressureCurve_Name == "") {
-            state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index = -1;
+        thisPump.PressureCurve_Name = thisInput->cAlphaArgs(6);
+        if (thisPump.PressureCurve_Name == "") {
+            thisPump.PressureCurve_Index = -1;
         } else {
-            TempCurveIndex = GetCurveIndex(state, state.dataPumps->PumpEquip(PumpNum).PressureCurve_Name);
+            TempCurveIndex = GetCurveIndex(state, thisPump.PressureCurve_Name);
             if (TempCurveIndex == 0) {
-                state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index = -1;
+                thisPump.PressureCurve_Index = -1;
             } else {
                 ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            TempCurveIndex,                             // Curve index
-                                                            {1},                                        // Valid dimensions
-                                                            RoutineName,                                // Routine name
-                                                            cCurrentModuleObject,                       // Object Type
-                                                            state.dataPumps->PumpEquip(PumpNum).Name,   // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(6)); // Field Name
+                                                            TempCurveIndex,                  // Curve index
+                                                            {1},                             // Valid dimensions
+                                                            RoutineName,                     // Routine name
+                                                            cCurrentModuleObject,            // Object Type
+                                                            thisPump.Name,                   // Object Name
+                                                            thisInput->cAlphaFieldNames(6)); // Field Name
 
                 if (!ErrorsFound) {
-                    state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index = TempCurveIndex;
-                    GetCurveMinMaxValues(
-                        state, TempCurveIndex, state.dataPumps->PumpEquip(PumpNum).MinPhiValue, state.dataPumps->PumpEquip(PumpNum).MaxPhiValue);
+                    thisPump.PressureCurve_Index = TempCurveIndex;
+                    GetCurveMinMaxValues(state, TempCurveIndex, thisPump.MinPhiValue, thisPump.MaxPhiValue);
                 }
             }
         }
 
         // read in the rest of the pump pressure characteristics
-        state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter = state.dataIPShortCut->rNumericArgs(6);
-        state.dataPumps->PumpEquip(PumpNum).RotSpeed_RPM = state.dataIPShortCut->rNumericArgs(7); // retrieve the input rotational speed, in revs/min
-        state.dataPumps->PumpEquip(PumpNum).RotSpeed =
-            state.dataPumps->PumpEquip(PumpNum).RotSpeed_RPM / 60.0; // convert input[rpm] to calculation units[rps]
+        thisPump.ImpellerDiameter = thisInput->rNumericArgs(6);
+        thisPump.RotSpeed_RPM = thisInput->rNumericArgs(7); // retrieve the input rotational speed, in revs/min
+        thisPump.RotSpeed = thisPump.RotSpeed_RPM / 60.0;   // convert input[rpm] to calculation units[rps]
 
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) { // zone named for pump skin losses
-            state.dataPumps->PumpEquip(PumpNum).ZoneNum =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(7), state.dataHeatBal->Zone);
-            if (state.dataPumps->PumpEquip(PumpNum).ZoneNum > 0) {
-                state.dataPumps->PumpEquip(PumpNum).HeatLossesToZone = true;
-                if (!state.dataIPShortCut->lNumericFieldBlanks(8)) {
-                    state.dataPumps->PumpEquip(PumpNum).SkinLossRadFraction = state.dataIPShortCut->rNumericArgs(8);
+        if (!thisInput->lAlphaFieldBlanks(7)) { // zone named for pump skin losses
+            thisPump.ZoneNum = UtilityRoutines::FindItemInList(thisInput->cAlphaArgs(7), state.dataHeatBal->Zone);
+            if (thisPump.ZoneNum > 0) {
+                thisPump.HeatLossesToZone = true;
+                if (!thisInput->lNumericFieldBlanks(8)) {
+                    thisPump.SkinLossRadFraction = thisInput->rNumericArgs(8);
                 }
             } else {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(7) + "=\"" + state.dataIPShortCut->cAlphaArgs(7) + "\" not found.");
+                                cCurrentModuleObject + "=\"" + thisInput->cAlphaArgs(1) + "\" invalid " + thisInput->cAlphaFieldNames(7) + "=\"" +
+                                    thisInput->cAlphaArgs(7) + "\" not found.");
                 ErrorsFound = true;
             }
         }
 
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-            if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
-            } else if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
+        if (!thisInput->lAlphaFieldBlanks(8)) {
+            if (thisInput->cAlphaArgs(8) == "POWERPERFLOW") {
+                thisPump.powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
+            } else if (thisInput->cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
+                thisPump.powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisPump.Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                 ErrorsFound = true;
             }
         }
 
-        if (!state.dataIPShortCut->lNumericFieldBlanks(9)) {
-            state.dataPumps->PumpEquip(PumpNum).powerPerFlowScalingFactor = state.dataIPShortCut->rNumericArgs(9);
+        if (!thisInput->lNumericFieldBlanks(9)) {
+            thisPump.powerPerFlowScalingFactor = thisInput->rNumericArgs(9);
         }
 
-        if (!state.dataIPShortCut->lNumericFieldBlanks(10)) {
-            state.dataPumps->PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = state.dataIPShortCut->rNumericArgs(10);
+        if (!thisInput->lNumericFieldBlanks(10)) {
+            thisPump.powerPerFlowPerPressureScalingFactor = thisInput->rNumericArgs(10);
         }
 
         if (NumAlphas > 8) {
-            state.dataPumps->PumpEquip(PumpNum).EndUseSubcategoryName = state.dataIPShortCut->cAlphaArgs(9);
+            thisPump.EndUseSubcategoryName = thisInput->cAlphaArgs(9);
         } else {
-            state.dataPumps->PumpEquip(PumpNum).EndUseSubcategoryName = "General";
+            thisPump.EndUseSubcategoryName = "General";
         }
     }
 
@@ -696,140 +683,128 @@ void GetPumpInput(EnergyPlusData &state)
     cCurrentModuleObject = cPump_Cond;
     for (NumCondPump = 1; NumCondPump <= NumCondensatePumps; ++NumCondPump) {
         PumpNum = NumCondPump + NumVarSpeedPumps + NumConstSpeedPumps;
+        auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  NumCondPump,
-                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 thisInput->cAlphaArgs,
                                                                  NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 thisInput->rNumericArgs,
                                                                  NumNums,
                                                                  IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+                                                                 thisInput->lNumericFieldBlanks,
+                                                                 thisInput->lAlphaFieldBlanks,
+                                                                 thisInput->cAlphaFieldNames,
+                                                                 thisInput->cNumericFieldNames);
 
-        GlobalNames::VerifyUniqueInterObjectName(state,
-                                                 state.dataPumps->PumpUniqueNames,
-                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                 cCurrentModuleObject,
-                                                 state.dataIPShortCut->cAlphaFieldNames(1),
-                                                 ErrorsFound);
-        state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::Cond; //'Pump:VariableSpeed:Condensate'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = DataPlant::PlantEquipmentType::PumpCondensate;
+        GlobalNames::VerifyUniqueInterObjectName(
+            state, state.dataPumps->PumpUniqueNames, thisInput->cAlphaArgs(1), cCurrentModuleObject, thisInput->cAlphaFieldNames(1), ErrorsFound);
+        thisPump.Name = thisInput->cAlphaArgs(1);
+        thisPump.pumpType = PumpType::Cond; //'Pump:VariableSpeed:Condensate'
+        thisPump.TypeOf_Num = DataPlant::PlantEquipmentType::PumpCondensate;
 
-        state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
-                                                                             state.dataIPShortCut->cAlphaArgs(2),
-                                                                             ErrorsFound,
-                                                                             DataLoopNode::ConnectionObjectType::PumpVariableSpeedCondensate,
-                                                                             state.dataIPShortCut->cAlphaArgs(1),
-                                                                             DataLoopNode::NodeFluidType::Steam,
-                                                                             DataLoopNode::ConnectionType::Inlet,
-                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                             ObjectIsNotParent);
+        thisPump.InletNodeNum = GetOnlySingleNode(state,
+                                                  thisInput->cAlphaArgs(2),
+                                                  ErrorsFound,
+                                                  DataLoopNode::ConnectionObjectType::PumpVariableSpeedCondensate,
+                                                  thisInput->cAlphaArgs(1),
+                                                  DataLoopNode::NodeFluidType::Steam,
+                                                  DataLoopNode::ConnectionType::Inlet,
+                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  ObjectIsNotParent);
 
-        state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                                              state.dataIPShortCut->cAlphaArgs(3),
-                                                                              ErrorsFound,
-                                                                              DataLoopNode::ConnectionObjectType::PumpVariableSpeedCondensate,
-                                                                              state.dataIPShortCut->cAlphaArgs(1),
-                                                                              DataLoopNode::NodeFluidType::Steam,
-                                                                              DataLoopNode::ConnectionType::Outlet,
-                                                                              NodeInputManager::CompFluidStream::Primary,
-                                                                              ObjectIsNotParent);
-        TestCompSet(state,
-                    cCurrentModuleObject,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(2),
-                    state.dataIPShortCut->cAlphaArgs(3),
-                    "Water Nodes");
+        thisPump.OutletNodeNum = GetOnlySingleNode(state,
+                                                   thisInput->cAlphaArgs(3),
+                                                   ErrorsFound,
+                                                   DataLoopNode::ConnectionObjectType::PumpVariableSpeedCondensate,
+                                                   thisInput->cAlphaArgs(1),
+                                                   DataLoopNode::NodeFluidType::Steam,
+                                                   DataLoopNode::ConnectionType::Outlet,
+                                                   NodeInputManager::CompFluidStream::Primary,
+                                                   ObjectIsNotParent);
+        TestCompSet(state, cCurrentModuleObject, thisInput->cAlphaArgs(1), thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
-        state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
+        thisPump.PumpControl = PumpControlType::Intermittent;
 
         // Input the optional schedule for the pump
-        state.dataPumps->PumpEquip(PumpNum).PumpSchedule = state.dataIPShortCut->cAlphaArgs(4);
-        state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(4) && !(state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
-                                 state.dataIPShortCut->cAlphaFieldNames(4));
-            ShowContinueError(state, "Schedule named =[" + state.dataIPShortCut->cAlphaArgs(4) + "]. was not found and will not be used.");
+        thisPump.PumpSchedule = thisInput->cAlphaArgs(4);
+        thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(4));
+        if (!thisInput->lAlphaFieldBlanks(4) && !(thisPump.PumpScheduleIndex > 0)) {
+            ShowWarningError(
+                state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisPump.Name + "\", Invalid " + thisInput->cAlphaFieldNames(4));
+            ShowContinueError(state, "Schedule named =[" + thisInput->cAlphaArgs(4) + "]. was not found and will not be used.");
         }
 
-        state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate == AutoSize) {
-            state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRateWasAutoSized = true;
+        thisPump.NomSteamVolFlowRate = thisInput->rNumericArgs(1);
+        if (thisPump.NomSteamVolFlowRate == AutoSize) {
+            thisPump.NomSteamVolFlowRateWasAutoSized = true;
         }
-        state.dataPumps->PumpEquip(PumpNum).NomPumpHead = state.dataIPShortCut->rNumericArgs(2);
-        state.dataPumps->PumpEquip(PumpNum).NomPowerUse = state.dataIPShortCut->rNumericArgs(3);
-        if (state.dataPumps->PumpEquip(PumpNum).NomPowerUse == AutoSize) {
-            state.dataPumps->PumpEquip(PumpNum).NomPowerUseWasAutoSized = true;
+        thisPump.NomPumpHead = thisInput->rNumericArgs(2);
+        thisPump.NomPowerUse = thisInput->rNumericArgs(3);
+        if (thisPump.NomPowerUse == AutoSize) {
+            thisPump.NomPowerUseWasAutoSized = true;
         }
-        state.dataPumps->PumpEquip(PumpNum).MotorEffic = state.dataIPShortCut->rNumericArgs(4);
-        state.dataPumps->PumpEquip(PumpNum).FracMotorLossToFluid = state.dataIPShortCut->rNumericArgs(5);
-        state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(1) = state.dataIPShortCut->rNumericArgs(6);
-        state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(2) = state.dataIPShortCut->rNumericArgs(7);
-        state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(3) = state.dataIPShortCut->rNumericArgs(8);
-        state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(4) = state.dataIPShortCut->rNumericArgs(9);
+        thisPump.MotorEffic = thisInput->rNumericArgs(4);
+        thisPump.FracMotorLossToFluid = thisInput->rNumericArgs(5);
+        thisPump.PartLoadCoef(1) = thisInput->rNumericArgs(6);
+        thisPump.PartLoadCoef(2) = thisInput->rNumericArgs(7);
+        thisPump.PartLoadCoef(3) = thisInput->rNumericArgs(8);
+        thisPump.PartLoadCoef(4) = thisInput->rNumericArgs(9);
 
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) { // zone named for pump skin losses
-            state.dataPumps->PumpEquip(PumpNum).ZoneNum =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataHeatBal->Zone);
-            if (state.dataPumps->PumpEquip(PumpNum).ZoneNum > 0) {
-                state.dataPumps->PumpEquip(PumpNum).HeatLossesToZone = true;
-                if (!state.dataIPShortCut->lNumericFieldBlanks(10)) {
-                    state.dataPumps->PumpEquip(PumpNum).SkinLossRadFraction = state.dataIPShortCut->rNumericArgs(10);
+        if (!thisInput->lAlphaFieldBlanks(5)) { // zone named for pump skin losses
+            thisPump.ZoneNum = UtilityRoutines::FindItemInList(thisInput->cAlphaArgs(5), state.dataHeatBal->Zone);
+            if (thisPump.ZoneNum > 0) {
+                thisPump.HeatLossesToZone = true;
+                if (!thisInput->lNumericFieldBlanks(10)) {
+                    thisPump.SkinLossRadFraction = thisInput->rNumericArgs(10);
                 }
             } else {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\" not found.");
+                                cCurrentModuleObject + "=\"" + thisInput->cAlphaArgs(1) + "\" invalid " + thisInput->cAlphaFieldNames(5) + "=\"" +
+                                    thisInput->cAlphaArgs(5) + "\" not found.");
                 ErrorsFound = true;
             }
         }
 
-        state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate = 0.0;
-        state.dataPumps->PumpEquip(PumpNum).Energy = 0.0;
-        state.dataPumps->PumpEquip(PumpNum).Power = 0.0;
+        thisPump.MinVolFlowRate = 0.0;
+        thisPump.Energy = 0.0;
+        thisPump.Power = 0.0;
 
-        if (state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRateWasAutoSized) {
-            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = AutoSize;
-            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRateWasAutoSized = true;
+        if (thisPump.NomSteamVolFlowRateWasAutoSized) {
+            thisPump.NomVolFlowRate = AutoSize;
+            thisPump.NomVolFlowRateWasAutoSized = true;
         } else {
             // Calc Condensate Pump Water Volume Flow Rate
-            SteamDensity =
-                GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, state.dataPumps->PumpEquip(PumpNum).FluidIndex, RoutineNameNoColon);
+            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, thisPump.FluidIndex, RoutineNameNoColon);
             TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
-            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate =
-                (state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
+            thisPump.NomVolFlowRate = (thisPump.NomSteamVolFlowRate * SteamDensity) / TempWaterDensity;
         }
 
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-            if (state.dataIPShortCut->cAlphaArgs(6) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
-            } else if (state.dataIPShortCut->cAlphaArgs(6) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
+        if (!thisInput->lAlphaFieldBlanks(6)) {
+            if (thisInput->cAlphaArgs(6) == "POWERPERFLOW") {
+                thisPump.powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
+            } else if (thisInput->cAlphaArgs(6) == "POWERPERFLOWPERPRESSURE") {
+                thisPump.powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisPump.Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                 ErrorsFound = true;
             }
         }
 
-        if (!state.dataIPShortCut->lNumericFieldBlanks(11)) {
-            state.dataPumps->PumpEquip(PumpNum).powerPerFlowScalingFactor = state.dataIPShortCut->rNumericArgs(11);
+        if (!thisInput->lNumericFieldBlanks(11)) {
+            thisPump.powerPerFlowScalingFactor = thisInput->rNumericArgs(11);
         }
 
-        if (!state.dataIPShortCut->lNumericFieldBlanks(12)) {
-            state.dataPumps->PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor = state.dataIPShortCut->rNumericArgs(12);
+        if (!thisInput->lNumericFieldBlanks(12)) {
+            thisPump.powerPerFlowPerPressureScalingFactor = thisInput->rNumericArgs(12);
         }
 
         if (NumAlphas > 6) {
-            state.dataPumps->PumpEquip(PumpNum).EndUseSubcategoryName = state.dataIPShortCut->cAlphaArgs(7);
+            thisPump.EndUseSubcategoryName = thisInput->cAlphaArgs(7);
         } else {
-            state.dataPumps->PumpEquip(PumpNum).EndUseSubcategoryName = "General";
+            thisPump.EndUseSubcategoryName = "General";
         }
     }
 
