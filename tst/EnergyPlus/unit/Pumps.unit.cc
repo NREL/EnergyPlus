@@ -710,7 +710,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedPump_MinFlowEqualToMax)
 
     // Should have reset the min to 99% of the the max, max not impacted
     Real64 expectedAnswer = 0.99 * 0.001;
-    Real64 const allowableTolerance = 0.00001;
+    Real64 constexpr allowableTolerance = 0.00001;
     EXPECT_NEAR(state->dataPumps->PumpEquip(1).MinVolFlowRate, expectedAnswer, allowableTolerance);
     expectedAnswer = 0.001;
     EXPECT_NEAR(state->dataPumps->PumpEquip(1).NomVolFlowRate, expectedAnswer, allowableTolerance);
