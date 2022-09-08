@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -3411,6 +3412,21 @@ namespace SurfaceGeometry {
                                         cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", " +
                                             state.dataIPShortCut->cAlphaFieldNames(2) + " not found=" + state.dataIPShortCut->cAlphaArgs(2));
                         ErrorsFound = true;
+                    } else {
+                        if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) {
+                            ShowSevereError(state,
+                                            format("{}=\"{}\" has an active {}=\"{}\";",
+                                                   cCurrentModuleObject,
+                                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                                                   state.dataIPShortCut->cAlphaFieldNames(2),
+                                                   state.dataIPShortCut->cAlphaArgs(2)));
+                            ShowContinueError(state, "The Shading Calculation Method of choice is \"PixelCounting\". With this choice, ");
+                            ShowContinueError(
+                                state,
+                                "the shading surfaces will be treated as completely opaque (transmittance = 0) during the shading calculation, ");
+                            ShowContinueError(state, "which may result in significant inaccurate or unexpected results.");
+                            ShowContinueError(state, "It is suggested to use another Shading Calculation Method, such as \"PolygonClipping\".");
+                        }
                     }
                 } else {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex = 0;
@@ -6458,6 +6474,20 @@ namespace SurfaceGeometry {
                                     cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", " +
                                         state.dataIPShortCut->cAlphaFieldNames(3) + " not found=\"" + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
+                } else {
+                    if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) {
+                        ShowSevereError(state,
+                                        format("{}=\"{}\" has an active {}=\"{}\";",
+                                               cCurrentModuleObject,
+                                               state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                                               state.dataIPShortCut->cAlphaFieldNames(3),
+                                               state.dataIPShortCut->cAlphaArgs(3)));
+                        ShowContinueError(state, "The Shading Calculation Method of choice is \"PixelCounting\". With this choice, ");
+                        ShowContinueError(
+                            state, "the shading surfaces will be treated as completely opaque (transmittance = 0) during the shading calculation, ");
+                        ShowContinueError(state, "which may result in significant inaccurate or unexpected results.");
+                        ShowContinueError(state, "It is suggested to use another Shading Calculation Method, such as \"PolygonClipping\".");
+                    }
                 }
             } else {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex = 0;
