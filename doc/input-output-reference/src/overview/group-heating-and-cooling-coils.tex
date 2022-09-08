@@ -2093,9 +2093,13 @@ The coefficient of performance is the ratio of the gross total cooling capacity 
 
 The air volume flow rate, in m\(^{3}\) per second, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated total cooling capacity (300 to 450 cfm/ton). For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7 °C drybulb/19.4 °C wetbulb, air entering the outdoor condenser coil at 35 °C drybulb/23.9 °C wetbulb, and the rated air volume flow rate defined here.
 
-\paragraph{Field: Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-rated-evaporator-fan-power-per-volume-flow-rate}
+\paragraph{Field: 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2017-rated-evaporator-fan-power-per-volume-flow-rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER.  ‘SEER User’ is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER Standard’ is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+
+\paragraph{Field: 2023 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2023-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m\(^{3}\)/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER2), Integrated Energy Efficiency Ratio (IEER2) and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER2, IEER2 and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER2.  ‘SEER2 User’ is calculated using user-input PLF curve and cooling coefficient of degradation. ‘SEER2 Standard’ is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-9}
 
@@ -2248,31 +2252,32 @@ Following is an example input for a Coil:Cooling:DX:SingleSpeed coil.
 \begin{lstlisting}
 
 Coil:Cooling:DX:SingleSpeed,
-  Zone1WindACDXCoil,               ! Coil Name
-  FanAndCoilAvailSched,         ! Availability Schedule
-  10548,           ! Gross Rated Total Cooling Capacity
-  0.75,             ! Gross Rated Sensible Heat Ratio
-  3.0,               ! Gross Rated Cooling COP
-  0.637,           ! Rated Air Flow Rate (m3/s)
-  773.3,           ! Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  Zone1WindACDXCoil,        ! Coil Name
+  FanAndCoilAvailSched,     ! Availability Schedule
+  10548,                    ! Gross Rated Total Cooling Capacity
+  0.75,                     ! Gross Rated Sensible Heat Ratio
+  3.0,                      ! Gross Rated Cooling COP
+  0.637,                    ! Rated Air Flow Rate (m3/s)
+  773.3,                    ! 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  934.4,                    ! 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   Zone1WindACFanOutletNode, ! Coil Air Inlet Node
   Zone1WindACAirOutletNode, ! Coil Air Outlet Node
-  WindACCoolCapFT,                   ! Total Cooling Capacity Modifier Curve (function of temperature)
-  WindACCoolCapFFF,                 ! Total Cooling Capacity Modifier Curve (function of flow fraction)
-  WindACEIRFT,                           ! Energy Input Ratio Modifier Curve (function of temperature)
-  WindACEIRFFF,                         ! Energy Input Ratio Modifier Curve (function of flow fraction)
-  WindACPLFFPLR,                       ! Part Load Fraction Correlation (function of part load ratio)
-  1000.,                         ! Nominal Time for Condensate Removal to Begin {s}
-  1.5,                             ! Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
-  3.0,                             ! Maximum ON/OFF Cycling Rate {cycles/hr}
-  45.0,                           ! Latent Capacity Time Constant {s}
-  ,                                   ! Condenser Air Inlet Node Name
-  AirCooled,               ! Condenser Type
-  ,                                   ! Evaporative Condenser Effectiveness
-  ,                                   ! Evaporative Condenser Air Volume Flow Rate {m3/s}
-  ,                                   ! Evaporative Condenser Pump Rated Power Consumption {W}
-  30.,                             ! Crankcase Heater Capacity {W}
-  10.;                             ! Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
+  WindACCoolCapFT,          ! Total Cooling Capacity Modifier Curve (function of temperature)
+  WindACCoolCapFFF,         ! Total Cooling Capacity Modifier Curve (function of flow fraction)
+  WindACEIRFT,              ! Energy Input Ratio Modifier Curve (function of temperature)
+  WindACEIRFFF,             ! Energy Input Ratio Modifier Curve (function of flow fraction)
+  WindACPLFFPLR,            ! Part Load Fraction Correlation (function of part load ratio)
+  1000.,                    ! Nominal Time for Condensate Removal to Begin {s}
+  1.5,                      ! Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
+  3.0,                      ! Maximum ON/OFF Cycling Rate {cycles/hr}
+  45.0,                     ! Latent Capacity Time Constant {s}
+  ,                         ! Condenser Air Inlet Node Name
+  AirCooled,                ! Condenser Type
+  ,                         ! Evaporative Condenser Effectiveness
+  ,                         ! Evaporative Condenser Air Volume Flow Rate {m3/s}
+  ,                         ! Evaporative Condenser Pump Rated Power Consumption {W}
+  30.,                      ! Crankcase Heater Capacity {W}
+  10.;                      ! Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
 \end{lstlisting}
 
 \subsection{Coil:Cooling:DX:TwoSpeed}\label{coilcoolingdxtwospeed}
@@ -2808,9 +2813,13 @@ The coefficient of performance is the ratio of the gross total cooling capacity 
 
 The volumetric air flow rate for Speed \textless{}x\textgreater{}, in m\(^{3}\) per second, across the DX cooling coil at rated conditions. The rated air volume flow rate for Speed \textless{}x\textgreater{} should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated total cooling capacity for Speed \textless{}x\textgreater{}. The gross rated total cooling capacity, gross rated SHR and gross rated COP for Speed \textless{}x\textgreater{} should be performance information for the unit with air entering the cooling coil at 26.7 °C drybulb/19.4 °C wetbulb, air entering the outdoor condenser coil at 35 °C drybulb/23.9 °C wetbulb, and the rated air volume flow rate defined here.
 
-\paragraph{Field: Speed \textless{}X\textgreater{} Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-rated-evaporator-fan-power-per-volume-flow-rate}
+\paragraph{Field: Speed \textless{}X\textgreater{} 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-2017-rated-evaporator-fan-power-per-volume-flow-rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 773.3 W/(m3/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m3/s). This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Cooling Coil, Standard Ratings). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 773.3 W/(m3/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m3/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 201-240 standard: Seasonal Energy Efficiency Ratio (SEER) and the Standard Rating (Net) Cooling Capacity. These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating the metrics listed above to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER.  ‘SEER User’ is calculated using user-input PLF curve and cooling coefficient of degradation. ‘SEER Standard’ is calculated using AHRI Standard 210/240-2023 default PLF curve and cooling coefficient of degradation.
+
+\paragraph{Field: Speed \textless{}X\textgreater{} 2023 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-2023-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1505 W/(m3/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 201-240 standard: Seasonal Energy Efficiency Ratio (SEER2) and the Standard Rating (Net) Cooling Capacity. These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating the metrics listed above to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER2.  ‘SEER2 User’ is calculated using user-input PLF curve and cooling coefficient of degradation. ‘SEER2 Standard’ is calculated using AHRI Standard 210/240-2023 default PLF curve and cooling coefficient of degradation.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Total Cooling Capacity Function of Temperature Curve Name}\label{field-speed-x-total-cooling-capacity-function-of-temperature-curve-name}
 
@@ -2917,99 +2926,103 @@ Following is an example input for this multispeed DX cooling coil.
 \begin{lstlisting}
 
 Coil:Cooling:DX:MultiSpeed,
-  Heat Pump ACDXCoil 1,       !- Coil Name
-  FanAndCoilAvailSched,       !- Availability Schedule
-  DX Cooling Coil Air Inlet Node,   !- Coil Air Inlet Node
-  Heating Coil Air Inlet Node,         !- Coil Air Outlet Node
-  Outdoor Condenser Air Node,           !- Condenser Air Inlet Node Name
-  AirCooled,                           !- Condenser Type
-  ,                                               !- Name of Water Storage Tank for Supply
-  ,                                               !- Name of Water Storage Tank for Condensate Collection
-  No,                                           !- Apply Part Load Fraction to Speeds greater than 1
-  No,                                           !- Apply latent degradation to Speeds greater than 1
-  200.0,                                     !- Crankcase Heater Capacity {W}
-  10.0,                                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation
-  ,                                               !- Basin Heater Capacity {W/K}
-  ,                                               !- Basin Heater Setpoint Temperature {C}
-  ,                                               !- Basin Heater Operating Schedule Name
-  NaturalGas,                           !- Fuel Type
-  4,                                             !- Number of speeds
-  7500,                                       !- Gross Rated Total Cooling Capacity, Speed 1 {W}
-  0.75,                                       !- Gross Rated Sensible Heat Ratio, Speed 1 {dimensionless}
-  3.0,                                         !- Gross Rated Cooling COP, Speed 1 {dimensionless}
-  0.40,                                       !- Rated Air Flow Rate, Speed 1 {m3/s}
-  ,                                               !- Rated Evaporator Fan Power Per Volume Flow Rate, Speed 1 {W/(m3/s)}
-  HPACCoolCapFT Speed 1,     !- Total Cooling Capacity Modifier Curve, Speed 1 (temperature)
-  HPACCoolCapFF Speed 1,     !- Total Cooling Capacity Modifier Curve, Speed 1 (flow fraction)
-  HPACCOOLEIRFT Speed 1,     !- Energy Input Ratio Modifier Curve, Speed 1 (temperature)
-  HPACCOOLEIRFF Speed 1,     !- Energy Input Ratio Modifier Curve, Speed 1 (flow fraction)
-  HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 1 (part load ratio)
-  1000.0,                                   !- Nominal Time for Condensate Removal to Begin, Speed 1 {s}
-  1.5,                                         !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-  3.0,                                         !- Maximum ON/OFF Cycling Rate, Speed 1 {cycles/hr}
-  45.0,                                       !- Latent Capacity Time Constant, Speed 1 {s}
-  0.2,                                         !- Rated waste heat fraction of power input, Speed 1 {dimensionless}
-  HAPCCoolWHFT Speed 1,       !- Waste heat modifier curve, Speed 1 (temperature)
-  0.9,                                         !- Evaporative Condenser Effectiveness, Speed 1 {dimensionless}
-  0.05,                                       !- Evaporative Condenser Air Volume Flow Rate, Speed 1 {m3/s}
-  50,                                           !- Evaporative Condenser Pump Rated Power Consumption, Speed 1 {W}
-  17500,                                     !- Gross Rated Total Cooling Capacity, Speed 2 {W}
-  0.75,                                       !- Gross Rated Sensible Heat Ratio, Speed 2 {dimensionless}
-  3.0,                                         !- Gross Rated Cooling COP, Speed 2 {dimensionless}
-  0.85,                                       !- Rated Air Flow Rate, Speed 2 {m3/s}
-  ,                                               !- Rated Evaporator Fan Power Per Volume Flow Rate, Speed 2 {W/(m3/s)}
-  HPACCoolCapFT Speed 2,     !- Total Cooling Capacity Modifier Curve, Speed 2 (temperature)
-  HPACCoolCapFF Speed 2,     !- Total Cooling Capacity Modifier Curve, Speed 2 (flow fraction)
-  HPACCOOLEIRFT Speed 2,     !- Energy Input Ratio Modifier Curve, Speed 2 (temperature)
-  HPACCOOLEIRFF Speed 2,     !- Energy Input Ratio Modifier Curve, Speed 2 (flow fraction)
-  HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 2 (part load ratio)
-  1000.0,                                   !- Nominal Time for Condensate Removal to Begin, Speed 2
-  1.5,                                         !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-  3.0,                                         !- Maximum ON/OFF Cycling Rate, Speed 2
-  45.0,                                       !- Latent Capacity Time Constant, Speed 2
-  0.2,                                         !- Rated waste heat fraction of power input, Speed 2 {dimensionless}
-  HAPCCoolWHFT Speed 2,       !- Waste heat modifier curve, Speed 2 (temperature)
-  0.9,                                         !- Evaporative Condenser Effectiveness, Speed 2 {dimensionless}
-  0.1,                                         !- Evaporative Condenser Air Volume Flow Rate, Speed 2 {m3/s}
-  60,                                           !- Evaporative Condenser Pump Rated Power Consumption, Speed 2 {W}
-  25500,                                     !- Gross Rated Total Cooling Capacity, Speed 3 {W}
-  0.75,                                       !- Gross Rated Sensible Heat Ratio, Speed 3 {dimensionless}
-  3.0,                                         !- Gross Rated Cooling COP, Speed 3 {dimensionless}
-  1.25,                                       !- Rated Air Flow Rate, Speed 3 {m3/s}
-  ,                                               !- Rated Evaporator Fan Power Per Volume Flow Rate, Speed 3 {W/(m3/s)}
-  HPACCoolCapFT Speed 3,     !- Total Cooling Capacity Modifier Curve, Speed 3 (temperature)
-  HPACCoolCapFF Speed 3,     !- Total Cooling Capacity Modifier Curve, Speed 3 (flow fraction)
-  HPACCOOLEIRFT Speed 3,     !- Energy Input Ratio Modifier Curve, Speed 3 (temperature)
-  HPACCOOLEIRFF Speed 3,     !- Energy Input Ratio Modifier Curve, Speed 3 (flow fraction)
-  HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 3 (part load ratio)
-  1000.0,                                   !- Nominal Time for Condensate Removal to Begin, Speed 3 {s}
-  1.5,                                         !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent
-  3.0,                                         !- Maximum ON/OFF Cycling Rate, Speed 3 {cycles/hr}
-  45.0,                                       !- Latent Capacity Time Constant, Speed 3 {s}
-  0.2,                                         !- Rated waste heat fraction of power input, Speed 3 {dimensionless}
-  HAPCCoolWHFT Speed 3,       !- Waste heat modifier curve, Speed 3 (temperature)
-  0.9,                                         !- Evaporative Condenser Effectiveness, Speed 3 {dimensionless}
-  0.2,                                         !- Evaporative Condenser Air Volume Flow Rate, Speed 3 {m3/s}
-  80,                                           !- Evaporative Condenser Pump Rated Power Consumption, Speed 3 {W}
-  35500,                                     !- Gross Rated Total Cooling Capacity, Speed 4 {W}
-  0.75,                                       !- Gross Rated Sensible Heat Ratio, Speed 4 {dimensionless}
-  3.0,                                         !- Gross Rated Cooling COP, Speed 4 {dimensionless}
-  1.75,                                       !- Rated Air Flow Rate, Speed 4 {m3/s}
-  ,                                               !- Rated Evaporator Fan Power Per Volume Flow Rate, Speed 4 {W/(m3/s)}
-  HPACCoolCapFT Speed 4,     !- Total Cooling Capacity Modifier Curve, Speed 4 (temperature)
-  HPACCoolCapFF Speed 4,     !- Total Cooling Capacity Modifier Curve, Speed 4 (flow fraction)
-  HPACCOOLEIRFT Speed 4,     !- Energy Input Ratio Modifier Curve, Speed 4 (temperature)
-  HPACCOOLEIRFF Speed 4,     !- Energy Input Ratio Modifier Curve, Speed 4 (flow fraction)
-  HPACCOOLPLFFPLR Speed 1, !- Part Load Fraction Correlation, Speed 4 (part load ratio)
-  1000.0,                                   !- Nominal Time for Condensate Removal to Begin, Speed 4 {s}
-  1.5,                                         !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent                                                     !- Capacity, Speed 4 {dimensionless}
-  3.0,                                         !- Maximum ON/OFF Cycling Rate, Speed 4 {cycles/hr}
-  45.0,                                       !- Latent Capacity Time Constant, Speed 4 {s}
-  0.2,                                         !- Rated waste heat fraction of power input, Speed 4 {dimensionless}
-  HAPCCoolWHFT Speed 4,       !- Waste heat modifier curve, Speed 4 (temperature)
-  0.9,                                         !- Evaporative Condenser Effectiveness, Speed 4 {dimensionless}
-  0.3,                                         !- Evaporative Condenser Air Volume Flow Rate, Speed 4 {m3/s}
-  100;                                         !- Evaporative Condenser Pump Rated Power Consumption, Speed 4 {W}
+  Heat Pump ACDXCoil 1,            !- Coil Name
+  FanAndCoilAvailSched,            !- Availability Schedule
+  DX Cooling Coil Air Inlet Node,  !- Coil Air Inlet Node
+  Heating Coil Air Inlet Node,     !- Coil Air Outlet Node
+  Outdoor Condenser Air Node,      !- Condenser Air Inlet Node Name
+  AirCooled,                       !- Condenser Type
+  ,                                !- Name of Water Storage Tank for Supply
+  ,                                !- Name of Water Storage Tank for Condensate Collection
+  No,                              !- Apply Part Load Fraction to Speeds greater than 1
+  No,                              !- Apply latent degradation to Speeds greater than 1
+  200.0,                           !- Crankcase Heater Capacity {W}
+  10.0,                            !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation
+  ,                                !- Basin Heater Capacity {W/K}
+  ,                                !- Basin Heater Setpoint Temperature {C}
+  ,                                !- Basin Heater Operating Schedule Name
+  NaturalGas,                      !- Fuel Type
+  4,                               !- Number of speeds
+  7500,                            !- Speed 1 Gross Rated Total Cooling Capacity {W}
+  0.75,                            !- Speed 1 Gross Rated Sensible Heat Ratio {dimensionless}
+  3.0,                             !- Speed 1 Gross Rated Cooling COP {dimensionless}
+  0.40,                            !- Speed 1 Rated Air Flow Rate {m3/s}
+  ,                                !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                                !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  HPACCoolCapFT Speed 1,           !- Speed 1 Total Cooling Capacity Modifier Curve (temperature)
+  HPACCoolCapFF Speed 1,           !- Speed 1 Total Cooling Capacity Modifier Curve (flow fraction)
+  HPACCOOLEIRFT Speed 1,           !- Speed 1 Energy Input Ratio Modifier Curve (temperature)
+  HPACCOOLEIRFF Speed 1,           !- Speed 1 Energy Input Ratio Modifier Curve (flow fraction)
+  HPACCOOLPLFFPLR Speed 1,         !- Speed 1 Part Load Fraction Correlation (part load ratio)
+  1000.0,                          !- Speed 1 Nominal Time for Condensate Removal to Begin {s}
+  1.5,                             !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity {dimensionless}
+  3.0,                             !- Speed 1 Maximum ON/OFF Cycling Rate {cycles/hr}
+  45.0,                            !- Speed 1 Latent Capacity Time Constant {s}
+  0.2,                             !- Speed 1 Rated waste heat fraction of power input {dimensionless}
+  HAPCCoolWHFT Speed 1,            !- Speed 1 Waste heat modifier curve (temperature)
+  0.9,                             !- Speed 1 Evaporative Condenser Effectiveness {dimensionless}
+  0.05,                            !- Speed 1 Evaporative Condenser Air Volume Flow Rate {m3/s}
+  50,                              !- Speed 1 Evaporative Condenser Pump Rated Power Consumption {W}
+  17500,                           !- Speed 2 Gross Rated Total Cooling Capacity {W}
+  0.75,                            !- Speed 2 Gross Rated Sensible Heat Ratio {dimensionless}
+  3.0,                             !- Speed 2 Gross Rated Cooling COP {dimensionless}
+  0.85,                            !- Speed 2 Rated Air Flow Rate {m3/s}
+  ,                                !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                                !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  HPACCoolCapFT Speed 2,           !- Speed 2 Total Cooling Capacity Modifier Curve (temperature)
+  HPACCoolCapFF Speed 2,           !- Speed 2 Total Cooling Capacity Modifier Curve (flow fraction)
+  HPACCOOLEIRFT Speed 2,           !- Speed 2 Energy Input Ratio Modifier Curve (temperature)
+  HPACCOOLEIRFF Speed 2,           !- Speed 2 Energy Input Ratio Modifier Curve (flow fraction)
+  HPACCOOLPLFFPLR Speed 1,         !- Speed 2 Part Load Fraction Correlation (part load ratio)
+  1000.0,                          !- Speed 2 Nominal Time for Condensate Removal to Begin
+  1.5,                             !- Speed 2 Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity {dimensionless}
+  3.0,                             !- Speed 2 Maximum ON/OFF Cycling Rate
+  45.0,                            !- Speed 2 Latent Capacity Time Constant
+  0.2,                             !- Speed 2 Rated waste heat fraction of power input {dimensionless}
+  HAPCCoolWHFT Speed 2,            !- Speed 2 Waste heat modifier curve (temperature)
+  0.9,                             !- Speed 2 Evaporative Condenser Effectiveness {dimensionless}
+  0.1,                             !- Speed 2 Evaporative Condenser Air Volume Flow Rate {m3/s}
+  60,                              !- Speed 2 Evaporative Condenser Pump Rated Power Consumption {W}
+  25500,                           !- Speed 3 Gross Rated Total Cooling Capacity {W}
+  0.75,                            !- Speed 3 Gross Rated Sensible Heat Ratio {dimensionless}
+  3.0,                             !- Speed 3 Gross Rated Cooling COP {dimensionless}
+  1.25,                            !- Speed 3 Rated Air Flow Rate {m3/s}
+  ,                                !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                                !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  HPACCoolCapFT Speed 3,           !- Speed 3 Total Cooling Capacity Modifier Curve (temperature)
+  HPACCoolCapFF Speed 3,           !- Speed 3 Total Cooling Capacity Modifier Curve (flow fraction)
+  HPACCOOLEIRFT Speed 3,           !- Speed 3 Energy Input Ratio Modifier Curve (temperature)
+  HPACCOOLEIRFF Speed 3,           !- Speed 3 Energy Input Ratio Modifier Curve (flow fraction)
+  HPACCOOLPLFFPLR Speed 1,         !- Speed 3 Part Load Fraction Correlation (part load ratio)
+  1000.0,                          !- Speed 3 Nominal Time for Condensate Removal to Begin {s}
+  1.5,                             !- Speed 3 Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity {dimensionless}
+  3.0,                             !- Speed 3 Maximum ON/OFF Cycling Rate {cycles/hr}
+  45.0,                            !- Speed 3 Latent Capacity Time Constant {s}
+  0.2,                             !- Speed 3 Rated waste heat fraction of power input {dimensionless}
+  HAPCCoolWHFT Speed 3,            !- Speed 3 Waste heat modifier curve (temperature)
+  0.9,                             !- Speed 3 Evaporative Condenser Effectiveness {dimensionless}
+  0.2,                             !- Speed 3 Evaporative Condenser Air Volume Flow Rate {m3/s}
+  80,                              !- Speed 3 Evaporative Condenser Pump Rated Power Consumption {W}
+  35500,                           !- Speed 4 Gross Rated Total Cooling Capacity {W}
+  0.75,                            !- Speed 4 Gross Rated Sensible Heat Ratio {dimensionless}
+  3.0,                             !- Speed 4 Gross Rated Cooling COP {dimensionless}
+  1.75,                            !- Speed 4 Rated Air Flow Rate {m3/s}
+  ,                                !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                                !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  HPACCoolCapFT Speed 4,           !- Speed 4 Total Cooling Capacity Modifier Curve (temperature)
+  HPACCoolCapFF Speed 4,           !- Speed 4 Total Cooling Capacity Modifier Curve (flow fraction)
+  HPACCOOLEIRFT Speed 4,           !- Speed 4 Energy Input Ratio Modifier Curve (temperature)
+  HPACCOOLEIRFF Speed 4,           !- Speed 4 Energy Input Ratio Modifier Curve (flow fraction)
+  HPACCOOLPLFFPLR Speed 1,         !- Speed 4 Part Load Fraction Correlation (part load ratio)
+  1000.0,                          !- Speed 4 ominal Time for Condensate Removal to Begin {s}
+  1.5,                             !- Speed 4 Ratio of Initial Moisture Evaporation Rate and Steady-state Capacity {dimensionless}
+  3.0,                             !- Speed 4 Maximum ON/OFF Cycling Rate {cycles/hr}
+  45.0,                            !- Speed 4 Latent Capacity Time Constant {s}
+  0.2,                             !- Speed 4 Rated waste heat fraction of power input {dimensionless}
+  HAPCCoolWHFT Speed 4,            !- Speed 4 Waste heat modifier curve (temperature)
+  0.9,                             !- Speed 4 Evaporative Condenser Effectiveness {dimensionless}
+  0.3,                             !- Speed 4 Evaporative Condenser Air Volume Flow Rate {m3/s}
+  100;                             !- Speed 4 Evaporative Condenser Pump Rated Power Consumption {W}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-12-002}
@@ -4008,9 +4021,13 @@ This numeric field defines the coefficient of performance (COP = the gross heati
 
 This numeric field defines the volume air flow rate, in m\(^{3}\) per second, across the DX heating coil at rated conditions. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated heating capacity. The gross rated heating capacity and gross rated COP should be performance information for the unit with outdoor air dry-bulb temperature of 8.33 C, outdoor air wet-bulb temperature of 6.11 C, heating coil entering air dry-bulb temperature of 21.11 C, heating coil entering air wet-bulb temperature of 15.55 C, and the rated air volume flow rate defined here.
 
-\paragraph{Field: Rated Supply Fan Power Per Volume Flow Rate}\label{field-rated-evaporator-fan-power-per-volume-flow-rate-1}
+\paragraph{Field: 2017 Rated Supply Fan Power Per Volume Flow Rate}\label{field-2017-rated-supply-fan-power-per-volume-flow-rate-1}
 
-This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Heating Coil, Standard Ratings). This value is not used for modeling the evaporator (heating coil) fan during simulations; instead, it is used for calculating the above standard ratings to assist the user in verifying their inputs for modeling this type of equipment.
+This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Heating Coil, Standard Ratings) and in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating the above standard ratings to assist the user in verifying their inputs for modeling this type of equipment.
+
+\paragraph{Field: 2023 Rated Supply Fan Power Per Volume Flow Rate}\label{field-2023-rated-supply-fan-power-per-volume-flow-rate-1}
+
+This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m\(^{3}\)/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF2). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Heating Coil, Standard Ratings) and in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating the above standard ratings to assist the user in verifying their inputs for modeling this type of equipment.
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-13}
 
@@ -4068,7 +4085,7 @@ This numeric field defines the minimum outdoor air dry-bulb temperature where th
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature to Turn On Compressor}\label{field-outdoor-dry-bulb-temperature-to-turn-on-compressor}
 
-This numeric field defines the outdoor air dry-bulb temperature when the compressor is automatically turned back on following an automatic shut off because of low outdoor temperature. This field is only used for the calculation heating seasonal performance factor (HSPF) of heating coil. If this field is not provided, outdoor bin temperature is always considered to be greater than this temperature and Minimum Outdoor dry-bulb Temperature for Compressor Operation field described above.
+This numeric field defines the outdoor air dry-bulb temperature when the compressor is automatically turned back on following an automatic shut off because of low outdoor temperature. This field is only used in calculating the Heating Seasonal Performance Factor (HSPF (2017 ANSI/AHRI standard) and HSPF2 (2023 ANSI/AHRI standard)) of heating coils. If this field is not provided, the outdoor bin temperature is always considered to be greater than this temperature and Minimum Outdoor dry-bulb Temperature for Compressor Operation field described above.
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Defrost Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-defrost-operation}
 
@@ -4098,9 +4115,9 @@ This numeric field defines the fraction of compressor runtime when the defrost c
 
 This numeric field defines the capacity of the resistive defrost heating element in Watts. This input field is used only when the selected defrost strategy is resistive (see input field Defrost Strategy above). The value for this input field must be greater than or equal to 0. If this input field is left blank, the default value is 0.
 
-\paragraph{Field: Region Number}\label{field-region-number}
+\paragraph{Field: Region Number for Calculating HSPF (2017) and HSPF2 (2023)}\label{field-region-number-for-calculating-HSPF-(2017)-and-hspf2-(2023)}
 
-This optional numeric field defines the region number which is used to calculate HSPF of heating coil. The value for this input field must be between 1 and 6. If this input field is left blank, the default value is 4.
+This optional numeric field defines the region number which is used in calculating the Heating Seasonal Performance Factor (HSPF (2017 ANSI/AHRI standard) and HSPF2 (2023 ANSI/AHRI standard)) of heating coils. The value for this input field must be between 1 and 6. If this input field is left blank, the default value is 4.
 
 \paragraph{Field: Evaporator Air Inlet Node Name}\label{field-evaporator-air-inlet-node-name}
 
@@ -4140,7 +4157,8 @@ Coil:Heating:DX:SingleSpeed,
   35000,                           ! Gross Rated Heating Capacity
   2.75,                            ! Gross Rated Heating COP
   1.7,                             ! Rated air flow rate (m3/s)
-  ,                                ! Rated supply fan power per volume flow rate (m3/s)
+  ,                                ! 2017 Rated supply fan power per volume flow rate (m3/s)
+  ,                                ! 2023 Rated supply fan power per volume flow rate (m3/s)
   Heating Coil Air Inlet Node,     ! Heating coil air side inlet node
   SuppHeating Coil Air Inlet Node, ! Heating coil air side outlet node
   HPACHeatCapFT,                   ! Heating cap modifier curve (temperature, C)
@@ -4335,6 +4353,14 @@ This numeric field defines the coefficient of performance (COP = gross heating c
 
 This numeric field defines the volume air flow rate, in m\(^{3}\) per second, across the DX heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated heating capacity. The gross rated heating capacity and gross rated COP should be performance information for the unit with outdoor air dry-bulb temperature of 8.33 °C, outdoor air wet-bulb temperature of 6.11 °C, heating coil entering air dry-bulb temperature of 21.11 °C, heating coil entering air wet-bulb temperature of 15.55 °C, and the rated air volume flow rate defined here.
 
+\paragraph{Field: Speed \textless{}x\textgreater{} 2017 Rated Supply Air Fan Power Per Volume Flow Rate}\label{field-speed-x-2017-rated-supply-air-fan-power-per-volume-flow-rate-1}
+
+This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 773.3 W/(m3/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m3/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210/240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Heating Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating Standard Ratings listed above to assist the user in verifying their inputs for modeling this type of equipment.
+
+\paragraph{Field: Speed \textless{}x\textgreater{} 2023 Rated Supply Air Fan Power Per Volume Flow Rate}\label{field-speed-x-2023-rated-supply-air-fan-power-per-volume-flow-rate-1}
+
+This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1505 W/(m3/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210/240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Heating Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating Standard Ratings listed above to assist the user in verifying their inputs for modeling this type of equipment.
+
 \paragraph{Field: Speed \textless{}x\textgreater{} Heating Capacity Function of Temperature Curve Name}\label{field-speed-x-heating-capacity-function-of-temperature-curve-name}
 
 This alpha field defines the name of a bi-quadratic, quadratic or cubic performance curve for Speed \textless{}x\textgreater{} (ref: Performance Curves) that parameterizes the variation of the total heating capacity as a function of the both the indoor and outdoor air dry-bulb temperature or just the outdoor air dry-bulb temperature depending on the type of curve selected. The bi-quadratic curve is recommended if sufficient manufacturer data is available as it provides sensitivity to the indoor air dry-bulb temperature and a more realistic output. The output of this curve is multiplied by the gross rated heating capacity to give the gross total heating capacity at specific temperature operating conditions (i.e., at an indoor air dry-bulb temperature or outdoor air dry-bulb temperature different from the rating point temperature). The curve is normalized to have the value of 1.0 at the rating point.
@@ -4412,62 +4438,70 @@ Following is an example input for a multi-speed heating DX coil.
 \begin{lstlisting}
 
 COIL:Heating:DX:MultiSpeed,
-  Heat Pump DX Heating Coil 1,   !- Name of heat pump heating coil
-  FanAndCoilAvailSched,       !- Availability Schedule
-  Heating Coil Air Inlet Node,   !- Coil Air Inlet Node
-  SuppHeating Coil Air Inlet Node,   !- Coil Air Outlet Node
-  -8.0,                                       !- Minimum Outdoor Dry-bulb Temperature for Compressor Operation {C}
-  200.0,                                     !- Crankcase Heater Capacity {W}
-  10.0,                                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
-  HPACDefrostCAPFT,               !- Defrost energy input ratio modifier curve (temperature)
-  7.22,                                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
-  reverse-cycle,                     !- Defrost Strategy
-  timed,                                     !- Defrost Control
-  0.058333,                               !- Defrost Time Period Fraction
-  2000.0,                                   !- Resistive Defrost Heater Capacity {W}
-  No,                                           !- Apply Part Load Fraction to Speeds greater than 1
-  NaturalGas,                           !- Fuel type
-  4,                                             !- Number of speeds
-  7500,                                       !- Gross Rated Heating Capacity, Speed 1 {W}
-  2.75,                                       !- Gross Rated Heating COP, Speed 1
-  0.45,                                       !- Rated Air Flow Rate, Speed 1 {m3/s}
-  HPACHeatCapFT Speed 1,     !- Heating Capacity Modifier Curve, Speed 1 (temperature)
-  HPACHeatCapFF Speed 1,     !- Heating capacity modifier curve, Speed 1 (flow fraction)
-  HPACHeatEIRFT Speed 1,     !- Energy input ratio modifier curve, Speed 1 (temperature)
-  HPACHeatEIRFF Speed 1,     !- Energy input ratio modifier curve, Speed 1 (flow fraction)
-  HPACHeatPLFFPLR Speed 1, !- Part load fraction correlation, Speed 1 (part load ratio)
-  0.2,                                         !- Rated waste heat fraction of power input, Speed 1
-  HAPCHeatWHFT Speed 1,       !- Waste heat modifier curve, Speed 1 (temperature)
-  17500,                                     !- Gross Rated Heating Capacity, Speed 2 {W}
-  2.75,                                       !- Gross Rated Heating COP, Speed 2
-  0.85,                                       !- Rated Air Flow Rate, Speed 2 {m3/s}
-  HPACHeatCapFT Speed 2,     !- Heating Capacity Modifier Curve, Speed 2 (temperature)
-  HPACHeatCapFF Speed 2,     !- Heating capacity modifier curve, Speed 2 (flow fraction)
-  HPACHeatEIRFT Speed 2,     !- Energy input ratio modifier curve, Speed 2 (temperature)
-  HPACHeatEIRFF Speed 2,     !- Energy input ratio modifier curve, Speed 2 (flow fraction)
-  HPACHeatPLFFPLR Speed 2, !- Part load fraction correlation, Speed 2 (part load ratio)
-  0.2,                                         !- Rated waste heat fraction of power input, Speed 2
-  HAPCHeatWHFT Speed 2,       !- Waste heat modifier curve, Speed 2 (temperature)
-  25500,                                     !- Gross Rated Heating Capacity, Speed 3 {W}
-  2.75,                                       !- Gross Rated Heating COP, Speed 3
-  1.25,                                       !- Rated Air Flow Rate, Speed 3 {m3/s}
-  HPACHeatCapFT Speed 3,     !- Heating Capacity Modifier Curve, Speed 3 (temperature)
-  HPACHeatCapFF Speed 3,     !- Heating capacity modifier curve, Speed 3 (flow fraction)
-  HPACHeatEIRFT Speed 3,     !- Energy input ratio modifier curve, Speed 3 (temperature)
-  HPACHeatEIRFF Speed 3,     !- Energy input ratio modifier curve, Speed 3 (flow fraction)
-  HPACHeatPLFFPLR Speed 3, !- Part load fraction correlation, Speed 3 (part load ratio)
-  0.2,                                         !- Rated waste heat fraction of power input, Speed 3
-  HAPCHeatWHFT Speed 3,       !- Waste heat modifier curve, Speed 3 (temperature)
-  35500,                                     !- Gross Rated Heating Capacity, Speed 4 {W}
-  2.75,                                       !- Gross Rated Heating COP, Speed 4
-  1.75,                                       !- Rated Air Flow Rate, Speed 4 {m3/s}
-  HPACHeatCapFT Speed 4,     !- Heating Capacity Modifier Curve, Speed 4 (temperature)
-  HPACHeatCapFF Speed 4,     !- Heating capacity modifier curve, Speed 4 (flow fraction)
-  HPACHeatEIRFT Speed 4,     !- Energy input ratio modifier curve, Speed 4 (temperature)
-  HPACHeatEIRFF Speed 4,     !- Energy input ratio modifier curve, Speed 4 (flow fraction)
-  HPACHeatPLFFPLR Speed 4, !- Part load fraction correlation, Speed 4 (part load ratio)
-  0.2,                                         !- Rated waste heat fraction of power input, Speed 4
-  HAPCHeatWHFT Speed 4;       !- Waste heat modifier curve, Speed 4 (temperature)
+  Heat Pump DX Heating Coil 1,     !- Name of heat pump heating coil
+  FanAndCoilAvailSched,            !- Availability Schedule
+  Heating Coil Air Inlet Node,     !- Coil Air Inlet Node
+  SuppHeating Coil Air Inlet Node, !- Coil Air Outlet Node
+  -8.0,                            !- Minimum Outdoor Dry-bulb Temperature for Compressor Operation {C}
+  200.0,                           !- Crankcase Heater Capacity {W}
+  10.0,                            !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
+  HPACDefrostCAPFT,                !- Defrost energy input ratio modifier curve (temperature)
+  7.22,                            !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
+  reverse-cycle,                   !- Defrost Strategy
+  timed,                           !- Defrost Control
+  0.058333,                        !- Defrost Time Period Fraction
+  2000.0,                          !- Resistive Defrost Heater Capacity {W}
+  No,                              !- Apply Part Load Fraction to Speeds greater than 1
+  NaturalGas,                      !- Fuel type
+  4,                               !- Number of speeds
+  7500,                            !- Speed 1 Gross Rated Heating Capacity {W}
+  2.75,                            !- Speed 1 Gross Rated Heating COP
+  0.45,                            !- Speed 1 Rated Air Flow Rate {m3/s}
+  ,                                !- Speed 1 2017 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                                !- Speed 1 2023 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  HPACHeatCapFT Speed 1,           !- Speed 1 Heating Capacity Modifier Curve (temperature)
+  HPACHeatCapFF Speed 1,           !- Speed 1 Heating capacity modifier curve (flow fraction)
+  HPACHeatEIRFT Speed 1,           !- Speed 1 Energy input ratio modifier curve (temperature)
+  HPACHeatEIRFF Speed 1,           !- Speed 1 Energy input ratio modifier curve (flow fraction)
+  HPACHeatPLFFPLR Speed 1,         !- Speed 1 Part load fraction correlation (part load ratio)
+  0.2,                             !- Speed 1 Rated waste heat fraction of power input
+  HAPCHeatWHFT Speed 1,            !- Speed 1 Waste heat modifier curve (temperature)
+  17500,                           !- Speed 2 Gross Rated Heating Capacity {W}
+  2.75,                            !- Speed 2 Gross Rated Heating COP
+  0.85,                            !- Speed 2 Rated Air Flow Rate {m3/s}
+  ,                                !- Speed 2 2017 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                                !- Speed 2 2023 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  HPACHeatCapFT Speed 2,           !- Speed 2 Heating Capacity Modifier Curve (temperature)
+  HPACHeatCapFF Speed 2,           !- Speed 2 Heating capacity modifier curve (flow fraction)
+  HPACHeatEIRFT Speed 2,           !- Speed 2 Energy input ratio modifier curve (temperature)
+  HPACHeatEIRFF Speed 2,           !- Speed 2 Energy input ratio modifier curve (flow fraction)
+  HPACHeatPLFFPLR Speed 2,         !- Speed 2 Part load fraction correlation (part load ratio)
+  0.2,                             !- Speed 2 Rated waste heat fraction of power input
+  HAPCHeatWHFT Speed 2,            !- Speed 2 Waste heat modifier curve (temperature)
+  25500,                           !- Speed 3 Gross Rated Heating Capacity {W}
+  2.75,                            !- Speed 3 Gross Rated Heating COP
+  1.25,                            !- Speed 3 Rated Air Flow Rate {m3/s}
+  ,                                !- Speed 3 2017 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                                !- Speed 3 2023 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  HPACHeatCapFT Speed 3,           !- Speed 3 Heating Capacity Modifier Curve (temperature)
+  HPACHeatCapFF Speed 3,           !- Speed 3 Heating capacity modifier curve (flow fraction)
+  HPACHeatEIRFT Speed 3,           !- Speed 3 Energy input ratio modifier curve (temperature)
+  HPACHeatEIRFF Speed 3,           !- Speed 3 Energy input ratio modifier curve (flow fraction)
+  HPACHeatPLFFPLR Speed 3,         !- Speed 3 Part load fraction correlation (part load ratio)
+  0.2,                             !- Speed 3 Rated waste heat fraction of power input
+  HAPCHeatWHFT Speed 3,            !- Speed 3 Waste heat modifier curve (temperature)
+  35500,                           !- Speed 4 Gross Rated Heating Capacity {W}
+  2.75,                            !- Speed 4 Gross Rated Heating COP
+  1.75,                            !- Speed 4 Rated Air Flow Rate {m3/s}
+  ,                                !- Speed 4 2017 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                                !- Speed 4 2023 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  HPACHeatCapFT Speed 4,           !- Speed 4 Heating Capacity Modifier Curve (temperature)
+  HPACHeatCapFF Speed 4,           !- Speed 4 Heating capacity modifier curve (flow fraction)
+  HPACHeatEIRFT Speed 4,           !- Speed 4 Energy input ratio modifier curve (temperature)
+  HPACHeatEIRFF Speed 4,           !- Speed 4 Energy input ratio modifier curve (flow fraction)
+  HPACHeatPLFFPLR Speed 4,         !- Speed 4 Part load fraction correlation (part load ratio)
+  0.2,                             !- Speed 4 Rated waste heat fraction of power input
+  HAPCHeatWHFT Speed 4;            !- Speed 4 Waste heat modifier curve (temperature)
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-16}
@@ -4637,7 +4671,7 @@ This numeric field defines the minimum outdoor air dry-bulb temperature where th
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature to Turn On Compressor}\label{field-outdoor-dry-bulb-temperature-to-turn-on-compressor-1}
 
-This numeric field defines the outdoor temperature when the compressor is automatically turned back on following an automatic shut off because of low outdoor dry-bulb temperature. This field is only used for the calculation of HSPF. If this field is not provided, then outdoor bin temperature used in the HSPF calculation is always considered to be greater than this temperature and `Minimum Outdoor Dry-Bulb Temperature for Compressor Operation' field described above. This assumption is based on AHRI standard 210/240 (2008) and can introduce significant error in the final value of HSPF.
+This numeric field defines the outdoor temperature when the compressor is automatically turned back on following an automatic shut off because of low outdoor dry-bulb temperature.
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Defrost Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-defrost-operation-2}
 
@@ -5418,7 +5452,15 @@ To model a heat exchanger-assisted DX cooling coil, the input data file should i
 \hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow}
 \end{itemize}
 \item
-  DX cooling coil object (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed})
+  DX cooling coil object such as:
+\begin{itemize}
+\item
+\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
+\item
+\hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
+\item
+\hyperref[coilcoolingdx]{Coil:Cooling:DX}
+\end{itemize}
 \end{itemize}
 
 In terms of controlling the operation of the heat exchanger, the heat exchanger is assumed to always provide its heat transfer when the associated DX cooling coil is operating and no high humidity control mechanism is specified. However, the heat exchanger\textquotesingle s energy transfer may be controlled (i.e., turned on and off) based on a zone air humidity level using either a humidistat (ref. \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem}, \hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool} or \hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool}) or a humidistat and a maximum humidity set point manager to place a humidity ratio set point on the appropriate control node (ref. \hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}). This model may also be used with the unitary changeover bypass system and the unitary air-to-air heat pump system (ref. \hyperref[airloophvacunitaryheatcoolvavchangeoverbypass]{AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass} and \hyperref[airloophvacunitaryheatpumpairtoair]{AirLoopHVAC:UnitaryHeatPump:AirToAir}); however, the heat exchanger is assumed to always provide its heat transfer when the cooling coil operates and cannot be turned on and off based on a zone air humidity set point. Two zone air conditioners may also use this model for improved dehumidification. The first type is the packaged terminal heat pump (ref. \hyperref[zonehvacpackagedterminalheatpump]{ZoneHVAC:PackagedTerminalHeatPump}) where the heat exchanger's heat transfer is always active whenever the cooling coil operates. The second type is the window air conditioner (ref. \hyperref[zonehvacwindowairconditioner]{ZoneHVAC:WindowAirConditioner}) where the heat exchanger's heat transfer is always active when the cooling coil operates and no high humidity control mechanism is specified, OR the heat exchanger's heat transfer may be controlled based on zone air humidity level if a humidistat and high humidity set point manager are specified (maximum humidity ratio set point placed on the heat exchanger's exhaust air outlet node, ref. Figure~\ref{fig:schematic-of-the-coilsystem-cooling-dx}).
@@ -5458,7 +5500,7 @@ This alpha field denotes the name of the air-to-air heat exchanger being modeled
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-1}
 
-This alpha field denotes the type of DX cooling coil being modeled. The only valid choices are \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}.
+This alpha field denotes the type of DX cooling coil being modeled. The only valid choices are \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}, \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}, or \hyperref[coilcoolingdx]{Coil:Cooling:DX}.
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-1}
 
@@ -9245,7 +9287,8 @@ Coil:Cooling:DX:SingleSpeed,
   autosize,                !- Gross Rated Sensible Heat Ratio
   3.0,                     !- Gross Rated Cooling COP {W/W}
   autosize,                !- Rated Air Flow Rate {m3/s}
-  ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
   Heating Coil Air Inlet Node,  !- Air Outlet Node Name
   HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
@@ -9254,7 +9297,7 @@ Coil:Cooling:DX:SingleSpeed,
   HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
   HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
   ,                        !- Nominal Time for Condensate Removal to Begin {s}
-  ,   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+  ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
   ,                        !- Maximum Cycling Rate {cycles/hr}
   ,                        !- Latent Capacity Time Constant {s}
   ,                        !- Condenser Air Inlet Node Name
@@ -9263,7 +9306,7 @@ Coil:Cooling:DX:SingleSpeed,
   ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
   ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
   ,                        !- Crankcase Heater Capacity {W}
-  ,                 !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+  ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   ,                        !- Supply Water Storage Tank Name
   ,                        !- Condensate Collection Water Storage Tank Name
   200,                     !- Basin Heater Capacity {W/K}
@@ -9312,10 +9355,10 @@ Coil:Cooling:DX:TwoSpeed,
   ,                        !- Basin Heater Capacity {W/K}
   ,                        !- Basin Heater Setpoint Temperature {C}
   ,                        !- Basin Heater Operating Schedule Name
-  ,     !- Sensible Heat Ratio Function of Temperature Curve Name
-  ,     !- Sensible Heat Ratio Function of Flow Fraction Curve Name
-  ,     !- Low Speed Sensible Heat Ratio Function of Temperature Curve Name
-  ,     !- Low Speed Sensible Heat Ratio Function of Flow Fraction Curve Name
+  ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
+  ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+  ,                        !- Low Speed Sensible Heat Ratio Function of Temperature Curve Name
+  ,                        !- Low Speed Sensible Heat Ratio Function of Flow Fraction Curve Name
   NORTH ZONE;              !- Zone Name for Condenser Placement
 \end{lstlisting}
 
@@ -9335,7 +9378,7 @@ Coil:Cooling:DX:MultiSpeed,
   No,                      !- Apply Part Load Fraction to Speeds Greater than 1
   No,                      !- Apply Latent Degradation to Speeds Greater than 1
   200.0,                   !- Crankcase Heater Capacity {W}
-  10.0,           !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+  10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   ,                        !- Basin Heater Capacity {W/K}
   ,                        !- Basin Heater Setpoint Temperature {C}
   ,                        !- Basin Heater Operating Schedule Name
@@ -9345,14 +9388,15 @@ Coil:Cooling:DX:MultiSpeed,
   autosize,                !- Speed 1 Gross Rated Sensible Heat Ratio
   3.0,                     !- Speed 1 Gross Rated Cooling COP {W/W}
   autosize,                !- Speed 1 Rated Air Flow Rate {m3/s}
-  453.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  453.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  547.7,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACCoolCapFT Speed 1,   !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
-  HPACCoolCapFF Speed 1, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
+  HPACCoolCapFF Speed 1,   !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
   HPACCOOLEIRFT Speed 1,   !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
   HPACCOOLEIRFF Speed 1,   !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name
   HPACCOOLPLFFPLR Speed 1, !- Speed 1 Part Load Fraction Correlation Curve Name
   1000.0,                  !- Speed 1 Nominal Time for Condensate Removal to Begin {s}
-  1.5,  !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+  1.5,                     !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
   3.0,                     !- Speed 1 Maximum Cycling Rate {cycles/hr}
   45.0,                    !- Speed 1 Latent Capacity Time Constant {s}
   0.2,                     !- Speed 1 Rated Waste Heat Fraction of Power Input {dimensionless}
@@ -9364,14 +9408,15 @@ Coil:Cooling:DX:MultiSpeed,
   autosize,                !- Speed 2 Gross Rated Sensible Heat Ratio
   3.0,                     !- Speed 2 Gross Rated Cooling COP {W/W}
   autosize,                !- Speed 2 Rated Air Flow Rate {m3/s}
-  523.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  523.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  632.3,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACCoolCapFT Speed 2,   !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
-  HPACCoolCapFF Speed 2, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
+  HPACCoolCapFF Speed 2,   !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
   HPACCOOLEIRFT Speed 2,   !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
   HPACCOOLEIRFF Speed 2,   !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name
   HPACCOOLPLFFPLR Speed 1, !- Speed 2 Part Load Fraction Correlation Curve Name
   1000.0,                  !- Speed 2 Nominal Time for Condensate Removal to Begin {s}
-  1.5,  !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
+  1.5,                     !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
   3.0,                     !- Speed 2 Maximum Cycling Rate {cycles/hr}
   45.0,                    !- Speed 2 Latent Capacity Time Constant {s}
   0.2,                     !- Speed 2 Rated Waste Heat Fraction of Power Input {dimensionless}
@@ -9383,14 +9428,15 @@ Coil:Cooling:DX:MultiSpeed,
   autosize,                !- Speed 3 Gross Rated Sensible Heat Ratio
   3.0,                     !- Speed 3 Gross Rated Cooling COP {W/W}
   autosize,                !- Speed 3 Rated Air Flow Rate {m3/s}
-  573.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  573.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  692.7,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACCoolCapFT Speed 3,   !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
-  HPACCoolCapFF Speed 3, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name
+  HPACCoolCapFF Speed 3,   !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name
   HPACCOOLEIRFT Speed 3,   !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
   HPACCOOLEIRFF Speed 3,   !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name
   HPACCOOLPLFFPLR Speed 1, !- Speed 3 Part Load Fraction Correlation Curve Name
   1000.0,                  !- Speed 3 Nominal Time for Condensate Removal to Begin {s}
-  1.5, !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
+  1.5,                     !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
   3.0,                     !- Speed 3 Maximum Cycling Rate {cycles/hr}
   45.0,                    !- Speed 3 Latent Capacity Time Constant {s}
   0.2,                     !- Speed 3 Rated Waste Heat Fraction of Power Input {dimensionless}
@@ -9402,14 +9448,15 @@ Coil:Cooling:DX:MultiSpeed,
   autosize,                !- Speed 4 Gross Rated Sensible Heat Ratio
   3.0,                     !- Speed 4 Gross Rated Cooling COP {W/W}
   autosize,                !- Speed 4 Rated Air Flow Rate {m3/s}
-  673.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  673.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  673.3,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACCoolCapFT Speed 4,   !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
-  HPACCoolCapFF Speed 4, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name
+  HPACCoolCapFF Speed 4,   !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name
   HPACCOOLEIRFT Speed 4,   !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
   HPACCOOLEIRFF Speed 4,   !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name
   HPACCOOLPLFFPLR Speed 1, !- Speed 4 Part Load Fraction Correlation Curve Name
   1000.0,                  !- Speed 4 Nominal Time for Condensate Removal to Begin {s}
-  1.5, !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
+  1.5,                     !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
   3.0,                     !- Speed 4 Maximum Cycling Rate {cycles/hr}
   45.0,                    !- Speed 4 Latent Capacity Time Constant {s}
   0.2,                     !- Speed 4 Rated Waste Heat Fraction of Power Input {dimensionless}
@@ -9456,7 +9503,8 @@ Coil:Heating:DX:SingleSpeed,
   autosize,                !- Gross Rated Heating Capacity {W}
   2.75,                    !- Gross Rated Heating COP {W/W}
   autosize,                !- Rated Air Flow Rate {m3/s}
-  ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
   Heating Coil Air Inlet Node,  !- Air Inlet Node Name
   SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
   HPACHeatCapFT,           !- Heating Capacity Function of Temperature Curve Name
@@ -9465,16 +9513,16 @@ Coil:Heating:DX:SingleSpeed,
   HPACHeatEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
   HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
   ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name
-  -5.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+  -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
   5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
   200.0,                   !- Crankcase Heater Capacity {W}
-  10.0,             !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+  10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   Resistive,               !- Defrost Strategy
   TIMED,                   !- Defrost Control
   0.166667,                !- Defrost Time Period Fraction
   autosize,                !- Resistive Defrost Heater Capacity {W}
-  4,                       !- Region number for calculating HSPF
+  4,                       !- Region number for calculating HSPF (2017) and HSPF2 (2023)
   ,                        !- Evaporator Air Inlet Node Name
   NORTH ZONE,              !- Zone Name for Evaporator Placement
   autosize,                !- Secondary Coil Air Flow Rate
@@ -9505,12 +9553,13 @@ Coil:Heating:DX:MultiSpeed,
   autosize,                !- Resistive Defrost Heater Capacity {W}
   No,                      !- Apply Part Load Fraction to Speeds Greater than 1
   Electricity,             !- Fuel Type
-  4,                       !- Region number for Calculating HSPF
+  4,                       !- Region number for Calculating HSPF (2017) and HSPF2 (2023)
   4,                       !- Number of Speeds
   autosize,                !- Speed 1 Gross Rated Heating Capacity {W}
   2.75,                    !- Speed 1 Gross Rated Heating COP {W/W}
   autosize,                !- Speed 1 Rated Air Flow Rate {m3/s}
-  345.0,                   !- Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  345.0,                   !- Speed 1 2017 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  416.9,                   !- Speed 1 2023 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACHeatCapFT Speed 1,   !- Speed 1 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFF Speed 1,   !- Speed 1 Heating Capacity Function of Flow Fraction Curve Name
   HPACHeatEIRFT Speed 1,   !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -9521,7 +9570,8 @@ Coil:Heating:DX:MultiSpeed,
   autosize,                !- Speed 2 Gross Rated Heating Capacity {W}
   2.75,                    !- Speed 2 Gross Rated Heating COP {W/W}
   autosize,                !- Speed 2 Rated Air Flow Rate {m3/s}
-  425.0,                   !- Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  425.0,                   !- Speed 2 2017 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  513.6,                   !- Speed 2 2023 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACHeatCapFT Speed 2,   !- Speed 2 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFF Speed 2,   !- Speed 2 Heating Capacity Function of Flow Fraction Curve Name
   HPACHeatEIRFT Speed 2,   !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -9532,7 +9582,8 @@ Coil:Heating:DX:MultiSpeed,
   autosize,                !- Speed 3 Gross Rated Heating Capacity {W}
   2.75,                    !- Speed 3 Gross Rated Heating COP {W/W}
   autosize,                !- Speed 3 Rated Air Flow Rate {m3/s}
-  525.0,                   !- Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  525.0,                   !- Speed 3 2017 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  634.4,                   !- Speed 3 2023 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACHeatCapFT Speed 3,   !- Speed 3 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFF Speed 3,   !- Speed 3 Heating Capacity Function of Flow Fraction Curve Name
   HPACHeatEIRFT Speed 3,   !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -9544,6 +9595,7 @@ Coil:Heating:DX:MultiSpeed,
   2.75,                    !- Speed 4 Gross Rated Heating COP {W/W}
   autosize,                !- Speed 4 Rated Air Flow Rate {m3/s}
   673.0,                   !- Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+  813.2,                   !- Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACHeatCapFT Speed 4,   !- Speed 4 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFF Speed 4,   !- Speed 4 Heating Capacity Function of Flow Fraction Curve Name
   HPACHeatEIRFT Speed 4,   !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -9555,22 +9607,22 @@ Coil:Heating:DX:MultiSpeed,
   autosize,                !- Speed 1 Secondary Coil Air Flow Rate
   1.5,                     !- Speed 1 Secondary Coil Fan Flow Scaling Factor
   0.9,                     !- Speed 1 Nominal Sensible Heat Ratio of Secondary Coil
-  DXSecondaryCoilSHRFT,!- Speed 1 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+  DXSecondaryCoilSHRFT,    !- Speed 1 Sensible Heat Ratio Modifier Function of Temperature Curve Name
   DXSecondaryCoilSHRFFF,   !- Speed 1 Sensible Heat Ratio Function of Flow Fraction Curve Name
   autosize,                !- Speed 2 Secondary Coil Air Flow Rate
   1.5,                     !- Speed 2 Secondary Coil Fan Flow Scaling Factor
   0.9,                     !- Speed 2 Nominal Sensible Heat Ratio of Secondary Coil
-  DXSecondaryCoilSHRFT,!- Speed 2 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+  DXSecondaryCoilSHRFT,    !- Speed 2 Sensible Heat Ratio Modifier Function of Temperature Curve Name
   DXSecondaryCoilSHRFFF,   !- Speed 2 Sensible Heat Ratio Function of Flow Fraction Curve Name
   autosize,                !- Speed 3 Secondary Coil Air Flow Rate
   1.5,                     !- Speed 3 Secondary Coil Fan Flow Scaling Factor
   0.9,                     !- Speed 3 Nominal Sensible Heat Ratio of Secondary Coil
-  DXSecondaryCoilSHRFT,!- Speed 3 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+  DXSecondaryCoilSHRFT,    !- Speed 3 Sensible Heat Ratio Modifier Function of Temperature Curve Name
   DXSecondaryCoilSHRFFF,   !- Speed 3 Sensible Heat Ratio Function of Flow Fraction Curve Name
   autosize,                !- Speed 4 Secondary Coil Air Flow Rate
   1.5,                     !- Speed 4 Secondary Coil Fan Flow Scaling Factor
   0.9,                     !- Speed 4 Nominal Sensible Heat Ratio of Secondary Coil
-  DXSecondaryCoilSHRFT,!- Speed 4 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+  DXSecondaryCoilSHRFT,    !- Speed 4 Sensible Heat Ratio Modifier Function of Temperature Curve Name
   DXSecondaryCoilSHRFFF;   !- Speed 4 Sensible Heat Ratio Function of Flow Fraction Curve Name
 \end{lstlisting}
 

@@ -69,6 +69,7 @@
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricASHRAE205.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>

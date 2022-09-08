@@ -72,7 +72,8 @@
     0.72,                    !- Gross Rated Sensible Heat Ratio
     4.07,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox KCA060S4 CapFT,   !- Total Cooling Capacity Function of Temperature Curve Name
@@ -566,7 +567,8 @@
     0.73,                    !- Gross Rated Sensible Heat Ratio
     4.48,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox SCA060H4B CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1058,7 +1060,8 @@
     0.75,                    !- Gross Rated Sensible Heat Ratio
     4.07,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Lennox TCA060S2 CapFT,   !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1550,7 +1553,8 @@
     0.74,                    !- Gross Rated Sensible Heat Ratio
     4.15,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier Centurion 50PG06 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1652,7 +1656,8 @@
     0.76,                    !- Gross Rated Sensible Heat Ratio
     4.05,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier Centurion 50PG12 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1754,7 +1759,8 @@
     0.71,                    !- Gross Rated Sensible Heat Ratio
     3.95,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier Centurion 50PG24 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1856,7 +1862,8 @@
     0.78,                    !- Gross Rated Sensible Heat Ratio
     3.9,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier Comfort 50ES060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -1958,7 +1965,8 @@
     0.73,                    !- Gross Rated Sensible Heat Ratio
     3.9,                     !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier Weathermaster 50HJ006 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2060,7 +2068,8 @@
     0.73,                    !- Gross Rated Sensible Heat Ratio
     3.71,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier Weathermaster 50HJ012 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2162,7 +2171,8 @@
     0.76,                    !- Gross Rated Sensible Heat Ratio
     3.73,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Carrier Weathermaster 50HJ024 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2264,7 +2274,8 @@
     0.72,                    !- Gross Rated Sensible Heat Ratio
     3.95,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     Goodman CPC060 CapFT,    !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2366,7 +2377,8 @@
     0.71,                    !- Gross Rated Sensible Heat Ratio
     3.88,                    !- Gross Rated Cooling COP {W/W}
     0.8496,                  !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     York Affinity DNP060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2468,7 +2480,8 @@
     0.68,                    !- Gross Rated Sensible Heat Ratio
     4.24,                    !- Gross Rated Cooling COP {W/W}
     0.826,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     York Affinity DNZ060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2570,7 +2583,8 @@
     0.70,                    !- Gross Rated Sensible Heat Ratio
     4.25,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     York Lattitude SJ060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2672,7 +2686,8 @@
     0.70,                    !- Gross Rated Sensible Heat Ratio
     3.85,                    !- Gross Rated Cooling COP {W/W}
     0.8024,                  !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     York Lattitude NM060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2774,7 +2789,8 @@
     0.734,                   !- Gross Rated Sensible Heat Ratio
     4.06,                    !- Gross Rated Cooling COP {W/W}
     1.888,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     York Predator ZF120 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2876,7 +2892,8 @@
     0.685,                   !- Gross Rated Sensible Heat Ratio
     3.98,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     York Sunline ZR060 CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -2978,7 +2995,8 @@
     0.69,                    !- Gross Rated Sensible Heat Ratio
     4.05,                    !- Gross Rated Cooling COP {W/W}
     0.944,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     York Sunline DR060 CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -3080,7 +3098,8 @@
     0.70,                    !- Gross Rated Sensible Heat Ratio
     3.59,                    !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     York Sunline ZF240 CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
@@ -3182,7 +3201,8 @@
     0.75,                    !- Gross Rated Sensible Heat Ratio
     4.096,                   !- Gross Rated Cooling COP {W/W}
     3.776,                   !- Rated Air Flow Rate {m3/s}
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     York Sunline DJ240 CapFT,!- Total Cooling Capacity Function of Temperature Curve Name

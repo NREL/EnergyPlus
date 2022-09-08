@@ -2075,6 +2075,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_1 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_1 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_1 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2583,6 +2584,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_1 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_1 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_1 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -3091,6 +3093,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_1 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_1 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_1 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -3599,6 +3602,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_2 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_2 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_2 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -4107,6 +4111,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_2 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_2 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_2 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -4615,6 +4620,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_2 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_2 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_2 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -5123,6 +5129,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_3 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_3 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_3 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -5631,6 +5638,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_3 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_3 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_3 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6139,6 +6147,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_3 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_3 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_3 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -6647,6 +6656,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_4 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_4 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_4 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7155,6 +7165,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_4 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_4 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_4 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -7663,6 +7674,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_4 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_4 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_4 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -8171,6 +8183,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_5 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_5 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_5 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -8679,6 +8692,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_5 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_5 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_5 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -9187,6 +9201,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_5 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_5 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_5 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -9695,6 +9710,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_6 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_6 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_6 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -10203,6 +10219,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_6 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_6 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_6 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -10711,6 +10728,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_6 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_6 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_6 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11219,6 +11237,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_7 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_7 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_7 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -11727,6 +11746,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_7 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_7 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_7 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -12235,6 +12255,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_7 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_7 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_7 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -12743,6 +12764,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_8 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_8 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_8 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -13251,6 +13273,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_8 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_8 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_8 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -13759,6 +13782,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_8 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_8 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_8 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -14267,6 +14291,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_9 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_9 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_9 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -14775,6 +14800,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_9 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_9 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_9 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -15283,6 +15309,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_9 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_9 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_9 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -15791,6 +15818,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_10 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_10 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_10 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -16299,6 +16327,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_10 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_10 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_10 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -16807,6 +16836,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_10 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_10 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_10 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -17315,6 +17345,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_11 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_11 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_11 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -17823,6 +17854,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_11 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_11 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_11 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -18331,6 +18363,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_11 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_11 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_11 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -18839,6 +18872,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_12 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_12 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_12 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -19347,6 +19381,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_12 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_12 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_12 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -19855,6 +19890,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_12 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_12 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_12 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -20342,6 +20378,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_13 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_13 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_13 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -20829,6 +20866,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_13 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_13 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_13 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -21316,6 +21354,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_13 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_13 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_13 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -21769,6 +21808,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_14 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_14 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_14 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -22222,6 +22262,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_14 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_14 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_14 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -22675,6 +22716,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_14 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_14 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_14 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -23162,6 +23204,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_1_SEC_15 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_1_SEC_15 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_1_SEC_15 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -23649,6 +23692,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_2_SEC_15 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_2_SEC_15 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_2_SEC_15 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
@@ -24136,6 +24180,7 @@
     3,                       !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     ZN_1_FLR_3_SEC_15 PTACDXcool inlet,  !- Air Inlet Node Name
     ZN_1_FLR_3_SEC_15 PTAC Post CC Node,  !- Air Outlet Node Name
     ZN_1_FLR_3_SEC_15 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
