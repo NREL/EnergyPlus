@@ -3271,7 +3271,8 @@ namespace SurfaceGeometry {
         //       DATE WRITTEN   May 2000
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
+        //       ADDED WARNINGS and UPDATED DESCRIPTIONS in Sep 2022
+        //
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the Detached Shading Surface Data,
         // checks it for errors, etc.
@@ -3281,52 +3282,64 @@ namespace SurfaceGeometry {
 
         // REFERENCES:
         // Detached Shading Surface Definition(s)
-        // Surface:Shading:Detached:Fixed,
-        //       \memo used for shading elements such as trees
-        //       \memo these items are fixed in space and would not move with relative geometry
-        //  A1 , \field User Supplied Surface Name
-        //       \required-field
-        //       \type alpha
-        //  A2,  \field TransSchedShadowSurf
-        //       \note Transmittance schedule for the shading device, defaults to zero (always opaque)
-        //       \type object-list
-        //       \object-list ScheduleNames
-        //  N1 , \field Number of Surface Vertex Groups -- Number of (X,Y,Z) groups in this surface
-        //       \required-field
-        //       \note shown with 12 vertex coordinates -- extensible object
-        //       \autocalculatable
-        //       \default autocalculate
-        //       \minimum 3
-        //       \note Rules for vertices are given in SurfaceGeometry coordinates --
-        //       \note For this object all surface coordinates are relative to the building origin (0,0,0)
-        //       \note and will rotate with the BUILDING north axis.
-        //  N2,  \field Vertex 1 X-coordinate
-        //       \units m
-        //       \type real
-        //  N3-37; as indicated by the N1 value
-        // Surface:Shading:Detached:Building,
-        //       \memo used for shading elements such as trees, other buildings, parts of this building not being modeled
-        //       \memo these items are relative to the current building and would move with relative geometry
-        //  A1 , \field User Supplied Surface Name
-        //       \required-field
-        //       \type alpha
-        //  A2,  \field TransSchedShadowSurf
-        //       \note Transmittance schedule for the shading device, defaults to zero (always opaque)
-        //       \type object-list
-        //       \object-list ScheduleNames
-        //  N1 , \field Number of Surface Vertex Groups -- Number of (X,Y,Z) groups in this surface
-        //       \required-field
-        //       \note shown with 12 vertex coordinates -- extensible object
-        //       \autocalculatable
-        //       \default autocalculate
-        //       \minimum 3
-        //       \note Rules for vertices are given in SurfaceGeometry coordinates --
-        //       \note For this object all surface coordinates are relative to the building origin (0,0,0)
-        //       \note and will rotate with the BUILDING north axis.
-        //  N2,  \field Vertex 1 X-coordinate
-        //       \units m
-        //       \type real
-        //  N3-37; as indicated by the N1 value
+        // Shading:Site:Detailed,
+        //   \extensible:3 -- duplicate last set of x,y,z coordinates, renumbering please (and changing z terminator to , for all but last)
+        //        \memo used for shading elements such as trees
+        //        \memo these items are fixed in space and would not move with relative geometry
+        //        \format vertices
+        //        \min-fields 12
+        //   A1 , \field Name
+        //        \required-field
+        //        \type alpha
+        //        \reference AllShadingAndHTSurfNames
+        //        \reference AllShadingSurfNames
+        //   A2,  \field Transmittance Schedule Name
+        //        \note Transmittance schedule for the shading device, defaults to zero (always opaque)
+        //        \type object-list
+        //        \object-list ScheduleNames
+        //   N1 , \field Number of Vertices
+        //        \note shown with 6 vertex coordinates -- extensible object
+        //        \autocalculatable
+        //        \default autocalculate
+        //        \minimum 3
+        //        \note Rules for vertices are given in GlobalGeometryRules coordinates --
+        //        \note For this object all surface coordinates are in world coordinates.
+        //   N2,  \field Vertex 1 X-coordinate
+        //        \begin-extensible
+        //        \required-field
+        //        \units m
+        //        \type real
+        //   N3-N361; as indicated by the N2 value
+        //
+        // Shading:Building:Detailed,
+        //   \extensible:3 -- duplicate last set of x,y,z coordinates, renumbering please (and changing z terminator to , for all but last)
+        //        \memo used for shading elements such as trees, other buildings, parts of this building not being modeled
+        //        \memo these items are relative to the current building and would move with relative geometry
+        //        \format vertices
+        //        \min-fields 12
+        //   A1 , \field Name
+        //        \required-field
+        //        \type alpha
+        //        \reference AllShadingAndHTSurfNames
+        //        \reference AllShadingSurfNames
+        //   A2,  \field Transmittance Schedule Name
+        //        \note Transmittance schedule for the shading device, defaults to zero (always opaque)
+        //        \type object-list
+        //        \object-list ScheduleNames
+        //   N1 , \field Number of Vertices
+        //        \note shown with 6 vertex coordinates -- extensible object
+        //        \autocalculatable
+        //        \default autocalculate
+        //        \minimum 3
+        //        \note Rules for vertices are given in GlobalGeometryRules coordinates --
+        //        \note For this object all surface coordinates are relative to the building origin (0,0,0)
+        //        \note and will rotate with the BUILDING north axis.
+        //   N2,  \field Vertex 1 X-coordinate
+        //        \begin-extensible
+        //        \required-field
+        //        \units m
+        //        \type real
+        //   N3-N361; as indicated by the N2 value
 
         // Using/Aliasing
 
@@ -6334,6 +6347,7 @@ namespace SurfaceGeometry {
         //       DATE WRITTEN   May 2000
         //       MODIFIED       na
         //       RE-ENGINEERED  na
+        //       ADDED WARNINGS and UPDATED DESCRIPTIONS in Sep 2022
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the HeatTransfer Surface Data,
@@ -6344,33 +6358,40 @@ namespace SurfaceGeometry {
 
         // REFERENCES:
         //  Attached Shading Surface Definition
-        // Surface:Shading:Attached,
-        //       \memo used For fins, overhangs, elements that shade the building, are attached to the building
-        //       \memo but are not part of the heat transfer calculations
-        //  A1 , \field User Supplied Surface Name
-        //       \required-field
-        //       \type alpha
-        //       \reference AttachedShadingSurfNames
-        //  A2 , \field Base Surface Name
-        //       \required-field
-        //       \type object-list
-        //       \object-list SurfaceNames
-        //  A3,  \field TransSchedShadowSurf
-        //       \note Transmittance schedule for the shading device, defaults to zero (always opaque)
-        //       \type object-list
-        //       \object-list ScheduleNames
-        //  N1 , \field Number of Surface Vertex Groups -- Number of (X,Y,Z) groups in this surface
-        //       \required-field
-        //       \note currently limited 3 or 4, later?
-        //       \minimum 3
-        //       \maximum 4
-        //       \note vertices are given in SurfaceGeometry coordinates -- if relative, all surface coordinates
-        //       \note are "relative" to the Zone Origin.  if WCS, then building and zone origins are used
-        //       \note for some internal calculations, but all coordinates are given in an "absolute" system.
-        //  N2,  \field Vertex 1 X-coordinate
-        //       \units m
-        //       \type real
-        //  N3-13; as indicated by the N2 value
+        // Shading:Zone:Detailed,
+        //   \extensible:3 -- duplicate last set of x,y,z coordinates, renumbering please (and changing z terminator to , for all but last)
+        //        \memo used For fins, overhangs, elements that shade the building, are attached to the building
+        //        \memo but are not part of the heat transfer calculations
+        //        \format vertices
+        //        \min-fields 13
+        //   A1 , \field Name
+        //        \required-field
+        //        \type alpha
+        //        \reference AttachedShadingSurfNames
+        //        \reference AllShadingAndHTSurfNames
+        //        \reference AllShadingSurfNames
+        //   A2 , \field Base Surface Name
+        //        \required-field
+        //        \type object-list
+        //        \object-list SurfaceNames
+        //   A3,  \field Transmittance Schedule Name
+        //        \note Transmittance schedule for the shading device, defaults to zero (always opaque)
+        //        \type object-list
+        //        \object-list ScheduleNames
+        //   N1 , \field Number of Vertices
+        //        \note shown with 6 vertex coordinates -- extensible object
+        //        \autocalculatable
+        //        \default autocalculate
+        //        \minimum 3
+        //        \note vertices are given in GlobalGeometryRules coordinates -- if relative, all surface coordinates
+        //        \note are "relative" to the Zone Origin. if world, then building and zone origins are used
+        //        \note for some internal calculations, but all coordinates are given in an "absolute" system.
+        //   N2,  \field Vertex 1 X-coordinate
+        //        \begin-extensible
+        //        \required-field
+        //        \units m
+        //        \type real
+        //   N3-N361; as indicated by the N2 value
 
         // Using/Aliasing
 
