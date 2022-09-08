@@ -1088,18 +1088,18 @@ namespace UnitarySystems {
 
         if (this->m_MySetPointCheckFlag) {
             if (!state.dataGlobal->SysSizingCalc && state.dataHVACGlobal->DoSetPointTest) {
-
+                bool setPointMissing = false;
                 if (this->m_CoolCoilExists) {
                     int ControlNode = this->m_SystemCoolControlNodeNum;
                     if (ControlNode > 0) {
                         this->checkNodeSetPoint(state, AirLoopNum, ControlNode, CoolingCoil, OAUCoilOutTemp);
                     } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
-                        ShowSevereError(state, format("{}: Missing set point in {} = {}", routineName, this->UnitType, this->Name));
+                        ShowSevereError(state, format("{}: Missing cooling set point in {} = {}", routineName, this->UnitType, this->Name));
                         ShowContinueError(state,
                                           format("...Setpoint is required at system air outlet node = {} or cooling coil air outlet node = {}",
                                                  state.dataLoopNodes->NodeID(this->AirOutNode),
                                                  state.dataLoopNodes->NodeID(this->CoolCoilOutletNodeNum)));
-                        state.dataUnitarySystems->initUnitarySystemsErrorsFound = true;
+                        setPointMissing = true;
                     }
                 }
 
@@ -1108,12 +1108,12 @@ namespace UnitarySystems {
                     if (ControlNode > 0) {
                         this->checkNodeSetPoint(state, AirLoopNum, ControlNode, HeatingCoil, OAUCoilOutTemp);
                     } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
-                        ShowSevereError(state, format("{}: Missing set point in {} = {}", routineName, this->UnitType, this->Name));
+                        ShowSevereError(state, format("{}: Missing heating set point in {} = {}", routineName, this->UnitType, this->Name));
                         ShowContinueError(state,
                                           format("...Setpoint is required at system air outlet node = {} or heating coil air outlet node = {}",
                                                  state.dataLoopNodes->NodeID(this->AirOutNode),
                                                  state.dataLoopNodes->NodeID(this->HeatCoilOutletNodeNum)));
-                        state.dataUnitarySystems->initUnitarySystemsErrorsFound = true;
+                        setPointMissing = true;
                     }
                 }
 
@@ -1122,16 +1122,18 @@ namespace UnitarySystems {
                     if (ControlNode > 0) {
                         this->checkNodeSetPoint(state, AirLoopNum, ControlNode, SuppHeatCoil, OAUCoilOutTemp);
                     } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
-                        ShowSevereError(state, format("{}: Missing set point in {} = {}", routineName, this->UnitType, this->Name));
+                        ShowSevereError(state,
+                                        format("{}: Missing supplemental heater set point in {} = {}", routineName, this->UnitType, this->Name));
                         ShowContinueError(
                             state,
                             format("...Setpoint is required at system air outlet node = {} or supplemental heating coil air outlet node = {}",
                                    state.dataLoopNodes->NodeID(this->AirOutNode),
                                    state.dataLoopNodes->NodeID(this->m_SuppCoilAirOutletNode)));
-                        state.dataUnitarySystems->initUnitarySystemsErrorsFound = true;
+                        setPointMissing = true;
                     }
                 }
 
+                if (setPointMissing) ShowFatalError(state, "Previous errors cause termination.");
                 this->m_MySetPointCheckFlag = false;
             }
         }
@@ -1227,9 +1229,6 @@ namespace UnitarySystems {
             state.dataHVACGlobal->DXElecCoolingPower = 0.0;
             state.dataHVACGlobal->DXElecHeatingPower = 0.0;
             state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
-        }
-        if (state.dataUnitarySystems->initUnitarySystemsErrorsFound) {
-            ShowFatalError(state, "Previous errors cause termination.");
         }
     }
 
