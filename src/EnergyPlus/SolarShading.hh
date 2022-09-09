@@ -430,6 +430,7 @@ struct SolarShadingData : BaseGlobalStruct
 #endif
 
     bool GetInputFlag = true;
+    bool GetInputFlag_SurfGeom_TM_and_Pixel_Count = true;
     bool firstTime = true;
     bool debugging = false;
     std::vector<unsigned> penumbraIDs;
@@ -542,6 +543,7 @@ struct SolarShadingData : BaseGlobalStruct
         this->ShadowingDaysLeft = 0;      // Days left in current shadowing period
         this->debugging = false;
         this->GetInputFlag = true;
+        this->GetInputFlag_SurfGeom_TM_and_Pixel_Count = true;
         this->firstTime = true;
         this->HCNS.deallocate();
         this->HCNV.deallocate();
