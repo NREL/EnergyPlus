@@ -85,6 +85,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
@@ -3426,6 +3427,13 @@ namespace SurfaceGeometry {
                                             state.dataIPShortCut->cAlphaFieldNames(2) + " not found=" + state.dataIPShortCut->cAlphaArgs(2));
                         ErrorsFound = true;
                     } else {
+                        if (state.dataSolarShading->GetInputFlag) {
+                            SolarShading::GetShadowingInput(state);
+                            state.dataSolarShading->GetInputFlag = false;
+                            state.dataSolarShading->MaxHCV = (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) -
+                                                             1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
+                            assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
+                        }
                         if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) {
                             ShowSevereError(state,
                                             format("{}=\"{}\" has an active {}=\"{}\";",
@@ -6496,6 +6504,13 @@ namespace SurfaceGeometry {
                                         state.dataIPShortCut->cAlphaFieldNames(3) + " not found=\"" + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
                 } else {
+                    if (state.dataSolarShading->GetInputFlag) {
+                        SolarShading::GetShadowingInput(state);
+                        state.dataSolarShading->GetInputFlag = false;
+                        state.dataSolarShading->MaxHCV = (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) -
+                                                         1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
+                        assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
+                    }
                     if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has an active {}=\"{}\";",
