@@ -1306,7 +1306,7 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
 
     static constexpr std::array<Real64, static_cast<int>(DataSurfaces::SurfaceClass::Num)> filmCoefs = {
         0.0,       // None
-        0.1197584, // Wall
+        0.1197548, // Wall
         0.1620212, // Floor
         0.1074271, // Roof
         0.0,       // IntMass
