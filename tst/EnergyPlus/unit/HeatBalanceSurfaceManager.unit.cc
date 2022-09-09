@@ -5081,7 +5081,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         0,                       !- Y Origin {m}
         0,                       !- Z Origin {m}
         1,                       !- Type
-        1.0,                     !- Multiplier
+        1,                       !- Multiplier
         ,                        !- Ceiling Height {m}
         8197.0573178193,         !- Volume {m3}
         631.643058536491,        !- Floor Area {m2}

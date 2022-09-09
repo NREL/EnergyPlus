@@ -3154,6 +3154,7 @@
     3.73224036438218,        !- Speed 1 Gross Rated Cooling COP {W/W}
     2.60651333333333,        !- Speed 1 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_CoolCStandard10Ton_CapFT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_CoolCStandard10Ton_CapFF,  !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC_CoolCStandard10Ton_EIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -3173,6 +3174,7 @@
     3.73224036438218,        !- Speed 2 Gross Rated Cooling COP {W/W}
     3.90977,                 !- Speed 2 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_CoolCStandard10Ton_CapFT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_CoolCStandard10Ton_CapFF,  !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC_CoolCStandard10Ton_EIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -3212,6 +3214,7 @@
     3.7988306741603,         !- Speed 1 Gross Rated Cooling COP {W/W}
     1.19644,                 !- Speed 1 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_CoolCStandard10Ton_CapFT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_CoolCStandard10Ton_CapFF,  !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC_CoolCStandard10Ton_EIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -3231,6 +3234,7 @@
     3.7988306741603,         !- Speed 2 Gross Rated Cooling COP {W/W}
     1.79466,                 !- Speed 2 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_CoolCStandard10Ton_CapFT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_CoolCStandard10Ton_CapFF,  !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC_CoolCStandard10Ton_EIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name

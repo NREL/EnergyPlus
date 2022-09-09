@@ -425,7 +425,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn003:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -447,7 +447,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn006:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -469,7 +469,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn009:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -491,7 +491,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn012:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -513,7 +513,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn015:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -535,7 +535,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn016:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -557,7 +557,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn017:Wall001:Win001,    !- Fenestration Surface 1 Name
@@ -579,7 +579,7 @@
     ,                        !- Shading Device Material Name
     ,                        !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     Zn018:Wall001:Win001,    !- Fenestration Surface 1 Name

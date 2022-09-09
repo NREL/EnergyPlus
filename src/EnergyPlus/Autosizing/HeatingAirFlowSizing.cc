@@ -213,7 +213,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                     } else if (this->unitarySysEqSizing(this->curSysNum).HeatingAirFlow) {
                         this->autoSizedValue = this->unitarySysEqSizing(this->curSysNum).HeatingAirVolFlow;
                     } else {
-                        if (this->curDuctType == DataHVACGlobals::Main) {
+                        if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
                             if (UtilityRoutines::SameString(this->compType, "COIL:HEATING:WATER")) {
                                 if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                     this->autoSizedValue =
@@ -224,7 +224,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                             } else {
                                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::Cooling) {
+                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
                             if (UtilityRoutines::SameString(this->compType, "COIL:HEATING:WATER")) {
                                 if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                     this->autoSizedValue =
@@ -235,9 +235,9 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                             } else {
                                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::Heating) {
+                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::Other) {
+                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Other) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         } else {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;

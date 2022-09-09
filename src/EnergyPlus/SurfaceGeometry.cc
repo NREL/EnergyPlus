@@ -9602,29 +9602,31 @@ namespace SurfaceGeometry {
                                                            "BETWEENGLASSBLIND"  // 9
                                                        });
 
-        int constexpr NumValidWindowShadingControlTypes(21);
-        static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
-                                                                    {"ALWAYSON",
-                                                                     "ALWAYSOFF",
-                                                                     "ONIFSCHEDULEALLOWS",
-                                                                     "ONIFHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHHORIZONTALSOLAR",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPERATURE",
-                                                                     "ONIFHIGHZONEAIRTEMPERATURE",
-                                                                     "ONIFHIGHZONECOOLING",
-                                                                     "ONIFHIGHGLARE",
-                                                                     "MEETDAYLIGHTILLUMINANCESETPOINT",
-                                                                     "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY",
-                                                                     "ONNIGHTIFLOWINSIDETEMPANDOFFDAY",
-                                                                     "ONNIGHTIFHEATINGANDOFFDAY",
-                                                                     "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING",
-                                                                     "ONNIGHTIFHEATINGANDONDAYIFCOOLING",
-                                                                     "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-                                                                     "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
-                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"});
+        constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> cValidWindowShadingControlTypes = {
+            "ALWAYSON",
+            "ALWAYSOFF",
+            "ONIFSCHEDULEALLOWS",
+            "ONIFHIGHSOLARONWINDOW",
+            "ONIFHIGHHORIZONTALSOLAR",
+            "ONIFHIGHOUTDOORAIRTEMPERATURE",
+            "ONIFHIGHZONEAIRTEMPERATURE",
+            "ONIFHIGHZONECOOLING",
+            "ONIFHIGHGLARE",
+            "MEETDAYLIGHTILLUMINANCESETPOINT",
+            "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY",
+            "ONNIGHTIFLOWINSIDETEMPANDOFFDAY",
+            "ONNIGHTIFHEATINGANDOFFDAY",
+            "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING",
+            "ONNIGHTIFHEATINGANDONDAYIFCOOLING",
+            "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
+            "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
+            "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
+            "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
+            "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
+            "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR",
+            "ONIFHIGHSOLARORHIGHLUMINANCETILLMIDNIGHT",
+            "ONIFHIGHSOLARORHIGHLUMINANCETILLSUNSET",
+            "ONIFHIGHSOLARORHIGHLUMINANCETILLNEXTMORNING"};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;          // IO Status when calling get input subroutine
@@ -9796,6 +9798,16 @@ namespace SurfaceGeometry {
                                      ControlType + "\"");
             }
 
+            if (has_prefix(ControlType, "ONIFHIGHSOLARORHIGHLUMINANCETILL")) {
+                if (state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                    ErrorsFound = true;
+                    ShowSevereError(state,
+                                    cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" invalid " +
+                                        state.dataIPShortCut->cAlphaFieldNames(12) + " must not be empty for shading control type \"" + ControlType +
+                                        "\"");
+                }
+            }
+
             if (state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice > 0) {
                 if (state.dataMaterial->Material(state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice).Group ==
                         DataHeatBalance::MaterialGroup::Screen &&
@@ -9858,20 +9870,22 @@ namespace SurfaceGeometry {
                 state.dataSurface->WindowShadingControl(ControlNum).ShadingControlIsScheduled = false;
                 state.dataSurface->WindowShadingControl(ControlNum).GlareControlIsActive = false;
                 ShowWarningError(state,
-                                 cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
-                                     state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\", changing to \"" +
-                                     ControlType + "\"");
+                                 format(R"({}="{}" is using obsolete {}="{}", changing to "{}")",
+                                        cCurrentModuleObject,
+                                        state.dataSurface->WindowShadingControl(ControlNum).Name,
+                                        state.dataIPShortCut->cAlphaFieldNames(5),
+                                        state.dataIPShortCut->cAlphaArgs(5),
+                                        ControlType));
             }
 
-            // Error if illegal control type
-            Found = UtilityRoutines::FindItemInList(ControlType, cValidWindowShadingControlTypes, NumValidWindowShadingControlTypes);
-            if (Found == 0) {
+            // Error if illegal control type, +1 to match index of WindowShadingControlType
+            state.dataSurface->WindowShadingControl(ControlNum).ShadingControlType =
+                static_cast<WindowShadingControlType>(getEnumerationValue(cValidWindowShadingControlTypes, ControlType));
+            if (state.dataSurface->WindowShadingControl(ControlNum).ShadingControlType == WindowShadingControlType::Invalid) {
                 ErrorsFound = true;
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
-            } else {
-                state.dataSurface->WindowShadingControl(ControlNum).ShadingControlType = WindowShadingControlType(Found);
             }
 
             // Error checks
@@ -9918,7 +9932,7 @@ namespace SurfaceGeometry {
                 ShowWarningError(state,
                                  cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
                                      state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                     "\", changing to \"InteriorShade\"");
+                                     R"(", changing to "InteriorShade")");
                 state.dataSurface->WindowShadingControl(ControlNum).ShadingType = WinShadingType::IntShade;
                 state.dataIPShortCut->cAlphaArgs(3) = "INTERIORSHADE";
             }
@@ -9927,7 +9941,7 @@ namespace SurfaceGeometry {
                 ShowWarningError(state,
                                  cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
                                      state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
-                                     "\", changing to \"ExteriorShade\"");
+                                     R"(", changing to "ExteriorShade")");
                 state.dataSurface->WindowShadingControl(ControlNum).ShadingType = WinShadingType::ExtShade;
                 state.dataIPShortCut->cAlphaArgs(3) = "EXTERIORSHADE";
             }
