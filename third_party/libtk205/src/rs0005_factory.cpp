@@ -11,16 +11,24 @@ std::shared_ptr<RSInstanceBase> RS0005Factory::create_instance(const char* RS_in
 {
     auto p_rs = std::make_shared<rs0005_ns::RS0005>();
     auto j = tk205::load_json(RS_instance_file);
-    if (j["metadata"]["schema"] == "RS0005")
+    std::string schema_version = j["metadata"]["schema_version"];
+    if (SchemVer(schema_version.c_str()) > SchemVer("0.2.1"))
+    {
+        p_rs = nullptr;
+        std::ostringstream oss;
+        oss << "Schema version " << schema_version << " is not supported.";
+        tk205::show_message(tk205::MsgSeverity::ERR_205, oss.str());
+    }
+    else if (j["metadata"]["schema"] == "RS0005")
     {
         p_rs->initialize(j);
     }
     else
     {
-       p_rs = nullptr;
-       std::ostringstream oss;
-       oss << RS_instance_file << " is not a valid instance of RS0005; returning nullptr.";
-       tk205::show_message(tk205::MsgSeverity::ERR_205, oss.str());
+        p_rs = nullptr;
+        std::ostringstream oss;
+        oss << RS_instance_file << " is not a valid instance of RS0005; returning nullptr.";
+        tk205::show_message(tk205::MsgSeverity::ERR_205, oss.str());
     }
     return p_rs;
 }
