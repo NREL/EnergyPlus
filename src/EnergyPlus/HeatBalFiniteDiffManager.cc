@@ -2631,8 +2631,7 @@ namespace HeatBalFiniteDiffManager {
 
     bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData &state, int const constructionNum)
     {
-        for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
-            auto &thisSurface = state.dataSurface->Surface(surfNum);
+        for (auto &thisSurface : state.dataSurface->Surface) {
             if (thisSurface.Construction == constructionNum) {
                 if (thisSurface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) return true;
             }
