@@ -1312,9 +1312,9 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
         0.0,       // IntMass
         0.0,       // Detached_B
         0.0,       // Detached_F
-        0.1197584, // Window
-        0.1197584, // GlassDoor
-        0.1197584, // Door
+        0.1197548, // Window
+        0.1197548, // GlassDoor
+        0.1197548, // Door
         0.0,       // Shading
         0.0,       // Overhang
         0.0,       // Fin
