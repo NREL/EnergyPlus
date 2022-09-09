@@ -1103,7 +1103,9 @@ void GetPumpInput(EnergyPlusData &state)
     }
 
     for (PumpNum = 1; PumpNum <= state.dataPumps->NumPumps; ++PumpNum) { // CurrentModuleObject='Pumps'
-        switch (state.dataPumps->PumpEquip(PumpNum).pumpType) {
+        auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
+        auto &thisPumpRep = state.dataPumps->PumpEquipReport(PumpNum);
+        switch (thisPump.pumpType) {
         case PumpType::VarSpeed:
         case PumpType::ConSpeed:
         case PumpType::Cond: {
@@ -1111,57 +1113,57 @@ void GetPumpInput(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataPumps->PumpEquip(PumpNum).Energy,
+                                thisPump.Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataPumps->PumpEquip(PumpNum).Name,
+                                thisPump.Name,
                                 _,
                                 "Electricity",
                                 "Pumps",
-                                state.dataPumps->PumpEquip(PumpNum).EndUseSubcategoryName,
+                                thisPump.EndUseSubcategoryName,
                                 "Plant");
             SetupOutputVariable(state,
                                 "Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataPumps->PumpEquip(PumpNum).Power,
+                                thisPump.Power,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Shaft Power",
                                 OutputProcessor::Unit::W,
-                                state.dataPumps->PumpEquipReport(PumpNum).ShaftPower,
+                                thisPumpRep.ShaftPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluid,
+                                thisPumpRep.PumpHeattoFluid,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy,
+                                thisPumpRep.PumpHeattoFluidEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                state.dataPumps->PumpEquipReport(PumpNum).OutletTemp,
+                                thisPumpRep.OutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataPumps->PumpEquipReport(PumpNum).PumpMassFlowRate,
+                                thisPumpRep.PumpMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
         } break;
 
         case PumpType::Bank_VarSpeed:
@@ -1170,169 +1172,155 @@ void GetPumpInput(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataPumps->PumpEquip(PumpNum).Energy,
+                                thisPump.Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataPumps->PumpEquip(PumpNum).Name,
+                                thisPump.Name,
                                 _,
                                 "Electricity",
                                 "Pumps",
-                                state.dataPumps->PumpEquip(PumpNum).EndUseSubcategoryName,
+                                thisPump.EndUseSubcategoryName,
                                 "Plant");
             SetupOutputVariable(state,
                                 "Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataPumps->PumpEquip(PumpNum).Power,
+                                thisPump.Power,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Shaft Power",
                                 OutputProcessor::Unit::W,
-                                state.dataPumps->PumpEquipReport(PumpNum).ShaftPower,
+                                thisPumpRep.ShaftPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluid,
+                                thisPumpRep.PumpHeattoFluid,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy,
+                                thisPumpRep.PumpHeattoFluidEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                state.dataPumps->PumpEquipReport(PumpNum).OutletTemp,
+                                thisPumpRep.OutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataPumps->PumpEquipReport(PumpNum).PumpMassFlowRate,
+                                thisPumpRep.PumpMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Operating Pumps Count",
                                 OutputProcessor::Unit::None,
-                                state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating,
+                                thisPumpRep.NumPumpsOperating,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
         } break;
         default: {
-            ShowFatalError(state, format("Invalid Pump Type = {}", state.dataPumps->PumpEquip(PumpNum).pumpType));
+            ShowFatalError(state, format("Invalid Pump Type = {}", thisPump.pumpType));
         } break;
         }
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            SetupEMSInternalVariable(state,
-                                     "Pump Maximum Mass Flow Rate",
-                                     state.dataPumps->PumpEquip(PumpNum).Name,
-                                     "[kg/s]",
-                                     state.dataPumps->PumpEquip(PumpNum).MassFlowRateMax);
-            SetupEMSActuator(state,
-                             "Pump",
-                             state.dataPumps->PumpEquip(PumpNum).Name,
-                             "Pump Mass Flow Rate",
-                             "[kg/s]",
-                             state.dataPumps->PumpEquip(PumpNum).EMSMassFlowOverrideOn,
-                             state.dataPumps->PumpEquip(PumpNum).EMSMassFlowValue);
-            SetupEMSActuator(state,
-                             "Pump",
-                             state.dataPumps->PumpEquip(PumpNum).Name,
-                             "Pump Pressure Rise",
-                             "[Pa]",
-                             state.dataPumps->PumpEquip(PumpNum).EMSPressureOverrideOn,
-                             state.dataPumps->PumpEquip(PumpNum).EMSPressureOverrideValue);
+            SetupEMSInternalVariable(state, "Pump Maximum Mass Flow Rate", thisPump.Name, "[kg/s]", thisPump.MassFlowRateMax);
+            SetupEMSActuator(
+                state, "Pump", thisPump.Name, "Pump Mass Flow Rate", "[kg/s]", thisPump.EMSMassFlowOverrideOn, thisPump.EMSMassFlowValue);
+            SetupEMSActuator(
+                state, "Pump", thisPump.Name, "Pump Pressure Rise", "[Pa]", thisPump.EMSPressureOverrideOn, thisPump.EMSPressureOverrideValue);
         }
 
-        if (state.dataPumps->PumpEquip(PumpNum).HeatLossesToZone) {
+        if (thisPump.HeatLossesToZone) {
             // setup skin loss output vars
             SetupOutputVariable(state,
                                 "Pump Zone Total Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate,
+                                thisPumpRep.ZoneTotalGainRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Zone Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainEnergy,
+                                thisPumpRep.ZoneTotalGainEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Zone Convective Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                thisPumpRep.ZoneConvGainRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Zone Radiative Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate,
+                                thisPumpRep.ZoneRadGainRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataPumps->PumpEquip(PumpNum).Name);
+                                thisPump.Name);
 
             // setup internal gains
-            switch (state.dataPumps->PumpEquip(PumpNum).pumpType) {
+            switch (thisPump.pumpType) {
             case PumpType::VarSpeed: {
                 SetupZoneInternalGain(state,
-                                      state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                      state.dataPumps->PumpEquip(PumpNum).Name,
+                                      thisPump.ZoneNum,
+                                      thisPump.Name,
                                       DataHeatBalance::IntGainType::Pump_VarSpeed,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                      &thisPumpRep.ZoneConvGainRate,
                                       nullptr,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                      &thisPumpRep.ZoneRadGainRate);
             } break;
             case PumpType::ConSpeed: {
                 SetupZoneInternalGain(state,
-                                      state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                      state.dataPumps->PumpEquip(PumpNum).Name,
+                                      thisPump.ZoneNum,
+                                      thisPump.Name,
                                       DataHeatBalance::IntGainType::Pump_ConSpeed,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                      &thisPumpRep.ZoneConvGainRate,
                                       nullptr,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                      &thisPumpRep.ZoneRadGainRate);
             } break;
             case PumpType::Cond: {
                 SetupZoneInternalGain(state,
-                                      state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                      state.dataPumps->PumpEquip(PumpNum).Name,
+                                      thisPump.ZoneNum,
+                                      thisPump.Name,
                                       DataHeatBalance::IntGainType::Pump_Cond,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                      &thisPumpRep.ZoneConvGainRate,
                                       nullptr,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                      &thisPumpRep.ZoneRadGainRate);
             } break;
             case PumpType::Bank_VarSpeed: {
                 SetupZoneInternalGain(state,
-                                      state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                      state.dataPumps->PumpEquip(PumpNum).Name,
+                                      thisPump.ZoneNum,
+                                      thisPump.Name,
                                       DataHeatBalance::IntGainType::PumpBank_VarSpeed,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                      &thisPumpRep.ZoneConvGainRate,
                                       nullptr,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                      &thisPumpRep.ZoneRadGainRate);
             } break;
             case PumpType::Bank_ConSpeed: {
                 SetupZoneInternalGain(state,
-                                      state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                      state.dataPumps->PumpEquip(PumpNum).Name,
+                                      thisPump.ZoneNum,
+                                      thisPump.Name,
                                       DataHeatBalance::IntGainType::PumpBank_ConSpeed,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                      &thisPumpRep.ZoneConvGainRate,
                                       nullptr,
-                                      &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                      &thisPumpRep.ZoneRadGainRate);
             } break;
             default:
                 break;
