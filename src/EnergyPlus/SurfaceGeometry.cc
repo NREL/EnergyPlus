@@ -3363,6 +3363,15 @@ namespace SurfaceGeometry {
         int numSides;
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
+
+        if (state.dataSolarShading->GetInputFlag) {
+            SolarShading::GetShadowingInput(state);
+            state.dataSolarShading->GetInputFlag = false;
+            state.dataSolarShading->MaxHCV =
+                (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
+            assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
+        }
+
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
@@ -3427,13 +3436,6 @@ namespace SurfaceGeometry {
                                             state.dataIPShortCut->cAlphaFieldNames(2) + " not found=" + state.dataIPShortCut->cAlphaArgs(2));
                         ErrorsFound = true;
                     } else {
-                        if (state.dataSolarShading->GetInputFlag) {
-                            SolarShading::GetShadowingInput(state);
-                            state.dataSolarShading->GetInputFlag = false;
-                            state.dataSolarShading->MaxHCV = (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) -
-                                                             1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
-                            assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
-                        }
                         if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) {
                             ShowSevereError(state,
                                             format("{}=\"{}\" has an active {}=\"{}\";",
@@ -6417,6 +6419,14 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
+        if (state.dataSolarShading->GetInputFlag) {
+            SolarShading::GetShadowingInput(state);
+            state.dataSolarShading->GetInputFlag = false;
+            state.dataSolarShading->MaxHCV =
+                (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
+            assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
+        }
+
         if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
@@ -6504,13 +6514,6 @@ namespace SurfaceGeometry {
                                         state.dataIPShortCut->cAlphaFieldNames(3) + " not found=\"" + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
                 } else {
-                    if (state.dataSolarShading->GetInputFlag) {
-                        SolarShading::GetShadowingInput(state);
-                        state.dataSolarShading->GetInputFlag = false;
-                        state.dataSolarShading->MaxHCV = (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) -
-                                                         1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
-                        assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
-                    }
                     if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" has an active {}=\"{}\";",
