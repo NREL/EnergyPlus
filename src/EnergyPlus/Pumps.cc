@@ -251,12 +251,8 @@ void GetPumpInput(EnergyPlusData &state)
     int NumVarSpeedPumps;
     int NumConstSpeedPumps;
     int NumCondensatePumps;
-    int NumConstPump;
-    int NumCondPump;
     int NumPumpBankSimpleVar;
     int NumPumpBankSimpleConst;
-    int NumVarPumpBankSimple;
-    int NumConstPumpBankSimple;
     Real64 SteamDensity;
     Real64 TempWaterDensity;
     int DummyWaterIndex(1);
@@ -309,7 +305,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
                                                   DataLoopNode::ConnectionObjectType::PumpVariableSpeed,
-                                                  thisInput->cAlphaArgs(1),
+                                                  thisPump.Name,
                                                   DataLoopNode::NodeFluidType::Water,
                                                   DataLoopNode::ConnectionType::Inlet,
                                                   NodeInputManager::CompFluidStream::Primary,
@@ -319,18 +315,16 @@ void GetPumpInput(EnergyPlusData &state)
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
                                                    DataLoopNode::ConnectionObjectType::PumpVariableSpeed,
-                                                   thisInput->cAlphaArgs(1),
+                                                   thisPump.Name,
                                                    DataLoopNode::NodeFluidType::Water,
                                                    DataLoopNode::ConnectionType::Outlet,
                                                    NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
-        TestCompSet(state, cCurrentModuleObject, thisInput->cAlphaArgs(1), thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
+        TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
-        if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Continuous")) {
-            thisPump.PumpControl = PumpControlType::Continuous;
-        } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Intermittent")) {
-            thisPump.PumpControl = PumpControlType::Intermittent;
-        } else {
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumerationValue(pumpCtrlTypeNames, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+        if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(
                 state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisPump.Name + "\", Invalid " + thisInput->cAlphaFieldNames(4));
             ShowContinueError(state,
@@ -340,7 +334,6 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         // Input the optional schedule for the pump
-        thisPump.PumpSchedule = thisInput->cAlphaArgs(5);
         thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(5));
         if (!thisInput->lAlphaFieldBlanks(5) && !(thisPump.PumpScheduleIndex > 0)) {
             ShowWarningError(
@@ -477,7 +470,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + thisInput->cAlphaArgs(1) + "\" invalid " + thisInput->cAlphaFieldNames(13) + "=\"" +
+                                cCurrentModuleObject + "=\"" + thisPump.Name + "\" invalid " + thisInput->cAlphaFieldNames(13) + "=\"" +
                                     thisInput->cAlphaArgs(13) + "\" not found.");
                 ErrorsFound = true;
             }
@@ -521,7 +514,7 @@ void GetPumpInput(EnergyPlusData &state)
 
     cCurrentModuleObject = cPump_ConSpeed;
 
-    for (NumConstPump = 1; NumConstPump <= NumConstSpeedPumps; ++NumConstPump) {
+    for (int NumConstPump = 1; NumConstPump <= NumConstSpeedPumps; ++NumConstPump) {
         PumpNum = NumVarSpeedPumps + NumConstPump;
         auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -547,7 +540,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
                                                   DataLoopNode::ConnectionObjectType::PumpConstantSpeed,
-                                                  thisInput->cAlphaArgs(1),
+                                                  thisPump.Name,
                                                   DataLoopNode::NodeFluidType::Water,
                                                   DataLoopNode::ConnectionType::Inlet,
                                                   NodeInputManager::CompFluidStream::Primary,
@@ -557,12 +550,12 @@ void GetPumpInput(EnergyPlusData &state)
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
                                                    DataLoopNode::ConnectionObjectType::PumpConstantSpeed,
-                                                   thisInput->cAlphaArgs(1),
+                                                   thisPump.Name,
                                                    DataLoopNode::NodeFluidType::Water,
                                                    DataLoopNode::ConnectionType::Outlet,
                                                    NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
-        TestCompSet(state, cCurrentModuleObject, thisInput->cAlphaArgs(1), thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
+        TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
         thisPump.NomVolFlowRate = thisInput->rNumericArgs(1);
         if (thisPump.NomVolFlowRate == AutoSize) {
@@ -585,11 +578,9 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.Energy = 0.0;
         thisPump.Power = 0.0;
 
-        if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Continuous")) {
-            thisPump.PumpControl = PumpControlType::Continuous;
-        } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Intermittent")) {
-            thisPump.PumpControl = PumpControlType::Intermittent;
-        } else {
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumerationValue(pumpCtrlTypeNames, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+        if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(
                 state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisPump.Name + "\", Invalid " + thisInput->cAlphaFieldNames(4));
             ShowContinueError(state,
@@ -599,7 +590,6 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         // Input the optional schedule for the pump
-        thisPump.PumpSchedule = thisInput->cAlphaArgs(5);
         thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(5));
         if (!thisInput->lAlphaFieldBlanks(5) && !(thisPump.PumpScheduleIndex > 0)) {
             ShowWarningError(
@@ -645,7 +635,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + thisInput->cAlphaArgs(1) + "\" invalid " + thisInput->cAlphaFieldNames(7) + "=\"" +
+                                cCurrentModuleObject + "=\"" + thisPump.Name + "\" invalid " + thisInput->cAlphaFieldNames(7) + "=\"" +
                                     thisInput->cAlphaArgs(7) + "\" not found.");
                 ErrorsFound = true;
             }
@@ -681,7 +671,7 @@ void GetPumpInput(EnergyPlusData &state)
 
     // pumps for steam system pumping condensate
     cCurrentModuleObject = cPump_Cond;
-    for (NumCondPump = 1; NumCondPump <= NumCondensatePumps; ++NumCondPump) {
+    for (int NumCondPump = 1; NumCondPump <= NumCondensatePumps; ++NumCondPump) {
         PumpNum = NumCondPump + NumVarSpeedPumps + NumConstSpeedPumps;
         auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -707,7 +697,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
                                                   DataLoopNode::ConnectionObjectType::PumpVariableSpeedCondensate,
-                                                  thisInput->cAlphaArgs(1),
+                                                  thisPump.Name,
                                                   DataLoopNode::NodeFluidType::Steam,
                                                   DataLoopNode::ConnectionType::Inlet,
                                                   NodeInputManager::CompFluidStream::Primary,
@@ -717,17 +707,16 @@ void GetPumpInput(EnergyPlusData &state)
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
                                                    DataLoopNode::ConnectionObjectType::PumpVariableSpeedCondensate,
-                                                   thisInput->cAlphaArgs(1),
+                                                   thisPump.Name,
                                                    DataLoopNode::NodeFluidType::Steam,
                                                    DataLoopNode::ConnectionType::Outlet,
                                                    NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
-        TestCompSet(state, cCurrentModuleObject, thisInput->cAlphaArgs(1), thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
+        TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
         thisPump.PumpControl = PumpControlType::Intermittent;
 
         // Input the optional schedule for the pump
-        thisPump.PumpSchedule = thisInput->cAlphaArgs(4);
         thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(4));
         if (!thisInput->lAlphaFieldBlanks(4) && !(thisPump.PumpScheduleIndex > 0)) {
             ShowWarningError(
@@ -760,7 +749,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + thisInput->cAlphaArgs(1) + "\" invalid " + thisInput->cAlphaFieldNames(5) + "=\"" +
+                                cCurrentModuleObject + "=\"" + thisPump.Name + "\" invalid " + thisInput->cAlphaFieldNames(5) + "=\"" +
                                     thisInput->cAlphaArgs(5) + "\" not found.");
                 ErrorsFound = true;
             }
@@ -810,7 +799,7 @@ void GetPumpInput(EnergyPlusData &state)
 
     // LOAD Variable Speed Pump Bank ARRAYS WITH VARIABLE SPEED CURVE FIT PUMP DATA
     cCurrentModuleObject = cPumpBank_VarSpeed;
-    for (NumVarPumpBankSimple = 1; NumVarPumpBankSimple <= NumPumpBankSimpleVar; ++NumVarPumpBankSimple) {
+    for (int NumVarPumpBankSimple = 1; NumVarPumpBankSimple <= NumPumpBankSimpleVar; ++NumVarPumpBankSimple) {
         PumpNum = NumVarPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps;
         auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -836,7 +825,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
                                                   DataLoopNode::ConnectionObjectType::HeaderedPumpsVariableSpeed,
-                                                  thisInput->cAlphaArgs(1),
+                                                  thisPump.Name,
                                                   DataLoopNode::NodeFluidType::Water,
                                                   DataLoopNode::ConnectionType::Inlet,
                                                   NodeInputManager::CompFluidStream::Primary,
@@ -846,12 +835,12 @@ void GetPumpInput(EnergyPlusData &state)
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
                                                    DataLoopNode::ConnectionObjectType::HeaderedPumpsVariableSpeed,
-                                                   thisInput->cAlphaArgs(1),
+                                                   thisPump.Name,
                                                    DataLoopNode::NodeFluidType::Water,
                                                    DataLoopNode::ConnectionType::Outlet,
                                                    NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
-        TestCompSet(state, cCurrentModuleObject, thisInput->cAlphaArgs(1), thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
+        TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
         if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Optimal")) {
             thisPump.SequencingScheme = PumpBankControlSeq::OptimalScheme;
@@ -868,12 +857,9 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        //    PumpEquip(PumpNum)%PumpControlType = thisInput->cAlphaArgs(5)
-        if (UtilityRoutines::SameString(thisInput->cAlphaArgs(5), "Continuous")) {
-            thisPump.PumpControl = PumpControlType::Continuous;
-        } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(5), "Intermittent")) {
-            thisPump.PumpControl = PumpControlType::Intermittent;
-        } else {
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumerationValue(pumpCtrlTypeNames, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+        if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(
                 state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisPump.Name + "\", Invalid " + thisInput->cAlphaFieldNames(5));
             ShowContinueError(state,
@@ -883,7 +869,6 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         // Input the optional schedule for the pump
-        thisPump.PumpSchedule = thisInput->cAlphaArgs(6);
         thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(6));
         if (!thisInput->lAlphaFieldBlanks(6) && !(thisPump.PumpScheduleIndex > 0)) {
             ShowWarningError(
@@ -919,7 +904,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + thisInput->cAlphaArgs(1) + "\" invalid " + thisInput->cAlphaFieldNames(7) + "=\"" +
+                                cCurrentModuleObject + "=\"" + thisPump.Name + "\" invalid " + thisInput->cAlphaFieldNames(7) + "=\"" +
                                     thisInput->cAlphaArgs(7) + "\" not found.");
                 ErrorsFound = true;
             }
@@ -957,7 +942,7 @@ void GetPumpInput(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = cPumpBank_ConSpeed;
-    for (NumConstPumpBankSimple = 1; NumConstPumpBankSimple <= NumPumpBankSimpleConst; ++NumConstPumpBankSimple) {
+    for (int NumConstPumpBankSimple = 1; NumConstPumpBankSimple <= NumPumpBankSimpleConst; ++NumConstPumpBankSimple) {
         PumpNum = NumConstPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar;
         auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -983,7 +968,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
                                                   DataLoopNode::ConnectionObjectType::HeaderedPumpsConstantSpeed,
-                                                  thisInput->cAlphaArgs(1),
+                                                  thisPump.Name,
                                                   DataLoopNode::NodeFluidType::Water,
                                                   DataLoopNode::ConnectionType::Inlet,
                                                   NodeInputManager::CompFluidStream::Primary,
@@ -993,12 +978,12 @@ void GetPumpInput(EnergyPlusData &state)
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
                                                    DataLoopNode::ConnectionObjectType::HeaderedPumpsConstantSpeed,
-                                                   thisInput->cAlphaArgs(1),
+                                                   thisPump.Name,
                                                    DataLoopNode::NodeFluidType::Water,
                                                    DataLoopNode::ConnectionType::Outlet,
                                                    NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
-        TestCompSet(state, cCurrentModuleObject, thisInput->cAlphaArgs(1), thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
+        TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
         if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Optimal")) {
             thisPump.SequencingScheme = PumpBankControlSeq::OptimalScheme;
@@ -1013,11 +998,10 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        if (UtilityRoutines::SameString(thisInput->cAlphaArgs(5), "Continuous")) {
-            thisPump.PumpControl = PumpControlType::Continuous;
-        } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(5), "Intermittent")) {
-            thisPump.PumpControl = PumpControlType::Intermittent;
-        } else {
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumerationValue(pumpCtrlTypeNames, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+
+        if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(
                 state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisPump.Name + "\", Invalid " + thisInput->cAlphaFieldNames(5));
             ShowContinueError(state,
@@ -1027,7 +1011,6 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         // Input the optional schedule for the pump
-        thisPump.PumpSchedule = thisInput->cAlphaArgs(6);
         thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(6));
         if (!thisInput->lAlphaFieldBlanks(6) && !(thisPump.PumpScheduleIndex > 0)) {
             ShowWarningError(
@@ -1061,7 +1044,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + thisInput->cAlphaArgs(1) + "\" invalid " + thisInput->cAlphaFieldNames(7) + "=\"" +
+                                cCurrentModuleObject + "=\"" + thisPump.Name + "\" invalid " + thisInput->cAlphaFieldNames(7) + "=\"" +
                                     thisInput->cAlphaArgs(7) + "\" not found.");
                 ErrorsFound = true;
             }
@@ -2042,11 +2025,11 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     Real64 DesVolFlowRatePerBranch; // local temporary for split of branch pumps
 
     auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
-    auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
     auto &thisOkToReport = state.dataPlnt->PlantFinalSizesOkayToReport;
 
     // Calculate density at InitConvTemp once here, to remove RhoH2O calls littered throughout
     if (thisPump.plantLoc.loopNum > 0) {
+        auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
         TempWaterDensity = GetDensityGlycol(state, thisPumpPlant.FluidName, DataGlobalConstants::InitConvTemp, thisPumpPlant.FluidIndex, RoutineName);
     } else {
         TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
@@ -2057,7 +2040,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     ErrorsFound = false;
 
     if (thisPump.plantLoc.loopNum > 0) {
-        PlantSizNum = thisPumpPlant.PlantSizNum;
+        PlantSizNum = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum).PlantSizNum;
     }
     // use pump sizing factor stored in plant sizing data structure
     if (PlantSizNum > 0) {
@@ -2065,6 +2048,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     } else {
         // might be able to remove this next block
         if (thisPump.plantLoc.loopNum > 0) {
+            auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
             for (DataPlant::LoopSideLocation Side : DataPlant::LoopSideKeys) {
                 for (BranchNum = 1; BranchNum <= thisPumpPlant.LoopSide(Side).TotalBranches; ++BranchNum) {
                     for (CompNum = 1; CompNum <= thisPumpPlant.LoopSide(Side).Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -2087,6 +2071,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     if (thisPump.NomVolFlowRateWasAutoSized) {
 
         if (PlantSizNum > 0) {
+            auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
             auto &thisPlantSize = state.dataSize->PlantSizData(PlantSizNum);
             if (thisPlantSize.DesVolFlowRate >= SmallWaterVolFlow) {
                 if (!thisPumpPlant.LoopSide(thisPump.plantLoc.loopSideNum).BranchPumpsExist) {
@@ -2214,8 +2199,6 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
     auto &thisOutNode = state.dataLoopNodes->Node(OutletNode);
     auto &daPumps = state.dataPumps;
 
-    Real64 const thisTimeStepSysInSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-
     if (daPumps->PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
         thisPumpRep.PumpMassFlowRate = 0.0;
         thisPumpRep.PumpHeattoFluid = 0.0;
@@ -2234,9 +2217,9 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
         thisPumpRep.PumpHeattoFluid = daPumps->PumpHeattoFluid;
         thisPumpRep.OutletTemp = thisOutNode.Temp;
         thisPump.Power = daPumps->Power;
-        thisPump.Energy = thisPump.Power * thisTimeStepSysInSec;
+        thisPump.Energy = thisPump.Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         thisPumpRep.ShaftPower = daPumps->ShaftPower;
-        thisPumpRep.PumpHeattoFluidEnergy = daPumps->PumpHeattoFluid * thisTimeStepSysInSec;
+        thisPumpRep.PumpHeattoFluidEnergy = daPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         switch (PumpType) {
         case PumpType::ConSpeed:
         case PumpType::VarSpeed:
@@ -2253,7 +2236,7 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
             break;
         }
         thisPumpRep.ZoneTotalGainRate = daPumps->Power - daPumps->PumpHeattoFluid;
-        thisPumpRep.ZoneTotalGainEnergy = thisPumpRep.ZoneTotalGainRate * thisTimeStepSysInSec;
+        thisPumpRep.ZoneTotalGainEnergy = thisPumpRep.ZoneTotalGainRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         thisPumpRep.ZoneConvGainRate = (1 - thisPump.SkinLossRadFraction) * thisPumpRep.ZoneTotalGainRate;
         thisPumpRep.ZoneRadGainRate = thisPump.SkinLossRadFraction * thisPumpRep.ZoneTotalGainRate;
     }

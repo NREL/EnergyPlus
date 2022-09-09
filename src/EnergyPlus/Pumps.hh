@@ -76,6 +76,8 @@ namespace Pumps {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(PumpControlType::Num)> pumpCtrlTypeNames{"CONTINUOUS", "INTERMITTENT"};
+
     enum class ControlTypeVFD
     {
         Invalid = -1,
@@ -149,7 +151,6 @@ namespace Pumps {
     {
         // Members
         std::string Name;               // user identifier
-        std::string PumpSchedule;       // Schedule to modify the design nominal capacity of the pump
         std::string PressureCurve_Name; // - placeholder for pump curve name
         PumpType pumpType;              // pump type enumerator, based on local parameter values, used to identify
         // index in the cPumpTypes string array to do error reporting
