@@ -2041,13 +2041,13 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     int DummyWaterIndex(1);
     Real64 DesVolFlowRatePerBranch; // local temporary for split of branch pumps
 
+    auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
+    auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
+    auto &thisOkToReport = state.dataPlnt->PlantFinalSizesOkayToReport;
+
     // Calculate density at InitConvTemp once here, to remove RhoH2O calls littered throughout
-    if (state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum > 0) {
-        TempWaterDensity = GetDensityGlycol(state,
-                                            state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).FluidName,
-                                            DataGlobalConstants::InitConvTemp,
-                                            state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).FluidIndex,
-                                            RoutineName);
+    if (thisPump.plantLoc.loopNum > 0) {
+        TempWaterDensity = GetDensityGlycol(state, thisPumpPlant.FluidName, DataGlobalConstants::InitConvTemp, thisPumpPlant.FluidIndex, RoutineName);
     } else {
         TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
     }
@@ -2056,44 +2056,22 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     PumpSizFac = 1.0;
     ErrorsFound = false;
 
-    if (state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum > 0) {
-        PlantSizNum = state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).PlantSizNum;
+    if (thisPump.plantLoc.loopNum > 0) {
+        PlantSizNum = thisPumpPlant.PlantSizNum;
     }
     // use pump sizing factor stored in plant sizing data structure
     if (PlantSizNum > 0) {
         PumpSizFac = state.dataSize->PlantSizData(PlantSizNum).PlantSizFac;
     } else {
         // might be able to remove this next block
-        if (state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum > 0) {
+        if (thisPump.plantLoc.loopNum > 0) {
             for (DataPlant::LoopSideLocation Side : DataPlant::LoopSideKeys) {
-                for (BranchNum = 1;
-                     BranchNum <= state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).LoopSide(Side).TotalBranches;
-                     ++BranchNum) {
-                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                                                     .LoopSide(Side)
-                                                     .Branch(BranchNum)
-                                                     .TotalComponents;
-                         ++CompNum) {
-                        if (state.dataPumps->PumpEquip(PumpNum).InletNodeNum ==
-                                state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                                    .LoopSide(Side)
-                                    .Branch(BranchNum)
-                                    .Comp(CompNum)
-                                    .NodeNumIn &&
-                            state.dataPumps->PumpEquip(PumpNum).OutletNodeNum ==
-                                state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                                    .LoopSide(Side)
-                                    .Branch(BranchNum)
-                                    .Comp(CompNum)
-                                    .NodeNumOut) {
-                            if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                                    .LoopSide(Side)
-                                    .Branch(BranchNum)
-                                    .PumpSizFac > 0.0) {
-                                PumpSizFac = state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                                                 .LoopSide(Side)
-                                                 .Branch(BranchNum)
-                                                 .PumpSizFac;
+                for (BranchNum = 1; BranchNum <= thisPumpPlant.LoopSide(Side).TotalBranches; ++BranchNum) {
+                    for (CompNum = 1; CompNum <= thisPumpPlant.LoopSide(Side).Branch(BranchNum).TotalComponents; ++CompNum) {
+                        if (thisPump.InletNodeNum == thisPumpPlant.LoopSide(Side).Branch(BranchNum).Comp(CompNum).NodeNumIn &&
+                            thisPump.OutletNodeNum == thisPumpPlant.LoopSide(Side).Branch(BranchNum).Comp(CompNum).NodeNumOut) {
+                            if (thisPumpPlant.LoopSide(Side).Branch(BranchNum).PumpSizFac > 0.0) {
+                                PumpSizFac = thisPumpPlant.LoopSide(Side).Branch(BranchNum).PumpSizFac;
                             } else {
                                 PumpSizFac = 1.0;
                             }
@@ -2106,70 +2084,54 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
         }
     }
 
-    if (state.dataPumps->PumpEquip(PumpNum).NomVolFlowRateWasAutoSized) {
+    if (thisPump.NomVolFlowRateWasAutoSized) {
 
         if (PlantSizNum > 0) {
-            if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                if (!state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                         .LoopSide(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum)
-                         .BranchPumpsExist) {
+            auto &thisPlantSize = state.dataSize->PlantSizData(PlantSizNum);
+            if (thisPlantSize.DesVolFlowRate >= SmallWaterVolFlow) {
+                if (!thisPumpPlant.LoopSide(thisPump.plantLoc.loopSideNum).BranchPumpsExist) {
                     // size pump to full flow of plant loop
-                    if (state.dataPumps->PumpEquip(PumpNum).pumpType == PumpType::Cond) {
+                    if (thisPump.pumpType == PumpType::Cond) {
                         TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
-                        SteamDensity = GetSatDensityRefrig(
-                            state, fluidNameSteam, StartTemp, 1.0, state.dataPumps->PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
-                        state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate =
-                            state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
-                        state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate =
-                            state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
+                        SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, thisPump.FluidIndex, RoutineNameSizePumps);
+                        thisPump.NomSteamVolFlowRate = thisPlantSize.DesVolFlowRate * PumpSizFac;
+                        thisPump.NomVolFlowRate = thisPump.NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
                     } else {
-                        state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
+                        thisPump.NomVolFlowRate = thisPlantSize.DesVolFlowRate * PumpSizFac;
                     }
                 } else {
                     // Distribute sizes evenly across all branch pumps
-                    DesVolFlowRatePerBranch = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate /
-                                              state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                                                  .LoopSide(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum)
-                                                  .TotalPumps;
-                    if (state.dataPumps->PumpEquip(PumpNum).pumpType == PumpType::Cond) {
+                    DesVolFlowRatePerBranch = thisPlantSize.DesVolFlowRate / thisPumpPlant.LoopSide(thisPump.plantLoc.loopSideNum).TotalPumps;
+                    if (thisPump.pumpType == PumpType::Cond) {
                         TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
-                        SteamDensity = GetSatDensityRefrig(
-                            state, fluidNameSteam, StartTemp, 1.0, state.dataPumps->PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
-                        state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
-                        state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate =
-                            state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
+                        SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, thisPump.FluidIndex, RoutineNameSizePumps);
+                        thisPump.NomSteamVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
+                        thisPump.NomVolFlowRate = thisPump.NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
                     } else {
-                        state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
+                        thisPump.NomVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
                     }
                 }
 
             } else {
-                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = 0.0;
-                    ShowWarningError(state,
-                                     format("SizePump: Calculated Pump Nominal Volume Flow Rate=[{:.2R}] is too small. Set to 0.0",
-                                            state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate));
-                    ShowContinueError(state, "..occurs for Pump=" + state.dataPumps->PumpEquip(PumpNum).Name);
+                if (thisOkToReport) {
+                    thisPump.NomVolFlowRate = 0.0;
+                    ShowWarningError(
+                        state,
+                        format("SizePump: Calculated Pump Nominal Volume Flow Rate=[{:.2R}] is too small. Set to 0.0", thisPlantSize.DesVolFlowRate));
+                    ShowContinueError(state, "..occurs for Pump=" + thisPump.Name);
                 }
             }
-            if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(state,
-                                             cPumpTypes[state.dataPumps->PumpEquip(PumpNum).pumpType],
-                                             state.dataPumps->PumpEquip(PumpNum).Name,
-                                             "Design Flow Rate [m3/s]",
-                                             state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate);
+            if (thisOkToReport) {
+                BaseSizer::reportSizerOutput(state, cPumpTypes[thisPump.pumpType], thisPump.Name, "Design Flow Rate [m3/s]", thisPump.NomVolFlowRate);
             }
             if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(state,
-                                             cPumpTypes[state.dataPumps->PumpEquip(PumpNum).pumpType],
-                                             state.dataPumps->PumpEquip(PumpNum).Name,
-                                             "Initial Design Flow Rate [m3/s]",
-                                             state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate);
+                BaseSizer::reportSizerOutput(
+                    state, cPumpTypes[thisPump.pumpType], thisPump.Name, "Initial Design Flow Rate [m3/s]", thisPump.NomVolFlowRate);
             }
         } else {
-            if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+            if (thisOkToReport) {
                 ShowSevereError(state, "Autosizing of plant loop pump flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in plant pump object=" + state.dataPumps->PumpEquip(PumpNum).Name);
+                ShowContinueError(state, "Occurs in plant pump object=" + thisPump.Name);
                 ErrorsFound = true;
             }
         }
@@ -2177,65 +2139,49 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
 
     // Note that autocalculation of power is based on nominal volume flow, regardless of whether the flow was
     //  auto sized or manually sized.  Thus, this must go after the flow sizing block above.
-    if (state.dataPumps->PumpEquip(PumpNum).NomPowerUseWasAutoSized) {
-        if (state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate >= SmallWaterVolFlow) {
-            switch (state.dataPumps->PumpEquip(PumpNum).powerSizingMethod) {
+    if (thisPump.NomPowerUseWasAutoSized) {
+        if (thisPump.NomVolFlowRate >= SmallWaterVolFlow) {
+            switch (thisPump.powerSizingMethod) {
 
             case PowerSizingMethod::SizePowerPerFlow: {
-                TotalEffic = state.dataPumps->PumpEquip(PumpNum).NomPumpHead / state.dataPumps->PumpEquip(PumpNum).powerPerFlowScalingFactor;
+                TotalEffic = thisPump.NomPumpHead / thisPump.powerPerFlowScalingFactor;
                 break;
             }
 
             case PowerSizingMethod::SizePowerPerFlowPerPressure: {
-                TotalEffic =
-                    (1 / state.dataPumps->PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor) * state.dataPumps->PumpEquip(PumpNum).MotorEffic;
+                TotalEffic = (1 / thisPump.powerPerFlowPerPressureScalingFactor) * thisPump.MotorEffic;
                 break;
             }
             default:
                 assert(false);
             }
 
-            state.dataPumps->PumpEquip(PumpNum).NomPowerUse =
-                (state.dataPumps->PumpEquip(PumpNum).NomPumpHead * state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate) / TotalEffic;
+            thisPump.NomPowerUse = (thisPump.NomPumpHead * thisPump.NomVolFlowRate) / TotalEffic;
         } else {
-            state.dataPumps->PumpEquip(PumpNum).NomPowerUse = 0.0;
+            thisPump.NomPowerUse = 0.0;
         }
-        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state,
-                                         cPumpTypes[state.dataPumps->PumpEquip(PumpNum).pumpType],
-                                         state.dataPumps->PumpEquip(PumpNum).Name,
-                                         "Design Power Consumption [W]",
-                                         state.dataPumps->PumpEquip(PumpNum).NomPowerUse);
+        if (thisOkToReport) {
+            BaseSizer::reportSizerOutput(state, cPumpTypes[thisPump.pumpType], thisPump.Name, "Design Power Consumption [W]", thisPump.NomPowerUse);
         }
         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state,
-                                         cPumpTypes[state.dataPumps->PumpEquip(PumpNum).pumpType],
-                                         state.dataPumps->PumpEquip(PumpNum).Name,
-                                         "Initial Design Power Consumption [W]",
-                                         state.dataPumps->PumpEquip(PumpNum).NomPowerUse);
+            BaseSizer::reportSizerOutput(
+                state, cPumpTypes[thisPump.pumpType], thisPump.Name, "Initial Design Power Consumption [W]", thisPump.NomPowerUse);
         }
     }
 
-    if (state.dataPumps->PumpEquip(PumpNum).minVolFlowRateWasAutosized) {
-        state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate =
-            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate * state.dataPumps->PumpEquip(PumpNum).MinVolFlowRateFrac;
-        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state,
-                                         cPumpTypes[state.dataPumps->PumpEquip(PumpNum).pumpType],
-                                         state.dataPumps->PumpEquip(PumpNum).Name,
-                                         "Design Minimum Flow Rate [m3/s]",
-                                         state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate);
+    if (thisPump.minVolFlowRateWasAutosized) {
+        thisPump.MinVolFlowRate = thisPump.NomVolFlowRate * thisPump.MinVolFlowRateFrac;
+        if (thisOkToReport) {
+            BaseSizer::reportSizerOutput(
+                state, cPumpTypes[thisPump.pumpType], thisPump.Name, "Design Minimum Flow Rate [m3/s]", thisPump.MinVolFlowRate);
         }
         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state,
-                                         cPumpTypes[state.dataPumps->PumpEquip(PumpNum).pumpType],
-                                         state.dataPumps->PumpEquip(PumpNum).Name,
-                                         "Initial Design Minimum Flow Rate [m3/s]",
-                                         state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate);
+            BaseSizer::reportSizerOutput(
+                state, cPumpTypes[thisPump.pumpType], thisPump.Name, "Initial Design Minimum Flow Rate [m3/s]", thisPump.MinVolFlowRate);
         }
     }
 
-    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+    if (thisOkToReport) {
         PumpDataForTable(state, PumpNum);
     }
 
@@ -2257,59 +2203,59 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
     // This subroutine sets the pump reporting variables.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;     // pump inlet node number
     int OutletNode;    // pump outlet node number
     PumpType PumpType; // Current pump type
 
-    PumpType = state.dataPumps->PumpEquip(PumpNum).pumpType;
-    InletNode = state.dataPumps->PumpEquip(PumpNum).InletNodeNum;
-    OutletNode = state.dataPumps->PumpEquip(PumpNum).OutletNodeNum;
+    auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
+    auto &thisPumpRep = state.dataPumps->PumpEquipReport(PumpNum);
 
-    if (state.dataPumps->PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-        state.dataPumps->PumpEquipReport(PumpNum).PumpMassFlowRate = 0.0;
-        state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluid = 0.0;
-        state.dataPumps->PumpEquipReport(PumpNum).OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
-        state.dataPumps->PumpEquip(PumpNum).Power = 0.0;
-        state.dataPumps->PumpEquip(PumpNum).Energy = 0.0;
-        state.dataPumps->PumpEquipReport(PumpNum).ShaftPower = 0.0;
-        state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy = 0.0;
-        state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate = 0.0;
-        state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainEnergy = 0.0;
-        state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate = 0.0;
-        state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate = 0.0;
-        state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = 0;
+    PumpType = thisPump.pumpType;
+    OutletNode = thisPump.OutletNodeNum;
+    auto &thisOutNode = state.dataLoopNodes->Node(OutletNode);
+    auto &daPumps = state.dataPumps;
+
+    Real64 const thisTimeStepSysInSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+
+    if (daPumps->PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
+        thisPumpRep.PumpMassFlowRate = 0.0;
+        thisPumpRep.PumpHeattoFluid = 0.0;
+        thisPumpRep.OutletTemp = thisOutNode.Temp;
+        thisPump.Power = 0.0;
+        thisPump.Energy = 0.0;
+        thisPumpRep.ShaftPower = 0.0;
+        thisPumpRep.PumpHeattoFluidEnergy = 0.0;
+        thisPumpRep.ZoneTotalGainRate = 0.0;
+        thisPumpRep.ZoneTotalGainEnergy = 0.0;
+        thisPumpRep.ZoneConvGainRate = 0.0;
+        thisPumpRep.ZoneRadGainRate = 0.0;
+        thisPumpRep.NumPumpsOperating = 0;
     } else {
-        state.dataPumps->PumpEquipReport(PumpNum).PumpMassFlowRate = state.dataPumps->PumpMassFlowRate;
-        state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluid = state.dataPumps->PumpHeattoFluid;
-        state.dataPumps->PumpEquipReport(PumpNum).OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
-        state.dataPumps->PumpEquip(PumpNum).Power = state.dataPumps->Power;
-        state.dataPumps->PumpEquip(PumpNum).Energy =
-            state.dataPumps->PumpEquip(PumpNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataPumps->PumpEquipReport(PumpNum).ShaftPower = state.dataPumps->ShaftPower;
-        state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy =
-            state.dataPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        thisPumpRep.PumpMassFlowRate = daPumps->PumpMassFlowRate;
+        thisPumpRep.PumpHeattoFluid = daPumps->PumpHeattoFluid;
+        thisPumpRep.OutletTemp = thisOutNode.Temp;
+        thisPump.Power = daPumps->Power;
+        thisPump.Energy = thisPump.Power * thisTimeStepSysInSec;
+        thisPumpRep.ShaftPower = daPumps->ShaftPower;
+        thisPumpRep.PumpHeattoFluidEnergy = daPumps->PumpHeattoFluid * thisTimeStepSysInSec;
         switch (PumpType) {
         case PumpType::ConSpeed:
         case PumpType::VarSpeed:
         case PumpType::Cond:
-            state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = 1;
+            thisPumpRep.NumPumpsOperating = 1;
             break;
 
         case PumpType::Bank_ConSpeed:
         case PumpType::Bank_VarSpeed:
-            state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating = state.dataPumps->NumPumpsRunning;
+            thisPumpRep.NumPumpsOperating = daPumps->NumPumpsRunning;
             break;
         default:
             ShowFatalError(state, format("Invalid Pump Type = {}", PumpType));
             break;
         }
-        state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate = state.dataPumps->Power - state.dataPumps->PumpHeattoFluid;
-        state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainEnergy =
-            state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate =
-            (1 - state.dataPumps->PumpEquip(PumpNum).SkinLossRadFraction) * state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate;
-        state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate =
-            state.dataPumps->PumpEquip(PumpNum).SkinLossRadFraction * state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate;
+        thisPumpRep.ZoneTotalGainRate = daPumps->Power - daPumps->PumpHeattoFluid;
+        thisPumpRep.ZoneTotalGainEnergy = thisPumpRep.ZoneTotalGainRate * thisTimeStepSysInSec;
+        thisPumpRep.ZoneConvGainRate = (1 - thisPump.SkinLossRadFraction) * thisPumpRep.ZoneTotalGainRate;
+        thisPumpRep.ZoneRadGainRate = thisPump.SkinLossRadFraction * thisPumpRep.ZoneTotalGainRate;
     }
 }
 
@@ -2331,28 +2277,28 @@ void PumpDataForTable(EnergyPlusData &state, int const NumPump)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string equipName;
 
-    equipName = state.dataPumps->PumpEquip(NumPump).Name;
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpType, equipName, cPumpTypes[state.dataPumps->PumpEquip(NumPump).pumpType]);
-    if (state.dataPumps->PumpEquip(NumPump).PumpControl == PumpControlType::Continuous) {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpControl, equipName, "Continuous");
-    } else if (state.dataPumps->PumpEquip(NumPump).PumpControl == PumpControlType::Intermittent) {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpControl, equipName, "Intermittent");
+    auto &thisPump = state.dataPumps->PumpEquip(NumPump);
+    auto &thisReport = state.dataOutRptPredefined;
+
+    equipName = thisPump.Name;
+    PreDefTableEntry(state, thisReport->pdchPumpType, equipName, cPumpTypes[thisPump.pumpType]);
+    if (thisPump.PumpControl == PumpControlType::Continuous) {
+        PreDefTableEntry(state, thisReport->pdchPumpControl, equipName, "Continuous");
+    } else if (thisPump.PumpControl == PumpControlType::Intermittent) {
+        PreDefTableEntry(state, thisReport->pdchPumpControl, equipName, "Intermittent");
     } else {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpControl, equipName, "Unknown");
+        PreDefTableEntry(state, thisReport->pdchPumpControl, equipName, "Unknown");
     }
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpHead, equipName, state.dataPumps->PumpEquip(NumPump).NomPumpHead);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpFlow, equipName, state.dataPumps->PumpEquip(NumPump).NomVolFlowRate, 6);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpPower, equipName, state.dataPumps->PumpEquip(NumPump).NomPowerUse);
-    if (state.dataPumps->PumpEquip(NumPump).NomVolFlowRate != 0) {
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchPumpPwrPerFlow,
-                         equipName,
-                         state.dataPumps->PumpEquip(NumPump).NomPowerUse / state.dataPumps->PumpEquip(NumPump).NomVolFlowRate);
+    PreDefTableEntry(state, thisReport->pdchPumpHead, equipName, thisPump.NomPumpHead);
+    PreDefTableEntry(state, thisReport->pdchPumpFlow, equipName, thisPump.NomVolFlowRate, 6);
+    PreDefTableEntry(state, thisReport->pdchPumpPower, equipName, thisPump.NomPowerUse);
+    if (thisPump.NomVolFlowRate != 0) {
+        PreDefTableEntry(state, thisReport->pdchPumpPwrPerFlow, equipName, thisPump.NomPowerUse / thisPump.NomVolFlowRate);
     } else {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpPwrPerFlow, equipName, "-");
+        PreDefTableEntry(state, thisReport->pdchPumpPwrPerFlow, equipName, "-");
     }
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpEndUse, equipName, state.dataPumps->PumpEquip(NumPump).EndUseSubcategoryName);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchMotEff, equipName, state.dataPumps->PumpEquip(NumPump).MotorEffic);
+    PreDefTableEntry(state, thisReport->pdchPumpEndUse, equipName, thisPump.EndUseSubcategoryName);
+    PreDefTableEntry(state, thisReport->pdchMotEff, equipName, thisPump.MotorEffic);
 }
 
 void GetRequiredMassFlowRate(EnergyPlusData &state,
@@ -2378,45 +2324,44 @@ void GetRequiredMassFlowRate(EnergyPlusData &state,
     Real64 MinPress(0.0);                 // Minimum pressure
     Real64 MaxPress(0.0);                 // Maximum pressure
 
-    RotSpeed_Min = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.MinRPMSchedIndex);
-    RotSpeed_Max = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.MaxRPMSchedIndex);
-    MinPress = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.LowerPsetSchedIndex);
-    MaxPress = GetCurrentScheduleValue(state, state.dataPumps->PumpEquip(PumpNum).VFD.UpperPsetSchedIndex);
+    auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
+
+    RotSpeed_Min = GetCurrentScheduleValue(state, thisPump.VFD.MinRPMSchedIndex);
+    RotSpeed_Max = GetCurrentScheduleValue(state, thisPump.VFD.MaxRPMSchedIndex);
+    MinPress = GetCurrentScheduleValue(state, thisPump.VFD.LowerPsetSchedIndex);
+    MaxPress = GetCurrentScheduleValue(state, thisPump.VFD.UpperPsetSchedIndex);
 
     // Calculate maximum and minimum mass flow rate associated with maximun and minimum RPM
-    if (state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum > 0) {
-        if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).UsePressureForPumpCalcs &&
-            state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).PressureSimType ==
-                DataPlant::PressSimType::FlowCorrection &&
-            state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).PressureDrop > 0.0) {
-            state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM =
-                ResolveLoopFlowVsPressure(state,
-                                          state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum,
-                                          InletNodeMassFlowRate,
-                                          state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
-                                          RotSpeed_Max,
-                                          state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
-                                          state.dataPumps->PumpEquip(PumpNum).MinPhiValue,
-                                          state.dataPumps->PumpEquip(PumpNum).MaxPhiValue);
-            state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM =
-                ResolveLoopFlowVsPressure(state,
-                                          state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum,
-                                          InletNodeMassFlowRate,
-                                          state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
-                                          RotSpeed_Min,
-                                          state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
-                                          state.dataPumps->PumpEquip(PumpNum).MinPhiValue,
-                                          state.dataPumps->PumpEquip(PumpNum).MaxPhiValue);
+    if (thisPump.plantLoc.loopNum > 0) {
+        if (state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum).UsePressureForPumpCalcs &&
+            state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum).PressureSimType == DataPlant::PressSimType::FlowCorrection &&
+            state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum).PressureDrop > 0.0) {
+            thisPump.PumpMassFlowRateMaxRPM = ResolveLoopFlowVsPressure(state,
+                                                                        thisPump.plantLoc.loopNum,
+                                                                        InletNodeMassFlowRate,
+                                                                        thisPump.PressureCurve_Index,
+                                                                        RotSpeed_Max,
+                                                                        thisPump.ImpellerDiameter,
+                                                                        thisPump.MinPhiValue,
+                                                                        thisPump.MaxPhiValue);
+            thisPump.PumpMassFlowRateMinRPM = ResolveLoopFlowVsPressure(state,
+                                                                        thisPump.plantLoc.loopNum,
+                                                                        InletNodeMassFlowRate,
+                                                                        thisPump.PressureCurve_Index,
+                                                                        RotSpeed_Min,
+                                                                        thisPump.ImpellerDiameter,
+                                                                        thisPump.MinPhiValue,
+                                                                        thisPump.MaxPhiValue);
         }
     }
 
     // Not correct necessarily, but values are coming out way wrong here, maxRPMmdot~3, minRPMmdot~62!
-    if (state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM < state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM) {
-        state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM = state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM;
+    if (thisPump.PumpMassFlowRateMaxRPM < thisPump.PumpMassFlowRateMinRPM) {
+        thisPump.PumpMassFlowRateMaxRPM = thisPump.PumpMassFlowRateMinRPM;
     }
 
     // Calculate maximum and minimum mass flow rate associated with operating pressure range
-    if (state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum > 0) {
+    if (thisPump.plantLoc.loopNum > 0) {
         if (state.dataPlnt->PlantLoop(LoopNum).PressureEffectiveK > 0.0) {
             PumpMassFlowRateMaxPress = std::sqrt(MaxPress / state.dataPlnt->PlantLoop(LoopNum).PressureEffectiveK);
             PumpMassFlowRateMinPress = std::sqrt(MinPress / state.dataPlnt->PlantLoop(LoopNum).PressureEffectiveK);
@@ -2425,18 +2370,18 @@ void GetRequiredMassFlowRate(EnergyPlusData &state,
 
     // Decide operating range for mass flow rate
     // Maximum mass flow rate value of the range
-    if (state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM > PumpMassFlowRateMaxPress) {
+    if (thisPump.PumpMassFlowRateMaxRPM > PumpMassFlowRateMaxPress) {
         // Maximum pressure value governs maximum VFD range value
         PumpMaxMassFlowRateVFDRange = PumpMassFlowRateMaxPress;
     } else {
         // Maximum RPM value governs maximum VFD range value
-        PumpMaxMassFlowRateVFDRange = state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM;
+        PumpMaxMassFlowRateVFDRange = thisPump.PumpMassFlowRateMaxRPM;
     }
 
     // Minimum mass flow rate value of the range
-    if (state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM > PumpMassFlowRateMinPress) {
+    if (thisPump.PumpMassFlowRateMinRPM > PumpMassFlowRateMinPress) {
         // Minimum pressure value governs minimum VFD range value
-        PumpMinMassFlowRateVFDRange = state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMinRPM;
+        PumpMinMassFlowRateVFDRange = thisPump.PumpMassFlowRateMinRPM;
     } else {
         // Minimum pressure range value governs minimum VFD range value
         PumpMinMassFlowRateVFDRange = PumpMassFlowRateMinPress;
