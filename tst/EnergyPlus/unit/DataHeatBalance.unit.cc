@@ -1174,4 +1174,18 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_ComputeNominalUwithConvCoeffsTest)
     actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
     EXPECT_TRUE(isWithConvCoefValid);
     EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
+
+    // Test 7: Surface is an interior ceiling (wall) using Other Side Coefficients (OSC)
+    thisUval = 1.0;
+    thisSurf.ExtBoundCond = DataSurfaces::OtherSideCoefCalcExt;
+    thisSurf.Class = DataSurfaces::SurfaceClass::Wall;
+    thisSurf.Construction = 1;
+    thisSurf.OSCPtr = 1;
+    state->dataSurface->OSC.allocate(1);
+    state->dataSurface->OSC(1).SurfFilmCoef = 0.5;
+    expectedAnswer = 0.617377;
+    isWithConvCoefValid = false;
+    actualAnswer = ComputeNominalUwithConvCoeffs(*state, 1, isWithConvCoefValid);
+    EXPECT_TRUE(isWithConvCoefValid);
+    EXPECT_NEAR(expectedAnswer, actualAnswer, allowableTolerance);
 }

@@ -1334,9 +1334,11 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
     case DataSurfaces::ExternalEnvironment: { // ExtBoundCond = 0
         outsideFilm = 0.0299387;              // All exterior conditions
     } break;
+    case DataSurfaces::OtherSideCoefCalcExt: {
+        outsideFilm = state.dataSurface->OSC(thisSurface.OSCPtr).SurfFilmCoef;
+    } break;
     case DataSurfaces::Ground:
     case DataSurfaces::OtherSideCoefNoCalcExt:
-    case DataSurfaces::OtherSideCoefCalcExt:
     case DataSurfaces::OtherSideCondModeledExt:
     case DataSurfaces::GroundFCfactorMethod:
     case DataSurfaces::KivaFoundation: { // All these cases have a negative ExtBoundCond so don't use film coefficients
