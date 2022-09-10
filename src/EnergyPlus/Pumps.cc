@@ -422,8 +422,11 @@ void GetPumpInput(EnergyPlusData &state)
                 thisPump.VFD.ManualRPMSchedName = thisInput->cAlphaArgs(8);
                 thisPump.VFD.ManualRPMSchedIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(8));
                 if (thisPump.VFD.ManualRPMSchedIndex <= 0) {
-                    ShowSevereError(
-                        state, format("{}{}={}, At least one scheduled VFD schedule input was invalid.", std::string{RoutineName}, thisPump.Name));
+                    ShowSevereError(state,
+                                    format("{}{}={}, At least one scheduled VFD schedule input was invalid.",
+                                           std::string{RoutineName},
+                                           cCurrentModuleObject,
+                                           thisPump.Name));
                     ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
                 } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, ">", 0.0) ||
@@ -2002,7 +2005,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
         // Efficiency errors are caught previously, but it doesn't hurt to add another catch before dividing by zero!!!
         if (TotalEffic == 0.0) {
             ShowSevereError(state,
-                            format("{} Plant pump simulation encountered a pump with zero efficiency: ", std::string{RoutineName}, thisPump.Name));
+                            format("{} Plant pump simulation encountered a pump with zero efficiency: {}", std::string{RoutineName}, thisPump.Name));
             ShowContinueError(state, "Check efficiency inputs for this pump component.");
             ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
         }
