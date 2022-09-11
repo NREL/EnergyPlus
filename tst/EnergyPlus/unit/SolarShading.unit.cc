@@ -3480,6 +3480,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
 {
+    // Test the severe warning messages given when there is a combination of PixelCounting type Shadow Calculation Method and schedule shading surface
+    // transmittance values
+    // Address Issue 9059 via PR 9653
     std::string const idf_objects = delimited_string({
         "  Building,",
         "    DemoFDT,                 !- Name",
@@ -3817,6 +3820,15 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    Zn001:Wall-South:Shade001,  !- Shading Surface Name",
         "    0.2,                     !- Diffuse Solar Reflectance of Unglazed Part of Shading",
         "    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shading",
+
+        "  Shading:Site:Detailed,",
+        "    Zn001:Wall-South:Shade002,  !- Name",
+        "    SunShading,              !- Transmittance Schedule Name",
+        "    4,                       !- Number of Vertices",
+        "    -3,-5,5,               !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-6,5,               !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-6,5,                !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,5;                !- X,Y,Z ==> Vertex 4 {m}",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3853,11 +3865,17 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
+    // This function will call SurfaceGeometry::GetDetShdSurfaceData() and SurfaceGeometry::GetAttShdSurfaceData(), which are the target functions to
+    // be tested
     SurfaceGeometry::GetSurfaceData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
-    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
+    // Expect to have two severre errors, one for the detached Shading:Site:Detailed, and one for the attached Shading:Zone:Detailed
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 2);
+    // The attached one will be the last severe error, since the "attached" function is called later than the "detached" one.
     EXPECT_EQ(state->dataErrTracking->LastSevereError,
               "Shading:Zone:Detailed=\"ZN001:WALL-SOUTH:SHADE001\" has an active Transmittance Schedule Name=\"SUNSHADING\";");
+
+    EXPECT_EQ(state->dataErrTracking->AskForSurfacesReport, true);
 }
