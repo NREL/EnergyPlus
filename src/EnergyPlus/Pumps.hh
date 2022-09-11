@@ -122,15 +122,10 @@ namespace Pumps {
     {
         // Members
         std::string Name;
-        std::string ManualRPMSchedName;
         int ManualRPMSchedIndex;
-        std::string LowerPsetSchedName;
         int LowerPsetSchedIndex;
-        std::string UpperPsetSchedName;
         int UpperPsetSchedIndex;
-        std::string MinRPMSchedName;
         int MinRPMSchedIndex;
-        std::string MaxRPMSchedName;
         int MaxRPMSchedIndex;
         ControlTypeVFD VFDControlType; // VFDControlType
         Real64 MaxRPM;                 // Maximum RPM range value - schedule limit
