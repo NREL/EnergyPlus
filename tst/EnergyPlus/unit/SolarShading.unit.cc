@@ -55,6 +55,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -3489,22 +3490,22 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    FullExterior,            !- Solar Distribution",
         "    ,                        !- Maximum Number of Warmup Days",
         "    6;                       !- Minimum Number of Warmup Days",
+
         "  ShadowCalculation,",
-        "    PolygonClipping,         !- Shading Calculation Method",
-        "    Timestep,                !- Shading Calculation Update Frequency Method",
-        "    ,                        !- Shading Calculation Update Frequency",
-        "    ,                           !- Maximum Figures in Shadow Overlap Calculations",
-        "    ,                           !- Polygon Clipping Algorithm",
-        "    ,                           !- Pixel Counting Resolution",
-        "    ,                           !- Sky Diffuse Modeling Algorithm",
-        "    ,                           !- Output External Shading Calculation Results",
-        "    Yes,                        !- Disable Shading within A Zone Group",
-        "    ,                           !- Disable Shading between Zone Groups",
-        "    ShadingZoneGroup;           !- Shading Group 1 ZoneList Name",
+        "    PixelCounting, !-Shading Calculation Method",
+        "    Periodic, !-Shading Calculation Update Frequency Method",
+        "    , !-Shading Calculation Update Frequency",
+        "    , !-Maximum Figures in Shadow Overlap Calculations",
+        "    , !-Polygon Clipping Algorithm",
+        "    2048, !- Pixel Counting Resolution",
+        "    DetailedSkyDiffuseModeling;!- Sky Diffuse Modeling Algorithm",
+
         "  SurfaceConvectionAlgorithm:Inside,TARP;",
         "  SurfaceConvectionAlgorithm:Outside,TARP;",
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
+
         "  Timestep,6;",
+
         "  RunPeriod,",
         "    RP1,                     !- Name",
         "    1,                       !- Begin Month",
@@ -3519,16 +3520,19 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    ,                        !- Apply Weekend Holiday Rule",
         "    ,                        !- Use Weather File Rain Indicators",
         "    ;                        !- Use Weather File Snow Indicators",
+
         "  ScheduleTypeLimits,",
         "    Fraction,                !- Name",
         "    0.0,                     !- Lower Limit Value",
         "    1.0,                     !- Upper Limit Value",
         "    Continuous;              !- Numeric Type",
+
         "  ScheduleTypeLimits,",
         "    ON/OFF,                  !- Name",
         "    0,                       !- Lower Limit Value",
         "    1,                       !- Upper Limit Value",
         "    Discrete;                !- Numeric Type",
+
         "  Schedule:Compact,",
         "    SunShading,              !- Name",
         "    ON/OFF,                  !- Schedule Type Limits Name",
@@ -3541,6 +3545,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    Through: 12/31,          !- Field 9",
         "    For: AllDays,            !- Field 10",
         "    until: 24:00,1;          !- Field 11",
+
         "  Material,",
         "    A2 - 4 IN DENSE FACE BRICK,  !- Name",
         "    Rough,                   !- Roughness",
@@ -3551,6 +3556,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    0.9000000,               !- Thermal Absorptance",
         "    0.9300000,               !- Solar Absorptance",
         "    0.9300000;               !- Visible Absorptance",
+
         "  Material,",
         "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
         "    Smooth,                  !- Roughness",
@@ -3561,6 +3567,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    0.9000000,               !- Thermal Absorptance",
         "    0.9200000,               !- Solar Absorptance",
         "    0.9200000;               !- Visible Absorptance",
+
         "  Material,",
         "    E2 - 1 / 2 IN SLAG OR STONE,  !- Name",
         "    Rough,                   !- Roughness",
@@ -3571,6 +3578,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    0.9000000,               !- Thermal Absorptance",
         "    0.5500000,               !- Solar Absorptance",
         "    0.5500000;               !- Visible Absorptance",
+
         "  Material,",
         "    C12 - 2 IN HW CONCRETE,  !- Name",
         "    MediumRough,             !- Roughness",
@@ -3581,6 +3589,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    0.9000000,               !- Thermal Absorptance",
         "    0.6500000,               !- Solar Absorptance",
         "    0.6500000;               !- Visible Absorptance",
+
         "  Material:NoMass,",
         "    R13LAYER,                !- Name",
         "    Rough,                   !- Roughness",
@@ -3588,6 +3597,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    0.9000000,               !- Thermal Absorptance",
         "    0.7500000,               !- Solar Absorptance",
         "    0.7500000;               !- Visible Absorptance",
+
         "  WindowMaterial:Glazing,",
         "    GLASS - CLEAR PLATE 1 / 4 IN,  !- Name",
         "    SpectralAverage,         !- Optical Data Type",
@@ -3603,48 +3613,46 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
         "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
         "    0.9;                     !- Conductivity {W/m-K}",
+
         "  WindowMaterial:Gas,",
         "    AIRGAP,                  !- Name",
         "    AIR,                     !- Gas Type",
         "    0.0125;                  !- Thickness {m}",
+
         "  Construction,",
         "    R13WALL,                 !- Name",
         "    R13LAYER;                !- Outside Layer",
+
         "  Construction,",
         "    EXTWALL09,               !- Name",
         "    A2 - 4 IN DENSE FACE BRICK,  !- Outside Layer",
         "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4",
-        "  Construction,",
-        "    INTERIOR,                !- Name",
-        "    C12 - 2 IN HW CONCRETE;  !- Layer 4",
+
         "  Construction,",
         "    SLAB FLOOR,              !- Name",
         "    C12 - 2 IN HW CONCRETE;  !- Layer 4",
+
         "  Construction,",
         "    ROOF31,                  !- Name",
         "    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer",
         "    C12 - 2 IN HW CONCRETE;  !- Layer 4",
+
         "  Construction,",
         "    DOUBLE PANE HW WINDOW,   !- Name",
         "    GLASS - CLEAR PLATE 1 / 4 IN,  !- Outside Layer",
         "    AIRGAP,                  !- Layer 2",
         "    GLASS - CLEAR PLATE 1 / 4 IN;  !- Layer 3",
-        "  Construction,",
-        "    PARTITION02,             !- Name",
-        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer",
-        "    C12 - 2 IN HW CONCRETE,  !- Layer 4",
-        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
-        "  Construction,",
-        "    single PANE HW WINDOW,   !- Name",
-        "    GLASS - CLEAR PLATE 1 / 4 IN;  !- Outside Layer",
+
         "  Construction,",
         "    EXTWALLdemo,             !- Name",
         "    A2 - 4 IN DENSE FACE BRICK,  !- Outside Layer",
         "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4",
+
         "  GlobalGeometryRules,",
         "    UpperLeftCorner,         !- Starting Vertex Position",
         "    Counterclockwise,        !- Vertex Entry Direction",
         "    Relative;                !- Coordinate System",
+
         "  Zone,",
         "    ZONE ONE,                !- Name",
         "    0,                       !- Direction of Relative North {deg}",
@@ -3655,9 +3663,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    1,                       !- Multiplier",
         "    0,                       !- Ceiling Height {m}",
         "    0;                       !- Volume {m3}",
-        "  ZoneList,",
-        "    ShadingZoneGroup,",
-        "    ZONE ONE;",
+
         "  BuildingSurface:Detailed,",
         "    Zn001:Wall-North,        !- Name",
         "    Wall,                    !- Surface Type",
@@ -3670,10 +3676,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    WindExposed,             !- Wind Exposure",
         "    0.5000000,               !- View Factor to Ground",
         "    4,                       !- Number of Vertices",
-        "    5,5,3,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    5,5,0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    -5,5,0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    -5,5,3;  !- X,Y,Z ==> Vertex 4 {m}",
+        "    5,5,3,                   !- X,Y,Z ==> Vertex 1 {m}",
+        "    5,5,0,                   !- X,Y,Z ==> Vertex 2 {m}",
+        "    -5,5,0,                  !- X,Y,Z ==> Vertex 3 {m}",
+        "    -5,5,3;                  !- X,Y,Z ==> Vertex 4 {m}",
+
         "  BuildingSurface:Detailed,",
         "    Zn001:Wall-East,         !- Name",
         "    Wall,                    !- Surface Type",
@@ -3686,10 +3693,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    WindExposed,             !- Wind Exposure",
         "    0.5000000,               !- View Factor to Ground",
         "    4,                       !- Number of Vertices",
-        "    5,-5,3,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    5,-5,0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    5,5,0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    5,5,3;  !- X,Y,Z ==> Vertex 4 {m}",
+        "    5,-5,3,                  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5,-5,0,                  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5,5,0,                   !- X,Y,Z ==> Vertex 3 {m}",
+        "    5,5,3;                   !- X,Y,Z ==> Vertex 4 {m}",
+
         "  BuildingSurface:Detailed,",
         "    Zn001:Wall-South,        !- Name",
         "    Wall,                    !- Surface Type",
@@ -3702,10 +3710,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    WindExposed,             !- Wind Exposure",
         "    0.5000000,               !- View Factor to Ground",
         "    4,                       !- Number of Vertices",
-        "    -5,-5,3,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    -5,-5,0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    5,-5,3;  !- X,Y,Z ==> Vertex 4 {m}",
+        "    -5,-5,3,                 !- X,Y,Z ==> Vertex 1 {m}",
+        "    -5,-5,0,                 !- X,Y,Z ==> Vertex 2 {m}",
+        "    5,-5,0,                  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5,-5,3;                  !- X,Y,Z ==> Vertex 4 {m}",
+
         "  BuildingSurface:Detailed,",
         "    Zn001:Wall-West,         !- Name",
         "    Wall,                    !- Surface Type",
@@ -3718,10 +3727,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    WindExposed,             !- Wind Exposure",
         "    0.5000000,               !- View Factor to Ground",
         "    4,                       !- Number of Vertices",
-        "    -5,5,3,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    -5,5,0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    -5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    -5,-5,3;  !- X,Y,Z ==> Vertex 4 {m}",
+        "    -5,5,3,                  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -5,5,0,                  !- X,Y,Z ==> Vertex 2 {m}",
+        "    -5,-5,0,                 !- X,Y,Z ==> Vertex 3 {m}",
+        "    -5,-5,3;                 !- X,Y,Z ==> Vertex 4 {m}",
+
         "  BuildingSurface:Detailed,",
         "    Zn001:roof,              !- Name",
         "    Roof,                    !- Surface Type",
@@ -3734,17 +3744,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    WindExposed,             !- Wind Exposure",
         "    0.0000000,               !- View Factor to Ground",
         "    4,                       !- Number of Vertices",
-        "    -5,-5,3,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    5,-5,3,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    5,5,3,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    -5,5,3;  !- X,Y,Z ==> Vertex 4 {m}",
-        "  Schedule:Compact,",
-        "    ExtShadingSch:Zn001:roof,",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00,            !- Field 3",
-        "    0.5432;                  !- Field 4",
+        "    -5,-5,3,                 !- X,Y,Z ==> Vertex 1 {m}",
+        "    5,-5,3,                  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5,5,3,                   !- X,Y,Z ==> Vertex 3 {m}",
+        "    -5,5,3;                  !- X,Y,Z ==> Vertex 4 {m}",
+
         "  BuildingSurface:Detailed,",
         "    Zn001:floor,             !- Name",
         "    Floor,                   !- Surface Type",
@@ -3757,10 +3761,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    WindExposed,             !- Wind Exposure",
         "    0.0000000,               !- View Factor to Ground",
         "    4,                       !- Number of Vertices",
-        "    -5,5,0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    5,5,0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    -5,-5,0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "    -5,5,0,                  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5,5,0,                   !- X,Y,Z ==> Vertex 2 {m}",
+        "    5,-5,0,                  !- X,Y,Z ==> Vertex 3 {m}",
+        "    -5,-5,0;                 !- X,Y,Z ==> Vertex 4 {m}",
+
         "  FenestrationSurface:Detailed,",
         "    Zn001:Wall-South:Win001, !- Name",
         "    Window,                  !- Surface Type",
@@ -3771,10 +3776,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    TestFrameAndDivider,     !- Frame and Divider Name",
         "    1.0,                     !- Multiplier",
         "    4,                       !- Number of Vertices",
-        "    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    -3,-5,0.5,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    3,-5,0.5,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+        "    -3,-5,2.5,               !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-5,0.5,               !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-5,0.5,                !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,2.5;                !- X,Y,Z ==> Vertex 4 {m}",
+
         "  WindowProperty:FrameAndDivider,",
         "    TestFrameAndDivider,     !- Name",
         "    0.05,                    !- Frame Width {m}",
@@ -3796,15 +3802,17 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
         "    0.8,                     !- Divider Solar Absorptance",
         "    0.8,                     !- Divider Visible Absorptance",
         "    0.9;                     !- Divider Thermal Hemispherical Emissivity",
+
         "  Shading:Zone:Detailed,",
         "    Zn001:Wall-South:Shade001,  !- Name",
         "    Zn001:Wall-South,        !- Base Surface Name",
         "    SunShading,              !- Transmittance Schedule Name",
         "    4,                       !- Number of Vertices",
-        "    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
-        "    -3,-6,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
-        "    3,-6,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
-        "    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+        "    -3,-5,2.5,               !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-6,2.5,               !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-6,2.5,                !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,2.5;                !- X,Y,Z ==> Vertex 4 {m}",
+
         "  ShadingProperty:Reflectance,",
         "    Zn001:Wall-South:Shade001,  !- Shading Surface Name",
         "    0.2,                     !- Diffuse Solar Reflectance of Unglazed Part of Shading",
@@ -3831,13 +3839,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     HeatBalanceManager::GetConstructData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetZoneData(*state, FoundError); // Read Zone data from input file
+    HeatBalanceManager::GetZoneData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
-
-    SizingManager::GetZoneSizingInput(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -3847,22 +3853,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    compare_err_stream("");                                 // just for debugging
-    SurfaceGeometry::SetupZoneGeometry(*state, FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::GetSurfaceData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    compare_err_stream(""); // just for debugging
-
-    SolarShading::GetShadowingInput(*state);
-
-    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        if (state->dataSurface->Surface(SurfNum).ExtBoundCond == 0 && state->dataSurface->Surface(SurfNum).Zone != 0) {
-            int ZoneSize = state->dataSurface->SurfShadowDisabledZoneList(SurfNum).size();
-            EXPECT_EQ(1, ZoneSize);
-            std::vector<int> DisabledZones = state->dataSurface->SurfShadowDisabledZoneList(SurfNum);
-            for (int i : DisabledZones) {
-                EXPECT_EQ(1, i);
-            }
-        }
-    }
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->LastSevereError,
+              "Shading:Zone:Detailed=\"ZN001:WALL-SOUTH:SHADE001\" has an active Transmittance Schedule Name=\"SUNSHADING\";");
 }
