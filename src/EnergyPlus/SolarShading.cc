@@ -363,6 +363,9 @@ void GetShadowCalcMethodforSurfGeom(EnergyPlusData &state)
 {
     // This is a much condensed revision based on the full ShadowCalculation input processing module
     // The purpose is to only retrieve the Shadow Calculation Method field for the Surface Geometry modules
+    // For this purpose, it just literally check the input types for Shadow Calculation Method field.
+    // If machine-specific or computation environment-specific adjustment needs to be done,
+    // the adjustment will be done in the full version of SolarShading::GetShadowingInput().
 
     // Using/Aliasing
     using DataSystemVariables::ShadingMethod;
@@ -413,35 +416,6 @@ void GetShadowCalcMethodforSurfGeom(EnergyPlusData &state)
             state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PixelCounting")) {
             state.dataSysVars->shadingMethod = ShadingMethod::PixelCounting;
-            if (NumNumbers >= 3) {
-                pixelRes = (unsigned)state.dataIPShortCut->rNumericArgs(3);
-            }
-#ifdef EP_NO_OPENGL
-            ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
-            ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\"");
-            ShowContinueError(state, "This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)");
-            ShowContinueError(state, "PolygonClipping will be used instead");
-            state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
-            state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
-#else
-            auto error_callback = [](const int messageType, const std::string &message, void *contextPtr) {
-                auto *state = (EnergyPlusData *)contextPtr;
-                if (messageType == Pumbra::MSG_ERR) {
-                    ShowSevereError(*state, message);
-                } else if (messageType == Pumbra::MSG_WARN) {
-                    ShowWarningError(*state, message);
-                } else { // if (messageType == MSG_INFO)
-                    ShowMessage(*state, message);
-                }
-            };
-            if (Pumbra::Penumbra::isValidContext()) {
-                state.dataSolarShading->penumbra = std::make_unique<Pumbra::Penumbra>(error_callback, &state, pixelRes);
-            } else {
-                ShowWarningError(state, "No GPU found (required for PixelCounting)");
-                ShowContinueError(state, "PolygonClipping will be used instead");
-                state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
-            }
-#endif
         } else {
             //
         }
