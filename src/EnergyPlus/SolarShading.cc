@@ -363,7 +363,7 @@ void GetShadowCalcMethodforSurfGeom(EnergyPlusData &state)
 {
     // This is a much condensed revision based on the full ShadowCalculation input processing module
     // The purpose is to only retrieve the Shadow Calculation Method field for the Surface Geometry modules
- 
+
     // Using/Aliasing
     using DataSystemVariables::ShadingMethod;
 
