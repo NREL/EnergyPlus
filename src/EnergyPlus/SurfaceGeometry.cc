@@ -3364,12 +3364,9 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
-        if (state.dataSolarShading->GetInputFlag) {
-            SolarShading::GetShadowingInput(state);
-            state.dataSolarShading->GetInputFlag = false;
-            state.dataSolarShading->MaxHCV =
-                (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
-            assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
+        if (state.dataSolarShading->GetInputFlagforSurfGeom) {
+            SolarShading::GetShadowCalcMethodforSurfGeom(state);
+            state.dataSolarShading->GetInputFlagforSurfGeom = false;
         }
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -6419,12 +6416,9 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
-        if (state.dataSolarShading->GetInputFlag) {
-            SolarShading::GetShadowingInput(state);
-            state.dataSolarShading->GetInputFlag = false;
-            state.dataSolarShading->MaxHCV =
-                (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
-            assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
+        if (state.dataSolarShading->GetInputFlagforSurfGeom) {
+            SolarShading::GetShadowCalcMethodforSurfGeom(state);
+            state.dataSolarShading->GetInputFlagforSurfGeom = false;
         }
 
         if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
