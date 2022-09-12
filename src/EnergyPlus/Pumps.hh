@@ -131,7 +131,7 @@ namespace Pumps {
         PumpType pumpType = PumpType::Invalid; // pump type enumerator, based on local parameter values, used to identify
         // index in the cPumpTypes string array to do error reporting
         DataPlant::PlantEquipmentType TypeOf_Num = DataPlant::PlantEquipmentType::Invalid; // pump type of number in reference to the dataplant values
-        PlantLocation plantLoc;
+        PlantLocation plantLoc = {0, DataPlant::LoopSideLocation::Invalid, 0, 0};
         PumpControlType PumpControl = PumpControlType::Invalid;            // Integer equivalent of PumpControlType
         int PumpScheduleIndex = 0;                                         // Schedule Pointer
         int InletNodeNum = 0;                                              // Node number on the inlet side of the plant
