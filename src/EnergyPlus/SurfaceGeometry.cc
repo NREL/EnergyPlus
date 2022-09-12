@@ -9629,7 +9629,6 @@ namespace SurfaceGeometry {
             "ONIFHIGHSOLARORHIGHLUMINANCETILLSUNSET",
             "ONIFHIGHSOLARORHIGHLUMINANCETILLNEXTMORNING"};
 
-
         constexpr std::array<std::string_view, static_cast<int>(SlatAngleControl::Num)> SlatAngleNamesUC{
             "FIXEDSLATANGLE", "SCHEDULEDSLATANGLE", "BLOCKBEAMSOLAR"};
 
