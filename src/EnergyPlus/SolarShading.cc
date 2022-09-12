@@ -359,6 +359,98 @@ void InitSolarCalculations(EnergyPlusData &state)
     state.dataSolarShading->firstTime = false;
 }
 
+void GetShadowCalcMethodforSurfGeom(EnergyPlusData &state)
+{
+    // This is a much condensed revision based on the full ShadowCalculation input processing module
+    // The purpose is to only retrieve the Shadow Calculation Method field for the Surface Geometry modules
+ 
+    // Using/Aliasing
+    using DataSystemVariables::ShadingMethod;
+
+    int NumItems;
+    int NumNumbers;
+    int NumAlphas;
+    int IOStat;
+    int Found = 0;
+    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+    state.dataIPShortCut->rNumericArgs({1, 4}) = 0.0; // so if nothing gotten, defaults will be maintained.
+    state.dataIPShortCut->cAlphaArgs(1) = "";
+    state.dataIPShortCut->cAlphaArgs(2) = "";
+    cCurrentModuleObject = "ShadowCalculation";
+    NumItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    NumAlphas = 0;
+    NumNumbers = 0;
+    if (NumItems >= 1) {
+        if (NumItems > 1) {
+            ShowWarningError(state, cCurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+        }
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 cCurrentModuleObject,
+                                                                 1,
+                                                                 state.dataIPShortCut->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 state.dataIPShortCut->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 IOStat,
+                                                                 state.dataIPShortCut->lNumericFieldBlanks,
+                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                 state.dataIPShortCut->cAlphaFieldNames,
+                                                                 state.dataIPShortCut->cNumericFieldNames);
+        state.dataSolarShading->ShadowingCalcFrequency = state.dataIPShortCut->rNumericArgs(1);
+    }
+
+    int aNum = 1;
+    unsigned pixelRes = 512u;
+    if (NumAlphas >= aNum) {
+        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Scheduled")) {
+            state.dataSysVars->shadingMethod = ShadingMethod::Scheduled;
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Imported")) {
+            if (state.dataScheduleMgr->ScheduleFileShadingProcessed) {
+                state.dataSysVars->shadingMethod = ShadingMethod::Imported;
+            } else {
+                //
+            }
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PolygonClipping")) {
+            state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
+        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PixelCounting")) {
+            state.dataSysVars->shadingMethod = ShadingMethod::PixelCounting;
+            if (NumNumbers >= 3) {
+                pixelRes = (unsigned)state.dataIPShortCut->rNumericArgs(3);
+            }
+#ifdef EP_NO_OPENGL
+            ShowWarningError(state, cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(aNum));
+            ShowContinueError(state, "Value entered=\"" + state.dataIPShortCut->cAlphaArgs(aNum) + "\"");
+            ShowContinueError(state, "This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)");
+            ShowContinueError(state, "PolygonClipping will be used instead");
+            state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
+            state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
+#else
+            auto error_callback = [](const int messageType, const std::string &message, void *contextPtr) {
+                auto *state = (EnergyPlusData *)contextPtr;
+                if (messageType == Pumbra::MSG_ERR) {
+                    ShowSevereError(*state, message);
+                } else if (messageType == Pumbra::MSG_WARN) {
+                    ShowWarningError(*state, message);
+                } else { // if (messageType == MSG_INFO)
+                    ShowMessage(*state, message);
+                }
+            };
+            if (Pumbra::Penumbra::isValidContext()) {
+                state.dataSolarShading->penumbra = std::make_unique<Pumbra::Penumbra>(error_callback, &state, pixelRes);
+            } else {
+                ShowWarningError(state, "No GPU found (required for PixelCounting)");
+                ShowContinueError(state, "PolygonClipping will be used instead");
+                state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
+            }
+#endif
+        } else {
+            //
+        }
+    } else {
+        state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
+    }
+}
+
 void GetShadowingInput(EnergyPlusData &state)
 {
 

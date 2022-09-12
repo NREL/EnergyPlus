@@ -95,6 +95,8 @@ namespace SolarShading {
 
     void InitSolarCalculations(EnergyPlusData &state);
 
+    void GetShadowCalcMethodforSurfGeom(EnergyPlusData &state);
+
     void GetShadowingInput(EnergyPlusData &state);
 
     void AllocateModuleArrays(EnergyPlusData &state);
