@@ -3870,7 +3870,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     SurfaceGeometry::GetSurfaceData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
     // Expect to have two severe errors, one for the detached Shading:Site:Detailed, and one for the attached Shading:Zone:Detailed.
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 2);
     // The attached one will be the last severe error, since the "attached" function is called later than the "detached" one.

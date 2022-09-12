@@ -371,7 +371,6 @@ void GetShadowCalcMethodforSurfGeom(EnergyPlusData &state)
     int NumNumbers;
     int NumAlphas;
     int IOStat;
-    int Found = 0;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     state.dataIPShortCut->rNumericArgs({1, 4}) = 0.0; // so if nothing gotten, defaults will be maintained.
     state.dataIPShortCut->cAlphaArgs(1) = "";
