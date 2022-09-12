@@ -3480,9 +3480,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
 {
-    // Test the severe warning messages given when there is a combination of PixelCounting type Shadow Calculation Method and schedule shading surface
-    // transmittance values
-    // Address Issue 9059 via PR 9653
+    // Test the severe warning messages given when there is a combination of PixelCounting type Shadow Calculation Method
+    // and schedule shading surface transmittance values
+    // Test the addressed Issue 9059 via PR 9653
     std::string const idf_objects = delimited_string({
         "  Building,",
         "    DemoFDT,                 !- Name",
@@ -3836,11 +3836,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(*state, FoundError); // read project control data
-    EXPECT_FALSE(FoundError);                                      // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, FoundError);
+    EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    ScheduleManager::ProcessScheduleInput(*state);
 
     HeatBalanceManager::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
@@ -3865,13 +3865,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    // This function will call SurfaceGeometry::GetDetShdSurfaceData() and SurfaceGeometry::GetAttShdSurfaceData(), which are the target functions to
-    // be tested
+    // This function will call SurfaceGeometry::GetDetShdSurfaceData() and SurfaceGeometry::GetAttShdSurfaceData(),
+    // which are the target functions to be tested.
     SurfaceGeometry::GetSurfaceData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
     EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
-    // Expect to have two severre errors, one for the detached Shading:Site:Detailed, and one for the attached Shading:Zone:Detailed
+    // Expect to have two severe errors, one for the detached Shading:Site:Detailed, and one for the attached Shading:Zone:Detailed.
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 2);
     // The attached one will be the last severe error, since the "attached" function is called later than the "detached" one.
     EXPECT_EQ(state->dataErrTracking->LastSevereError,
