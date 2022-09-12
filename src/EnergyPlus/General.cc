@@ -421,44 +421,22 @@ std::string &strip_trailing_zeros(std::string &InputString)
     return InputString; // Allows chaining
 }
 
-void MovingAvg(Array1A<Real64> const DataIn, // input data that needs smoothing
-               int const NumDataItems,       // number of values in DataIn
-               int const NumItemsInAvg,      // number of items in the averaging window
-               Array1A<Real64> SmoothedData  // output data after smoothing
-)
+void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
+    if (NumItemsInAvg <= 1) return; // no need to average/smooth
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   January 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+    Array1D<Real64> TempData(2 * DataIn.size()); // a scratch array twice the size, bottom end duplicate of top end
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // Smooth the data in the 1-d array DataIn by averaging over a window NumItemsInAvg
-    // wide. Return the results in the 1-d array SmoothedData
-
-    // METHODOLOGY EMPLOYED:
-    // Note that DataIn and SmoothedData should have the same size. This is the reponsibility
-    // of the calling routine. NumItemsInAvg should be no bigger than the size of DataIn.
-
-    // Argument array dimensioning
-    DataIn.dim(NumDataItems);
-    SmoothedData.dim(NumDataItems);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array1D<Real64> TempData(3 * NumDataItems); // a scratch array
-
-    for (int i = 1; i <= NumDataItems; ++i) {
-        TempData(i) = TempData(NumDataItems + i) = TempData(2 * NumDataItems + i) = DataIn(i);
-        SmoothedData(i) = 0.0;
+    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
+        TempData(i) = TempData(DataIn.size() + i) = DataIn(i); // initialize both bottom and top end
+        DataIn(i) = 0.0;
     }
 
-    for (int i = 1; i <= NumDataItems; ++i) {
+    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
         for (int j = 1; j <= NumItemsInAvg; ++j) {
-            SmoothedData(i) += TempData(NumDataItems + i - NumItemsInAvg + j);
+            DataIn(i) += TempData(DataIn.size() - NumItemsInAvg + i + j); // sum top end including NumItemsInAvg history terms
         }
-        SmoothedData(i) /= double(NumItemsInAvg);
+        DataIn(i) /= NumItemsInAvg; // average to smooth over NumItemsInAvg window
     }
 }
 
