@@ -9604,7 +9604,6 @@ namespace SurfaceGeometry {
                                                        });
 
         constexpr std::array<std::string_view, static_cast<int>(WindowShadingControlType::Num)> WindowShadingControlTypeNamesUC{
-            "UNCONTROLLED",
             "ALWAYSON",
             "ALWAYSOFF",
             "ONIFSCHEDULEALLOWS",
@@ -9626,9 +9625,10 @@ namespace SurfaceGeometry {
             "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
             "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
             "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR",
-            "ONIFHIGHSOLARANDHIGHLUMINOFFMIDNIGHT",
-            "ONIFHIGHSOLARANDHIGHLUMINOFFSUNSET",
-            "ONIFHIGHSOLARANDHIGHLUMINOFFNEXTMORNING"};
+            "ONIFHIGHSOLARORHIGHLUMINANCETILLMIDNIGHT",
+            "ONIFHIGHSOLARORHIGHLUMINANCETILLSUNSET",
+            "ONIFHIGHSOLARORHIGHLUMINANCETILLNEXTMORNING"};
+
 
         constexpr std::array<std::string_view, static_cast<int>(SlatAngleControl::Num)> SlatAngleNamesUC{
             "FIXEDSLATANGLE", "SCHEDULEDSLATANGLE", "BLOCKBEAMSOLAR"};

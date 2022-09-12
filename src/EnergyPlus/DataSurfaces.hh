@@ -153,7 +153,6 @@ namespace DataSurfaces {
     enum class WindowShadingControlType
     {
         Invalid = -1,
-        UnControlled,                   // "UNCONTROLLED",
         AlwaysOn,                       // "ALWAYSON",
         AlwaysOff,                      // "ALWAYSOFF",
         OnIfScheduled,                  // "ONIFSCHEDULEALLOWS",
@@ -969,7 +968,7 @@ namespace DataSurfaces {
         //  ExteriorScreen;
         //  this must be a Material:WindowShade, Material:WindowScreen, or Material:WindowBlind
         WindowShadingControlType shadingControlType{
-            WindowShadingControlType::UnControlled}; // Takes one of the following values that specifies type of shading control
+            WindowShadingControlType::Invalid}; // Takes one of the following values that specifies type of shading control
         //  CHARACTER(len=60) :: ShadingControlType =' ' ! Takes one of the following values that specifies type of shading control
         // (control is active only when schedule value = 1; if no schedule
         // specified, schedule value defaults to 1)
