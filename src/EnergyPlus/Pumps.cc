@@ -349,10 +349,10 @@ void GetPumpInput(EnergyPlusData &state)
         }
         thisPump.MotorEffic = thisInput->rNumericArgs(4);
         thisPump.FracMotorLossToFluid = thisInput->rNumericArgs(5);
-        thisPump.PartLoadCoef[1] = thisInput->rNumericArgs(6);
-        thisPump.PartLoadCoef[2] = thisInput->rNumericArgs(7);
-        thisPump.PartLoadCoef[3] = thisInput->rNumericArgs(8);
-        thisPump.PartLoadCoef[4] = thisInput->rNumericArgs(9);
+        thisPump.PartLoadCoef[0] = thisInput->rNumericArgs(6);
+        thisPump.PartLoadCoef[1] = thisInput->rNumericArgs(7);
+        thisPump.PartLoadCoef[2] = thisInput->rNumericArgs(8);
+        thisPump.PartLoadCoef[3] = thisInput->rNumericArgs(9);
         thisPump.MinVolFlowRate = thisInput->rNumericArgs(10);
         if (thisPump.MinVolFlowRate == AutoSize) {
             thisPump.minVolFlowRateWasAutosized = true;
@@ -571,10 +571,10 @@ void GetPumpInput(EnergyPlusData &state)
         }
         thisPump.MotorEffic = thisInput->rNumericArgs(4);
         thisPump.FracMotorLossToFluid = thisInput->rNumericArgs(5);
-        thisPump.PartLoadCoef[1] = 1.0;
+        thisPump.PartLoadCoef[0] = 1.0;
+        thisPump.PartLoadCoef[1] = 0.0;
         thisPump.PartLoadCoef[2] = 0.0;
         thisPump.PartLoadCoef[3] = 0.0;
-        thisPump.PartLoadCoef[4] = 0.0;
         // In a constant volume pump we previously set the minimum to the nominal capacity
         // Now we model the pump as constant speed and set flow by riding the pump curve.
         thisPump.MinVolFlowRate = 0.0;
@@ -743,10 +743,10 @@ void GetPumpInput(EnergyPlusData &state)
         }
         thisPump.MotorEffic = thisInput->rNumericArgs(4);
         thisPump.FracMotorLossToFluid = thisInput->rNumericArgs(5);
-        thisPump.PartLoadCoef[1] = thisInput->rNumericArgs(6);
-        thisPump.PartLoadCoef[2] = thisInput->rNumericArgs(7);
-        thisPump.PartLoadCoef[3] = thisInput->rNumericArgs(8);
-        thisPump.PartLoadCoef[4] = thisInput->rNumericArgs(9);
+        thisPump.PartLoadCoef[0] = thisInput->rNumericArgs(6);
+        thisPump.PartLoadCoef[1] = thisInput->rNumericArgs(7);
+        thisPump.PartLoadCoef[2] = thisInput->rNumericArgs(8);
+        thisPump.PartLoadCoef[3] = thisInput->rNumericArgs(9);
 
         if (!thisInput->lAlphaFieldBlanks(5)) { // zone named for pump skin losses
             thisPump.ZoneNum = UtilityRoutines::FindItemInList(thisInput->cAlphaArgs(5), state.dataHeatBal->Zone);
@@ -899,10 +899,10 @@ void GetPumpInput(EnergyPlusData &state)
         }
         thisPump.MotorEffic = thisInput->rNumericArgs(5);
         thisPump.FracMotorLossToFluid = thisInput->rNumericArgs(6);
-        thisPump.PartLoadCoef[1] = thisInput->rNumericArgs(7);
-        thisPump.PartLoadCoef[2] = thisInput->rNumericArgs(8);
-        thisPump.PartLoadCoef[3] = thisInput->rNumericArgs(9);
-        thisPump.PartLoadCoef[4] = thisInput->rNumericArgs(10);
+        thisPump.PartLoadCoef[0] = thisInput->rNumericArgs(7);
+        thisPump.PartLoadCoef[1] = thisInput->rNumericArgs(8);
+        thisPump.PartLoadCoef[2] = thisInput->rNumericArgs(9);
+        thisPump.PartLoadCoef[3] = thisInput->rNumericArgs(10);
         thisPump.MinVolFlowRateFrac = thisInput->rNumericArgs(11);
         thisPump.MinVolFlowRate = thisPump.NomVolFlowRate * thisPump.MinVolFlowRateFrac;
 
@@ -1044,10 +1044,10 @@ void GetPumpInput(EnergyPlusData &state)
         }
         thisPump.MotorEffic = thisInput->rNumericArgs(5);
         thisPump.FracMotorLossToFluid = thisInput->rNumericArgs(6);
-        thisPump.PartLoadCoef[1] = 1.0;
+        thisPump.PartLoadCoef[0] = 1.0;
+        thisPump.PartLoadCoef[1] = 0.0;
         thisPump.PartLoadCoef[2] = 0.0;
         thisPump.PartLoadCoef[3] = 0.0;
-        thisPump.PartLoadCoef[4] = 0.0;
 
         if (!thisInput->lAlphaFieldBlanks(7)) { // zone named for pump skin losses
             thisPump.ZoneNum = UtilityRoutines::FindItemInList(thisInput->cAlphaArgs(7), state.dataHeatBal->Zone);
@@ -1605,7 +1605,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
     InletNodeMin = thisInNode.MassFlowRateMinAvail;
 
     // Retrive the pump speed fraction from the pump schedule
-    if (thisPump.PumpScheduleIndex > 0) {
+    if (thisPump.PumpScheduleIndex != 0) {
         PumpSchedFraction = GetCurrentScheduleValue(state, thisPump.PumpScheduleIndex);
         PumpSchedFraction = BoundValueToWithinTwoValues(PumpSchedFraction, 0.0, 1.0);
     } else {
@@ -1894,8 +1894,8 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     case PumpType::Cond: {
         VolFlowRate = daPumps->PumpMassFlowRate / LoopDensity;
         PartLoadRatio = min(1.0, (VolFlowRate / thisPump.NomVolFlowRate));
-        FracFullLoadPower = thisPump.PartLoadCoef[1] + thisPump.PartLoadCoef[2] * PartLoadRatio + thisPump.PartLoadCoef[3] * pow_2(PartLoadRatio) +
-                            thisPump.PartLoadCoef[4] * pow_3(PartLoadRatio);
+        FracFullLoadPower = thisPump.PartLoadCoef[0] + thisPump.PartLoadCoef[1] * PartLoadRatio + thisPump.PartLoadCoef[2] * pow_2(PartLoadRatio) +
+                            thisPump.PartLoadCoef[3] * pow_3(PartLoadRatio);
         daPumps->Power = FracFullLoadPower * thisPump.NomPowerUse;
 
     } break;
@@ -1908,10 +1908,10 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
         FullLoadVolFlowRate = thisPump.NomVolFlowRate / thisPump.NumPumpsInBank;
         PartLoadVolFlowRate = daPumps->PumpMassFlowRate / LoopDensity - FullLoadVolFlowRate * daPumps->NumPumpsFullLoad;
         FullLoadPower = thisPump.NomPowerUse / thisPump.NumPumpsInBank;
-        FullLoadPowerRatio = thisPump.PartLoadCoef[1] + thisPump.PartLoadCoef[2] + thisPump.PartLoadCoef[3] + thisPump.PartLoadCoef[4];
+        FullLoadPowerRatio = thisPump.PartLoadCoef[0] + thisPump.PartLoadCoef[1] + thisPump.PartLoadCoef[2] + thisPump.PartLoadCoef[3];
         PartLoadRatio = min(1.0, (PartLoadVolFlowRate / FullLoadVolFlowRate));
-        FracFullLoadPower = thisPump.PartLoadCoef[1] + thisPump.PartLoadCoef[2] * PartLoadRatio + thisPump.PartLoadCoef[3] * pow_2(PartLoadRatio) +
-                            thisPump.PartLoadCoef[4] * pow_3(PartLoadRatio);
+        FracFullLoadPower = thisPump.PartLoadCoef[0] + thisPump.PartLoadCoef[1] * PartLoadRatio + thisPump.PartLoadCoef[2] * pow_2(PartLoadRatio) +
+                            thisPump.PartLoadCoef[3] * pow_3(PartLoadRatio);
         daPumps->Power = (FullLoadPowerRatio * daPumps->NumPumpsFullLoad + FracFullLoadPower) * FullLoadPower;
     } break;
     default: {
