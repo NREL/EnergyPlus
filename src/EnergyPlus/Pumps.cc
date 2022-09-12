@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -105,7 +106,7 @@ using DataHVACGlobals::ForceOff;
 using DataHVACGlobals::SmallWaterVolFlow;
 using DataLoopNode::ObjectIsNotParent;
 
-constexpr std::array<std::string_view, static_cast<int>(PumpType::Num)> pumpTypeIDFNames = {
+static constexpr std::array<std::string_view, static_cast<int>(PumpType::Num)> pumpTypeIDFNames = {
     "Pump:VariableSpeed", "Pump:ConstantSpeed", "Pump:VariableSpeed:Condensate", "HeaderedPumps:VariableSpeed", "HeaderedPumps:ConstantSpeed"};
 
 static constexpr std::string_view fluidNameSteam("STEAM");
@@ -228,10 +229,11 @@ void GetPumpInput(EnergyPlusData &state)
     Real64 constexpr StartTemp(100.0); // Standard Temperature across code to calculated Steam density
     static constexpr std::string_view RoutineName("GetPumpInput: ");
     static constexpr std::string_view RoutineNameNoColon("GetPumpInput");
-    constexpr std::array<std::string_view, static_cast<int>(PumpControlType::Num)> pumpCtrlTypeNamesUC{"CONTINUOUS", "INTERMITTENT"};
-    constexpr std::array<std::string_view, static_cast<int>(ControlTypeVFD::Num)> controlTypeVFDNamesUC{"MANUALCONTROL", "PRESSURESETPOINTCONTROL"};
-    constexpr std::array<std::string_view, static_cast<int>(PowerSizingMethod::Num)> powerSizingMethodNamesUC{"POWERPERFLOW",
-                                                                                                              "POWERPERFLOWPERPRESSURE"};
+    static constexpr std::array<std::string_view, static_cast<int>(PumpControlType::Num)> pumpCtrlTypeNamesUC{"CONTINUOUS", "INTERMITTENT"};
+    static constexpr std::array<std::string_view, static_cast<int>(ControlTypeVFD::Num)> controlTypeVFDNamesUC{"MANUALCONTROL",
+                                                                                                               "PRESSURESETPOINTCONTROL"};
+    static constexpr std::array<std::string_view, static_cast<int>(PowerSizingMethod::Num)> powerSizingMethodNamesUC{"POWERPERFLOW",
+                                                                                                                     "POWERPERFLOWPERPRESSURE"};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PumpNum;
@@ -241,11 +243,11 @@ void GetPumpInput(EnergyPlusData &state)
     bool ErrorsFound;
     int TempCurveIndex;
     std::string TempCurveType;
-    int NumVarSpeedPumps;
-    int NumConstSpeedPumps;
-    int NumCondensatePumps;
-    int NumPumpBankSimpleVar;
-    int NumPumpBankSimpleConst;
+    int NumVarSpeedPumps = 0;
+    int NumConstSpeedPumps = 0;
+    int NumCondensatePumps = 0;
+    int NumPumpBankSimpleVar = 0;
+    int NumPumpBankSimpleConst = 0;
     Real64 SteamDensity;
     Real64 TempWaterDensity;
     int DummyWaterIndex(1);
@@ -321,7 +323,7 @@ void GetPumpInput(EnergyPlusData &state)
             getEnumerationValue(pumpCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
-                             format("{} {} = {}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
+                             format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
             ShowContinueError(
                 state,
                 format("Entered Value=[{}]. {} has been set to Continuous for this pump.", thisInput->cAlphaArgs(4), thisInput->cAlphaFieldNames(4)));
@@ -333,7 +335,7 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(5));
             if (thisPump.PumpScheduleIndex <= 0) {
                 ShowWarningError(state,
-                                 format("{} {} = {}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
+                                 format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
                 ShowContinueError(state, format("Schedule named =[{}]. was not found and will not be used.", thisInput->cAlphaArgs(5)));
             }
         }
@@ -358,8 +360,8 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.minVolFlowRateWasAutosized = true;
         } else if (!thisPump.NomVolFlowRateWasAutoSized && (thisPump.MinVolFlowRate > (minToMaxRatioMax * thisPump.NomVolFlowRate))) {
             // Check that the minimum isn't greater than the maximum
-            ShowWarningError(state,
-                             format("{} {} = {}, Invalid '{}'", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cNumericFieldNames(10)));
+            ShowWarningError(
+                state, format("{}{}=\"{}\", Invalid '{}'", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cNumericFieldNames(10)));
             ShowContinueError(state,
                               format("Entered Value=[{:.5T}] is above or too close (equal) to the {}=[{:.5T}].",
                                      thisPump.MinVolFlowRate,
@@ -413,16 +415,18 @@ void GetPumpInput(EnergyPlusData &state)
                 if (thisPump.VFD.ManualRPMSchedIndex <= 0) {
                     ShowSevereError(
                         state,
-                        format("{} {}={}, At least one scheduled VFD schedule input was invalid.", RoutineName, cCurrentModuleObject, thisPump.Name));
+                        format(
+                            "{}{}=\"{}\", At least one scheduled VFD schedule input was invalid.", RoutineName, cCurrentModuleObject, thisPump.Name));
                     ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
                 } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, ">", 0.0) ||
                            !CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, ">", 0.0)) {
-                    ShowSevereError(state,
-                                    format("{} {}={}, A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.",
-                                           RoutineName,
-                                           cCurrentModuleObject,
-                                           thisPump.Name));
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.",
+                               RoutineName,
+                               cCurrentModuleObject,
+                               thisPump.Name));
                     ErrorsFound = true;
                 }
             } break;
@@ -437,22 +441,24 @@ void GetPumpInput(EnergyPlusData &state)
                         thisPump.VFD.MaxRPMSchedIndex) <= 0) {
                     ShowSevereError(
                         state,
-                        format("{} {}={}, At least one scheduled VFD schedule input was invalid.", RoutineName, cCurrentModuleObject, thisPump.Name));
+                        format(
+                            "{}{}=\"{}\", At least one scheduled VFD schedule input was invalid.", RoutineName, cCurrentModuleObject, thisPump.Name));
                     ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
                 } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.MinRPMSchedIndex, ">", 0.0) ||
                            !CheckScheduleValueMinMax(state, thisPump.VFD.MaxRPMSchedIndex, ">", 0.0)) {
-                    ShowSevereError(state,
-                                    format("{} {}={}, A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.",
-                                           RoutineName,
-                                           cCurrentModuleObject,
-                                           thisPump.Name));
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.",
+                               RoutineName,
+                               cCurrentModuleObject,
+                               thisPump.Name));
                     ErrorsFound = true;
                 }
             } break;
             default: {
                 ShowSevereError(state,
-                                format("{} {}={}, VFD Control type entered is invalid.  Use one of the key choice entries.",
+                                format("{}{}=\"{}\", VFD Control type entered is invalid.  Use one of the key choice entries.",
                                        RoutineName,
                                        cCurrentModuleObject,
                                        thisPump.Name));
@@ -470,7 +476,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                format("{}={} invalid {}={} not found.",
+                                format("{}=\"{}\" invalid {}=\"{}\" not found.",
                                        cCurrentModuleObject,
                                        thisPump.Name,
                                        thisInput->cAlphaFieldNames(13),
@@ -484,7 +490,7 @@ void GetPumpInput(EnergyPlusData &state)
                 getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(14))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
-                                format("{} {}={}, sizing method type entered is invalid.  Use one of the key choice entries.",
+                                format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
                                        RoutineName,
                                        cCurrentModuleObject,
                                        thisPump.Name));
@@ -584,7 +590,8 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.PumpControl = static_cast<PumpControlType>(
             getEnumerationValue(pumpCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
-            ShowWarningError(state, format("{} {}={}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
+            ShowWarningError(state,
+                             format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
             ShowContinueError(
                 state,
                 format("Entered Value=[{}]. {} has been set to Continuous for this pump.", thisInput->cAlphaArgs(4), thisInput->cAlphaFieldNames(4)));
@@ -596,7 +603,7 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(5));
             if (thisPump.PumpScheduleIndex <= 0) {
                 ShowWarningError(state,
-                                 format("{} {} = {}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
+                                 format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
                 ShowContinueError(state, format("Schedule named =[{}]. was not found and will not be used.", thisInput->cAlphaArgs(5)));
             }
         }
@@ -638,7 +645,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                format("{}={} invalid {}={} not found.",
+                                format("{}=\"{}\" invalid {}=\"{}\" not found.",
                                        cCurrentModuleObject,
                                        thisPump.Name,
                                        thisInput->cAlphaFieldNames(7),
@@ -652,7 +659,7 @@ void GetPumpInput(EnergyPlusData &state)
                 getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
-                                format("{} {}={}, sizing method type entered is invalid.  Use one of the key choice entries.",
+                                format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
                                        RoutineName,
                                        cCurrentModuleObject,
                                        thisPump.Name));
@@ -727,7 +734,7 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(4));
             if (thisPump.PumpScheduleIndex <= 0) {
                 ShowWarningError(state,
-                                 format("{} {} = {}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
+                                 format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
                 ShowContinueError(state, format("Schedule named =[{}]. was not found and will not be used.", thisInput->cAlphaArgs(4)));
             }
         }
@@ -757,7 +764,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                format("{}={} invalid {}={} not found.",
+                                format("{}=\"{}\" invalid {}=\"{}\" not found.",
                                        cCurrentModuleObject,
                                        thisPump.Name,
                                        thisInput->cAlphaFieldNames(5),
@@ -785,7 +792,7 @@ void GetPumpInput(EnergyPlusData &state)
                 getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
-                                format("{} {}={}, sizing method type entered is invalid.  Use one of the key choice entries.",
+                                format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
                                        RoutineName,
                                        cCurrentModuleObject,
                                        thisPump.Name));
@@ -860,7 +867,8 @@ void GetPumpInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "SupplyEquipmentAssigned")) {
             thisPump.SequencingScheme = PumpBankControlSeq::UserDefined;
         } else {
-            ShowWarningError(state, format("{} {}={}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
+            ShowWarningError(state,
+                             format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
             ShowContinueError(
                 state,
                 format("Entered Value=[{}]. {} has been set to Sequential for this pump.", thisInput->cAlphaArgs(4), thisInput->cAlphaFieldNames(4)));
@@ -870,7 +878,8 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.PumpControl = static_cast<PumpControlType>(
             getEnumerationValue(pumpCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
-            ShowWarningError(state, format("{} {}={}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
+            ShowWarningError(state,
+                             format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
             ShowContinueError(
                 state,
                 format("Entered Value=[{}]. {} has been set to Continuous for this pump.", thisInput->cAlphaArgs(5), thisInput->cAlphaFieldNames(5)));
@@ -882,7 +891,7 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(6));
             if (thisPump.PumpScheduleIndex <= 0) {
                 ShowWarningError(state,
-                                 format("{} {} = {}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(6)));
+                                 format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(6)));
                 ShowContinueError(state, format("Schedule named =[{}]. was not found and will not be used.", thisInput->cAlphaArgs(6)));
             }
         }
@@ -915,7 +924,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                format("{}={} invalid {}={} not found.",
+                                format("{}=\"{}\" invalid {}=\"{}\" not found.",
                                        cCurrentModuleObject,
                                        thisPump.Name,
                                        thisInput->cAlphaFieldNames(7),
@@ -929,7 +938,7 @@ void GetPumpInput(EnergyPlusData &state)
                 getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
-                                format("{} {}={}, sizing method type entered is invalid.  Use one of the key choice entries.",
+                                format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
                                        RoutineName,
                                        cCurrentModuleObject,
                                        thisPump.Name));
@@ -1004,7 +1013,8 @@ void GetPumpInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Sequential")) {
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         } else {
-            ShowWarningError(state, format("{} {}={}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
+            ShowWarningError(state,
+                             format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
             ShowContinueError(
                 state,
                 format("Entered Value=[{}]. {} has been set to Sequential for this pump.", thisInput->cAlphaArgs(4), thisInput->cAlphaFieldNames(4)));
@@ -1015,7 +1025,8 @@ void GetPumpInput(EnergyPlusData &state)
             getEnumerationValue(pumpCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
 
         if (thisPump.PumpControl == PumpControlType::Invalid) {
-            ShowWarningError(state, format("{} {}={}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
+            ShowWarningError(state,
+                             format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
             ShowContinueError(
                 state,
                 format("Entered Value=[{}]. {} has been set to Continuous for this pump.", thisInput->cAlphaArgs(5), thisInput->cAlphaFieldNames(5)));
@@ -1027,7 +1038,7 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.PumpScheduleIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(6));
             if (thisPump.PumpScheduleIndex <= 0) {
                 ShowWarningError(state,
-                                 format("{} {} = {}, Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(6)));
+                                 format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(6)));
                 ShowContinueError(state, format("Schedule named =[{}]. was not found and will not be used.", thisInput->cAlphaArgs(6)));
             }
         }
@@ -1058,7 +1069,7 @@ void GetPumpInput(EnergyPlusData &state)
                 }
             } else {
                 ShowSevereError(state,
-                                format("{}={} invalid {}={} not found.",
+                                format("{}=\"{}\" invalid {}=\"{}\" not found.",
                                        cCurrentModuleObject,
                                        thisPump.Name,
                                        thisInput->cAlphaFieldNames(7),
@@ -1071,7 +1082,7 @@ void GetPumpInput(EnergyPlusData &state)
                 getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
-                                format("{} {}={}, sizing method type entered is invalid.  Use one of the key choice entries.",
+                                format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
                                        RoutineName,
                                        cCurrentModuleObject,
                                        thisPump.Name));
@@ -1395,7 +1406,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
             if (thisPumpLoc.Comp(cpnum).NodeNumIn != InletNode || thisPumpLoc.Comp(cpnum).NodeNumOut != OutletNode) {
                 ShowSevereError(
                     state,
-                    format("InitializePumps: {}={}, non-matching nodes.", pumpTypeIDFNames[static_cast<int>(thisPump.pumpType)], thisPump.Name));
+                    format("InitializePumps: {}=\"{}\", non-matching nodes.", pumpTypeIDFNames[static_cast<int>(thisPump.pumpType)], thisPump.Name));
                 ShowContinueError(state, format("...in Branch={}, Component referenced with:", thisPumpLoc.Name));
                 ShowContinueError(state, format("...Inlet Node={}", thisLoopNodeID(thisPumpLoc.Comp(cpnum).NodeNumIn)));
                 ShowContinueError(state, format("...Outlet Node={}", thisLoopNodeID(thisPumpLoc.Comp(cpnum).NodeNumOut)));
@@ -1405,7 +1416,8 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
             }
         } else { // CR9292
             ShowSevereError(
-                state, format("InitializePumps: {}={}, component missing.", pumpTypeIDFNames[static_cast<int>(thisPump.pumpType)], thisPump.Name));
+                state,
+                format("InitializePumps: {}=\"{}\", component missing.", pumpTypeIDFNames[static_cast<int>(thisPump.pumpType)], thisPump.Name));
             errFlag = true; // should have received warning/severe earlier, will reiterate
         }
 
