@@ -45,17 +45,57 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-//#define TIMER_CPU_TIME
-#define TIMER_F90_EPTIME
+// EnergyPlus::Standalone ERV Unit Tests
 
-#if defined(TIMER_F90_EPTIME)
-#define TSTART(x) x = epelapsedtime()
-#define TSTOP(x) x = epelapsedtime()
-#define TSTAMP(x) x = epelapsedtime()
-#elif defined(TIMER_CPU_TIME)
-#define TSTART(x) CPU_TIME(x)
-#define TSTOP(x) CPU_TIME(x)
-#define TSTAMP(x) CPU_TIME(x)
-#else
-NEED_TO_SPECIFY_TIMER
-#endif
+// Google Test Headers
+#include <gtest/gtest.h>
+
+// EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+
+using namespace EnergyPlus;
+using namespace EnergyPlus::DataPlant;
+using namespace EnergyPlus::DataSizing;
+using namespace EnergyPlus::DataZoneEnergyDemands;
+
+namespace EnergyPlus {
+
+TEST_F(EnergyPlusFixture, ExerciseBaseboardElectric)
+{
+    std::string const idf_objects = delimited_string({"ZoneHVAC:Baseboard:Convective:Electric,",
+                                                      "Zone1Baseboard,          !- Name",
+                                                      ",                        !- Availability Schedule Name",
+                                                      "HeatingDesignCapacity,   !- Heating Design Capacity Method",
+                                                      "5000,                    !- Heating Design Capacity {W}",
+                                                      ",                        !- Heating Design Capacity Per Floor Area {W/m2}",
+                                                      ",                        !- Fraction of Autosized Heating Design Capacity",
+                                                      "0.97;                    !- Efficiency"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataLoopNodes->Node.allocate(1);
+    state->dataLoopNodes->Node(1).Temp = 25.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 100;
+
+    int zoneNum = 1;
+    Real64 powerMet = 0.0;
+    int compIndex = 0;
+    BaseboardElectric::SimElectricBaseboard(*state, "ZONE1BASEBOARD", zoneNum, powerMet, compIndex);
+}
+
+} // namespace EnergyPlus

@@ -864,7 +864,8 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         "    autosize,              !- Gross Rated Sensible Heat Ratio",
         "    4.40,                  !- Gross Rated Cooling COP { W / W }",
         "    autosize,              !- Rated Air Flow Rate { m3 / s }",
-        "    ,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "	,                       !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "	,                       !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    Mixed Air Node 1,      !- Air Inlet Node Name",
         "    Main Cooling Coil 1 Outlet Node,    !- Air Outlet Node Name",
         "    Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -1339,7 +1340,6 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
     state->dataSingleDuct->sd_airterminal(1).CtrlZoneNum = 1;
-    state->dataSingleDuct->sd_airterminal(1).ActualZoneNum = 1;
     state->dataSingleDuct->sd_airterminal(1).NoOAFlowInputFromUser = false;
     state->dataSingleDuct->sd_airterminal(1).OARequirementsPtr = 1;
     state->dataSingleDuct->sd_airterminal(1).AirLoopNum = 1;
@@ -1350,7 +1350,7 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     state->dataAirLoop->AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
     state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowCalcMethod::Sum;
     state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
     state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
     state->dataEnvrn->StdRhoAir = 1.20;
@@ -2077,7 +2077,8 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "    autosize,                !- Gross Rated Sensible Heat Ratio",
         "    4.40,                    !- Gross Rated Cooling COP { W / W }",
         "    autosize,                !- Rated Air Flow Rate { m3 / s }",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "	,                         !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "	,                         !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    Mixed Air Node 1,        !- Air Inlet Node Name",
         "    Main Cooling Coil 1 Outlet Node,    !- Air Outlet Node Name",
         "    Biquadratic,             !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -2543,14 +2544,13 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode = 3;
     state->dataSingleDuct->SysATMixer(ATMixerNum).AirLoopNum = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = 1;
-    state->dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
     state->dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = 1;
 
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
-    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowCalcMethod::Sum;
     state->dataSize->OARequirements(1).OAFlowPerZone = 0.1;
     state->dataSize->OARequirements(1).OAFlowPerPerson = 0.1;
 
@@ -2606,7 +2606,6 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode = 3;
     state->dataSingleDuct->SysATMixer(ATMixerNum).AirLoopNum = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = 1;
-    state->dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
     state->dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = 1;
 
@@ -2616,7 +2615,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
-    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowCalcMethod::Sum;
     state->dataSize->OARequirements(1).OAFlowPerZone = 0.5;
     state->dataSize->OARequirements(1).OAFlowPerPerson = 0.0;
     state->dataSize->OARequirements(1).OAFlowPerArea = 0.0;
@@ -3003,8 +3002,8 @@ TEST_F(EnergyPlusFixture, VAVConstantVolTU_Reheat_Sizing)
     bool FirstHVACIteration = true;
     state->dataSingleDuct->sd_airterminal(SysNum).SimConstVol(*state,
                                                               FirstHVACIteration,
-                                                              state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum,
-                                                              state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum);
+                                                              state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum,
+                                                              state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex);
     // TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
     //     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
     //         this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);

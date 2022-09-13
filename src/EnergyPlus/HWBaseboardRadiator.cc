@@ -128,7 +128,6 @@ namespace HWBaseboardRadiator {
 
     void SimHWBaseboard(EnergyPlusData &state,
                         std::string const &EquipName,
-                        int const ActualZoneNum,
                         int const ControlledZoneNum,
                         bool const FirstHVACIteration,
                         Real64 &PowerMet,
@@ -138,8 +137,6 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
-        //       MODIFIED
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the Baseboard Radiators.
@@ -198,7 +195,7 @@ namespace HWBaseboardRadiator {
 
             InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
 
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -830,7 +827,7 @@ namespace HWBaseboardRadiator {
         }
     }
 
-    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -840,7 +837,6 @@ namespace HWBaseboardRadiator {
         //                      Feb 2001
         //       MODIFIED       Aug 2007 Daeho Kang (Add radiant component)
         //                      Sept 2010 Brent Griffith (plant interactions)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the baseboard units, and determines the UA values during simulation.
@@ -861,28 +857,15 @@ namespace HWBaseboardRadiator {
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr Constant(0.0062); // Constant of linear equation for air mass flow rate
         Real64 constexpr Coeff(0.0000275); // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &MyOneTimeFlag = state.dataHWBaseboardRad->MyOneTimeFlag;
         auto &ZoneEquipmentListChecked = state.dataHWBaseboardRad->ZoneEquipmentListChecked;
         auto &MyEnvrnFlag = state.dataHWBaseboardRad->MyEnvrnFlag;
         int Loop;
         int WaterInletNode;
-        int ZoneNode;
-        int ZoneNum;
         Real64 RhoAirStdInit;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
@@ -923,8 +906,7 @@ namespace HWBaseboardRadiator {
             }
         }
 
-        if (HWBaseboard(BaseboardNum).ZonePtr <= 0)
-            HWBaseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        HWBaseboard(BaseboardNum).ZonePtr = ControlledZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -1011,7 +993,7 @@ namespace HWBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
+            int ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
             ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum);
             QBBRadSrcAvg(BaseboardNum) = 0.0;
             LastQBBRadSrc(BaseboardNum) = 0.0;
@@ -1021,7 +1003,7 @@ namespace HWBaseboardRadiator {
 
         // Do the every time step initializations
         WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
-        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         HWBaseboard(BaseboardNum).WaterMassFlowRate = state.dataLoopNodes->Node(WaterInletNode).MassFlowRate;
         HWBaseboard(BaseboardNum).WaterInletTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
         HWBaseboard(BaseboardNum).WaterInletEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;

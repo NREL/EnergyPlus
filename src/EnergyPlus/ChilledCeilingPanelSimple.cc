@@ -101,13 +101,8 @@ namespace EnergyPlus::CoolingPanelSimple {
 // MODULE PARAMETER DEFINITIONS
 std::string const cCMO_CoolingPanel_Simple("ZoneHVAC:CoolingPanel:RadiantConvective:Water");
 
-void SimCoolingPanel(EnergyPlusData &state,
-                     std::string const &EquipName,
-                     int const ActualZoneNum,
-                     int const ControlledZoneNum,
-                     bool const FirstHVACIteration,
-                     Real64 &PowerMet,
-                     int &CompIndex)
+void SimCoolingPanel(
+    EnergyPlusData &state, std::string const &EquipName, int const ControlledZoneNum, bool const FirstHVACIteration, Real64 &PowerMet, int &CompIndex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -169,7 +164,7 @@ void SimCoolingPanel(EnergyPlusData &state,
 
         InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
 
-        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToCoolSP;
 
         // On the first HVAC iteration the system values are given to the controller, but after that
         // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -401,7 +396,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             ThisCP.CoolingCapMethod = DataSizing::CapacityPerFloorArea;
             if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {
                 ThisCP.ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(5);
-                if (ThisCP.CoolingCapMethod <= 0.0) {
+                if (ThisCP.ScaledCoolingCapacity < 0.0) {
                     ShowSevereError(state, cCMO_CoolingPanel_Simple + " = " + ThisCP.EquipID);
                     ShowContinueError(state, "Input for " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
                     ShowContinueError(
@@ -734,7 +729,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     }
 }
 
-void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ControlledZoneNum, bool const FirstHVACIteration)
 {
 
     // SUBROUTINE INFORMATION:
@@ -761,8 +756,6 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     static constexpr std::string_view RoutineName("ChilledCeilingPanelSimple:InitCoolingPanel");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNode;
-    int ZoneNum;
     Real64 rho; // local fluid density
     Real64 Cp;  // local fluid specific heat
     bool errFlag;
@@ -770,7 +763,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
     auto &ThisInNode(state.dataLoopNodes->Node(ThisCP.WaterInletNode));
 
-    if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+    if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ControlledZoneNum;
 
     // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
     if (!ThisCP.ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -854,7 +847,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     }
 
     if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-        ZoneNum = ThisCP.ZonePtr;
+        int ZoneNum = ThisCP.ZonePtr;
         state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf = SumHATsurf(state, ZoneNum);
         ThisCP.CoolingPanelSrcAvg = 0.0;
         ThisCP.LastCoolingPanelSrc = 0.0;
@@ -863,7 +856,6 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     }
 
     // Do the every time step initializations
-    ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
     ThisCP.WaterMassFlowRate = ThisInNode.MassFlowRate;
     ThisCP.WaterInletTemp = ThisInNode.Temp;
     ThisCP.WaterInletEnthalpy = ThisInNode.Enthalpy;

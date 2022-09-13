@@ -5422,10 +5422,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "    ACDXCoil 1,              !- Name",
         "    CoolingCoilAvailSched,   !- Availability Schedule Name",
         "    20000,                   !- Gross Rated Total Cooling Capacity {W}",
-        "    0.75,                     !- Gross Rated Sensible Heat Ratio",
+        "    0.75,                    !- Gross Rated Sensible Heat Ratio",
         "    3.0,                     !- Gross Rated Cooling COP {W/W}",
-        "    1.16,                     !- Rated Air Flow Rate {m3/s}",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    1.16,                    !- Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "    Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -5650,10 +5651,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "Coil:Heating:DX:SingleSpeed,",
         "  Heat Pump 1 HP Heating Coil,                             !- Name",
         "  ,                                                        !- Availability Schedule Name",
-        "  9000.0,                                                !- Rated Total Heating Capacity {W}",
+        "  9000.0,                                                  !- Rated Total Heating Capacity {W}",
         "  2.75,                                                    !- Rated COP",
-        "  0.5,                                                !- Rated Air Flow Rate {m3/s}",
-        "  ,                                                        !- Rated Evaporator Fan Power Per Volume Flow Rate",
+        "  0.5,                                                     !- Rated Air Flow Rate {m3/s}",
+        "  ,                                                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  ,                                                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "  Heat Pump 1 Cooling Coil Outlet,                         !- Air Inlet Node Name",
         "  Heat Pump 1 Heating Coil Outlet,                         !- Air Outlet Node Name",
         "  Heat Pump 1 HP Heating Coil Cap-FT,                      !- Total Heating Capacity Function of Temperature Curve Name",
@@ -5740,11 +5742,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "Coil:Cooling:DX:SingleSpeed,",
         "  Heat Pump 1 Cooling Coil,                                !- Name",
         "  ,                                                        !- Availability Schedule Name",
-        "  9000.0,                                                !- Gross Rated Total Cooling Capacity {W}",
-        "  0.8,                                                !- Gross Rated Sensible Heat Ratio",
+        "  9000.0,                                                  !- Gross Rated Total Cooling Capacity {W}",
+        "  0.8,                                                     !- Gross Rated Sensible Heat Ratio",
         "  3,                                                       !- Rated COP",
-        "  0.5,                                                !- Rated Air Flow Rate {m3/s}",
-        "  ,                                                        !- Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}",
+        "  0.5,                                                     !- Rated Air Flow Rate {m3/s}",
+        "  ,                                                        !- 2017 Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}",
+        "  ,                                                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "  Heat Pump 1 Supply Fan Outlet,                           !- Air Inlet Node Name",
         "  Heat Pump 1 Cooling Coil Outlet,                         !- Air Outlet Node Name",
         "  Heat Pump 1 Cool Coil Cap-FT,                            !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -6138,7 +6141,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
@@ -6217,7 +6219,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
@@ -7515,7 +7516,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuplicatedNodeNameTest)
         "    0.8,                     !- Gross Rated Sensible Heat Ratio",
         "    3.0,                     !- Gross Rated Cooling COP {W/W}",
         "    2.36,                    !- Rated Air Flow Rate {m3/s}",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "    Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -10351,7 +10353,8 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
         "    0.75,                     !- Gross Rated Sensible Heat Ratio",
         "    3.0,                     !- Gross Rated Cooling COP {W/W}",
         "    1.16,                     !- Rated Air Flow Rate {m3/s}",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "    Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -10687,7 +10690,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
@@ -10869,7 +10871,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
@@ -11038,7 +11039,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
@@ -11218,7 +11218,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportHPWH)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
@@ -11357,7 +11356,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
@@ -11487,11 +11485,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
-    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
     state->afn->AirflowNetworkNumOfZones = 1;
@@ -13932,7 +13928,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
         "    autosize,                !- Gross Rated Sensible Heat Ratio",
         "    3,                       !- Gross Rated Cooling COP {W/W}",
         "    autosize,                !- Rated Air Flow Rate {m3/s}",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    NORTH_ZONE PTAC Mixed Air Outlet,  !- Air Inlet Node Name",
         "    NORTH_ZONE PTAC Cooling Coil Outlet,  !- Air Outlet Node Name",
         "    NORTH_ZONE PTAC Cooling Coil Cap-FT,  !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -16079,7 +16076,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
         "    0.8,                     !- Gross Rated Sensible Heat Ratio",
         "    3.0,                     !- Gross Rated Cooling COP {W/W}",
         "    1.18,                    !- Rated Air Flow Rate {m3/s}",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "    Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -16094,7 +16092,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
         "    21000,                   !- Gross Rated Heating Capacity {W}",
         "    2.75,                    !- Gross Rated Heating COP {W/W}",
         "    1.18,                    !- Rated Air Flow Rate {m3/s}",
-        "    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
         "    SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "    HPACHeatCapFT,           !- Heating Capacity Function of Temperature Curve Name",

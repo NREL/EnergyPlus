@@ -1751,60 +1751,60 @@
 
   People,
     SPACE1-1 People 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   1,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0,                       !- People per Zone Floor Area {person/m2}
-    20,                      !- Zone Floor Area per Person {m2/person}
+    0,                       !- People per Floor Area {person/m2}
+    20,                      !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch;            !- Activity Level Schedule Name
 
   People,
     SPACE2-1 People 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   1,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0,                       !- People per Zone Floor Area {person/m2}
-    20,                      !- Zone Floor Area per Person {m2/person}
+    0,                       !- People per Floor Area {person/m2}
+    20,                      !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch;            !- Activity Level Schedule Name
 
   People,
     SPACE3-1 People 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   1,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0,                       !- People per Zone Floor Area {person/m2}
-    20,                      !- Zone Floor Area per Person {m2/person}
+    0,                       !- People per Floor Area {person/m2}
+    20,                      !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch;            !- Activity Level Schedule Name
 
   People,
     SPACE4-1 People 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   1,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0,                       !- People per Zone Floor Area {person/m2}
-    20,                      !- Zone Floor Area per Person {m2/person}
+    0,                       !- People per Floor Area {person/m2}
+    20,                      !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch;            !- Activity Level Schedule Name
 
   People,
     SPACE5-1 People 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   1,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0,                       !- People per Zone Floor Area {person/m2}
-    20,                      !- Zone Floor Area per Person {m2/person}
+    0,                       !- People per Floor Area {person/m2}
+    20,                      !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Sch;            !- Activity Level Schedule Name
@@ -1813,7 +1813,7 @@
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   3,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1827,7 +1827,7 @@
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   3,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -1841,7 +1841,7 @@
 
   Lights,
     SPACE3-1 Lights 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   3,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     0,                       !- Lighting Level {W}
@@ -1855,7 +1855,7 @@
 
   Lights,
     SPACE4-1 Lights 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   3,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     0,                       !- Lighting Level {W}
@@ -1869,7 +1869,7 @@
 
   Lights,
     SPACE5-1 Lights 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   3,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     0,                       !- Lighting Level {W}
@@ -1885,7 +1885,7 @@
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   2,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1897,7 +1897,7 @@
 
   ElectricEquipment,
     SPACE2-1 ElecEq 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   2,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1909,7 +1909,7 @@
 
   ElectricEquipment,
     SPACE3-1 ElecEq 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   2,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1921,7 +1921,7 @@
 
   ElectricEquipment,
     SPACE4-1 ElecEq 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   2,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1933,7 +1933,7 @@
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG Sch   2,            !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1947,7 +1947,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Zone1INF,                !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1961,7 +1961,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Zone2INF,                !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1975,7 +1975,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Zone3INF,                !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1989,7 +1989,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Zone4INF,                !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -2003,7 +2003,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Zone5INF,                !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}

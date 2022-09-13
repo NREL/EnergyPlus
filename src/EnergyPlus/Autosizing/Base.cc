@@ -159,6 +159,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataBypassFrac = state.dataSize->DataBypassFrac;
     this->dataIsDXCoil = state.dataSize->DataIsDXCoil;
     this->dataNonZoneNonAirloopValue = state.dataSize->DataNonZoneNonAirloopValue;
+    this->dataDXCoolsLowSpeedsAutozize = state.dataSize->DataDXCoolsLowSpeedsAutozize;
 }
 
 void BaseSizer::initializeFromAPI(EnergyPlusData &state, Real64 const elevation)
@@ -744,7 +745,7 @@ void BaseSizer::clearState()
     curSysNum = 0;
     curOASysNum = 0;
     curZoneEqNum = 0;
-    curDuctType = 0;
+    curDuctType = DataHVACGlobals::AirDuctType::Invalid;
     curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
     numPrimaryAirSys = 0;
     numSysSizInput = 0;
@@ -775,6 +776,7 @@ void BaseSizer::clearState()
     dataAutosizable = false;
     dataConstantUsedForSizing = 0.0;
     dataFractionUsedForSizing = 0.0;
+    dataDXCoolsLowSpeedsAutozize = false;
     dataPltSizHeatNum = 0;
     dataWaterLoopNum = 0;
     dataFanIndex = -1;

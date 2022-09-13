@@ -35,7 +35,7 @@
     PolygonClipping,         !- Shading Calculation Method
     Periodic,                !- Shading Calculation Update Frequency Method
     30,                      !- Shading Calculation Update Frequency
-    200;                   !- Maximum Figures in Shadow Overlap Calculations
+    200;                     !- Maximum Figures in Shadow Overlap Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
@@ -56,8 +56,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
   ConvergenceLimits,
-    15,                       !- Minimum System Timestep {minutes}
-    5;                        !- Maximum HVAC Iterations
+    15,                      !- Minimum System Timestep {minutes}
+    5;                       !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
@@ -132,7 +132,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -143,34 +143,34 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 2,              !- Name
-    4,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    4,                        !- End Month
-    30,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 2,             !- Name
+    4,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    4,                       !- End Month
+    30,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    RUNPERIOD 3,              !- Name
-    7,                        !- Begin Month
-    1,                        !- Begin Day of Month
-    ,                         !- Begin Year
-    7,                        !- End Month
-    31,                       !- End Day of Month
-    ,                         !- End Year
-    Sunday,                   !- Day of Week for Start Day
-    No,                       !- Use Weather File Holidays and Special Days
-    No,                       !- Use Weather File Daylight Saving Period
-    No,                       !- Apply Weekend Holiday Rule
-    Yes,                      !- Use Weather File Rain Indicators
-    Yes;                      !- Use Weather File Snow Indicators
+    RUNPERIOD 3,             !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Sunday,                  !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
@@ -3181,7 +3181,7 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,1.0;          !- Field 3
+    Until: 24:00,1.0;        !- Field 3
 
   Schedule:Compact,
     AHU_2 Balanced Exhaust Fraction Schedule,  !- Name
@@ -3189,11 +3189,11 @@
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
     Until: 06:00,1.00,       !- Field 3
-    Until: 18:00,1.0,          !- Field 5
+    Until: 18:00,1.0,        !- Field 5
     Until: 24:00,1.00,       !- Field 7
     For: SummerDesignDay,    !- Field 9
     Until: 06:00,1.00,       !- Field 10
-    Until: 18:00,1.0,          !- Field 12
+    Until: 18:00,1.0,        !- Field 12
     Until: 24:00,1.00,       !- Field 14
     For: WinterDesignDay,    !- Field 16
     Until: 06:00,1.00,       !- Field 17
@@ -28261,12 +28261,12 @@
 
   People,
     Floor 1 Anesthesia People,  !- Name
-    Floor 1 Anesthesia,      !- Zone or ZoneList Name
+    Floor 1 Anesthesia,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28283,12 +28283,12 @@
 
   People,
     Floor 1 Cafe People,     !- Name
-    Floor 1 Cafe,            !- Zone or ZoneList Name
+    Floor 1 Cafe,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    1.076495791,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    1.076495791,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28305,12 +28305,12 @@
 
   People,
     Floor 1 Clean People,    !- Name
-    Floor 1 Clean,           !- Zone or ZoneList Name
+    Floor 1 Clean,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28327,12 +28327,12 @@
 
   People,
     Floor 1 Clean Work People,  !- Name
-    Floor 1 Clean Work,      !- Zone or ZoneList Name
+    Floor 1 Clean Work,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28349,12 +28349,12 @@
 
   People,
     Floor 1 Dictation People,!- Name
-    Floor 1 Dictation,       !- Zone or ZoneList Name
+    Floor 1 Dictation,       !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28371,12 +28371,12 @@
 
   People,
     Floor 1 Dressing Room People,  !- Name
-    Floor 1 Dressing Room,   !- Zone or ZoneList Name
+    Floor 1 Dressing Room,   !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28393,12 +28393,12 @@
 
   People,
     Floor 1 Humid People,    !- Name
-    Floor 1 Humid,           !- Zone or ZoneList Name
+    Floor 1 Humid,           !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28415,12 +28415,12 @@
 
   People,
     Floor 1 IT Room People,  !- Name
-    Floor 1 IT Room,         !- Zone or ZoneList Name
+    Floor 1 IT Room,         !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28437,12 +28437,12 @@
 
   People,
     Floor 1 Lobby People,    !- Name
-    Floor 1 Lobby,           !- Zone or ZoneList Name
+    Floor 1 Lobby,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.107649579,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.107649579,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28459,12 +28459,12 @@
 
   People,
     Floor 1 Locker Room People,  !- Name
-    Floor 1 Locker Room,     !- Zone or ZoneList Name
+    Floor 1 Locker Room,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.161474369,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.161474369,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28481,12 +28481,12 @@
 
   People,
     Floor 1 Lounge People,   !- Name
-    Floor 1 Lounge,          !- Zone or ZoneList Name
+    Floor 1 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.161474369,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.161474369,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28503,12 +28503,12 @@
 
   People,
     Floor 1 MRI Control Room People,  !- Name
-    Floor 1 MRI Control Room,!- Zone or ZoneList Name
+    Floor 1 MRI Control Room,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28525,12 +28525,12 @@
 
   People,
     Floor 1 MRI Room People, !- Name
-    Floor 1 MRI Room,        !- Zone or ZoneList Name
+    Floor 1 MRI Room,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28547,12 +28547,12 @@
 
   People,
     Floor 1 Nourishment People,  !- Name
-    Floor 1 Nourishment,     !- Zone or ZoneList Name
+    Floor 1 Nourishment,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28569,12 +28569,12 @@
 
   People,
     Floor 1 Nurse Station People,  !- Name
-    Floor 1 Nurse Station,   !- Zone or ZoneList Name
+    Floor 1 Nurse Station,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28591,12 +28591,12 @@
 
   People,
     Floor 1 Office People,   !- Name
-    Floor 1 Office,          !- Zone or ZoneList Name
+    Floor 1 Office,          !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28613,12 +28613,12 @@
 
   People,
     Floor 1 Operating Room 1 People,  !- Name
-    Floor 1 Operating Room 1,!- Zone or ZoneList Name
+    Floor 1 Operating Room 1,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28635,12 +28635,12 @@
 
   People,
     Floor 1 Operating Room 2 People,  !- Name
-    Floor 1 Operating Room 2,!- Zone or ZoneList Name
+    Floor 1 Operating Room 2,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28657,12 +28657,12 @@
 
   People,
     Floor 1 Operating Room 3 People,  !- Name
-    Floor 1 Operating Room 3,!- Zone or ZoneList Name
+    Floor 1 Operating Room 3,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28679,12 +28679,12 @@
 
   People,
     Floor 1 PACU People,     !- Name
-    Floor 1 PACU,            !- Zone or ZoneList Name
+    Floor 1 PACU,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28701,12 +28701,12 @@
 
   People,
     Floor 1 Pre-Op Room 1 People,  !- Name
-    Floor 1 Pre-Op Room 1,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Room 1,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.107649579,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.107649579,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28723,12 +28723,12 @@
 
   People,
     Floor 1 Pre-Op Room 2 People,  !- Name
-    Floor 1 Pre-Op Room 2,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Room 2,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.107649579,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.107649579,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28745,12 +28745,12 @@
 
   People,
     Floor 1 Procedure Room People,  !- Name
-    Floor 1 Procedure Room,  !- Zone or ZoneList Name
+    Floor 1 Procedure Room,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28767,12 +28767,12 @@
 
   People,
     Floor 1 Reception People,!- Name
-    Floor 1 Reception,       !- Zone or ZoneList Name
+    Floor 1 Reception,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.322948737,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.322948737,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28789,12 +28789,12 @@
 
   People,
     Floor 1 Recovery Room People,  !- Name
-    Floor 1 Recovery Room,   !- Zone or ZoneList Name
+    Floor 1 Recovery Room,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28811,12 +28811,12 @@
 
   People,
     Floor 1 Scheduling People,  !- Name
-    Floor 1 Scheduling,      !- Zone or ZoneList Name
+    Floor 1 Scheduling,      !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28833,12 +28833,12 @@
 
   People,
     Floor 1 Soil People,     !- Name
-    Floor 1 Soil,            !- Zone or ZoneList Name
+    Floor 1 Soil,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28855,12 +28855,12 @@
 
   People,
     Floor 1 Soil Hold People,!- Name
-    Floor 1 Soil Hold,       !- Zone or ZoneList Name
+    Floor 1 Soil Hold,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28877,12 +28877,12 @@
 
   People,
     Floor 1 Soil Work People,!- Name
-    Floor 1 Soil Work,       !- Zone or ZoneList Name
+    Floor 1 Soil Work,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28899,12 +28899,12 @@
 
   People,
     Floor 1 Step Down People,!- Name
-    Floor 1 Step Down,       !- Zone or ZoneList Name
+    Floor 1 Step Down,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28921,12 +28921,12 @@
 
   People,
     Floor 2 Conference People,  !- Name
-    Floor 2 Conference,      !- Zone or ZoneList Name
+    Floor 2 Conference,      !- Zone or ZoneList or Space or SpaceList Name
     MEETINGROOM_OCC_w_SB_SCH,!- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.538247895,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.538247895,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28943,12 +28943,12 @@
 
   People,
     Floor 2 Dictation People,!- Name
-    Floor 2 Dictation,       !- Zone or ZoneList Name
+    Floor 2 Dictation,       !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28965,12 +28965,12 @@
 
   People,
     Floor 2 Exam 1 People,   !- Name
-    Floor 2 Exam 1,          !- Zone or ZoneList Name
+    Floor 2 Exam 1,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -28987,12 +28987,12 @@
 
   People,
     Floor 2 Exam 2 People,   !- Name
-    Floor 2 Exam 2,          !- Zone or ZoneList Name
+    Floor 2 Exam 2,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29009,12 +29009,12 @@
 
   People,
     Floor 2 Exam 3 People,   !- Name
-    Floor 2 Exam 3,          !- Zone or ZoneList Name
+    Floor 2 Exam 3,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29031,12 +29031,12 @@
 
   People,
     Floor 2 Exam 4 People,   !- Name
-    Floor 2 Exam 4,          !- Zone or ZoneList Name
+    Floor 2 Exam 4,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29053,12 +29053,12 @@
 
   People,
     Floor 2 Exam 5 People,   !- Name
-    Floor 2 Exam 5,          !- Zone or ZoneList Name
+    Floor 2 Exam 5,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29075,12 +29075,12 @@
 
   People,
     Floor 2 Exam 6 People,   !- Name
-    Floor 2 Exam 6,          !- Zone or ZoneList Name
+    Floor 2 Exam 6,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29097,12 +29097,12 @@
 
   People,
     Floor 2 Exam 7 People,   !- Name
-    Floor 2 Exam 7,          !- Zone or ZoneList Name
+    Floor 2 Exam 7,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29119,12 +29119,12 @@
 
   People,
     Floor 2 Exam 8 People,   !- Name
-    Floor 2 Exam 8,          !- Zone or ZoneList Name
+    Floor 2 Exam 8,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29141,12 +29141,12 @@
 
   People,
     Floor 2 Exam 9 People,   !- Name
-    Floor 2 Exam 9,          !- Zone or ZoneList Name
+    Floor 2 Exam 9,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29163,12 +29163,12 @@
 
   People,
     Floor 2 Lounge People,   !- Name
-    Floor 2 Lounge,          !- Zone or ZoneList Name
+    Floor 2 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.161474369,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.161474369,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29185,12 +29185,12 @@
 
   People,
     Floor 2 Nurse Station 1 People,  !- Name
-    Floor 2 Nurse Station 1, !- Zone or ZoneList Name
+    Floor 2 Nurse Station 1, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29207,12 +29207,12 @@
 
   People,
     Floor 2 Nurse Station 2 People,  !- Name
-    Floor 2 Nurse Station 2, !- Zone or ZoneList Name
+    Floor 2 Nurse Station 2, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29229,12 +29229,12 @@
 
   People,
     Floor 2 Office People,   !- Name
-    Floor 2 Office,          !- Zone or ZoneList Name
+    Floor 2 Office,          !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29251,12 +29251,12 @@
 
   People,
     Floor 2 Reception People,!- Name
-    Floor 2 Reception,       !- Zone or ZoneList Name
+    Floor 2 Reception,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.322948737,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.322948737,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29273,12 +29273,12 @@
 
   People,
     Floor 2 Scheduling 1 People,  !- Name
-    Floor 2 Scheduling 1,    !- Zone or ZoneList Name
+    Floor 2 Scheduling 1,    !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29295,12 +29295,12 @@
 
   People,
     Floor 2 Scheduling 2 People,  !- Name
-    Floor 2 Scheduling 2,    !- Zone or ZoneList Name
+    Floor 2 Scheduling 2,    !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29317,12 +29317,12 @@
 
   People,
     Floor 2 Work People,     !- Name
-    Floor 2 Work,            !- Zone or ZoneList Name
+    Floor 2 Work,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29339,12 +29339,12 @@
 
   People,
     Floor 2 X-Ray People,    !- Name
-    Floor 2 X-Ray,           !- Zone or ZoneList Name
+    Floor 2 X-Ray,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29361,12 +29361,12 @@
 
   People,
     Floor 3 Dressing Room People,  !- Name
-    Floor 3 Dressing Room,   !- Zone or ZoneList Name
+    Floor 3 Dressing Room,   !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29383,12 +29383,12 @@
 
   People,
     Floor 3 Humid People,    !- Name
-    Floor 3 Humid,           !- Zone or ZoneList Name
+    Floor 3 Humid,           !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29405,12 +29405,12 @@
 
   People,
     Floor 3 Locker People,   !- Name
-    Floor 3 Locker,          !- Zone or ZoneList Name
+    Floor 3 Locker,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.161474369,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.161474369,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29427,12 +29427,12 @@
 
   People,
     Floor 3 Lounge People,   !- Name
-    Floor 3 Lounge,          !- Zone or ZoneList Name
+    Floor 3 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.161474369,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.161474369,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29449,12 +29449,12 @@
 
   People,
     Floor 3 Office People,   !- Name
-    Floor 3 Office,          !- Zone or ZoneList Name
+    Floor 3 Office,          !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29471,12 +29471,12 @@
 
   People,
     Floor 3 Physical Therapy 1 People,  !- Name
-    Floor 3 Physical Therapy 1,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 1,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29493,12 +29493,12 @@
 
   People,
     Floor 3 Physical Therapy 2 People,  !- Name
-    Floor 3 Physical Therapy 2,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 2,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29515,12 +29515,12 @@
 
   People,
     Floor 3 Treatment People,!- Name
-    Floor 3 Treatment,       !- Zone or ZoneList Name
+    Floor 3 Treatment,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.215299158,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.215299158,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29537,12 +29537,12 @@
 
   People,
     Floor 3 Work People,     !- Name
-    Floor 3 Work,            !- Zone or ZoneList Name
+    Floor 3 Work,            !- Zone or ZoneList or Space or SpaceList Name
     OFFICE_OCC_w_SB_SCH,     !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.053824790,             !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.053824790,             !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3000,                  !- Fraction Radiant
     AUTOCALCULATE,           !- Sensible Heat Fraction
     ACTIVITY_SCH,            !- Activity Level Schedule Name
@@ -29561,7 +29561,7 @@
 
   Lights,
     Floor 1 Anesthesia_Lights,  !- Name
-    Floor 1 Anesthesia,      !- Zone or ZoneList Name
+    Floor 1 Anesthesia,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29576,7 +29576,7 @@
 
   Lights,
     Floor 1 Bio Haz_Lights,  !- Name
-    Floor 1 Bio Haz,         !- Zone or ZoneList Name
+    Floor 1 Bio Haz,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29591,7 +29591,7 @@
 
   Lights,
     Floor 1 Cafe_Lights,     !- Name
-    Floor 1 Cafe,            !- Zone or ZoneList Name
+    Floor 1 Cafe,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29606,7 +29606,7 @@
 
   Lights,
     Floor 1 Clean_Lights,    !- Name
-    Floor 1 Clean,           !- Zone or ZoneList Name
+    Floor 1 Clean,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29621,7 +29621,7 @@
 
   Lights,
     Floor 1 Clean Work_Lights,  !- Name
-    Floor 1 Clean Work,      !- Zone or ZoneList Name
+    Floor 1 Clean Work,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29636,7 +29636,7 @@
 
   Lights,
     Floor 1 Dictation_Lights,!- Name
-    Floor 1 Dictation,       !- Zone or ZoneList Name
+    Floor 1 Dictation,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29651,7 +29651,7 @@
 
   Lights,
     Floor 1 Dressing Room_Lights,  !- Name
-    Floor 1 Dressing Room,   !- Zone or ZoneList Name
+    Floor 1 Dressing Room,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29666,7 +29666,7 @@
 
   Lights,
     Floor 1 Electrical Room_Lights,  !- Name
-    Floor 1 Electrical Room, !- Zone or ZoneList Name
+    Floor 1 Electrical Room, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29681,7 +29681,7 @@
 
   Lights,
     Floor 1 Elevator Pump Room_Lights,  !- Name
-    Floor 1 Elevator Pump Room,  !- Zone or ZoneList Name
+    Floor 1 Elevator Pump Room,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29696,7 +29696,7 @@
 
   Lights,
     Floor 1 Humid_Lights,    !- Name
-    Floor 1 Humid,           !- Zone or ZoneList Name
+    Floor 1 Humid,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29711,7 +29711,7 @@
 
   Lights,
     Floor 1 IT Hall_Lights,  !- Name
-    Floor 1 IT Hall,         !- Zone or ZoneList Name
+    Floor 1 IT Hall,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29726,7 +29726,7 @@
 
   Lights,
     Floor 1 IT Room_Lights,  !- Name
-    Floor 1 IT Room,         !- Zone or ZoneList Name
+    Floor 1 IT Room,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29741,7 +29741,7 @@
 
   Lights,
     Floor 1 Lobby_Lights,    !- Name
-    Floor 1 Lobby,           !- Zone or ZoneList Name
+    Floor 1 Lobby,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_LOBBYFLR1_SCH,!- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29756,7 +29756,7 @@
 
   Lights,
     Floor 1 Lobby Hall_Lights,  !- Name
-    Floor 1 Lobby Hall,      !- Zone or ZoneList Name
+    Floor 1 Lobby Hall,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29771,7 +29771,7 @@
 
   Lights,
     Floor 1 Lobby Toilet_Lights,  !- Name
-    Floor 1 Lobby Toilet,    !- Zone or ZoneList Name
+    Floor 1 Lobby Toilet,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29786,7 +29786,7 @@
 
   Lights,
     Floor 1 Locker Room_Lights,  !- Name
-    Floor 1 Locker Room,     !- Zone or ZoneList Name
+    Floor 1 Locker Room,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_LOCKER_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29801,7 +29801,7 @@
 
   Lights,
     Floor 1 Locker Room Hall_Lights,  !- Name
-    Floor 1 Locker Room Hall,!- Zone or ZoneList Name
+    Floor 1 Locker Room Hall,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29816,7 +29816,7 @@
 
   Lights,
     Floor 1 Lounge_Lights,   !- Name
-    Floor 1 Lounge,          !- Zone or ZoneList Name
+    Floor 1 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_LOUNGE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29831,7 +29831,7 @@
 
   Lights,
     Floor 1 Med Gas_Lights,  !- Name
-    Floor 1 Med Gas,         !- Zone or ZoneList Name
+    Floor 1 Med Gas,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29846,7 +29846,7 @@
 
   Lights,
     Floor 1 MRI Control Room_Lights,  !- Name
-    Floor 1 MRI Control Room,!- Zone or ZoneList Name
+    Floor 1 MRI Control Room,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29861,7 +29861,7 @@
 
   Lights,
     Floor 1 MRI Hall_Lights, !- Name
-    Floor 1 MRI Hall,        !- Zone or ZoneList Name
+    Floor 1 MRI Hall,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29876,7 +29876,7 @@
 
   Lights,
     Floor 1 MRI Room_Lights, !- Name
-    Floor 1 MRI Room,        !- Zone or ZoneList Name
+    Floor 1 MRI Room,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29891,7 +29891,7 @@
 
   Lights,
     Floor 1 MRI Toilet_Lights,  !- Name
-    Floor 1 MRI Toilet,      !- Zone or ZoneList Name
+    Floor 1 MRI Toilet,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29906,7 +29906,7 @@
 
   Lights,
     Floor 1 Nourishment_Lights,  !- Name
-    Floor 1 Nourishment,     !- Zone or ZoneList Name
+    Floor 1 Nourishment,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29921,7 +29921,7 @@
 
   Lights,
     Floor 1 Nurse Hall_Lights,  !- Name
-    Floor 1 Nurse Hall,      !- Zone or ZoneList Name
+    Floor 1 Nurse Hall,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29936,7 +29936,7 @@
 
   Lights,
     Floor 1 Nurse Janitor_Lights,  !- Name
-    Floor 1 Nurse Janitor,   !- Zone or ZoneList Name
+    Floor 1 Nurse Janitor,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29951,7 +29951,7 @@
 
   Lights,
     Floor 1 Nurse Station_Lights,  !- Name
-    Floor 1 Nurse Station,   !- Zone or ZoneList Name
+    Floor 1 Nurse Station,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29966,7 +29966,7 @@
 
   Lights,
     Floor 1 Nurse Toilet_Lights,  !- Name
-    Floor 1 Nurse Toilet,    !- Zone or ZoneList Name
+    Floor 1 Nurse Toilet,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29981,7 +29981,7 @@
 
   Lights,
     Floor 1 Office_Lights,   !- Name
-    Floor 1 Office,          !- Zone or ZoneList Name
+    Floor 1 Office,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -29996,7 +29996,7 @@
 
   Lights,
     Floor 1 Operating Room 1_Lights,  !- Name
-    Floor 1 Operating Room 1,!- Zone or ZoneList Name
+    Floor 1 Operating Room 1,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30011,7 +30011,7 @@
 
   Lights,
     Floor 1 Operating Room 2_Lights,  !- Name
-    Floor 1 Operating Room 2,!- Zone or ZoneList Name
+    Floor 1 Operating Room 2,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30026,7 +30026,7 @@
 
   Lights,
     Floor 1 Operating Room 3_Lights,  !- Name
-    Floor 1 Operating Room 3,!- Zone or ZoneList Name
+    Floor 1 Operating Room 3,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30041,7 +30041,7 @@
 
   Lights,
     Floor 1 PACU_Lights,     !- Name
-    Floor 1 PACU,            !- Zone or ZoneList Name
+    Floor 1 PACU,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30056,7 +30056,7 @@
 
   Lights,
     Floor 1 Pre-Op Hall_Lights,  !- Name
-    Floor 1 Pre-Op Hall,     !- Zone or ZoneList Name
+    Floor 1 Pre-Op Hall,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30071,7 +30071,7 @@
 
   Lights,
     Floor 1 Pre-Op Room 1_Lights,  !- Name
-    Floor 1 Pre-Op Room 1,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Room 1,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30086,7 +30086,7 @@
 
   Lights,
     Floor 1 Pre-Op Room 2_Lights,  !- Name
-    Floor 1 Pre-Op Room 2,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Room 2,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30101,7 +30101,7 @@
 
   Lights,
     Floor 1 Pre-Op Toilet_Lights,  !- Name
-    Floor 1 Pre-Op Toilet,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Toilet,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30116,7 +30116,7 @@
 
   Lights,
     Floor 1 Procedure Room_Lights,  !- Name
-    Floor 1 Procedure Room,  !- Zone or ZoneList Name
+    Floor 1 Procedure Room,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30131,7 +30131,7 @@
 
   Lights,
     Floor 1 Reception_Lights,!- Name
-    Floor 1 Reception,       !- Zone or ZoneList Name
+    Floor 1 Reception,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30146,7 +30146,7 @@
 
   Lights,
     Floor 1 Reception Hall_Lights,  !- Name
-    Floor 1 Reception Hall,  !- Zone or ZoneList Name
+    Floor 1 Reception Hall,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30161,7 +30161,7 @@
 
   Lights,
     Floor 1 Recovery Room_Lights,  !- Name
-    Floor 1 Recovery Room,   !- Zone or ZoneList Name
+    Floor 1 Recovery Room,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30176,7 +30176,7 @@
 
   Lights,
     Floor 1 Scheduling_Lights,  !- Name
-    Floor 1 Scheduling,      !- Zone or ZoneList Name
+    Floor 1 Scheduling,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30191,7 +30191,7 @@
 
   Lights,
     Floor 1 Scrub_Lights,    !- Name
-    Floor 1 Scrub,           !- Zone or ZoneList Name
+    Floor 1 Scrub,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30206,7 +30206,7 @@
 
   Lights,
     Floor 1 Soil_Lights,     !- Name
-    Floor 1 Soil,            !- Zone or ZoneList Name
+    Floor 1 Soil,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30221,7 +30221,7 @@
 
   Lights,
     Floor 1 Soil Hold_Lights,!- Name
-    Floor 1 Soil Hold,       !- Zone or ZoneList Name
+    Floor 1 Soil Hold,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30236,7 +30236,7 @@
 
   Lights,
     Floor 1 Soil Work_Lights,!- Name
-    Floor 1 Soil Work,       !- Zone or ZoneList Name
+    Floor 1 Soil Work,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30251,7 +30251,7 @@
 
   Lights,
     Floor 1 Step Down_Lights,!- Name
-    Floor 1 Step Down,       !- Zone or ZoneList Name
+    Floor 1 Step Down,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30266,7 +30266,7 @@
 
   Lights,
     Floor 1 Sterile Hall_Lights,  !- Name
-    Floor 1 Sterile Hall,    !- Zone or ZoneList Name
+    Floor 1 Sterile Hall,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30281,7 +30281,7 @@
 
   Lights,
     Floor 1 Sterile Storage_Lights,  !- Name
-    Floor 1 Sterile Storage, !- Zone or ZoneList Name
+    Floor 1 Sterile Storage, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30296,7 +30296,7 @@
 
   Lights,
     Floor 1 Storage_Lights,  !- Name
-    Floor 1 Storage,         !- Zone or ZoneList Name
+    Floor 1 Storage,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30311,7 +30311,7 @@
 
   Lights,
     Floor 1 Sub-Sterile_Lights,  !- Name
-    Floor 1 Sub-Sterile,     !- Zone or ZoneList Name
+    Floor 1 Sub-Sterile,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30326,7 +30326,7 @@
 
   Lights,
     Floor 1 Utility Hall_Lights,  !- Name
-    Floor 1 Utility Hall,    !- Zone or ZoneList Name
+    Floor 1 Utility Hall,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30341,7 +30341,7 @@
 
   Lights,
     Floor 1 Utility Janitor_Lights,  !- Name
-    Floor 1 Utility Janitor, !- Zone or ZoneList Name
+    Floor 1 Utility Janitor, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30356,7 +30356,7 @@
 
   Lights,
     Floor 1 Utility Room_Lights,  !- Name
-    Floor 1 Utility Room,    !- Zone or ZoneList Name
+    Floor 1 Utility Room,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30371,7 +30371,7 @@
 
   Lights,
     Floor 1 Vestibule_Lights,!- Name
-    Floor 1 Vestibule,       !- Zone or ZoneList Name
+    Floor 1 Vestibule,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30386,7 +30386,7 @@
 
   Lights,
     Floor 2 Conference_Lights,  !- Name
-    Floor 2 Conference,      !- Zone or ZoneList Name
+    Floor 2 Conference,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30401,7 +30401,7 @@
 
   Lights,
     Floor 2 Conference Toilet_Lights,  !- Name
-    Floor 2 Conference Toilet,  !- Zone or ZoneList Name
+    Floor 2 Conference Toilet,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30416,7 +30416,7 @@
 
   Lights,
     Floor 2 Dictation_Lights,!- Name
-    Floor 2 Dictation,       !- Zone or ZoneList Name
+    Floor 2 Dictation,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30431,7 +30431,7 @@
 
   Lights,
     Floor 2 Exam 1_Lights,   !- Name
-    Floor 2 Exam 1,          !- Zone or ZoneList Name
+    Floor 2 Exam 1,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30446,7 +30446,7 @@
 
   Lights,
     Floor 2 Exam 2_Lights,   !- Name
-    Floor 2 Exam 2,          !- Zone or ZoneList Name
+    Floor 2 Exam 2,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30461,7 +30461,7 @@
 
   Lights,
     Floor 2 Exam 3_Lights,   !- Name
-    Floor 2 Exam 3,          !- Zone or ZoneList Name
+    Floor 2 Exam 3,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30476,7 +30476,7 @@
 
   Lights,
     Floor 2 Exam 4_Lights,   !- Name
-    Floor 2 Exam 4,          !- Zone or ZoneList Name
+    Floor 2 Exam 4,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30491,7 +30491,7 @@
 
   Lights,
     Floor 2 Exam 5_Lights,   !- Name
-    Floor 2 Exam 5,          !- Zone or ZoneList Name
+    Floor 2 Exam 5,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30506,7 +30506,7 @@
 
   Lights,
     Floor 2 Exam 6_Lights,   !- Name
-    Floor 2 Exam 6,          !- Zone or ZoneList Name
+    Floor 2 Exam 6,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30521,7 +30521,7 @@
 
   Lights,
     Floor 2 Exam 7_Lights,   !- Name
-    Floor 2 Exam 7,          !- Zone or ZoneList Name
+    Floor 2 Exam 7,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30536,7 +30536,7 @@
 
   Lights,
     Floor 2 Exam 8_Lights,   !- Name
-    Floor 2 Exam 8,          !- Zone or ZoneList Name
+    Floor 2 Exam 8,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30551,7 +30551,7 @@
 
   Lights,
     Floor 2 Exam 9_Lights,   !- Name
-    Floor 2 Exam 9,          !- Zone or ZoneList Name
+    Floor 2 Exam 9,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30566,7 +30566,7 @@
 
   Lights,
     Floor 2 Exam Hall 1_Lights,  !- Name
-    Floor 2 Exam Hall 1,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 1,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30581,7 +30581,7 @@
 
   Lights,
     Floor 2 Exam Hall 2_Lights,  !- Name
-    Floor 2 Exam Hall 2,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 2,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30596,7 +30596,7 @@
 
   Lights,
     Floor 2 Exam Hall 3_Lights,  !- Name
-    Floor 2 Exam Hall 3,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 3,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30611,7 +30611,7 @@
 
   Lights,
     Floor 2 Exam Hall 4_Lights,  !- Name
-    Floor 2 Exam Hall 4,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 4,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30626,7 +30626,7 @@
 
   Lights,
     Floor 2 Exam Hall 5_Lights,  !- Name
-    Floor 2 Exam Hall 5,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 5,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30641,7 +30641,7 @@
 
   Lights,
     Floor 2 Exam Hall 6_Lights,  !- Name
-    Floor 2 Exam Hall 6,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 6,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30656,7 +30656,7 @@
 
   Lights,
     Floor 2 Janitor_Lights,  !- Name
-    Floor 2 Janitor,         !- Zone or ZoneList Name
+    Floor 2 Janitor,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30671,7 +30671,7 @@
 
   Lights,
     Floor 2 Lounge_Lights,   !- Name
-    Floor 2 Lounge,          !- Zone or ZoneList Name
+    Floor 2 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_LOUNGE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30686,7 +30686,7 @@
 
   Lights,
     Floor 2 Nurse Station 1_Lights,  !- Name
-    Floor 2 Nurse Station 1, !- Zone or ZoneList Name
+    Floor 2 Nurse Station 1, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30701,7 +30701,7 @@
 
   Lights,
     Floor 2 Nurse Station 2_Lights,  !- Name
-    Floor 2 Nurse Station 2, !- Zone or ZoneList Name
+    Floor 2 Nurse Station 2, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30716,7 +30716,7 @@
 
   Lights,
     Floor 2 Office_Lights,   !- Name
-    Floor 2 Office,          !- Zone or ZoneList Name
+    Floor 2 Office,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30731,7 +30731,7 @@
 
   Lights,
     Floor 2 Office Hall_Lights,  !- Name
-    Floor 2 Office Hall,     !- Zone or ZoneList Name
+    Floor 2 Office Hall,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30746,7 +30746,7 @@
 
   Lights,
     Floor 2 Reception_Lights,!- Name
-    Floor 2 Reception,       !- Zone or ZoneList Name
+    Floor 2 Reception,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30761,7 +30761,7 @@
 
   Lights,
     Floor 2 Reception Hall_Lights,  !- Name
-    Floor 2 Reception Hall,  !- Zone or ZoneList Name
+    Floor 2 Reception Hall,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30776,7 +30776,7 @@
 
   Lights,
     Floor 2 Reception Toilet_Lights,  !- Name
-    Floor 2 Reception Toilet,!- Zone or ZoneList Name
+    Floor 2 Reception Toilet,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30791,7 +30791,7 @@
 
   Lights,
     Floor 2 Scheduling 1_Lights,  !- Name
-    Floor 2 Scheduling 1,    !- Zone or ZoneList Name
+    Floor 2 Scheduling 1,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30806,7 +30806,7 @@
 
   Lights,
     Floor 2 Scheduling 2_Lights,  !- Name
-    Floor 2 Scheduling 2,    !- Zone or ZoneList Name
+    Floor 2 Scheduling 2,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30821,7 +30821,7 @@
 
   Lights,
     Floor 2 Storage 1_Lights,!- Name
-    Floor 2 Storage 1,       !- Zone or ZoneList Name
+    Floor 2 Storage 1,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30836,7 +30836,7 @@
 
   Lights,
     Floor 2 Storage 2_Lights,!- Name
-    Floor 2 Storage 2,       !- Zone or ZoneList Name
+    Floor 2 Storage 2,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30851,7 +30851,7 @@
 
   Lights,
     Floor 2 Storage 3_Lights,!- Name
-    Floor 2 Storage 3,       !- Zone or ZoneList Name
+    Floor 2 Storage 3,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30866,7 +30866,7 @@
 
   Lights,
     Floor 2 Utility_Lights,  !- Name
-    Floor 2 Utility,         !- Zone or ZoneList Name
+    Floor 2 Utility,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30881,7 +30881,7 @@
 
   Lights,
     Floor 2 Work_Lights,     !- Name
-    Floor 2 Work,            !- Zone or ZoneList Name
+    Floor 2 Work,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30896,7 +30896,7 @@
 
   Lights,
     Floor 2 Work Hall_Lights,!- Name
-    Floor 2 Work Hall,       !- Zone or ZoneList Name
+    Floor 2 Work Hall,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30911,7 +30911,7 @@
 
   Lights,
     Floor 2 Work Toilet_Lights,  !- Name
-    Floor 2 Work Toilet,     !- Zone or ZoneList Name
+    Floor 2 Work Toilet,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30926,7 +30926,7 @@
 
   Lights,
     Floor 2 X-Ray_Lights,    !- Name
-    Floor 2 X-Ray,           !- Zone or ZoneList Name
+    Floor 2 X-Ray,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30941,7 +30941,7 @@
 
   Lights,
     Floor 3 Dressing Room_Lights,  !- Name
-    Floor 3 Dressing Room,   !- Zone or ZoneList Name
+    Floor 3 Dressing Room,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30956,7 +30956,7 @@
 
   Lights,
     Floor 3 Elevator Hall_Lights,  !- Name
-    Floor 3 Elevator Hall,   !- Zone or ZoneList Name
+    Floor 3 Elevator Hall,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30971,7 +30971,7 @@
 
   Lights,
     Floor 3 Humid_Lights,    !- Name
-    Floor 3 Humid,           !- Zone or ZoneList Name
+    Floor 3 Humid,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -30986,7 +30986,7 @@
 
   Lights,
     Floor 3 Janitor_Lights,  !- Name
-    Floor 3 Janitor,         !- Zone or ZoneList Name
+    Floor 3 Janitor,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31001,7 +31001,7 @@
 
   Lights,
     Floor 3 Locker_Lights,   !- Name
-    Floor 3 Locker,          !- Zone or ZoneList Name
+    Floor 3 Locker,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_LOCKER_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31016,7 +31016,7 @@
 
   Lights,
     Floor 3 Lounge_Lights,   !- Name
-    Floor 3 Lounge,          !- Zone or ZoneList Name
+    Floor 3 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_LOUNGE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31031,7 +31031,7 @@
 
   Lights,
     Floor 3 Lounge Toilet_Lights,  !- Name
-    Floor 3 Lounge Toilet,   !- Zone or ZoneList Name
+    Floor 3 Lounge Toilet,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31046,7 +31046,7 @@
 
   Lights,
     Floor 3 Mechanical_Lights,  !- Name
-    Floor 3 Mechanical,      !- Zone or ZoneList Name
+    Floor 3 Mechanical,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31061,7 +31061,7 @@
 
   Lights,
     Floor 3 Mechanical Hall_Lights,  !- Name
-    Floor 3 Mechanical Hall, !- Zone or ZoneList Name
+    Floor 3 Mechanical Hall, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31076,7 +31076,7 @@
 
   Lights,
     Floor 3 Office_Lights,   !- Name
-    Floor 3 Office,          !- Zone or ZoneList Name
+    Floor 3 Office,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31091,7 +31091,7 @@
 
   Lights,
     Floor 3 Office Hall_Lights,  !- Name
-    Floor 3 Office Hall,     !- Zone or ZoneList Name
+    Floor 3 Office Hall,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31106,7 +31106,7 @@
 
   Lights,
     Floor 3 Office Toilet_Lights,  !- Name
-    Floor 3 Office Toilet,   !- Zone or ZoneList Name
+    Floor 3 Office Toilet,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31121,7 +31121,7 @@
 
   Lights,
     Floor 3 Physical Therapy 1_Lights,  !- Name
-    Floor 3 Physical Therapy 1,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 1,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31136,7 +31136,7 @@
 
   Lights,
     Floor 3 Physical Therapy 2_Lights,  !- Name
-    Floor 3 Physical Therapy 2,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 2,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_EXAM_SCH,     !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31151,7 +31151,7 @@
 
   Lights,
     Floor 3 Physical Therapy Toilet_Lights,  !- Name
-    Floor 3 Physical Therapy Toilet,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy Toilet,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_TOILET_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31166,7 +31166,7 @@
 
   Lights,
     Floor 3 Storage 1_Lights,!- Name
-    Floor 3 Storage 1,       !- Zone or ZoneList Name
+    Floor 3 Storage 1,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31181,7 +31181,7 @@
 
   Lights,
     Floor 3 Storage 2_Lights,!- Name
-    Floor 3 Storage 2,       !- Zone or ZoneList Name
+    Floor 3 Storage 2,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31196,7 +31196,7 @@
 
   Lights,
     Floor 3 Treatment_Lights,!- Name
-    Floor 3 Treatment,       !- Zone or ZoneList Name
+    Floor 3 Treatment,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_SCH,          !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31211,7 +31211,7 @@
 
   Lights,
     Floor 3 Undeveloped 1_Lights,  !- Name
-    Floor 3 Undeveloped 1,   !- Zone or ZoneList Name
+    Floor 3 Undeveloped 1,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31226,7 +31226,7 @@
 
   Lights,
     Floor 3 Undeveloped 2_Lights,  !- Name
-    Floor 3 Undeveloped 2,   !- Zone or ZoneList Name
+    Floor 3 Undeveloped 2,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31241,7 +31241,7 @@
 
   Lights,
     Floor 3 Utility_Lights,  !- Name
-    Floor 3 Utility,         !- Zone or ZoneList Name
+    Floor 3 Utility,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_STORAGE_SCH,  !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31256,7 +31256,7 @@
 
   Lights,
     Floor 3 Work_Lights,     !- Name
-    Floor 3 Work,            !- Zone or ZoneList Name
+    Floor 3 Work,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_OFFICE_SCH,   !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31271,7 +31271,7 @@
 
   Lights,
     NE Stair_Lights,         !- Name
-    NE Stair,                !- Zone or ZoneList Name
+    NE Stair,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31286,7 +31286,7 @@
 
   Lights,
     NW Elevator_Lights,      !- Name
-    NW Elevator,             !- Zone or ZoneList Name
+    NW Elevator,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31301,7 +31301,7 @@
 
   Lights,
     NW Stair_Lights,         !- Name
-    NW Stair,                !- Zone or ZoneList Name
+    NW Stair,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31316,7 +31316,7 @@
 
   Lights,
     SW Stair_Lights,         !- Name
-    SW Stair,                !- Zone or ZoneList Name
+    SW Stair,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_LIGHT_CORRIDOR_SCH, !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -31333,7 +31333,7 @@
 
   ElectricEquipment,
     Floor 1 Anesthesia_PlugMisc_Equip,  !- Name
-    Floor 1 Anesthesia,      !- Zone or ZoneList Name
+    Floor 1 Anesthesia,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     216.0219,                !- Design Level {W}
@@ -31346,7 +31346,7 @@
 
   ElectricEquipment,
     Floor 1 Bio Haz_PlugMisc_Equip,  !- Name
-    Floor 1 Bio Haz,         !- Zone or ZoneList Name
+    Floor 1 Bio Haz,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     5.6188,                  !- Design Level {W}
@@ -31359,7 +31359,7 @@
 
   ElectricEquipment,
     Floor 1 Cafe_PlugMisc_Equip,  !- Name
-    Floor 1 Cafe,            !- Zone or ZoneList Name
+    Floor 1 Cafe,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     419.8474,                !- Design Level {W}
@@ -31372,7 +31372,7 @@
 
   ElectricEquipment,
     Floor 1 Clean_PlugMisc_Equip,  !- Name
-    Floor 1 Clean,           !- Zone or ZoneList Name
+    Floor 1 Clean,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     252.0255,                !- Design Level {W}
@@ -31385,7 +31385,7 @@
 
   ElectricEquipment,
     Floor 1 Clean Work_PlugMisc_Equip,  !- Name
-    Floor 1 Clean Work,      !- Zone or ZoneList Name
+    Floor 1 Clean Work,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     330.0334,                !- Design Level {W}
@@ -31398,7 +31398,7 @@
 
   ElectricEquipment,
     Floor 1 Dictation_PlugMisc_Equip,  !- Name
-    Floor 1 Dictation,       !- Zone or ZoneList Name
+    Floor 1 Dictation,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     138.5965,                !- Design Level {W}
@@ -31411,7 +31411,7 @@
 
   ElectricEquipment,
     Floor 1 Dressing Room_PlugMisc_Equip,  !- Name
-    Floor 1 Dressing Room,   !- Zone or ZoneList Name
+    Floor 1 Dressing Room,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     49.4987,                 !- Design Level {W}
@@ -31424,7 +31424,7 @@
 
   ElectricEquipment,
     Floor 1 Electrical Room_PlugMisc_Equip,  !- Name
-    Floor 1 Electrical Room, !- Zone or ZoneList Name
+    Floor 1 Electrical Room, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     490.0041,                !- Design Level {W}
@@ -31437,7 +31437,7 @@
 
   ElectricEquipment,
     Floor 1 Elevator Pump Room_Elevators_Equip,  !- Name
-    Floor 1 Elevator Pump Room,  !- Zone or ZoneList Name
+    Floor 1 Elevator Pump Room,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_ELEVATORS,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     48164.8351648352,        !- Design Level {W}
@@ -31450,7 +31450,7 @@
 
   ElectricEquipment,
     Elevators_Lights_Fan,    !- Name
-    Floor 1 Elevator Pump Room,  !- Zone or ZoneList Name
+    Floor 1 Elevator Pump Room,  !- Zone or ZoneList or Space or SpaceList Name
     ELEV_LIGHT_FAN_SCH_ADD_DF,  !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     188,                     !- Design Level {W}
@@ -31463,7 +31463,7 @@
 
   ElectricEquipment,
     Floor 1 Humid_PlugMisc_Equip,  !- Name
-    Floor 1 Humid,           !- Zone or ZoneList Name
+    Floor 1 Humid,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     59.3985,                 !- Design Level {W}
@@ -31476,7 +31476,7 @@
 
   ElectricEquipment,
     Floor 1 IT Hall_PlugMisc_Equip,  !- Name
-    Floor 1 IT Hall,         !- Zone or ZoneList Name
+    Floor 1 IT Hall,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     56.0577,                 !- Design Level {W}
@@ -31489,7 +31489,7 @@
 
   ElectricEquipment,
     Floor 1 IT Room_PlugMisc_Equip,  !- Name
-    Floor 1 IT Room,         !- Zone or ZoneList Name
+    Floor 1 IT Room,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     123.1969,                !- Design Level {W}
@@ -31502,7 +31502,7 @@
 
   ElectricEquipment,
     Floor 1 Lobby_PlugMisc_Equip,  !- Name
-    Floor 1 Lobby,           !- Zone or ZoneList Name
+    Floor 1 Lobby,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     684.1826,                !- Design Level {W}
@@ -31515,7 +31515,7 @@
 
   ElectricEquipment,
     Floor 1 Lobby Hall_PlugMisc_Equip,  !- Name
-    Floor 1 Lobby Hall,      !- Zone or ZoneList Name
+    Floor 1 Lobby Hall,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     96.0989,                 !- Design Level {W}
@@ -31528,7 +31528,7 @@
 
   ElectricEquipment,
     Floor 1 Lobby Toilet_PlugMisc_Equip,  !- Name
-    Floor 1 Lobby Toilet,    !- Zone or ZoneList Name
+    Floor 1 Lobby Toilet,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     21.6223,                 !- Design Level {W}
@@ -31541,7 +31541,7 @@
 
   ElectricEquipment,
     Floor 1 Locker Room_PlugMisc_Equip,  !- Name
-    Floor 1 Locker Room,     !- Zone or ZoneList Name
+    Floor 1 Locker Room,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1979.8938,               !- Design Level {W}
@@ -31554,7 +31554,7 @@
 
   ElectricEquipment,
     Floor 1 Locker Room Hall_PlugMisc_Equip,  !- Name
-    Floor 1 Locker Room Hall,!- Zone or ZoneList Name
+    Floor 1 Locker Room Hall,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     198.6044,                !- Design Level {W}
@@ -31567,7 +31567,7 @@
 
   ElectricEquipment,
     Floor 1 Lounge_PlugMisc_Equip,  !- Name
-    Floor 1 Lounge,          !- Zone or ZoneList Name
+    Floor 1 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1079.9421,               !- Design Level {W}
@@ -31580,7 +31580,7 @@
 
   ElectricEquipment,
     Floor 1 Med Gas_PlugMisc_Equip,  !- Name
-    Floor 1 Med Gas,         !- Zone or ZoneList Name
+    Floor 1 Med Gas,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     5.6188,                  !- Design Level {W}
@@ -31593,7 +31593,7 @@
 
   ElectricEquipment,
     Floor 1 MRI Control Room_PlugMisc_Equip,  !- Name
-    Floor 1 MRI Control Room,!- Zone or ZoneList Name
+    Floor 1 MRI Control Room,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1680.0140,               !- Design Level {W}
@@ -31606,7 +31606,7 @@
 
   ElectricEquipment,
     Floor 1 MRI Hall_PlugMisc_Equip,  !- Name
-    Floor 1 MRI Hall,        !- Zone or ZoneList Name
+    Floor 1 MRI Hall,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     58.8606,                 !- Design Level {W}
@@ -31619,7 +31619,7 @@
 
   ElectricEquipment,
     Floor 1 MRI Room_PlugMisc_Equip,  !- Name
-    Floor 1 MRI Room,        !- Zone or ZoneList Name
+    Floor 1 MRI Room,        !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     4400.0366,               !- Design Level {W}
@@ -31632,7 +31632,7 @@
 
   ElectricEquipment,
     Floor 1 MRI Toilet_PlugMisc_Equip,  !- Name
-    Floor 1 MRI Toilet,      !- Zone or ZoneList Name
+    Floor 1 MRI Toilet,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     21.6223,                 !- Design Level {W}
@@ -31645,7 +31645,7 @@
 
   ElectricEquipment,
     Floor 1 Nourishment_PlugMisc_Equip,  !- Name
-    Floor 1 Nourishment,     !- Zone or ZoneList Name
+    Floor 1 Nourishment,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     364.0368,                !- Design Level {W}
@@ -31658,7 +31658,7 @@
 
   ElectricEquipment,
     Floor 1 Nurse Hall_PlugMisc_Equip,  !- Name
-    Floor 1 Nurse Hall,      !- Zone or ZoneList Name
+    Floor 1 Nurse Hall,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     198.6044,                !- Design Level {W}
@@ -31671,7 +31671,7 @@
 
   ElectricEquipment,
     Floor 1 Nurse Janitor_PlugMisc_Equip,  !- Name
-    Floor 1 Nurse Janitor,   !- Zone or ZoneList Name
+    Floor 1 Nurse Janitor,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     5.4181,                  !- Design Level {W}
@@ -31684,7 +31684,7 @@
 
   ElectricEquipment,
     Floor 1 Nurse Station_PlugMisc_Equip,  !- Name
-    Floor 1 Nurse Station,   !- Zone or ZoneList Name
+    Floor 1 Nurse Station,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     522.0528,                !- Design Level {W}
@@ -31697,7 +31697,7 @@
 
   ElectricEquipment,
     Floor 1 Nurse Toilet_PlugMisc_Equip,  !- Name
-    Floor 1 Nurse Toilet,    !- Zone or ZoneList Name
+    Floor 1 Nurse Toilet,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     21.6223,                 !- Design Level {W}
@@ -31710,7 +31710,7 @@
 
   ElectricEquipment,
     Floor 1 Office_PlugMisc_Equip,  !- Name
-    Floor 1 Office,          !- Zone or ZoneList Name
+    Floor 1 Office,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     531.2865,                !- Design Level {W}
@@ -31723,7 +31723,7 @@
 
   ElectricEquipment,
     Floor 1 Operating Room 1_PlugMisc_Equip,  !- Name
-    Floor 1 Operating Room 1,!- Zone or ZoneList Name
+    Floor 1 Operating Room 1,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1840.1863,               !- Design Level {W}
@@ -31736,7 +31736,7 @@
 
   ElectricEquipment,
     Floor 1 Operating Room 2_PlugMisc_Equip,  !- Name
-    Floor 1 Operating Room 2,!- Zone or ZoneList Name
+    Floor 1 Operating Room 2,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1920.1944,               !- Design Level {W}
@@ -31749,7 +31749,7 @@
 
   ElectricEquipment,
     Floor 1 Operating Room 3_PlugMisc_Equip,  !- Name
-    Floor 1 Operating Room 3,!- Zone or ZoneList Name
+    Floor 1 Operating Room 3,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1904.1927,               !- Design Level {W}
@@ -31762,7 +31762,7 @@
 
   ElectricEquipment,
     Floor 1 PACU_PlugMisc_Equip,  !- Name
-    Floor 1 PACU,            !- Zone or ZoneList Name
+    Floor 1 PACU,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     323.9826,                !- Design Level {W}
@@ -31775,7 +31775,7 @@
 
   ElectricEquipment,
     Floor 1 Pre-Op Hall_PlugMisc_Equip,  !- Name
-    Floor 1 Pre-Op Hall,     !- Zone or ZoneList Name
+    Floor 1 Pre-Op Hall,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     211.4176,                !- Design Level {W}
@@ -31788,7 +31788,7 @@
 
   ElectricEquipment,
     Floor 1 Pre-Op Room 1_PlugMisc_Equip,  !- Name
-    Floor 1 Pre-Op Room 1,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Room 1,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     378.0383,                !- Design Level {W}
@@ -31801,7 +31801,7 @@
 
   ElectricEquipment,
     Floor 1 Pre-Op Room 2_PlugMisc_Equip,  !- Name
-    Floor 1 Pre-Op Room 2,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Room 2,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     676.0684,                !- Design Level {W}
@@ -31814,7 +31814,7 @@
 
   ElectricEquipment,
     Floor 1 Pre-Op Toilet_PlugMisc_Equip,  !- Name
-    Floor 1 Pre-Op Toilet,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Toilet,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     21.6223,                 !- Design Level {W}
@@ -31827,7 +31827,7 @@
 
   ElectricEquipment,
     Floor 1 Procedure Room_PlugMisc_Equip,  !- Name
-    Floor 1 Procedure Room,  !- Zone or ZoneList Name
+    Floor 1 Procedure Room,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     854.9542,                !- Design Level {W}
@@ -31840,7 +31840,7 @@
 
   ElectricEquipment,
     Floor 1 Reception_PlugMisc_Equip,  !- Name
-    Floor 1 Reception,       !- Zone or ZoneList Name
+    Floor 1 Reception,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     559.8857,                !- Design Level {W}
@@ -31853,7 +31853,7 @@
 
   ElectricEquipment,
     Floor 1 Reception Hall_PlugMisc_Equip,  !- Name
-    Floor 1 Reception Hall,  !- Zone or ZoneList Name
+    Floor 1 Reception Hall,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     51.2527,                 !- Design Level {W}
@@ -31866,7 +31866,7 @@
 
   ElectricEquipment,
     Floor 1 Recovery Room_PlugMisc_Equip,  !- Name
-    Floor 1 Recovery Room,   !- Zone or ZoneList Name
+    Floor 1 Recovery Room,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1619.9131,               !- Design Level {W}
@@ -31879,7 +31879,7 @@
 
   ElectricEquipment,
     Floor 1 Scheduling_PlugMisc_Equip,  !- Name
-    Floor 1 Scheduling,      !- Zone or ZoneList Name
+    Floor 1 Scheduling,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     130.8967,                !- Design Level {W}
@@ -31892,7 +31892,7 @@
 
   ElectricEquipment,
     Floor 1 Scrub_PlugMisc_Equip,  !- Name
-    Floor 1 Scrub,           !- Zone or ZoneList Name
+    Floor 1 Scrub,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     33.6346,                 !- Design Level {W}
@@ -31905,7 +31905,7 @@
 
   ElectricEquipment,
     Floor 1 Soil_PlugMisc_Equip,  !- Name
-    Floor 1 Soil,            !- Zone or ZoneList Name
+    Floor 1 Soil,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     252.0255,                !- Design Level {W}
@@ -31918,7 +31918,7 @@
 
   ElectricEquipment,
     Floor 1 Soil Hold_PlugMisc_Equip,  !- Name
-    Floor 1 Soil Hold,       !- Zone or ZoneList Name
+    Floor 1 Soil Hold,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     112.0113,                !- Design Level {W}
@@ -31931,7 +31931,7 @@
 
   ElectricEquipment,
     Floor 1 Soil Work_PlugMisc_Equip,  !- Name
-    Floor 1 Soil Work,       !- Zone or ZoneList Name
+    Floor 1 Soil Work,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     360.0364,                !- Design Level {W}
@@ -31944,7 +31944,7 @@
 
   ElectricEquipment,
     Floor 1 Step Down_PlugMisc_Equip,  !- Name
-    Floor 1 Step Down,       !- Zone or ZoneList Name
+    Floor 1 Step Down,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     899.9517,                !- Design Level {W}
@@ -31957,7 +31957,7 @@
 
   ElectricEquipment,
     Floor 1 Sterile Hall_PlugMisc_Equip,  !- Name
-    Floor 1 Sterile Hall,    !- Zone or ZoneList Name
+    Floor 1 Sterile Hall,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     246.6539,                !- Design Level {W}
@@ -31970,7 +31970,7 @@
 
   ElectricEquipment,
     Floor 1 Sterile Storage_PlugMisc_Equip,  !- Name
-    Floor 1 Sterile Storage, !- Zone or ZoneList Name
+    Floor 1 Sterile Storage, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     39.7328,                 !- Design Level {W}
@@ -31983,7 +31983,7 @@
 
   ElectricEquipment,
     Floor 1 Storage_PlugMisc_Equip,  !- Name
-    Floor 1 Storage,         !- Zone or ZoneList Name
+    Floor 1 Storage,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     92.3085,                 !- Design Level {W}
@@ -31996,7 +31996,7 @@
 
   ElectricEquipment,
     Floor 1 Sub-Sterile_PlugMisc_Equip,  !- Name
-    Floor 1 Sub-Sterile,     !- Zone or ZoneList Name
+    Floor 1 Sub-Sterile,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     78.4808,                 !- Design Level {W}
@@ -32009,7 +32009,7 @@
 
   ElectricEquipment,
     Floor 1 Utility Hall_PlugMisc_Equip,  !- Name
-    Floor 1 Utility Hall,    !- Zone or ZoneList Name
+    Floor 1 Utility Hall,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     102.5055,                !- Design Level {W}
@@ -32022,7 +32022,7 @@
 
   ElectricEquipment,
     Floor 1 Utility Janitor_PlugMisc_Equip,  !- Name
-    Floor 1 Utility Janitor, !- Zone or ZoneList Name
+    Floor 1 Utility Janitor, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     4.2141,                  !- Design Level {W}
@@ -32035,7 +32035,7 @@
 
   ElectricEquipment,
     Floor 1 Utility Room_PlugMisc_Equip,  !- Name
-    Floor 1 Utility Room,    !- Zone or ZoneList Name
+    Floor 1 Utility Room,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     36.1207,                 !- Design Level {W}
@@ -32048,7 +32048,7 @@
 
   ElectricEquipment,
     Floor 1 Vestibule_PlugMisc_Equip,  !- Name
-    Floor 1 Vestibule,       !- Zone or ZoneList Name
+    Floor 1 Vestibule,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     28.8297,                 !- Design Level {W}
@@ -32061,7 +32061,7 @@
 
   ElectricEquipment,
     Floor 2 Conference_PlugMisc_Equip,  !- Name
-    Floor 2 Conference,      !- Zone or ZoneList Name
+    Floor 2 Conference,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     335.8779,                !- Design Level {W}
@@ -32074,7 +32074,7 @@
 
   ElectricEquipment,
     Floor 2 Conference Toilet_PlugMisc_Equip,  !- Name
-    Floor 2 Conference Toilet,  !- Zone or ZoneList Name
+    Floor 2 Conference Toilet,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     25.6264,                 !- Design Level {W}
@@ -32087,7 +32087,7 @@
 
   ElectricEquipment,
     Floor 2 Dictation_PlugMisc_Equip,  !- Name
-    Floor 2 Dictation,       !- Zone or ZoneList Name
+    Floor 2 Dictation,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     76.9980,                 !- Design Level {W}
@@ -32100,7 +32100,7 @@
 
   ElectricEquipment,
     Floor 2 Exam 1_PlugMisc_Equip,  !- Name
-    Floor 2 Exam 1,          !- Zone or ZoneList Name
+    Floor 2 Exam 1,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     395.9899,                !- Design Level {W}
@@ -32113,7 +32113,7 @@
 
   ElectricEquipment,
     Floor 2 Exam 2_PlugMisc_Equip,  !- Name
-    Floor 2 Exam 2,          !- Zone or ZoneList Name
+    Floor 2 Exam 2,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     593.9849,                !- Design Level {W}
@@ -32126,7 +32126,7 @@
 
   ElectricEquipment,
     Floor 2 Exam 3_PlugMisc_Equip,  !- Name
-    Floor 2 Exam 3,          !- Zone or ZoneList Name
+    Floor 2 Exam 3,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     791.9798,                !- Design Level {W}
@@ -32139,7 +32139,7 @@
 
   ElectricEquipment,
     Floor 2 Exam 4_PlugMisc_Equip,  !- Name
-    Floor 2 Exam 4,          !- Zone or ZoneList Name
+    Floor 2 Exam 4,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     92.3976,                 !- Design Level {W}
@@ -32152,7 +32152,7 @@
 
   ElectricEquipment,
     Floor 2 Exam 5_PlugMisc_Equip,  !- Name
-    Floor 2 Exam 5,          !- Zone or ZoneList Name
+    Floor 2 Exam 5,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     384.9902,                !- Design Level {W}
@@ -32165,7 +32165,7 @@
 
   ElectricEquipment,
     Floor 2 Exam 6_PlugMisc_Equip,  !- Name
-    Floor 2 Exam 6,          !- Zone or ZoneList Name
+    Floor 2 Exam 6,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     247.4937,                !- Design Level {W}
@@ -32178,7 +32178,7 @@
 
   ElectricEquipment,
     Floor 2 Exam 7_PlugMisc_Equip,  !- Name
-    Floor 2 Exam 7,          !- Zone or ZoneList Name
+    Floor 2 Exam 7,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     871.1778,                !- Design Level {W}
@@ -32191,7 +32191,7 @@
 
   ElectricEquipment,
     Floor 2 Exam 8_PlugMisc_Equip,  !- Name
-    Floor 2 Exam 8,          !- Zone or ZoneList Name
+    Floor 2 Exam 8,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     296.9924,                !- Design Level {W}
@@ -32204,7 +32204,7 @@
 
   ElectricEquipment,
     Floor 2 Exam 9_PlugMisc_Equip,  !- Name
-    Floor 2 Exam 9,          !- Zone or ZoneList Name
+    Floor 2 Exam 9,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     435.5889,                !- Design Level {W}
@@ -32217,7 +32217,7 @@
 
   ElectricEquipment,
     Floor 2 Exam Hall 1_PlugMisc_Equip,  !- Name
-    Floor 2 Exam Hall 1,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 1,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     72.0742,                 !- Design Level {W}
@@ -32230,7 +32230,7 @@
 
   ElectricEquipment,
     Floor 2 Exam Hall 2_PlugMisc_Equip,  !- Name
-    Floor 2 Exam Hall 2,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 2,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     72.0742,                 !- Design Level {W}
@@ -32243,7 +32243,7 @@
 
   ElectricEquipment,
     Floor 2 Exam Hall 3_PlugMisc_Equip,  !- Name
-    Floor 2 Exam Hall 3,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 3,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     72.0742,                 !- Design Level {W}
@@ -32256,7 +32256,7 @@
 
   ElectricEquipment,
     Floor 2 Exam Hall 4_PlugMisc_Equip,  !- Name
-    Floor 2 Exam Hall 4,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 4,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     79.2816,                 !- Design Level {W}
@@ -32269,7 +32269,7 @@
 
   ElectricEquipment,
     Floor 2 Exam Hall 5_PlugMisc_Equip,  !- Name
-    Floor 2 Exam Hall 5,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 5,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     79.2816,                 !- Design Level {W}
@@ -32282,7 +32282,7 @@
 
   ElectricEquipment,
     Floor 2 Exam Hall 6_PlugMisc_Equip,  !- Name
-    Floor 2 Exam Hall 6,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 6,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     79.2816,                 !- Design Level {W}
@@ -32295,7 +32295,7 @@
 
   ElectricEquipment,
     Floor 2 Janitor_PlugMisc_Equip,  !- Name
-    Floor 2 Janitor,         !- Zone or ZoneList Name
+    Floor 2 Janitor,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     6.3211,                  !- Design Level {W}
@@ -32308,7 +32308,7 @@
 
   ElectricEquipment,
     Floor 2 Lounge_PlugMisc_Equip,  !- Name
-    Floor 2 Lounge,          !- Zone or ZoneList Name
+    Floor 2 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     239.9871,                !- Design Level {W}
@@ -32321,7 +32321,7 @@
 
   ElectricEquipment,
     Floor 2 Nurse Station 1_PlugMisc_Equip,  !- Name
-    Floor 2 Nurse Station 1, !- Zone or ZoneList Name
+    Floor 2 Nurse Station 1, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     300.0304,                !- Design Level {W}
@@ -32334,7 +32334,7 @@
 
   ElectricEquipment,
     Floor 2 Nurse Station 2_PlugMisc_Equip,  !- Name
-    Floor 2 Nurse Station 2, !- Zone or ZoneList Name
+    Floor 2 Nurse Station 2, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     360.0364,                !- Design Level {W}
@@ -32347,7 +32347,7 @@
 
   ElectricEquipment,
     Floor 2 Office_PlugMisc_Equip,  !- Name
-    Floor 2 Office,          !- Zone or ZoneList Name
+    Floor 2 Office,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     615.9843,                !- Design Level {W}
@@ -32360,7 +32360,7 @@
 
   ElectricEquipment,
     Floor 2 Office Hall_PlugMisc_Equip,  !- Name
-    Floor 2 Office Hall,     !- Zone or ZoneList Name
+    Floor 2 Office Hall,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     177.7830,                !- Design Level {W}
@@ -32373,7 +32373,7 @@
 
   ElectricEquipment,
     Floor 2 Reception_PlugMisc_Equip,  !- Name
-    Floor 2 Reception,       !- Zone or ZoneList Name
+    Floor 2 Reception,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1082.3724,               !- Design Level {W}
@@ -32386,7 +32386,7 @@
 
   ElectricEquipment,
     Floor 2 Reception Hall_PlugMisc_Equip,  !- Name
-    Floor 2 Reception Hall,  !- Zone or ZoneList Name
+    Floor 2 Reception Hall,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     225.8324,                !- Design Level {W}
@@ -32399,7 +32399,7 @@
 
   ElectricEquipment,
     Floor 2 Reception Toilet_PlugMisc_Equip,  !- Name
-    Floor 2 Reception Toilet,!- Zone or ZoneList Name
+    Floor 2 Reception Toilet,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     50.4519,                 !- Design Level {W}
@@ -32412,7 +32412,7 @@
 
   ElectricEquipment,
     Floor 2 Scheduling 1_PlugMisc_Equip,  !- Name
-    Floor 2 Scheduling 1,    !- Zone or ZoneList Name
+    Floor 2 Scheduling 1,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     356.3909,                !- Design Level {W}
@@ -32425,7 +32425,7 @@
 
   ElectricEquipment,
     Floor 2 Scheduling 2_PlugMisc_Equip,  !- Name
-    Floor 2 Scheduling 2,    !- Zone or ZoneList Name
+    Floor 2 Scheduling 2,    !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     376.1904,                !- Design Level {W}
@@ -32438,7 +32438,7 @@
 
   ElectricEquipment,
     Floor 2 Storage 1_PlugMisc_Equip,  !- Name
-    Floor 2 Storage 1,       !- Zone or ZoneList Name
+    Floor 2 Storage 1,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     5.6188,                  !- Design Level {W}
@@ -32451,7 +32451,7 @@
 
   ElectricEquipment,
     Floor 2 Storage 2_PlugMisc_Equip,  !- Name
-    Floor 2 Storage 2,       !- Zone or ZoneList Name
+    Floor 2 Storage 2,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     12.0402,                 !- Design Level {W}
@@ -32464,7 +32464,7 @@
 
   ElectricEquipment,
     Floor 2 Storage 3_PlugMisc_Equip,  !- Name
-    Floor 2 Storage 3,       !- Zone or ZoneList Name
+    Floor 2 Storage 3,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     14.4483,                 !- Design Level {W}
@@ -32477,7 +32477,7 @@
 
   ElectricEquipment,
     Floor 2 Utility_PlugMisc_Equip,  !- Name
-    Floor 2 Utility,         !- Zone or ZoneList Name
+    Floor 2 Utility,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     12.6422,                 !- Design Level {W}
@@ -32490,7 +32490,7 @@
 
   ElectricEquipment,
     Floor 2 Work_PlugMisc_Equip,  !- Name
-    Floor 2 Work,            !- Zone or ZoneList Name
+    Floor 2 Work,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1535.5609,               !- Design Level {W}
@@ -32503,7 +32503,7 @@
 
   ElectricEquipment,
     Floor 2 Work Hall_PlugMisc_Equip,  !- Name
-    Floor 2 Work Hall,       !- Zone or ZoneList Name
+    Floor 2 Work Hall,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     333.9437,                !- Design Level {W}
@@ -32516,7 +32516,7 @@
 
   ElectricEquipment,
     Floor 2 Work Toilet_PlugMisc_Equip,  !- Name
-    Floor 2 Work Toilet,     !- Zone or ZoneList Name
+    Floor 2 Work Toilet,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     21.6223,                 !- Design Level {W}
@@ -32529,7 +32529,7 @@
 
   ElectricEquipment,
     Floor 2 X-Ray_PlugMisc_Equip,  !- Name
-    Floor 2 X-Ray,           !- Zone or ZoneList Name
+    Floor 2 X-Ray,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     9000.0749,               !- Design Level {W}
@@ -32542,7 +32542,7 @@
 
   ElectricEquipment,
     Floor 3 Dressing Room_PlugMisc_Equip,  !- Name
-    Floor 3 Dressing Room,   !- Zone or ZoneList Name
+    Floor 3 Dressing Room,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     46.1988,                 !- Design Level {W}
@@ -32555,7 +32555,7 @@
 
   ElectricEquipment,
     Floor 3 Elevator Hall_PlugMisc_Equip,  !- Name
-    Floor 3 Elevator Hall,   !- Zone or ZoneList Name
+    Floor 3 Elevator Hall,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     148.1525,                !- Design Level {W}
@@ -32568,7 +32568,7 @@
 
   ElectricEquipment,
     Floor 3 Humid_PlugMisc_Equip,  !- Name
-    Floor 3 Humid,           !- Zone or ZoneList Name
+    Floor 3 Humid,           !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     118.7970,                !- Design Level {W}
@@ -32581,7 +32581,7 @@
 
   ElectricEquipment,
     Floor 3 Janitor_PlugMisc_Equip,  !- Name
-    Floor 3 Janitor,         !- Zone or ZoneList Name
+    Floor 3 Janitor,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     6.3211,                  !- Design Level {W}
@@ -32594,7 +32594,7 @@
 
   ElectricEquipment,
     Floor 3 Locker_PlugMisc_Equip,  !- Name
-    Floor 3 Locker,          !- Zone or ZoneList Name
+    Floor 3 Locker,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     359.9807,                !- Design Level {W}
@@ -32607,7 +32607,7 @@
 
   ElectricEquipment,
     Floor 3 Lounge_PlugMisc_Equip,  !- Name
-    Floor 3 Lounge,          !- Zone or ZoneList Name
+    Floor 3 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2276.8779,               !- Design Level {W}
@@ -32620,7 +32620,7 @@
 
   ElectricEquipment,
     Floor 3 Lounge Toilet_PlugMisc_Equip,  !- Name
-    Floor 3 Lounge Toilet,   !- Zone or ZoneList Name
+    Floor 3 Lounge Toilet,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     76.8791,                 !- Design Level {W}
@@ -32633,7 +32633,7 @@
 
   ElectricEquipment,
     Floor 3 Mechanical_PlugMisc_Equip,  !- Name
-    Floor 3 Mechanical,      !- Zone or ZoneList Name
+    Floor 3 Mechanical,      !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1750.0146,               !- Design Level {W}
@@ -32646,7 +32646,7 @@
 
   ElectricEquipment,
     Floor 3 Mechanical Hall_PlugMisc_Equip,  !- Name
-    Floor 3 Mechanical Hall, !- Zone or ZoneList Name
+    Floor 3 Mechanical Hall, !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     120.1236,                !- Design Level {W}
@@ -32659,7 +32659,7 @@
 
   ElectricEquipment,
     Floor 3 Office_PlugMisc_Equip,  !- Name
-    Floor 3 Office,          !- Zone or ZoneList Name
+    Floor 3 Office,          !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3339.5150,               !- Design Level {W}
@@ -32672,7 +32672,7 @@
 
   ElectricEquipment,
     Floor 3 Office Hall_PlugMisc_Equip,  !- Name
-    Floor 3 Office Hall,     !- Zone or ZoneList Name
+    Floor 3 Office Hall,     !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     333.9437,                !- Design Level {W}
@@ -32685,7 +32685,7 @@
 
   ElectricEquipment,
     Floor 3 Office Toilet_PlugMisc_Equip,  !- Name
-    Floor 3 Office Toilet,   !- Zone or ZoneList Name
+    Floor 3 Office Toilet,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     21.6223,                 !- Design Level {W}
@@ -32698,7 +32698,7 @@
 
   ElectricEquipment,
     Floor 3 Physical Therapy 1_PlugMisc_Equip,  !- Name
-    Floor 3 Physical Therapy 1,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 1,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1950.4993,               !- Design Level {W}
@@ -32711,7 +32711,7 @@
 
   ElectricEquipment,
     Floor 3 Physical Therapy 2_PlugMisc_Equip,  !- Name
-    Floor 3 Physical Therapy 2,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 2,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     888.2274,                !- Design Level {W}
@@ -32724,7 +32724,7 @@
 
   ElectricEquipment,
     Floor 3 Physical Therapy Toilet_PlugMisc_Equip,  !- Name
-    Floor 3 Physical Therapy Toilet,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy Toilet,  !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     33.6346,                 !- Design Level {W}
@@ -32737,7 +32737,7 @@
 
   ElectricEquipment,
     Floor 3 Storage 1_PlugMisc_Equip,  !- Name
-    Floor 3 Storage 1,       !- Zone or ZoneList Name
+    Floor 3 Storage 1,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     10.8362,                 !- Design Level {W}
@@ -32750,7 +32750,7 @@
 
   ElectricEquipment,
     Floor 3 Storage 2_PlugMisc_Equip,  !- Name
-    Floor 3 Storage 2,       !- Zone or ZoneList Name
+    Floor 3 Storage 2,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     8.4282,                  !- Design Level {W}
@@ -32763,7 +32763,7 @@
 
   ElectricEquipment,
     Floor 3 Treatment_PlugMisc_Equip,  !- Name
-    Floor 3 Treatment,       !- Zone or ZoneList Name
+    Floor 3 Treatment,       !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     523.5867,                !- Design Level {W}
@@ -32776,7 +32776,7 @@
 
   ElectricEquipment,
     Floor 3 Undeveloped 1_PlugMisc_Equip,  !- Name
-    Floor 3 Undeveloped 1,   !- Zone or ZoneList Name
+    Floor 3 Undeveloped 1,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2494.7365,               !- Design Level {W}
@@ -32789,7 +32789,7 @@
 
   ElectricEquipment,
     Floor 3 Undeveloped 2_PlugMisc_Equip,  !- Name
-    Floor 3 Undeveloped 2,   !- Zone or ZoneList Name
+    Floor 3 Undeveloped 2,   !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1267.1677,               !- Design Level {W}
@@ -32802,7 +32802,7 @@
 
   ElectricEquipment,
     Floor 3 Utility_PlugMisc_Equip,  !- Name
-    Floor 3 Utility,         !- Zone or ZoneList Name
+    Floor 3 Utility,         !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     21.6724,                 !- Design Level {W}
@@ -32815,7 +32815,7 @@
 
   ElectricEquipment,
     Floor 3 Work_PlugMisc_Equip,  !- Name
-    Floor 3 Work,            !- Zone or ZoneList Name
+    Floor 3 Work,            !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     631.3839,                !- Design Level {W}
@@ -32828,7 +32828,7 @@
 
   ElectricEquipment,
     NE Stair_PlugMisc_Equip, !- Name
-    NE Stair,                !- Zone or ZoneList Name
+    NE Stair,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     67.2692,                 !- Design Level {W}
@@ -32841,7 +32841,7 @@
 
   ElectricEquipment,
     NW Elevator_PlugMisc_Equip,  !- Name
-    NW Elevator,             !- Zone or ZoneList Name
+    NW Elevator,             !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     56.0577,                 !- Design Level {W}
@@ -32854,7 +32854,7 @@
 
   ElectricEquipment,
     NW Stair_PlugMisc_Equip, !- Name
-    NW Stair,                !- Zone or ZoneList Name
+    NW Stair,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     76.8791,                 !- Design Level {W}
@@ -32867,7 +32867,7 @@
 
   ElectricEquipment,
     SW Stair_PlugMisc_Equip, !- Name
-    SW Stair,                !- Zone or ZoneList Name
+    SW Stair,                !- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     38.4396,                 !- Design Level {W}
@@ -32882,7 +32882,7 @@
 
   GasEquipment,
     Floor 1 Operating Room 1_GasMisc_Equip,  !- Name
-    Floor 1 Operating Room 1,!- Zone or ZoneList Name
+    Floor 1 Operating Room 1,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH_BASE,     !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3217.9755,               !- Design Level {W}
@@ -32896,7 +32896,7 @@
 
   GasEquipment,
     Floor 1 Operating Room 2_GasMisc_Equip,  !- Name
-    Floor 1 Operating Room 2,!- Zone or ZoneList Name
+    Floor 1 Operating Room 2,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH_BASE,     !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3357.8875,               !- Design Level {W}
@@ -32910,7 +32910,7 @@
 
   GasEquipment,
     Floor 1 Operating Room 3_GasMisc_Equip,  !- Name
-    Floor 1 Operating Room 3,!- Zone or ZoneList Name
+    Floor 1 Operating Room 3,!- Zone or ZoneList or Space or SpaceList Name
     BLDG_EQUIP_SCH_BASE,     !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     3329.9051,               !- Design Level {W}
@@ -32926,7 +32926,7 @@
 
   Daylighting:Controls,
     Floor 2 Reception_DaylCtrl,  !- Name
-    Floor 2 Reception,       !- Zone Name
+    Floor 2 Reception,       !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -32939,15 +32939,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Floor 2 Reception_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.23,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.23,                    !- Fraction of Lights Controlled by Reference Point 1
     269,                     !- Illuminance Setpoint at Reference Point 1 {lux}
     Floor 2 Reception_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.54,                    !- Fraction of Zone Controlled by Reference Point 2
+    0.54,                    !- Fraction of Lights Controlled by Reference Point 2
     269;                     !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Floor 3 Office_DaylCtrl, !- Name
-    Floor 3 Office,          !- Zone Name
+    Floor 3 Office,          !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -32960,15 +32960,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Floor 3 Office_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.19,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.19,                    !- Fraction of Lights Controlled by Reference Point 1
     323.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Floor 3 Office_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.19,                    !- Fraction of Zone Controlled by Reference Point 2
+    0.19,                    !- Fraction of Lights Controlled by Reference Point 2
     323.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Floor 3 Lounge_DaylCtrl, !- Name
-    Floor 3 Lounge,          !- Zone Name
+    Floor 3 Lounge,          !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -32981,15 +32981,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Floor 3 Lounge_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.24,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.24,                    !- Fraction of Lights Controlled by Reference Point 1
     161.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Floor 3 Lounge_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.24,                    !- Fraction of Zone Controlled by Reference Point 2
+    0.24,                    !- Fraction of Lights Controlled by Reference Point 2
     161.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Floor 2 Office_DaylCtrl, !- Name
-    Floor 2 Office,          !- Zone Name
+    Floor 2 Office,          !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -33002,15 +33002,15 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Floor 2 Office_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.57,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.57,                    !- Fraction of Lights Controlled by Reference Point 1
     323.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Floor 2 Office_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.43,                    !- Fraction of Zone Controlled by Reference Point 2
+    0.43,                    !- Fraction of Lights Controlled by Reference Point 2
     323.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:Controls,
     Floor 2 Conference_DaylCtrl,  !- Name
-    Floor 2 Conference,      !- Zone Name
+    Floor 2 Conference,      !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuousoff,           !- Lighting Control Type
@@ -33023,80 +33023,80 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Floor 2 Conference_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    0.67,                    !- Fraction of Zone Controlled by Reference Point 1
+    0.67,                    !- Fraction of Lights Controlled by Reference Point 1
     323.0,                   !- Illuminance Setpoint at Reference Point 1 {lux}
     Floor 2 Conference_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.33,                    !- Fraction of Zone Controlled by Reference Point 2
+    0.33,                    !- Fraction of Lights Controlled by Reference Point 2
     323.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
 !-   ===========  ALL OBJECTS IN CLASS: DAYLIGHTING:REFERENCEPOINT ===========
 
   Daylighting:ReferencePoint,
     Floor 2 Reception_DaylRefPt1,  !- Name
-    Floor 2 Reception,       !- Zone Name
+    Floor 2 Reception,       !- Zone or Space Name
     3.352800,                !- X-Coordinate of Reference Point {m}
     -2.438400,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Floor 2 Reception_DaylRefPt2,  !- Name
-    Floor 2 Reception,       !- Zone Name
+    Floor 2 Reception,       !- Zone or Space Name
     8.686800,                !- X-Coordinate of Reference Point {m}
     -3.962400,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Floor 3 Office_DaylRefPt1,  !- Name
-    Floor 3 Office,          !- Zone Name
+    Floor 3 Office,          !- Zone or Space Name
     -11.277600,              !- X-Coordinate of Reference Point {m}
     -1.633700,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Floor 3 Office_DaylRefPt2,  !- Name
-    Floor 3 Office,          !- Zone Name
+    Floor 3 Office,          !- Zone or Space Name
     -11.277600,              !- X-Coordinate of Reference Point {m}
     -3.267500,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Floor 3 Lounge_DaylRefPt1,  !- Name
-    Floor 3 Lounge,          !- Zone Name
+    Floor 3 Lounge,          !- Zone or Space Name
     3.505200,                !- X-Coordinate of Reference Point {m}
     -1.633700,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Floor 3 Lounge_DaylRefPt2,  !- Name
-    Floor 3 Lounge,          !- Zone Name
+    Floor 3 Lounge,          !- Zone or Space Name
     3.505200,                !- X-Coordinate of Reference Point {m}
     -3.267500,               !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Floor 2 Office_DaylRefPt1,  !- Name
-    Floor 2 Office,          !- Zone Name
+    Floor 2 Office,          !- Zone or Space Name
     -1.676400,               !- X-Coordinate of Reference Point {m}
     6.096000,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Floor 2 Office_DaylRefPt2,  !- Name
-    Floor 2 Office,          !- Zone Name
+    Floor 2 Office,          !- Zone or Space Name
     -3.352800,               !- X-Coordinate of Reference Point {m}
     6.096000,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Floor 2 Conference_DaylRefPt1,  !- Name
-    Floor 2 Conference,      !- Zone Name
+    Floor 2 Conference,      !- Zone or Space Name
     -6.400800,               !- X-Coordinate of Reference Point {m}
     3.352800,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Floor 2 Conference_DaylRefPt2,  !- Name
-    Floor 2 Conference,      !- Zone Name
+    Floor 2 Conference,      !- Zone or Space Name
     -2.133600,               !- X-Coordinate of Reference Point {m}
     3.352800,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
@@ -33105,7 +33105,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Anesthesia_Infiltration,  !- Name
-    Floor 1 Anesthesia,      !- Zone or ZoneList Name
+    Floor 1 Anesthesia,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33119,7 +33119,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Cafe_Infiltration,  !- Name
-    Floor 1 Cafe,            !- Zone or ZoneList Name
+    Floor 1 Cafe,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33133,7 +33133,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Dressing Room_Infiltration,  !- Name
-    Floor 1 Dressing Room,   !- Zone or ZoneList Name
+    Floor 1 Dressing Room,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33147,7 +33147,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Electrical Room_Infiltration,  !- Name
-    Floor 1 Electrical Room, !- Zone or ZoneList Name
+    Floor 1 Electrical Room, !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33161,7 +33161,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Elevator Pump Room_Infiltration,  !- Name
-    Floor 1 Elevator Pump Room,  !- Zone or ZoneList Name
+    Floor 1 Elevator Pump Room,  !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33175,7 +33175,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Lobby_Infiltration,  !- Name
-    Floor 1 Lobby,           !- Zone or ZoneList Name
+    Floor 1 Lobby,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33189,7 +33189,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Lobby Toilet_Infiltration,  !- Name
-    Floor 1 Lobby Toilet,    !- Zone or ZoneList Name
+    Floor 1 Lobby Toilet,    !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33203,7 +33203,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Locker Room_Infiltration,  !- Name
-    Floor 1 Locker Room,     !- Zone or ZoneList Name
+    Floor 1 Locker Room,     !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33217,7 +33217,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Med Gas_Infiltration,  !- Name
-    Floor 1 Med Gas,         !- Zone or ZoneList Name
+    Floor 1 Med Gas,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33231,7 +33231,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 MRI Toilet_Infiltration,  !- Name
-    Floor 1 MRI Toilet,      !- Zone or ZoneList Name
+    Floor 1 MRI Toilet,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33245,7 +33245,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Operating Room 1_Infiltration,  !- Name
-    Floor 1 Operating Room 1,!- Zone or ZoneList Name
+    Floor 1 Operating Room 1,!- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33259,7 +33259,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Operating Room 2_Infiltration,  !- Name
-    Floor 1 Operating Room 2,!- Zone or ZoneList Name
+    Floor 1 Operating Room 2,!- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33273,7 +33273,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Pre-Op Room 1_Infiltration,  !- Name
-    Floor 1 Pre-Op Room 1,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Room 1,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33287,7 +33287,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Pre-Op Toilet_Infiltration,  !- Name
-    Floor 1 Pre-Op Toilet,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Toilet,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33301,7 +33301,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Procedure Room_Infiltration,  !- Name
-    Floor 1 Procedure Room,  !- Zone or ZoneList Name
+    Floor 1 Procedure Room,  !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33315,7 +33315,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Reception_Infiltration,  !- Name
-    Floor 1 Reception,       !- Zone or ZoneList Name
+    Floor 1 Reception,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33329,7 +33329,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Recovery Room_Infiltration,  !- Name
-    Floor 1 Recovery Room,   !- Zone or ZoneList Name
+    Floor 1 Recovery Room,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33343,7 +33343,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Scheduling_Infiltration,  !- Name
-    Floor 1 Scheduling,      !- Zone or ZoneList Name
+    Floor 1 Scheduling,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33357,7 +33357,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Step Down_Infiltration,  !- Name
-    Floor 1 Step Down,       !- Zone or ZoneList Name
+    Floor 1 Step Down,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33371,7 +33371,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Storage_Infiltration,  !- Name
-    Floor 1 Storage,         !- Zone or ZoneList Name
+    Floor 1 Storage,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33385,7 +33385,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Sub-Sterile_Infiltration,  !- Name
-    Floor 1 Sub-Sterile,     !- Zone or ZoneList Name
+    Floor 1 Sub-Sterile,     !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33399,7 +33399,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Utility Hall_Infiltration,  !- Name
-    Floor 1 Utility Hall,    !- Zone or ZoneList Name
+    Floor 1 Utility Hall,    !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33413,7 +33413,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Utility Room_Infiltration,  !- Name
-    Floor 1 Utility Room,    !- Zone or ZoneList Name
+    Floor 1 Utility Room,    !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33427,7 +33427,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Vestibule_Infiltration,  !- Name
-    Floor 1 Vestibule,       !- Zone or ZoneList Name
+    Floor 1 Vestibule,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33441,7 +33441,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 1 Vestibule_Door_Infiltration,  !- Name
-    Floor 1 Vestibule,       !- Zone or ZoneList Name
+    Floor 1 Vestibule,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_Door_Opening_SCH,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.776824762,             !- Design Flow Rate {m3/s}
@@ -33455,7 +33455,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Conference_Infiltration,  !- Name
-    Floor 2 Conference,      !- Zone or ZoneList Name
+    Floor 2 Conference,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33469,7 +33469,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Exam 1_Infiltration,  !- Name
-    Floor 2 Exam 1,          !- Zone or ZoneList Name
+    Floor 2 Exam 1,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33483,7 +33483,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Exam 2_Infiltration,  !- Name
-    Floor 2 Exam 2,          !- Zone or ZoneList Name
+    Floor 2 Exam 2,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33497,7 +33497,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Exam 3_Infiltration,  !- Name
-    Floor 2 Exam 3,          !- Zone or ZoneList Name
+    Floor 2 Exam 3,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33511,7 +33511,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Exam 4_Infiltration,  !- Name
-    Floor 2 Exam 4,          !- Zone or ZoneList Name
+    Floor 2 Exam 4,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33525,7 +33525,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Exam 5_Infiltration,  !- Name
-    Floor 2 Exam 5,          !- Zone or ZoneList Name
+    Floor 2 Exam 5,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33539,7 +33539,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Exam 6_Infiltration,  !- Name
-    Floor 2 Exam 6,          !- Zone or ZoneList Name
+    Floor 2 Exam 6,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33553,7 +33553,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Exam 7_Infiltration,  !- Name
-    Floor 2 Exam 7,          !- Zone or ZoneList Name
+    Floor 2 Exam 7,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33567,7 +33567,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Exam 8_Infiltration,  !- Name
-    Floor 2 Exam 8,          !- Zone or ZoneList Name
+    Floor 2 Exam 8,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33581,7 +33581,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Exam 9_Infiltration,  !- Name
-    Floor 2 Exam 9,          !- Zone or ZoneList Name
+    Floor 2 Exam 9,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33595,7 +33595,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Janitor_Infiltration,  !- Name
-    Floor 2 Janitor,         !- Zone or ZoneList Name
+    Floor 2 Janitor,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33609,7 +33609,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Office_Infiltration,  !- Name
-    Floor 2 Office,          !- Zone or ZoneList Name
+    Floor 2 Office,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33623,7 +33623,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Reception_Infiltration,  !- Name
-    Floor 2 Reception,       !- Zone or ZoneList Name
+    Floor 2 Reception,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33637,7 +33637,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Utility_Infiltration,  !- Name
-    Floor 2 Utility,         !- Zone or ZoneList Name
+    Floor 2 Utility,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33651,7 +33651,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Work_Infiltration,  !- Name
-    Floor 2 Work,            !- Zone or ZoneList Name
+    Floor 2 Work,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33665,7 +33665,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 2 Work Toilet_Infiltration,  !- Name
-    Floor 2 Work Toilet,     !- Zone or ZoneList Name
+    Floor 2 Work Toilet,     !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33679,7 +33679,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Elevator Hall_Infiltration,  !- Name
-    Floor 3 Elevator Hall,   !- Zone or ZoneList Name
+    Floor 3 Elevator Hall,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33693,7 +33693,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Janitor_Infiltration,  !- Name
-    Floor 3 Janitor,         !- Zone or ZoneList Name
+    Floor 3 Janitor,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33707,7 +33707,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Lounge_Infiltration,  !- Name
-    Floor 3 Lounge,          !- Zone or ZoneList Name
+    Floor 3 Lounge,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33721,7 +33721,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Lounge Toilet_Infiltration,  !- Name
-    Floor 3 Lounge Toilet,   !- Zone or ZoneList Name
+    Floor 3 Lounge Toilet,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33735,7 +33735,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Mechanical_Infiltration,  !- Name
-    Floor 3 Mechanical,      !- Zone or ZoneList Name
+    Floor 3 Mechanical,      !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33749,7 +33749,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Office_Infiltration,  !- Name
-    Floor 3 Office,          !- Zone or ZoneList Name
+    Floor 3 Office,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33763,7 +33763,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Office Hall_Infiltration,  !- Name
-    Floor 3 Office Hall,     !- Zone or ZoneList Name
+    Floor 3 Office Hall,     !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33777,7 +33777,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Office Toilet_Infiltration,  !- Name
-    Floor 3 Office Toilet,   !- Zone or ZoneList Name
+    Floor 3 Office Toilet,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33791,7 +33791,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Physical Therapy 1_Infiltration,  !- Name
-    Floor 3 Physical Therapy 1,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 1,  !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33805,7 +33805,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Undeveloped 1_Infiltration,  !- Name
-    Floor 3 Undeveloped 1,   !- Zone or ZoneList Name
+    Floor 3 Undeveloped 1,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33819,7 +33819,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Undeveloped 2_Infiltration,  !- Name
-    Floor 3 Undeveloped 2,   !- Zone or ZoneList Name
+    Floor 3 Undeveloped 2,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33833,7 +33833,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Work_Infiltration,  !- Name
-    Floor 3 Work,            !- Zone or ZoneList Name
+    Floor 3 Work,            !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33847,7 +33847,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     NE Stair_Infiltration,   !- Name
-    NE Stair,                !- Zone or ZoneList Name
+    NE Stair,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33861,7 +33861,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     NW Elevator_Infiltration,!- Name
-    NW Elevator,             !- Zone or ZoneList Name
+    NW Elevator,             !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33875,7 +33875,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     NW Stair_Infiltration,   !- Name
-    NW Stair,                !- Zone or ZoneList Name
+    NW Stair,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33889,7 +33889,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SW Stair_Infiltration,   !- Name
-    SW Stair,                !- Zone or ZoneList Name
+    SW Stair,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorWallArea,   !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33903,7 +33903,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Dressing Room_Infiltration,  !- Name
-    Floor 3 Dressing Room,   !- Zone or ZoneList Name
+    Floor 3 Dressing Room,   !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33917,7 +33917,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Humid_Infiltration,  !- Name
-    Floor 3 Humid,           !- Zone or ZoneList Name
+    Floor 3 Humid,           !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33931,7 +33931,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Locker_Infiltration,  !- Name
-    Floor 3 Locker,          !- Zone or ZoneList Name
+    Floor 3 Locker,          !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33945,7 +33945,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Mechanical Hall_Infiltration,  !- Name
-    Floor 3 Mechanical Hall, !- Zone or ZoneList Name
+    Floor 3 Mechanical Hall, !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33959,7 +33959,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Physical Therapy 2_Infiltration,  !- Name
-    Floor 3 Physical Therapy 2,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 2,  !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33973,7 +33973,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Physical Therapy Toilet_Infiltration,  !- Name
-    Floor 3 Physical Therapy Toilet,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy Toilet,  !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -33987,7 +33987,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Storage 1_Infiltration,  !- Name
-    Floor 3 Storage 1,       !- Zone or ZoneList Name
+    Floor 3 Storage 1,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -34001,7 +34001,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Storage 2_Infiltration,  !- Name
-    Floor 3 Storage 2,       !- Zone or ZoneList Name
+    Floor 3 Storage 2,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -34015,7 +34015,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Treatment_Infiltration,  !- Name
-    Floor 3 Treatment,       !- Zone or ZoneList Name
+    Floor 3 Treatment,       !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -34029,7 +34029,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Floor 3 Utility_Infiltration,  !- Name
-    Floor 3 Utility,         !- Zone or ZoneList Name
+    Floor 3 Utility,         !- Zone or ZoneList or Space or SpaceList Name
     INFIL_SCH,               !- Schedule Name
     Flow/ExteriorArea,       !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -51266,3 +51266,4 @@
   Output:Meter:MeterFileOnly,Electricity:HVAC,hourly;
 
   Output:Meter:MeterFileOnly,NaturalGas:Facility,hourly;
+

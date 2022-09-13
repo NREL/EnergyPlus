@@ -269,7 +269,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     GARAGE ZONE,             !- Name
-    GARAGE ZONE,             !- Zone or ZoneList Name
+    GARAGE ZONE,             !- Zone or ZoneList or Space or SpaceList Name
     INF-SCHED,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.1,                     !- Design Flow Rate {m3/s}

@@ -347,7 +347,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Main Zone Infiltration,  !- Name
-    Main Zone,               !- Zone or ZoneList Name
+    Main Zone,               !- Zone or ZoneList or Space or SpaceList Name
     System Availability Schedule,  !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.02,                    !- Design Flow Rate {m3/s}

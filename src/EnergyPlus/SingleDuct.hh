@@ -189,7 +189,6 @@ namespace SingleDuct {
         Real64 ZoneFloorArea;                 // Zone floor area
         int CtrlZoneNum;                      // Pointer to CtrlZone data structure
         int CtrlZoneInNodeIndex;              // which controlled zone inlet node number corresponds with this unit
-        int ActualZoneNum;                    // Pointer to Zone data Structure
         Real64 MaxAirVolFlowRateDuringReheat; // Maximum vol flow during reheat
         Real64 MaxAirVolFractionDuringReheat; // Maximum vol flow fraction during reheat
         Real64 AirMassFlowDuringReheatMax;    // Maximum mass flow during reheat
@@ -233,7 +232,7 @@ namespace SingleDuct {
               ReheatAirOutletNode(0), MaxReheatWaterVolFlow(0.0), MaxReheatSteamVolFlow(0.0), MaxReheatWaterFlow(0.0), MaxReheatSteamFlow(0.0),
               MinReheatWaterVolFlow(0.0), MinReheatSteamVolFlow(0.0), MinReheatWaterFlow(0.0), MinReheatSteamFlow(0.0), ControllerOffset(0.0),
               MaxReheatTemp(0.0), MaxReheatTempSetByUser(false), DamperHeatingAction(Action::HeatingNotUsed), DamperPosition(0.0), ADUNum(0),
-              FluidIndex(0), ErrCount1(0), ErrCount1c(0), ErrCount2(0), ZoneFloorArea(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), ActualZoneNum(0),
+              FluidIndex(0), ErrCount1(0), ErrCount1c(0), ErrCount2(0), ZoneFloorArea(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0),
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
               OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWplantLoc{}, SecInNode(0),
               IterationLimit(0), IterationFailed(0), OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Invalid), EMSOverrideAirFlow(false),
@@ -316,8 +315,7 @@ namespace SingleDuct {
         int TermUnitSizingIndex;      // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
         bool OneTimeInitFlag;         // true if one-time inits should be done
         bool OneTimeInitFlag2;        // true if more one-time inits should be done
-        int ZoneEqNum;
-        int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
+        int CtrlZoneInNodeIndex;      // which controlled zone inlet node number corresponds with this unit
         int ZoneNum;
         bool NoOAFlowInputFromUser;                               // avoids OA calculation if no input specified by user
         int OARequirementsPtr;                                    // - Index to DesignSpecification:OutdoorAir object
@@ -331,8 +329,8 @@ namespace SingleDuct {
               ZoneAirHumRat(0.0), ZoneAirEnthalpy(0.0), ZoneAirPressure(0.0), ZoneAirMassFlowRate(0.0), DOASTemp(0.0), DOASHumRat(0.0),
               DOASEnthalpy(0.0), DOASPressure(0.0), DOASMassFlowRate(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0), MixedAirEnthalpy(0.0),
               MixedAirPressure(0.0), MixedAirMassFlowRate(0.0), MassFlowRateMaxAvail(0.0), ADUNum(0), TermUnitSizingIndex(0), OneTimeInitFlag(true),
-              OneTimeInitFlag2(true), ZoneEqNum(0), CtrlZoneInNodeIndex(0), ZoneNum(0), NoOAFlowInputFromUser(true), OARequirementsPtr(0),
-              AirLoopNum(0), DesignPrimaryAirVolRate(0.0), OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Invalid), printWarning(true)
+              OneTimeInitFlag2(true), CtrlZoneInNodeIndex(0), ZoneNum(0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0),
+              DesignPrimaryAirVolRate(0.0), OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Invalid), printWarning(true)
         {
         }
 

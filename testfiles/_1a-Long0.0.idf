@@ -1091,7 +1091,7 @@
   OtherEquipment,
     ZONE ONE OthEq 1,        !- Name
     None,                    !- Fuel Type
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Sch 1,                   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     297.0,                   !- Design Level {W}
@@ -1155,7 +1155,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     ZONE ONE Infil 1,        !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Sch 2,                   !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.0154,                  !- Design Flow Rate {m3/s}

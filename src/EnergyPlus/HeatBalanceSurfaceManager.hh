@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #include "WCETarcog.hpp"
 
@@ -199,7 +200,15 @@ namespace HeatBalanceSurfaceManager {
 
     void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
 
+    Real64 GetSurfIncidentSolarMultiplier(EnergyPlusData &state, int SurfNum);
+
     void InitSurfacePropertyViewFactors(EnergyPlusData &state);
+
+    void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state);
+
+    void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state);
+
+    void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum);
 
 } // namespace HeatBalanceSurfaceManager
 

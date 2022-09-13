@@ -64,6 +64,19 @@ struct EnergyPlusData;
 
 namespace InternalHeatGains {
 
+    struct GlobalInternalGainMiscObject
+    {
+        // Members
+        std::string Name;
+        bool ZoneListActive = false;
+        int spaceOrSpaceListPtr = 0;
+        int numOfSpaces = 0;
+        int spaceStartPtr = 0;
+        bool spaceListActive = false;
+        EPVector<int> spaceNums;     // Indexes to spaces associated with this input object
+        EPVector<std::string> names; // Names for each instance created from this input object
+    };
+
     void ManageInternalHeatGains(EnergyPlusData &state,
                                  Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
@@ -71,7 +84,7 @@ namespace InternalHeatGains {
 
     void setupIHGZonesAndSpaces(EnergyPlusData &state,
                                 const std::string objectType,
-                                EPVector<DataHeatBalance::GlobalInternalGainMiscObject> &inputObjects,
+                                EPVector<InternalHeatGains::GlobalInternalGainMiscObject> &inputObjects,
                                 int &numInputObjects,
                                 int &numGainInstances,
                                 bool &errors,
@@ -214,6 +227,10 @@ struct InternalHeatGainsData : BaseGlobalStruct
     Real64 sumPower = 0.0;
     Real64 curQL = 0.0; // radiant value prior to adjustment for pulse for load component report
     Real64 adjQL = 0.0; // radiant value including adjustment for pulse for load component report
+
+    // Declared here because they are needed later for the demand manager, other types of internal gain inputs are local
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> lightsObjects;
+    EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneElectricObjects;
 
     void clear_state() override
     {

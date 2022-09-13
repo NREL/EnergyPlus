@@ -580,15 +580,15 @@ namespace FuelCellElectricGenerator {
                 int thisGasID = UtilityRoutines::FindItem(
                     thisName, state.dataGenerator->GasPhaseThermoChemistryData, &DataGenerators::GasPropertyDataStruct::ConstituentName);
 
-                state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.GasLibID(i) = thisGasID;
+                state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.GasLibID(i) = static_cast<GasID>(thisGasID);
             }
 
             // set up gas constituents for product gases
-            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(1) = 1; // Carbon Dioxide
-            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(2) = 2; // Nitrogen
-            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(3) = 3; // Oxygen
-            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(4) = 4; // Water
-            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(5) = 5; // Argon
+            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(1) = GasID::CarbonDioxide;
+            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(2) = GasID::Nitrogen;
+            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(3) = GasID::Oxygen;
+            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(4) = GasID::Water;
+            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FCPM.GasLibID(5) = GasID::Argon;
         }
 
         state.dataIPShortCut->cCurrentModuleObject = "Generator:FuelCell:WaterSupply";
@@ -1982,31 +1982,31 @@ namespace FuelCellElectricGenerator {
 
             for (int thisGas = 1; thisGas <= this->AirSup.NumConstituents; ++thisGas) {
 
-                {
-                    auto const SELECT_CASE_var(this->AirSup.GasLibID(thisGas));
+                switch (this->AirSup.GasLibID(thisGas)) {
+                case GasID::CarbonDioxide: {
+                    // all the CO2 coming in plus the new CO2 from reactions
+                    NdotCO2 = NdotCO2ProdGas + this->AirSup.ConstitMolalFract(thisGas) * this->FCPM.NdotAir;
+                } break;
+                case GasID::Nitrogen: {
+                    // all the nitrogen coming in
+                    NdotN2 = this->FCPM.NdotAir * this->AirSup.ConstitMolalFract(thisGas);
+                } break;
+                case GasID::Oxygen: {
+                    // all the oxygen in the excess air stream
+                    Ndot02 = NdotExcessAir * this->AirSup.ConstitMolalFract(thisGas);
+                } break;
+                case GasID::Water: {
+                    // all the H2O coming in plus the new H2O from reactions and the H2O from water used in reforming
+                    NdotH2O = NdotH2OProdGas + this->AirSup.ConstitMolalFract(thisGas) * this->FCPM.NdotAir;
 
-                    if (SELECT_CASE_var == 1) {
-                        // all the CO2 coming in plus the new CO2 from reactions
-                        NdotCO2 = NdotCO2ProdGas + this->AirSup.ConstitMolalFract(thisGas) * this->FCPM.NdotAir;
+                } break;
+                case GasID::Argon: {
+                    // all the argon coming in.
+                    NdotAr = this->FCPM.NdotAir * this->AirSup.ConstitMolalFract(thisGas);
 
-                    } else if (SELECT_CASE_var == 2) {
-                        // all the nitrogen coming in
-                        NdotN2 = this->FCPM.NdotAir * this->AirSup.ConstitMolalFract(thisGas);
-
-                    } else if (SELECT_CASE_var == 3) {
-                        // all the oxygen in the excess air stream
-                        Ndot02 = NdotExcessAir * this->AirSup.ConstitMolalFract(thisGas);
-
-                    } else if (SELECT_CASE_var == 4) {
-                        // all the H2O coming in plus the new H2O from reactions and the H2O from water used in reforming
-                        NdotH2O = NdotH2OProdGas + this->AirSup.ConstitMolalFract(thisGas) * this->FCPM.NdotAir;
-
-                    } else if (SELECT_CASE_var == 5) {
-                        // all the argon coming in.
-                        NdotAr = this->FCPM.NdotAir * this->AirSup.ConstitMolalFract(thisGas);
-
-                    } else {
-                    }
+                } break;
+                default:
+                    break;
                 }
             }
 
@@ -2412,7 +2412,7 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
         for (int thisConstit = 1; thisConstit <= this->AirSup.NumConstituents; ++thisConstit) {
-            int gasID = this->AirSup.GasLibID(thisConstit);
+            int gasID = static_cast<int>(this->AirSup.GasLibID(thisConstit));
             if (gasID > 0) {
                 if (state.dataGenerator->GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::ThermodynamicMode::NISTShomate) {
 
@@ -2490,7 +2490,7 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
         for (int thisConstit = 1; thisConstit <= this->AirSup.NumConstituents; ++thisConstit) {
-            int gasID = this->AirSup.GasLibID(thisConstit);
+            int gasID = static_cast<int>(this->AirSup.GasLibID(thisConstit));
             if (gasID > 0) {
                 if (state.dataGenerator->GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::ThermodynamicMode::NISTShomate) {
 
@@ -2730,7 +2730,7 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
         for (int thisConstit = 1; thisConstit <= 5; ++thisConstit) {
-            int gasID = this->FCPM.GasLibID(thisConstit);
+            int gasID = static_cast<int>(this->FCPM.GasLibID(thisConstit));
             if (gasID > 0) {
                 if (state.dataGenerator->GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::ThermodynamicMode::NISTShomate) {
                     A = state.dataGenerator->GasPhaseThermoChemistryData(gasID).ShomateA;
@@ -2798,7 +2798,7 @@ namespace FuelCellElectricGenerator {
         Real64 const pow_4_Tkel(pow_4(Tkel));
 
         for (int thisConstit = 1; thisConstit <= isize(this->AuxilHeat.GasLibID); ++thisConstit) {
-            int gasID = this->AuxilHeat.GasLibID(thisConstit);
+            int gasID = static_cast<int>(this->AuxilHeat.GasLibID(thisConstit));
             if (gasID > 0) {
                 if (state.dataGenerator->GasPhaseThermoChemistryData(gasID).ThermoMode == DataGenerators::ThermodynamicMode::NISTShomate) {
 
@@ -3236,7 +3236,7 @@ namespace FuelCellElectricGenerator {
 
                 // find water fraction in incoming gas stream
                 for (int i = 1; i <= isize(this->AuxilHeat.GasLibID); ++i) {
-                    if (this->AuxilHeat.GasLibID(i) == 4) this->ExhaustHX.WaterVaporFractExh = this->AuxilHeat.ConstitMolalFract(i);
+                    if (this->AuxilHeat.GasLibID(i) == GasID::Water) this->ExhaustHX.WaterVaporFractExh = this->AuxilHeat.ConstitMolalFract(i);
                 }
                 Real64 NdotWaterVapor = this->ExhaustHX.WaterVaporFractExh * NdotGas;
 

@@ -67,6 +67,10 @@ namespace EnergyPlus {
 
 namespace DataOutputs {
 
+    // TODO: keep only one of these two
+    bool isKeyRegexLike(std::string_view key);
+    bool isKeyRegexLikeOri(std::string_view key); // DataOutputs implementation
+
     int constexpr NumMonthlyReports(63);
 
     extern Array1D_string const MonthlyNamedReports;
@@ -83,7 +87,7 @@ namespace DataOutputs {
     };
 
     // Check if a KeyValue/VariableName is inside the map OutputVariablesForSimulation
-    bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VariableName);
+    bool FindItemInVariableList(EnergyPlusData &state, std::string_view const KeyedValue, std::string_view const VariableName);
 
 } // namespace DataOutputs
 
@@ -99,13 +103,13 @@ struct OutputsData : BaseGlobalStruct
     int iTotalAutoSizableFields;          // number of fields that can be autosized
     int iNumberOfAutoCalcedFields;        // number of autocalculated fields
     int iTotalAutoCalculatableFields;     // number of fields that can be autocalculated
-    std::unordered_map<std::string,
-                       std::unordered_map<std::string,
-                                          DataOutputs::OutputReportingVariables,
-                                          UtilityRoutines::case_insensitive_hasher,
-                                          UtilityRoutines::case_insensitive_comparator>,
-                       UtilityRoutines::case_insensitive_hasher,
-                       UtilityRoutines::case_insensitive_comparator>
+    std::map<std::string,
+             std::map<std::string,
+                      DataOutputs::OutputReportingVariables,
+                      // UtilityRoutines::case_insensitive_hasher,
+                      UtilityRoutines::case_insensitive_comparator>,
+             // UtilityRoutines::case_insensitive_hasher,
+             UtilityRoutines::case_insensitive_comparator>
         OutputVariablesForSimulation;
 
     void clear_state() override

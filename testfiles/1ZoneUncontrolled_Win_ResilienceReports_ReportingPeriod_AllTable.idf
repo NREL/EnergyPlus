@@ -1,0 +1,728 @@
+!-Generator IDFEditor 1.34
+!-Option OriginalOrderTop UseSpecialFormat
+!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
+!1ZoneUncontrolled_ResilienceReport.idf
+! Basic file description:  Basic test for EnergyPlus.  Resistive Walls.  Regular (no ground contact) floor.
+!                          Regular roof.  One Window.
+!
+! Highlights:              Reporting thermal, CO2 and visual resilience metrics. Heat Index, Humidex,
+!                          Standard Effective Temperature, Daylighting levels and Zone CO2 levels are calculated.
+!
+!
+! Simulation Location/Run: Denver Centennial  Golden CO USA WMO=724666, 2 design days, 1 run period,
+!                          Run Control executes two design days (see RUN PERIOD object)
+!
+! Location:                Denver, CO
+!
+! Design Days:             Denver Centennial  Golden CO USA Annual Heating 99%, MaxDB=-15.5°C
+!                          Denver Centennial  Golden CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32°C MWB=15.5°C
+!
+! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
+!
+! Run Control:             No zone or system sizing, design day run control (no weather file simulation)
+!
+! Building: Fictional 1 zone building with resistive walls.
+!
+!           The building is oriented due north.
+!
+! Floor Area:        232.25 m2
+! Number of Stories: 1
+!
+! Zone Description Details:
+!
+!       (0,15.24,0)                 (15.24,15.24,0)
+!              _____________________________
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |____[=Win X 2=]______________|
+!
+!          (0,0,0)                      (15.24,0,0)
+!
+! Internal gains description:     NA
+!
+! Interzone Surfaces:             None
+! Internal Mass:                  None
+! People:                         12
+! Lights:                         None
+! Equipment:                      None
+! Windows:                        1
+! Detached Shading:               None
+! Daylight:                       None
+! Natural Ventilation:            None
+! Compact Schedules:              NA (Example of non-Compact Schedules)
+! Solar Distribution:             MinimalShadowing
+!
+! HVAC:                           NA
+!
+! Zonal Equipment:                NA
+! Central Air Handling Equipment: No
+! System Equipment Autosize:      No
+! Purchased Cooling:              No
+! Purchased Heating:              No
+! Purchased Chilled Water:        No
+! Purchased Hot Water:            No
+! Coils:                          None
+! Pumps:                          None
+! Boilers:                        None
+! Chillers:                       None
+! Towers:                         None
+!
+! Results:
+! Standard Reports:               Variable Dictionary
+! Timestep or Hourly Variables:   Hourly and Daily
+! Time bins Report:               None
+! HTML Report:                    Tabular
+! Environmental Emissions:        None
+! Utility Tariffs:                None
+
+  Version,9.6;
+
+  Timestep,4;
+
+  Building,
+    Simple One Zone (Wireframe DXF),  !- Name
+    0,                       !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value {W}
+    0.004,                   !- Temperature Convergence Tolerance Value {deltaC}
+    MinimalShadowing,        !- Solar Distribution
+    30,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  HeatBalanceAlgorithm,ConductionTransferFunction;
+
+  SurfaceConvectionAlgorithm:Inside,TARP;
+
+  SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+  SimulationControl,
+    No,                      !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    ,                        !- Do HVAC Sizing Simulation for Sizing Periods
+    ;                        !- Maximum Number of HVAC Sizing Simulation Passes
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    1,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    Run Period 2,            !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  Site:Location,
+    Denver Centennial  Golden   N_CO_USA Design_Conditions,  !- Name
+    39.74,                   !- Latitude {deg}
+    -105.18,                 !- Longitude {deg}
+    -7.00,                   !- Time Zone {hr}
+    1829.00;                 !- Elevation {m}
+
+ !  WMO=724666 Time Zone=NAM: (GMT-07:00) Mountain Time (US & Canada)
+ !  Data Source=ASHRAE 2009 Annual Design Conditions
+ ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
+ ! Coldest Month=DEC
+ ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5°C
+
+  SizingPeriod:DesignDay,
+    Denver Centennial  Golden   N Ann Htg 99% Condns DB,  !- Name
+    12,                      !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -15.5,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -15.5,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    81198.,                  !- Barometric Pressure {Pa}
+    3,                       !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+ ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
+ ! Hottest Month=JUL
+ ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32°C MWB=15.5°C
+
+  SizingPeriod:DesignDay,
+    Denver Centennial  Golden   N Ann Clg 1% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    32,                      !- Maximum Dry-Bulb Temperature {C}
+    15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    15.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    81198.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    0,                       !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+  Material:NoMass,
+    R13LAYER,                !- Name
+    Rough,                   !- Roughness
+    2.290965,                !- Thermal Resistance {m2-K/W}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
+  Material:NoMass,
+    R31LAYER,                !- Name
+    Rough,                   !- Roughness
+    5.456,                   !- Thermal Resistance {m2-K/W}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
+  Material,
+    C5 - 4 IN HW CONCRETE,   !- Name
+    MediumRough,             !- Roughness
+    0.1014984,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Construction,
+    R13WALL,                 !- Name
+    R13LAYER;                !- Outside Layer
+
+  Construction,
+    FLOOR,                   !- Name
+    C5 - 4 IN HW CONCRETE;   !- Outside Layer
+
+  Construction,
+    ROOF31,                  !- Name
+    R31LAYER;                !- Outside Layer
+
+  Zone,
+    ZONE ONE,                !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    World;                   !- Coordinate System
+
+  BuildingSurface:Detailed,
+    Zn001:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  WindowMaterial:Gas,
+    AIR 13MM,                !- Name
+    Air,                     !- Gas Type
+    0.0127;                  !- Thickness {m}
+
+  WindowMaterial:Glazing,
+    CLEAR 3MM,               !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.003,                   !- Thickness {m}
+    0.837,                   !- Solar Transmittance at Normal Incidence
+    0.075,                   !- Front Side Solar Reflectance at Normal Incidence
+    0.075,                   !- Back Side Solar Reflectance at Normal Incidence
+    0.898,                   !- Visible Transmittance at Normal Incidence
+    0.081,                   !- Front Side Visible Reflectance at Normal Incidence
+    0.081,                   !- Back Side Visible Reflectance at Normal Incidence
+    0.0,                     !- Infrared Transmittance at Normal Incidence
+    0.84,                    !- Front Side Infrared Hemispherical Emissivity
+    0.84,                    !- Back Side Infrared Hemispherical Emissivity
+    0.9;                     !- Conductivity {W/m-K}
+
+  WindowMaterial:Glazing,
+    GREY 3MM,                !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.003,                   !- Thickness {m}
+    0.626,                   !- Solar Transmittance at Normal Incidence
+    0.061,                   !- Front Side Solar Reflectance at Normal Incidence
+    0.061,                   !- Back Side Solar Reflectance at Normal Incidence
+    0.611,                   !- Visible Transmittance at Normal Incidence
+    0.061,                   !- Front Side Visible Reflectance at Normal Incidence
+    0.061,                   !- Back Side Visible Reflectance at Normal Incidence
+    0.0,                     !- Infrared Transmittance at Normal Incidence
+    0.84,                    !- Front Side Infrared Hemispherical Emissivity
+    0.84,                    !- Back Side Infrared Hemispherical Emissivity
+    0.9;                     !- Conductivity {W/m-K}
+
+  Construction,
+    Dbl Clr 3mm/13mm Air,    !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall001:Win001,    !- Name
+    Window,                  !- Surface Type
+    Dbl Clr 3mm/13mm Air,    !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}
+    5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}
+    5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}
+    0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR,                   !- Construction Name
+    ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
+    Adiabatic,               !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
+  People,
+    ZONE ONE People 1,       !- Name
+    ZONE ONE,                !- Zone or ZoneList Name
+    BLDG_OCC_SCH,            !- Number of People Schedule Name
+    People,                  !- Number of People Calculation Method
+    10,                      !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
+    0.3000,                  !- Fraction Radiant
+    AUTOCALCULATE,           !- Sensible Heat Fraction
+    ACTIVITY_SCH,            !- Activity Level Schedule Name
+    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
+    No,                      !- Enable ASHRAE 55 Comfort Warnings
+    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    ,                        !- Surface Name/Angle Factor List Name
+    WORK_EFF_SCH,            !- Work Efficiency Schedule Name
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method Schedule Name
+    CLOTHING_SCH,            !- Clothing Insulation Schedule Name
+    AIR_VELO_SCH,            !- Air Velocity Schedule Name
+    PIERCE,                  !- Thermal Comfort Model 1 Type
+    ,                        !- Thermal Comfort Model 2 Type
+    ,                        !- Thermal Comfort Model 3 Type
+    ,                        !- Thermal Comfort Model 4 Type
+    ,                        !- Thermal Comfort Model 5 Type
+    ,                        !- Thermal Comfort Model 6 Type
+    ,                        !- Thermal Comfort Model 7 Type
+    ,                        !- Ankle Level Air Velocity Schedule Name
+    10.5,                    !- Cold Stress Temperature Threshold [C]
+    32.5;                    !- Heat Stress Temperature Threshold [C]
+
+  People,
+    ZONE ONE People 2,       !- Name
+    ZONE ONE,                !- Zone or ZoneList Name
+    BLDG_OCC_SCH,            !- Number of People Schedule Name
+    People,                  !- Number of People Calculation Method
+    10,                      !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
+    0.3000,                  !- Fraction Radiant
+    AUTOCALCULATE,           !- Sensible Heat Fraction
+    ACTIVITY_SCH,            !- Activity Level Schedule Name
+    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
+    No,                      !- Enable ASHRAE 55 Comfort Warnings
+    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    ,                        !- Surface Name/Angle Factor List Name
+    WORK_EFF_SCH,            !- Work Efficiency Schedule Name
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method Schedule Name
+    CLOTHING_SCH,            !- Clothing Insulation Schedule Name
+    AIR_VELO_SCH,            !- Air Velocity Schedule Name
+    PIERCE,                  !- Thermal Comfort Model 1 Type
+    ,                        !- Thermal Comfort Model 2 Type
+    ,                        !- Thermal Comfort Model 3 Type
+    ,                        !- Thermal Comfort Model 4 Type
+    ,                        !- Thermal Comfort Model 5 Type
+    ,                        !- Thermal Comfort Model 6 Type
+    ,                        !- Thermal Comfort Model 7 Type
+    ,                        !- Ankle Level Air Velocity Schedule Name
+    10.5,                    !- Cold Stress Temperature Threshold [C]
+    32.5;                    !- Heat Stress Temperature Threshold [C]
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  Schedule:Compact,
+    BLDG_OCC_SCH,            !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: SummerDesignDay,    !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 22:00,1.0,        !- Field 5
+    Until: 24:00,0.05,       !- Field 7
+    For: Weekdays,           !- Field 9
+    Until: 06:00,0.0,        !- Field 10
+    Until: 07:00,0.1,        !- Field 12
+    Until: 08:00,0.2,        !- Field 14
+    Until: 12:00,0.95,       !- Field 16
+    Until: 13:00,0.5,        !- Field 18
+    Until: 17:00,0.95,       !- Field 20
+    Until: 18:00,0.7,        !- Field 22
+    Until: 20:00,0.4,        !- Field 24
+    Until: 22:00,0.1,        !- Field 26
+    Until: 24:00,0.05,       !- Field 28
+    For: Saturday,           !- Field 30
+    Until: 06:00,0.0,        !- Field 31
+    Until: 08:00,0.1,        !- Field 33
+    Until: 14:00,0.5,        !- Field 35
+    Until: 17:00,0.1,        !- Field 37
+    Until: 24:00,0.0,        !- Field 39
+    For: AllOtherDays,       !- Field 41
+    Until: 24:00,0.0;        !- Field 42
+
+  Schedule:Compact,
+    ACTIVITY_SCH,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,120.;       !- Field 3
+
+  Schedule:Compact,
+    AIR_VELO_SCH,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.2;        !- Field 3
+
+  Schedule:Compact,
+    CLOTHING_SCH,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 04/30,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0,        !- Field 3
+    Through: 09/30,          !- Field 5
+    For: AllDays,            !- Field 6
+    Until: 24:00,0.5,        !- Field 7
+    Through: 12/31,          !- Field 9
+    For: AllDays,            !- Field 10
+    Until: 24:00,1.0;        !- Field 11
+
+  Schedule:Compact,
+    WORK_EFF_SCH,            !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.0;        !- Field 3
+
+  Exterior:Lights,
+    ExtLights,               !- Name
+    AlwaysOn,                !- Schedule Name
+    5250,                    !- Design Level {W}
+    AstronomicalClock,       !- Control Option
+    Grounds Lights;          !- End-Use Subcategory
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  OtherEquipment,
+    Test 352a,               !- Name
+    None,                    !- Fuel Type
+    ZONE ONE,                !- Zone or ZoneList Name
+    AlwaysOn,                !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    352,                     !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    ,                        !- Power per Person {W/person}
+    0,                       !- Fraction Latent
+    0,                       !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  OtherEquipment,
+    Test 352 minus,          !- Name
+    None,                    !- Fuel Type
+    ZONE ONE,                !- Zone or ZoneList Name
+    AlwaysOn,                !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    -352,                    !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    ,                        !- Power per Person {W/person}
+    0,                       !- Fraction Latent
+    0,                       !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  Schedule:Constant,AlwaysOn,On/Off,1.0;
+
+  ZoneAirContaminantBalance,
+    Yes,                     !- Carbon Dioxide Concentration
+    Outdoor CO2 Schedule;    !- Outdoor Carbon Dioxide Schedule Name
+
+  Schedule:Compact,
+    Outdoor CO2 Schedule,    !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,400.0;      !- Field 3
+
+  Lights,
+    SPACE1-1 Lights 1,       !- Name
+    ZONE ONE,                !- Zone or ZoneList Name
+    LIGHTS-1,                !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    1584,                    !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0.2,                     !- Return Air Fraction
+    0.59,                    !- Fraction Radiant
+    0.2,                     !- Fraction Visible
+    1.0,                     !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+  Schedule:Compact,
+    LIGHTS-1,                !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: WeekDays SummerDesignDay CustomDay1 CustomDay2, !- Field 2
+    Until: 8:00,0.05,        !- Field 3
+    Until: 9:00,0.9,         !- Field 5
+    Until: 10:00,0.95,       !- Field 7
+    Until: 11:00,1.00,       !- Field 9
+    Until: 12:00,0.95,       !- Field 11
+    Until: 13:00,0.8,        !- Field 13
+    Until: 14:00,0.9,        !- Field 15
+    Until: 18:00,1.00,       !- Field 17
+    Until: 19:00,0.60,       !- Field 19
+    Until: 21:00,0.20,       !- Field 21
+    Until: 24:00,0.05,       !- Field 23
+    For: Weekends WinterDesignDay Holiday, !- Field 25
+    Until: 24:00,0.05;       !- Field 26
+
+  Daylighting:Controls,
+    SPACE1-1 Daylighting Control,  !- Name
+    ZONE ONE,                !- Zone Name
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    SPACE1-1 Reference Point1,  !- Glare Calculation Daylighting Reference Point Name
+    180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
+    20,                      !- Maximum Allowable Discomfort Glare Index
+    ,                        !- DElight Gridding Resolution {m2}
+    SPACE1-1 Reference Point1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    SPACE1-1 Reference Point1,  !- Name
+    ZONE ONE,                !- Zone Name
+    7.5,                     !- X-Coordinate of Reference Point {m}
+    7.5,                     !- Y-Coordinate of Reference Point {m}
+    0.7;                     !- Z-Coordinate of Reference Point {m}
+
+  Output:Variable,*,Site Outdoor Air Barometric Pressure,hourly;
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+
+  Output:Variable,*,Site Outdoor Air Humidity Ratio,hourly;
+
+  Output:Variable,*,Site Outdoor Air Relative Humidity,hourly;
+
+  Output:Variable,*,Zone Mean Air Temperature,hourly;
+
+  Output:Variable,*,Zone Mean Air Humidity Ratio,hourly;
+
+  Output:Variable,*,Zone Mean Air Dewpoint Temperature,hourly;
+
+  Output:Variable,*,Zone Heat Index,hourly;
+
+  Output:Variable,*,Zone Humidity Index,hourly;
+
+  Output:Variable,*,Zone Thermal Comfort Pierce Model Standard Effective Temperature,hourly;
+
+  Output:Variable,*,Zone Air CO2 Concentration,hourly;
+
+  Output:Variable,*,Daylighting Reference Point 1 Illuminance,hourly;
+
+  Output:VariableDictionary,IDF;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AnnualBuildingUtilityPerformanceSummary,  !- Report 1 Name
+    DemandEndUseComponentsSummary,  !- Report 2 Name
+    ThermalResilienceSummary,!- Report 3 Name
+    CO2ResilienceSummary,    !- Report 4 Name
+    VisualResilienceSummary; !- Report 5 Name
+
+  Output:Table:ReportPeriod,
+   AllResilienceReportTimeWinter,  !- field Name,
+   AllResilienceSummaries,         !- field Report Name,
+   ,                               !- Begin Year
+   2,                              !- Begin Month
+   1,                              !- Begin Day of Month
+   8,                              !- Begin Hour of Day
+   ,                               !- End Year
+   1,                              !- End Month
+   3,                              !- End Day of Month
+   18;                             !- End Hour of Day

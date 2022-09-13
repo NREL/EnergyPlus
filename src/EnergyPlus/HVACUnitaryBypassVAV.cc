@@ -908,14 +908,13 @@ namespace HVACUnitaryBypassVAV {
                 if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:SingleSpeed")) {
                     CBVAV(CBVAVNum).HeatCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
                     DXCoilErrFlag = false;
-                    CBVAV(CBVAVNum).MinOATCompressor =
-                        DXCoils::GetMinOATCompressor(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
+                    DXCoils::GetDXCoilIndex(
+                        state, CBVAV(CBVAVNum).HeatCoilName, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).HeatCoilType);
+                    CBVAV(CBVAVNum).MinOATCompressor = DXCoils::GetMinOATCompressor(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilInletNode =
                         DXCoils::GetCoilInletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilOutletNode =
                         DXCoils::GetCoilOutletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
-                    DXCoils::GetDXCoilIndex(
-                        state, CBVAV(CBVAVNum).HeatCoilName, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).HeatCoilType);
                     if (DXCoilErrFlag) ShowContinueError(state, "...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                 } else if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:VariableSpeed")) {
@@ -924,7 +923,7 @@ namespace HVACUnitaryBypassVAV {
                     CBVAV(CBVAVNum).DXHeatCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
                         state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     CBVAV(CBVAVNum).MinOATCompressor =
-                        VariableSpeedCoils::GetVSCoilMinOATCompressor(state, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
+                        VariableSpeedCoils::GetVSCoilMinOATCompressor(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(
                         state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
@@ -1205,23 +1204,19 @@ namespace HVACUnitaryBypassVAV {
             if (CBVAV(CBVAVNum).AirLoopNumber > 0) {
                 CBVAV(CBVAVNum).NumControlledZones = state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).NumZonesCooled;
                 CBVAV(CBVAVNum).ControlledZoneNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
-                CBVAV(CBVAVNum).ActualZoneNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
-                CBVAV(CBVAVNum).ActualZoneNodeNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
+                CBVAV(CBVAVNum).ControlledZoneNodeNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
                 CBVAV(CBVAVNum).CBVAVBoxOutletNode.allocate(CBVAV(CBVAVNum).NumControlledZones);
                 CBVAV(CBVAVNum).ZoneSequenceCoolingNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
                 CBVAV(CBVAVNum).ZoneSequenceHeatingNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
 
                 CBVAV(CBVAVNum).ControlledZoneNum = 0;
-                CBVAV(CBVAVNum).ActualZoneNum = 0;
                 for (int AirLoopZoneNum = 1; AirLoopZoneNum <= state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).NumZonesCooled;
                      ++AirLoopZoneNum) {
                     CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum) =
                         state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolCtrlZoneNums(AirLoopZoneNum);
                     if (CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum) > 0) {
-                        CBVAV(CBVAVNum).ActualZoneNodeNum(AirLoopZoneNum) =
+                        CBVAV(CBVAVNum).ControlledZoneNodeNum(AirLoopZoneNum) =
                             state.dataZoneEquip->ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ZoneNode;
-                        CBVAV(CBVAVNum).ActualZoneNum(AirLoopZoneNum) =
-                            state.dataZoneEquip->ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ActualZoneNum;
                         CBVAV(CBVAVNum).CBVAVBoxOutletNode(AirLoopZoneNum) =
                             state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolZoneInletNodes(AirLoopZoneNum);
                         // check for thermostat in controlled zone
@@ -3767,7 +3762,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 TSupplyToCoolSetPtMin = 99999.0;  // Minimum of the supply air temperatures required to reach the cooling setpoint [C]
 
         for (int ZoneNum = 1; ZoneNum <= CBVAV(CBVAVNumber).NumControlledZones; ++ZoneNum) {
-            int ZoneNodeNum = CBVAV(CBVAVNumber).ActualZoneNodeNum(ZoneNum);
+            int ZoneNodeNum = CBVAV(CBVAVNumber).ControlledZoneNodeNum(ZoneNum);
             int BoxOutletNodeNum = CBVAV(CBVAVNumber).CBVAVBoxOutletNode(ZoneNum);
             if ((CBVAV(CBVAVNumber).ZoneSequenceCoolingNum(ZoneNum) > 0) && (CBVAV(CBVAVNumber).ZoneSequenceHeatingNum(ZoneNum) > 0)) {
                 QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum))
@@ -4025,7 +4020,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(OutletNode).HumRat); // Specific heat of outlet air [J/kg-K]
         // Determine zone air flow
         for (int ZoneNum = 1; ZoneNum <= CBVAV(CBVAVNum).NumControlledZones; ++ZoneNum) {
-            int ZoneNodeNum = CBVAV(CBVAVNum).ActualZoneNodeNum(ZoneNum);
+            int ZoneNodeNum = CBVAV(CBVAVNum).ControlledZoneNodeNum(ZoneNum);
             int BoxOutletNodeNum = CBVAV(CBVAVNum).CBVAVBoxOutletNode(ZoneNum); // Zone supply air inlet node number
             if ((CBVAV(CBVAVNum).ZoneSequenceCoolingNum(ZoneNum) > 0) && (CBVAV(CBVAVNum).ZoneSequenceHeatingNum(ZoneNum) > 0)) {
                 Real64 QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum))

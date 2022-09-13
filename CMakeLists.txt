@@ -339,12 +339,6 @@ if(BUILD_TESTING)
   set_target_properties(TestAPI_Runtime_C PROPERTIES FOLDER Testing)
   set_target_properties(TestAPI_Functional_C PROPERTIES FOLDER Testing)
   set_target_properties(TestEnergyPlusCallbacks PROPERTIES FOLDER Testing)
-
-  set_target_properties(btwxt_tests PROPERTIES FOLDER ThirdParty/Btwxt)
-  set_target_properties(kiva_tests PROPERTIES FOLDER ThirdParty/Kiva)
-  if(OPENGL_FOUND AND BUILD_PENUMBRA_TESTING)
-    set_target_properties(penumbra_tests PROPERTIES FOLDER ThirdParty/Penumbra)
-  endif()
 endif()
 
 add_subdirectory(src/ConvertInputFormat)

@@ -78,6 +78,7 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -586,13 +587,13 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         state.dataSysVars->ReportExtShadingSunlitFrac = false;
     }
-    int ExtShadingSchedNum;
     if (state.dataSysVars->shadingMethod == ShadingMethod::Imported) {
+        int ExtShadingSchedNum;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
-            if (ExtShadingSchedNum) {
-                state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = true;
-                state.dataSurface->SurfExternalShadingSchInd(SurfNum) = ExtShadingSchedNum;
+            if (ExtShadingSchedNum != 0) {
+                state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac = true;
+                state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd = ExtShadingSchedNum;
             } else {
                 ShowWarningError(state,
                                  cCurrentModuleObject + ": sunlit fraction schedule not found for " + state.dataSurface->Surface(SurfNum).Name +
@@ -4972,9 +4973,9 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
     if ((state.dataSysVars->shadingMethod == ShadingMethod::Scheduled || state.dataSysVars->shadingMethod == ShadingMethod::Imported) &&
         !state.dataGlobal->DoingSizing && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->SurfSchedExternalShadingFrac(SurfNum)) {
+            if (state.dataSurface->Surface(SurfNum).SurfSchedExternalShadingFrac) {
                 state.dataHeatBal->SurfSunlitFrac(iHour, iTimeStep, SurfNum) =
-                    LookUpScheduleValue(state, state.dataSurface->SurfExternalShadingSchInd(SurfNum), iHour, iTimeStep);
+                    LookUpScheduleValue(state, state.dataSurface->Surface(SurfNum).SurfExternalShadingSchInd, iHour, iTimeStep);
             } else {
                 state.dataHeatBal->SurfSunlitFrac(iHour, iTimeStep, SurfNum) = 1.0;
             }
@@ -8350,8 +8351,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
         // Variables for reporting
         for (int const SurfNum : thisEnclosure.SurfacePtr) {
+            Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
             if (state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::FullInteriorExterior) {
-                state.dataHeatBal->SurfBmIncInsSurfAmountRep(SurfNum) *= state.dataEnvrn->BeamSolarRad;
+                state.dataHeatBal->SurfBmIncInsSurfAmountRep(SurfNum) *= state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier;
                 state.dataHeatBal->SurfBmIncInsSurfAmountRepEnergy(SurfNum) =
                     state.dataHeatBal->SurfBmIncInsSurfAmountRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfNum) =
@@ -8361,11 +8363,12 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                 if (state.dataSolarShading->SurfIntAbsFac(SurfNum) > 0.0 && state.dataSurface->Surface(SurfNum).HeatTransSurf) {
                     if (thisEnclosure.FloorArea > 0.0) {
                         // spread onto all floor surfaces, these may or may not be called "floor"
-                        state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfNum) = state.dataEnvrn->BeamSolarRad * BTOTZone / thisEnclosure.FloorArea;
+                        state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfNum) =
+                            state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * BTOTZone / thisEnclosure.FloorArea;
                     } else if (thisEnclosure.TotalSurfArea > 0.0) {
                         // spread onto all interior surfaces
                         state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfNum) =
-                            state.dataEnvrn->BeamSolarRad * BTOTZone / thisEnclosure.TotalSurfArea;
+                            state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * BTOTZone / thisEnclosure.TotalSurfArea;
                     } else { // divide be zero otherwise
                         state.dataHeatBal->SurfBmIncInsSurfIntensRep(SurfNum) = 0.0;
                     }
@@ -8380,7 +8383,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                 state.dataSurface->SurfWinIntBeamAbsByShade(SurfNum) = state.dataSolarShading->SurfWinIntBeamAbsByShadFac(SurfNum);
                 state.dataSurface->SurfWinExtBeamAbsByShade(SurfNum) =
-                    state.dataEnvrn->BeamSolarRad * state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum);
+                    state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum);
 
                 if ((state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) ||
                     (state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
@@ -8398,18 +8401,20 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
                         Real64 CosInc = state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2);
                         // Exterior diffuse solar incident on window (W/m2)
-                        Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) +
-                                             state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
+                        Real64 DifSolarInc =
+                            state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) +
+                            state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
                         // Exterior diffuse sky solar transmitted by TDD (W/m2)
-                        Real64 SkySolarTrans = state.dataEnvrn->DifSolarRad *
+                        Real64 SkySolarTrans = state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier *
                                                TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarAniso) *
                                                state.dataSolarShading->SurfAnisoSkyMult(SurfNum2);
                         // Exterior diffuse ground solar transmitted by TDD (W/m2)
-                        Real64 GndSolarTrans = state.dataEnvrn->GndSolarRad * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso *
+                        Real64 GndSolarTrans = state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier *
+                                               state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso *
                                                state.dataSurface->Surface(SurfNum2).ViewFactorGround;
 
                         state.dataSurface->SurfWinBmSolar(SurfNum) =
-                            state.dataEnvrn->BeamSolarRad * state.dataSolarShading->SurfWinTransBmSolar(SurfNum);
+                            state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfWinTransBmSolar(SurfNum);
                         state.dataSurface->SurfWinDifSolar(SurfNum) =
                             SkySolarTrans * state.dataSurface->Surface(SurfNum).Area + GndSolarTrans * state.dataSurface->Surface(SurfNum).Area;
                         state.dataSurface->SurfWinBmSolarEnergy(SurfNum) =
@@ -8432,18 +8437,19 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                     } else if (OutShelfSurf > 0) { // Outside daylighting shelf
                         Real64 ShelfSolarRad =
-                            (state.dataEnvrn->BeamSolarRad *
+                            (state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
                                  state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, OutShelfSurf) *
                                  state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, OutShelfSurf) +
-                             state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
+                             state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                             state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
-                        Real64 DifSolarInc = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum) +
-                                             state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(SurfNum).ViewFactorGround +
-                                             ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
+                        Real64 DifSolarInc =
+                            state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum) +
+                            state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier * state.dataSurface->Surface(SurfNum).ViewFactorGround +
+                            ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
 
                         state.dataSurface->SurfWinBmSolar(SurfNum) =
-                            state.dataEnvrn->BeamSolarRad * state.dataSolarShading->SurfWinTransBmSolar(SurfNum);
+                            state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfWinTransBmSolar(SurfNum);
                         state.dataSurface->SurfWinDifSolar(SurfNum) = DifSolarInc * state.dataSolarShading->SurfWinTransDifSolar(SurfNum);
                         state.dataSurface->SurfWinBmSolarEnergy(SurfNum) =
                             state.dataSurface->SurfWinBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -8460,7 +8466,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         Real64 GndSolarInc = state.dataSurface->SurfGndSolarInc(SurfNum);
                         Real64 DifSolarInc = SkySolarInc + GndSolarInc;
                         state.dataSurface->SurfWinBmSolar(SurfNum) =
-                            state.dataEnvrn->BeamSolarRad * state.dataSolarShading->SurfWinTransBmSolar(SurfNum);
+                            state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfWinTransBmSolar(SurfNum);
                         // Note: for complex fenestration, SurfWinTransDifSolar has previously been defined using the effective
                         // transmittance for sky and ground diffuse radiation (including beam radiation reflected from the ground)
                         // so these calculations should be correct
@@ -8487,10 +8493,10 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                     // added TH 12/9/2009, CR 7907 & 7809
                     state.dataSurface->SurfWinBmBmSolar(SurfNum) =
-                        state.dataEnvrn->BeamSolarRad * state.dataSolarShading->SurfWinTransBmBmSolar(SurfNum);
+                        state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfWinTransBmBmSolar(SurfNum);
 
                     state.dataSurface->SurfWinBmDifSolar(SurfNum) =
-                        state.dataEnvrn->BeamSolarRad * state.dataSolarShading->SurfWinTransBmDifSolar(SurfNum);
+                        state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfWinTransBmDifSolar(SurfNum);
                     state.dataSurface->SurfWinBmBmSolarEnergy(SurfNum) =
                         state.dataSurface->SurfWinBmBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                     state.dataSurface->SurfWinBmDifSolarEnergy(SurfNum) =
@@ -9741,6 +9747,69 @@ void WindowShadingManager(EnergyPlusData &state)
                 }
                 break;
 
+            case WindowShadingControlType::HiSolar_HiLumin_OffMidNight:
+                // 'OnIfHighSolarOrHighLuminanceTillMidnight'
+                // if shade is already on, then keep it on until midnight, otherwise check thresholds
+                if (SchedAllowsControl && IS_SHADED(state.dataSurface->SurfWinExtIntShadePrevTS(ISurf))) {
+                    shadingOn = true;
+                } else if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
+                    if (SolarOnWindow > SetPoint) {
+                        shadingOn = true;
+                    } else {
+                        // pass to DayltgInteriorIllum to check for luminance
+                        shadingOn = false;
+                        shadingOffButGlareControlOn = true;
+                    }
+                }
+                // if it is the beginning of the day, then shades off
+                if (state.dataGlobal->BeginDayFlag) {
+                    shadingOn = false;
+                    shadingOffButGlareControlOn = false;
+                }
+                break;
+
+            case WindowShadingControlType::HiSolar_HiLumin_OffSunset:
+                // 'OnIfHighSolarOrHighLuminanceTillSunset'
+                // if shade is already on, then keep it on until sunset, otherwise check thresholds
+                if (SchedAllowsControl && IS_SHADED(state.dataSurface->SurfWinExtIntShadePrevTS(ISurf))) {
+                    shadingOn = true;
+                } else if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
+                    if (SolarOnWindow > SetPoint) {
+                        shadingOn = true;
+                    } else {
+                        // pass to DayltgInteriorIllum to check for luminance
+                        shadingOn = false;
+                        shadingOffButGlareControlOn = true;
+                    }
+                }
+                // if sunset, then shades off
+                if (!state.dataEnvrn->SunIsUp) {
+                    shadingOn = false;
+                    shadingOffButGlareControlOn = false;
+                }
+                break;
+
+            case WindowShadingControlType::HiSolar_HiLumin_OffNextMorning:
+                // 'OnIfHighSolarOrHighLuminanceTillNextMorning'
+                // if shade is already on, then keep it on until next day when sun is up, otherwise check thresholds
+                if (SchedAllowsControl && IS_SHADED(state.dataSurface->SurfWinExtIntShadePrevTS(ISurf))) {
+                    shadingOn = true;
+                } else if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
+                    if (SolarOnWindow > SetPoint) {
+                        shadingOn = true;
+                    } else {
+                        // pass to DayltgInteriorIllum to check for luminance
+                        shadingOn = false;
+                        shadingOffButGlareControlOn = true;
+                    }
+                }
+                // if next morning (identified by sun is not up in previous time step and is up now), then shades off
+                if (!state.dataEnvrn->SunIsUpPrevTS && state.dataEnvrn->SunIsUp) {
+                    shadingOn = false;
+                    shadingOffButGlareControlOn = false;
+                }
+                break;
+
             case WindowShadingControlType::OnNightLoOutTemp_OffDay: // 'OnNightIfLowOutdoorTempAndOffDay'
                 if (!state.dataEnvrn->SunIsUp && state.dataSurface->SurfOutDryBulbTemp(ISurf) < SetPoint && SchedAllowsControl) {
                     shadingOn = true;
@@ -10423,10 +10492,9 @@ void SkyDifSolarShading(EnergyPlusData &state)
         }
         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR;
 
-        if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-            int SrdSurfsNum;
+        if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
             Real64 SrdSurfsViewFactor = 0.0;
-            SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+            int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
             auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
             for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                 SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;

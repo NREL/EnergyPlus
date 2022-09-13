@@ -95,7 +95,12 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).DesHeatingLoad;
             } else {
-                if (this->zoneEqSizing(this->curZoneEqNum).HeatingCapacity) {
+                if (this->dataCoilIsSuppHeater && this->suppHeatCap > 0.0) {
+                    NominalCapacityDes = this->suppHeatCap;
+                    if (this->dataFlowUsedForSizing > 0.0) {
+                        DesVolFlow = this->dataFlowUsedForSizing;
+                    }
+                } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingCapacity) {
                     NominalCapacityDes = this->zoneEqSizing(this->curZoneEqNum).DesHeatingLoad;
                     if (this->dataFlowUsedForSizing > 0.0) {
                         DesVolFlow = this->dataFlowUsedForSizing;
@@ -222,21 +227,21 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     } else if (this->unitarySysEqSizing(this->curSysNum).HeatingAirFlow) {
                         DesVolFlow = this->unitarySysEqSizing(this->curSysNum).HeatingAirVolFlow;
                     } else {
-                        if (this->curDuctType == DataHVACGlobals::Main) {
+                        if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
                             if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                 DesVolFlow =
                                     this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             } else {
                                 DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::Cooling) {
+                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
                             if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                 DesVolFlow =
                                     this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             } else {
                                 DesVolFlow = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::Heating) {
+                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                         } else {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
@@ -265,14 +270,6 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                    (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetHumRat; // include humrat for coil sizing reports
                 } else if (this->curOASysNum > 0 && this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     CoilInTemp = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
-                    if (this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex > -1 &&
-                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].FanBlowTroughFlag &&
-                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanTypeNum ==
-                            SimAirServingZones::CompType::Fan_System_Object) {
-                        int FanIndex = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].m_FanIndex;
-                        Real64 DeltaT = state.dataHVACFan->fanObjs[FanIndex]->getFanDesignTemperatureRise(state);
-                        CoilInTemp += DeltaT;
-                    }
                 } else {
                     CoilInTemp = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp +
                                  (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;

@@ -819,7 +819,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -833,19 +833,19 @@
 
   People,
     AllZones with People,    !- Name
-    AllOccupiedZones,        !- Zone or ZoneList Name
+    AllOccupiedZones,        !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    .11,                     !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    .11,                     !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     AllZones with Lights,    !- Name
-    AllOccupiedZones,        !- Zone or ZoneList Name
+    AllOccupiedZones,        !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -859,7 +859,7 @@
 
   ElectricEquipment,
     AllZones with Electric Equipment,  !- Name
-    AllOccupiedZones,        !- Zone or ZoneList Name
+    AllOccupiedZones,        !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     Watts/Person,            !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -1034,7 +1034,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1176,7 +1176,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE3-1 Infil 1,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1333,7 +1333,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE4-1 Infil 1,        !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -1475,7 +1475,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}

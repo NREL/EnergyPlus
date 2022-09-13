@@ -754,7 +754,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.032,                   !- Design Flow Rate {m3/s}
@@ -768,19 +768,19 @@
 
   People,
     SPACE1-1 People 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -794,7 +794,7 @@
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -969,7 +969,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.014,                   !- Design Flow Rate {m3/s}
@@ -983,19 +983,19 @@
 
   People,
     SPACE2-1 People 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1009,7 +1009,7 @@
 
   ElectricEquipment,
     SPACE2-1 ElecEq 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1149,7 +1149,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE3-1 Infil 1,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.032,                   !- Design Flow Rate {m3/s}
@@ -1163,19 +1163,19 @@
 
   People,
     SPACE3-1 People 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE3-1 Lights 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1189,7 +1189,7 @@
 
   ElectricEquipment,
     SPACE3-1 ElecEq 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1344,7 +1344,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE4-1 Infil 1,        !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.014,                   !- Design Flow Rate {m3/s}
@@ -1358,19 +1358,19 @@
 
   People,
     SPACE4-1 People 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE4-1 Lights 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1384,7 +1384,7 @@
 
   ElectricEquipment,
     SPACE4-1 ElecEq 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1524,7 +1524,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.062,                   !- Design Flow Rate {m3/s}
@@ -1538,19 +1538,19 @@
 
   People,
     SPACE5-1 People 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     20,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE5-1 Lights 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1564,7 +1564,7 @@
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1976,                    !- Design Level {W}
@@ -2631,14 +2631,14 @@
     0.0;                     !- Minimum Actuated Flow {m3/s}
 
   SetpointManager:SystemNodeReset:Temperature,
-    Supply Air Temp Manager 1,        !- Name
-    Temperature,                      !- Control Variable
-    16.7,                             !- Setpoint at Low Reference Temperature {C}
-    12.8,                             !- Setpoint at High Reference Temperature {C}
-    20.0,                             !- Low Reference Temperature {C}
-    23.3,                             !- High Reference Temperature {C}
-    Plenum-1 Out Node,         !- Reference Node Name
-    VAV Sys 1 Outlet Node;          !- Setpoint Node or NodeList Name
+    Supply Air Temp Manager 1,  !- Name
+    Temperature,             !- Control Variable
+    16.7,                    !- Setpoint at Low Reference Temperature {C}
+    12.8,                    !- Setpoint at High Reference Temperature {C}
+    20.0,                    !- Low Reference Temperature {C}
+    23.3,                    !- High Reference Temperature {C}
+    Plenum-1 Out Node,       !- Reference Node Name
+    VAV Sys 1 Outlet Node;   !- Setpoint Node or NodeList Name
 
   SetpointManager:MixedAir,
     Mixed Air Temp Manager 1,!- Name
@@ -2675,13 +2675,13 @@
 
   SetpointManager:SystemNodeReset:Temperature,
     Hot Water Loop Setpoint Manager,  !- Name
-    Temperature,                      !- Control Variable
-    82.0,                             !- Setpoint at Low Reference Temperature {C}
-    65.6,                             !- Setpoint at High Reference Temperature {C}
-    -6.7,                             !- Low Reference Temperature {C}
-    10.0,                             !- High Reference Temperature {C}
-    Outside Air Inlet Node 1,         !- Reference Node Name
-    HW Supply Outlet Node;       !- Setpoint Node or NodeList Name
+    Temperature,             !- Control Variable
+    82.0,                    !- Setpoint at Low Reference Temperature {C}
+    65.6,                    !- Setpoint at High Reference Temperature {C}
+    -6.7,                    !- Low Reference Temperature {C}
+    10.0,                    !- High Reference Temperature {C}
+    Outside Air Inlet Node 1,!- Reference Node Name
+    HW Supply Outlet Node;   !- Setpoint Node or NodeList Name
 
   BranchList,
     Heating Supply Side Branches,  !- Name
@@ -2903,13 +2903,13 @@
 
   SetpointManager:SystemNodeReset:Temperature,
     Central Boiler Setpoint Manager,  !- Name
-    Temperature,                      !- Control Variable
-    82.0,                             !- Setpoint at Low Reference Temperature {C}
-    65.6,                             !- Setpoint at High Reference Temperature {C}
-    -6.7,                             !- Low Reference Temperature {C}
-    10.0,                             !- High Reference Temperature {C}
-    Outside Air Inlet Node 1,         !- Reference Node Name
-    Central Boiler Outlet Node;       !- Setpoint Node or NodeList Name
+    Temperature,             !- Control Variable
+    82.0,                    !- Setpoint at Low Reference Temperature {C}
+    65.6,                    !- Setpoint at High Reference Temperature {C}
+    -6.7,                    !- Low Reference Temperature {C}
+    10.0,                    !- High Reference Temperature {C}
+    Outside Air Inlet Node 1,!- Reference Node Name
+    Central Boiler Outlet Node;  !- Setpoint Node or NodeList Name
 
   Curve:Quadratic,
     BoilerEfficiency,        !- Name
@@ -3634,14 +3634,14 @@
     DOAS Supply Fan Outlet;  !- Air Outlet Node Name
 
   SetpointManager:SystemNodeReset:Humidity,
-    DOAS Dehumidification Setpoint Manager, !- Name
-    MaximumHumidityRatio,                   !- Control Variable
-    0.00924,                                !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}
-    0.00600,                                !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}
-    0.00850,                                !- Low Reference Humidity Ratio {kgWater/kgDryAir}
-    0.01000,                                !- High Reference Humidity Ratio {kgWater/kgDryAir}
-    Plenum-1 Out Node,                      !- Reference Node Name
-    DOAS Cooling Coil Outlet;               !- Setpoint Node or NodeList Name
+    DOAS Dehumidification Setpoint Manager,  !- Name
+    MaximumHumidityRatio,    !- Control Variable
+    0.00924,                 !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}
+    0.00600,                 !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}
+    0.00850,                 !- Low Reference Humidity Ratio {kgWater/kgDryAir}
+    0.01000,                 !- High Reference Humidity Ratio {kgWater/kgDryAir}
+    Plenum-1 Out Node,       !- Reference Node Name
+    DOAS Cooling Coil Outlet;!- Setpoint Node or NodeList Name
 
   OutdoorAir:NodeList,
     DOAS Air Loop Inlet;     !- Node or NodeList Name 1
@@ -3800,3 +3800,4 @@
     ZoneComponentLoadSummary;!- Report 2 Name
 
   Output:Surfaces:List,Details;
+

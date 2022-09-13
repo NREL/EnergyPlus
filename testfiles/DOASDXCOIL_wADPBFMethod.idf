@@ -794,7 +794,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE1-1 Infil 1,        !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -808,19 +808,19 @@
 
   People,
     SPACE1-1 People 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE1-1 Lights 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -834,7 +834,7 @@
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
-    SPACE1-1,                !- Zone or ZoneList Name
+    SPACE1-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1009,7 +1009,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE2-1 Infil 1,        !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1023,19 +1023,19 @@
 
   People,
     SPACE2-1 People 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1049,7 +1049,7 @@
 
   ElectricEquipment,
     SPACE2-1 ElecEq 1,       !- Name
-    SPACE2-1,                !- Zone or ZoneList Name
+    SPACE2-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1189,7 +1189,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE3-1 Infil 1,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.0167,                  !- Design Flow Rate {m3/s}
@@ -1203,19 +1203,19 @@
 
   People,
     SPACE3-1 People 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     11,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE3-1 Lights 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -1229,7 +1229,7 @@
 
   ElectricEquipment,
     SPACE3-1 ElecEq 1,       !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
+    SPACE3-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1056,                    !- Design Level {W}
@@ -1384,7 +1384,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE4-1 Infil 1,        !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.00717,                 !- Design Flow Rate {m3/s}
@@ -1398,19 +1398,19 @@
 
   People,
     SPACE4-1 People 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     5,                       !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE4-1 Lights 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1424,7 +1424,7 @@
 
   ElectricEquipment,
     SPACE4-1 ElecEq 1,       !- Name
-    SPACE4-1,                !- Zone or ZoneList Name
+    SPACE4-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     456,                     !- Design Level {W}
@@ -1564,7 +1564,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.031089,                !- Design Flow Rate {m3/s}
@@ -1578,19 +1578,19 @@
 
   People,
     SPACE5-1 People 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     OCCUPY-1,                !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     20,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     ActSchd;                 !- Activity Level Schedule Name
 
   Lights,
     SPACE5-1 Lights 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1604,7 +1604,7 @@
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
-    SPACE5-1,                !- Zone or ZoneList Name
+    SPACE5-1,                !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1976,                    !- Design Level {W}
@@ -2748,9 +2748,9 @@
     DOAS Outdoor Air Inlet;  !- Node or NodeList Name 1
 
   AirLoopHVAC:OutdoorAirSystem,
-    DOAS OA System,              !- Name
+    DOAS OA System,          !- Name
     DOAS OA System Controllers,  !- Controller List Name
-    DOAS OA System Equipment;    !- Outdoor Air Equipment List Name
+    DOAS OA System Equipment;!- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     DOAS OA System Controllers,  !- Name
@@ -2805,8 +2805,8 @@
     HVACOperationSchd,       !- Availability Schedule Name
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     2.753,                   !- Gross Rated Cooling COP {W/W}
-    -5,                      !- Minimum Outdoor Temperature in Cooling Mode {C}
-    43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}
+    -5,                      !- Minimum Condenser Inlet Node Temperature in Cooling Mode {C}
+    43,                      !- Maximum Condenser Inlet Node Temperature in Cooling Mode {C}
     VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name
     VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name
     VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name
@@ -2820,8 +2820,8 @@
     autosize,                !- Gross Rated Heating Capacity {W}
     ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
     3.921,                   !- Gross Rated Heating COP {W/W}
-    -21,                     !- Minimum Outdoor Temperature in Heating Mode {C}
-    35,                      !- Maximum Outdoor Temperature in Heating Mode {C}
+    -21,                     !- Minimum Condenser Inlet Node Temperature in Heating Mode {C}
+    35,                      !- Maximum Condenser Inlet Node Temperature in Heating Mode {C}
     VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name
     VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name
     VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name
@@ -2868,7 +2868,7 @@
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
     Electricity,             !- Fuel Type
-    ;                        !- Minimum Outdoor Temperature in Heat Recovery Mode {C}
+    ;                        !- Minimum Condenser Inlet Node Temperature in Heat Recovery Mode {C}
 
   ZoneTerminalUnitList,
     VRF TU List,             !- Zone Terminal Unit List Name

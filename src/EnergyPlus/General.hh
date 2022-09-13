@@ -76,7 +76,8 @@ namespace OutputProcessor {
 
 namespace WeatherManager {
     enum class DateType;
-}
+    struct ReportPeriodData;
+} // namespace WeatherManager
 
 namespace General {
 
@@ -329,11 +330,7 @@ namespace General {
 
     std::string &strip_trailing_zeros(std::string &InputString);
 
-    void MovingAvg(Array1A<Real64> DataIn,      // input data that needs smoothing
-                   int NumDataItems,            // number of values in DataIn
-                   int NumItemsInAvg,           // number of items in the averaging window
-                   Array1A<Real64> SmoothedData // output data after smoothing
-    );
+    void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg);
 
     void ProcessDateString(EnergyPlusData &state,
                            std::string const &String,
@@ -367,6 +364,9 @@ namespace General {
     );
 
     void InvOrdinalDay(int Number, int &PMonth, int &PDay, int LeapYr);
+
+    bool BetweenDateHoursLeftInclusive(
+        int const TestDate, int const TestHour, int const StartDate, int const StartHour, int const EndDate, int const EndHour);
 
     bool BetweenDates(int TestDate,  // Date to test
                       int StartDate, // Start date in sequence
@@ -500,6 +500,13 @@ namespace General {
     }
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
+
+    bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx);
+
+    void findReportPeriodIdx(EnergyPlusData &state,
+                             const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                             const int nReportPeriods,
+                             Array1D_bool &inReportPeriodFlags);
 
     inline Real64 epexp(const Real64 numerator, const Real64 denominator)
     {

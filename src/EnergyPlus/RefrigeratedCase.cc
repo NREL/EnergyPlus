@@ -632,7 +632,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 state.dataRefrigCase->RefrigPresentInZone(RefrigCase(CaseNum).ActualZoneNum) = true;
             }
 
-            RefrigCase(CaseNum).ZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, RefrigCase(CaseNum).ZoneName);
+            RefrigCase(CaseNum).ZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, RefrigCase(CaseNum).ActualZoneNum);
 
             RefrigCase(CaseNum).RatedAmbientTemp = Numbers(1);
             if (Numbers(1) <= 0.0) {
@@ -1113,7 +1113,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (RefrigCase(CaseNum).RAFrac > 0.0) {
                 std::string callDescription = CurrentModuleObject + "=" + RefrigCase(CaseNum).Name;
                 RefrigCase(CaseNum).ZoneRANode =
-                    DataZoneEquipment::GetReturnAirNodeForZone(state, RefrigCase(CaseNum).ZoneName, retNodeName, callDescription);
+                    DataZoneEquipment::GetReturnAirNodeForZone(state, RefrigCase(CaseNum).ActualZoneNum, retNodeName, callDescription);
             }
 
             if (RefrigCase(CaseNum).ActualZoneNum >= 0) {
@@ -1594,7 +1594,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 } else {
                     state.dataRefrigCase->RefrigPresentInZone(WalkIn(WalkInID).ZoneNum(ZoneID)) = true;
                 }
-                WalkIn(WalkInID).ZoneNodeNum(ZoneID) = DataZoneEquipment::GetSystemNodeNumberForZone(state, WalkIn(WalkInID).ZoneName(ZoneID));
+                WalkIn(WalkInID).ZoneNodeNum(ZoneID) = DataZoneEquipment::GetSystemNodeNumberForZone(state, WalkIn(WalkInID).ZoneNum(ZoneID));
                 if (WalkIn(WalkInID).ZoneNum(ZoneID) >= 0) {
                     if (WalkIn(WalkInID).ZoneNodeNum(ZoneID) == 0) {
                         ShowSevereError(state,
@@ -2413,7 +2413,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                     cAlphaFieldNames(AlphaNum) + " not valid: " + Alphas(AlphaNum));
                 ErrorsFound = true;
             }
-            AirChillerSet(SetID).ZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, AirChillerSet(SetID).ZoneName);
+            AirChillerSet(SetID).ZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, AirChillerSet(SetID).ZoneNum);
             if (AirChillerSet(SetID).ZoneNodeNum == 0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AirChillerSet(SetID).Name +
@@ -2973,7 +2973,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     } else { // alpha (15) not blank
                         RefrigRack(RackNum).HeatRejectionZoneNum = UtilityRoutines::FindItemInList(Alphas(15), state.dataHeatBal->Zone);
-                        RefrigRack(RackNum).HeatRejectionZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(15));
+                        RefrigRack(RackNum).HeatRejectionZoneNodeNum =
+                            DataZoneEquipment::GetSystemNodeNumberForZone(state, RefrigRack(RackNum).HeatRejectionZoneNum);
                         if (RefrigRack(RackNum).HeatRejectionZoneNum == 0) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
@@ -3122,7 +3123,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     // need to clearly id node number for air inlet conditions and zone number for casecredit assignment
                     if (Condenser(CondNum).InletAirZoneNum != 0) {
                         // set condenser flag (later used to set system flag) and zone flag
-                        Condenser(CondNum).InletAirNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(4));
+                        Condenser(CondNum).InletAirNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Condenser(CondNum).InletAirZoneNum);
                         Condenser(CondNum).CondenserRejectHeatToZone = true;
                         state.dataRefrigCase->RefrigPresentInZone(Condenser(CondNum).InletAirZoneNum) = true;
                     } else { // not in a conditioned zone, so see if it's outside
@@ -3810,7 +3811,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     // need to clearly id node number for air inlet conditions and zone number for casecredit assignment
                     if (GasCooler(GCNum).InletAirZoneNum != 0) {
                         // set condenser flag (later used to set system flag) and zone flag
-                        GasCooler(GCNum).InletAirNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(4));
+                        GasCooler(GCNum).InletAirNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, GasCooler(GCNum).InletAirZoneNum);
                         GasCooler(GCNum).GasCoolerRejectHeatToZone = true;
                         state.dataRefrigCase->RefrigPresentInZone(GasCooler(GCNum).InletAirZoneNum) = true;
                     } else { // not in a conditioned zone, so see if it's outside
@@ -4313,7 +4314,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (!lNumericBlanks(NumNum) && !lAlphaBlanks(AlphaNum)) {
                     Secondary(SecondaryNum).SumUADistPiping = Numbers(NumNum);
                     Secondary(SecondaryNum).DistPipeZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
-                    Secondary(SecondaryNum).DistPipeZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
+                    Secondary(SecondaryNum).DistPipeZoneNodeNum =
+                        DataZoneEquipment::GetSystemNodeNumberForZone(state, Secondary(SecondaryNum).DistPipeZoneNum);
 
                     if (Secondary(SecondaryNum).DistPipeZoneNum == 0) {
                         ShowSevereError(state,
@@ -4359,7 +4361,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (!lNumericBlanks(NumNum) && !lAlphaBlanks(AlphaNum)) {
                     Secondary(SecondaryNum).SumUAReceiver = Numbers(NumNum);
                     Secondary(SecondaryNum).ReceiverZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
-                    Secondary(SecondaryNum).ReceiverZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
+                    Secondary(SecondaryNum).ReceiverZoneNodeNum =
+                        DataZoneEquipment::GetSystemNodeNumberForZone(state, Secondary(SecondaryNum).ReceiverZoneNum);
 
                     if (Secondary(SecondaryNum).ReceiverZoneNum == 0) {
                         ShowSevereError(state,
@@ -5319,7 +5322,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (!lNumericBlanks(2) && !lAlphaBlanks(AlphaNum)) {
                 System(RefrigSysNum).SumUASuctionPiping = Numbers(2);
                 System(RefrigSysNum).SuctionPipeActualZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
-                System(RefrigSysNum).SuctionPipeZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
+                System(RefrigSysNum).SuctionPipeZoneNodeNum =
+                    DataZoneEquipment::GetSystemNodeNumberForZone(state, System(RefrigSysNum).SuctionPipeActualZoneNum);
                 if (System(RefrigSysNum).SuctionPipeZoneNodeNum == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
@@ -6193,7 +6197,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 TransSystem(TransRefrigSysNum).SumUASuctionPipingMT = Numbers(3);
                 TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumMT =
                     UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
-                TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
+                TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT =
+                    DataZoneEquipment::GetSystemNodeNumberForZone(state, TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumMT);
                 if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
@@ -6226,7 +6231,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 TransSystem(TransRefrigSysNum).SumUASuctionPipingLT = Numbers(4);
                 TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumLT =
                     UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
-                TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
+                TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT =
+                    DataZoneEquipment::GetSystemNodeNumberForZone(state, TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumLT);
                 if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +

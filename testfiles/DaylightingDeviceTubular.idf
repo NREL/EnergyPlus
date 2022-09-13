@@ -803,7 +803,7 @@
 
   Lights,
     Daylit Zone Lights 1,    !- Name
-    Daylit Zone,             !- Zone or ZoneList Name
+    Daylit Zone,             !- Zone or ZoneList or Space or SpaceList Name
     AlwaysOnSchedule,        !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     800,                     !- Lighting Level {W}
@@ -817,7 +817,7 @@
 
   Lights,
     Standard Zone Lights 1,  !- Name
-    Standard Zone,           !- Zone or ZoneList Name
+    Standard Zone,           !- Zone or ZoneList or Space or SpaceList Name
     AlwaysOnSchedule,        !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     800,                     !- Lighting Level {W}
@@ -913,7 +913,7 @@
 
   Daylighting:Controls,
     Daylit Zone_DaylCtrl,    !- Name
-    Daylit Zone,             !- Zone Name
+    Daylit Zone,             !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     Continuous,              !- Lighting Control Type
@@ -926,22 +926,22 @@
     20.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     Daylit Zone_DaylRefPt1,  !- Daylighting Reference Point 1 Name
-    1.0,                     !- Fraction of Zone Controlled by Reference Point 1
+    1.0,                     !- Fraction of Lights Controlled by Reference Point 1
     550,                     !- Illuminance Setpoint at Reference Point 1 {lux}
     Daylit Zone_DaylRefPt2,  !- Daylighting Reference Point 2 Name
-    0.0,                     !- Fraction of Zone Controlled by Reference Point 2
+    0.0,                     !- Fraction of Lights Controlled by Reference Point 2
     0;                       !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:ReferencePoint,
     Daylit Zone_DaylRefPt1,  !- Name
-    Daylit Zone,             !- Zone Name
+    Daylit Zone,             !- Zone or Space Name
     2.5,                     !- X-Coordinate of Reference Point {m}
     5.0,                     !- Y-Coordinate of Reference Point {m}
     0.8;                     !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     Daylit Zone_DaylRefPt2,  !- Name
-    Daylit Zone,             !- Zone Name
+    Daylit Zone,             !- Zone or Space Name
     2.5,                     !- X-Coordinate of Reference Point {m}
     3.0,                     !- Y-Coordinate of Reference Point {m}
     0.8;                     !- Z-Coordinate of Reference Point {m}

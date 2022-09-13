@@ -4,7 +4,7 @@
 
 \subsubsection{Overview}\label{overview-000}
 
-In order for EnergyPlus to successfully calculate zone design heating and cooling loads and air flow rates and for the program to use these results to automatically size the HVAC components a number of input objects must be present and certain object input fields must be entered.
+In order for EnergyPlus to successfully calculate zone design sensible/latent heating and cooling loads and air flow rates and for the program to use these results to automatically size the HVAC components a number of input objects must be present and certain object input fields must be entered.
 
 \begin{itemize}
 \item
@@ -16,7 +16,7 @@ In order for EnergyPlus to successfully calculate zone design heating and coolin
 \item
   For each controlled zone in the input file there should be a corresponding \hyperref[sizingzone]{Sizing:Zone} object. Similarly for each \hyperref[airloophvac]{AirLoopHVAC} there should be a \hyperref[sizingsystem]{Sizing:System} object. And for each Plant or Condenser Loop there should be a \hyperref[sizingplant]{Sizing:Plant} object. Note however that if a controlled zone has no corresponding Zone Sizing object the data from the first Zone Sizing object will be used. Thus if all the zone sizing information is the same only one Zone Sizing object need be entered.
 \item
-  Only controlled zones are included in the zone and system sizing calculations. Thus for a design air flow rate to be calculated for a zone, it must contain a thermostat \emph{even though it might not need or have a thermostat in the full simulation}. An illustration would be a three zone building with a packaged single zone system and a thermostat in one of the zones. In order for the two slave zones to be included in the design air flow calculations they must be treated as if they have a thermostat: there must be a \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} for each of the slave zones.
+  Only controlled zones are included in the zone and system sizing calculations. Thus for a design air flow rate to be calculated for a zone, it must contain a thermostat \emph{even though it might not need or have a thermostat in the full simulation}. An illustration would be a three zone building with a packaged single zone system and a thermostat in one of the zones. In order for the two slave zones to be included in the design air flow calculations they must be treated as if they have a thermostat: there must be a \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} for each of the slave zones. When sizing latent loads, a humidistat is not required for sizing calculations, however, a humidistat is required to control zone moisture levels.
 \item
   Some attention should be paid to schedules. In a weekly schedule object the 9\(^{th}\) and 10\(^{th}\) day schedules are for summer and winter design days respectively. This means that if a SizingPeriod object has field \emph{Day Type} set to \emph{SummerDesignDay} ~the day schedule for summer sizing periods will be in effect. Similarly if a SizingPeriod object has field \emph{Day Type} set to \emph{WinterDesignDay} ~the day schedule for winter sizing periods will be in effect. Some possible applications of this capability are:
 \end{itemize}
@@ -109,6 +109,7 @@ AirLoopHVAC:UnitarySystem \tabularnewline
  & Cooling Supply Air Flow Rate \tabularnewline
  & Heating Supply Air Flow Rate \tabularnewline
  & No Load Supply Air Flow Rate \tabularnewline
+ & Minimum Supply Air Temperature \tabularnewline
  & Maximum Supply Air Temperature \tabularnewline
 AirTerminal:DualDuct:ConstantVolume \tabularnewline
  & Maximum Air Flow Rate \tabularnewline
@@ -1106,6 +1107,8 @@ The user can also place limits on the heating and design cooling air flow rates.
 
 The user can ask the zone design calculation to take into account the effect of a Dedicated Outdoor Air System on the zone design loads and airflow rates. The design calculation will calculate the heat addition rate to the zone of an idealized SOA system and add or subtract the result from the total zone loads and flow rates.
 
+Latent zone loads can also be calulated when specifying a \hyperref[field-zone-load-sizing-method]{Zone Load Sizing Method} other than Sensible Load Only No Latent Load. The design latent cooling and heating air flow will be calculated using the specified supply air humidity ratio and saved for further processing. Depending on the user choice for \emph{Zone Load Sizing Method},  the sensible, latent or largest load will determine the air flow rate used for the simulation. Care should be used to select appropriate values for \emph{Zone Cooling Design Supply Air Temperature}, \emph{Zone Heating Design Supply Air Temperature}, \emph{Zone Dehumidification Design Supply Air Humidity Ratio} and \emph{Zone Humidification Design Supply Air Humidity Ratio} as these values determine the zone sensible and latent mass flow rates. The larger the temperature difference, the smaller the air flow. Similarly, the larger the humidity ratio difference, the smaller the air flow. Coordinating these inputs will provide accurate results for air mass flow rate and which loads (i.e., sensible or latent) are largest.
+
 \subsubsection{Inputs}\label{inputs-4-008}
 
 \paragraph{Field: Zone Name}\label{field-zone-name-004}
@@ -1227,6 +1230,63 @@ The lower setpoint temperature to be used with the DOAS design control strategy.
 
 The higher setpoint temperature to be used with the DOAS design control strategy. The units are degrees C. The default is autosized to the values given above for the three design control strategies.
 
+\paragraph{Field: Zone Load Sizing Method}\label{field-zone-load-sizing-method}
+
+Specifies the basis for sizing the zone supply air flow rate. Valid choices are Sensible Load, Latent Load, Sensible And Latent Load and Sensible Load Only No Latent Load. 
+Zone latent loads will not be used during sizing only when Zone Load Sizing Method = Sensible Load Only No Latent Load (default). For this case the zone humidity level 
+will float according to the fields Cooling and Heating Design Supply Air Humidity Ratio. For all other choices the zone humidity level will be controlled. Sensible Load will 
+use zone sensible air flow rate for zone component sizing. Latent loads will also be reported during sizing. Latent Load will use zone latent air flow rate for zone component 
+sizing. Sensible loads will also be reported during sizing. Sensible and Latent Load will use the larger of sensible and latent air flow rate for zone component sizing. Sensible 
+Load Only No Latent Load or leaving this field blank will disable zone latent sizing and reporting. Latent loads will not be reported during sizing (reported as 0's).
+
+\paragraph{Field: Zone Latent Cooling Design Supply Air Humidity Ratio Input Method}\label{field-zone-latent-cooling-design-supply-air-humidity-ratio-input-method}
+
+Specifies the method for supply air humidity ratio used for latent sizing. Valid choices are SupplyAirHumidityRatio and HumidityRatioDifference (default). Use 
+SupplyAirHumidityRatio to enter the humidity ratio when zone dehumidification is required. The supply air humidity ratio should be less than the zone humidity 
+ratio at the zone thermostat and humidistat set point condition. Use HumidityRatioDifference to enter the difference in humidity ratio from the zone thermostat and 
+humidistat set point condition.
+
+\paragraph{Field: Zone Dehumidification Design Supply Air Humidity Ratio}\label{field-zone-dehumidification-design-supply-air-humidity-ratio}
+
+Zone Dehumidification Design Supply Air Humidity Ratio (kgWater/kgDryAir) is only used when Zone Latent Cooling Design Supply Air Humidity Ratio Input Method = 
+SupplyAirHumidityRatio. This input must be less than the zone humidity ratio at the humidistat set point so that dehumidification can occur.
+
+\paragraph{Field: Zone Cooling Design Supply Air Humidity Ratio Difference}\label{field-zone-cooling-design-supply-air-humidity-ratio-difference}
+
+Zone Dehumidification Design Supply Air Humidity Ratio Difference (kgWater/kgDryAir) is only used when Zone Latent Cooling Design Supply Air Humidity Ratio Input 
+Method = HumidityRatioDifference. This input is a positive value and defines the difference between the zone humidity ratio at the thermostat and humidistat set point 
+condition and the supply air humidity ratio entering the zone. 
+
+\paragraph{Field: Zone Latent Heating Design Supply Air Humidity Ratio Input Method}\label{field-zone-latent-heating-design-supply-air-humidity-ratio-input-method}
+
+Specifies the method for supply air humidity ratio used for latent sizing. Valid choices are SupplyAirHumidityRatio and HumidityRatioDifference (default). Use 
+SupplyAirHumidityRatio to enter the humidity ratio when zone humidification is required. The supply air humidity ratio should be greater than the zone humidity 
+ratio at the zone thermostat and humidistat set point condition. Use HumidityRatioDifference to enter the difference in humidity ratio from the zone thermostat and 
+humidistat set point condition.
+
+\paragraph{Field: Zone Humidification Design Supply Air Humidity Ratio}\label{field-zone-humidification-design-supply-air-humidity-ratio}
+
+Zone Humidification Design Supply Air Humidity Ratio (kgWater/kgDryAir) is only used when Zone Latent Heating Design Supply Air Humidity Ratio Input Method = 
+SupplyAirHumidityRatio. This input must be greater than the zone humidity ratio at the humidistat set point so that humidification can occur.
+
+\paragraph{Field: Zone Heating Design Supply Air Humidity Ratio Difference}\label{field-zone-heating-design-supply-air-humidity-ratio-difference}
+
+Zone Humidification Design Supply Air Humidity Ratio Difference (kgWater/kgDryAir) is only used when Zone Latent Heating Design Supply Air Humidity Ratio Input 
+Method = HumidityRatioDifference. This input is a positive value and defines the difference between the zone humidity ratio at the thermostat and humidistat set point 
+condition and the supply air humidity ratio entering the zone. 
+
+\paragraph{Field: Zone Humidistat Dehumidification Set Point Schedule Name}\label{field-zone-humidistat-dehumidification-set-point-schedule-name}
+
+Enter the zone relative humidity schedule used for zone latent cooling calculations. A zone humidistat will take priority over this input. This field is not used if Zone Load 
+Sizing Method = Sensible Load Only No Latent Load or a zone humidistat is present. A default of 50.0 will be used if no schedule is provided and no humidistat is 
+associated with this zone.
+
+\paragraph{Field: Zone Humidistat Humidification Set Point Schedule Name}\label{field-zone-humidistat-humidification-set-point-schedule-name}
+
+Enter the zone relative humidity schedule used for zone latent heating calculations. A zone humidistat will take priority over this input. This field is not used if Zone Load 
+Sizing Method = Sensible Load Only No Latent Load or a zone humidistat is present. A default of 50.0 will be used if no schedule is provided and no humidistat is 
+associated with this zone.
+
 An IDF example:
 
 \begin{lstlisting}
@@ -1254,7 +1314,16 @@ Sizing:Zone,
       Yes,                     !- Account for Dedicated Outside Air System
       ColdSupplyAir,           !- Dedicated Outside Air System Control Strategy
       12.2,                    !- Dedicated Outside Air Low Setpoint for Design
-      14.4;                    !- Dedicated Outside Air High Setpoint for Design
+      14.4,                    !- Dedicated Outside Air High Setpoint for Design
+      Sensible And Latent Load, !- Zone Load Sizing Method
+      HumidityRatioDifference, !- Zone Latent Cooling Design Supply Air Humidity Ratio Input Method
+      ,                        !- Zone Dehumidification Design Supply Air Humidity Ratio
+      0.005,                   !- Zone Cooling Design Supply Air Humidity Ratio Difference
+      HumidityRatioDifference, !- Zone Latent Heating Design Supply Air Humidity Ratio Input Method
+      ,                        !- Zone Humidification Design Supply Air Humidity Ratio
+      0.005,                   !- Zone Heating Design Supply Air Humidity Ratio Difference
+      ,                        !- Zone Humidistat Dehumidification Set Point Schedule Name
+      ;                        !- Zone Humidistat Humidification Set Point Schedule Name
 
   DesignSpecification:OutdoorAir,
   DSOA1,                   !- Name
@@ -1610,7 +1679,7 @@ The name of the \hyperref[airloophvac]{AirLoopHVAC} corresponding to this Sizing
 
 \paragraph{Field: Type of Load to Size On}\label{field-type-of-load-to-size-on}
 
-The user specified type of load on which to size the central system. The choices are \emph{Sensible}, \emph{Total} and \emph{VentilationRequirement}. \emph{Sensible} and \emph{Total} mean that the central system supply air flow rate will be determined by combining the zone design air flow rates, which have been calculated to meet the zone sensible loads from the design days. \emph{VentilationRequirement} means that the central system supply air flow rate will be determined by the system ventilation requirement. In addition \emph{Sensible} tells the program to size the central cooling coil using entering air flow rate and air conditions at the sensible load peak; \emph{Total} indicates that the program should size the central cooling coil at the air flow rate and conditions at the total load peak. The central heating coil is always sized at the conditions at the peak sensible heating load.
+The user specified type of load on which to size the central system. The choices are \emph{Sensible}, \emph{Latent}, \emph{Total} and \emph{VentilationRequirement}. \emph{Sensible}, \emph{Latent} and \emph{Total} mean that the central system supply air flow rate will be determined by combining the zone design air flow rates, which have been calculated to meet the zone sensible and latent loads from the design days. Latent sizing requires the the zones connected to this air system be sized for latent loads, otherwise sizing will use sensible loads. Additionally, if zone latent sizing is performed and zone latent loads do not exceed zone sensible loads, sizing will use sensible loads. If any zone latent load exceeds a zone's sensible load, latent sizing will be performed. \emph{VentilationRequirement} means that the central system supply air flow rate will be determined by the system ventilation requirement. In addition \emph{Sensible} tells the program to size the central cooling coil using entering air flow rate and air conditions at the sensible load peak; \emph{Total} indicates that the program should size the central cooling coil at the air flow rate and conditions at the total load peak. The central heating coil is always sized at the conditions at the peak sensible heating load.
 
 \paragraph{Field: Design Outdoor Air Flow Rate}\label{field-design-outdoor-air-flow-rate}
 

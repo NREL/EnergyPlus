@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -133,6 +134,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
         state->dataDXCoils->DXCoil(DXCoilNum).MSMaxONOFFCyclesperHour.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
         state->dataDXCoils->DXCoil(DXCoilNum).MSLatentCapacityTimeConstant.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
         state->dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+        state->dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate_2023.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
     }
 
     state->dataDXCoils->DXCoil(1).MSRatedTotCap(1) = 4455.507579219055;
@@ -157,6 +159,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(1) = 0.2339;
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate(2) = 0.2924;
     state->dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate = 0.0;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate_2023 = 0.0;
     state->dataDXCoils->DXCoil(DXCoilNum).RegionNum = 4;
     state->dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor = -17.78;
 
@@ -803,6 +806,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.RatedAirMassFlowRate(1) =
         Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 21.11, 0.00881, "InitDXCoil");
     Coil.FanPowerPerEvapAirFlowRate(1) = 773.3;
+    Coil.FanPowerPerEvapAirFlowRate_2023(1) = 934.3;
     Coil.MinOATCompressor = -73.27777777777779;
     Coil.CrankcaseHeaterCapacity = 0.0;
     Coil.MaxOATDefrost = 0.0;
@@ -1043,7 +1047,8 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
         "	0.75,                 !- Gross Rated Sensible Heat Ratio",
         "	4.40,                 !- Gross Rated Cooling COP { W / W }",
         "	1.30,                 !- Rated Air Flow Rate { m3 / s }",
-        "	,                     !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "	,                     !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   ,                     !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "	DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
         "	Heating Coil Air Inlet Node,    !- Air Outlet Node Name",
         "	WindACCoolCapFT,      !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -1170,7 +1175,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
         "  0.75, !- Speed 1 Gross Rated Sensible Heat Ratio",
         "  3.0, !- Speed 1 Gross Rated Cooling COP{ W / W }",
         "  0.40, !- Speed 1 Rated Air Flow Rate{ m3 / s }",
-        "  453.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        "  453.3, !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  453.3, !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "  HPACCoolCapFT Speed, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
         "  HPACCoolCapFF Speed, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name",
         "  HPACCOOLEIRFT Speed, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
@@ -1189,7 +1195,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
         "  0.75, !- Speed 2 Gross Rated Sensible Heat Ratio",
         "  3.0, !- Speed 2 Gross Rated Cooling COP{ W / W }",
         "  0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }",
-        "  523.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        "  523.3, !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  523.3, !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "  HPACCoolCapFT Speed, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
         "  HPACCoolCapFF Speed, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name",
         "  HPACCOOLEIRFT Speed, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
@@ -1208,7 +1215,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
         "  0.75, !- Speed 3 Gross Rated Sensible Heat Ratio",
         "  3.0, !- Speed 3 Gross Rated Cooling COP{ W / W }",
         "  1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }",
-        "  573.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        "  573.3, !- 2017 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  573.3, !- 2023 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "  HPACCoolCapFT Speed, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
         "  HPACCoolCapFF Speed, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name",
         "  HPACCOOLEIRFT Speed, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
@@ -1227,7 +1235,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
         "  0.75, !- Speed 4 Gross Rated Sensible Heat Ratio",
         "  3.0, !- Speed 4 Gross Rated Cooling COP{ W / W }",
         "  1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }",
-        "  673.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        "  673.3, !- 2017 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  673.3, !- 2023 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "  HPACCoolCapFT Speed, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
         "  HPACCoolCapFF Speed, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name",
         "  HPACCOOLEIRFT Speed, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
@@ -1427,7 +1436,8 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
         "	autosize,             !- Gross Rated Sensible Heat Ratio",
         "	4.40,                 !- Gross Rated Cooling COP { W / W }",
         "	1.30,                 !- Rated Air Flow Rate { m3 / s }",
-        "	,                     !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "	,                     !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   ,                     !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "	DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
         "	Heating Coil Air Inlet Node,    !- Air Outlet Node Name",
         "	WindACCoolCapFT,      !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -1565,7 +1575,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
         "  0.75, !- Speed 1 Gross Rated Sensible Heat Ratio",
         "  3.0, !- Speed 1 Gross Rated Cooling COP{ W / W }",
         "  0.40, !- Speed 1 Rated Air Flow Rate{ m3 / s }",
-        "  453.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        "  453.3, !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  453.3, !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "  HPACCoolCapFT Speed, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
         "  HPACCoolCapFF Speed, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name",
         "  HPACCOOLEIRFT Speed, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
@@ -1584,7 +1595,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
         "  0.75, !- Speed 2 Gross Rated Sensible Heat Ratio",
         "  3.0, !- Speed 2 Gross Rated Cooling COP{ W / W }",
         "  0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }",
-        "  523.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        "  523.3, !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  523.3, !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "  HPACCoolCapFT Speed, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
         "  HPACCoolCapFF Speed, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name",
         "  HPACCOOLEIRFT Speed, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
@@ -1603,7 +1615,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
         "  0.75, !- Speed 3 Gross Rated Sensible Heat Ratio",
         "  3.0, !- Speed 3 Gross Rated Cooling COP{ W / W }",
         "  1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }",
-        "  573.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        "  573.3, !- 2017 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  573.3, !- 2023 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "  HPACCoolCapFT Speed, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
         "  HPACCoolCapFF Speed, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name",
         "  HPACCOOLEIRFT Speed, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
@@ -1622,7 +1635,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
         "  0.75, !- Speed 4 Gross Rated Sensible Heat Ratio",
         "  3.0, !- Speed 4 Gross Rated Cooling COP{ W / W }",
         "  1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }",
-        "  673.3, !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        "  673.3, !- 2017 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  673.3, !- 2023 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "  HPACCoolCapFT Speed, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
         "  HPACCoolCapFF Speed, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name",
         "  HPACCOOLEIRFT Speed, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
@@ -1761,7 +1775,8 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
         "	autosize,                !- Gross Rated Heating Capacity {W}",
         "	3.03,                    !- Gross Rated Heating COP {W/W}",
         "	autosize,                !- Rated Air Flow Rate {m3/s}",
-        "	773.3,                   !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "	773.3,                   !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.3,                   !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "	CoilSystem_Cooling_DX 1 DX Cooling Coil System Outlet Node Name,  !- Air Inlet Node Name",
         "	CoilSystem_Heating_DX 1 Air Outlet,  !- Air Outlet Node Name",
         "	Biquadratic,             !- Heating Capacity Function of Temperature Curve Name",
@@ -1933,7 +1948,8 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
         "    Autosize,                !- Gross Rated Heating Capacity {W}",
         "    3.75,                    !- Gross Rated Heating COP {W/W}",
         "    Autosize,                !- Rated Air Flow Rate {m3/s}",
-        "    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name",
         "    SPACE1-1 Heating Coil Outlet,  !- Air Outlet Node Name",
         "    HPACHeatCapFT,           !- Heating Capacity Function of Temperature Curve Name",
@@ -2220,7 +2236,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     // Fake having a parent coil setting the size
     // UnitarySysEqSizing(DXCoilNum).CoolingCapacity = true;
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
     // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
@@ -2387,7 +2403,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
         "  0.75,                 !- Gross Rated Sensible Heat Ratio",
         "  4.40,                 !- Gross Rated Cooling COP { W / W }",
         "  1.30,                 !- Rated Air Flow Rate { m3 / s }",
-        "  ,                     !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "  ,                     !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  ,                     !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
         "  Heating Coil Air Inlet Node,    !- Air Outlet Node Name",
         "  WindACCoolCapFT,      !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -2445,7 +2462,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     state->dataSize->OASysEqSizing.allocate(1);
 
     // Get into a block so that it sets the RatedTotCap
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
     // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
@@ -2550,7 +2567,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
         "   0.714668466400895,                      !- Speed Gross Rated Sensible Heat Ratio 1",
         "   4.77462180051141,                       !- Speed Gross Rated Cooling COP 1 {W/W}",
         "   0.558646076305085,                      !- Speed Rated Air Flow Rate 1 {m3/s}",
-        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 1 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.4,                                  !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "   Cool-Cap-fT1,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 1",
         "   Cool-Cap-fFF1,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 1",
         "   Cool-EIR-fT1,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
@@ -2570,7 +2588,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
         "   0.727729571918817,                      !- Speed Gross Rated Sensible Heat Ratio 2",
         "   4.41853147094111,                       !- Speed Gross Rated Cooling COP 2 {W/W}",
         "   0.649588460819866,                      !- Speed Rated Air Flow Rate 2 {m3/s}",
-        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 2 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.4,                                  !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "   Cool-Cap-fT2,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 2",
         "   Cool-Cap-fFF2,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 2",
         "   Cool-EIR-fT2,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
@@ -2734,7 +2753,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
         "   10128.5361851424,                       !- Speed Gross Rated Heating Capacity 1 {W}",
         "   4.4518131589158,                        !- Speed Gross Rated Heating COP 1 {W/W}",
         "   0.531903646383625,                      !- Speed Rated Air Flow Rate 1 {m3/s}",
-        "   773.3,                                  !- Speed Rated Supply Air Fan Power Per Volume Flow Rate 1 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.3,                                  !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}", //??
         "   HP_Heat-Cap-fT1,                        !- Speed Heating Capacity Function of Temperature Curve Name 1",
         "   HP_Heat-CAP-fFF1,                       !- Speed Heating Capacity Function of Flow Fraction Curve Name 1",
         "   HP_Heat-EIR-fT1,                        !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
@@ -2745,7 +2765,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
         "   14067.4113682534,                       !- Speed Gross Rated Heating Capacity 2 {W}",
         "   3.9871749697327,                        !- Speed Gross Rated Heating COP 2 {W/W}",
         "   0.664879557979531,                      !- Speed Rated Air Flow Rate 2 {m3/s}",
-        "   773.3,                                  !- Speed Rated Supply Air Fan Power Per Volume Flow Rate 2 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.3,                                  !- 2023 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "   HP_Heat-Cap-fT2,                        !- Speed Heating Capacity Function of Temperature Curve Name 2",
         "   HP_Heat-CAP-fFF2,                       !- Speed Heating Capacity Function of Flow Fraction Curve Name 2",
         "   HP_Heat-EIR-fT2,                        !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
@@ -2945,7 +2966,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
         "   0.714668466400895,                      !- Speed Gross Rated Sensible Heat Ratio 1",
         "   4.77462180051141,                       !- Speed Gross Rated Cooling COP 1 {W/W}",
         "   0.558646076305085,                      !- Speed Rated Air Flow Rate 1 {m3/s}",
-        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 1 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.4,                                  !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "   Cool-Cap-fT1,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 1",
         "   Cool-Cap-fFF1,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 1",
         "   Cool-EIR-fT1,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
@@ -2965,7 +2987,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
         "   0.727729571918817,                      !- Speed Gross Rated Sensible Heat Ratio 2",
         "   4.41853147094111,                       !- Speed Gross Rated Cooling COP 2 {W/W}",
         "   0.649588460819866,                      !- Speed Rated Air Flow Rate 2 {m3/s}",
-        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 2 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate 2 {W/(m3/s)}",
+        "   934.4,                                  !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate 2 {W/(m3/s)}", //??TBD:BPS
         "   Cool-Cap-fT2,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 2",
         "   Cool-Cap-fFF2,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 2",
         "   Cool-EIR-fT2,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
@@ -3179,7 +3202,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
         "   AutoSize,                               !- Speed Gross Rated Sensible Heat Ratio 1",
         "   4.80,                                   !- Speed Gross Rated Cooling COP 1 {W/W}",
         "   AutoSize,                               !- Speed Rated Air Flow Rate 1 {m3/s}",
-        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 1 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.4,                                  !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "   Cool-Cap-fT1,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 1",
         "   Cool-Cap-fFF1,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 1",
         "   Cool-EIR-fT1,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
@@ -3199,7 +3223,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
         "   AutoSize,                               !- Speed Gross Rated Sensible Heat Ratio 2",
         "   4.80,                                   !- Speed Gross Rated Cooling COP 2 {W/W}",
         "   AutoSize,                               !- Speed Rated Air Flow Rate 2 {m3/s}",
-        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 2 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.4,                                  !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "   Cool-Cap-fT2,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 2",
         "   Cool-Cap-fFF2,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 2",
         "   Cool-EIR-fT2,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
@@ -3363,7 +3388,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
         "   AutoSize,                               !- Speed Gross Rated Heating Capacity 1 {W}",
         "   4.60,                                   !- Speed Gross Rated Heating COP 1 {W/W}",
         "   AutoSize,                               !- Speed Rated Air Flow Rate 1 {m3/s}",
-        "   773.3,                                  !- Speed Rated Supply Air Fan Power Per Volume Flow Rate 1 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.3,                                  !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}", //??
         "   HP_Heat-Cap-fT1,                        !- Speed Heating Capacity Function of Temperature Curve Name 1",
         "   HP_Heat-CAP-fFF1,                       !- Speed Heating Capacity Function of Flow Fraction Curve Name 1",
         "   HP_Heat-EIR-fT1,                        !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
@@ -3374,7 +3400,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
         "   AutoSize,                               !- Speed Gross Rated Heating Capacity 2 {W}",
         "   4.40,                                   !- Speed Gross Rated Heating COP 2 {W/W}",
         "   AutoSize,                               !- Speed Rated Air Flow Rate 2 {m3/s}",
-        "   773.3,                                  !- Speed Rated Supply Air Fan Power Per Volume Flow Rate 2 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.3,                                  !- 2023 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}", //??
         "   HP_Heat-Cap-fT2,                        !- Speed Heating Capacity Function of Temperature Curve Name 2",
         "   HP_Heat-CAP-fFF2,                       !- Speed Heating Capacity Function of Flow Fraction Curve Name 2",
         "   HP_Heat-EIR-fT2,                        !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
@@ -3610,7 +3637,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
         "   AutoSize,                               !- Speed Gross Rated Sensible Heat Ratio 1",
         "   4.80,                                   !- Speed Gross Rated Cooling COP 1 {W/W}",
         "   AutoSize,                               !- Speed Rated Air Flow Rate 1 {m3/s}",
-        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 1 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.4,                                  !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "   Cool-Cap-fT1,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 1",
         "   Cool-Cap-fFF1,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 1",
         "   Cool-EIR-fT1,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
@@ -3630,7 +3658,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
         "   AutoSize,                               !- Speed Gross Rated Sensible Heat Ratio 2",
         "   4.80,                                   !- Speed Gross Rated Cooling COP 2 {W/W}",
         "   AutoSize,                               !- Speed Rated Air Flow Rate 2 {m3/s}",
-        "   773.3,                                  !- Speed Rated Evaporator Fan Power Per Volume Flow Rate 2 {W/(m3/s)}",
+        "   773.3,                                  !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.4,                                  !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
         "   Cool-Cap-fT2,                           !- Speed Total Cooling Capacity Function of Temperature Curve Name 2",
         "   Cool-Cap-fFF2,                          !- Speed Total Cooling Capacity Function of Flow Fraction Curve Name 2",
         "   Cool-EIR-fT2,                           !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
@@ -4328,6 +4357,136 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
+}
+
+TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "    OnOff,                   !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    1,                       !- Upper Limit Value",
+        "    Discrete,                !- Numeric Type",
+        "    availability;            !- Unit Type",
+
+        "Schedule:Constant,",
+        "    Always On Discrete,      !- Name",
+        "    OnOff,                   !- Schedule Type Limits Name",
+        "    1;                       !- Hourly Value",
+
+        "Fan:VariableVolume,",
+        "    Fan Variable Volume,     !- Name",
+        "    Always On Discrete,      !- Availability Schedule Name",
+        "    0.60,                    !- Fan Total Efficiency",
+        "    500,                     !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    0,                       !- Fan Power Minimum Flow Fraction",
+        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.90,                    !- Motor Efficiency",
+        "    1,                       !- Motor In Airstream Fraction",
+        "    0.040759894,             !- Fan Power Coefficient 1",
+        "    0.08804497,              !- Fan Power Coefficient 2",
+        "    -0.07292612,             !- Fan Power Coefficient 3",
+        "    0.943739823,             !- Fan Power Coefficient 4",
+        "    0,                       !- Fan Power Coefficient 5",
+        "    Node 11,                 !- Air Inlet Node Name",
+        "    Node 3;                  !- Air Outlet Node Name",
+
+        "Coil:Cooling:DX:TwoSpeed,",
+        "    CCooling DX Two Speed,   !- Name",
+        "    Always On Discrete,      !- Availability Schedule Name",
+        "    17580.0,                 !- High Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- High Speed Rated Sensible Heat Ratio",
+        "    3,                       !- High Speed Gross Rated Cooling COP {W/W}",
+        "    1.0,                     !- High Speed Rated Air Flow Rate {m3/s}",
+        "    400,                     !- Unit Internal Static Air Pressure {Pa}",
+        "    Node 9,                  !- Air Inlet Node Name",
+        "    Node 10,                 !- Air Outlet Node Name",
+        "    CoolCAPFT,               !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    CoolCAPFFF,              !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    CoolEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name",
+        "    CoolEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    CoolPLFFPLR,             !- Part Load Fraction Correlation Curve Name",
+        "    4300.0,                  !- Low Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.70,                    !- Low Speed Gross Rated Sensible Heat Ratio",
+        "    3,                       !- Low Speed Gross Rated Cooling COP {W/W}",
+        "    0.30,                    !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    LSCoolCAPFT,             !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
+        "    LSCoolEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
+        "    ,                        !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- High Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- High Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Low Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- Low Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Low Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    ,                        !- Condensate Collection Water Storage Tank Name",
+        "    0,                       !- Basin Heater Capacity {W/K}",
+        "    2;                       !- Basin Heater Setpoint Temperature {C}",
+
+        "Curve:Quadratic,CoolCAPFFF,0.77136,0.34053,-0.11088,0.75918,1.13877, 0.0, 2.0, Dimensionless, Dimensionless; ",
+        "Curve:Quadratic,CoolEIRFFF,1.2055,-0.32953,0.12308,0.75918,1.13877, 0.0, 2.0, Dimensionless, Dimensionless; ",
+        "Curve:Quadratic,CoolPLFFPLR,0.771,0.229, 0.0, 0.0, 1.0, 0.0, 1.0, Dimensionless, Dimensionless; ",
+        "Curve:Biquadratic,CoolCAPFT,0.42415,0.04426,-0.00042,0.00333,-8e-005,-0.00021,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,CoolEIRFT,1.23649,-0.02431,0.00057,-0.01434,0.00063,-0.00038,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,LSCoolCAPFT,0.42415,0.04426,-0.00042,0.00333,-8e-005,-0.00021,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,LSCoolEIRFT,1.23649,-0.02431,0.00057,-0.01434,0.00063,-0.00038,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    GetCurveInput(*state);
+    Fans::GetFanInput(*state);
+    GetDXCoils(*state);
+    int dXCoilIndex = UtilityRoutines::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
+    int fanIndex = UtilityRoutines::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
+    auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
+    auto &supplyFan = state->dataFans->Fan(fanIndex);
+    coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan.FanName;
+    coolcoilTwoSpeed.SupplyFan_TypeNum = supplyFan.FanType_Num;
+    state->dataGlobal->SysSizingCalc = true;
+    coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
+    coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
+    supplyFan.MaxAirMassFlowRate = supplyFan.MaxAirFlowRate * state->dataEnvrn->StdRhoAir;
+    supplyFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    auto &InletNode = state->dataLoopNodes->Node(supplyFan.InletNodeNum);
+    auto &OutletNode = state->dataLoopNodes->Node(supplyFan.OutletNodeNum);
+    InletNode.MassFlowRate = 1.0;
+    InletNode.MassFlowRateMax = 1.0;
+    InletNode.MassFlowRateMaxAvail = 1.0;
+    InletNode.MassFlowRateMinAvail = 0.0;
+    OutletNode.MassFlowRate = 1.0;
+    OutletNode.MassFlowRateMax = 1.0;
+    OutletNode.MassFlowRateMaxAvail = 1.0;
+    OutletNode.MassFlowRateMinAvail = 0.0;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    // test 1: using internal static and fan pressure rise
+    CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
+    EXPECT_EQ(coolcoilTwoSpeed.Name, "CCOOLING DX TWO SPEED");
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType, "Coil:Cooling:DX:TwoSpeed");
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType_Num, CoilDX_CoolingTwoSpeed);
+    EXPECT_EQ(coolcoilTwoSpeed.InternalStaticPressureDrop, 400.0);
+    EXPECT_TRUE(coolcoilTwoSpeed.RateWithInternalStaticAndFanObject);
+    EXPECT_EQ("8.77", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
+    EXPECT_EQ("11.25", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+    // test 2: using default fan power per evap air flow rate, 365 W/1000 scfm or 773.3 W/(m3/s)
+    coolcoilTwoSpeed.RateWithInternalStaticAndFanObject = false;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
+    EXPECT_EQ("8.72", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
+    EXPECT_EQ("10.15", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
 }
 
 } // namespace EnergyPlus

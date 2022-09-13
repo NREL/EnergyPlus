@@ -589,10 +589,12 @@ namespace HeatBalFiniteDiffManager {
 
         for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             // Need to skip window constructions, IRT, air wall and construction not in use.
+            // Need to also skip constructions for surfaces that do not use CondFD.
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
             if (state.dataConstruction->Construct(ConstrNum).TypeIsIRT) continue;
             if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
             if (!state.dataConstruction->Construct(ConstrNum).IsUsed) continue;
+            if (!findAnySurfacesUsingConstructionAndCondFD(state, ConstrNum)) continue;
 
             ConstructFD(ConstrNum).Name.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
             ConstructFD(ConstrNum).Thickness.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
@@ -1314,6 +1316,7 @@ namespace HeatBalFiniteDiffManager {
                 if (state.dataConstruction->Construct(ThisNum).TypeIsIRT) continue;
                 if (state.dataConstruction->Construct(ThisNum).TypeIsAirBoundary) continue;
                 if (!state.dataConstruction->Construct(ThisNum).IsUsed) continue;
+                if (!findAnySurfacesUsingConstructionAndCondFD(state, ThisNum)) continue;
 
                 static constexpr std::string_view Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
                 print(state.files.eio,
@@ -1573,6 +1576,13 @@ namespace HeatBalFiniteDiffManager {
             auto TDT_i(TDT(i));
             auto const TDT_p(TDT(i + 1));
 
+            Real64 Tgndsurface = 0.0;
+            if (state.dataSurface->Surface(Surf).UseSurfPropertyGndSurfTemp) {
+                Tgndsurface = state.dataSurface->GroundSurfsProperty(Surf).SurfsTempAvg;
+            } else {
+                Tgndsurface = state.dataMstBal->TempOutsideAirFD(Surf);
+            }
+
             // Boundary Conditions from Simulation for Exterior
             Real64 const hconvo(state.dataMstBal->HConvExtFD(Surf));
 
@@ -1580,7 +1590,7 @@ namespace HeatBalFiniteDiffManager {
             Real64 const hsky(state.dataMstBal->HSkyFD(Surf));
             Real64 const hgnd(state.dataMstBal->HGrndFD(Surf));
             Real64 const Toa(state.dataMstBal->TempOutsideAirFD(Surf));
-            Real64 const Tgnd(state.dataMstBal->TempOutsideAirFD(Surf));
+            Real64 const Tgnd(Tgndsurface);
 
             if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
 
@@ -2617,6 +2627,16 @@ namespace HeatBalFiniteDiffManager {
             state.dataHeatBalFiniteDiffMgr->SurfaceFD(surfaceIndex).PhaseChangeState(finiteDifferenceLayerIndex));
         updatedDensity = materialDefinition.phaseChange->getDensity(temperaturePrevious);
         updatedThermalConductivity = materialDefinition.phaseChange->getConductivity(temperatureUpdated);
+    }
+
+    bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData &state, int const constructionNum)
+    {
+        for (auto &thisSurface : state.dataSurface->Surface) {
+            if (thisSurface.Construction == constructionNum) {
+                if (thisSurface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) return true;
+            }
+        }
+        return false;
     }
 
 } // namespace HeatBalFiniteDiffManager

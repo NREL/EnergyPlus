@@ -635,64 +635,64 @@
     Freezer_1_Load,          !- Name
     Fish Frozen,             !- Construction Name
     Freezer_1,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    36200.;                  !- Extended Field
+    ,                        !- Space or SpaceList Name
+    36200.;                  !- Surface Area {m2}
 
   InternalMass,
     Freezer_2_Load,          !- Name
     Meat,                    !- Construction Name
     Freezer_2,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    8440.;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    8440.;                   !- Surface Area {m2}
 
   InternalMass,
     Freezer_3_Load,          !- Name
     Vegetable Frozen,        !- Construction Name
     Freezer_3,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    9540.;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    9540.;                   !- Surface Area {m2}
 
   InternalMass,
     Freezer_4_Load,          !- Name
     Fruit Frozen,            !- Construction Name
     Freezer_4,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    8000.;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    8000.;                   !- Surface Area {m2}
 
   InternalMass,
     Freezer_5_Load,          !- Name
     Fruit Frozen,            !- Construction Name
     Freezer_5,               !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    25440.;                  !- Extended Field
+    ,                        !- Space or SpaceList Name
+    25440.;                  !- Surface Area {m2}
 
   InternalMass,
     Sub Freezer_Load,        !- Name
     Ice Cream,               !- Construction Name
     SubFreezer,              !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    7000.;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    7000.;                   !- Surface Area {m2}
 
   InternalMass,
     Cooler_1_Load,           !- Name
     Fruit Fresh,             !- Construction Name
     Cooler_1,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    18600.;                  !- Extended Field
+    ,                        !- Space or SpaceList Name
+    18600.;                  !- Surface Area {m2}
 
   InternalMass,
     Cooler_2_Load,           !- Name
     Vegetable Fresh,         !- Construction Name
     Cooler_2,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    4760.;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    4760.;                   !- Surface Area {m2}
 
   InternalMass,
     Cooler_3_Load,           !- Name
     Dairy Milk,              !- Construction Name
     Cooler_3,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    4000.;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    4000.;                   !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
@@ -4467,7 +4467,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Freezer_1Infiltration,   !- Name
-    Freezer_1,               !- Zone or ZoneList Name
+    Freezer_1,               !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4481,7 +4481,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     SubFreezerInfiltration,  !- Name
-    SubFreezer,              !- Zone or ZoneList Name
+    SubFreezer,              !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4495,7 +4495,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Freezer_2Infiltration,   !- Name
-    Freezer_2,               !- Zone or ZoneList Name
+    Freezer_2,               !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4509,7 +4509,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Freezer_3Infiltration,   !- Name
-    Freezer_3,               !- Zone or ZoneList Name
+    Freezer_3,               !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4523,7 +4523,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Freezer_4Infiltration,   !- Name
-    Freezer_4,               !- Zone or ZoneList Name
+    Freezer_4,               !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4537,7 +4537,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Freezer_5Infiltration,   !- Name
-    Freezer_5,               !- Zone or ZoneList Name
+    Freezer_5,               !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4551,7 +4551,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Cooler_1Infiltration,    !- Name
-    Cooler_1,                !- Zone or ZoneList Name
+    Cooler_1,                !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4565,7 +4565,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Cooler_2Infiltration,    !- Name
-    Cooler_2,                !- Zone or ZoneList Name
+    Cooler_2,                !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4579,7 +4579,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Cooler_3Infiltration,    !- Name
-    Cooler_3,                !- Zone or ZoneList Name
+    Cooler_3,                !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4593,7 +4593,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     DockInfiltration,        !- Name
-    Dock,                    !- Zone or ZoneList Name
+    Dock,                    !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4607,7 +4607,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office1_LowerInfiltration,  !- Name
-    Office1_Lower,           !- Zone or ZoneList Name
+    Office1_Lower,           !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4621,7 +4621,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office1_UpperInfiltration,  !- Name
-    Office1_Upper,           !- Zone or ZoneList Name
+    Office1_Upper,           !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4635,7 +4635,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office2_LowerInfiltration,  !- Name
-    Office2_Lower,           !- Zone or ZoneList Name
+    Office2_Lower,           !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4649,7 +4649,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     Office2_UpperInfiltration,  !- Name
-    Office2_Upper,           !- Zone or ZoneList Name
+    Office2_Upper,           !- Zone or ZoneList or Space or SpaceList Name
     InfiltrationSchedule,    !- Schedule Name
     AirChanges/Hour,         !- Design Flow Rate Calculation Method
     ,                        !- Design Flow Rate {m3/s}
@@ -4694,12 +4694,12 @@
 
   People,
     Freezer_1 People,        !- Name
-    Freezer_1,               !- Zone or ZoneList Name
+    Freezer_1,               !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4716,12 +4716,12 @@
 
   People,
     Freezer_2 People,        !- Name
-    Freezer_2,               !- Zone or ZoneList Name
+    Freezer_2,               !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4738,12 +4738,12 @@
 
   People,
     Freezer_3 People,        !- Name
-    Freezer_3,               !- Zone or ZoneList Name
+    Freezer_3,               !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4760,12 +4760,12 @@
 
   People,
     Freezer_4 People,        !- Name
-    Freezer_4,               !- Zone or ZoneList Name
+    Freezer_4,               !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4782,12 +4782,12 @@
 
   People,
     Freezer_5 People,        !- Name
-    Freezer_5,               !- Zone or ZoneList Name
+    Freezer_5,               !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4804,12 +4804,12 @@
 
   People,
     SubFreezer People,       !- Name
-    SubFreezer,              !- Zone or ZoneList Name
+    SubFreezer,              !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4826,12 +4826,12 @@
 
   People,
     Cooler_1 People,         !- Name
-    Cooler_1,                !- Zone or ZoneList Name
+    Cooler_1,                !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4848,12 +4848,12 @@
 
   People,
     Cooler_2 People,         !- Name
-    Cooler_2,                !- Zone or ZoneList Name
+    Cooler_2,                !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4870,12 +4870,12 @@
 
   People,
     Cooler_3 People,         !- Name
-    Cooler_3,                !- Zone or ZoneList Name
+    Cooler_3,                !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4892,12 +4892,12 @@
 
   People,
     Dock People,             !- Name
-    Dock,                    !- Zone or ZoneList Name
+    Dock,                    !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4914,12 +4914,12 @@
 
   People,
     Office1_Lower People,    !- Name
-    Office1_Lower,           !- Zone or ZoneList Name
+    Office1_Lower,           !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4936,12 +4936,12 @@
 
   People,
     Office1_Upper People,    !- Name
-    Office1_Upper,           !- Zone or ZoneList Name
+    Office1_Upper,           !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4958,12 +4958,12 @@
 
   People,
     Office2_Lower People,    !- Name
-    Office2_Lower,           !- Zone or ZoneList Name
+    Office2_Lower,           !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -4980,12 +4980,12 @@
 
   People,
     Office2_Upper People,    !- Name
-    Office2_Upper,           !- Zone or ZoneList Name
+    Office2_Upper,           !- Zone or ZoneList or Space or SpaceList Name
     T24 OCC,                 !- Number of People Schedule Name
     People/Area,             !- Number of People Calculation Method
     ,                        !- Number of People
-    0.11,                    !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    0.11,                    !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     1.0,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Activity Schedule,       !- Activity Level Schedule Name
@@ -5004,7 +5004,7 @@
 
   Lights,
     Freezer_1 Lights,        !- Name
-    Freezer_1,               !- Zone or ZoneList Name
+    Freezer_1,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5018,7 +5018,7 @@
 
   Lights,
     Freezer_2 Lights,        !- Name
-    Freezer_2,               !- Zone or ZoneList Name
+    Freezer_2,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5032,7 +5032,7 @@
 
   Lights,
     Freezer_3 Lights,        !- Name
-    Freezer_3,               !- Zone or ZoneList Name
+    Freezer_3,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5046,7 +5046,7 @@
 
   Lights,
     Freezer_4 Lights,        !- Name
-    Freezer_4,               !- Zone or ZoneList Name
+    Freezer_4,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5060,7 +5060,7 @@
 
   Lights,
     Freezer_5 Lights,        !- Name
-    Freezer_5,               !- Zone or ZoneList Name
+    Freezer_5,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5074,7 +5074,7 @@
 
   Lights,
     SubFreezer Lights,       !- Name
-    SubFreezer,              !- Zone or ZoneList Name
+    SubFreezer,              !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5088,7 +5088,7 @@
 
   Lights,
     Cooler_1 Lights,         !- Name
-    Cooler_1,                !- Zone or ZoneList Name
+    Cooler_1,                !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5102,7 +5102,7 @@
 
   Lights,
     Cooler_2 Lights,         !- Name
-    Cooler_2,                !- Zone or ZoneList Name
+    Cooler_2,                !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5116,7 +5116,7 @@
 
   Lights,
     Cooler_3 Lights,         !- Name
-    Cooler_3,                !- Zone or ZoneList Name
+    Cooler_3,                !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5130,7 +5130,7 @@
 
   Lights,
     Dock Lights,             !- Name
-    Dock,                    !- Zone or ZoneList Name
+    Dock,                    !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5144,7 +5144,7 @@
 
   Lights,
     Office1_Lower Lights,    !- Name
-    Office1_Lower,           !- Zone or ZoneList Name
+    Office1_Lower,           !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5158,7 +5158,7 @@
 
   Lights,
     Office1_Upper Lights,    !- Name
-    Office1_Upper,           !- Zone or ZoneList Name
+    Office1_Upper,           !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5172,7 +5172,7 @@
 
   Lights,
     Office2_Lower Lights,    !- Name
-    Office2_Lower,           !- Zone or ZoneList Name
+    Office2_Lower,           !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5186,7 +5186,7 @@
 
   Lights,
     Office2_Upper Lights,    !- Name
-    Office2_Upper,           !- Zone or ZoneList Name
+    Office2_Upper,           !- Zone or ZoneList or Space or SpaceList Name
     T24 Light,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Lighting Level {W}
@@ -5202,7 +5202,7 @@
 
   ElectricEquipment,
     Freezer_1 ElecEq,        !- Name
-    Freezer_1,               !- Zone or ZoneList Name
+    Freezer_1,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5215,7 +5215,7 @@
 
   ElectricEquipment,
     Freezer_2 ElecEq,        !- Name
-    Freezer_2,               !- Zone or ZoneList Name
+    Freezer_2,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5228,7 +5228,7 @@
 
   ElectricEquipment,
     Freezer_3 ElecEq,        !- Name
-    Freezer_3,               !- Zone or ZoneList Name
+    Freezer_3,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5241,7 +5241,7 @@
 
   ElectricEquipment,
     Freezer_4 ElecEq,        !- Name
-    Freezer_4,               !- Zone or ZoneList Name
+    Freezer_4,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5254,7 +5254,7 @@
 
   ElectricEquipment,
     Freezer_5 ElecEq,        !- Name
-    Freezer_5,               !- Zone or ZoneList Name
+    Freezer_5,               !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5267,7 +5267,7 @@
 
   ElectricEquipment,
     SubFreezer ElecEq,       !- Name
-    SubFreezer,              !- Zone or ZoneList Name
+    SubFreezer,              !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5280,7 +5280,7 @@
 
   ElectricEquipment,
     Cooler_1 ElecEq,         !- Name
-    Cooler_1,                !- Zone or ZoneList Name
+    Cooler_1,                !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5293,7 +5293,7 @@
 
   ElectricEquipment,
     Cooler_2 ElecEq,         !- Name
-    Cooler_2,                !- Zone or ZoneList Name
+    Cooler_2,                !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5306,7 +5306,7 @@
 
   ElectricEquipment,
     Cooler_3 ElecEq,         !- Name
-    Cooler_3,                !- Zone or ZoneList Name
+    Cooler_3,                !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5319,7 +5319,7 @@
 
   ElectricEquipment,
     Dock ElecEq,             !- Name
-    Dock,                    !- Zone or ZoneList Name
+    Dock,                    !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5332,7 +5332,7 @@
 
   ElectricEquipment,
     Office1_Lower ElecEq,    !- Name
-    Office1_Lower,           !- Zone or ZoneList Name
+    Office1_Lower,           !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5345,7 +5345,7 @@
 
   ElectricEquipment,
     Office1_Upper ElecEq,    !- Name
-    Office1_Upper,           !- Zone or ZoneList Name
+    Office1_Upper,           !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5358,7 +5358,7 @@
 
   ElectricEquipment,
     Office2_Lower ElecEq,    !- Name
-    Office2_Lower,           !- Zone or ZoneList Name
+    Office2_Lower,           !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -5371,7 +5371,7 @@
 
   ElectricEquipment,
     Office2_Upper ElecEq,    !- Name
-    Office2_Upper,           !- Zone or ZoneList Name
+    Office2_Upper,           !- Zone or ZoneList or Space or SpaceList Name
     T24 Equip,               !- Schedule Name
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
@@ -13443,7 +13443,7 @@
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,23.;       !- Field 3
+    Until: 24:00,23.;        !- Field 3
 
 !====   Report  ====
 

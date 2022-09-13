@@ -97,6 +97,7 @@ namespace DataPlant {
         "Chiller:Electric",
         "Chiller:Electric:EIR",
         "Chiller:Electric:ReformulatedEIR",
+        "Chiller:Electric:ASHRAE205",
         "Chiller:EngineDriven",
         "CoolingTower:SingleSpeed",
         "CoolingTower:TwoSpeed",
@@ -195,6 +196,7 @@ namespace DataPlant {
         "CHILLER:ELECTRIC",
         "CHILLER:ELECTRIC:EIR",
         "CHILLER:ELECTRIC:REFORMULATEDEIR",
+        "CHILLER:ELECTRIC:ASHRAE205",
         "CHILLER:ENGINEDRIVEN",
         "COOLINGTOWER:SINGLESPEED",
         "COOLINGTOWER:TWOSPEED",
@@ -283,19 +285,104 @@ namespace DataPlant {
         "HEATPUMP:PLANTLOOP:EIR:HEATING"};
 
     static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
-        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
-        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant,
-        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
-        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,
-        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant,
-        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant,
-        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
-        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
-        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant,
-        LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
-        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,
-        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both};
-
+        LoopType::Plant, //	"Boiler:HotWater"
+        LoopType::Plant, //	"Boiler:Steam"
+        LoopType::Plant, //	"Chiller:Absorption"
+        LoopType::Plant, //	"Chiller:Absorption:Indirect"
+        LoopType::Plant, //	"Chiller:CombustionTurbine"
+        LoopType::Plant, //	"Chiller:ConstantCOP"
+        LoopType::Plant, //	"ChillerHeater:Absorption:DirectFired"
+        LoopType::Plant, //	"Chiller:Electric"
+        LoopType::Plant, //	"Chiller:Electric:EIR"
+        LoopType::Plant, //	"Chiller:Electric:ReformulatedEIR"
+        LoopType::Plant, //	"Chiller:Electric:ASHRAE205"
+        LoopType::Plant, //	"Chiller:EngineDriven"
+        LoopType::Both,  //	"CoolingTower:SingleSpeed"
+        LoopType::Both,  //	"CoolingTower:TwoSpeed"
+        LoopType::Both,  //	"CoolingTower:VariableSpeed"
+        LoopType::Plant, //	"Generator:Fuelcell:ExhaustGastoWaterHeatExchanger"
+        LoopType::Plant, //	"WaterHeater:HeatPump:PumpedCondenser"
+        LoopType::Plant, //	"Heatpump:WatertoWater:Equationfit:Cooling"
+        LoopType::Plant, //	"Heatpump:WatertoWater:Equationfit:Heating"
+        LoopType::Plant, //	"Heatpump:WatertoWater:ParameterEstimation:Cooling"
+        LoopType::Plant, //	"Heatpump:WatertoWater:ParameterEstimation:Heating"
+        LoopType::Both,  //	"Pipe:Adiabatic"
+        LoopType::Both,  //	"Pipe:Adiabatic:Steam"
+        LoopType::Both,  //	"Pipe:Outdoor"
+        LoopType::Both,  //	"Pipe:Indoor"
+        LoopType::Both,  //	"Pipe:Underground"
+        LoopType::Both,  //	"DistrictCooling"
+        LoopType::Both,  //	"DistrictHeating"
+        LoopType::Plant, //	"ThermalStorage:Ice:Detailed"
+        LoopType::Plant, //	"ThermalStorage:Ice:Simple"
+        LoopType::Both,  //	"TemperingValve"
+        LoopType::Both,  //	"WaterHeater:Mixed"
+        LoopType::Both,  //	"WaterHeater:Stratified"
+        LoopType::Both,  //	"Pump:VariableSpeed"
+        LoopType::Both,  //	"Pump:ConstantSpeed"
+        LoopType::Both,  //	"Pump:VariableSpeed:Condensate"
+        LoopType::Both,  //	"HeaderedPumps:VariableSpeed"
+        LoopType::Both,  //	"HeaderedPumps:ConstantSpeed"
+        LoopType::Plant, //	"WaterUse:Connections"
+        LoopType::Plant, //	"Coil:Cooling:Water"
+        LoopType::Plant, //	"Coil:Cooling:Water:DetailedGeometry"
+        LoopType::Plant, //	"Coil:Heating:Water"
+        LoopType::Plant, //	"Coil:Heating:Steam"
+        LoopType::Plant, //	"Solarcollector:Flatplate:Water"
+        LoopType::Both,  //	"LoadProfile:Plant"
+        LoopType::Both,  //	"GroundHeatExchanger:System"
+        LoopType::Both,  //	"GroundHeatExchanger:Surface"
+        LoopType::Both,  //	"GroundHeatExchanger:Pond"
+        LoopType::Plant, //	"Generator:Microturbine"
+        LoopType::Plant, //	"Generator:InternalCombustionEngine"
+        LoopType::Plant, //	"Generator:CombustionTurbine"
+        LoopType::Plant, //	"Generator:Microchp"
+        LoopType::Plant, //	"Generator:Fuelcell:StackCooler"
+        LoopType::Both,  //	"FluidCooler:SingleSpeed"
+        LoopType::Both,  //	"FluidCooler:TwoSpeed"
+        LoopType::Both,  //	"EvaporativeFluidCooler:SingleSpeed"
+        LoopType::Both,  //	"EvaporativeFluidCooler:TwoSpeed"
+        LoopType::Both,  //	"ThermalStorage:ChilledWater:Mixed"
+        LoopType::Both,  //	"ThermalStorage:ChilledWater:Stratified"
+        LoopType::Both,  //	"SolarCollector:FlatPlate:PhotovoltaicThermal"
+        LoopType::Plant, //	"ZoneHVAC:Baseboard:Convective:Water"
+        LoopType::Plant, //	"ZoneHVAC:Baseboard:RadiantConvective:Steam"
+        LoopType::Plant, //	"ZoneHVAC:Baseboard:RadiantConvective:Water"
+        LoopType::Plant, //	"ZoneHVAC:LowTemperatureRadiant:VariableFlow"
+        LoopType::Plant, //	"ZoneHVAC:LowTemperatureRadiant:ConstantFlow"
+        LoopType::Both,  //	"AirTerminal:SingleDuct:ConstantVolume:CooledBeam"
+        LoopType::Both,  //	"Coil:Heating:WaterToAirHeatPump:EquationFit"
+        LoopType::Both,  //	"Coil:Cooling:WaterToAirHeatPump:EquationFit"
+        LoopType::Both,  //	"Coil:Heating:WaterToAirHeatPump:ParameterEstimation"
+        LoopType::Both,  //	"Coil:Cooling:WaterToAirHeatPump:ParameterEstimation"
+        LoopType::Both,  //	"Refrigeration:Condenser:WaterCooled"
+        LoopType::Both,  //	"Refrigeration:CompressorRack"
+        LoopType::Plant, //	"AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed"
+        LoopType::Plant, //	"ChillerHeater:Absorption:DoubleEffect"
+        LoopType::Both,  //	"PipingSystem:Underground:PipeCircuit"
+        LoopType::Both,  //	"SolarCollector:IntegralCollectorStorage"
+        LoopType::Both,  //	"Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit"
+        LoopType::Both,  //	"Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"
+        LoopType::Both,  //	"PlantComponent:UserDefined"
+        LoopType::Both,  //	"Coil:UserDefined"
+        LoopType::Both,  //	"ZoneHVAC:ForcedAir:UserDefined"
+        LoopType::Both,  //	"AirTerminal:SingleDuct:UserDefined"
+        LoopType::Both,  //	"AirConditioner:VariableRefrigerantFlow"
+        LoopType::Both,  //	"GroundHeatExchanger:HorizontalTrench"
+        LoopType::Both,  //	"HeatExchanger:FluidToFluid"
+        LoopType::Both,  //	"PlantComponent:TemperatureSource"
+        LoopType::Plant, //	"CentralHeatPumpSystem"
+        LoopType::Plant, //	"AirLoopHVAC:UnitarySystem"
+        LoopType::Both,  //	"Coil:Cooling:DX:SingleSpeed:ThermalStorage"
+        LoopType::Both,  //	"CoolingTower:VariableSpeed:Merkel"
+        LoopType::Both,  //	"SwimmingPool:Indoor"
+        LoopType::Both,  //	"GroundHeatExchanger:Slinky"
+        LoopType::Plant, //	"WaterHeater:HeatPump:WrappedCondenser"
+        LoopType::Plant, //	"AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam"
+        LoopType::Plant, //	"ZoneHVAC:CoolingPanel:RadiantConvective:Water"
+        LoopType::Both,  //	"HeatPump:PlantLoop:EIR:Cooling"
+        LoopType::Both   //	"HeatPump:PlantLoop:EIR:Heating"
+    };
 } // namespace DataPlant
 
 struct DataPlantData : BaseGlobalStruct

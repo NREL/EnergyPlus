@@ -1389,7 +1389,7 @@ void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID
                                                 int const storeTypeIndex,
                                                 std::string const &indexGroup,
                                                 std::string_view keyedValueString,
-                                                std::string const &variableName,
+                                                std::string_view const variableName,
                                                 int const indexType,
                                                 std::string const &units,
                                                 int const reportingFreq,

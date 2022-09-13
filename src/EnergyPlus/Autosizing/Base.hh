@@ -53,6 +53,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/api/TypeDefs.h>
@@ -146,7 +147,7 @@ struct BaseSizer
     int curSysNum = 0;
     int curOASysNum = 0;
     int curZoneEqNum = 0;
-    int curDuctType = 0;
+    DataHVACGlobals::AirDuctType curDuctType = DataHVACGlobals::AirDuctType::Invalid;
     int curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
     int numPrimaryAirSys = 0;
     int numSysSizInput = 0;
@@ -175,6 +176,7 @@ struct BaseSizer
     // HeatingWaterflowSizer
     Real64 dataConstantUsedForSizing = 0.0;
     Real64 dataFractionUsedForSizing = 0.0;
+    bool dataDXCoolsLowSpeedsAutozize = false;
 
     // HeatingWaterDesCoilWaterVolFlowUsedForUASizer
     int dataPltSizHeatNum = 0;
@@ -238,7 +240,7 @@ struct BaseSizer
     // CoolingAirFlowSizing
     Real64 dataBypassFrac = 0.0;
 
-    Real64 dataIsDXCoil = false;
+    bool dataIsDXCoil = false;
 
     Real64 dataNonZoneNonAirloopValue = 0.0;
 

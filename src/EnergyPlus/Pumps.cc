@@ -1524,7 +1524,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                                          state.dataPumps->PumpEquip(PumpNum).MotorEffic * 100.0));
                 ShowContinueError(
                     state,
-                    format("Total_Efficiency % =(Rated_Volume_Flow_Rate [{:.1R}] * Rated_Pump_Head [{:.1R}] / Rated_Power_Use [{:.1R}]) * 100.",
+                    format("Total_Efficiency % =(Rated_Volume_Flow_Rate [{:.3R}] * Rated_Pump_Head [{:.1R}] / Rated_Power_Use [{:.1R}]) * 100.",
                            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate,
                            state.dataPumps->PumpEquip(PumpNum).NomPumpHead,
                            state.dataPumps->PumpEquip(PumpNum).NomPowerUse));
@@ -1539,7 +1539,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                                          state.dataPumps->PumpEquip(PumpNum).MotorEffic * 100.0));
                 ShowContinueError(
                     state,
-                    format("Total_Efficiency % =(Rated_Volume_Flow_Rate [{:.1R}] * Rated_Pump_Head [{:.1R}] / Rated_Power_Use [{:.1R}]) * 100.",
+                    format("Total_Efficiency % =(Rated_Volume_Flow_Rate [{:.3R}] * Rated_Pump_Head [{:.1R}] / Rated_Power_Use [{:.1R}]) * 100.",
                            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate,
                            state.dataPumps->PumpEquip(PumpNum).NomPumpHead,
                            state.dataPumps->PumpEquip(PumpNum).NomPowerUse));
@@ -1554,7 +1554,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                                          state.dataPumps->PumpEquip(PumpNum).MotorEffic * 100.0));
                 ShowContinueError(
                     state,
-                    format("Total_Efficiency % =(Rated_Volume_Flow_Rate [{:.1R}] * Rated_Pump_Head [{:.1R}] / Rated_Power_Use [{:.1R}]) * 100.",
+                    format("Total_Efficiency % =(Rated_Volume_Flow_Rate [{:.3R}] * Rated_Pump_Head [{:.1R}] / Rated_Power_Use [{:.1R}]) * 100.",
                            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate,
                            state.dataPumps->PumpEquip(PumpNum).NomPumpHead,
                            state.dataPumps->PumpEquip(PumpNum).NomPowerUse));

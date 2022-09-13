@@ -177,7 +177,6 @@ namespace HWBaseboardRadiator {
 
     void SimHWBaseboard(EnergyPlusData &state,
                         std::string const &EquipName,
-                        int const ActualZoneNum,
                         int const ControlledZoneNum,
                         bool const FirstHVACIteration,
                         Real64 &PowerMet,
@@ -185,7 +184,7 @@ namespace HWBaseboardRadiator {
 
     void GetHWBaseboardInput(EnergyPlusData &state);
 
-    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
     void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 

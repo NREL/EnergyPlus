@@ -234,6 +234,8 @@ namespace SurfaceGeometry {
 
     void GetSurfaceHeatTransferAlgorithmOverrides(EnergyPlusData &state, bool &ErrorsFound);
 
+    void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound); // Error flag indicator (true if errors found)
+
     class ExposedFoundationPerimeter
     {
     public:
@@ -296,6 +298,11 @@ namespace SurfaceGeometry {
         EdgeOfSurf() : start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
         {
         }
+
+        bool operator==(const EdgeOfSurf &other) const;
+        bool operator!=(const EdgeOfSurf &other) const;
+        bool containsPoints(const Vector &vertex) const;
+        double length() const;
     };
 
     bool isEnclosedVolume(DataVectorTypes::Polyhedron const &zonePoly, std::vector<EdgeOfSurf> &edgeNot2);
@@ -463,9 +470,7 @@ struct SurfaceGeometryData : BaseGlobalStruct
     Array1D<Real64> Z;
     Array1D<Real64> A; // containers for convexity test
     Array1D<Real64> B;
-    Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
-    int VertSize = 0;               // size of X,Y,Z,A,B arrays
-    Real64 ACosZero = 0.0;          // set on firstTime
+    int VertSize = 0; // size of X,Y,Z,A,B arrays
 
     void clear_state() override
     {

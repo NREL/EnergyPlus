@@ -560,12 +560,12 @@
 
   People,
     ZONE ONE People 1,       !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     WorkHours ScheduleG,     !- Number of People Schedule Name
     people,                  !- Number of People Calculation Method
     10,                      !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.5,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
     Live Gang,               !- Activity Level Schedule Name
@@ -583,7 +583,7 @@
 
   ElectricEquipment,
     ZONE ONE ElecEq 1,       !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     WorkHours ScheduleG,     !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     2200,                    !- Design Level {W}
@@ -605,7 +605,11 @@
     1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
     90.0,                    !- Azimuth Angle of Long Axis of Building {deg}
-    0.833;                   !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    0.833,                   !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    ,                        !- Height Dependence of External Node Temperature
+    ,                        !- Solver
+    ,                        !- Allow Unsupported Zone Equipment
+    ;                        !- Do Distribution Duct Sizing Calculation
 
   AirflowNetwork:MultiZone:Zone,
     ZONE ONE,                !- Zone Name

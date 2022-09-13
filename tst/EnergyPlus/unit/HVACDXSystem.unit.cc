@@ -537,6 +537,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -720,6 +721,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -874,7 +876,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    0.77,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    0.5,                     !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -895,7 +898,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    0.77,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    1.0,                     !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -932,7 +936,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    0.67,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    0.5,                     !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -953,7 +958,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    0.67,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    1.0,                     !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -987,6 +993,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);

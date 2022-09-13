@@ -151,9 +151,6 @@ namespace HeatBalanceIntRadExchange {
         auto &SurfaceTempInKto4th(state.dataHeatBalIntRadExchg->SurfaceTempInKto4th);
         auto &SurfaceEmiss(state.dataHeatBalIntRadExchg->SurfaceEmiss);
 
-#ifdef EP_Detailed_Timings
-        epStartTime("CalcInteriorRadExchange=");
-#endif
         if (state.dataHeatBalIntRadExchg->CalcInteriorRadExchangefirstTime) {
             SurfaceTempRad.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
             SurfaceTempInKto4th.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
@@ -429,10 +426,6 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
         }
-
-#ifdef EP_Detailed_Timings
-        epStopTime("CalcInteriorRadExchange=");
-#endif
     }
 
     void UpdateMovableInsulationFlag(EnergyPlusData &state, bool &MovableInsulationChange, int const SurfNum)

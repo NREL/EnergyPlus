@@ -312,7 +312,7 @@
     ,                        !- Shading Device Material Name
     FixedSlatAngle,          !- Type of Slat Angle Control for Blinds
     ,                        !- Slat Angle Schedule Name
-    ,                        !- Setpoint 2 {W/m2 or deg C}
+    ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
     ZONE ONE_DaylCtrl,       !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
     ZONE SUBSURFACE 1 EAST WINDOW,  !- Fenestration Surface 1 Name
@@ -356,7 +356,13 @@
     1.0,                     !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance
     0.8,                     !- Divider Solar Absorptance
     0.8,                     !- Divider Visible Absorptance
-    0.9;                     !- Divider Thermal Hemispherical Emissivity
+    0.9,                     !- Divider Thermal Hemispherical Emissivity
+    ,                        !- Outside Reveal Solar Absorptance
+    ,                        !- Inside Sill Depth {m}
+    ,                        !- Inside Sill Solar Absorptance
+    ,                        !- Inside Reveal Depth {m}
+    ,                        !- Inside Reveal Solar Absorptance
+    ;                        !- NFRC Product Type for Assembly Calculations
 
 ! ========================================================================
 
@@ -565,15 +571,15 @@
     HALLWAY WALL,            !- Name
     INTWALL,                 !- Construction Name
     ZONE ONE,                !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    54.24;                   !- Extended Field
+    ,                        !- Space or SpaceList Name
+    54.24;                   !- Surface Area {m2}
 
 ! 54.24 = 4 * ( 2.7 * 6 - 2.2 * 1.2 )
 ! ===========================================================
 
   ElectricEquipment,
     ROOM ELE EQU,            !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Sch Equ,                 !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     768,                     !- Design Level {W}
@@ -586,7 +592,7 @@
 
   Lights,
     ROOM LIGHTS,             !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Sch Lig,                 !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1632.0,                  !- Lighting Level {W}
@@ -600,12 +606,12 @@
 
   People,
     ROOM PEOPLE,             !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Sch Peo,                 !- Number of People Schedule Name
     People,                  !- Number of People Calculation Method
     3.2,                     !- Number of People
-    ,                        !- People per Zone Floor Area {person/m2}
-    ,                        !- Zone Floor Area per Person {m2/person}
+    ,                        !- People per Floor Area {person/m2}
+    ,                        !- Floor Area per Person {m2/person}
     0.6,                     !- Fraction Radiant
     Autocalculate,           !- Sensible Heat Fraction
     Sch Act;                 !- Activity Level Schedule Name
@@ -1141,7 +1147,7 @@
 
   ZoneInfiltration:DesignFlowRate,
     INFILTRATION 1,          !- Name
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     Sch 1,                   !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.036,                   !- Design Flow Rate {m3/s}
@@ -1159,7 +1165,7 @@
 
   Daylighting:Controls,
     ZONE ONE_DaylCtrl,       !- Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or Space Name
     SplitFlux,               !- Daylighting Method
     ,                        !- Availability Schedule Name
     ContinuousOff,           !- Lighting Control Type
@@ -1172,22 +1178,22 @@
     22.0,                    !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     ZONE ONE_DaylRefPt1,     !- Daylighting Reference Point 1 Name
-    0.5,                     !- Fraction of Zone Controlled by Reference Point 1
+    0.5,                     !- Fraction of Lights Controlled by Reference Point 1
     500,                     !- Illuminance Setpoint at Reference Point 1 {lux}
     ZONE ONE_DaylRefPt2,     !- Daylighting Reference Point 2 Name
-    0.5,                     !- Fraction of Zone Controlled by Reference Point 2
+    0.5,                     !- Fraction of Lights Controlled by Reference Point 2
     500;                     !- Illuminance Setpoint at Reference Point 2 {lux}
 
   Daylighting:ReferencePoint,
     ZONE ONE_DaylRefPt1,     !- Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or Space Name
     3,                       !- X-Coordinate of Reference Point {m}
     3,                       !- Y-Coordinate of Reference Point {m}
     1;                       !- Z-Coordinate of Reference Point {m}
 
   Daylighting:ReferencePoint,
     ZONE ONE_DaylRefPt2,     !- Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or Space Name
     13,                      !- X-Coordinate of Reference Point {m}
     3,                       !- Y-Coordinate of Reference Point {m}
     1;                       !- Z-Coordinate of Reference Point {m}
@@ -1199,7 +1205,7 @@
   OtherEquipment,
     OthEquSen_ZoneOne,       !- Name
     None,                    !- Fuel Type
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     FMU_OthEquSen_ZoneOne,   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1,                       !- Design Level {W}
@@ -1214,7 +1220,7 @@
   OtherEquipment,
     OthEquLat_ZoneOne,       !- Name
     None,                    !- Fuel Type
-    ZONE ONE,                !- Zone or ZoneList Name
+    ZONE ONE,                !- Zone or ZoneList or Space or SpaceList Name
     FMU_OthEquLat_ZoneOne,   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1,                       !- Design Level {W}

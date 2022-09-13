@@ -212,7 +212,7 @@ namespace EvaporativeFluidCoolers {
         Real64 StarvedMakeUpVol = 0.0;
         EvapFluidCoolerInletConds inletConds;
 
-        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
+        static EvapFluidCoolerSpecs *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
 
         void setupOutputVars(EnergyPlusData &state);
 

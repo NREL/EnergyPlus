@@ -465,8 +465,8 @@
     WallMass,                !- Name
     Interior,                !- Construction Name
     Zone1,                   !- Zone or ZoneList Name
-    ,                        !- Surface Area {m2}
-    18.5806;                 !- Extended Field
+    ,                        !- Space or SpaceList Name
+    18.5806;                 !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 

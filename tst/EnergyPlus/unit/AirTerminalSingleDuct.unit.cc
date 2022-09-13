@@ -638,7 +638,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     int constexpr SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const OutletNode = state->dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum;
-    int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
+    int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum;
     int const ZoneAirNodeNum = thisZoneEquip.ZoneNode;
     state->dataScheduleMgr->Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
 
@@ -1767,7 +1767,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
 
     int ZoneNodeNum = 1;
     int InletNodeNum = thisHeatCoolAT.InletNodeNum;
-    state->dataZoneEquip->ZoneEquipConfig(thisHeatCoolAT.ActualZoneNum).InletNodeAirLoopNum(thisHeatCoolAT.CtrlZoneInNodeIndex) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(thisHeatCoolAT.CtrlZoneNum).InletNodeAirLoopNum(thisHeatCoolAT.CtrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions
     state->dataLoopNodes->Node(ZoneNodeNum).Temp = 20.0;
     state->dataLoopNodes->Node(ZoneNodeNum).HumRat = 0.005;
