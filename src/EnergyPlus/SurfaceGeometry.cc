@@ -3364,11 +3364,6 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
-        if (state.dataSolarShading->GetInputFlagforSurfGeom) {
-            SolarShading::GetShadowCalcMethodforSurfGeom(state);
-            state.dataSolarShading->GetInputFlagforSurfGeom = false;
-        }
-
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
@@ -3433,20 +3428,7 @@ namespace SurfaceGeometry {
                                             state.dataIPShortCut->cAlphaFieldNames(2) + " not found=" + state.dataIPShortCut->cAlphaArgs(2));
                         ErrorsFound = true;
                     } else {
-                        if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) {
-                            ShowSevereError(state,
-                                            format("{}=\"{}\" has an active {}=\"{}\";",
-                                                   cCurrentModuleObject,
-                                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                                   state.dataIPShortCut->cAlphaFieldNames(2),
-                                                   state.dataIPShortCut->cAlphaArgs(2)));
-                            ShowContinueError(state, "The Shading Calculation Method of choice is \"PixelCounting\". With this choice, ");
-                            ShowContinueError(
-                                state,
-                                "the shading surfaces will be treated as completely opaque (transmittance = 0) during the shading calculation, ");
-                            ShowContinueError(state, "which may result in significant inaccurate or unexpected results.");
-                            ShowContinueError(state, "It is suggested to use another Shading Calculation Method, such as \"PolygonClipping\".");
-                        }
+                        //
                     }
                 } else {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex = 0;
@@ -3475,6 +3457,9 @@ namespace SurfaceGeometry {
                                             state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                             "\", has schedule values < 0.");
                         ShowContinueError(state, "...Schedule values < 0 have no meaning for shading elements.");
+                    }
+                    if (SchedMaxValue > 0.0) {
+                        state.dataSolarShading->anyScheduledShadingSurface = true;
                     }
                     if (SchedMaxValue > 1.0) {
                         ShowSevereError(state,
@@ -6416,11 +6401,6 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
-        if (state.dataSolarShading->GetInputFlagforSurfGeom) {
-            SolarShading::GetShadowCalcMethodforSurfGeom(state);
-            state.dataSolarShading->GetInputFlagforSurfGeom = false;
-        }
-
         if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
@@ -6508,19 +6488,7 @@ namespace SurfaceGeometry {
                                         state.dataIPShortCut->cAlphaFieldNames(3) + " not found=\"" + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
                 } else {
-                    if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) {
-                        ShowSevereError(state,
-                                        format("{}=\"{}\" has an active {}=\"{}\";",
-                                               cCurrentModuleObject,
-                                               state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                               state.dataIPShortCut->cAlphaFieldNames(3),
-                                               state.dataIPShortCut->cAlphaArgs(3)));
-                        ShowContinueError(state, "The Shading Calculation Method of choice is \"PixelCounting\". With this choice, ");
-                        ShowContinueError(
-                            state, "the shading surfaces will be treated as completely opaque (transmittance = 0) during the shading calculation, ");
-                        ShowContinueError(state, "which may result in significant inaccurate or unexpected results.");
-                        ShowContinueError(state, "It is suggested to use another Shading Calculation Method, such as \"PolygonClipping\".");
-                    }
+                    //
                 }
             } else {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex = 0;
@@ -6549,6 +6517,9 @@ namespace SurfaceGeometry {
                                         state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                         "\", has schedule values < 0.");
                     ShowContinueError(state, "...Schedule values < 0 have no meaning for shading elements.");
+                }
+                if (SchedMaxValue > 0.0) {
+                    state.dataSolarShading->anyScheduledShadingSurface = true;
                 }
                 if (SchedMaxValue > 1.0) {
                     ShowSevereError(state,
