@@ -942,7 +942,7 @@ Current ventilation output variables:
 \item
   HVAC,Sum,Zone Ventilation Mass {[}kg{]}
 \item
-  HVAC,Sum,Zone Ventilation Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Zone Ventilation Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Zone Ventilation Air Change Rate {[}ACH{]}
 \item
@@ -1099,7 +1099,7 @@ ZoneAirBalance:OutdoorAir output variables will be provided when the Air Balance
 \item
   HVAC,Sum,Zone Combined Outdoor Air Mass {[}kg{]}
 \item
-  HVAC,Sum,Zone Combined Outdoor Air Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Zone Combined Outdoor Air Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average, Zone Combined Outdoor Air Changes per Hour {[}ACH{]}
 \item
@@ -1275,13 +1275,13 @@ ZoneMixing,
 \item
   HVAC,Sum,Zone Mixing Volume {[}m3{]}
 \item
-  HVAC,Sum,Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}
 \item
-  HVAC,Sum,Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}
 \item
   HVAC,Sum,Zone Mixing Mass {[}kg{]}
 \item
-  HVAC,Sum,Zone Mixing Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Zone Mixing Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Sum,Zone Mixing Sensible Heat Loss Energy {[}J{]}
 \item
@@ -1453,13 +1453,13 @@ ZoneCrossMixing,
 \item
   HVAC,Sum,Zone Mixing Volume {[}m3{]}
 \item
-  HVAC,Sum,Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}
 \item
-  HVAC,Sum,Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}
 \item
   HVAC,Sum,Zone Mixing Mass {[}kg{]}
 \item
-  HVAC,Sum,Zone Mixing Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Zone Mixing Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Sum,Zone Mixing Sensible Heat Loss Energy {[}J{]}
 \item
@@ -1580,13 +1580,13 @@ ZoneRefrigerationDoorMixing,
 \item
   HVAC,Sum,Zone Mixing Volume {[}m3{]}
 \item
-  HVAC,Sum,Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Mixing Current Density Volume Flow Rate {[}m3/s{]}
 \item
-  HVAC,Sum,Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}
+  HVAC,Average,Zone Mixing Standard Density Volume Flow Rate {[}m3/s{]}
 \item
   HVAC,Sum,Zone Mixing Mass {[}kg{]}
 \item
-  HVAC,Sum,Zone Mixing Mass Flow Rate {[}kg/s{]}
+  HVAC,Average,Zone Mixing Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Sum,Zone Mixing Sensible Heat Loss Energy {[}J{]}
 \item
@@ -1631,7 +1631,7 @@ The sensible (temperature) heat transfer due to the sum of mixing, cross-mixing,
 
 \paragraph{Zone Mixing Latent Heat Gain Energy {[}J{]}}\label{zone-mixing-latent-heat-gain-energy-j-2}
 
-The latent heat transfer due tothe sum of mixing, cross-mixing, and refrigeration-door mixing in the host (receiving) zone is the sum of all the incoming air mass flow rates multiplied by the elapsed time, the heat of vaporization (calculated for the average conditions (temperature and humidity) between the ``source'' and ``receiving'' zones)and the humidity ratio differences between the host zone and corresponding source zones. If the heat transfer is negative, the heat transfer is considered to be a zone mixing latent heat loss. If the heat transfer is positive, the heat transfer is considered to be a zone mixing latent heat gain.
+The latent heat transfer due to the sum of mixing, cross-mixing, and refrigeration-door mixing in the host (receiving) zone is the sum of all the incoming air mass flow rates multiplied by the elapsed time, the heat of vaporization (calculated for the average conditions (temperature and humidity) between the ``source'' and ``receiving'' zones)and the humidity ratio differences between the host zone and corresponding source zones. If the heat transfer is negative, the heat transfer is considered to be a zone mixing latent heat loss. If the heat transfer is positive, the heat transfer is considered to be a zone mixing latent heat gain.
 
 \paragraph{Zone Mixing Total Heat Loss Energy {[}J{]}}\label{zone-mixing-total-heat-loss-energy-j-2}
 
