@@ -578,8 +578,8 @@ namespace UnitVentilator {
                 }
             }
 
-            if (!lAlphaBlanks(18)) {
-                unitVent.AvailManagerListName = Alphas(18);
+            if (!lAlphaBlanks(19)) {
+                unitVent.AvailManagerListName = Alphas(19);
             }
 
             unitVent.HVACSizingIndex = 0;
