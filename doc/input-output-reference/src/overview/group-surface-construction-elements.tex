@@ -4233,7 +4233,7 @@ Complete description of the CompositeWallConstructions data set are found in the
 
 \subsection{Construction:ComplexFenestrationState}\label{constructioncomplexfenestrationstate}
 
-This input object is used to describe the properties of a single state for complex fenestration.~ There are two parts to the input, 1) layer-by-layer physical description of fenestration system and 2) a set of matrices that describe overall system optical performance.~ Each layer also has associated with it two matrices that give the layer absorptance (for front and back incidence on the system.
+This input object is used to describe the properties of a single state for complex fenestration.~ There are two parts to the input, 1) layer-by-layer physical description of fenestration system and 2) a set of matrices that describe overall system optical performance.~ Each layer also has associated with it two matrices that give the layer absorptance (for front and back incidence on the system).
 
 The optical properties are given as a two-dimensional matrix describing the basis and four two-dimensional matrices of system bidirectional optical properties.
 
@@ -4242,6 +4242,8 @@ These input objects will generally be exported directly from the WINDOW program 
 Multiple instances of this object are used to define the separate operating states of complex fenestration.~ For example, blinds could be deployed or redirected to create a new state, or electrochromic glazings could change transmittance.~ Each separate state defines the materials present and the overall optical performance.~ If the glazing system has only one state, then only one of these objects is needed.
 
 If there is more than one complex fenestration state, it will be controlled using the EMS actuator called ``Surface'' with the control type ``Construction State'' and the EMS input object called \hyperref[energymanagementsystemconstructionindexvariable]{EnergyManagementSystem:ConstructionIndexVariable}.
+
+Note that when using the Solar Distribution method of \textbf{FullInteriorAndExterior} or \textbf{FullInteriorAndExteriorWithReflections}, the Construction:ComplexFenestrationState windows are not suggested to be mix-used together with regular windows (windows constructed from ``actual'' materials descriptions, or simple layers) in the same zone, due to the limitations of the current models. When these two solar distribution methods are used, it is suggested using either all regular windows or all Complex Fenestration windows in the same zone, but not a mix of these two types of windows.
 
 \subsubsection{Inputs}\label{inputs-39}
 
