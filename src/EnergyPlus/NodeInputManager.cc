@@ -72,8 +72,6 @@ namespace EnergyPlus::NodeInputManager {
 // MODULE INFORMATION:
 //       AUTHOR         Linda K. Lawrie
 //       DATE WRITTEN   September 1999
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // To provide utilities for reading and assigning indices for the
@@ -95,7 +93,7 @@ void GetNodeNums(EnergyPlusData &state,
                  DataLoopNode::ConnectionType const nodeConnectionType,   // Node Connection Type (see DataLoopNode)
                  CompFluidStream const NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
                  bool const ObjectIsParent,                               // True/False
-                 Optional_bool_const IncrementFluidStream,                // True/False
+                 bool const IncrementFluidStream,                         // True/False
                  std::string_view const InputFieldName                    // Input Field Name
 )
 {
@@ -131,7 +129,7 @@ void GetNodeNums(EnergyPlusData &state,
         ShowFatalError(state, "Preceding issue causes termination.");
     }
 
-    if (not_blank(Name)) {
+    if (!Name.empty()) {
         int ThisOne = UtilityRoutines::FindItemInList(Name, state.dataNodeInputMgr->NodeLists);
         if (ThisOne != 0) {
             NumNodes = state.dataNodeInputMgr->NodeLists(ThisOne).NumOfNodesInList;
@@ -174,21 +172,10 @@ void GetNodeNums(EnergyPlusData &state,
     NodeInputManager::CompFluidStream FluidStreamNum = NodeFluidStream;
     DataLoopNode::ConnectionType thisConnectionType;
     for (int Loop = 1; Loop <= NumNodes; ++Loop) {
-
-        switch (nodeConnectionType) {
-        case DataLoopNode::ConnectionType::Num:
-        case DataLoopNode::ConnectionType::Invalid:
-            thisConnectionType = ConnectionType::Invalid;
-            break;
-        default:
-            thisConnectionType = nodeConnectionType;
-            break;
-        }
-
         // If requested, assign NodeFluidStream to the first node and increment the fluid stream number
         // for each remaining node in the list
-        if (present(IncrementFluidStream)) {
-            if (IncrementFluidStream) FluidStreamNum = static_cast<NodeInputManager::CompFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
+        if (IncrementFluidStream) {
+            FluidStreamNum = static_cast<NodeInputManager::CompFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
         }
 
         RegisterNodeConnection(state,
@@ -196,7 +183,7 @@ void GetNodeNums(EnergyPlusData &state,
                                state.dataLoopNodes->NodeID(NodeNumbers(Loop)),
                                NodeObjectType,
                                NodeObjectName,
-                               thisConnectionType,
+                               nodeConnectionType,
                                FluidStreamNum,
                                ObjectIsParent,
                                ErrorsFound,
@@ -210,8 +197,6 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   September
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is called when the indicated number of
@@ -792,7 +777,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
                 nodeConnectionType,
                 NodeFluidStream,
                 ObjectIsParent,
-                _,
+                false,
                 InputFieldName);
 
     if (NumNodes > 1) {

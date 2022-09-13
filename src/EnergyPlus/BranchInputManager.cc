@@ -1184,7 +1184,7 @@ namespace BranchInputManager {
                             ConnectionType,
                             NodeInputManager::CompFluidStream::Primary,
                             ObjectIsParent,
-                            _,
+                            false,
                             cAlphaFields(Loop + 2));
                 if (NumNodes > 1) {
                     ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
@@ -1226,7 +1226,7 @@ namespace BranchInputManager {
                             ConnectionType,
                             NodeInputManager::CompFluidStream::Primary,
                             ObjectIsParent,
-                            _,
+                            false,
                             cAlphaFields(Loop + 3));
                 if (NumNodes > 1) {
                     ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
