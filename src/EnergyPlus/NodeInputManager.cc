@@ -170,7 +170,6 @@ void GetNodeNums(EnergyPlusData &state,
 
     // Most calls to this routine use a fixed fluid stream number for all nodes, this is the default
     NodeInputManager::CompFluidStream FluidStreamNum = NodeFluidStream;
-    DataLoopNode::ConnectionType thisConnectionType;
     for (int Loop = 1; Loop <= NumNodes; ++Loop) {
         // If requested, assign NodeFluidStream to the first node and increment the fluid stream number
         // for each remaining node in the list
