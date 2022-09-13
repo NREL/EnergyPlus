@@ -3870,12 +3870,18 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     SurfaceGeometry::GetSurfaceData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
-    // Expect to have two severe errors, one for the detached Shading:Site:Detailed, and one for the attached Shading:Zone:Detailed.
-    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 2);
-    // The attached one will be the last severe error, since the "attached" function is called later than the "detached" one.
-    EXPECT_EQ(state->dataErrTracking->LastSevereError,
-              "Shading:Zone:Detailed=\"ZN001:WALL-SOUTH:SHADE001\" has an active Transmittance Schedule Name=\"SUNSHADING\";");
+    EXPECT_EQ(state->dataSolarShading->anyScheduledShadingSurface, true);
 
     EXPECT_EQ(state->dataErrTracking->AskForSurfacesReport, true);
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
+    // Expect no severe errors at this point
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+
+    SolarShading::GetShadowingInput(*state);
+
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
+    // Now expect one severe error from GetShadowInput()
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
+    // There should be a severe warning reported about the PixelCounting and the scheduled shading surface tm values > 0.0 combination.
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\";");
 }
