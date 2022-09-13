@@ -7107,20 +7107,20 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 }
                 if (SCCenter(IGlSys) <= 0.0) {
-                    ShowSevereError(state,
-                                    format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used: it "
-                                           "has Shading Coefficient <= 0 in glazing system {}",
-                                           DesiredConstructionName,
-                                           IGlSys));
-                    ErrorsFound = true;
+                    ShowWarningError(
+                        state,
+                        format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file has flawed data: it "
+                               "has a Shading Coefficient <= 0 in glazing system {}",
+                               DesiredConstructionName,
+                               IGlSys));
                 }
                 if (SHGCCenter(IGlSys) <= 0.0) {
-                    ShowSevereError(state,
-                                    format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used: it "
-                                           "has SHGC <= 0 in glazing system {}",
-                                           DesiredConstructionName,
-                                           IGlSys));
-                    ErrorsFound = true;
+                    ShowWarningError(
+                        state,
+                        format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file has flawed data: it "
+                               "has a SHGC <= 0 in glazing system {}",
+                               DesiredConstructionName,
+                               IGlSys));
                 }
                 WinHeight(IGlSys) *= 0.001;
                 WinWidth(IGlSys) *= 0.001;

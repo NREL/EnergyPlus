@@ -1642,105 +1642,25 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             auto &calcZoneSizing(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum));
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.CoolFlowSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.CoolFlowSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.CoolLoadSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.CoolLoadSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.HeatFlowSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.HeatFlowSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.HeatLoadSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.HeatLoadSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.CoolZoneRetTempSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.CoolZoneRetTempSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.HeatZoneRetTempSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.HeatZoneRetTempSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.DOASHeatAddSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.DOASHeatAddSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.DOASLatAddSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.DOASLatAddSeq = state.dataZoneEquipmentManager->AvgData;
+            General::MovingAvg(calcZoneSizing.CoolFlowSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.CoolLoadSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.HeatFlowSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.HeatLoadSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.CoolZoneRetTempSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.HeatZoneRetTempSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.DOASHeatAddSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.DOASLatAddSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.CoolLatentLoadNoDOASSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.HeatLatentLoadNoDOASSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.CoolLoadNoDOASSeq, state.dataSize->NumTimeStepsInAvg);
+            General::MovingAvg(calcZoneSizing.HeatLoadNoDOASSeq, state.dataSize->NumTimeStepsInAvg);
 
             if (calcZoneSizing.zoneLatentSizing) {
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                General::MovingAvg(calcZoneSizing.LatentHeatLoadSeq,
-                                   state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                                   state.dataSize->NumTimeStepsInAvg,
-                                   state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.LatentHeatLoadSeq = state.dataZoneEquipmentManager->AvgData;
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                General::MovingAvg(calcZoneSizing.LatentHeatFlowSeq,
-                                   state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                                   state.dataSize->NumTimeStepsInAvg,
-                                   state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.LatentHeatFlowSeq = state.dataZoneEquipmentManager->AvgData;
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                General::MovingAvg(calcZoneSizing.LatentCoolLoadSeq,
-                                   state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                                   state.dataSize->NumTimeStepsInAvg,
-                                   state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.LatentCoolLoadSeq = state.dataZoneEquipmentManager->AvgData;
-                state.dataZoneEquipmentManager->AvgData = 0.0;
-                General::MovingAvg(calcZoneSizing.LatentCoolFlowSeq,
-                                   state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                                   state.dataSize->NumTimeStepsInAvg,
-                                   state.dataZoneEquipmentManager->AvgData);
-                calcZoneSizing.LatentCoolFlowSeq = state.dataZoneEquipmentManager->AvgData;
+                General::MovingAvg(calcZoneSizing.LatentHeatLoadSeq, state.dataSize->NumTimeStepsInAvg);
+                General::MovingAvg(calcZoneSizing.LatentHeatFlowSeq, state.dataSize->NumTimeStepsInAvg);
+                General::MovingAvg(calcZoneSizing.LatentCoolLoadSeq, state.dataSize->NumTimeStepsInAvg);
+                General::MovingAvg(calcZoneSizing.LatentCoolFlowSeq, state.dataSize->NumTimeStepsInAvg);
             }
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.CoolLatentLoadNoDOASSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.CoolLatentLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.HeatLatentLoadNoDOASSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.HeatLatentLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.CoolLoadNoDOASSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.CoolLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
-            state.dataZoneEquipmentManager->AvgData = 0.0;
-            General::MovingAvg(calcZoneSizing.HeatLoadNoDOASSeq,
-                               state.dataZoneEquipmentManager->NumOfTimeStepInDay,
-                               state.dataSize->NumTimeStepsInAvg,
-                               state.dataZoneEquipmentManager->AvgData);
-            calcZoneSizing.HeatLoadNoDOASSeq = state.dataZoneEquipmentManager->AvgData;
         }
 
         auto &desDayWeath = state.dataSize->DesDayWeath(state.dataSize->CurOverallSimDay);
@@ -1927,7 +1847,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                     calcFinalZoneSizing.DesLatentHeatCoilInTemp = calcZoneSizing.DesLatentHeatCoilInTemp;
                     calcFinalZoneSizing.DesLatentHeatCoilInHumRat = calcZoneSizing.DesLatentHeatCoilInHumRat;
                     calcFinalZoneSizing.LatHeatDesDay = calcZoneSizing.LatHeatDesDay;
-                    calcFinalZoneSizing.cLatentHeatDDDate = state.dataSize->DesDayWeath(state.dataSize->CurOverallSimDay).DateString;
+                    calcFinalZoneSizing.cLatentHeatDDDate = desDayWeath.DateString;
                     calcFinalZoneSizing.LatentHeatDDNum = calcZoneSizing.LatentHeatDDNum;
                     calcFinalZoneSizing.TimeStepNumAtLatentHeatMax = calcZoneSizing.TimeStepNumAtLatentHeatMax;
                     calcFinalZoneSizing.LatentHeatLoadSeq = calcZoneSizing.LatentHeatLoadSeq;
@@ -1937,7 +1857,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                     // design latent heating volume flow rate is set to zero due to heating supply air humrat is less than zone humidistat humrat
                     if (calcZoneSizing.DesLatentHeatLoad > calcFinalZoneSizing.DesLatentHeatLoad) {
                         calcFinalZoneSizing.DesLatentHeatLoad = calcZoneSizing.DesLatentHeatLoad;
-                        calcFinalZoneSizing.cLatentHeatDDDate = state.dataSize->DesDayWeath(state.dataSize->CurOverallSimDay).DateString;
+                        calcFinalZoneSizing.cLatentHeatDDDate = desDayWeath.DateString;
                         calcFinalZoneSizing.LatentHeatDDNum = calcZoneSizing.LatentHeatDDNum;
                         calcFinalZoneSizing.TimeStepNumAtLatentHeatMax = calcZoneSizing.TimeStepNumAtLatentHeatMax;
                         calcFinalZoneSizing.LatentHeatLoadSeq = calcZoneSizing.LatentHeatLoadSeq;
