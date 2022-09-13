@@ -645,6 +645,16 @@ namespace SystemAvailabilityManager {
                             ErrorsFound = true;
                         }
                     }
+                } else if (nightCycleMgr.nightCycleControlType == NightCycleControlType::OnControlZone) {
+                    ShowSevereError(state,
+                                    format("{}{} = \"{}\" {} required when \"{}\" = {}.",
+                                           RoutineName,
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cAlphaFieldNames(6),
+                                           cAlphaFieldNames(4),
+                                           cAlphaArgs(4)));
+                    ErrorsFound = true;
                 }
 
                 // Cooling zone or zonelist
