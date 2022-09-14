@@ -10137,7 +10137,10 @@ void CheckGlazingShadingStatusChange(EnergyPlusData &state)
         }
         if (state.dataHeatBal->EnclRadAlwaysReCalc) {
             for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-                state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+                state.dataViewFactor->EnclSolInfo(enclosureNum).radReCalc = true;
+            }
+            for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
+                state.dataViewFactor->EnclRadInfo(enclosureNum).radReCalc = true;
             }
         }
     }
@@ -10145,12 +10148,18 @@ void CheckGlazingShadingStatusChange(EnergyPlusData &state)
 
     if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel || state.dataGlobal->AnySurfPropOverridesInModel) {
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-            state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+            state.dataViewFactor->EnclSolInfo(enclosureNum).radReCalc = true;
+        }
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
+            state.dataViewFactor->EnclRadInfo(enclosureNum).radReCalc = true;
         }
         return;
     }
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-        state.dataHeatBal->EnclRadReCalc(enclosureNum) = false;
+        state.dataViewFactor->EnclSolInfo(enclosureNum).radReCalc = false;
+    }
+    for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
+        state.dataViewFactor->EnclRadInfo(enclosureNum).radReCalc = false;
     }
     if (!state.dataGlobal->AndShadingControlInModel) return;
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
@@ -10160,7 +10169,8 @@ void CheckGlazingShadingStatusChange(EnergyPlusData &state)
                 state.dataSurface->Surface(SurfNum).activeShadedConstruction != state.dataSurface->Surface(SurfNum).activeShadedConstructionPrev ||
                 state.dataSurface->SurfWinMovableSlats(SurfNum);
             if (surfShadingStatusChange) {
-                state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+                state.dataViewFactor->EnclSolInfo(enclosureNum).radReCalc = true;
+                state.dataViewFactor->EnclRadInfo(enclosureNum).radReCalc = true;
                 break;
             }
         }

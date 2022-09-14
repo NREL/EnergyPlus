@@ -1032,7 +1032,7 @@ namespace DataHeatBalance {
         int SupplyApproachTempSch = 0;      // The difference schedule of the IT inlet temperature from the AHU supply air temperature
         Real64 ReturnApproachTemp = 0.0;    // The difference of the unit outlet temperature from the well mixed zone temperature
         int ReturnApproachTempSch = 0;      // The difference schedule of the unit outlet temperature from the well mixed zone temperature
-        int zoneEqIndex = 0;                // index in zone equipment data structure for the zone this IT equipment is in
+        bool inControlledZone = false;      // True if in a controlled zone
 
         // Report variables
         std::array<Real64, (int)PERptVars::Num> PowerRpt;
@@ -2223,12 +2223,6 @@ struct HeatBalanceData : BaseGlobalStruct
     // from interior surfaces, and beam entering through interior windows
     // (considered diffuse)
     // Originally QD, now used only for EnclSolQSDifSol calc for daylighting
-
-    Array1D<Real64> EnclSolVMULT;        // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
-    Array1D<Real64> EnclRadQThermalRad;  // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
-    Array1D<Real64> EnclRadThermAbsMult; // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
-    Array1D<bool> EnclSolAbsFirstCalc;   // for error message
-    Array1D<bool> EnclRadReCalc;         // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
 
     bool EnclRadAlwaysReCalc = false; // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
 

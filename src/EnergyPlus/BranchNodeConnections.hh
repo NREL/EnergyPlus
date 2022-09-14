@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 
@@ -67,6 +68,9 @@ namespace DataBranchNodeConnections {
 
 namespace BranchNodeConnections {
 
+    extern const std::array<std::string_view, static_cast<int>(DataLoopNode::ConnectionObjectType::Num)> ConnectionObjectTypeNames;
+    extern const std::array<std::string_view, static_cast<int>(DataLoopNode::ConnectionObjectType::Num)> ConnectionObjectTypeNamesUC;
+
     void RegisterNodeConnection(EnergyPlusData &state,
                                 int NodeNumber,                                // Number for this Node
                                 std::string_view NodeName,                     // Name of this Node
@@ -79,25 +83,26 @@ namespace BranchNodeConnections {
                                 std::string_view const InputFieldName = {}     // Input Field Name
     );
 
-    void OverrideNodeConnectionType(EnergyPlusData &state,
-                                    int NodeNumber,                                // Number for this Node
-                                    std::string const &NodeName,                   // Name of this Node
-                                    std::string const &ObjectType,                 // Type of object this Node is connected to (e.g. Chiller:Electric)
-                                    std::string const &ObjectName,                 // Name of object this Node is connected to (e.g. MyChiller)
-                                    DataLoopNode::ConnectionType ConnectionType,   // Connection Type for this Node (must be valid)
-                                    NodeInputManager::CompFluidStream FluidStream, // Count on Fluid Streams
-                                    bool IsParent,                                 // True when node is a parent node
-                                    bool &errFlag                                  // Will be True if errors already detected or if errors found here
+    void OverrideNodeConnectionType(
+        EnergyPlusData &state,
+        int const NodeNumber,                                // Number for this Node
+        std::string const &NodeName,                         // Name of this Node
+        DataLoopNode::ConnectionObjectType const ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+        std::string const &ObjectName,                       // Name of object this Node is connected to (e.g. MyChiller)
+        DataLoopNode::ConnectionType const ConnectionType,   // Connection Type for this Node (must be valid)
+        NodeInputManager::CompFluidStream const FluidStream, // Count on Fluid Streams
+        bool const IsParent,                                 // True when node is a parent node
+        bool &errFlag                                        // Will be True if errors already detected or if errors found here
     );
 
     void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool IsParentObject(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
+    bool IsParentObject(EnergyPlusData &state, DataLoopNode::ConnectionObjectType const ComponentType, std::string const &ComponentName);
 
-    int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
+    int WhichParentSet(EnergyPlusData &state, DataLoopNode::ConnectionObjectType const ComponentType, std::string const &ComponentName);
 
     void GetParentData(EnergyPlusData &state,
-                       std::string const &ComponentType,
+                       DataLoopNode::ConnectionObjectType const ComponentType,
                        std::string const &ComponentName,
                        std::string &InletNodeName,
                        int &InletNodeNum,
@@ -105,14 +110,14 @@ namespace BranchNodeConnections {
                        int &OutletNodeNum,
                        bool &ErrorsFound);
 
-    bool IsParentObjectCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
+    bool IsParentObjectCompSet(EnergyPlusData &state, DataLoopNode::ConnectionObjectType const ComponentType, std::string const &ComponentName);
 
-    int WhichCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
+    int WhichCompSet(EnergyPlusData &state, DataLoopNode::ConnectionObjectType const ComponentType, std::string const &ComponentName);
 
-    int GetNumChildren(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
+    int GetNumChildren(EnergyPlusData &state, DataLoopNode::ConnectionObjectType const ComponentType, std::string const &ComponentName);
 
     void GetComponentData(EnergyPlusData &state,
-                          std::string const &ComponentType,
+                          DataLoopNode::ConnectionObjectType const ComponentType,
                           std::string const &ComponentName,
                           bool &IsParent, // true or false
                           int &NumInlets,
@@ -127,10 +132,10 @@ namespace BranchNodeConnections {
     );
 
     void GetChildrenData(EnergyPlusData &state,
-                         std::string const &ComponentType,
+                         DataLoopNode::ConnectionObjectType const ComponentType,
                          std::string const &ComponentName,
                          int &NumChildren,
-                         Array1D_string &ChildrenCType,
+                         EPVector<DataLoopNode::ConnectionObjectType> &ChildrenCType,
                          Array1D_string &ChildrenCName,
                          Array1D_string &InletNodeName,
                          Array1D_int &InletNodeNum,
@@ -148,7 +153,7 @@ namespace BranchNodeConnections {
                        std::string_view const Description = {} // Description
     );
 
-    void TestInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
+    void TestInletOutletNodes(EnergyPlusData &state);
 
     void TestCompSet(EnergyPlusData &state,
                      std::string const &CompType,   // Component Type
@@ -160,10 +165,10 @@ namespace BranchNodeConnections {
 
     void TestCompSetInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetNodeConnectionType(EnergyPlusData &state, int NodeNumber, Array1D<DataLoopNode::ConnectionType> &NodeConnectType, bool &errFlag);
+    void GetNodeConnectionType(EnergyPlusData &state, int NodeNumber, EPVector<DataLoopNode::ConnectionType> &NodeConnectType, bool &errFlag);
 
     void FindAllNodeNumbersInList(int WhichNumber,
-                                  Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
+                                  EPVector<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                                   int NumItems,
                                   int &CountOfItems,            // Number of items found
                                   Array1D_int &AllNumbersInList // Index array to all numbers found
