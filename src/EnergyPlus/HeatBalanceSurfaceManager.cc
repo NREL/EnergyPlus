@@ -674,6 +674,58 @@ void GatherForPredefinedReport(EnergyPlusData &state)
         "OnIfHighZoneAirTempAndHighSolarOnWindow",
         "OnIfHighZoneAirTempAndHighHorizontalSolar"};
 
+    constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductNames = {
+        "CasementDouble", "CasementSingle",   "DualAction",
+        "Fixed",          "Garage",           "Greenhouse",
+        "HingedEscape",   "HorizontalSlider", "Jal",
+        "Pivoted",        "ProjectingSingle", "ProjectingDual",
+        "DoorSidelite",   "Skylight",         "SlidingPatioDoor",
+        "CurtainWall",    "SpandrelPanel",    "SideHingedDoor",
+        "DoorTransom",    "TropicalAwning",   "TubularDaylightingDevice",
+        "VerticalSlider"};
+
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
+        // width in meters from Table 4-3 of NFRC 100-2020
+        1.200, 0.600, 1.200, //  CasementDouble,  CasementSingle,    DualAction,
+        1.200, 2.134, 1.500, //  Fixed,           Garage,            Greenhouse,
+        1.500, 1.500, 1.200, //  HingedEscape,    HorizontalSlider,  Jal,
+        1.200, 1.500, 1.500, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        0.600, 1.200, 2.000, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        2.000, 2.000, 1.920, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        2.000, 1.500, 0.350, //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        1.200                //  VerticalSlider,
+    };
+
+    constexpr std::array<Real64, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
+        // height in meters from Table 4-3 of NFRC 100-2020
+        1.500, 1.500, 1.500, //  CasementDouble,  CasementSingle,    DualAction,
+        1.500, 2.134, 1.200, //  Fixed,           Garage,            Greenhouse,
+        1.200, 1.200, 1.500, //  HingedEscape,    HorizontalSlider,  Jal,
+        1.500, 1.200, 0.600, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        2.090, 1.200, 2.000, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        2.000, 1.200, 2.090, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        0.600, 1.200, 0.350, //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        1.500                //  VerticalSlider,
+    };
+
+    constexpr std::array<NfrcVisionType, static_cast<int>(NfrcProductOptions::Num)> NfrcVision = {
+        NfrcVisionType::DualHorizontal, NfrcVisionType::Single,
+        NfrcVisionType::DualVertical, //  CasementDouble,  CasementSingle,    DualAction,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::Single, //  Fixed,           Garage,            Greenhouse,
+        NfrcVisionType::Single,         NfrcVisionType::DualHorizontal,
+        NfrcVisionType::Single, //  HingedEscape,    HorizontalSlider,  Jal,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::DualHorizontal, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::DualHorizontal, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::Single, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::Single,      //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        NfrcVisionType::DualVertical //  VerticalSlider
+    };
+
     auto &Surface(state.dataSurface->Surface);
 
     numSurfaces = 0;
@@ -788,8 +840,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                      3);
 
                     // report the selected NRFC product type (specific sizes) and the NFRC rating for the assembly (glass + frame + divider)
-                    std::string_view NFRCname =
-                        DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                    std::string_view NFRCname = NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                     const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
@@ -892,8 +943,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         GetWindowAssemblyNfrcForReport(
                             state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
 
-                        std::string_view NFRCname =
-                            DataSurfaces::NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        std::string_view NFRCname = NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemNfrcType, constructionName, NFRCname);
 
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdAssemUfact, constructionName, stateAssemblyUValue, 3);
@@ -958,7 +1008,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWscControl,
                                      surfName,
-                                     WindowShadingControlTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).ShadingControlType)]);
+                                     WindowShadingControlTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).shadingControlType)]);
 
                     // output list of all possible shading contructions for shaded windows including those with storms
                     std::string names = "";
@@ -2994,7 +3044,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                     WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
 
-                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) == Window5DetailedModel &&
+                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::Detailed &&
                         !state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                         int TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers; // Number of glass layers
                         for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
@@ -3135,15 +3185,15 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         // Need to do it this way for now beaucse of scheduled surface gains. They do work only with
                         // BSDF windows and overwriting absorbtances will work only for ordinary windows
-                        // } else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel &&
-                        //   SurfaceWindow( SurfNum ).WindowModelType != WindowEQLModel &&
+                        // } else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowModel:: BSDF &&
+                        //   SurfaceWindow( SurfNum ).WindowModelType != WindowModel:: EQL &&
                         //   inExtWindowModel->isExternalLibraryModel() ) {
                         //   TotSolidLay = Construct( ConstrNum ).TotSolidLayers;
                         //   for ( Lay = 1; Lay <= TotSolidLay; ++Lay ) {
                         //     SurfWinQRadSWwinAbs( Lay, SurfNum ) = SurfWinA( Lay, SurfNum ) *
                         //       ( SurfQRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone ) );
                         //   }
-                    } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
+                    } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) {
                         int TotSolidLay = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
                         // Number of solid layers in fenestration system (glass + shading)
                         int CurrentState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.CurrentState;
@@ -3181,7 +3231,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                         state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
                             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
-                    } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
+                    } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL) {
                         state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
                         // EQLNum = Construct(Surface(SurfNum)%Construction)%EQLConsPtr
                         int TotSolidLay =
@@ -3733,7 +3783,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             int const solEnclosureNum = Surface(SurfNum).SolarEnclIndex;
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
 
-            if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
+            if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowModel::EQL) {
                 int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
 
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
@@ -3926,12 +3976,12 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 }
                 // Window frame has not been included for equivalent layer model yet
 
-            } // end if for IF ( SurfaceWindow(SurfNum)%WindowModelType /= WindowEQLModel) THEN
+            } // end if for IF ( SurfaceWindow(SurfNum)%WindowModelType /= WindowModel:: EQL) THEN
 
             if (Surface(SurfNum).ExtBoundCond > 0) { // Interzone surface
                 // Short-wave radiation absorbed in panes of corresponding window in adjacent zone
                 int SurfNumAdjZone = Surface(SurfNum).ExtBoundCond; // Surface number in adjacent zone for interzone surfaces
-                if (state.dataSurface->SurfWinWindowModelType(SurfNumAdjZone) != WindowEQLModel) {
+                if (state.dataSurface->SurfWinWindowModelType(SurfNumAdjZone) != WindowModel::EQL) {
                     int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNumAdjZone, IGlass) +=
@@ -3941,7 +3991,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                         // radiation from the current zone is incident on the outside of the adjacent
                         // zone's window.
                     }
-                } else { // IF (SurfaceWindow(SurfNumAdjZone)%WindowModelType == WindowEQLModel) THEN
+                } else { // IF (SurfaceWindow(SurfNumAdjZone)%WindowModelType == WindowModel:: EQL) THEN
                     int const AdjConstrNum = Surface(SurfNumAdjZone).Construction;
                     int const EQLNum = state.dataConstruction->Construct(AdjConstrNum).EQLConsPtr;
                     for (int Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
@@ -3954,7 +4004,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 }
             }
 
-            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {
+            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::Detailed) {
                 int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -3977,12 +4027,12 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                         state.dataSurface->SurfWinIntSWAbsByShade(SurfNum) += state.dataSurface->SurfWinInitialDifSolAbsByShade(SurfNum);
                     }
                 } // End of shading flag check
-            } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
+            } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) {
                 int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                     state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) += state.dataHeatBal->SurfWinInitialDifSolwinAbs(SurfNum, IGlass);
                 }
-            } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
+            } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL) {
 
                 // ConstrNum   = Surface(SurfNum)%Construction
                 int EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
@@ -6375,9 +6425,9 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             int const constrNum = state.dataSurface->SurfActiveConstruction(surfNum);
             int const constrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(surfNum);
             WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(surfNum);
-            if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowEQLModel) {
+            if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowModel::EQL) {
                 TotGlassLayers = state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(constrNum).EQLConsPtr).NL;
-            } else if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowBSDFModel) {
+            } else if (state.dataSurface->SurfWinWindowModelType(surfNum) == WindowModel::BSDF) {
                 TotGlassLayers = state.dataConstruction->Construct(constrNum).TotSolidLayers;
             } else if (NOT_SHADED(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
                 TotGlassLayers = state.dataConstruction->Construct(constrNum).TotGlassLayers;

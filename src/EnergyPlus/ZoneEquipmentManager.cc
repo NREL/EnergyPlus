@@ -4966,7 +4966,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                 for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
                      ++SurfNum) {
                     if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
-                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::AirFlowWindow_Destination_ReturnAir) {
+                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
                         Real64 FlowThisTS = PsyRhoAirFnPbTdbW(state,
                                                               state.dataEnvrn->OutBaroPress,
                                                               state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
