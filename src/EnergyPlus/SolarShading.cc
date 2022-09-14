@@ -359,85 +359,17 @@ void InitSolarCalculations(EnergyPlusData &state)
     state.dataSolarShading->firstTime = false;
 }
 
-//void GetShadowCalcMethodforSurfGeom(EnergyPlusData &state)
-//{
-//    // This is a much condensed revision based on the full ShadowCalculation input processing module
-//    // The purpose is to only retrieve the Shadow Calculation Method field for the Surface Geometry modules
-//    // For this purpose, it just literally check the input types for Shadow Calculation Method field.
-//    // If machine-specific or computation environment-specific adjustment needs to be done,
-//    // the adjustment will be done in the full version of SolarShading::GetShadowingInput().
-//
-//    // Using/Aliasing
-//    using DataSystemVariables::ShadingMethod;
-//
-//    int NumItems;
-//    int NumNumbers;
-//    int NumAlphas;
-//    int IOStat;
-//    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-//    state.dataIPShortCut->rNumericArgs({1, 4}) = 0.0; // so if nothing gotten, defaults will be maintained.
-//    state.dataIPShortCut->cAlphaArgs(1) = "";
-//    state.dataIPShortCut->cAlphaArgs(2) = "";
-//    cCurrentModuleObject = "ShadowCalculation";
-//    NumItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-//    NumAlphas = 0;
-//    NumNumbers = 0;
-//    if (NumItems >= 1) {
-//        if (NumItems > 1) {
-//            ShowWarningError(state, cCurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
-//        }
-//        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-//                                                                 cCurrentModuleObject,
-//                                                                 1,
-//                                                                 state.dataIPShortCut->cAlphaArgs,
-//                                                                 NumAlphas,
-//                                                                 state.dataIPShortCut->rNumericArgs,
-//                                                                 NumNumbers,
-//                                                                 IOStat,
-//                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-//                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-//                                                                 state.dataIPShortCut->cAlphaFieldNames,
-//                                                                 state.dataIPShortCut->cNumericFieldNames);
-//        state.dataSolarShading->ShadowingCalcFrequency = state.dataIPShortCut->rNumericArgs(1);
-//    }
-//
-//    int aNum = 1;
-//    unsigned pixelRes = 512u;
-//    if (NumAlphas >= aNum) {
-//        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Scheduled")) {
-//            state.dataSysVars->shadingMethod = ShadingMethod::Scheduled;
-//        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Imported")) {
-//            if (state.dataScheduleMgr->ScheduleFileShadingProcessed) {
-//                state.dataSysVars->shadingMethod = ShadingMethod::Imported;
-//            } else {
-//                //
-//            }
-//        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PolygonClipping")) {
-//            state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
-//        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PixelCounting")) {
-//            state.dataSysVars->shadingMethod = ShadingMethod::PixelCounting;
-//        } else {
-//            //
-//        }
-//    } else {
-//        state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
-//    }
-//}
-
 void GetShadowingInput(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   July 1999
     //       MODIFIED       B. Griffith, Nov 2012, add calculation method
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the Shadowing Calculation object.
 
     // Using/Aliasing
-
     using DataSystemVariables::ShadingMethod;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -550,15 +482,16 @@ void GetShadowingInput(EnergyPlusData &state)
         state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
     }
 
-    if (state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting &&
-        state.dataSolarShading->anyScheduledShadingSurface == true) {
-        ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\";");
+    if ((state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) &&
+        state.dataSolarShading->anyScheduledShadingSurface) {
+        ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
         ShowContinueError(state, "and there is at least one shading surface of type ");
-        ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed,");
+        ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
         ShowContinueError(state, "that has an active transmittance schedule value greater than zero.");
-        ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as completely opaque (transmittance = 0) during the shading calculation, ");
+        ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
+        ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
         ShowContinueError(state, "which may result in inaccurate or unexpected results.");
-        ShowContinueError(state, "It is suggested to use another Shading Calculation Method, such as \"PolygonClipping\".");
+        ShowContinueError(state, "It is suggested switching to another Shading Calculation Method, such as \"PolygonClipping\".");
     }
 
     aNum++;
