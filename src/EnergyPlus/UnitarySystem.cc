@@ -1206,9 +1206,9 @@ namespace UnitarySystems {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine checks for proper set point at control node.
         constexpr static std::array<std::string_view, 3> coilTypes = {"cooling", "heating", "supplemental"};
+        bool SetPointErrorFlag = false;
 
         if (ControlNode == 0) {
-            bool setPointMissing = false;
             if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                 int coilOutNode = this->CoolCoilOutletNodeNum;
                 if (CoilType == HeatingCoil) coilOutNode = this->HeatCoilOutletNodeNum;
@@ -1220,9 +1220,9 @@ namespace UnitarySystems {
                                          state.dataLoopNodes->NodeID(this->AirOutNode),
                                          coilTypes[CoilType],
                                          state.dataLoopNodes->NodeID(coilOutNode)));
-                setPointMissing = true;
+                SetPointErrorFlag = true;
             }
-            return setPointMissing;
+            return SetPointErrorFlag;
         }
 
         if (AirLoopNum == -1) {                                                   // Outdoor Air Unit
@@ -1237,7 +1237,6 @@ namespace UnitarySystems {
             }
         } else { // Not an Outdoor air unit
 
-            bool SetPointErrorFlag = false;
             if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue &&
                 this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -1274,6 +1273,7 @@ namespace UnitarySystems {
                 }
             }
         }
+        return false; // these later errors do not cause a fatal at this time
     }
 
     void UnitarySys::frostControlSetPointLimit(EnergyPlusData &state,

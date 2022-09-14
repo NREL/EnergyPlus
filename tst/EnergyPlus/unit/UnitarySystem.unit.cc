@@ -10327,6 +10327,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                 0.001); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                                  // fan PLR at maximum speed
     EXPECT_LT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
+
+    // spot check function checkNodeSetPoint for load control
+    int const coolingCoil = 0;
+    bool SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->CoolCtrlNode, coolingCoil, OAUCoilOutTemp);
+    EXPECT_FALSE(SetPointError);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
@@ -18123,6 +18128,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
+
+    // spot check function checkNodeSetPoint for set point control
+    int const heatingCoil = 1;
+    bool SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->HeatCtrlNode, heatingCoil, OAUCoilOutTemp);
+    EXPECT_FALSE(SetPointError);
+
+    // test as if control node were 0
+    thisSys->HeatCtrlNode = 0;
+    SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->HeatCtrlNode, heatingCoil, OAUCoilOutTemp);
+    EXPECT_TRUE(SetPointError);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
