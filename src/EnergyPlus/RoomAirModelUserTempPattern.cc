@@ -830,7 +830,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         WinGapTtoRA = 0.0;
         WinGapFlowTtoRA = 0.0;
 
-        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneHasAirFlowWindowReturn) {
+        if (state.dataHeatBal->Zone(ZoneNum).HasAirFlowWindowReturn) {
             for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {

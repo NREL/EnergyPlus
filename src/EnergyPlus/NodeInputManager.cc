@@ -72,8 +72,6 @@ namespace EnergyPlus::NodeInputManager {
 // MODULE INFORMATION:
 //       AUTHOR         Linda K. Lawrie
 //       DATE WRITTEN   September 1999
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // To provide utilities for reading and assigning indices for the
@@ -95,7 +93,7 @@ void GetNodeNums(EnergyPlusData &state,
                  DataLoopNode::ConnectionType const nodeConnectionType,   // Node Connection Type (see DataLoopNode)
                  CompFluidStream const NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
                  bool const ObjectIsParent,                               // True/False
-                 Optional_bool_const IncrementFluidStream,                // True/False
+                 bool const IncrementFluidStream,                         // True/False
                  std::string_view const InputFieldName                    // Input Field Name
 )
 {
@@ -104,7 +102,6 @@ void GetNodeNums(EnergyPlusData &state,
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   September 1999
     //       MODIFIED       February 2004, Fluid Type checking/setting
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine calls the Node Manager to determine if the
@@ -116,11 +113,7 @@ void GetNodeNums(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetNodeNums: ");
 
-    std::string objTypeStr = std::string(DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)]);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataLoopNode::ConnectionType ConnectionType;
-    NodeInputManager::CompFluidStream FluidStreamNum; // Fluid stream number passed to RegisterNodeConnection
+    std::string_view const objTypeStr = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)];
 
     if (state.dataNodeInputMgr->GetNodeInputFlag) {
         GetNodeListsInput(state, ErrorsFound);
@@ -130,13 +123,13 @@ void GetNodeNums(EnergyPlusData &state,
     if (nodeFluidType != DataLoopNode::NodeFluidType::Air && nodeFluidType != DataLoopNode::NodeFluidType::Water &&
         nodeFluidType != DataLoopNode::NodeFluidType::Electric && nodeFluidType != DataLoopNode::NodeFluidType::Steam &&
         nodeFluidType != DataLoopNode::NodeFluidType::Blank) {
-        ShowSevereError(state, std::string{RoutineName} + objTypeStr + "=\"" + NodeObjectName + "\", invalid fluid type.");
+        ShowSevereError(state, format("{}{}=\"{}=\", invalid fluid type.", RoutineName, objTypeStr, NodeObjectName));
         ShowContinueError(state, format("..Invalid FluidType={}", nodeFluidType));
         ErrorsFound = true;
         ShowFatalError(state, "Preceding issue causes termination.");
     }
 
-    if (not_blank(Name)) {
+    if (!Name.empty()) {
         int ThisOne = UtilityRoutines::FindItemInList(Name, state.dataNodeInputMgr->NodeLists);
         if (ThisOne != 0) {
             NumNodes = state.dataNodeInputMgr->NodeLists(ThisOne).NumOfNodesInList;
@@ -145,7 +138,7 @@ void GetNodeNums(EnergyPlusData &state,
                 if (nodeFluidType != DataLoopNode::NodeFluidType::Blank &&
                     state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != DataLoopNode::NodeFluidType::Blank) {
                     if (state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != nodeFluidType) {
-                        ShowSevereError(state, std::string{RoutineName} + objTypeStr + "=\"" + NodeObjectName + "\", invalid data.");
+                        ShowSevereError(state, format("{}{}=\"{}=\", invalid data.", RoutineName, objTypeStr, NodeObjectName));
                         if (!InputFieldName.empty()) {
                             ShowContinueError(state, fmt::format("...Ref field={}", InputFieldName));
                         }
@@ -176,23 +169,12 @@ void GetNodeNums(EnergyPlusData &state,
     }
 
     // Most calls to this routine use a fixed fluid stream number for all nodes, this is the default
-    FluidStreamNum = NodeFluidStream;
+    NodeInputManager::CompFluidStream FluidStreamNum = NodeFluidStream;
     for (int Loop = 1; Loop <= NumNodes; ++Loop) {
-
-        switch (nodeConnectionType) {
-        case DataLoopNode::ConnectionType::Num:
-        case DataLoopNode::ConnectionType::Invalid:
-            ConnectionType = ConnectionType::Invalid;
-            break;
-        default:
-            ConnectionType = nodeConnectionType;
-            break;
-        }
-
         // If requested, assign NodeFluidStream to the first node and increment the fluid stream number
         // for each remaining node in the list
-        if (present(IncrementFluidStream)) {
-            if (IncrementFluidStream) FluidStreamNum = static_cast<NodeInputManager::CompFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
+        if (IncrementFluidStream) {
+            FluidStreamNum = static_cast<NodeInputManager::CompFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
         }
 
         RegisterNodeConnection(state,
@@ -200,7 +182,7 @@ void GetNodeNums(EnergyPlusData &state,
                                state.dataLoopNodes->NodeID(NodeNumbers(Loop)),
                                NodeObjectType,
                                NodeObjectName,
-                               ConnectionType,
+                               nodeConnectionType,
                                FluidStreamNum,
                                ObjectIsParent,
                                ErrorsFound,
@@ -214,8 +196,6 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   September
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is called when the indicated number of
@@ -765,25 +745,19 @@ int GetOnlySingleNode(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie; adapted from GasAbsorptionChiller;Jason Glazer
     //       DATE WRITTEN   December 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function gets a single node (or error message results) using the
     // node id from the input file.
 
-    // FUNCTION PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetOnlySingleNode: ");
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int NumNodes;
     int NumParams;
     int NumAlphas;
     int NumNums;
 
-    DataLoopNode::NodeFluidType FluidType;
-    std::string ConnectionType;
-    std::string objTypeStr = std::string(DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)]);
+    std::string_view const objTypeStr = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)];
 
     if (state.dataNodeInputMgr->GetOnlySingleNodeFirstTime) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
@@ -791,24 +765,22 @@ int GetOnlySingleNode(EnergyPlusData &state,
         state.dataNodeInputMgr->GetOnlySingleNodeFirstTime = false;
     }
 
-    FluidType = nodeFluidType;
-
     GetNodeNums(state,
                 NodeName,
                 NumNodes,
                 state.dataNodeInputMgr->GetOnlySingleNodeNodeNums,
                 errFlag,
-                FluidType,
+                nodeFluidType,
                 NodeObjectType,
                 NodeObjectName,
                 nodeConnectionType,
                 NodeFluidStream,
                 ObjectIsParent,
-                _,
+                false,
                 InputFieldName);
 
     if (NumNodes > 1) {
-        ShowSevereError(state, std::string{RoutineName} + objTypeStr + "=\"" + NodeObjectName + "\", invalid data.");
+        ShowSevereError(state, format("{}{}=\"{}=\", invalid data.", RoutineName, objTypeStr, NodeObjectName));
         if (!InputFieldName.empty()) {
             ShowContinueError(state, fmt::format("...Ref field={}", InputFieldName));
         }
@@ -817,14 +789,6 @@ int GetOnlySingleNode(EnergyPlusData &state,
         errFlag = true;
     } else if (NumNodes == 0) {
         state.dataNodeInputMgr->GetOnlySingleNodeNodeNums(1) = 0;
-    }
-    if (NumNodes > 0) {
-        auto nodeConnType(static_cast<int>(nodeConnectionType));
-        if (nodeConnType >= 1 && nodeConnType < static_cast<int>(ConnectionType::Num)) {
-            ConnectionType = DataLoopNode::ConnectionTypeNames[nodeConnType];
-        } else {
-            ConnectionType = format("{}-unknown", nodeConnectionType);
-        }
     }
 
     return state.dataNodeInputMgr->GetOnlySingleNodeNodeNums(1);
@@ -1300,7 +1264,8 @@ void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
     for (int NodeNum = 1; NodeNum <= state.dataLoopNodes->NumOfNodes; ++NodeNum) {
         if (state.dataLoopNodes->MarkedNode(NodeNum).IsMarked) {
             if (state.dataNodeInputMgr->NodeRef(NodeNum) == 0) {
-                auto objType = DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataLoopNodes->MarkedNode(NodeNum).ObjectType)];
+                auto objType =
+                    BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(state.dataLoopNodes->MarkedNode(NodeNum).ObjectType)];
                 ShowSevereError(state, "Node=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\" did not find reference by another object.");
                 ShowContinueError(state,
                                   format(R"(Object="{}", Name="{}", Field=[{}])",
