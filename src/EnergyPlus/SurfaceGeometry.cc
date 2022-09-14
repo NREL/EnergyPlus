@@ -3357,8 +3357,6 @@ namespace SurfaceGeometry {
                                         cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", " +
                                             state.dataIPShortCut->cAlphaFieldNames(2) + " not found=" + state.dataIPShortCut->cAlphaArgs(2));
                         ErrorsFound = true;
-                    } else {
-                        //
                     }
                 } else {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex = 0;
@@ -6372,8 +6370,6 @@ namespace SurfaceGeometry {
                                     cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", " +
                                         state.dataIPShortCut->cAlphaFieldNames(3) + " not found=\"" + state.dataIPShortCut->cAlphaArgs(3));
                     ErrorsFound = true;
-                } else {
-                    //
                 }
             } else {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex = 0;
