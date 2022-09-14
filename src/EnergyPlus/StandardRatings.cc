@@ -581,7 +581,7 @@ namespace StandardRatings {
                     PartLoadRatio = MinUnloadRat;
                 }
             } else {
-                // should not come here, do nothing
+                assert(false);
             }
 
             // Available chiller capacity as a function of temperature
