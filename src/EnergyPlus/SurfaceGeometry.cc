@@ -10547,7 +10547,6 @@ namespace SurfaceGeometry {
 
             if (SurfNum > 0) {
                 state.dataSurface->AirflowWindows = true;
-
                 state.dataSurface->SurfWinAirflowSource(SurfNum) =
                     static_cast<WindowAirFlowSource>(getEnumerationValue(WindowAirFlowSourceNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
 
@@ -10557,7 +10556,6 @@ namespace SurfaceGeometry {
                 if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
                     int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, state.dataSurface->Surface(SurfNum).ZoneName);
                     if (controlledZoneNum > 0) {
-                        state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneHasAirFlowWindowReturn = true;
                         state.dataHeatBal->Zone(state.dataSurface->Surface(SurfNum).Zone).HasAirFlowWindowReturn = true;
                     }
 
@@ -14784,9 +14782,9 @@ namespace SurfaceGeometry {
 
     void
     SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
-                                    Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
-                                    SurfaceGeometry::enclosureType const EnclosureType,                             // Radiant or Solar
-                                    bool &ErrorsFound)                                                              // Set to true if errors found
+                                    EPVector<DataViewFactorInformation::EnclosureViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
+                                    SurfaceGeometry::enclosureType const EnclosureType,                              // Radiant or Solar
+                                    bool &ErrorsFound)                                                               // Set to true if errors found
     {
         static constexpr std::string_view RoutineName = "SetupEnclosuresAndAirBoundaries";
         bool anyGroupedSpaces = false;
