@@ -1788,17 +1788,17 @@ void GetDXCoils(EnergyPlusData &state)
                         if (lAlphaBlanks2(7)) {
                             state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(PerfModeNum) = 0;
                         } else {
-                            state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(PerfModeNum) =
-                                GetOnlySingleNode(state,
-                                                  Alphas2(7),
-                                                  ErrorsFound,
-                                                  (DataLoopNode::ConnectionObjectType)getEnumerationValue(
-                                                      DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(PerfObjectType)),
-                                                  PerfObjectName,
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::OutsideAirReference,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+                            state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(PerfModeNum) = GetOnlySingleNode(
+                                state,
+                                Alphas2(7),
+                                ErrorsFound,
+                                (DataLoopNode::ConnectionObjectType)getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                                                                                        UtilityRoutines::MakeUPPERCase(PerfObjectType)),
+                                PerfObjectName,
+                                DataLoopNode::NodeFluidType::Air,
+                                DataLoopNode::ConnectionType::OutsideAirReference,
+                                NodeInputManager::CompFluidStream::Primary,
+                                ObjectIsNotParent);
                             if (!CheckOutAirNodeNumber(state, state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(PerfModeNum))) {
                                 ShowWarningError(state, std::string{RoutineName} + PerfObjectType + "=\"" + PerfObjectName + "\":");
                                 ShowContinueError(state, "may not be valid " + cAlphaFields2(7) + "=\"" + Alphas2(7) + "\".");
@@ -16166,31 +16166,34 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
     int DXCoolingCoilIndex; // Index of HP DX cooling coil returned from this function
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichComp;                    // DO loop counter to find correct comp set
-    int WhichCompanionComp;           // DO loop counter to find companion coil comp set
-    int WhichHXAssistedComp;          // DO loop counter when DX coil is used in a HX assisted cooling coil
-    std::string CompSetsParentType;   // Parent object type which uses DX heating coil pass into this function
-    std::string CompSetsParentName;   // Parent object name which uses DX heating coil pass into this function
-    std::string HXCompSetsParentType; // Used when DX cooling coil is a child of a HX assisted cooling coil
-    std::string HXCompSetsParentName; // Used when DX cooling coil is a child of a HX assisted cooling coil
+    int WhichComp;           // DO loop counter to find correct comp set
+    int WhichCompanionComp;  // DO loop counter to find companion coil comp set
+    int WhichHXAssistedComp; // DO loop counter when DX coil is used in a HX assisted cooling coil
 
     DXCoolingCoilIndex = 0;
 
+    DataLoopNode::ConnectionObjectType HeatingCoilTypeNum = static_cast<DataLoopNode::ConnectionObjectType>(
+        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(HeatingCoilType)));
+
+    DataLoopNode::ConnectionObjectType CompSetsParentType; // Parent object type which uses DX heating coil pass into this function
+    std::string CompSetsParentName;
     for (WhichComp = 1; WhichComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichComp) {
-        if (!UtilityRoutines::SameString(HeatingCoilType, state.dataBranchNodeConnections->CompSets(WhichComp).CType) ||
+
+        if (HeatingCoilTypeNum != state.dataBranchNodeConnections->CompSets(WhichComp).ComponentObjectType ||
             !UtilityRoutines::SameString(HeatingCoilName, state.dataBranchNodeConnections->CompSets(WhichComp).CName))
             continue;
-        CompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichComp).ParentCType;
+        CompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichComp).ParentObjectType;
         CompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichComp).ParentCName;
-        if (UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitaryHeatPump:AirToAir") ||
-            UtilityRoutines::SameString(CompSetsParentType, "ZoneHVAC:PackagedTerminalHeatPump") ||
-            UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed") ||
-            UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass") ||
-            UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitarySystem")) {
+        if ((CompSetsParentType == DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpAirToAir) ||
+            (CompSetsParentType == DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalHeatPump) ||
+            (CompSetsParentType == DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpAirToAirMultiSpeed) ||
+            (CompSetsParentType == DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatCoolVAVChangeoverBypass) ||
+            (CompSetsParentType == DataLoopNode::ConnectionObjectType::AirLoopHVACUnitarySystem)) {
             //       Search for DX cooling coils
             for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
                 if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
-                    !UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CType, "Coil:Cooling:DX:SingleSpeed"))
+                    (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
+                     DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed))
                     continue;
                 DXCoolingCoilIndex =
                     UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
@@ -16198,7 +16201,8 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
             }
             for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
                 if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
-                    !UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CType, "Coil:Cooling:DX:MultiSpeed"))
+                    (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
+                     DataLoopNode::ConnectionObjectType::CoilCoolingDXMultiSpeed))
                     continue;
                 DXCoolingCoilIndex =
                     UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
@@ -16209,16 +16213,17 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
                 for (WhichHXAssistedComp = 1; WhichHXAssistedComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichHXAssistedComp) {
                     if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ParentCName,
                                                      CompSetsParentName) ||
-                        !UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CType,
-                                                     "CoilSystem:Cooling:DX:HeatExchangerAssisted"))
+                        (state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ComponentObjectType !=
+                         DataLoopNode::ConnectionObjectType::CoilSystemCoolingDXHeatExchangerAssisted))
                         continue;
-                    HXCompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CType;
-                    HXCompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CName;
+                    DataLoopNode::ConnectionObjectType HXCompSetsParentType; // Used when DX cooling coil is a child of a HX assisted cooling coil
+                    HXCompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ComponentObjectType;
+                    std::string const &HXCompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CName;
                     for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
                         if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName,
                                                          HXCompSetsParentName) ||
-                            !UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CType,
-                                                         "Coil:Cooling:DX:SingleSpeed"))
+                            (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
+                             DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed))
                             continue;
                         DXCoolingCoilIndex = UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName,
                                                                              state.dataDXCoils->DXCoil);
@@ -16229,7 +16234,10 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
             }
         } else {
             //     ErrorFound, Coil:Heating:DX:SingleSpeed is used in wrong type of parent object (should never get here)
-            ShowSevereError(state, "Configuration error in " + CompSetsParentType + " \"" + CompSetsParentName + "\"");
+            ShowSevereError(state,
+                            format("Configuration error in {}\"{}\"",
+                                   BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(CompSetsParentType)],
+                                   CompSetsParentName));
             ShowContinueError(state, "DX heating coil not allowed in this configuration.");
             ShowFatalError(state, "Preceding condition(s) causes termination.");
         }
@@ -16246,7 +16254,10 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
                 ShowWarningError(state, "Crankcase heater capacity or max outdoor temp for crankcase heater operation specified in");
                 ShowContinueError(state, "Coil:Cooling:DX:SingleSpeed = " + state.dataDXCoils->DXCoil(DXCoolingCoilIndex).Name);
                 ShowContinueError(state, "is different than that specified in Coil:Heating:DX:SingleSpeed = " + HeatingCoilName + '.');
-                ShowContinueError(state, "Both of these DX coils are part of " + CompSetsParentType + " = " + CompSetsParentName + '.');
+                ShowContinueError(state,
+                                  format("Both of these DX coils are part of {}={}.",
+                                         BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(CompSetsParentType)],
+                                         CompSetsParentName));
                 ShowContinueError(state, "The value specified in the DX heating coil will be used and the simulation continues...");
             }
         }

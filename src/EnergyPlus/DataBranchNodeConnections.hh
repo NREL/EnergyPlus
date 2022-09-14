@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 
@@ -64,9 +65,11 @@ namespace DataBranchNodeConnections {
     struct ComponentListData
     {
         // Members
-        std::string ParentCType;    // Parent Object Type (Cannot be SPLITTER or MIXER)
-        std::string ParentCName;    // Parent Object Name
-        std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
+        // std::string ParentCType; // Parent Object Type (Cannot be SPLITTER or MIXER)
+        DataLoopNode::ConnectionObjectType ParentObjectType = DataLoopNode::ConnectionObjectType::Invalid;
+        std::string ParentCName; // Parent Object Name
+        // std::string CType;       // Component Type (Cannot be SPLITTER or MIXER)
+        DataLoopNode::ConnectionObjectType ComponentObjectType = DataLoopNode::ConnectionObjectType::Invalid;
         std::string CName;          // Component Name
         std::string InletNodeName;  // Inlet Node ID
         std::string OutletNodeName; // Outlet Node ID
@@ -121,10 +124,10 @@ struct BranchNodeConnectionsData : BaseGlobalStruct
     int NumOfAirTerminalNodes = 0;
     int MaxNumOfAirTerminalNodes = 0;
 
-    Array1D<DataBranchNodeConnections::ComponentListData> CompSets;
-    Array1D<DataBranchNodeConnections::ParentListData> ParentNodeList;
-    Array1D<DataBranchNodeConnections::NodeConnectionDef> NodeConnections;
-    Array1D<DataBranchNodeConnections::EqNodeConnectionDef> AirTerminalNodeConnections;
+    EPVector<DataBranchNodeConnections::ComponentListData> CompSets;
+    EPVector<DataBranchNodeConnections::ParentListData> ParentNodeList;
+    EPVector<DataBranchNodeConnections::NodeConnectionDef> NodeConnections;
+    EPVector<DataBranchNodeConnections::EqNodeConnectionDef> AirTerminalNodeConnections;
     Array1D_bool NonConnectedNodes;
 
     void clear_state() override
