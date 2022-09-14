@@ -6148,7 +6148,7 @@ void DefineOutsideAirSetPointManager::calculate(EnergyPlusData &state)
                 ShowSevereError(state,
                                 format("Schedule Values for the Outside Air Setpoint Manager = {} are something other than 1 or 2.", this->Name));
                 ShowContinueError(state, format("...the value for the schedule currently is {}", SchedVal));
-                ShowContinueError(state, format("...the value is being interpreted as 1 for this run but should be fixed."));
+                ShowContinueError(state, "...the value is being interpreted as 1 for this run but should be fixed.");
             } else {
                 ShowRecurringSevereErrorAtEnd(
                     state,
