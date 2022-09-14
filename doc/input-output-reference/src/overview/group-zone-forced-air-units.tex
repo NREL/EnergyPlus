@@ -7,7 +7,7 @@ Regarding component schedules, the general rule is don't schedule any components
 
 The simplest piece of zone equipment is the ZoneHVAC:IdealLoadsAirSystem component. ZoneHVAC:IdealLoadsAirSystem is used in situations where the user wishes to study the performance of a building without modeling a full HVAC system. In such a case, the Ideal Loads Air System is usually the sole conditioning component: the user does not need to specify air loops, water loops, etc. All that is needed for the ideal system are zone controls, zone equipment configurations, and the ideal loads system component. The use of a return plenum is optional and will require use of the AirloopHVAC:ReturnPlenum object.
 
-This component can be operated with infinite or finite heating and cooling capacity. For either mode -- infinite or limited capacity -- the user can also specify on/off schedules for heating and cooling and outdoor air controls. There are also optional controls for dehumidification, humidification, economizer, and heat recovery. This component may be used in combination with other HVAC equipment serving the same zone.
+This component can be operated with infinite or finite heating and cooling capacity. For either mode---infinite or limited capacity---the user can also specify on/off schedules for heating and cooling and outdoor air controls. There are also optional controls for dehumidification, humidification, economizer, and heat recovery. This component may be used in combination with other HVAC equipment serving the same zone.
 
 This component can be thought of as an ideal unit that mixes air at the zone exhaust condition (or plenum outlet condition when a plenum is attached) with the specified amount of outdoor air and then adds or removes heat and moisture at 100\% efficiency in order to produce a supply air stream at the specified conditions. The energy required to condition the supply air is metered and reported as \hyperref[districtheating]{DistrictHeating} and \hyperref[districtcooling]{DistrictCooling}.
 
@@ -49,7 +49,7 @@ The minimum air temperature (\si{\degreeCelsius}) of the air used for cooling th
 
 \paragraph{Field: Maximum Heating Supply Air Humidity Ratio}\label{field-maximum-heating-supply-air-humidity-ratio-000}
 
-The maximum humidity ratio (kg of water per kg of dry air) of the hot supply air. The default is 0.0156 kgWater/kgDryAir which corresponds to a 20\%RH at 50\si{\degreeCelsius} (122F) dry bulb.
+The maximum humidity ratio (kg of water per kg of dry air) of the hot supply air. The default is 0.0156 kgWater/kgDryAir which corresponds to a 20\%RH at 50\si{\degreeCelsius} (122$^\circ$F) dry bulb.
 
 \paragraph{Field: Minimum Cooling Supply Air Humidity Ratio}\label{field-minimum-cooling-supply-air-humidity-ratio-000}
 
@@ -61,7 +61,7 @@ The input must be either \textbf{\emph{LimitFlowRate, LimitCapacity, LimitFlowRa
 
 \paragraph{Field: Maximum Heating Air Flow Rate}\label{field-maximum-heating-air-flow-rate-001}
 
-The maximum heating supply air flow rate in cubic meters per second if heating limit is set to \textbf{\emph{LimitFlowRate or LimitFlowRateAndCapacity}} \emph{.} This field may be autosized. This field is ignored if heating limit is set to \textbf{\emph{NoLimit}} or \textbf{\emph{LimitCapacity}}.~ If blank, there is no limit.
+The maximum heating supply air flow rate in cubic meters per second if heating limit is set to \textbf{\emph{LimitFlowRate}} or \textbf{\emph{LimitFlowRateAndCapacity}}. This field may be autosized. This field is ignored if heating limit is set to \textbf{\emph{NoLimit}} or \textbf{\emph{LimitCapacity}}.~ If blank, there is no limit.
 
 \paragraph{Field: Maximum Sensible Heating Capacity}\label{field-maximum-sensible-heating-capacity-000}
 
@@ -73,11 +73,11 @@ The input must be either \textbf{\emph{LimitFlowRate, LimitCapacity, LimitFlowRa
 
 \paragraph{Field: Maximum Cooling Air Flow Rate}\label{field-maximum-cooling-air-flow-rate-001}
 
-The maximum cooling supply air flow rate in cubic meters per second if Cooling Limit is set to \textbf{\emph{LimitFlowRate}} or \textbf{\emph{LimitFlowRateAndCapacity}}\emph{.} This field may be autosized. This field is ignored if cooling limit is set to \textbf{\emph{NoLimit}} or \textbf{\emph{LimitCapacity}}. If blank, there is no limit. If \emph{Cooling Limit is set to \textbf{NoLimit},} this field is ignored\emph{.} This field is required if Outdoor Air Control Type is \textbf{\emph{TemperatureEconomizer}} in order to establish an upper limit on outdoor air flow when the economizer is active\textbf{\emph{.}}
+The maximum cooling supply air flow rate in cubic meters per second if Cooling Limit is set to \textbf{\emph{LimitFlowRate}} or \textbf{\emph{LimitFlowRateAndCapacity}}. This field may be autosized. This field is ignored if cooling limit is set to \textbf{\emph{NoLimit}} or \textbf{\emph{LimitCapacity}}. If blank, there is no limit. If \emph{Cooling Limit is set to \textbf{NoLimit},} this field is ignored. This field is required if Outdoor Air Control Type is \textbf{\emph{TemperatureEconomizer}} in order to establish an upper limit on outdoor air flow when the economizer is active.
 
 \paragraph{Field: Maximum Total Cooling Capacity}\label{field-maximum-total-cooling-capacity-000}
 
-The maximum allowed total (sensible plus latent) cooling capacity in Watts if Cooling Limit is set to \textbf{\emph{LimitCapacity}} or \textbf{\emph{LimitFlowRateAndCapacity}}. This field may be autosized. If blank, there is no limit. If Cooling Limit \emph{is set to \textbf{NoLimit}} or \textbf{\emph{LimitFlowRate}}\emph{,} this field is ignored\emph{.}
+The maximum allowed total (sensible plus latent) cooling capacity in Watts if Cooling Limit is set to \textbf{\emph{LimitCapacity}} or \textbf{\emph{LimitFlowRateAndCapacity}}. This field may be autosized. If blank, there is no limit. If Cooling Limit \emph{is set to \textbf{NoLimit}} or \emph{\textbf{LimitFlowRate}}, this field is ignored.
 
 \paragraph{Field: Heating Availability Schedule Name}\label{field-heating-availability-schedule-name-001}
 
@@ -101,7 +101,7 @@ When the Dehumidification Control Type is set to \textbf{\emph{ConstantSensibleH
 
 \paragraph{Field: Humidification Control Type}\label{field-humidification-control-type-000}
 
-Select from \textbf{\emph{None}}, \textbf{\emph{Humidistat, or ConstantSupplyHumidityRatio}}. \textbf{\emph{None}} means that there is no humidification. \textbf{\emph{Humidistat}} means that there is a \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} for this zone and the ideal loads system will attempt to meet the humidistat request (i.e., humidify according to the Humidifying Relative Humidity Setpoint Schedule in the \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object). \textbf{\emph{ConstantSupplyHumidityRatio}} means that during heating the supply air will always be at the Maximum Heating Supply Humidity Ratio. The default is \textbf{\emph{None}}. For \textbf{\emph{Humidistat}}, if the mixed air humidity ratio is greater than the target humidity ratio, then the mixed air humidity ratio will be used. For all options, the supply air humidity ratio will never be allowed to exceed saturation at the supply dry bulb temperature.
+Select from \textbf{\emph{None}}, \textbf{\emph{Humidistat, or ConstantSupplyHumidityRatio}}. \textbf{\emph{None}} means that there is no humidification. \textbf{\emph{Humidistat}} means that there is a \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} for this zone and the ideal loads system will attempt to meet the humidistat request (i.e., humidify according to the Humidifying Relative Humidity Setpoint Schedule in the \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object).   \textbf{\emph{ConstantSupplyHumidityRatio}} means that during heating the supply air will always be at the Maximum Heating Supply Humidity Ratio. The default is \textbf{\emph{None}}. For \textbf{\emph{Humidistat}}, if the mixed air humidity ratio is greater than the target humidity ratio, then the mixed air humidity ratio will be used. For all options, the supply air humidity ratio will never be allowed to exceed saturation at the supply dry bulb temperature.
 
 The selected humidification control type is always applied when the unit is in heating mode. If the unit is in deadband mode (not actively heating the supply air) control type \textbf{\emph{Humidistat}} will be active. If the unit is in cooling mode, control type \textbf{\emph{Humidistat}} will be active if the Dehumidification Control Type field above is set to \emph{Humidistat} or \emph{None}.
 
@@ -516,7 +516,7 @@ The humidity ratio of the mixed air stream after mixing the recirculation air st
 
 \subsection{ZoneHVAC:FourPipeFanCoil}\label{zonehvacfourpipefancoil}
 
-What is a fan coil unit? Like many HVAC terms, ``fan coil unit'' is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. The hydronic heating coil may be replaced with an electric heating coil. Typically these units are small (200 -- 1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, \emph{\hyperref[zonehvacunitventilator]{ZoneHVAC:UnitVentilator}} should be used.
+What is a fan coil unit? Like many HVAC terms, ``fan coil unit'' is used rather loosely. Sometimes it is used for terminal units that would be better described as powered induction units. Carrier and others use the term for the room side of refrigerant-based split systems. Here we are modeling in-room forced-convection hydronic units. The hydronic heating coil may be replaced with an electric heating coil. Typically these units are small (200--1200 cfm) and self-contained. They are mostly used in exterior zones, usually in hotels, apartments, or offices. They may be connected to ducted outside air, or have a direct outside air vent, but they do not have outside air economizers. Units with outside air economizers are marketed (in the United States) as unit ventilators. Unit ventilators are typically bigger than fan coils and are widely used in classrooms or other applications where ventilation is a priority. If a zonal unit with an outside economizer is desired, \emph{\hyperref[zonehvacunitventilator]{ZoneHVAC:UnitVentilator}} should be used.
 
 The heating or cooling output of the fan coil unit is controlled by varying the air flow rate, the water flow rate, or both. Air flow rate can be controlled by cycling the fan on/off or with a variable speed fan drive. The most common setup is a two or three speed fan with the speed selected by hand. The fan then cycles on/off to control heating / cooling output. The controls are often a wall mounted thermostat with hand selection of heating/cooling and fan speed (off/low/medium/high). These controls may also be mounted on the unit.
 
@@ -3046,7 +3046,7 @@ This numeric field defines the outdoor air flow rate through the heat pump in cu
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-7}
 
-This alpha field contains the identifying type of supply air fan specified in the heat pump. Fan type must be \hyperref[fanonoff]{Fan:OnOff}.
+This alpha field contains the identifying type of supply air fan specified in the heat pump. Fan type must be \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanonoff]{Fan:OnOff}.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-6}
 
@@ -3434,23 +3434,23 @@ This alpha field defines the name of the HVAC system node to which the dehumidif
 
 \paragraph{Field: Rated Water Removal}\label{field-rated-water-removal}
 
-This numeric input is the full load water removal rate, in liters per day, at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
+This numeric input is the full load water removal rate, in liters per day, at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80$^\circ$F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
 
 \paragraph{Field: Rated Energy Factor}\label{field-rated-energy-factor}
 
-This numeric input is the energy factor (liters of water removed per kWh of electricity consumed) at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
+This numeric input is the energy factor (liters of water removed per kWh of electricity consumed) at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80$^\circ$F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-001}
 
-This numeric input is the volumetric air flow rate through the dehumidifier, in m\(^{3}\) per second, at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity). This is a required input field and the entered value must be greater than zero.
+This numeric input is the volumetric air flow rate through the dehumidifier, in m\(^{3}\) per second, at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80$^\circ$F{]} dry-bulb and 60\% relative humidity). This is a required input field and the entered value must be greater than zero.
 
 \paragraph{Field: Water Removal Curve Name}\label{field-water-removal-curve-name}
 
-This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of water removal as a function of the dry-bulb temperature (\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Water Removal to give the water removal of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
+This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of water removal as a function of the dry-bulb temperature (\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Water Removal to give the water removal of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80$^\circ$F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
 
 \paragraph{Field: Energy Factor Curve Name}\label{field-energy-factor-curve-name}
 
-This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy factor as a function of the dry-bulb temperature (\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Energy Factor to give the energy factor of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
+This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy factor as a function of the dry-bulb temperature (\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Energy Factor to give the energy factor of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80$^\circ$F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-000}
 
@@ -4412,10 +4412,10 @@ This optional numeric input field specifies the minimum return air humidity rati
 This optional numeric input field specifies the maximum return air humidity ratio at which Mode \# is allowed. When return air humidity ratio is above this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in \hyperref[tablelookup]{Table:Lookup} objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, there will be no upper constraint on return air humidity ratio for Mode \#.
 
 \paragraph{Field: Mode \# Minimum Return Air Relative Humidity}
-This optional numeric input field specifies the minimum return air relative humidity at which Mode \# is allowed. When return air relative humidity is below this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in \hyperref[tablelookup]{Table:Lookup} objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the lower constraint on return air relative humidity will be 0.00% for Mode \#.
+This optional numeric input field specifies the minimum return air relative humidity at which Mode \# is allowed. When return air relative humidity is below this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in \hyperref[tablelookup]{Table:Lookup} objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the lower constraint on return air relative humidity will be 0.00\% for Mode \#.
 
 \paragraph{Field: Mode \# Maximum Return Air Relative Humidity}
-This optional numeric input field specifies the maximum return air relative humidity at which Mode \# is allowed. When return air relative humidity is above this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond than the extents of the data in \hyperref[tablelookup]{Table:Lookup} objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the upper constraint on return air relative humidity will be 100% for Mode \#
+This optional numeric input field specifies the maximum return air relative humidity at which Mode \# is allowed. When return air relative humidity is above this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond than the extents of the data in \hyperref[tablelookup]{Table:Lookup} objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the upper constraint on return air relative humidity will be 100\% for Mode \#.
 
 \paragraph{Field: Mode \# Minimum Outdoor Air Fraction}
 This optional numeric input field specifies the minimum outdoor air fraction allowed in Mode \#. Outdoor air fractions below this value will be excluded from the feasible set within Mode \#. This value may be beyond than the extents of the data in \hyperref[tablelookup]{Table:Lookup} objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the lower constraint on outdoor air fraction will be 0.00 for Mode \#.

@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 #include <EnergyPlus/Data/CommonIncludes.hh>
 
@@ -5220,7 +5221,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 
     thisSys.UnitType = "AirLoopHVAC:UnitarySystem";
     thisSys.m_sysType = UnitarySys::SysType::Unitary;
-    thisSys.UnitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
+    thisSys.AirloopEqType = SimAirServingZones::CompType::UnitarySystemModel;
     thisSys.m_RequestAutoSize = true;
 
     state->dataSize->ZoneSizingRunDone = true;
@@ -10326,6 +10327,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                 0.001); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                                  // fan PLR at maximum speed
     EXPECT_LT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
+
+    // spot check function checkNodeSetPoint for load control
+    int constexpr coolingCoil = 0;
+    bool SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->CoolCtrlNode, coolingCoil, OAUCoilOutTemp);
+    EXPECT_FALSE(SetPointError);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
@@ -11640,6 +11646,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "UNITARY SYSTEM MODEL";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::UnitarySystemModel;
 
     state->dataZoneCtrls->NumTempControlledZones = 1;
     state->dataZoneCtrls->TempControlledZone.allocate(state->dataZoneCtrls->NumTempControlledZones);
@@ -13001,7 +13008,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_sysType = UnitarySys::SysType::Unitary;
     thisSys.m_MultiOrVarSpeedCoolCoil = false;
     thisSys.m_MultiOrVarSpeedHeatCoil = false;
-    thisSys.UnitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
+    thisSys.AirloopEqType = SimAirServingZones::CompType::UnitarySystemModel;
     thisSys.m_RequestAutoSize = true;
 
     // test cooling only sizing
@@ -18121,6 +18128,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
+
+    // spot check function checkNodeSetPoint for set point control
+    int constexpr heatingCoil = 1;
+    bool SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->HeatCtrlNode, heatingCoil, OAUCoilOutTemp);
+    EXPECT_FALSE(SetPointError);
+
+    // test as if control node were 0
+    thisSys->HeatCtrlNode = 0;
+    SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->HeatCtrlNode, heatingCoil, OAUCoilOutTemp);
+    EXPECT_TRUE(SetPointError);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
@@ -18682,6 +18699,7 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::CoilSystemWater;
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
@@ -18694,7 +18712,7 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
     // check object inputs
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
+    EXPECT_TRUE(compare_enums(thisSys.AirloopEqType, SimAirServingZones::CompType::CoilSystemWater));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -18768,6 +18786,7 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::CoilSystemWater;
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
@@ -18779,7 +18798,7 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
     // check object inputs
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
+    EXPECT_TRUE(compare_enums(thisSys.AirloopEqType, SimAirServingZones::CompType::CoilSystemWater));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -18869,6 +18888,7 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::CoilSystemWater;
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
@@ -18880,7 +18900,7 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
     // check object inputs
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
+    EXPECT_TRUE(compare_enums(thisSys.AirloopEqType, SimAirServingZones::CompType::CoilSystemWater));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -18945,6 +18965,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::CoilSystemWater;
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
 
@@ -19064,7 +19085,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
 
     thisSys.CoolCoilFluidInletNode = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     thisSys.CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    thisSys.m_SystemCoolControlNodeNum = thisSys.AirOutNode;
+    thisSys.CoolCtrlNode = thisSys.AirOutNode;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -19073,7 +19094,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
 
     // check getinputs
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
+    EXPECT_TRUE(compare_enums(thisSys.AirloopEqType, SimAirServingZones::CompType::CoilSystemWater));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -19192,6 +19213,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::CoilSystemWater;
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
 
@@ -19315,7 +19337,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
         state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
     thisSys.CoolCoilFluidInletNode = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     thisSys.CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    thisSys.m_SystemCoolControlNodeNum = thisSys.AirOutNode;
+    thisSys.CoolCtrlNode = thisSys.AirOutNode;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -19324,7 +19346,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
 
     // check getinputs
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
+    EXPECT_TRUE(compare_enums(thisSys.AirloopEqType, SimAirServingZones::CompType::CoilSystemWater));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -19348,8 +19370,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
     thisSys.m_DesiredOutletHumRat = 0.10;
-    state->dataLoopNodes->Node(thisSys.m_SystemCoolControlNodeNum).TempSetPoint = 10.0;
-    thisSys.m_DesiredOutletTemp = state->dataLoopNodes->Node(thisSys.m_SystemCoolControlNodeNum).TempSetPoint;
+    state->dataLoopNodes->Node(thisSys.CoolCtrlNode).TempSetPoint = 10.0;
+    thisSys.m_DesiredOutletTemp = state->dataLoopNodes->Node(thisSys.CoolCtrlNode).TempSetPoint;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
@@ -19459,6 +19481,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::CoilSystemWater;
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
 
@@ -19586,7 +19609,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
         state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
     thisSys.CoolCoilFluidInletNode = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     thisSys.CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    thisSys.m_SystemCoolControlNodeNum = thisSys.AirOutNode;
+    thisSys.CoolCtrlNode = thisSys.AirOutNode;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).Name = state->dataWaterCoils->WaterCoil(2).Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).Type =
         DataPlant::PlantEquipmentType::CoilWaterCooling;
@@ -19604,7 +19627,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
 
     // check getinputs
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel));
+    EXPECT_TRUE(compare_enums(thisSys.AirloopEqType, SimAirServingZones::CompType::CoilSystemWater));
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -19628,8 +19651,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
     thisSys.m_DesiredOutletHumRat = 0.10;
-    state->dataLoopNodes->Node(thisSys.m_SystemCoolControlNodeNum).TempSetPoint = 10.0;
-    thisSys.m_DesiredOutletTemp = state->dataLoopNodes->Node(thisSys.m_SystemCoolControlNodeNum).TempSetPoint;
+    state->dataLoopNodes->Node(thisSys.CoolCtrlNode).TempSetPoint = 10.0;
+    thisSys.m_DesiredOutletTemp = state->dataLoopNodes->Node(thisSys.CoolCtrlNode).TempSetPoint;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
