@@ -832,14 +832,16 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  cNumericFieldNames);
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-        state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
-        state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumTemperature")) {
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MaxTemp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumTemperature")) {
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MinTemp;
+        auto &thisOASetPtMgr = state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum);
+
+        thisOASetPtMgr.Name = cAlphaArgs(1);
+        thisOASetPtMgr.ctrlVarType = cAlphaArgs(2);
+        if (UtilityRoutines::SameString(thisOASetPtMgr.ctrlVarType, "Temperature")) {
+            thisOASetPtMgr.CtrlTypeMode = CtrlVarType::Temp;
+        } else if (UtilityRoutines::SameString(thisOASetPtMgr.ctrlVarType, "MaximumTemperature")) {
+            thisOASetPtMgr.CtrlTypeMode = CtrlVarType::MaxTemp;
+        } else if (UtilityRoutines::SameString(thisOASetPtMgr.ctrlVarType, "MinimumTemperature")) {
+            thisOASetPtMgr.CtrlTypeMode = CtrlVarType::MinTemp;
         } else {
             // should not come here if idd type choice and key list is working
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -847,49 +849,59 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ShowContinueError(state, "..Valid value is \"Temperature\".");
             ErrorsFound = true;
         }
-        state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLowSetPt1 = rNumericArgs(1);
-        state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow1 = rNumericArgs(2);
-        state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHighSetPt1 = rNumericArgs(3);
-        state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh1 = rNumericArgs(4);
-        state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlNodeListName = cAlphaArgs(3);
-        if (state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh1 < state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow1) {
+        thisOASetPtMgr.OutLowSetPt1 = rNumericArgs(1);
+        thisOASetPtMgr.OutLow1 = rNumericArgs(2);
+        thisOASetPtMgr.OutHighSetPt1 = rNumericArgs(3);
+        thisOASetPtMgr.OutHigh1 = rNumericArgs(4);
+        thisOASetPtMgr.CtrlNodeListName = cAlphaArgs(3);
+        if (thisOASetPtMgr.OutHigh1 < thisOASetPtMgr.OutLow1) {
             ShowWarningError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state,
                               format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
                                      cNumericFieldNames(4),
-                                     state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh1,
+                                     thisOASetPtMgr.OutHigh1,
                                      cNumericFieldNames(2),
-                                     state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow1));
+                                     thisOASetPtMgr.OutLow1));
         }
         // Get optional input: schedule and 2nd reset rule
         if (NumAlphas == 4 && NumNums == 8) {
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).Sched = cAlphaArgs(4);
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
-            // Schedule is optional here, so no check on SchedPtr
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLowSetPt2 = rNumericArgs(5);
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow2 = rNumericArgs(6);
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHighSetPt2 = rNumericArgs(7);
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh2 = rNumericArgs(8);
-            if (state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh2 < state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow2) {
+            thisOASetPtMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(4)); // Schedule is optional here, so no check on SchedPtr
+            if (thisOASetPtMgr.SchedPtr > 0) {                                // Only check schedule values if a schedule was entered
+                Real64 minValSched = GetScheduleMinValue(state, thisOASetPtMgr.SchedPtr);
+                Real64 maxValSched = GetScheduleMaxValue(state, thisOASetPtMgr.SchedPtr);
+                if ((minValSched < 1.0) || (maxValSched > 2.0)) {
+                    ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, "..Schedule Values for the Outdoor Reset Schedule must be either 1 or 2");
+                    ShowContinueError(state, format("..Minimum Schedule Value = {} ", minValSched));
+                    ShowContinueError(state, format("..Maximum Schedule Value = {} ", minValSched));
+                    ShowContinueError(
+                        state, format("..Adjust the schedule values so that all of them are either 1 or 2 in schedule = \"{}\"", cAlphaArgs(4)));
+                    ErrorsFound = true;
+                }
+            }
+            thisOASetPtMgr.OutLowSetPt2 = rNumericArgs(5);
+            thisOASetPtMgr.OutLow2 = rNumericArgs(6);
+            thisOASetPtMgr.OutHighSetPt2 = rNumericArgs(7);
+            thisOASetPtMgr.OutHigh2 = rNumericArgs(8);
+            if (thisOASetPtMgr.OutHigh2 < thisOASetPtMgr.OutLow2) {
                 ShowWarningError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
                                          cNumericFieldNames(8),
-                                         state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh2,
+                                         thisOASetPtMgr.OutHigh2,
                                          cNumericFieldNames(6),
-                                         state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow2));
+                                         thisOASetPtMgr.OutLow2));
             }
         } else {
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).Sched = "";
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).SchedPtr = 0;
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLowSetPt2 = 0.0;
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow2 = 0.0;
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHighSetPt2 = 0.0;
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh2 = 0.0;
+            thisOASetPtMgr.SchedPtr = 0;
+            thisOASetPtMgr.OutLowSetPt2 = 0.0;
+            thisOASetPtMgr.OutLow2 = 0.0;
+            thisOASetPtMgr.OutHighSetPt2 = 0.0;
+            thisOASetPtMgr.OutHigh2 = 0.0;
         }
         NodeListError = false;
         GetNodeNums(state,
-                    state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlNodeListName,
+                    thisOASetPtMgr.CtrlNodeListName,
                     NumNodes,
                     NodeNums,
                     NodeListError,
@@ -903,28 +915,28 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     cAlphaFieldNames(3));
         if (!NodeListError) {
             NumNodesCtrld = NumNodes;
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).NumCtrlNodes = NumNodesCtrld;
-            state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).SetPt = 0.0;
+            thisOASetPtMgr.CtrlNodes.allocate(NumNodesCtrld);
+            thisOASetPtMgr.NumCtrlNodes = NumNodesCtrld;
+            thisOASetPtMgr.SetPt = 0.0;
 
             for (CtrldNodeNum = 1; CtrldNodeNum <= NumNodesCtrld; ++CtrldNodeNum) {
-                state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
+                thisOASetPtMgr.CtrlNodes(CtrldNodeNum) = NodeNums(CtrldNodeNum);
             }
         } else {
             ErrorsFound = true;
         }
 
         AllSetPtMgrNum = SetPtMgrNum + state.dataSetPointManager->NumSchSetPtMgrs + state.dataSetPointManager->NumDualSchSetPtMgrs;
-
+        auto &allOASetPtMgr = state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum);
         if (!NodeListError) {
-            state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
-            state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlNodes;
+            allOASetPtMgr.CtrlNodes.allocate(NumNodesCtrld);
+            allOASetPtMgr.CtrlNodes = thisOASetPtMgr.CtrlNodes;
         }
-        state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).Name = state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).Name;
-        state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::OutsideAir;
-        state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
-        state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode;
-        state.dataSetPointManager->AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).NumCtrlNodes;
+        allOASetPtMgr.Name = thisOASetPtMgr.Name;
+        allOASetPtMgr.SPMType = SetPointManagerType::OutsideAir;
+        allOASetPtMgr.SPMIndex = SetPtMgrNum;
+        allOASetPtMgr.CtrlTypeMode = thisOASetPtMgr.CtrlTypeMode;
+        allOASetPtMgr.NumCtrlNodes = thisOASetPtMgr.NumCtrlNodes;
     }
 
     // Input the Single Zone Reheat Setpoint Managers
@@ -6130,6 +6142,20 @@ void DefineOutsideAirSetPointManager::calculate(EnergyPlusData &state)
         OutHighTemp = this->OutHigh1;
         SetTempAtOutLow = this->OutLowSetPt1;
         SetTempAtOutHigh = this->OutHighSetPt1;
+        if ((this->SchedPtr > 0) && (SchedVal != 1.0)) { // Since schedule is optional, only check this if the user entered a schedule
+            ++this->setPtErrorCount;
+            if (this->setPtErrorCount <= 10) {
+                ShowSevereError(state,
+                                format("Schedule Values for the Outside Air Setpoint Manager = {} are something other than 1 or 2.", this->Name));
+                ShowContinueError(state, format("...the value for the schedule currently is {}", SchedVal));
+                ShowContinueError(state, format("...the value is being interpreted as 1 for this run but should be fixed."));
+            } else {
+                ShowRecurringSevereErrorAtEnd(
+                    state,
+                    format("Schedule Values for the Outside Air Setpoint Manager = {} are something other than 1 or 2.", this->Name),
+                    this->invalidSchedValErrorIndex);
+            }
+        }
     }
 
     this->SetPt = this->calcSetPointLinInt(OutLowTemp, OutHighTemp, state.dataEnvrn->OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
@@ -6479,7 +6505,6 @@ void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
     Real64 MoistureLoad; // Zone moisture load (kg moisture/sec) required to meet the relative humidity setpoint
     // Value obtained from ZoneTempPredictorCorrector (via ZoneSysMoistureDemand in DataZoneEnergyDemands)
     Real64 SupplyAirHumRat; // Desired air humidity ratio
-    Real64 SystemMassFlow;
 
     this->SetPt = 0.0;
     // Only use one zone for now
@@ -6489,8 +6514,6 @@ void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
     if (ZoneMassFlow > SmallMassFlow) {
 
         MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->CtrlZoneNum(1)).OutputRequiredToDehumidifyingSP;
-
-        SystemMassFlow = state.dataLoopNodes->Node(this->CtrlNodes(1)).MassFlowRate;
 
         // MoistureLoad (negative for dehumidification) may be so large that a negative humrat results, cap at 0.00001
         SupplyAirHumRat = max(0.00001, state.dataLoopNodes->Node(ZoneNode).HumRat + MoistureLoad / ZoneMassFlow);
