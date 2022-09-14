@@ -3883,5 +3883,5 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     // Now expect one severe error from GetShadowInput()
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
     // There should be a severe warning reported about the PixelCounting and the scheduled shading surface tm values > 0.0 combination.
-    EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\";");
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
 }
