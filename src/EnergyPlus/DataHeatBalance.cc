@@ -1320,7 +1320,7 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
         0.0,       // Fin
         0.0,       // TDD_Dome
         0.0        // TDD_Diffuser
-    };
+    };             // If anything added to the enum SurfaceClass, adjust this list appropriately
 
     Real64 insideFilm;
     Real64 outsideFilm;
