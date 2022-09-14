@@ -10327,6 +10327,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                 0.001); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 1.0, 0.0001);                                  // fan PLR at maximum speed
     EXPECT_LT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
+
+    // spot check function checkNodeSetPoint for load control
+    int constexpr coolingCoil = 0;
+    bool SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->CoolCtrlNode, coolingCoil, OAUCoilOutTemp);
+    EXPECT_FALSE(SetPointError);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
@@ -18123,6 +18128,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
+
+    // spot check function checkNodeSetPoint for set point control
+    int constexpr heatingCoil = 1;
+    bool SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->HeatCtrlNode, heatingCoil, OAUCoilOutTemp);
+    EXPECT_FALSE(SetPointError);
+
+    // test as if control node were 0
+    thisSys->HeatCtrlNode = 0;
+    SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->HeatCtrlNode, heatingCoil, OAUCoilOutTemp);
+    EXPECT_TRUE(SetPointError);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
@@ -19070,7 +19085,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
 
     thisSys.CoolCoilFluidInletNode = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     thisSys.CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    thisSys.m_SystemCoolControlNodeNum = thisSys.AirOutNode;
+    thisSys.CoolCtrlNode = thisSys.AirOutNode;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -19322,7 +19337,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
         state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
     thisSys.CoolCoilFluidInletNode = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     thisSys.CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    thisSys.m_SystemCoolControlNodeNum = thisSys.AirOutNode;
+    thisSys.CoolCtrlNode = thisSys.AirOutNode;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -19355,8 +19370,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
     thisSys.m_DesiredOutletHumRat = 0.10;
-    state->dataLoopNodes->Node(thisSys.m_SystemCoolControlNodeNum).TempSetPoint = 10.0;
-    thisSys.m_DesiredOutletTemp = state->dataLoopNodes->Node(thisSys.m_SystemCoolControlNodeNum).TempSetPoint;
+    state->dataLoopNodes->Node(thisSys.CoolCtrlNode).TempSetPoint = 10.0;
+    thisSys.m_DesiredOutletTemp = state->dataLoopNodes->Node(thisSys.CoolCtrlNode).TempSetPoint;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
@@ -19594,7 +19609,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
         state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
     thisSys.CoolCoilFluidInletNode = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     thisSys.CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    thisSys.m_SystemCoolControlNodeNum = thisSys.AirOutNode;
+    thisSys.CoolCtrlNode = thisSys.AirOutNode;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).Name = state->dataWaterCoils->WaterCoil(2).Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).Type =
         DataPlant::PlantEquipmentType::CoilWaterCooling;
@@ -19636,8 +19651,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
     thisSys.m_DesiredOutletHumRat = 0.10;
-    state->dataLoopNodes->Node(thisSys.m_SystemCoolControlNodeNum).TempSetPoint = 10.0;
-    thisSys.m_DesiredOutletTemp = state->dataLoopNodes->Node(thisSys.m_SystemCoolControlNodeNum).TempSetPoint;
+    state->dataLoopNodes->Node(thisSys.CoolCtrlNode).TempSetPoint = 10.0;
+    thisSys.m_DesiredOutletTemp = state->dataLoopNodes->Node(thisSys.CoolCtrlNode).TempSetPoint;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
