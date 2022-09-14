@@ -1273,7 +1273,7 @@ namespace UnitarySystems {
                 }
             }
         }
-        return false; // these later errors do not cause a fatal at this time
+        return SetPointErrorFlag; // these later errors will also cause a fatal error
     }
 
     void UnitarySys::frostControlSetPointLimit(EnergyPlusData &state,
