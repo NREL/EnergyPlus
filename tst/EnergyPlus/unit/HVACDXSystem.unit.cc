@@ -568,7 +568,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
     EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
-    EXPECT_EQ(2, thisSys->m_SystemCoolControlNodeNum);
+    EXPECT_EQ(2, thisSys->CoolCtrlNode);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;
@@ -1028,7 +1028,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
     EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::CoilDX_Cooling);
-    EXPECT_EQ(2, thisSys->m_SystemCoolControlNodeNum);
+    EXPECT_EQ(2, thisSys->CoolCtrlNode);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;
