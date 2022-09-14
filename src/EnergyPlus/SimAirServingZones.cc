@@ -608,7 +608,7 @@ void GetAirPathData(EnergyPlusData &state)
                     DataLoopNode::ConnectionType::Inlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
-                    _,
+                    false,
                     cAlphaFields(8));
         if (ErrInList) {
             ErrorsFound = true;
@@ -646,7 +646,7 @@ void GetAirPathData(EnergyPlusData &state)
                     DataLoopNode::ConnectionType::Outlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
-                    _,
+                    false,
                     cAlphaFields(9));
         if (ErrInList) {
             ErrorsFound = true;
