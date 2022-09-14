@@ -735,6 +735,8 @@ namespace DataSurfaces {
         int SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
         int SurfExternalShadingSchInd;         // Schedule for a the external shading
         int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node
+        Real64 AE = 0.0;                       // Product of area and emissivity for each surface
+        Real64 enclAESum = 0.0;                // Sum of area times emissivity for all other surfaces in enclosure
 
         // Default Constructor
         SurfaceData()
