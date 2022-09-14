@@ -1088,52 +1088,11 @@ namespace UnitarySystems {
 
         if (this->m_MySetPointCheckFlag) {
             if (!state.dataGlobal->SysSizingCalc && state.dataHVACGlobal->DoSetPointTest) {
-                bool setPointMissing = false;
-                if (this->m_CoolCoilExists) {
-                    int ControlNode = this->m_SystemCoolControlNodeNum;
-                    if (ControlNode > 0) {
-                        this->checkNodeSetPoint(state, AirLoopNum, ControlNode, CoolingCoil, OAUCoilOutTemp);
-                    } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
-                        ShowSevereError(state, format("{}: Missing cooling set point in {} = {}", routineName, this->UnitType, this->Name));
-                        ShowContinueError(state,
-                                          format("...Setpoint is required at system air outlet node = {} or cooling coil air outlet node = {}",
-                                                 state.dataLoopNodes->NodeID(this->AirOutNode),
-                                                 state.dataLoopNodes->NodeID(this->CoolCoilOutletNodeNum)));
-                        setPointMissing = true;
-                    }
-                }
-
-                if (this->m_HeatCoilExists) {
-                    int ControlNode = this->m_SystemHeatControlNodeNum;
-                    if (ControlNode > 0) {
-                        this->checkNodeSetPoint(state, AirLoopNum, ControlNode, HeatingCoil, OAUCoilOutTemp);
-                    } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
-                        ShowSevereError(state, format("{}: Missing heating set point in {} = {}", routineName, this->UnitType, this->Name));
-                        ShowContinueError(state,
-                                          format("...Setpoint is required at system air outlet node = {} or heating coil air outlet node = {}",
-                                                 state.dataLoopNodes->NodeID(this->AirOutNode),
-                                                 state.dataLoopNodes->NodeID(this->HeatCoilOutletNodeNum)));
-                        setPointMissing = true;
-                    }
-                }
-
-                if (this->m_SuppCoilExists) {
-                    int ControlNode = this->m_SuppHeatControlNodeNum;
-                    if (ControlNode > 0) {
-                        this->checkNodeSetPoint(state, AirLoopNum, ControlNode, SuppHeatCoil, OAUCoilOutTemp);
-                    } else if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
-                        ShowSevereError(state,
-                                        format("{}: Missing supplemental heater set point in {} = {}", routineName, this->UnitType, this->Name));
-                        ShowContinueError(
-                            state,
-                            format("...Setpoint is required at system air outlet node = {} or supplemental heating coil air outlet node = {}",
-                                   state.dataLoopNodes->NodeID(this->AirOutNode),
-                                   state.dataLoopNodes->NodeID(this->m_SuppCoilAirOutletNode)));
-                        setPointMissing = true;
-                    }
-                }
-
-                if (setPointMissing) ShowFatalError(state, "Previous errors cause termination.");
+                bool e = false;
+                if (this->m_CoolCoilExists) e = this->checkNodeSetPoint(state, AirLoopNum, this->CoolCtrlNode, CoolingCoil, OAUCoilOutTemp);
+                if (this->m_HeatCoilExists) e = this->checkNodeSetPoint(state, AirLoopNum, this->HeatCtrlNode, HeatingCoil, OAUCoilOutTemp) || e;
+                if (this->m_SuppCoilExists) e = this->checkNodeSetPoint(state, AirLoopNum, this->SuppCtrlNode, SuppHeatCoil, OAUCoilOutTemp) || e;
+                if (e) ShowFatalError(state, "Previous errors cause termination.");
                 this->m_MySetPointCheckFlag = false;
             }
         }
@@ -1232,7 +1191,7 @@ namespace UnitarySystems {
         }
     }
 
-    void UnitarySys::checkNodeSetPoint(EnergyPlusData &state,
+    bool UnitarySys::checkNodeSetPoint(EnergyPlusData &state,
                                        int const AirLoopNum,       // number of the current air loop being simulated
                                        int const ControlNode,      // Node to test for set point
                                        int const CoilType,         // True if cooling coil, then test for HumRatMax set point
@@ -1246,6 +1205,25 @@ namespace UnitarySystems {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine checks for proper set point at control node.
+        constexpr static std::array<std::string_view, 3> coilTypes = {"cooling", "heating", "supplemental"};
+
+        if (ControlNode == 0) {
+            bool setPointMissing = false;
+            if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
+                int coilOutNode = this->CoolCoilOutletNodeNum;
+                if (CoilType == HeatingCoil) coilOutNode = this->HeatCoilOutletNodeNum;
+                if (CoilType == SuppHeatCoil) coilOutNode = this->SuppCoilOutletNodeNum;
+
+                ShowSevereError(state, format("checkNodeSetPoint: Missing {} set point in {} = {}", coilTypes[CoilType], this->UnitType, this->Name));
+                ShowContinueError(state,
+                                  format("...Setpoint is required at system air outlet node = {} or {} coil air outlet node = {}",
+                                         state.dataLoopNodes->NodeID(this->AirOutNode),
+                                         coilTypes[CoilType],
+                                         state.dataLoopNodes->NodeID(coilOutNode)));
+                setPointMissing = true;
+            }
+            return setPointMissing;
+        }
 
         if (AirLoopNum == -1) {                                                   // Outdoor Air Unit
             state.dataLoopNodes->Node(ControlNode).TempSetPoint = OAUCoilOutTemp; // Set the coil outlet temperature
@@ -4559,9 +4537,9 @@ namespace UnitarySystems {
 
         // coil outlet node set point has priority, IF not exist, then use system outlet node
         if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
-            this->m_SystemHeatControlNodeNum = this->AirOutNode;
+            this->HeatCtrlNode = this->AirOutNode;
         if (SetPointManager::NodeHasSPMCtrlVarType(state, HeatingCoilOutletNode, SetPointManager::CtrlVarType::Temp))
-            this->m_SystemHeatControlNodeNum = HeatingCoilOutletNode;
+            this->HeatCtrlNode = HeatingCoilOutletNode;
 
         this->HeatCoilInletNodeNum = HeatingCoilInletNode;
         this->HeatCoilOutletNodeNum = HeatingCoilOutletNode;
@@ -5273,20 +5251,20 @@ namespace UnitarySystems {
             }
 
             if (!input_data.dx_cooling_coil_system_sensor_node_name.empty()) { // used by CoilSystem:Cooling:DX
-                this->m_SystemCoolControlNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                                       input_data.dx_cooling_coil_system_sensor_node_name,
-                                                                                       errFlag,
-                                                                                       objType,
-                                                                                       thisObjectName,
-                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::ConnectionType::Sensor,
-                                                                                       NodeInputManager::CompFluidStream::Primary,
-                                                                                       DataLoopNode::ObjectIsParent);
+                this->CoolCtrlNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                         input_data.dx_cooling_coil_system_sensor_node_name,
+                                                                         errFlag,
+                                                                         objType,
+                                                                         thisObjectName,
+                                                                         DataLoopNode::NodeFluidType::Air,
+                                                                         DataLoopNode::ConnectionType::Sensor,
+                                                                         NodeInputManager::CompFluidStream::Primary,
+                                                                         DataLoopNode::ObjectIsParent);
             } else {
                 if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
-                    this->m_SystemCoolControlNodeNum = this->AirOutNode;
+                    this->CoolCtrlNode = this->AirOutNode;
                 if (SetPointManager::NodeHasSPMCtrlVarType(state, CoolingCoilOutletNode, SetPointManager::CtrlVarType::Temp))
-                    this->m_SystemCoolControlNodeNum = CoolingCoilOutletNode;
+                    this->CoolCtrlNode = CoolingCoilOutletNode;
             }
 
             this->CoolCoilInletNodeNum = CoolingCoilInletNode;
@@ -5476,7 +5454,7 @@ namespace UnitarySystems {
                 } // IF (IsNotOK) THEN
 
                 this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
-                this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
+                this->SuppCoilOutletNodeNum = SupHeatCoilOutletNode;
 
             } else if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
 
@@ -5502,7 +5480,7 @@ namespace UnitarySystems {
                         SupHeatCoilInletNode = thisSuppCoil.AirInletNodeNum;
                         this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
                         SupHeatCoilOutletNode = thisSuppCoil.AirOutletNodeNum;
-                        this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
+                        this->SuppCoilOutletNodeNum = SupHeatCoilOutletNode;
                     }
                 }
 
@@ -5538,7 +5516,7 @@ namespace UnitarySystems {
                         SupHeatCoilInletNode = thisSuppCoil.AirInletNodeNum;
                         this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
                         SupHeatCoilOutletNode = thisSuppCoil.AirOutletNodeNum;
-                        this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
+                        this->SuppCoilOutletNodeNum = SupHeatCoilOutletNode;
                     }
                 }
 
@@ -5561,7 +5539,7 @@ namespace UnitarySystems {
                         SupHeatCoilInletNode = thisSuppCoil.Air(1).InletNodeNum;
                         this->m_SuppCoilAirInletNode = SupHeatCoilInletNode;
                         SupHeatCoilOutletNode = thisSuppCoil.Air(1).OutletNodeNum;
-                        this->m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
+                        this->SuppCoilOutletNodeNum = SupHeatCoilOutletNode;
                     }
                 }
 
@@ -5574,9 +5552,9 @@ namespace UnitarySystems {
         } // IF(.NOT. lAlphaBlanks(iSuppHeatCoilTypeAlphaNum))THEN
 
         if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
-            this->m_SuppHeatControlNodeNum = this->AirOutNode;
+            this->SuppCtrlNode = this->AirOutNode;
         if (SetPointManager::NodeHasSPMCtrlVarType(state, SupHeatCoilOutletNode, SetPointManager::CtrlVarType::Temp))
-            this->m_SuppHeatControlNodeNum = SupHeatCoilOutletNode;
+            this->SuppCtrlNode = SupHeatCoilOutletNode;
 
         // Add supplemental heating coil to component sets array
         if (this->m_SuppCoilExists && this->m_SuppCompNotSetYet) {
@@ -7751,7 +7729,7 @@ namespace UnitarySystems {
         this->updateUnitarySystemControl(state,
                                          AirLoopNum,
                                          this->CoolCoilOutletNodeNum,
-                                         this->m_SystemCoolControlNodeNum,
+                                         this->CoolCtrlNode,
                                          OnOffAirFlowRatio,
                                          FirstHVACIteration,
                                          OAUCoilOutTemp,
@@ -7962,7 +7940,7 @@ namespace UnitarySystems {
                 this->updateUnitarySystemControl(state,
                                                  AirLoopNum,
                                                  this->CoolCoilOutletNodeNum,
-                                                 this->m_SystemCoolControlNodeNum,
+                                                 this->CoolCtrlNode,
                                                  OnOffAirFlowRatio,
                                                  FirstHVACIteration,
                                                  OAUCoilOutTemp,
@@ -7982,7 +7960,7 @@ namespace UnitarySystems {
                 this->updateUnitarySystemControl(state,
                                                  AirLoopNum,
                                                  this->HeatCoilOutletNodeNum,
-                                                 this->m_SystemHeatControlNodeNum,
+                                                 this->HeatCtrlNode,
                                                  OnOffAirFlowRatio,
                                                  FirstHVACIteration,
                                                  OAUCoilOutTemp,
@@ -8004,7 +7982,7 @@ namespace UnitarySystems {
                 this->updateUnitarySystemControl(state,
                                                  AirLoopNum,
                                                  this->HeatCoilOutletNodeNum,
-                                                 this->m_SystemHeatControlNodeNum,
+                                                 this->HeatCtrlNode,
                                                  OnOffAirFlowRatio,
                                                  FirstHVACIteration,
                                                  OAUCoilOutTemp,
@@ -8023,7 +8001,7 @@ namespace UnitarySystems {
                 this->updateUnitarySystemControl(state,
                                                  AirLoopNum,
                                                  this->CoolCoilOutletNodeNum,
-                                                 this->m_SystemCoolControlNodeNum,
+                                                 this->CoolCtrlNode,
                                                  OnOffAirFlowRatio,
                                                  FirstHVACIteration,
                                                  OAUCoilOutTemp,
@@ -8063,8 +8041,8 @@ namespace UnitarySystems {
             state.dataUnitarySystems->SuppHeatingCoilFlag = true;
             this->updateUnitarySystemControl(state,
                                              AirLoopNum,
-                                             this->m_SuppCoilAirOutletNode,
-                                             this->m_SuppHeatControlNodeNum,
+                                             this->SuppCoilOutletNodeNum,
+                                             this->SuppCtrlNode,
                                              OnOffAirFlowRatio,
                                              FirstHVACIteration,
                                              OAUCoilOutTemp,
@@ -11377,12 +11355,12 @@ namespace UnitarySystems {
         }
         if (this->m_SuppCoilExists) {
             this->calcUnitarySuppHeatingSystem(state, FirstHVACIteration, SuppCoilLoad);
-            if ((state.dataLoopNodes->Node(this->m_SuppCoilAirOutletNode).Temp > this->DesignMaxOutletTemp) && this->m_SuppHeatPartLoadFrac > 0.0 &&
+            if ((state.dataLoopNodes->Node(this->SuppCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp) && this->m_SuppHeatPartLoadFrac > 0.0 &&
                 !this->m_SimASHRAEModel) {
                 // EMS override will ignore this recalculation.
                 Real64 MDotAir = state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode).MassFlowRate;
                 Real64 CpAir = Psychrometrics::PsyCpAirFnW(0.5 * (state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode).HumRat +
-                                                                  state.dataLoopNodes->Node(this->m_SuppCoilAirOutletNode).HumRat));
+                                                                  state.dataLoopNodes->Node(this->SuppCoilOutletNodeNum).HumRat));
                 Real64 HCDeltaT = max(0.0, this->DesignMaxOutletTemp - state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode).Temp);
                 Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
                 this->calcUnitarySuppHeatingSystem(state, FirstHVACIteration, MaxHeatCoilLoad);
@@ -12331,7 +12309,7 @@ namespace UnitarySystems {
             Real64 tempAcc = Acc;
             // Determine if there is a sensible load on this system
             if (this->m_sysType == SysType::CoilCoolingDX) {
-                if ((state.dataLoopNodes->Node(InletNode).Temp > state.dataLoopNodes->Node(this->m_SystemCoolControlNodeNum).TempSetPoint) &&
+                if ((state.dataLoopNodes->Node(InletNode).Temp > state.dataLoopNodes->Node(this->CoolCtrlNode).TempSetPoint) &&
                     (state.dataLoopNodes->Node(InletNode).Temp > DesOutTemp) &&
                     (std::abs(state.dataLoopNodes->Node(InletNode).Temp - DesOutTemp) > DataHVACGlobals::TempControlTol)) {
                     SensibleLoad = true;
@@ -14677,7 +14655,7 @@ namespace UnitarySystems {
         int SpeedNum = 0;
 
         // Set local variables
-        int OutletNode = this->m_SuppCoilAirOutletNode;
+        int OutletNode = this->SuppCoilOutletNodeNum;
         int InletNode = this->m_SuppCoilAirInletNode;
         Real64 DesOutTemp = this->m_DesiredOutletTemp;
         std::string CompName = this->m_SuppHeatCoilName;
@@ -16000,7 +15978,7 @@ namespace UnitarySystems {
             state.dataLoopNodes->Node(thisSys.m_SuppCoilFluidInletNode).MassFlowRate = mdot;
             WaterCoils::SimulateWaterCoilComponents(
                 state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, thisSys.m_SuppHeatCoilIndex, QActual, thisSys.m_FanOpMode, PartLoadFrac);
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.m_SuppCoilAirOutletNode).Temp;
+            OutletAirTemp = state.dataLoopNodes->Node(thisSys.SuppCoilOutletNodeNum).Temp;
         }
         if (LoadBased) {
             Residuum = Par[3] - QActual;
@@ -16459,7 +16437,7 @@ namespace UnitarySystems {
         int heatingCoilOutletNode = thisSys.HeatCoilOutletNodeNum;
         if (SuppHeat) {
             heatCoilType = thisSys.m_SuppHeatCoilType_Num;
-            heatingCoilOutletNode = thisSys.m_SuppCoilAirOutletNode;
+            heatingCoilOutletNode = thisSys.SuppCoilOutletNodeNum;
         }
 
         switch (heatCoilType) {
@@ -16856,7 +16834,7 @@ namespace UnitarySystems {
         int heatingCoilOutletNode = thisSys.HeatCoilOutletNodeNum;
         if (SuppHeat) {
             heatCoilType = thisSys.m_SuppHeatCoilType_Num;
-            heatingCoilOutletNode = thisSys.m_SuppCoilAirOutletNode;
+            heatingCoilOutletNode = thisSys.SuppCoilOutletNodeNum;
         }
 
         switch (heatCoilType) {
@@ -17153,7 +17131,7 @@ namespace UnitarySystems {
         } else {
             HeatingCoils::SimulateHeatingCoilComponents(
                 state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, HeatingLoad, thisSys.m_SuppHeatCoilIndex, _, true, FanOpMode, PartLoadFrac);
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.m_SuppCoilAirOutletNode).Temp;
+            OutletAirTemp = state.dataLoopNodes->Node(thisSys.SuppCoilOutletNodeNum).Temp;
         }
         return Par[3] - OutletAirTemp;
     }
