@@ -10329,7 +10329,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_LT(state->dataLoopNodes->Node(OutletNode).Temp, thisSys->DesignMinOutletTemp); // outlet temperature below minimum temperature limit
 
     // spot check function checkNodeSetPoint for load control
-    int const coolingCoil = 0;
+    int constexpr coolingCoil = 0;
     bool SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->CoolCtrlNode, coolingCoil, OAUCoilOutTemp);
     EXPECT_FALSE(SetPointError);
 }
@@ -18130,7 +18130,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
     EXPECT_GT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(3).Temp);
 
     // spot check function checkNodeSetPoint for set point control
-    int const heatingCoil = 1;
+    int constexpr heatingCoil = 1;
     bool SetPointError = thisSys->checkNodeSetPoint(*state, AirLoopNum, thisSys->HeatCtrlNode, heatingCoil, OAUCoilOutTemp);
     EXPECT_FALSE(SetPointError);
 
