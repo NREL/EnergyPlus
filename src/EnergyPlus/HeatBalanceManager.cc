@@ -5409,27 +5409,7 @@ namespace HeatBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the zone data for each zone in the input file.
 
-        // METHODOLOGY EMPLOYED:
-        // The GetObjectItem routines are employed to retrieve the data.
-
-        // REFERENCES:
-        // IDD Definition for Zone object
-
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr const char *RoutineName("ProcessZoneData: ");
-        //  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         state.dataHeatBal->Zone(ZoneLoop).Name = cAlphaArgs(1);
         if (NumNumbers >= 1) state.dataHeatBal->Zone(ZoneLoop).RelNorth = rNumericArgs(1);
@@ -5960,30 +5940,20 @@ namespace HeatBalanceManager {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
         }
-        state.dataHeatBal->EnclSolAbsFirstCalc.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-        state.dataHeatBal->EnclRadReCalc.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQD.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-        state.dataHeatBal->EnclRadQThermalRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-        state.dataHeatBal->EnclRadThermAbsMult.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolDB.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolDBSSG.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolDBIntWin.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-        state.dataHeatBal->EnclSolVMULT.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-            state.dataHeatBal->EnclSolAbsFirstCalc(enclosureNum) = true;
-            state.dataHeatBal->EnclRadReCalc(enclosureNum) = false;
             state.dataHeatBal->EnclSolQSDifSol(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQD(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQDforDaylight(enclosureNum) = 0.0;
-            state.dataHeatBal->EnclRadQThermalRad(enclosureNum) = 0.0;
-            state.dataHeatBal->EnclRadThermAbsMult(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQSWRad(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = 0.0;
-            state.dataHeatBal->EnclSolVMULT(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolDB(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolDBSSG(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolDBIntWin(enclosureNum) = 0.0;
@@ -5995,39 +5965,8 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 1998
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine allocates the arrays to meet simulation requirements
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the status flags to trigger variable allocation.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         // Use the total number of zones or surfaces to allocate variables to avoid a limit
-        // Allocate real Variables
-        // Following used for Calculations
-        //  Allocate variables in DataHeatBalSys
         AllocateZoneHeatBalArrays(state);
         state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -7107,20 +7046,20 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 }
                 if (SCCenter(IGlSys) <= 0.0) {
-                    ShowSevereError(state,
-                                    format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used: it "
-                                           "has Shading Coefficient <= 0 in glazing system {}",
-                                           DesiredConstructionName,
-                                           IGlSys));
-                    ErrorsFound = true;
+                    ShowWarningError(
+                        state,
+                        format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file has flawed data: it "
+                               "has a Shading Coefficient <= 0 in glazing system {}",
+                               DesiredConstructionName,
+                               IGlSys));
                 }
                 if (SHGCCenter(IGlSys) <= 0.0) {
-                    ShowSevereError(state,
-                                    format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used: it "
-                                           "has SHGC <= 0 in glazing system {}",
-                                           DesiredConstructionName,
-                                           IGlSys));
-                    ErrorsFound = true;
+                    ShowWarningError(
+                        state,
+                        format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file has flawed data: it "
+                               "has a SHGC <= 0 in glazing system {}",
+                               DesiredConstructionName,
+                               IGlSys));
                 }
                 WinHeight(IGlSys) *= 0.001;
                 WinWidth(IGlSys) *= 0.001;
