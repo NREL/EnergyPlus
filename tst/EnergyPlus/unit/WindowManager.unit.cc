@@ -7690,7 +7690,6 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     Real64 T_in = 21.0;
     Real64 T_out = -18.0;
     Real64 I_s = 20.0;
-    Real64 v_ws = 5.5;
 
     // Override values
     state->dataHeatBal->SurfCosIncAng.dimension(1, 1, 11, 1.0);
