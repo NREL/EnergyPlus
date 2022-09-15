@@ -17,6 +17,18 @@ namespace tk205  {
 			a205_json_get<std::string>(j, "disclaimer", x.disclaimer, x.disclaimer_is_set, false);
 			a205_json_get<std::string>(j, "notes", x.notes, x.notes_is_set, false);
 		}
+		void Metadata::initialize(const nlohmann::json& j) {
+			a205_json_get<std::string>(j, "data_model", data_model, data_model_is_set, true);
+			a205_json_get<ashrae205_ns::SchemaType>(j, "schema", schema, schema_is_set, true);
+			a205_json_get<ashrae205_ns::Version>(j, "schema_version", schema_version, schema_version_is_set, true);
+			a205_json_get<ashrae205_ns::UUID>(j, "id", id, id_is_set, true);
+			a205_json_get<std::string>(j, "description", description, description_is_set, true);
+			a205_json_get<ashrae205_ns::Timestamp>(j, "data_timestamp", data_timestamp, data_timestamp_is_set, true);
+			a205_json_get<int>(j, "data_version", data_version, data_version_is_set, true);
+			a205_json_get<std::string>(j, "data_source", data_source, data_source_is_set, false);
+			a205_json_get<std::string>(j, "disclaimer", disclaimer, disclaimer_is_set, false);
+			a205_json_get<std::string>(j, "notes", notes, notes_is_set, false);
+		}
 		const std::string_view Metadata::data_model_units = "";
 
 		const std::string_view Metadata::schema_units = "";
@@ -81,6 +93,10 @@ namespace tk205  {
 			a205_json_get<ashrae205_ns::LiquidConstituent>(j, "liquid_constituent", x.liquid_constituent, x.liquid_constituent_is_set, true);
 			a205_json_get<double>(j, "concentration", x.concentration, x.concentration_is_set, false);
 		}
+		void LiquidComponent::initialize(const nlohmann::json& j) {
+			a205_json_get<ashrae205_ns::LiquidConstituent>(j, "liquid_constituent", liquid_constituent, liquid_constituent_is_set, true);
+			a205_json_get<double>(j, "concentration", concentration, concentration_is_set, false);
+		}
 		const std::string_view LiquidComponent::liquid_constituent_units = "";
 
 		const std::string_view LiquidComponent::concentration_units = "";
@@ -96,6 +112,10 @@ namespace tk205  {
 		void from_json(const nlohmann::json& j, LiquidMixture& x) {
 			a205_json_get<std::vector<ashrae205_ns::LiquidComponent>>(j, "liquid_components", x.liquid_components, x.liquid_components_is_set, true);
 			a205_json_get<ashrae205_ns::ConcentrationType>(j, "concentration_type", x.concentration_type, x.concentration_type_is_set, true);
+		}
+		void LiquidMixture::initialize(const nlohmann::json& j) {
+			a205_json_get<std::vector<ashrae205_ns::LiquidComponent>>(j, "liquid_components", liquid_components, liquid_components_is_set, true);
+			a205_json_get<ashrae205_ns::ConcentrationType>(j, "concentration_type", concentration_type, concentration_type_is_set, true);
 		}
 		const std::string_view LiquidMixture::liquid_components_units = "";
 

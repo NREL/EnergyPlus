@@ -61,7 +61,13 @@ public:
   /// @param	table_index TBD
   // ----------------------------------------------------------------------------------------------
     inline double calculate_performance(const std::vector<double> &target,
-                                        std::size_t table_index) {
+                                        std::size_t table_index,
+                                        Btwxt::Method performance_interpolation_method = Btwxt::Method::LINEAR)
+    {
+        for (auto i = 0u; i < _grid_axes.size(); i++)
+        {
+            _btwxt.set_axis_interp_method(i, performance_interpolation_method);
+        }
         return _btwxt.get_value_at_target(target, table_index);
     }
 
@@ -70,7 +76,13 @@ public:
   ///         results.
   /// @param	target 
   // ----------------------------------------------------------------------------------------------
-    inline std::vector<double> calculate_performance(const std::vector<double> &target) {
+    inline std::vector<double> calculate_performance(const std::vector<double> &target,
+                                                     Btwxt::Method performance_interpolation_method = Btwxt::Method::LINEAR)
+    {
+        for (auto i = 0u; i < _grid_axes.size(); i++)
+        {
+            _btwxt.set_axis_interp_method(i, performance_interpolation_method);
+        }
         return _btwxt.get_values_at_target(target);
     }
 
