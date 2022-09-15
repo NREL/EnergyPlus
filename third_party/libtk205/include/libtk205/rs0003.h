@@ -279,7 +279,7 @@ namespace tk205  {
 			const static std::string_view grid_variables_name;
 			const static std::string_view lookup_variables_name;
 			using PerformanceMapBase::calculate_performance;
-			LookupVariablesContinuousStruct calculate_performance (double standard_air_volumetric_flow_rate, double static_pressure_difference);
+			LookupVariablesContinuousStruct calculate_performance (double standard_air_volumetric_flow_rate, double static_pressure_difference, Btwxt::Method performance_interpolation_method = Btwxt::Method::LINEAR);
 		};
 		class GridVariablesDiscrete  : public GridVariablesBase {
 		public:
@@ -344,7 +344,7 @@ namespace tk205  {
 			const static std::string_view grid_variables_name;
 			const static std::string_view lookup_variables_name;
 			using PerformanceMapBase::calculate_performance;
-			LookupVariablesDiscreteStruct calculate_performance (double speed_number, double static_pressure_difference);
+			LookupVariablesDiscreteStruct calculate_performance (double speed_number, double static_pressure_difference, Btwxt::Method performance_interpolation_method = Btwxt::Method::LINEAR);
 		};
 		NLOHMANN_JSON_SERIALIZE_ENUM (OperationSpeedControlType, {
 			{OperationSpeedControlType::UNKNOWN, "UNKNOWN"},

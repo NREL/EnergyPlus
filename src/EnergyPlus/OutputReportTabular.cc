@@ -7534,7 +7534,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                             curConversionFactor *= 3600.0;
                         }
                         columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
-                        columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
+                        columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP}";
                         minVal = storedMaxVal;
                         maxVal = storedMinVal;
                         for (lMonth = 1; lMonth <= 12; ++lMonth) {

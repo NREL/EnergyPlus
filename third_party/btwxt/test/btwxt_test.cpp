@@ -75,6 +75,20 @@ TEST_F(CubicFixture, spacing_multiplier) {
   EXPECT_DOUBLE_EQ(result, 0.0);
 }
 
+TEST_F(CubicFixture, switch_interp_method) {
+  for (auto i = 0u; i < test_gridded_data.get_ndims(); i++)
+  {
+    test_rgi.set_axis_interp_method(i, Method::CUBIC);
+  }
+  std::vector<double> result1 = test_rgi.get_values_at_target(target);
+  for (auto i = 0u; i < test_gridded_data.get_ndims(); i++)
+  {
+    test_rgi.set_axis_interp_method(i, Method::LINEAR);
+  }
+  std::vector<double> result2 = test_rgi.get_values_at_target(target);
+  EXPECT_NE(result1, result2);
+}
+
 TEST_F(CubicFixture, interpolate) {
   test_rgi.set_new_target(target);
 

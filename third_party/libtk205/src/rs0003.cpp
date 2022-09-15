@@ -280,9 +280,9 @@ namespace tk205  {
 
 		const std::string_view PerformanceMapContinuous::lookup_variables_name = "lookup_variables";
 
-		LookupVariablesContinuousStruct PerformanceMapContinuous::calculate_performance(double standard_air_volumetric_flow_rate, double static_pressure_difference) {
+		LookupVariablesContinuousStruct PerformanceMapContinuous::calculate_performance(double standard_air_volumetric_flow_rate, double static_pressure_difference, Btwxt::Method performance_interpolation_method ) {
 			std::vector<double> target {standard_air_volumetric_flow_rate, static_pressure_difference};
-			auto v = PerformanceMapBase::calculate_performance(target);
+			auto v = PerformanceMapBase::calculate_performance(target, performance_interpolation_method);
 			LookupVariablesContinuousStruct s {v[0], v[1], };
 			return s;
 		}
@@ -359,9 +359,9 @@ namespace tk205  {
 
 		const std::string_view PerformanceMapDiscrete::lookup_variables_name = "lookup_variables";
 
-		LookupVariablesDiscreteStruct PerformanceMapDiscrete::calculate_performance(double speed_number, double static_pressure_difference) {
+		LookupVariablesDiscreteStruct PerformanceMapDiscrete::calculate_performance(double speed_number, double static_pressure_difference, Btwxt::Method performance_interpolation_method ) {
 			std::vector<double> target {speed_number, static_pressure_difference};
-			auto v = PerformanceMapBase::calculate_performance(target);
+			auto v = PerformanceMapBase::calculate_performance(target, performance_interpolation_method);
 			LookupVariablesDiscreteStruct s {v[0], v[1], v[2], };
 			return s;
 		}
