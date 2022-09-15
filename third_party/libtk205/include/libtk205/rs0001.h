@@ -558,7 +558,7 @@ namespace tk205  {
 			const static std::string_view grid_variables_name;
 			const static std::string_view lookup_variables_name;
 			using PerformanceMapBase::calculate_performance;
-			LookupVariablesCoolingStruct calculate_performance (double evaporator_liquid_volumetric_flow_rate, double evaporator_liquid_leaving_temperature, double condenser_liquid_volumetric_flow_rate, double condenser_liquid_entering_temperature, double compressor_sequence_number);
+			LookupVariablesCoolingStruct calculate_performance (double evaporator_liquid_volumetric_flow_rate, double evaporator_liquid_leaving_temperature, double condenser_liquid_volumetric_flow_rate, double condenser_liquid_entering_temperature, double compressor_sequence_number, Btwxt::Method performance_interpolation_method = Btwxt::Method::LINEAR);
 		};
 		class GridVariablesStandby  : public GridVariablesBase {
 		public:
@@ -603,7 +603,7 @@ namespace tk205  {
 			const static std::string_view grid_variables_name;
 			const static std::string_view lookup_variables_name;
 			using PerformanceMapBase::calculate_performance;
-			LookupVariablesStandbyStruct calculate_performance (double environment_dry_bulb_temperature);
+			LookupVariablesStandbyStruct calculate_performance (double environment_dry_bulb_temperature, Btwxt::Method performance_interpolation_method = Btwxt::Method::LINEAR);
 		};
 		class Performance  {
 		public:
