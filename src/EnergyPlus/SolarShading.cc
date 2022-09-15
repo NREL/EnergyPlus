@@ -7457,7 +7457,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     // transmitting and back window centers
                                     CosIncBack = std::abs(state.dataBSDFWindow->ComplexWind(SurfNum).sdotN(IBack));
                                 }
-                                int const ConstrNumBackSh = state.dataSurface->SurfWinActiveShadedConstruction(BackSurfNum);
+                                int ConstrNumBackShRaw = state.dataSurface->SurfWinActiveShadedConstruction(BackSurfNum);
+                                int const ConstrNumBackSh = ConstrNumBackShRaw == 0 ? ConstrNumBack : ConstrNumBackShRaw;
                                 state.dataSolarShading->SurfWinAbsBeam.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
                                 Real64 TransBeamWin = 0.0;  // Beam solar transmittance of a window
                                 Real64 AbsBeamTotWin = 0.0; // Sum of window glass layer beam solar absorptances
@@ -9561,7 +9562,11 @@ void WindowShadingManager(EnergyPlusData &state)
             }
 
             if (state.dataSurface->Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
-            if (!state.dataSurface->Surface(ISurf).HasShadeControl) continue;
+            if (!state.dataSurface->Surface(ISurf).HasShadeControl) {
+                continue;
+            } else {
+                //
+            }
 
             // Initialize switching factor (applicable only to switchable glazing) to unswitched
             state.dataSurface->SurfWinSwitchingFactor(ISurf) = 0.0;
