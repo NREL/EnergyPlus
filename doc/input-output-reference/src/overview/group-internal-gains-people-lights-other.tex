@@ -909,7 +909,7 @@ These fractions depend on the type of lamp and luminaire, whether the luminaire 
 
 \paragraph{Field: Return Air Fraction}\label{field-return-air-fraction}
 
-The fraction of the heat from lights that goes into the zone return air (i.e., into the zone outlet node). If the return air flow is zero or the zone has no return air system, the program will put this fraction into the zone air. Return Air Fraction should be non-zero only for luminaires that are return-air ducted~ (see Table~\ref{table:approximate-values-of-return-air-fraction} and Figure 51). (However, see the field ``Return Air Fraction Is Calculated from Plenum Temperature,'' below, for an approach to modeling the case where Return Air Fraction is caused by \emph{conduction} between a luminaire that is in contact with a return-air plenum.)
+The fraction of the heat from lights that goes into the zone return air (i.e., into the zone outlet node). If the return air flow is zero or the zone has no return air system, the program will put this fraction into the zone air. Return Air Fraction should be non-zero only for luminaires that are return-air ducted~ (see Table~\ref{table:approximate-values-of-return-air-fraction} and Figure \ref{fig:vertical-section-through-a-zone-and-its}). (However, see the field ``Return Air Fraction Is Calculated from Plenum Temperature,'' below, for an approach to modeling the case where Return Air Fraction is caused by \emph{conduction} between a luminaire that is in contact with a return-air plenum.)
 
 \paragraph{Field: Fraction Radiant}\label{field-fraction-radiant-1}
 
@@ -1169,7 +1169,7 @@ The amount of heat gain from lights that goes into the zone's return air (and, t
 
 \paragraph{Lights Total Heating Energy {[}J{]}}\label{lights-total-heating-energy-j}
 
-The total heat gain from lights. It is the sum of the following four outputs, i.e., Total Heat Gain = Return Air Heat Gain + Radiant Heat Gain + Visible Heat Gain + Convective Heat Gain. It is also equal to the electrical input to the lights.
+The total heat gain from lights. It is the sum of the following four outputs, i.e., Total Heat Gain $=$ Return Air Heat Gain $+$ Radiant Heat Gain $+$ Visible Heat Gain $+$ Convective Heat Gain. It is also equal to the electrical input to the lights.
 
 \paragraph{Lights Electricity Rate {[}W{]}}\label{lights-electric-power-w}
 
@@ -1178,7 +1178,8 @@ The electric power input for the lights.
 \paragraph{Lights Electricity Energy {[}J{]}}\label{lights-electric-energy-j}
 
 The lighting electrical consumption including ballasts, if present. This will have the same value as Lights Total Heating Energy (above).
- The energy amount is also included in the following Electricity meters:
+
+The energy amount is also included in the following Electricity meters:
 \begin{lstlisting}
 Electricity:Facility
 Electricity:Building
@@ -1430,7 +1431,7 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 \paragraph{Field: Carbon Dioxide Generation Rate}\label{field-carbon-dioxide-generation-rate-1}
 
-This numeric input field specifies carbon dioxide generation rate with units of m3/s-W. The default value of 0.0 assumes the equipment is fully vented to outdoors. In the absence of better information, the user might consider using a value of 3.45E-8 m3/s-W which assumes the equipment is not vented to outdoors. This value is converted from natural gas CO\(_{2}\) emission rate at 11.7 lbs CO\(_{2}\) per therm. The CO\(_{2}\) emission rate is provided by U.S. Energy Information Administration, ``Frequently Asked Questions - Environment, Questions About Environmental Emissions'', \url{http://tonto.eia.doe.gov/ask/environment_faqs.asp#CO2_quantity}, January 2010. The maximum value for this input field is 3.45E-7 m3/s-W.
+This numeric input field specifies carbon dioxide generation rate with units of m3/s-W. The default value of 0.0 assumes the equipment is fully vented to outdoors. In the absence of better information, the user might consider using a value of 3.45E-8 m3/s-W which assumes the equipment is not vented to outdoors. This value is converted from natural gas CO\(_{2}\) emission rate at 11.7 lbs CO\(_{2}\) per therm. The CO\(_{2}\) emission rate is provided by U.S. Energy Information Administration, ``Frequently Asked Questions - Environment, Questions About Environmental Emissions'', \url{http://tonto.eia.doe.gov/ask/environment_faqs.asp#CO2_quantity}, January 2010. The maximum value for this input field is 3.45$\times$10$^{-7}$ m3/s-W.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-2-001}
 

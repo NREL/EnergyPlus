@@ -108,9 +108,9 @@ namespace DataSurfaces {
 
     enum class SurfaceClass : int
     {
-        Invalid = -1,
-        None,
-        Wall,
+        Invalid = -1, // If any addition classes get added to this list, add appropriate data
+        None,         // to ComputeNominalUwithConvCoeffs in DataHeatBalance.cc and make sure
+        Wall,         // that the data aligns with any revision to this enum.
         Floor,
         Roof,
         IntMass,
