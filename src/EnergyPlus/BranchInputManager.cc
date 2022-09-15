@@ -1097,7 +1097,7 @@ namespace BranchInputManager {
                                         " Input, preceding condition(s) will likely cause termination.");
                     state.dataBranchInputManager->InvalidBranchDefinitions = true;
                 }
-                TestInletOutletNodes(state, ErrFound);
+                TestInletOutletNodes(state);
                 state.dataBranchInputManager->GetBranchInputOneTimeFlag = false;
             }
         }
@@ -1184,7 +1184,7 @@ namespace BranchInputManager {
                             ConnectionType,
                             NodeInputManager::CompFluidStream::Primary,
                             ObjectIsParent,
-                            _,
+                            false,
                             cAlphaFields(Loop + 2));
                 if (NumNodes > 1) {
                     ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
@@ -1226,7 +1226,7 @@ namespace BranchInputManager {
                             ConnectionType,
                             NodeInputManager::CompFluidStream::Primary,
                             ObjectIsParent,
-                            _,
+                            false,
                             cAlphaFields(Loop + 3));
                 if (NumNodes > 1) {
                     ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");

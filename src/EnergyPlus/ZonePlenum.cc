@@ -374,7 +374,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                     DataLoopNode::ConnectionType::InducedAir,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
-                    _,
+                    false,
                     cAlphaFields(5));
 
         if (!NodeListError) {

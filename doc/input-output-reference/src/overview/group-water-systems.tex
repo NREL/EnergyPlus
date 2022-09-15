@@ -1,8 +1,8 @@
 \section{Group Water Systems}\label{group-water-systems}
 
-This group of objects is used to describe the water systems in the building. EnergyPlus offers water modeling capabilities than include not only hot water systems but also the overall water systems including cold water uses, on-site water collection (e.g., from rain, condensate, or well), and storage. HVAC components may consume or collect a significant portion of the water making it appropriate to include water modeling in EnergyPlus.
+This group of objects is used to describe the water systems in the building. EnergyPlus offers water modeling capabilities that include not only hot water systems but also the overall water systems including cold water uses, on-site water collection (e.g., from rain, condensate, or well), and storage. HVAC components may consume or collect a significant portion of the water making it appropriate to include water modeling in EnergyPlus.
 
-All water systems are collected into an end use category called Water Systems . This category includes hot and cold water. Water consumed by an HVAC component will be assigned to the end use category for that component. End use subcategories are available to separate hot water from cold water if desired. Simple hot water systems can be configured as stand-alone or use a \hyperref[plantloop]{PlantLoop}. The Water Systems can be connected to \hyperref[plantloop]{PlantLoop}s for modeling heated water end uses. However \hyperref[plantloop]{PlantLoop}s are not used to model cold water and the \hyperref[waterusestorage]{WaterUse:Storage}s portions of the water system. Cold water systems are connected together using \hyperref[waterusestorage]{WaterUse:Storage} objects. \hyperref[wateruseconnections]{WaterUse:Connections} are used at the zone level to connect to both cold and hot water.
+All water systems are collected into an end use category called Water Systems. This category includes hot and cold water. Water consumed by an HVAC component will be assigned to the end use category for that component. End use subcategories are available to separate hot water from cold water if desired. Simple hot water systems can be configured as stand-alone or use a \hyperref[plantloop]{PlantLoop}. The Water Systems can be connected to \hyperref[plantloop]{PlantLoop}s for modeling heated water end uses. However \hyperref[plantloop]{PlantLoop}s are not used to model cold water and the \hyperref[waterusestorage]{WaterUse:Storage}s portions of the water system. Cold water systems are connected together using \hyperref[waterusestorage]{WaterUse:Storage} objects. \hyperref[wateruseconnections]{WaterUse:Connections} are used at the zone level to connect to both cold and hot water.
 
 In addition to the input objects described in this section below, there are a variety of HVAC components that can be configured to interact with the water systems. These component input objects include optional fields that allow describing how the water systems are connected to them by providing the name of a storage tank. The following table lists EnergyPlus input objects that include provisions for connecting to the water systems but are described elsewhere in this document:
 
@@ -544,7 +544,7 @@ Name of a second WaterUse:Storage that would receive overflow. Overflow could oc
 
 \paragraph{Field: Type of Supply Controlled by Float Valve}\label{field-type-of-supply-controlled-by-float-valve}
 
-The storage tank can include the capability of modeling a float valve that will call for water to be added to the tank. This field is used to select the type of system used to respondto fill requests made by a float valve. The available options are None , Mains , GroundwaterWell , or OtherTank. The float valve settings are described in the next two fields.
+The storage tank can include the capability of modeling a float valve that will call for water to be added to the tank. This field is used to select the type of system used to respond to fill requests made by a float valve. The available options are None , Mains , GroundwaterWell , or OtherTank. The float valve settings are described in the next two fields.
 
 \paragraph{Field: Float Valve On Capacity}\label{field-float-valve-on-capacity}
 
@@ -678,7 +678,7 @@ This is the temperature of the water in the tank, in units of degrees Celsius (C
 
 \paragraph{Water System Storage Tank Overflow Volume Flow Rate {[}m3/s{]}}\label{water-system-storage-tank-overflow-volume-flow-rate-m3s}
 
-This is the rate of water flows that overflow the tank either because of limits on how fast the tank can fill or because the tank is full and cannot handle the water provided, in units of cubic meters per seconc (m\(^{3}\)/s).
+This is the rate of water flows that overflow the tank either because of limits on how fast the tank can fill or because the tank is full and cannot handle the water provided, in units of cubic meters per second (m\(^{3}\)/s).
 
 \paragraph{Water System Storage Tank Overflow Water Volume {[}m3{]}}\label{water-system-storage-tank-overflow-water-volume-m3}
 
@@ -690,21 +690,7 @@ This the temperature of overflow water leaving the tank.
 
 \subsection{WaterUse:RainCollector}\label{wateruseraincollector}
 
-The WaterUse:RainCollector object is used for harvesting rainwater falling on
-building surfaces. The rainwater is sent to a
-\hyperref[waterusestorage]{WaterUse:Storage} object. Up till version 9.6, in
-order to use this object, it is necessary to also include a
-\hyperref[siteprecipitation]{Site:Precipitation} object to describe the rates of
-rainfall. For newer versions, if the
-\hyperref[siteprecipitation]{Site:Precipitation} object is not defined,
-precipitation depth in the weather input .epw will be used instead. When this is
-the case, a warning message will be displayed. Please make sure the
-precipitation in the .epw is accurate. This \href{table by the State Climate
-Extreme Committee}{https://www.ncdc.noaa.gov/extremes/scec/records/all/maxp}
-could be a reference for sanity check of extreme values in the precipitation
-data. The tabular report ``Monthly Precipitation Summary'' provides a monthly
-summary of rainfall in the weather file and the amount used in the rain
-collector calculation.
+The WaterUse:RainCollector object is used for harvesting rainwater falling on building surfaces. The rainwater is sent to a \hyperref[waterusestorage]{WaterUse:Storage} object. Up till version 9.6, in order to use this object, it is necessary to also include a \hyperref[siteprecipitation]{Site:Precipitation} object to describe the rates of rainfall. For newer versions, if the \hyperref[siteprecipitation]{Site:Precipitation} object is not defined, precipitation depth in the weather input .epw will be used instead. When this is the case, a warning message will be displayed. Please make sure the precipitation in the .epw is accurate. This \href{table by the State Climate Extreme Committee}{https://www.ncdc.noaa.gov/extremes/scec/records/all/maxp} could be a reference for sanity check of extreme values in the precipitation data. The tabular report ``Monthly Precipitation Summary'' provides a monthly summary of rainfall in the weather file and the amount used in the rain collector calculation.
 
 \subsubsection{Inputs}\label{inputs-3-041}
 
@@ -734,7 +720,7 @@ The maximum flow rate {[}m3/s{]} for rainwater collection. In a scenario where a
 
 \paragraph{Field: Collection Surface 1-10 Name}\label{field-collection-surface-1-10-name}
 
-A reference to the name of a surface object which will collect the rain. Typically the collection surfaces would correspond to roof surfaces on the building. The effective area for rainwater collection is the horizontal component (area * cosine of the slope, etc.). More detailed modeling of rainwater collection can be added later to account for factors such as wind speed and direction, etc.
+A reference to the name of a surface object which will collect the rain. Typically the collection surfaces would correspond to roof surfaces on the building. The effective area for rainwater collection is the horizontal component (area $*$ cosine of the slope, etc.). More detailed modeling of rainwater collection can be added later to account for factors such as wind speed and direction, etc.
 
 IDF examples:
 
@@ -786,11 +772,11 @@ A reference to a \hyperref[waterusestorage]{WaterUse:Storage} object where the r
 
 \paragraph{Field: Pump Depth}\label{field-pump-depth}
 
-Reserved for future use. Effective depth of well {[}m{]}
+Reserved for future use. Effective depth of well in {[}m{]}.
 
 \paragraph{Field: Pump Rated Flow Rate}\label{field-pump-rated-flow-rate}
 
-This is the nominal pump flow rate {[}m3/s{]}. This field is required.
+This is the nominal pump flow rate in {[}m3/s{]}. This field is required.
 
 \paragraph{Field: Pump Rated Head}\label{field-pump-rated-head}
 
@@ -806,19 +792,19 @@ Reserved for future use.
 
 \paragraph{Field: Well Recovery Rate}\label{field-well-recovery-rate}
 
-Reserved for future use. Rate at which ground water enters well during a sustained draw, e.g., 2 hour well test {[}m3/s{]}.
+Reserved for future use. Rate at which ground water enters well during a sustained draw, e.g., 2 hour well test. The unit is {[}m3/s{]}.
 
 \paragraph{Field: Nominal Well Storage Volume}\label{field-nominal-well-storage-volume}
 
-Reserved for future use. Capacity in well after long period of inactivity and the usual water table depth. {[}m3{]}
+Reserved for future use. Capacity in well after long period of inactivity and the usual water table depth. The unit is {[}m3{]}.
 
 \paragraph{Field: Water Table Depth Mode}\label{field-water-table-depth-mode}
 
-Reserved for future use. Two options available: Constant or Scheduled
+Reserved for future use. Two options are available: \emph{Constant} or \emph{Scheduled}.
 
 \paragraph{Field: Water Table Depth}\label{field-water-table-depth}
 
-Reserved for future use. Depth of water table from \hyperref[waterusestorage]{WaterUse:Storage}
+Reserved for future use. Depth of water table from \hyperref[waterusestorage]{WaterUse:Storage}.
 
 \paragraph{Field: Water Table Depth Schedule Name}\label{field-water-table-depth-schedule-name}
 
@@ -870,7 +856,7 @@ This is the volume flow water of water actually obtained from the well, in units
 
 \paragraph{Water System Groundwater Well Volume {[}m3{]}}\label{water-system-groundwater-well-volume-m3}
 
-This is the volume of water obtained from the well, in units of cubic meters (m\(^{3}\)). This output is also added to a meter with Resource Type = OnSiteWater, End Use Key = WellWater, and Group Key = System (ref. Output Meter).
+This is the volume of water obtained from the well, in units of cubic meters (m\(^{3}\)). This output is also added to a meter with Resource Type = OnSiteWater, End Use Key = WellWater, and Group Key = System (ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter}).
 
 \paragraph{Water System Groundwater Well Pump Electricity Rate {[}W{]}}\label{water-system-groundwater-well-pump-electric-power-w}
 
@@ -878,4 +864,4 @@ This is the electrical power of the pump used to extract water from the well, in
 
 \paragraph{Water System Groundwater Well Pump Electricity Energy {[}J{]}}\label{water-system-groundwater-well-pump-electric-energy-j}
 
-This is the electricity energy used by the pump to extract water from the well, in units of Joules (J). This output is also added to a meter with Resource Type = Electricity, End Use Key = WaterSystems, and Group Key = System (ref. Output Meter).
+This is the electricity energy used by the pump to extract water from the well, in units of Joules (J). This output is also added to a meter with Resource Type = Electricity, End Use Key = WaterSystems, and Group Key = System (ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter}).
