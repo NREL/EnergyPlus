@@ -4997,10 +4997,7 @@ namespace SurfaceGeometry {
                                        cCurrentModuleObject,
                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
                                        SurfaceNumProp));
-                // For the remaining of the routine, as soon as ErrorsFound is true, we just skip to the next subsurface
-                // no point in more checks, the subsurface is invalid, and it could lead to a crash (cf #9331). Eventually, a Fatal will be issued
                 ErrorsFound = true;
-                continue;
             }
 
             ++SurfNum;
@@ -5011,7 +5008,6 @@ namespace SurfaceGeometry {
                                 cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2));
                 ErrorsFound = true;
-                continue;
             } else {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SubSurfIDs(ValidChk); // Set class number
             }
@@ -5039,30 +5035,27 @@ namespace SurfaceGeometry {
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction != 0) {
                     auto &construction = state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction);
                     if (!construction.TypeIsWindow && !construction.TypeIsAirBoundary) {
+                        ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                             "\" has an opaque surface construction; it should have a window construction.");
-                        ErrorsFound = true;
-                        continue;
                     }
                     if (state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).SourceSinkPresent) {
+                        ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                             "\": Windows are not allowed to have embedded sources/sinks");
-                        ErrorsFound = true;
-                        continue;
                     }
                 }
 
             } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction != 0) {
                 if (state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).TypeIsWindow) {
+                    ErrorsFound = true;
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                         state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                         "\" - has Window materials.");
                     ShowContinueError(state, "...because " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                    ErrorsFound = true;
-                    continue;
                 }
             }
 
@@ -5100,7 +5093,6 @@ namespace SurfaceGeometry {
                                     state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4));
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = "Unknown Zone";
                 ErrorsFound = true;
-                continue;
             }
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Dome ||
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::TDD_Diffuser) {
@@ -5132,7 +5124,6 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName =
                         state.dataIPShortCut->cAlphaArgs(5); // putting it as blank will not confuse things later.
                     ErrorsFound = true;
-                    continue;
                 }
             }
 
@@ -5151,7 +5142,6 @@ namespace SurfaceGeometry {
                                             state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
                         ShowContinueError(state, "...base surface requires that this subsurface have OtherSideCoefficients -- not found.");
                         ErrorsFound = true;
-                        continue;
                     } else { // found
                         // The following allows for a subsurface that has different characteristics than
                         // the base surface with OtherSide Coeff -- do we want that or is it an error?
@@ -5254,7 +5244,6 @@ namespace SurfaceGeometry {
                                     cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                         "\", Other side coefficients are not allowed with windows.");
                     ErrorsFound = true;
-                    continue;
                 }
 
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
@@ -5262,7 +5251,6 @@ namespace SurfaceGeometry {
                                     cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                         "\", Exterior boundary condition = Ground is not allowed with windows.");
                     ErrorsFound = true;
-                    continue;
                 }
 
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == KivaFoundation) {
@@ -5270,7 +5258,6 @@ namespace SurfaceGeometry {
                                     cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                         "\", Exterior boundary condition = Foundation is not allowed with windows.");
                     ErrorsFound = true;
-                    continue;
                 }
 
                 InitialAssociateWindowShadingControlFenestration(state, ErrorsFound, SurfNum);
