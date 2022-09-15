@@ -361,18 +361,15 @@ void InitSolarCalculations(EnergyPlusData &state)
 
 void GetShadowingInput(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   July 1999
     //       MODIFIED       B. Griffith, Nov 2012, add calculation method
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the Shadowing Calculation object.
 
     // Using/Aliasing
-
     using DataSystemVariables::ShadingMethod;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -483,6 +480,18 @@ void GetShadowingInput(EnergyPlusData &state)
     } else {
         state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
         state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
+    }
+
+    if ((state.dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::PixelCounting) &&
+        state.dataSolarShading->anyScheduledShadingSurface) {
+        ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
+        ShowContinueError(state, "and there is at least one shading surface of type ");
+        ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
+        ShowContinueError(state, "that has an active transmittance schedule value greater than zero.");
+        ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
+        ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
+        ShowContinueError(state, "which may result in inaccurate or unexpected results.");
+        ShowContinueError(state, "It is suggested switching to another Shading Calculation Method, such as \"PolygonClipping\".");
     }
 
     aNum++;
