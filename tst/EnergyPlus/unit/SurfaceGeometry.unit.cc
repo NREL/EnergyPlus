@@ -3282,7 +3282,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(1).Name = "WSC1";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
     state->dataSurface->WindowShadingControl(1).FenestrationName(1) = "Fene-01";
@@ -3292,7 +3292,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(2).Name = "WSC2";
     state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Sequential;
     state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
     state->dataSurface->WindowShadingControl(2).FenestrationName.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
     state->dataSurface->WindowShadingControl(2).FenestrationName(1) = "Fene-04";
@@ -3303,7 +3303,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(3).Name = "WSC3";
     state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
-    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
     state->dataSurface->WindowShadingControl(3).FenestrationName.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
     state->dataSurface->WindowShadingControl(3).FenestrationName(1) = "Fene-08";
@@ -3416,7 +3416,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     state->dataSurface->WindowShadingControl(1).Name = "WSC1";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
     state->dataSurface->WindowShadingControl(1).FenestrationName(1) = "Fene-01";
@@ -3426,7 +3426,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     state->dataSurface->WindowShadingControl(2).Name = "WSC2";
     state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Sequential;
     state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
     state->dataSurface->WindowShadingControl(2).FenestrationName.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
     state->dataSurface->WindowShadingControl(2).FenestrationName(1) = "Fene-02";
@@ -3437,7 +3437,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     state->dataSurface->WindowShadingControl(3).Name = "WSC3";
     state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
-    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
     state->dataSurface->WindowShadingControl(3).FenestrationName.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
     state->dataSurface->WindowShadingControl(3).FenestrationName(1) = "Fene-03";
@@ -3519,7 +3519,7 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(1).Name = "WSC1";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
     state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
@@ -3530,7 +3530,7 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(2).Name = "WSC2";
     state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Sequential;
     state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
     state->dataSurface->WindowShadingControl(2).FenestrationName.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
     state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
@@ -3542,7 +3542,7 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     state->dataSurface->WindowShadingControl(3).Name = "WSC3";
     state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
     state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
-    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).multiSurfaceControl = MultiSurfaceControl::Group;
     state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
     state->dataSurface->WindowShadingControl(3).FenestrationName.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
     state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
@@ -3615,17 +3615,17 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 3;
     state->dataSurface->WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
     state->dataSurface->WindowShadingControl(1).ShadingDevice = 17;
-    state->dataSurface->WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
+    state->dataSurface->WindowShadingControl(1).shadingControlType = WindowShadingControlType::OnIfScheduled;
     state->dataSurface->WindowShadingControl(1).Schedule = 83;
     state->dataSurface->WindowShadingControl(1).SetPoint = 200;
     state->dataSurface->WindowShadingControl(1).SetPoint2 = 170;
     state->dataSurface->WindowShadingControl(1).ShadingControlIsScheduled = true;
     state->dataSurface->WindowShadingControl(1).GlareControlIsActive = false;
     state->dataSurface->WindowShadingControl(1).SlatAngleSchedule = 84;
-    state->dataSurface->WindowShadingControl(1).SlatAngleControlForBlinds = WSC_SAC_BlockBeamSolar;
+    state->dataSurface->WindowShadingControl(1).slatAngleControl = SlatAngleControl::BlockBeamSolar;
     state->dataSurface->WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
     state->dataSurface->WindowShadingControl(1).DaylightControlIndex = 7;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Sequential;
 
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
@@ -3688,7 +3688,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
-    state->dataSurface->WindowShadingControl(2).ShadingControlType = WindowShadingControlType::OffNight_OnDay_HiSolarWindow;
+    state->dataSurface->WindowShadingControl(2).shadingControlType = WindowShadingControlType::OffNight_OnDay_HiSolarWindow;
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
@@ -3708,7 +3708,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
-    state->dataSurface->WindowShadingControl(2).SlatAngleControlForBlinds = WSC_SAC_FixedSlatAngle;
+    state->dataSurface->WindowShadingControl(2).slatAngleControl = SlatAngleControl::Fixed;
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
@@ -3720,7 +3720,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
-    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(2).multiSurfaceControl = MultiSurfaceControl::Group;
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 }
@@ -3741,17 +3741,17 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 3;
     state->dataSurface->WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
     state->dataSurface->WindowShadingControl(1).ShadingDevice = 17;
-    state->dataSurface->WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
+    state->dataSurface->WindowShadingControl(1).shadingControlType = WindowShadingControlType::OnIfScheduled;
     state->dataSurface->WindowShadingControl(1).Schedule = 83;
     state->dataSurface->WindowShadingControl(1).SetPoint = 200;
     state->dataSurface->WindowShadingControl(1).SetPoint2 = 170;
     state->dataSurface->WindowShadingControl(1).ShadingControlIsScheduled = true;
     state->dataSurface->WindowShadingControl(1).GlareControlIsActive = false;
     state->dataSurface->WindowShadingControl(1).SlatAngleSchedule = 84;
-    state->dataSurface->WindowShadingControl(1).SlatAngleControlForBlinds = WSC_SAC_BlockBeamSolar;
+    state->dataSurface->WindowShadingControl(1).slatAngleControl = SlatAngleControl::BlockBeamSolar;
     state->dataSurface->WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
     state->dataSurface->WindowShadingControl(1).DaylightControlIndex = 7;
-    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(1).multiSurfaceControl = MultiSurfaceControl::Sequential;
 
     state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
     state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);

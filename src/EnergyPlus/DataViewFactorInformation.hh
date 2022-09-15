@@ -84,6 +84,12 @@ namespace DataViewFactorInformation {
         Array1D<Real64> SolAbsorptance;      // Surface solar absorptance
         int TotalEnclosureDaylRefPoints = 0; // Total number of daylighting reference points in enclosure
         bool HasInterZoneWindow = false;     // Interzone Window(s) present in this zone
+        Real64 solVMULT = 0.0;               // 1/(Sum Of Inside Surfaces Area*Absorptance)
+        Real64 radQThermalRad = 0.0;         // TOTAL THERMAL RADIATION ADDED TO Radiant Enclosure
+        Real64 radThermAbsMult = 0.0;        // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
+        bool solAbsFirstCalc = true;         // for error message
+        bool radReCalc = false; // Enclosure solar or thermal radiation properties need recalc due to window/shading status change or envelope EMS
+                                // actuators present
     };
 
 } // namespace DataViewFactorInformation
@@ -93,8 +99,8 @@ struct ViewFactorInfoData : BaseGlobalStruct
 
     int NumOfRadiantEnclosures = 0; // Number of radiant enclosures
     int NumOfSolarEnclosures = 0;   // Number of solar enclosures
-    Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> EnclRadInfo;
-    Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> EnclSolInfo;
+    EPVector<DataViewFactorInformation::EnclosureViewFactorInformation> EnclRadInfo;
+    EPVector<DataViewFactorInformation::EnclosureViewFactorInformation> EnclSolInfo;
 
     void clear_state() override
     {

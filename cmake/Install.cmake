@@ -268,6 +268,7 @@ install(FILES "${PROJECT_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DES
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/Boilers.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/California_Title_24-2008.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/Chillers.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/CodeCompliantEquipment.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/CompositeWallConstructions.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/DXCoolingCoil.idf" DESTINATION "./DataSets" COMPONENT Datasets)
 install(FILES "${PROJECT_SOURCE_DIR}/datasets/ElectricGenerators.idf" DESTINATION "./DataSets" COMPONENT Datasets)
@@ -457,6 +458,12 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/src/Slab/SlabExample.idf" DESTINATION "PreProcess/GrndTempCalc/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Appearance Pakx64.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Cryptox64.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/GZipx64.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Internet Encodingsx64.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater Libs/Shellx64.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/icudt65.dll"
@@ -474,6 +481,8 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/vccorlib140.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/vcruntime140.dll"
+          DESTINATION "PreProcess/IDFVersionUpdater/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/vcruntime140_1.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Win/XojoGUIFramework64.dll"
           DESTINATION "PreProcess/IDFVersionUpdater/")
@@ -564,11 +573,17 @@ elseif(UNIX)
 
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBAppearancePak64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBCrypto64.so"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBInternetEncodings64.so"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBShell64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/XojoGUIFramework64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libc++.so.1"
+          DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libGZip64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater Libs/libRBRegEx64.so"
           DESTINATION "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")

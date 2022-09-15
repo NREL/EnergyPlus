@@ -8,6 +8,7 @@ option(ENABLE_OPENMP "Use OpenMP" OFF)
 option( KIVA_GROUND_PLOT "Build ground plotting library" ON )
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)
 option( KIVA_TESTING "Build tests" ON )
+option( KIVA_WERROR "Turn on warnings into error" OFF )
 
 find_package(Git QUIET)
 
@@ -20,6 +21,8 @@ if (KIVA_TESTING)
     find_package(codecov)
   endif()
 endif()
+
+include(compiler-flags)
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${kiva_BINARY_DIR}" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${kiva_BINARY_DIR}" )

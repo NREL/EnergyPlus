@@ -38,6 +38,7 @@ public:
   void printCellTypes();
   std::tuple<std::size_t, std::size_t, std::size_t> getCoordinates(std::size_t index);
   std::vector<std::size_t> getDestIndex(std::size_t i, std::size_t j, std::size_t k);
+  std::size_t getIndex(std::size_t i, std::size_t j, std::size_t k);
 };
 
 } // namespace Kiva

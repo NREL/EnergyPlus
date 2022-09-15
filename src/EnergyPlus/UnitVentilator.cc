@@ -378,8 +378,6 @@ namespace UnitVentilator {
             }
             unitVent.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::UnitVentilator, unitVent.Name);
             if (unitVent.ZonePtr == 0) {
-                ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
-                ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
                 ErrorsFound = true;
             }
 
@@ -578,8 +576,8 @@ namespace UnitVentilator {
                 }
             }
 
-            if (!lAlphaBlanks(18)) {
-                unitVent.AvailManagerListName = Alphas(18);
+            if (!lAlphaBlanks(19)) {
+                unitVent.AvailManagerListName = Alphas(19);
             }
 
             unitVent.HVACSizingIndex = 0;

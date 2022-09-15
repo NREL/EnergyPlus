@@ -57,8 +57,10 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -279,7 +281,7 @@ namespace UnitarySystems {
         int m_NumOfSpeedSuppHeating = 0;
         bool m_MultiSpeedHeatingCoil = false;
         bool m_VarSpeedHeatingCoil = false;
-        int m_SystemHeatControlNodeNum = 0;
+        int HeatCtrlNode = 0;
         bool m_CoolCoilExists = false;
         int m_CoolingCoilType_Num = 0;
         int m_NumOfSpeedCooling = 0;
@@ -293,7 +295,7 @@ namespace UnitarySystems {
         int m_ActualDXCoilIndexForHXAssisted = 0;
         bool m_DiscreteSpeedCoolingCoil = false;
         bool m_ContSpeedCoolingCoil = false;
-        int m_SystemCoolControlNodeNum = 0;
+        int CoolCtrlNode = 0;
         int m_WaterCyclingMode = 0;
         bool m_ISHundredPercentDOASDXCoil = false;
         bool m_RunOnSensibleLoad = false;
@@ -304,11 +306,11 @@ namespace UnitarySystems {
         bool m_SuppCoilExists = false;
         Real64 m_DesignSuppHeatingCapacity = 0.0;
         int m_SuppCoilAirInletNode = 0;
-        int m_SuppCoilAirOutletNode = 0;
+        int SuppCoilOutletNodeNum = 0;
         int m_SuppCoilFluidInletNode = 0;
         Real64 m_MaxSuppCoilFluidFlow = 0.0;
         int m_SuppHeatCoilIndex = 0;
-        int m_SuppHeatControlNodeNum = 0;
+        int SuppCtrlNode = 0;
         Real64 m_SupHeaterLoad = 0.0;
         int m_CoolingSAFMethod = 0;
         int m_HeatingSAFMethod = 0;
@@ -487,7 +489,8 @@ namespace UnitarySystems {
 
     public:
         // SZVAV variables
-        int UnitarySystemType_Num = 0;
+        DataZoneEquipment::ZoneEquip ZoneEqType = DataZoneEquipment::ZoneEquip::Invalid;
+        SimAirServingZones::CompType AirloopEqType = SimAirServingZones::CompType::Invalid;
         int MaxIterIndex = 0;
         int RegulaFalsiFailedIndex = 0;
         int NodeNumOfControlledZone = 0;
@@ -733,7 +736,7 @@ namespace UnitarySystems {
 
         void initUnitarySystems(EnergyPlusData &state, int AirLoopNum, bool FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
 
-        void checkNodeSetPoint(EnergyPlusData &state,
+        bool checkNodeSetPoint(EnergyPlusData &state,
                                int const AirLoopNum,       // number of the current air loop being simulated
                                int const ControlNode,      // Node to test for set point
                                int const CoilType,         // True if cooling coil, then test for HumRatMax set point
@@ -976,7 +979,12 @@ namespace UnitarySystems {
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
     bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
-    bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
+    bool searchTotalComponents(EnergyPlusData &state,
+                               SimAirServingZones::CompType compTypeToFind,
+                               std::string_view objectNameToFind,
+                               int &compIndex,
+                               int &branchIndex,
+                               int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound);
 

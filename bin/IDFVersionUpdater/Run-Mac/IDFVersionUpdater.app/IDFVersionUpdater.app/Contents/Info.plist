@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+   <key>CFBundleExecutable</key>
+   <string>IDFVersionUpdater</string>
+   <key>CFBundleName</key>
+   <string>IDFVersionUpdater</string>
+   <key>CFBundleIdentifier</key>
+   <string>com.gard.idfversionupdater</string>
+   <key>CFBundleInfoDictionaryVersion</key>
+   <string>6.0</string>
+   <key>CFBundleVersion</key>
+   <string>0.16.0.2.0</string>
+   <key>CFBundleDevelopmentRegion</key>
+   <string>en</string>
+   <key>CFBundlePackageType</key>
+   <string>APPL</string>
+   <key>CFBundleSignature</key>
+   <string>????</string>
+   <key>NSHumanReadableCopyright</key>
+   <string>0.16</string>
+   <key>CFBundleShortVersionString</key>
+   <string>0.16</string>
+   <key>CFBundleIconFile</key>
+   <string>App</string>
+   <key>LSMinimumSystemVersion</key>
+   <string>10.10.0</string>
+<key>NSHighResolutionCapable</key><false/>
+<key>NSRequiresAquaSystemAppearance</key><true/>
+<key>CFBundleSupportedPlatforms</key><array><string>MacOSX</string></array>
+   <key>CFBundleDocumentTypes</key>
+   <array>
+      <dict>
+         <key>CFBundleTypeName</key>
+         <string>EnergyPlus Input Files (*.idf)</string>
+         <key>CFBundleTypeExtensions</key>
+         <array>
+            <string>idf</string>
+         </array>
+         <key>LSItemContentTypes</key>
+         <array>
+            <string>public.data</string>
+         </array>
+         <key>CFBundleTypeRole</key>
+         <string>Editor</string>
+         <key>LSHandlerRank</key>
+         <string>Default</string>
+      </dict>
+      <dict>
+         <key>CFBundleTypeName</key>
+         <string>Text file with list of EnergyPlus Input Files (*.lst)</string>
+         <key>CFBundleTypeExtensions</key>
+         <array>
+            <string>lst</string>
+         </array>
+         <key>LSItemContentTypes</key>
+         <array>
+            <string>public.data</string>
+         </array>
+         <key>CFBundleTypeRole</key>
+         <string>Editor</string>
+         <key>LSHandlerRank</key>
+         <string>Default</string>
+      </dict>
+   </array>
+
+   <key>UTImportedTypeDeclarations</key>
+   <array>
+      <dict>
+         <key>UTTypeIdentifier</key>
+         <string>public.data</string>
+         <key>UTTypeConformsTo</key>
+         <array>
+            <string>public.data</string>
+         </array>
+         <key>UTTypeTagSpecification</key>
+         <dict>
+            <key>public.filename-extension</key>
+            <array>
+            <string>idf</string>
+            </array>
+            <key>com.apple.ostype</key>
+            <array>
+               <string>????</string>
+            </array>
+         </dict>
+      </dict>
+      <dict>
+         <key>UTTypeIdentifier</key>
+         <string>public.data</string>
+         <key>UTTypeConformsTo</key>
+         <array>
+            <string>public.data</string>
+         </array>
+         <key>UTTypeTagSpecification</key>
+         <dict>
+            <key>public.filename-extension</key>
+            <array>
+            <string>lst</string>
+            </array>
+            <key>com.apple.ostype</key>
+            <array>
+               <string>????</string>
+            </array>
+         </dict>
+      </dict>
+   </array>
+
+</dict>
+</plist>
