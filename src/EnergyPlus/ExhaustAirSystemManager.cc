@@ -324,13 +324,15 @@ namespace ExhaustAirSystemManager {
                 if (availSchNum > 0) {
                     // normal conditions
                 } else if (availSchNum == 0) {
-                    // blank, treat as always avaialabe
+                    // mismatch, a regular warning
+                    ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
+                    ShowContinueError(state, "Could not find a match for Central Exhaust Fan's Availability Schedule.");
+                    ShowContinueError(state, format("Please check the availability schedule input for {}={}.", centralFanType, centralFanName));
+                    ErrorsFound = true;
                 } else { // no match
-                    availSchNum = 0;
-                    // a regular warning
-                    ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
-                    ShowContinueError(state, "Could not find a match for Central Exhaust Fan's Avaiability Schedule.");
-                    ShowContinueError(state, "It will be treated as always available.");
+                    // blank, treat as always avaialabe
+                    availSchNum = DataGlobalConstants::ScheduleAlwaysOn;
+                    // 
                 }
                 thisExhSys.AvailScheduleNum = availSchNum;
 
@@ -345,7 +347,7 @@ namespace ExhaustAirSystemManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
+            ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem. Preceding condition(s) causes termination.");
         }
     }
 
