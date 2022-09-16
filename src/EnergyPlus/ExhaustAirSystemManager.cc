@@ -332,7 +332,7 @@ namespace ExhaustAirSystemManager {
                 } else { // no match
                     // blank, treat as always avaialabe
                     availSchNum = DataGlobalConstants::ScheduleAlwaysOn;
-                    // 
+                    //
                 }
                 thisExhSys.AvailScheduleNum = availSchNum;
 
@@ -607,7 +607,6 @@ namespace ExhaustAirSystemManager {
                 bool nodeNotFound = false;
                 if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
                     for (size_t i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
-                        // CheckForSupplyNode(); // bypass for debugging
                         CheckForSupplyNode(state, exhCtrlNum, nodeNotFound);
                         if (nodeNotFound) {
                             ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
@@ -900,11 +899,6 @@ namespace ExhaustAirSystemManager {
                 state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow + state.dataZoneEquip->ZoneExhaustControlSystem(i).UnbalancedFlow;
             state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneExhBalanced += state.dataZoneEquip->ZoneExhaustControlSystem(i).BalancedFlow;
         }
-    }
-
-    void CheckForSupplyNode() // EnergyPlusData &state, int const ExhCtrlNum, bool &NodeNotFound)
-    {
-        // bypass for debugging
     }
 
     void CheckForSupplyNode(EnergyPlusData &state, int const ExhCtrlNum, bool &NodeNotFound)
