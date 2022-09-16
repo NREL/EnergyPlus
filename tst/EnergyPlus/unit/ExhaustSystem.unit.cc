@@ -405,10 +405,14 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(3).DesignExhaustFlowRate, 0.3, 1e-5);
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(4).DesignExhaustFlowRate, 0.4, 1e-5);
 
-    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(1).FlowControlTypeNum, 0);
-    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(2).FlowControlTypeNum, 0);
-    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(3).FlowControlTypeNum, 0);
-    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(4).FlowControlTypeNum, 0);
+    EXPECT_TRUE((state->dataZoneEquip->ZoneExhaustControlSystem(1).FlowControlOption ==
+                 ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled));
+    EXPECT_TRUE((state->dataZoneEquip->ZoneExhaustControlSystem(2).FlowControlOption ==
+                 ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled));
+    EXPECT_TRUE((state->dataZoneEquip->ZoneExhaustControlSystem(3).FlowControlOption ==
+                 ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled));
+    EXPECT_TRUE((state->dataZoneEquip->ZoneExhaustControlSystem(4).FlowControlOption ==
+                 ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled));
 
     EXPECT_EQ(state->dataZoneEquip->NumExhaustAirSystems, 2);
     EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(1).Name, "CENTRAL EXHAUST 1");
@@ -710,7 +714,7 @@ TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
     // state->dataHeatBal->space(1).Name = "LIVING ZONE";
     // state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(4);
-    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE1";
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 2;
@@ -720,7 +724,7 @@ TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
     state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
 
-    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "ZONE2";
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 2;
@@ -730,51 +734,49 @@ TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeExhaustNodeNum.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
     state->dataZoneEquip->ZoneEquipConfig(2).SharedExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
 
+    // int NumOfNodes = 10;
+    // state->dataLoopNodes->Node.allocate(NumOfNodes);
+    // state->dataLoopNodes->NodeID.allocate(NumOfNodes);
+    // state->dataLoopNodes->NodeID(1) = "ZoeNode";
+    // state->dataLoopNodes->NodeID(2) = "ZoeInletNode";
+    // state->dataLoopNodes->NodeID(3) = "";
+    // state->dataLoopNodes->NodeID(4) = "ZoeReturNode1";
+    // state->dataLoopNodes->NodeID(5) = "ZoeReturNode2";
+    // state->dataLoopNodes->NodeID(6) = "ZoeExhaustNode";
+    // state->dataLoopNodes->NodeID(7) = "ZoeSupplyNode";
+    // state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    // state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(2) = 5;
+    // state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 6;
+    // state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(1) = 6;
+    // state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(2) = 6;
+    // state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(1) = LightReturnExhaustConfig::Multi;
+    // state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(2) = LightReturnExhaustConfig::Shared;
 
+    // state->dataHeatBal->spaceIntGainDevices.allocate(1);
+    // state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices = 2;
+    // state->dataHeatBal->spaceIntGainDevices(1).device.allocate(2);
+    // state->dataHeatBal->spaceIntGainDevices(1).device(1).ReturnAirNodeNum = 4;
+    // state->dataHeatBal->spaceIntGainDevices(1).device(2).ReturnAirNodeNum = 5;
+    // state->dataHeatBal->spaceIntGainDevices(1).device(1).ReturnAirConvGainRate = 50.0;
+    // state->dataHeatBal->spaceIntGainDevices(1).device(2).ReturnAirConvGainRate = 100.0;
 
-    //int NumOfNodes = 10;
-    //state->dataLoopNodes->Node.allocate(NumOfNodes);
-    //state->dataLoopNodes->NodeID.allocate(NumOfNodes);
-    //state->dataLoopNodes->NodeID(1) = "ZoeNode";
-    //state->dataLoopNodes->NodeID(2) = "ZoeInletNode";
-    //state->dataLoopNodes->NodeID(3) = "";
-    //state->dataLoopNodes->NodeID(4) = "ZoeReturNode1";
-    //state->dataLoopNodes->NodeID(5) = "ZoeReturNode2";
-    //state->dataLoopNodes->NodeID(6) = "ZoeExhaustNode";
-    //state->dataLoopNodes->NodeID(7) = "ZoeSupplyNode";
-    //state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
-    //state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(2) = 5;
-    //state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 6;
-    //state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(1) = 6;
-    //state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(2) = 6;
-    //state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(1) = LightReturnExhaustConfig::Multi;
-    //state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(2) = LightReturnExhaustConfig::Shared;
-
-    //state->dataHeatBal->spaceIntGainDevices.allocate(1);
-    //state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices = 2;
-    //state->dataHeatBal->spaceIntGainDevices(1).device.allocate(2);
-    //state->dataHeatBal->spaceIntGainDevices(1).device(1).ReturnAirNodeNum = 4;
-    //state->dataHeatBal->spaceIntGainDevices(1).device(2).ReturnAirNodeNum = 5;
-    //state->dataHeatBal->spaceIntGainDevices(1).device(1).ReturnAirConvGainRate = 50.0;
-    //state->dataHeatBal->spaceIntGainDevices(1).device(2).ReturnAirConvGainRate = 100.0;
-
-    //for (int Nodecount = 1; Nodecount <= NumOfNodes; ++Nodecount) {
+    // for (int Nodecount = 1; Nodecount <= NumOfNodes; ++Nodecount) {
     //    state->dataLoopNodes->Node(Nodecount).Temp = 20.0;
     //    state->dataLoopNodes->Node(Nodecount).HumRat = 0.001;
     //}
-    //state->dataLoopNodes->Node(4).MassFlowRate = 0.01;
-    //state->dataLoopNodes->Node(5).MassFlowRate = 0.02;
-    //state->dataLoopNodes->Node(6).MassFlowRate = 0.015;
+    // state->dataLoopNodes->Node(4).MassFlowRate = 0.01;
+    // state->dataLoopNodes->Node(5).MassFlowRate = 0.02;
+    // state->dataLoopNodes->Node(6).MassFlowRate = 0.015;
 
-    //state->dataHeatBal->Zone(1).NoHeatToReturnAir = false;
-    //state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    //state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    // state->dataHeatBal->Zone(1).NoHeatToReturnAir = false;
+    // state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    // state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
-    //state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    //state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
-    //state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-    //state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
-    //state->dataZoneEquip->ZoneEquipList.allocate(1);
+    // state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    // state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    // state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    // state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    // state->dataZoneEquip->ZoneEquipList.allocate(1);
 
     ASSERT_TRUE(process_idf(idf_objects));
     ScheduleManager::ProcessScheduleInput(*state);
