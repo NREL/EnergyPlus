@@ -1227,8 +1227,11 @@ namespace WaterUse {
             }
 
             this->ColdMassFlowRate = this->TotalMassFlowRate - this->HotMassFlowRate;
-
             this->MixedTemp = (this->ColdMassFlowRate * this->ColdTemp + this->HotMassFlowRate * this->HotTemp) / this->TotalMassFlowRate;
+            // there should be no out of bounds results
+            assert(this->ColdMassFlowRate >= 0.0 && this->ColdMassFlowRate <= this->TotalMassFlowRate);
+            assert(this->HotMassFlowRate >= 0.0 && this->HotMassFlowRate <= this->TotalMassFlowRate);
+            assert(std::abs(this->HotMassFlowRate + this->ColdMassFlowRate - this->TotalMassFlowRate) < EPSILON);
         } else {
             this->HotMassFlowRate = 0.0;
             this->ColdMassFlowRate = this->TotalMassFlowRate;

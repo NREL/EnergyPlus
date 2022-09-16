@@ -457,6 +457,16 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 
     EXPECT_TRUE(compare_err_stream(error_string1, true));
 
+    // configuration allows hot water mixing. A target temp schedule exists with either a hot temp schedule or a connnections object
+    EXPECT_TRUE(state->dataWaterUse->WaterEquipment(WaterEquipNum).allowHotControl);
+    EXPECT_TRUE(state->dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempSchedule);
+    EXPECT_TRUE(state->dataWaterUse->WaterEquipment(WaterEquipNum).HotTempSchedule || state->dataWaterUse->WaterEquipment(WaterEquipNum).Connections);
+    EXPECT_GT(state->dataWaterUse->WaterEquipment(WaterEquipNum).HotMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataWaterUse->WaterEquipment(WaterEquipNum).ColdMassFlowRate +
+                    state->dataWaterUse->WaterEquipment(WaterEquipNum).HotMassFlowRate,
+                state->dataWaterUse->WaterEquipment(WaterEquipNum).TotalMassFlowRate,
+                0.00000001);
+
     // Reset hot water temperature to 43.3C
     state->dataLoopNodes->Node(1).Temp = 43.3;
     state->dataWaterUse->WaterConnections(WaterConnNum).InitConnections(*state);
@@ -477,6 +487,11 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     });
 
     EXPECT_TRUE(compare_err_stream(error_string2, true));
+    EXPECT_GT(state->dataWaterUse->WaterEquipment(WaterEquipNum).HotMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataWaterUse->WaterEquipment(WaterEquipNum).ColdMassFlowRate +
+                    state->dataWaterUse->WaterEquipment(WaterEquipNum).HotMassFlowRate,
+                state->dataWaterUse->WaterEquipment(WaterEquipNum).TotalMassFlowRate,
+                0.00000001);
 
     // Set target temperature to 0C, below cold water temperature to trigger warning
     state->dataScheduleMgr->Schedule(4).CurrentValue = 0;
@@ -494,4 +509,9 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     });
 
     EXPECT_TRUE(compare_err_stream(error_string3, true));
+    EXPECT_GT(state->dataWaterUse->WaterEquipment(WaterEquipNum).ColdMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataWaterUse->WaterEquipment(WaterEquipNum).ColdMassFlowRate +
+                    state->dataWaterUse->WaterEquipment(WaterEquipNum).HotMassFlowRate,
+                state->dataWaterUse->WaterEquipment(WaterEquipNum).TotalMassFlowRate,
+                0.00000001);
 }
