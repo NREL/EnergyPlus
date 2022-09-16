@@ -1004,11 +1004,6 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     //  CALL's passing the screen number without the relative azimuth and altitude angles is not allowed
     //  CALL CalcScreenTransmittance(0, ScreenNumber=ScNum) ! DO NOT use this syntax
 
-    // Using/Aliasing
-    using DataSurfaces::DoNotModel;
-    using DataSurfaces::ModelAsDiffuse;
-    using DataSurfaces::ModelAsDirectBeam;
-
     // Locals
     // FUNCTION ARGUMENT DEFINITIONS:
     // The optional arguments Phi and Theta are used to integrate over a hemisphere and are passed as pairs
@@ -1121,8 +1116,10 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         IncidentAngle = 0.0;
     }
 
+    auto &thisScreen = state.dataHeatBal->SurfaceScreens(ScNum);
+
     // ratio of screen material diameter to screen material spacing
-    Gamma = state.dataHeatBal->SurfaceScreens(ScNum).ScreenDiameterToSpacingRatio;
+    Gamma = thisScreen.ScreenDiameterToSpacingRatio;
 
     // ************************************************************************************************
     // * calculate transmittance of totally absorbing screen material (beam passing through open area)*
@@ -1171,8 +1168,8 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // * calculate transmittance of scattered beam due to reflecting screen material *
     // *******************************************************************************
 
-    ReflectCyl = state.dataHeatBal->SurfaceScreens(ScNum).ReflectCylinder;
-    ReflectCylVis = state.dataHeatBal->SurfaceScreens(ScNum).ReflectCylinderVis;
+    ReflectCyl = thisScreen.ReflectCylinder;
+    ReflectCylVis = thisScreen.ReflectCylinderVis;
 
     if (std::abs(SunAzimuthToScreenNormal - DataGlobalConstants::PiOvr2) < Small ||
         std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2) < Small) {
@@ -1213,62 +1210,62 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Tscattered = max(0.0, Tscattered);
     TscatteredVis = max(0.0, TscatteredVis);
 
-    if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == DoNotModel) {
+    if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::DoNotModel) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+            thisScreen.BmBmTrans = Tdirect;
+            thisScreen.BmBmTransVis = Tdirect;
+            thisScreen.BmBmTransBack = 0.0;
         } else {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
+            thisScreen.BmBmTrans = 0.0;
+            thisScreen.BmBmTransVis = 0.0;
+            thisScreen.BmBmTransBack = Tdirect;
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDirectBeam) {
+    } else if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::DirectBeam) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+            thisScreen.BmBmTrans = Tdirect + Tscattered;
+            thisScreen.BmBmTransVis = Tdirect + TscatteredVis;
+            thisScreen.BmBmTransBack = 0.0;
         } else {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect + Tscattered;
+            thisScreen.BmBmTrans = 0.0;
+            thisScreen.BmBmTransVis = 0.0;
+            thisScreen.BmBmTransBack = Tdirect + Tscattered;
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDiffuse) {
+    } else if (thisScreen.screenBeamReflectanceModel == DataSurfaces::ScreenBeamReflectanceModel::Diffuse) {
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+            thisScreen.BmBmTrans = Tdirect;
+            thisScreen.BmBmTransVis = Tdirect;
+            thisScreen.BmBmTransBack = 0.0;
         } else {
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-            state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
+            thisScreen.BmBmTrans = 0.0;
+            thisScreen.BmBmTransVis = 0.0;
+            thisScreen.BmBmTransBack = Tdirect;
         }
     }
 
     if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTrans = Tscattered;
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransVis = TscatteredVis;
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransBack = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-        state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamBack = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamBack = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamBack = 0.0;
+        thisScreen.BmDifTrans = Tscattered;
+        thisScreen.BmDifTransVis = TscatteredVis;
+        thisScreen.BmDifTransBack = 0.0;
+        thisScreen.ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+        thisScreen.ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+        thisScreen.AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+        thisScreen.ReflectSolBeamBack = 0.0;
+        thisScreen.ReflectVisBeamBack = 0.0;
+        thisScreen.AbsorpSolarBeamBack = 0.0;
     } else {
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTrans = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransVis = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransBack = Tscattered;
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-        state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamFront = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamFront = 0.0;
-        state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamFront = 0.0;
+        thisScreen.BmDifTrans = 0.0;
+        thisScreen.BmDifTransVis = 0.0;
+        thisScreen.BmDifTransBack = Tscattered;
+        thisScreen.ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+        thisScreen.ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+        thisScreen.AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+        thisScreen.ReflectSolBeamFront = 0.0;
+        thisScreen.ReflectVisBeamFront = 0.0;
+        thisScreen.AbsorpSolarBeamFront = 0.0;
     }
 }
 
@@ -1338,71 +1335,64 @@ Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
     //      Interior horizontal surfaces, heat flow up     IP: 0.61  SI: 0.1074
     //      Interior horizontal surfaces, heat flow down   IP: 0.92  SI: 0.1620
     //      Interior vertical surfaces                     IP: 0.68  SI: 0.1198
-    // This section shows the same value in 90.1-2007 and 90.2-2010
-
-    // Using/Aliasing
-    using DataSurfaces::ExternalEnvironment;
-    using DataSurfaces::Ground;
-    using DataSurfaces::GroundFCfactorMethod;
-    using DataSurfaces::SurfaceClass;
+    // This section shows the same value in 90.1-2010 and 90.2-2010
+    // Note that this report does not use the semi-exterior surface value because
+    // EnergyPlus does not have a way to specifically tell whether or not a surface
+    // is connected to a semi-exterior area of the building.  Users can always use
+    // the Nominal U-Value to manually calculated this.  The values calculated here
+    // are simply reported to the EIO file and not used for any calculations.
 
     // Return value
     Real64 NominalUwithConvCoeffs; // return value
+
+    static constexpr std::array<Real64, static_cast<int>(DataSurfaces::SurfaceClass::Num)> filmCoefs = {
+        0.0,       // None
+        0.1197548, // Wall
+        0.1620212, // Floor
+        0.1074271, // Roof
+        0.0,       // IntMass
+        0.0,       // Detached_B
+        0.0,       // Detached_F
+        0.1197548, // Window
+        0.1197548, // GlassDoor
+        0.1197548, // Door
+        0.0,       // Shading
+        0.0,       // Overhang
+        0.0,       // Fin
+        0.0,       // TDD_Dome
+        0.0        // TDD_Diffuser
+    };             // If anything added to the enum SurfaceClass, adjust this list appropriately
 
     Real64 insideFilm;
     Real64 outsideFilm;
 
     isValid = true;
+
+    auto &thisSurface = state.dataSurface->Surface(numSurf);
+
     // exterior conditions
-    switch (state.dataSurface->Surface(numSurf).ExtBoundCond) {
-    case ExternalEnvironment: {
-        outsideFilm = 0.0299387; // All exterior conditions
+    switch (thisSurface.ExtBoundCond) {
+    case DataSurfaces::ExternalEnvironment: { // ExtBoundCond = 0
+        outsideFilm = 0.0299387;              // All exterior conditions
     } break;
-    case Ground:
-    case GroundFCfactorMethod: {
-        outsideFilm = 0.0; // No outside film when underground
+    case DataSurfaces::OtherSideCoefCalcExt: {
+        outsideFilm = state.dataSurface->OSC(thisSurface.OSCPtr).SurfFilmCoef;
     } break;
-    default: {
-        if (state.dataSurface->Surface(numSurf).ExtBoundCond > 0) { // interzone partition
-            // use companion surface in adjacent zone
-            switch (state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class) {
-            case SurfaceClass::Wall:
-            case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-                outsideFilm = 0.1197548;
-            } break;
-            case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-                outsideFilm = 0.1620212;
-            } break;
-            case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-                outsideFilm = 0.1074271;
-            } break;
-            default: {
-                outsideFilm = 0.0810106; // All semi-exterior surfaces
-            } break;
-            }
-        } else {
-            outsideFilm = 0.0810106; // All semi-exterior surfaces
-        }
+    case DataSurfaces::Ground:
+    case DataSurfaces::OtherSideCoefNoCalcExt:
+    case DataSurfaces::OtherSideCondModeledExt:
+    case DataSurfaces::GroundFCfactorMethod:
+    case DataSurfaces::KivaFoundation: { // All these cases have a negative ExtBoundCond so don't use film coefficients
+        outsideFilm = 0.0;
+    } break;
+    default: { // Interior Surface Attached to a Zone (ExtBoundCond is a surface)
+        outsideFilm = filmCoefs[static_cast<int>(state.dataSurface->Surface(thisSurface.ExtBoundCond).Class)];
     } break;
     }
-    // interior conditions
-    if (state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction) > 0.0) {
-        switch (state.dataSurface->Surface(numSurf).Class) {
-        case SurfaceClass::Wall:
-        case SurfaceClass::Door: { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-            insideFilm = 0.1197548;
-        } break;
-        case SurfaceClass::Floor: { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-            insideFilm = 0.1620212;
-        } break;
-        case SurfaceClass::Roof: { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-            insideFilm = 0.1074271;
-        } break;
-        default: {
-            insideFilm = 0.0;
-            outsideFilm = 0.0;
-        } break;
-        }
+    // interior conditions and calculate the return value
+    if (state.dataHeatBal->NominalU(thisSurface.Construction) > 0.0) {
+        insideFilm = filmCoefs[static_cast<int>(thisSurface.Class)];
+        if (insideFilm == 0.0) outsideFilm = 0.0;
         NominalUwithConvCoeffs =
             1.0 / (insideFilm + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction)) + outsideFilm);
     } else {

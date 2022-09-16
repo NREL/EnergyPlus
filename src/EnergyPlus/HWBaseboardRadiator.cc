@@ -115,9 +115,6 @@ namespace HWBaseboardRadiator {
     // Use statements for data only modules
     // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
-
-    using DataZoneEquipment::CheckZoneEquipmentList;
-
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
     using Psychrometrics::PsyCpAirFnW;
@@ -649,22 +646,8 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).FracDistribToSurf.allocate(HWBaseboard(BaseboardNum).TotSurfToDistrib);
             HWBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
 
-            // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBWater &&
-                        state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == HWBaseboard(BaseboardNum).EquipID) {
-                        HWBaseboard(BaseboardNum).ZonePtr = ctrlZone;
-                    }
-                }
-            }
-            if (HWBaseboard(BaseboardNum).ZonePtr <= 0) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + cCMO_BBRadiator_Water + "=\"" + HWBaseboard(BaseboardNum).EquipID +
-                                    "\" is not on any ZoneHVAC:EquipmentList.");
-                ErrorsFound = true;
-                continue;
-            }
+            HWBaseboard(BaseboardNum).ZonePtr =
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBWater, HWBaseboard(BaseboardNum).EquipID);
 
             AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
@@ -862,7 +845,6 @@ namespace HWBaseboardRadiator {
         static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
 
         auto &MyOneTimeFlag = state.dataHWBaseboardRad->MyOneTimeFlag;
-        auto &ZoneEquipmentListChecked = state.dataHWBaseboardRad->ZoneEquipmentListChecked;
         auto &MyEnvrnFlag = state.dataHWBaseboardRad->MyEnvrnFlag;
         int Loop;
         int WaterInletNode;
@@ -903,19 +885,6 @@ namespace HWBaseboardRadiator {
                 // Air mass flow rate is obtained from the following linear equation (reset if autosize is used)
                 // m_dot = 0.0062 + 2.75e-05*q
                 HWBaseboard(Loop).AirMassFlowRateStd = Constant + Coeff * HWBaseboard(Loop).RatedCapacity;
-            }
-        }
-
-        HWBaseboard(BaseboardNum).ZonePtr = ControlledZoneNum;
-
-        // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= NumHWBaseboards; ++Loop) {
-                if (CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, HWBaseboard(Loop).EquipID)) continue;
-                ShowSevereError(state,
-                                "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + HWBaseboard(Loop).EquipID +
-                                    "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 

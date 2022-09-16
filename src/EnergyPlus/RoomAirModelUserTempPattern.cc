@@ -768,7 +768,6 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // Using/Aliasing
     using DataHVACGlobals::RetTempMax;
     using DataHVACGlobals::RetTempMin;
-    using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
     using InternalHeatGains::SumAllReturnAirConvectionGains;
     using InternalHeatGains::SumAllReturnAirLatentGains;
     using Psychrometrics::PsyCpAirFnW;
@@ -828,20 +827,19 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         WinGapTtoRA = 0.0;
         WinGapFlowTtoRA = 0.0;
 
-        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneHasAirFlowWindowReturn) {
+        if (state.dataHeatBal->Zone(ZoneNum).HasAirFlowWindowReturn) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
                 for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                    if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
-                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(state,
-                                                       state.dataEnvrn->OutBaroPress,
-                                                       state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
-                                                       state.dataLoopNodes->Node(ZoneNode).HumRat) *
-                                     state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
-                        WinGapFlowToRA += FlowThisTS;
-                        WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
-                    }
+                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
+                    FlowThisTS = PsyRhoAirFnPbTdbW(state,
+                                                   state.dataEnvrn->OutBaroPress,
+                                                   state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
+                                                   state.dataLoopNodes->Node(ZoneNode).HumRat) *
+                                 state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
+                    WinGapFlowToRA += FlowThisTS;
+                    WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
                 }
             }
         }

@@ -105,7 +105,7 @@ namespace NodeInputManager {
                      DataLoopNode::ConnectionType nodeConnectionType,   // Node Connection Type (see DataLoopNode)
                      CompFluidStream NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
                      bool ObjectIsParent,                               // True/False
-                     Optional_bool_const IncrementFluidStream = _,      // True/False
+                     bool const IncrementFluidStream = false,           // True/False
                      std::string_view const InputFieldName = {}         // Input Field Name
     );
 

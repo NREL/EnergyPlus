@@ -236,7 +236,6 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
     Array1D<HWBaseboardRadiator::HWBaseboardDesignNumericFieldData> HWBaseboardDesignNumericFields;
     bool GetInputFlag = true; // One time get input flag
     bool MyOneTimeFlag = true;
-    bool ZoneEquipmentListChecked = false;
     int Iter = 0;
     bool MyEnvrnFlag2 = true;
     Array1D_bool MyEnvrnFlag;
@@ -261,7 +260,6 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
         this->HWBaseboardDesignNumericFields.clear();
         this->GetInputFlag = true;
         this->MyOneTimeFlag = true;
-        this->ZoneEquipmentListChecked = false;
         this->MyEnvrnFlag.clear();
         this->Iter = 0;
         this->MyEnvrnFlag2 = true;

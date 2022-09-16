@@ -6,7 +6,7 @@ set(kiva_test_src
 
 add_executable(kiva_tests ${kiva_test_src})
 
-target_link_libraries(kiva_tests gtest libkiva)
+target_link_libraries(kiva_tests PRIVATE gtest libkiva kiva_common_interface)
 
 add_test(NAME unit.GC10aFixture.calculateADI COMMAND $<TARGET_FILE:kiva_tests> "--gtest_filter=GC10aFixture.calculateADI")
 add_test(NAME unit.GC10aFixture.calculateImplicit COMMAND $<TARGET_FILE:kiva_tests> "--gtest_filter=GC10aFixture.calculateImplicit")

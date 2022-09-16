@@ -981,7 +981,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " autosize,                 !- Gross Rated Sensible Heat Ratio",
         " 3.0,                      !- Gross Rated Cooling COP{ W / W }",
         " autosize,                 !- Rated Air Flow Rate{ m3 / s }",
-        " ,                         !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        " ,                         !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate{W/(m3/s)}",
+        " ,                         !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate{W/(m3/s)}",
         " WindACFanOutletNode,      !- Air Inlet Node Name",
         " Space In Node,            !- Air Outlet Node Name",
         " Biquadratic,              !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -997,7 +998,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " autosize,                 !- Gross Rated Sensible Heat Ratio",
         " 3.0,                      !- Gross Rated Cooling COP{ W / W }",
         " autosize,                 !- Rated Air Flow Rate{ m3 / s }",
-        " ,                         !- Rated Evaporator Fan Power Per Volume Flow Rate{ W / ( m3 / s ) }",
+        " ,                         !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate{W/(m3/s)}",
+        " ,                         !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate{W/(m3/s)}",
         " WindACx10FanOutletNode,   !- Air Inlet Node Name",
         " Spacex10 In Node,         !- Air Outlet Node Name",
         " Biquadratic,              !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -2239,7 +2241,8 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "   autosize,              !- Gross Rated Sensible Heat Ratio",
         "   4.40,                  !- Gross Rated Cooling COP { W / W }",
         "   autosize,              !- Rated Air Flow Rate { m3 / s }",
-        "   ,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "   ,                      !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   ,                      !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "   DOAS Mixed Air Outlet, !- Air Inlet Node Name",
         "   DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
         "   Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -3214,7 +3217,8 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //" autosize,              !- Gross Rated Sensible Heat Ratio",
 //" 4.40,                  !- Gross Rated Cooling COP { W / W }",
 //" autosize,              !- Rated Air Flow Rate { m3 / s }",
-//" ,                      !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+//" ,                      !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+//" ,                      !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
 //" DOAS Mixed Air Outlet, !- Air Inlet Node Name",
 //" DOAS Cooling Coil Outlet,    !- Air Outlet Node Name",
 //" Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -10131,6 +10135,20 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
     for (auto &col : missingBracesHeaders) {
         std::string colHeader = col[0];
         EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
+    }
+
+    // Test for #9436
+    auto extraSpaceAfterBracesHeaders = queryResult(
+        R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
+             WHERE ReportName LIKE "MONTHLY EXAMPLE%"
+             AND ColumnName LIKE "%} %")",
+        "TabularDataWithStrings");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // Should be none!
+    for (auto &col : extraSpaceAfterBracesHeaders) {
+        std::string colHeader = col[0];
+        ADD_FAILURE() << "Extra space after brace in monthly table for : '" << colHeader << "'";
     }
 }
 

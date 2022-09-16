@@ -1040,7 +1040,7 @@ namespace DataHeatBalance {
         int SupplyApproachTempSch = 0;      // The difference schedule of the IT inlet temperature from the AHU supply air temperature
         Real64 ReturnApproachTemp = 0.0;    // The difference of the unit outlet temperature from the well mixed zone temperature
         int ReturnApproachTempSch = 0;      // The difference schedule of the unit outlet temperature from the well mixed zone temperature
-        int zoneEqIndex = 0;                // index in zone equipment data structure for the zone this IT equipment is in
+        bool inControlledZone = false;      // True if in a controlled zone
 
         // Report variables
         std::array<Real64, (int)PERptVars::Num> PowerRpt;
@@ -1536,7 +1536,8 @@ namespace DataHeatBalance {
         Real64 ReflectCylinder = 0.0;              // Screen material solar reflectance (user input, does not account for holes in screen)
         Real64 ReflectCylinderVis = 0.0;           // Screen material visible reflectance (user input, does not account for holes in screen)
         Real64 ScreenDiameterToSpacingRatio = 0.0; // ratio of screen material diameter to screen material spacing
-        int ScreenBeamReflectanceAccounting = 0;   // user specified method of accounting for scattered solar beam
+        DataSurfaces::ScreenBeamReflectanceModel screenBeamReflectanceModel =
+            DataSurfaces::ScreenBeamReflectanceModel::Invalid; // user specified method of accounting for scattered solar beam
     };
 
     struct ScreenTransData
@@ -2048,7 +2049,7 @@ struct HeatBalanceData : BaseGlobalStruct
     bool AnyHAMT = false;                // HAMT used
     bool AnyKiva = false;                // Kiva used
     bool AnyAirBoundary = false;         // Construction:AirBoundary used (implies grouped solar and radiant is present)
-    bool AnyBSDF = false;                // True if any WindowModelType == WindowBSDFModel
+    bool AnyBSDF = false;                // True if any WindowModelType == WindowModel:: BSDF
     int MaxNumberOfWarmupDays = 25;      // Maximum number of warmup days allowed
     int MinNumberOfWarmupDays = 1;       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor = 1.0;      // Relaxation factor, for looping across all the surfaces.
@@ -2234,12 +2235,6 @@ struct HeatBalanceData : BaseGlobalStruct
     // from interior surfaces, and beam entering through interior windows
     // (considered diffuse)
     // Originally QD, now used only for EnclSolQSDifSol calc for daylighting
-
-    Array1D<Real64> EnclSolVMULT;        // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
-    Array1D<Real64> EnclRadQThermalRad;  // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
-    Array1D<Real64> EnclRadThermAbsMult; // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
-    Array1D<bool> EnclSolAbsFirstCalc;   // for error message
-    Array1D<bool> EnclRadReCalc;         // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
 
     bool EnclRadAlwaysReCalc = false; // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
 

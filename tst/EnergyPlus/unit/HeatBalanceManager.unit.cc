@@ -2314,6 +2314,29 @@ TEST_F(EnergyPlusFixture, Window5DataFileSpaceInName)
     EXPECT_TRUE(ConstructionFound);
 }
 
+TEST_F(EnergyPlusFixture, Window5DataFileZeroSCSHGC)
+{
+
+    fs::path window5DataFilePath;
+    window5DataFilePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/Window5DataFile_ZeroSCandSHGC.dat";
+    std::string ConstructName{"DOUBLE CLEAR"};
+    bool ConstructionFound{false};
+    bool EOFonW5File{false};
+    bool ErrorsFound{false};
+    state->dataHeatBal->MaxSolidWinLayers = 2;
+
+    SearchWindow5DataFile(*state, window5DataFilePath, ConstructName, ConstructionFound, EOFonW5File, ErrorsFound);
+
+    EXPECT_EQ(ConstructName, "DOUBLE CLEAR");
+    EXPECT_FALSE(ErrorsFound);
+
+    std::string error_string = delimited_string({"   ** Warning ** HeatBalanceManager: SearchWindow5DataFile: Construction=DOUBLE CLEAR from the "
+                                                 "Window5 data file has flawed data: it has a Shading Coefficient <= 0 in glazing system 1",
+                                                 "   ** Warning ** HeatBalanceManager: SearchWindow5DataFile: Construction=DOUBLE CLEAR from the "
+                                                 "Window5 data file has flawed data: it has a SHGC <= 0 in glazing system 1"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
 TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput_invalidSched)
 {
     std::string const idf_objects_invalid_sch = delimited_string({

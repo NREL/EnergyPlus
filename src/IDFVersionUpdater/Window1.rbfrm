@@ -1093,6 +1093,8 @@ End
 		  dim commaPos as Integer = 0
 		  dim semiPos as Integer = 0
 		  dim versionFound as String = ""
+		  Var strParts() as String
+		  dim returnVersion as String = ""
 		  IF InFile.Exists then
 		    SourceStream = TextInputStream.Open(InFile)
 		    While Not SourceStream.EOF
@@ -1119,23 +1121,19 @@ End
 		      If semiPos > commaPos Then
 		        versionFound = fullObj.mid(commaPos + 1, (semiPos - commaPos) - 1)
 		        versionFound = versionFound.Trim
-		        If versionFound.Len = 1 Then
-		          versionFound = versionFound + ".0.0"
-		        elseif versionFound.Len = 3 Then
-		          versionFound = versionFound + ".0"
-		        End If
-		        if versionFound.instr(".") = 2 then
-		          versionFound = versionFound.Left(5) 'trim build number if included, such as: 3.0.0.028 to 3.0.0
+		        strParts = versionFound.split(".")
+		        if strParts.lastIndex = 1 then
+		          returnVersion = strParts(0) + "." + strParts(1) + ".0"
+		        elseif strParts.LastIndex >= 2 then
+		          returnVersion = strParts(0) + "." + strParts(1) + strParts(2)
 		        Else
-		          versionFound = versionFound.Left(6) 'trim build number if included, such as: 23.0.0.028 to 23.0.0
-		        End if
-		      Else
-		        versionFound = ""
-		      End If
+		          returnVersion = ""
+		        End If
+		      end if
+		      SourceStream.Close
 		    end if
-		    SourceStream.Close
 		  end if
-		  return versionFound
+		  return returnVersion
 		  
 		End Function
 	#tag EndMethod
@@ -1340,7 +1338,7 @@ End
 	#tag Event
 		Sub Action()
 		  dim t as String
-		  t = "IDF Version Updater - Version 0.15" + EndOfLine+ EndOfLine
+		  t = "IDF Version Updater - Version 0.16" + EndOfLine+ EndOfLine
 		  t = t + "Copyright (c) 2011-2022 GARD Analytics, All rights reserved." + EndOfLine+ EndOfLine
 		  t = t + "NOTICE: The U.S. Government is granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to reproduce, prepare derivativeworks, and perform publicly and display publicly. Beginning five (5) years after permission to assert copyright is granted, subject to two possible five year renewals, the U.S. Government is granted for itself and others acting on its behalf a paid-up, non-exclusive,irrevocable worldwide license in this data to reproduce, prepare derivative works, distribute copies to the public,perform publicly and display publicly,and to permit others to do so." + EndOfLine+ EndOfLine
 		  t = t + "TRADEMARKS: EnergyPlus, DOE-2.1E, DOE-2, and DOE are trademarks of the US Department of Energy." + EndOfLine+ EndOfLine

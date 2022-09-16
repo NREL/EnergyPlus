@@ -459,7 +459,7 @@ void Ground::calculateBoundaryLayer() {
   size_t j = pre.nY / 2;
 
   for (size_t i = i_min; i < pre.nX; i++) {
-    std::size_t index = i + pre.nX * j + pre.nX * pre.nY * k;
+    std::size_t index = pre.domain.getIndex(i, j, k);
     double Qz = pre.domain.cell[index]->calculateHeatFlux(pre.foundation.numberOfDimensions,
                                                           pre.TNew[index], pre.nX, pre.nY, pre.nZ,
                                                           pre.domain.cell)[2];
@@ -753,6 +753,61 @@ void Ground::link_cells_to_temp() {
 double getArrayValue(std::vector<std::vector<std::vector<double>>> Mat, std::size_t i,
                      std::size_t j, std::size_t k) {
   return Mat[i][j][k];
+}
+
+std::array<double, 3> Ground::calculateHeatFlux(std::size_t index) {
+  return domain.cell[index]->calculateHeatFlux(foundation.numberOfDimensions, TNew[index], nX, nY,
+                                               nZ, domain.cell);
+}
+
+void Ground::writeCSV(std::string path) {
+
+  // Used for debugging purposes
+
+  std::ofstream output;
+  output.open(path);
+
+  std::size_t j = nY / 2;
+  for (std::size_t i = 0; i < nX; i++) {
+
+    output << ", , " << i;
+  }
+
+  output << "\n, ";
+
+  for (std::size_t i = 0; i < nX; i++) {
+
+    output << ", " << domain.mesh[0].centers[i];
+  }
+
+  output << "\n";
+
+  for (std::size_t k = nZ - 1; k < nZ /*k >= 0*/; k--) {
+
+    output << k << ", " << domain.mesh[2].centers[k];
+
+    for (std::size_t i = 0; i < nX; i++) {
+
+      double value;
+      std::size_t index = domain.getIndex(i, j, k);
+
+      std::array<double, 3> Qflux = calculateHeatFlux(index);
+      double Qx = Qflux[0];
+      double Qy = Qflux[1];
+      double Qz = Qflux[2];
+      double Qmag = sqrt(Qx * Qx + Qy * Qy + Qz * Qz);
+      value = Qmag;
+
+      value = domain.cell[index]->surfacePtr
+                  ? static_cast<double>(domain.cell[index]->surfacePtr->type)
+                  : -1.0;
+
+      output << ", " << value;
+    }
+
+    output << "\n";
+  }
+  output.close();
 }
 
 } // namespace Kiva

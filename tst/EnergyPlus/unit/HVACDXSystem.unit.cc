@@ -64,6 +64,7 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -546,6 +547,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = compName;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::DXSystem;
     OutputReportPredefined::SetPredefinedTables(*state);
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
@@ -566,7 +568,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
     EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
-    EXPECT_EQ(2, thisSys->m_SystemCoolControlNodeNum);
+    EXPECT_EQ(2, thisSys->CoolCtrlNode);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;
@@ -730,6 +732,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = compName;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::DXSystem;
     OutputReportPredefined::SetPredefinedTables(*state);
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
@@ -876,7 +879,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    0.77,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    0.5,                     !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -897,7 +901,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    0.77,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    1.0,                     !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -934,7 +939,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    0.67,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    0.5,                     !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -955,7 +961,8 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    0.67,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    1.0,                     !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -999,6 +1006,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = compName;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::DXSystem;
     OutputReportPredefined::SetPredefinedTables(*state);
     ScheduleManager::ProcessScheduleInput(*state);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
@@ -1020,7 +1028,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     EXPECT_FALSE(thisSys->m_ISHundredPercentDOASDXCoil);
     EXPECT_EQ(thisSys->UnitType, "CoilSystem:Cooling:DX");
     EXPECT_EQ(thisSys->m_CoolingCoilType_Num, DataHVACGlobals::CoilDX_Cooling);
-    EXPECT_EQ(2, thisSys->m_SystemCoolControlNodeNum);
+    EXPECT_EQ(2, thisSys->CoolCtrlNode);
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;

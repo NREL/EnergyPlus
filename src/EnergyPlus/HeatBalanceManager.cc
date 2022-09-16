@@ -148,9 +148,7 @@ namespace HeatBalanceManager {
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataRoomAirModel;
-    using DataSurfaces::DividedLite;
     using DataSurfaces::FrameDividerProperties;
-    using DataSurfaces::Suspended;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
     using WindowComplexManager::CalculateBasisLength;
@@ -5420,27 +5418,7 @@ namespace HeatBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the zone data for each zone in the input file.
 
-        // METHODOLOGY EMPLOYED:
-        // The GetObjectItem routines are employed to retrieve the data.
-
-        // REFERENCES:
-        // IDD Definition for Zone object
-
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr const char *RoutineName("ProcessZoneData: ");
-        //  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         state.dataHeatBal->Zone(ZoneLoop).Name = cAlphaArgs(1);
         if (NumNumbers >= 1) state.dataHeatBal->Zone(ZoneLoop).RelNorth = rNumericArgs(1);
@@ -5826,7 +5804,7 @@ namespace HeatBalanceManager {
                     int const lastSurfWin = thisSpace.WindowSurfaceLast;
                     for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                         if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 &&
-                            state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::Window5DetailedModel) {
+                            state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::WindowModel::Detailed) {
                             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
                         } else {
                             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
@@ -5954,9 +5932,9 @@ namespace HeatBalanceManager {
                     int const firstSurfWin = thisSpace.WindowSurfaceFirst;
                     int const lastSurfWin = thisSpace.WindowSurfaceLast;
                     for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
-                            state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
-                            state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
+                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel::BSDF &&
+                            state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowModel::EQL) {
+                            state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::WindowModel::Detailed;
                         }
                     }
                 }
@@ -5985,25 +5963,17 @@ namespace HeatBalanceManager {
         state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQD.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-        state.dataHeatBal->EnclRadQThermalRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-        state.dataHeatBal->EnclRadThermAbsMult.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolDB.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolDBSSG.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolDBIntWin.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-        state.dataHeatBal->EnclSolVMULT.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-            state.dataHeatBal->EnclSolAbsFirstCalc(enclosureNum) = true;
-            state.dataHeatBal->EnclRadReCalc(enclosureNum) = false;
             state.dataHeatBal->EnclSolQSDifSol(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQD(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQDforDaylight(enclosureNum) = 0.0;
-            state.dataHeatBal->EnclRadQThermalRad(enclosureNum) = 0.0;
-            state.dataHeatBal->EnclRadThermAbsMult(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQSWRad(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = 0.0;
-            state.dataHeatBal->EnclSolVMULT(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolDB(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolDBSSG(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolDBIntWin(enclosureNum) = 0.0;
@@ -6016,16 +5986,7 @@ namespace HeatBalanceManager {
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   February 1998
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine allocates the arrays to meet simulation requirements
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the status flags to trigger variable allocation.
-
         // Use the total number of zones or surfaces to allocate variables to avoid a limit
-        // Allocate real Variables
-        // Following used for Calculations
-        //  Allocate variables in DataHeatBalSys
         AllocateZoneHeatBalArrays(state);
         state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -6702,6 +6663,21 @@ namespace HeatBalanceManager {
         Array1D<Real64> FrameDividerProps(23); // Temporary array to transfer frame/divider properties
         int Loop;
 
+        constexpr std::array<std::string_view, static_cast<int>(DataSurfaces::NfrcProductOptions::Num)> NfrcProductNamesUC = {
+            "CASEMENTDOUBLE", "CASEMENTSINGLE",   "DUALACTION",
+            "FIXED",          "GARAGE",           "GREENHOUSE",
+            "HINGEDESCAPE",   "HORIZONTALSLIDER", "JAL",
+            "PIVOTED",        "PROJECTINGSINGLE", "PROJECTINGDUAL",
+            "DOORSIDELITE",   "SKYLIGHT",         "SLIDINGPATIODOOR",
+            "CURTAINWALL",    "SPANDRELPANEL",    "SIDEHINGEDDOOR",
+            "DOORTRANSOM",    "TROPICALAWNING",   "TUBULARDAYLIGHTINGDEVICE",
+            "VERTICALSLIDER"};
+
+        constexpr std::array<std::string_view, static_cast<int>(DataSurfaces::FrameDividerType::Num)> FrameDividerTypeNamesUC = {
+            "DIVIDEDLITE", // 0
+            "SUSPENDED"    // 1
+        };
+
         state.dataHeatBalMgr->CurrentModuleObject = "WindowProperty:FrameAndDivider";
         state.dataHeatBal->TotFrameDivider =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
@@ -6745,7 +6721,7 @@ namespace HeatBalanceManager {
             frameDivider.FrameEmis = FrameDividerProps(8);
 
             DataSurfaces::FrameDividerType currentDividerType =
-                DataSurfaces::FrameDividerType(getEnumerationValue(DataSurfaces::FrameDividerTypeNamesUC, FrameDividerAlphas(2)));
+                DataSurfaces::FrameDividerType(getEnumerationValue(FrameDividerTypeNamesUC, FrameDividerAlphas(2)));
             if (currentDividerType == DataSurfaces::FrameDividerType::Invalid) {
                 ShowWarningError(state,
                                  fmt::format("{}={}, Invalid {}",
@@ -6776,8 +6752,7 @@ namespace HeatBalanceManager {
             frameDivider.DividerEmis = FrameDividerProps(18);
 
             // look up the NFRC Product Type for Assembly Calculations using the DataSurfaces::NfrcProductName
-            frameDivider.NfrcProductType =
-                DataSurfaces::NfrcProductOptions(getEnumerationValue(DataSurfaces::NfrcProductNamesUC, FrameDividerAlphas(3)));
+            frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions(getEnumerationValue(NfrcProductNamesUC, FrameDividerAlphas(3)));
             if (frameDivider.NfrcProductType == DataSurfaces::NfrcProductOptions::Invalid) {
                 frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
             }
@@ -7072,20 +7047,20 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 }
                 if (SCCenter(IGlSys) <= 0.0) {
-                    ShowSevereError(state,
-                                    format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used: it "
-                                           "has Shading Coefficient <= 0 in glazing system {}",
-                                           DesiredConstructionName,
-                                           IGlSys));
-                    ErrorsFound = true;
+                    ShowWarningError(
+                        state,
+                        format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file has flawed data: it "
+                               "has a Shading Coefficient <= 0 in glazing system {}",
+                               DesiredConstructionName,
+                               IGlSys));
                 }
                 if (SHGCCenter(IGlSys) <= 0.0) {
-                    ShowSevereError(state,
-                                    format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file cannot be used: it "
-                                           "has SHGC <= 0 in glazing system {}",
-                                           DesiredConstructionName,
-                                           IGlSys));
-                    ErrorsFound = true;
+                    ShowWarningError(
+                        state,
+                        format("HeatBalanceManager: SearchWindow5DataFile: Construction={} from the Window5 data file has flawed data: it "
+                               "has a SHGC <= 0 in glazing system {}",
+                               DesiredConstructionName,
+                               IGlSys));
                 }
                 WinHeight(IGlSys) *= 0.001;
                 WinWidth(IGlSys) *= 0.001;
