@@ -1960,8 +1960,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT_Enclosure_Based)
     state->dataSurface->Surface(11).Zone = 2;
     state->dataSurface->Surface(12).Zone = 2;
 
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 6;
+    state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes[0] = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 6;
     state->dataHeatBalSurf->SurfInsideTempHist(1)(1) = 10.0;
     state->dataHeatBalSurf->SurfInsideTempHist(1)(2) = 10.0;
     state->dataHeatBalSurf->SurfInsideTempHist(1)(3) = 10.0;
