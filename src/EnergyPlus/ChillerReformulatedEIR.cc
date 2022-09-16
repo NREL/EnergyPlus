@@ -1435,7 +1435,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                                              this->ChillerEIRFPLRIndex,
                                              this->MinUnloadRat,
                                              IPLV,
-                                             this->EvapVolFlowRate,
+                                             this->CondVolFlowRate,
                                              this->CDPlantLoc.loopNum,
                                              this->CompPowerToCondenserFrac);
             this->MySizeFlag = false;

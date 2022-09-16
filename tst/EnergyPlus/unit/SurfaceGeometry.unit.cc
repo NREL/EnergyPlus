@@ -10171,3 +10171,107 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates)
     EXPECT_NEAR(11.80, sf_temps(1).Perimeter, 0.02);
     EXPECT_NEAR(11.80, sf_temps(2).Perimeter, 0.02);
 }
+
+TEST_F(EnergyPlusFixture, Wrong_Window_Construction)
+{
+    // Test for #9331 - Crash in debug when wrong construction name is used for a Window
+
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        " FenestrationSurface:Detailed,",
+        "    Surface 8 - TriangularWindow,    !- Name",
+        "    Window,                  !- Surface Type",
+        "    WRONG CONSTRUCTION,      !- Construction Name", // <------- HERE: doesn't exist
+        "    Surface 3 - Rectangle,   !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.0,                     !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    Autocalculate,           !- Number of Vertices",
+        "    0.05, 0.0, 0.05,         !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.15, 0.0, 0.05,         !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.10, 0.0, 0.15;         !- X,Y,Z ==> Vertex 3 {m}",
+
+        " BuildingSurface:Detailed,",
+        "    Surface 3 - Rectangle,   !- Name",
+        "    Wall,                    !- Surface Type",
+        "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
+        "    Zone1,                   !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    ,                        !- Number of Vertices",
+        "    0.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 1 {m}",
+        "    1.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 2 {m}",
+        "    1.0, 0.0, 1.0,           !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.0, 0.0, 1.0;           !- X,Y,Z ==> Vertex 4 {m}",
+
+        " Zone,",
+        "    Zone1,                   !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0.0,                     !- X Origin {m}",
+        "    0.0,                     !- Y Origin {m}",
+        "    0.0,                     !- Z Origin {m}",
+        "    ,                        !- Type",
+        "    ,                        !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    ,                        !- Volume {m3}",
+        "    ,                        !- Floor Area {m2}",
+        "    ,                        !- Zone Inside Convection Algorithm",
+        "    ,                        !- Zone Outside Convection Algorithm",
+        "    No;                      !- Part of Total Floor Area",
+
+        " Construction,",
+        "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Name",
+        "    MAT-CC05 4 HW CONCRETE;  !- Outside Layer",
+
+        " Material,",
+        "    MAT-CC05 4 HW CONCRETE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1016,                  !- Thickness {m}",
+        "    1.311,                   !- Conductivity {W/m-K}",
+        "    2240,                    !- Density {kg/m3}",
+        "    836.800000000001,        !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.85,                    !- Solar Absorptance",
+        "    0.85;                    !- Visible Absorptance",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);                  // expect no errors
+
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
+
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
+
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
+
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+
+    EXPECT_THROW(GetSurfaceData(*state, ErrorsFound), std::runtime_error);
+    EXPECT_TRUE(ErrorsFound);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** FenestrationSurface:Detailed=\"SURFACE 8 - TRIANGULARWINDOW\", invalid Construction Name=\"WRONG CONSTRUCTION\".",
+        "   **  Fatal  ** GetSurfaceData: Errors discovered, program terminates.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=FenestrationSurface:Detailed=\"SURFACE 8 - TRIANGULARWINDOW\", invalid Construction Name=\"WRONG CONSTRUCTION\".",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
