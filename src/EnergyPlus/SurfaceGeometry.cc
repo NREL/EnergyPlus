@@ -2538,41 +2538,42 @@ namespace SurfaceGeometry {
                     }
                 } // else leave fractions at zero
             }
+        }
 
-            for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
-                if (state.dataSurface->Surface(SurfNum).Area < 1.e-06) {
-                    ShowSevereError(state,
-                                    format("{}Zero or negative surface area[{:.5R}], Surface={}",
-                                           RoutineName,
-                                           state.dataSurface->Surface(SurfNum).Area,
-                                           state.dataSurface->Surface(SurfNum).Name));
-                    SurfError = true;
-                }
-                if (state.dataSurface->Surface(SurfNum).Area >= 1.e-06 && state.dataSurface->Surface(SurfNum).Area < 0.001) {
-                    ShowWarningError(state,
-                                     format("{}Very small surface area[{:.5R}], Surface={}",
-                                            RoutineName,
-                                            state.dataSurface->Surface(SurfNum).Area,
-                                            state.dataSurface->Surface(SurfNum).Name));
-                }
+        for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+            if (state.dataSurface->Surface(SurfNum).Area < 1.e-06) {
+                ShowSevereError(state,
+                                format("{}Zero or negative surface area[{:.5R}], Surface={}",
+                                       RoutineName,
+                                       state.dataSurface->Surface(SurfNum).Area,
+                                       state.dataSurface->Surface(SurfNum).Name));
+                SurfError = true;
             }
-
-            for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
-                // GLASSDOORs and TDD:DIFFUSERs will be treated as windows in the subsequent heat transfer and daylighting
-                // calculations. Reset class to 'Window' after saving the original designation in SurfaceWindow.
-
-                state.dataSurface->SurfWinOriginalClass(SurfNum) = state.dataSurface->Surface(SurfNum).Class;
-
-                if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::GlassDoor ||
-                    state.dataSurface->Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)
-                    state.dataSurface->Surface(SurfNum).Class = SurfaceClass::Window;
-
-                if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
-                    // Reset the TDD:DOME subsurface to act as a base surface that can shade and be shaded
-                    // NOTE: This must be set early so that subsequent shading calculations are done correctly
-                    state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
-                }
+            if (state.dataSurface->Surface(SurfNum).Area >= 1.e-06 && state.dataSurface->Surface(SurfNum).Area < 0.001) {
+                ShowWarningError(state,
+                                 format("{}Very small surface area[{:.5R}], Surface={}",
+                                        RoutineName,
+                                        state.dataSurface->Surface(SurfNum).Area,
+                                        state.dataSurface->Surface(SurfNum).Name));
             }
+        }
+
+        for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
+            // GLASSDOORs and TDD:DIFFUSERs will be treated as windows in the subsequent heat transfer and daylighting
+            // calculations. Reset class to 'Window' after saving the original designation in SurfaceWindow.
+
+            state.dataSurface->SurfWinOriginalClass(SurfNum) = state.dataSurface->Surface(SurfNum).Class;
+
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::GlassDoor ||
+                state.dataSurface->Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)
+                state.dataSurface->Surface(SurfNum).Class = SurfaceClass::Window;
+
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
+                // Reset the TDD:DOME subsurface to act as a base surface that can shade and be shaded
+                // NOTE: This must be set early so that subsequent shading calculations are done correctly
+                state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
+            }
+        }
 
         errFlag = false;
         if (!SurfError) {
@@ -2908,14 +2909,16 @@ namespace SurfaceGeometry {
                         for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; surfNum++) {
                             auto &surface(state.dataSurface->Surface(surfNum));
                             // Conditions where surface always needs to be unique
-                            bool forceUniqueSurface = surface.HasShadeControl || state.dataSurface->SurfWinAirflowSource(surfNum) ||
-                                                      state.dataConstruction->Construct(surface.Construction).SourceSinkPresent ||
-                                                      surface.Class == SurfaceClass::TDD_Dome ||
-                                                      (surface.Class == SurfaceClass::Window &&
-                                                       (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser ||
-                                                        state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel::Detailed ||
-                                                        state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
-                                                        state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
+                            bool forceUniqueSurface =
+                                surface.HasShadeControl ||
+                                state.dataSurface->SurfWinAirflowSource(surfNum) != DataSurfaces::WindowAirFlowSource::Invalid ||
+                                state.dataConstruction->Construct(surface.Construction).SourceSinkPresent ||
+                                surface.Class == SurfaceClass::TDD_Dome ||
+                                (surface.Class == SurfaceClass::Window &&
+                                 (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser ||
+                                  state.dataSurface->SurfWinWindowModelType(surfNum) != WindowModel::Detailed ||
+                                  state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
+                                  state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
                             if (!forceUniqueSurface) {
                                 state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
                             }

@@ -831,15 +831,16 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
                 for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
-                    FlowThisTS = PsyRhoAirFnPbTdbW(state,
-                                                   state.dataEnvrn->OutBaroPress,
-                                                   state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
-                                                   state.dataLoopNodes->Node(ZoneNode).HumRat) *
-                                 state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
-                    WinGapFlowToRA += FlowThisTS;
-                    WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
+                    if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
+                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
+                        FlowThisTS = PsyRhoAirFnPbTdbW(state,
+                                                       state.dataEnvrn->OutBaroPress,
+                                                       state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
+                                                       state.dataLoopNodes->Node(ZoneNode).HumRat) *
+                                     state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
+                        WinGapFlowToRA += FlowThisTS;
+                        WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
+                    }
                 }
             }
         }

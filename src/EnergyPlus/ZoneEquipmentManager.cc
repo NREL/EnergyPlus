@@ -4969,16 +4969,16 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                 for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                     auto &thisSpace = state.dataHeatBal->space(spaceNum);
                     for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                     ++SurfNum) {
-                    if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
-                        state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
-                        Real64 FlowThisTS = PsyRhoAirFnPbTdbW(state,
-                                                              state.dataEnvrn->OutBaroPress,
-                                                              state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
-                                                              state.dataLoopNodes->Node(ZoneNode).HumRat) *
-                                            state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
-                        WinGapFlowToRA += FlowThisTS;
-                        WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
+                        if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
+                            state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
+                            Real64 FlowThisTS = PsyRhoAirFnPbTdbW(state,
+                                                                  state.dataEnvrn->OutBaroPress,
+                                                                  state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
+                                                                  state.dataLoopNodes->Node(ZoneNode).HumRat) *
+                                                state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
+                            WinGapFlowToRA += FlowThisTS;
+                            WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
+                        }
                     }
                 }
             }
@@ -5333,10 +5333,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (state.dataHeatBal->Ventilation(I).MinOutdoorTemperature > state.dataHeatBal->Ventilation(I).MaxOutdoorTemperature) {
                 ++state.dataHeatBal->Ventilation(I).OutdoorTempErrCount;
                 if (state.dataHeatBal->Ventilation(I).OutdoorTempErrCount < 2) {
-                    ShowWarningError(
-                        state,
-                        "Ventilation outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor temperature in " +
-                            state.dataHeatBal->Ventilation(I).Name);
+                    ShowWarningError(state,
+                                     "Ventilation outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor "
+                                     "temperature in " +
+                                         state.dataHeatBal->Ventilation(I).Name);
                     ShowContinueError(state, "The minimum outdoor temperature is set to the maximum outdoor temperature. Simulation continues.");
                     ShowContinueErrorTimeStamp(state, " Occurrence info:");
                 } else {
@@ -5599,10 +5599,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (MixingTmin > MixingTmax) {
                     ++state.dataHeatBal->Mixing(j).OutdoorTempErrCount;
                     if (state.dataHeatBal->Mixing(j).OutdoorTempErrCount < 2) {
-                        ShowWarningError(
-                            state,
-                            "Mixing outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor temperature in " +
-                                state.dataHeatBal->Mixing(j).Name);
+                        ShowWarningError(state,
+                                         "Mixing outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor "
+                                         "temperature in " +
+                                             state.dataHeatBal->Mixing(j).Name);
                         ShowContinueError(state, "The minimum outdoor temperature is set to the maximum source temperature. Simulation continues.");
                         ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
@@ -5799,10 +5799,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (MixingTmin > MixingTmax) {
                     ++state.dataHeatBal->CrossMixing(j).SourceTempErrCount;
                     if (state.dataHeatBal->CrossMixing(j).SourceTempErrCount < 2) {
-                        ShowWarningError(
-                            state,
-                            "CrossMixing source temperature control: The minimum source temperature is above the maximum source temperature in " +
-                                state.dataHeatBal->CrossMixing(j).Name);
+                        ShowWarningError(state,
+                                         "CrossMixing source temperature control: The minimum source temperature is above the maximum source "
+                                         "temperature in " +
+                                             state.dataHeatBal->CrossMixing(j).Name);
                         ShowContinueError(state, "The minimum source temperature is set to the maximum source temperature. Simulation continues.");
                         ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
@@ -6344,8 +6344,8 @@ void ReportZoneSizingDOASInputs(EnergyPlusData &state,
 
     // BSLLC Start
     // if ( sqlite ) {
-    //     state.dataSQLiteProcedures->sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow,
-    //     DesDayName, PeakHrMin,
+    //     state.dataSQLiteProcedures->sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow,
+    //     UserDesFlow, DesDayName, PeakHrMin,
     //         PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
     // }
     // BSLLC Finish

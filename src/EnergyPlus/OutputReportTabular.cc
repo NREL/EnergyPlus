@@ -16187,83 +16187,82 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             auto &thisSpace = state.dataHeatBal->space(spaceNum);
             for (int kSurf = thisSpace.HTSurfaceFirst; kSurf <= thisSpace.HTSurfaceLast; ++kSurf) {
 
-            int curExtBoundCond = state.dataSurface->Surface(kSurf).ExtBoundCond;
-            // if exterior is other side coefficients using ground preprocessor terms then
-            // set it to ground instead of other side coefficients
-            if (curExtBoundCond == DataSurfaces::OtherSideCoefNoCalcExt || curExtBoundCond == DataSurfaces::OtherSideCoefCalcExt) {
-                if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
-                    curExtBoundCond = DataSurfaces::Ground;
+                int curExtBoundCond = state.dataSurface->Surface(kSurf).ExtBoundCond;
+                // if exterior is other side coefficients using ground preprocessor terms then
+                // set it to ground instead of other side coefficients
+                if (curExtBoundCond == DataSurfaces::OtherSideCoefNoCalcExt || curExtBoundCond == DataSurfaces::OtherSideCoefCalcExt) {
+                    if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
+                        curExtBoundCond = DataSurfaces::Ground;
+                    }
                 }
-            }
-            AvgData = surfDelaySeq(_, kSurf);
-            General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
-            Real64 singleSurfDelay = AvgData(timeOfMax);
-            switch (state.dataSurface->Surface(kSurf).Class) {
-            case DataSurfaces::SurfaceClass::Wall: {
-                switch (curExtBoundCond) {
-                case DataSurfaces::ExternalEnvironment: {
-                    delayOpaque(LoadCompRow::ExtWall) += singleSurfDelay;
+                AvgData = surfDelaySeq(_, kSurf);
+                General::MovingAvg(AvgData, state.dataSize->NumTimeStepsInAvg);
+                Real64 singleSurfDelay = AvgData(timeOfMax);
+                switch (state.dataSurface->Surface(kSurf).Class) {
+                case DataSurfaces::SurfaceClass::Wall: {
+                    switch (curExtBoundCond) {
+                    case DataSurfaces::ExternalEnvironment: {
+                        delayOpaque(LoadCompRow::ExtWall) += singleSurfDelay;
+                    } break;
+                    case DataSurfaces::Ground:
+                    case DataSurfaces::GroundFCfactorMethod:
+                    case DataSurfaces::KivaFoundation: {
+                        delayOpaque(LoadCompRow::GrdWall) += singleSurfDelay;
+                    } break;
+                    case DataSurfaces::OtherSideCoefNoCalcExt:
+                    case DataSurfaces::OtherSideCoefCalcExt:
+                    case DataSurfaces::OtherSideCondModeledExt: {
+                        delayOpaque(LoadCompRow::OtherWall) += singleSurfDelay;
+                    } break;
+                    default: { // interzone
+                        delayOpaque(LoadCompRow::IntZonWall) += singleSurfDelay;
+                    } break;
+                    }
                 } break;
-                case DataSurfaces::Ground:
-                case DataSurfaces::GroundFCfactorMethod:
-                case DataSurfaces::KivaFoundation: {
-                    delayOpaque(LoadCompRow::GrdWall) += singleSurfDelay;
+                case DataSurfaces::SurfaceClass::Floor: {
+                    switch (curExtBoundCond) {
+                    case DataSurfaces::ExternalEnvironment: {
+                        delayOpaque(LoadCompRow::ExtFlr) += singleSurfDelay;
+                    } break;
+                    case DataSurfaces::Ground:
+                    case DataSurfaces::GroundFCfactorMethod:
+                    case DataSurfaces::KivaFoundation: {
+                        delayOpaque(LoadCompRow::GrdFlr) += singleSurfDelay;
+                    } break;
+                    case DataSurfaces::OtherSideCoefNoCalcExt:
+                    case DataSurfaces::OtherSideCoefCalcExt:
+                    case DataSurfaces::OtherSideCondModeledExt: {
+                        delayOpaque(LoadCompRow::OtherFlr) += singleSurfDelay;
+                    } break;
+                    default: { // interzone
+                        delayOpaque(LoadCompRow::IntZonFlr) += singleSurfDelay;
+                    } break;
+                    }
                 } break;
-                case DataSurfaces::OtherSideCoefNoCalcExt:
-                case DataSurfaces::OtherSideCoefCalcExt:
-                case DataSurfaces::OtherSideCondModeledExt: {
-                    delayOpaque(LoadCompRow::OtherWall) += singleSurfDelay;
+                case DataSurfaces::SurfaceClass::Roof: {
+                    switch (curExtBoundCond) {
+                    case DataSurfaces::ExternalEnvironment: {
+                        delayOpaque(LoadCompRow::Roof) += singleSurfDelay;
+                    } break;
+                    case DataSurfaces::Ground:
+                    case DataSurfaces::GroundFCfactorMethod:
+                    case DataSurfaces::KivaFoundation:
+                    case DataSurfaces::OtherSideCoefNoCalcExt:
+                    case DataSurfaces::OtherSideCoefCalcExt:
+                    case DataSurfaces::OtherSideCondModeledExt: {
+                        delayOpaque(LoadCompRow::OtherRoof) += singleSurfDelay;
+                    } break;
+                    default: { // interzone
+                        delayOpaque(LoadCompRow::IntZonCeil) += singleSurfDelay;
+                    } break;
+                    }
                 } break;
-                case SurfaceClass::Door: {
+                case DataSurfaces::SurfaceClass::Door: {
                     delayOpaque(LoadCompRow::OpqDoor) += singleSurfDelay;
                 } break;
                 default:
                     break;
                 }
-            } break;
-            case DataSurfaces::SurfaceClass::Floor: {
-                switch (curExtBoundCond) {
-                case DataSurfaces::ExternalEnvironment: {
-                    delayOpaque(LoadCompRow::ExtFlr) += singleSurfDelay;
-                } break;
-                case DataSurfaces::Ground:
-                case DataSurfaces::GroundFCfactorMethod:
-                case DataSurfaces::KivaFoundation: {
-                    delayOpaque(LoadCompRow::GrdFlr) += singleSurfDelay;
-                } break;
-                case DataSurfaces::OtherSideCoefNoCalcExt:
-                case DataSurfaces::OtherSideCoefCalcExt:
-                case DataSurfaces::OtherSideCondModeledExt: {
-                    delayOpaque(LoadCompRow::OtherFlr) += singleSurfDelay;
-                } break;
-                default: { // interzone
-                    delayOpaque(LoadCompRow::IntZonFlr) += singleSurfDelay;
-                } break;
-                }
-            } break;
-            case DataSurfaces::SurfaceClass::Roof: {
-                switch (curExtBoundCond) {
-                case DataSurfaces::ExternalEnvironment: {
-                    delayOpaque(LoadCompRow::Roof) += singleSurfDelay;
-                } break;
-                case DataSurfaces::Ground:
-                case DataSurfaces::GroundFCfactorMethod:
-                case DataSurfaces::KivaFoundation:
-                case DataSurfaces::OtherSideCoefNoCalcExt:
-                case DataSurfaces::OtherSideCoefCalcExt:
-                case DataSurfaces::OtherSideCondModeledExt: {
-                    delayOpaque(LoadCompRow::OtherRoof) += singleSurfDelay;
-                } break;
-                default: { // interzone
-                    delayOpaque(LoadCompRow::IntZonCeil) += singleSurfDelay;
-                } break;
-                }
-            } break;
-            case DataSurfaces::SurfaceClass::Door: {
-                delayOpaque(LoadCompRow::OpqDoor) += singleSurfDelay;
-            } break;
-            default:
-                break;
             }
         }
         for (int k = LoadCompRow::Roof; k <= LoadCompRow::OtherFlr; ++k) {
