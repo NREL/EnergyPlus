@@ -84,6 +84,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
@@ -3264,71 +3265,15 @@ namespace SurfaceGeometry {
                               int const TotDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the Detached Shading Surface Data,
         // checks it for errors, etc.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // Detached Shading Surface Definition(s)
-        // Surface:Shading:Detached:Fixed,
-        //       \memo used for shading elements such as trees
-        //       \memo these items are fixed in space and would not move with relative geometry
-        //  A1 , \field User Supplied Surface Name
-        //       \required-field
-        //       \type alpha
-        //  A2,  \field TransSchedShadowSurf
-        //       \note Transmittance schedule for the shading device, defaults to zero (always opaque)
-        //       \type object-list
-        //       \object-list ScheduleNames
-        //  N1 , \field Number of Surface Vertex Groups -- Number of (X,Y,Z) groups in this surface
-        //       \required-field
-        //       \note shown with 12 vertex coordinates -- extensible object
-        //       \autocalculatable
-        //       \default autocalculate
-        //       \minimum 3
-        //       \note Rules for vertices are given in SurfaceGeometry coordinates --
-        //       \note For this object all surface coordinates are relative to the building origin (0,0,0)
-        //       \note and will rotate with the BUILDING north axis.
-        //  N2,  \field Vertex 1 X-coordinate
-        //       \units m
-        //       \type real
-        //  N3-37; as indicated by the N1 value
-        // Surface:Shading:Detached:Building,
-        //       \memo used for shading elements such as trees, other buildings, parts of this building not being modeled
-        //       \memo these items are relative to the current building and would move with relative geometry
-        //  A1 , \field User Supplied Surface Name
-        //       \required-field
-        //       \type alpha
-        //  A2,  \field TransSchedShadowSurf
-        //       \note Transmittance schedule for the shading device, defaults to zero (always opaque)
-        //       \type object-list
-        //       \object-list ScheduleNames
-        //  N1 , \field Number of Surface Vertex Groups -- Number of (X,Y,Z) groups in this surface
-        //       \required-field
-        //       \note shown with 12 vertex coordinates -- extensible object
-        //       \autocalculatable
-        //       \default autocalculate
-        //       \minimum 3
-        //       \note Rules for vertices are given in SurfaceGeometry coordinates --
-        //       \note For this object all surface coordinates are relative to the building origin (0,0,0)
-        //       \note and will rotate with the BUILDING north axis.
-        //  N2,  \field Vertex 1 X-coordinate
-        //       \units m
-        //       \type real
-        //  N3-37; as indicated by the N1 value
-
         // Using/Aliasing
-
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;
@@ -3348,6 +3293,7 @@ namespace SurfaceGeometry {
         int numSides;
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
+
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
@@ -3439,6 +3385,9 @@ namespace SurfaceGeometry {
                                             state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                             "\", has schedule values < 0.");
                         ShowContinueError(state, "...Schedule values < 0 have no meaning for shading elements.");
+                    }
+                    if (SchedMaxValue > 0.0) {
+                        state.dataSolarShading->anyScheduledShadingSurface = true;
                     }
                     if (SchedMaxValue > 1.0) {
                         ShowSevereError(state,
@@ -5016,10 +4965,11 @@ namespace SurfaceGeometry {
                 state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
 
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction == 0) {
-                ErrorsFound = true;
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                ErrorsFound = true;
+                continue;
             } else {
                 state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).IsUsed = true;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ConstructionStoredInputValue =
@@ -6312,52 +6262,15 @@ namespace SurfaceGeometry {
                               int const TotShdSubs // Number of Attached Shading SubSurfaces to obtain
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the HeatTransfer Surface Data,
         // checks it for errors, etc.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        //  Attached Shading Surface Definition
-        // Surface:Shading:Attached,
-        //       \memo used For fins, overhangs, elements that shade the building, are attached to the building
-        //       \memo but are not part of the heat transfer calculations
-        //  A1 , \field User Supplied Surface Name
-        //       \required-field
-        //       \type alpha
-        //       \reference AttachedShadingSurfNames
-        //  A2 , \field Base Surface Name
-        //       \required-field
-        //       \type object-list
-        //       \object-list SurfaceNames
-        //  A3,  \field TransSchedShadowSurf
-        //       \note Transmittance schedule for the shading device, defaults to zero (always opaque)
-        //       \type object-list
-        //       \object-list ScheduleNames
-        //  N1 , \field Number of Surface Vertex Groups -- Number of (X,Y,Z) groups in this surface
-        //       \required-field
-        //       \note currently limited 3 or 4, later?
-        //       \minimum 3
-        //       \maximum 4
-        //       \note vertices are given in SurfaceGeometry coordinates -- if relative, all surface coordinates
-        //       \note are "relative" to the Zone Origin.  if WCS, then building and zone origins are used
-        //       \note for some internal calculations, but all coordinates are given in an "absolute" system.
-        //  N2,  \field Vertex 1 X-coordinate
-        //       \units m
-        //       \type real
-        //  N3-13; as indicated by the N2 value
-
         // Using/Aliasing
-
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;
@@ -6486,6 +6399,9 @@ namespace SurfaceGeometry {
                                         state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                         "\", has schedule values < 0.");
                     ShowContinueError(state, "...Schedule values < 0 have no meaning for shading elements.");
+                }
+                if (SchedMaxValue > 0.0) {
+                    state.dataSolarShading->anyScheduledShadingSurface = true;
                 }
                 if (SchedMaxValue > 1.0) {
                     ShowSevereError(state,
