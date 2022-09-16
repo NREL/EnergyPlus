@@ -86,6 +86,14 @@ namespace ExhaustAirSystemManager {
 
     struct ZoneExhaustControl
     {
+        enum class FlowControlType
+        {
+            Invalid = -1,
+            Scheduled,
+            FollowSupply,
+            Num
+        };
+
         std::string Name = "";
 
         int AvailScheduleNum = 0;
@@ -98,7 +106,7 @@ namespace ExhaustAirSystemManager {
         int OutletNodeNum = 0;
 
         Real64 DesignExhaustFlowRate = 0.0;
-        int FlowControlTypeNum = 0;
+        FlowControlType FlowControlOption = FlowControlType::Scheduled;
         int ExhaustFlowFractionScheduleNum = 0;
         std::string SupplyNodeOrNodelistName = "";
         int SupplyNodeOrNodelistNum = 0;

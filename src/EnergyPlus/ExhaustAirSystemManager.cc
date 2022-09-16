@@ -83,6 +83,9 @@ namespace ExhaustAirSystemManager {
 
     bool mappingDone = false;
 
+    static constexpr std::array<std::string_view, static_cast<int>(ZoneExhaustControl::FlowControlType::Num)> flowControlTypeNamesUC = {
+        "SCHEDULED", "FOLLOWSUPPLY"};
+
     void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration)
     {
         // Obtains and Allocates Mixer related parameters from input file
@@ -559,9 +562,11 @@ namespace ExhaustAirSystemManager {
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate");
                 thisExhCtrl.DesignExhaustFlowRate = designExhaustFlowRate;
 
-                std::string flowControlType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type");
-                int flowControlTypeNum = 0;
-                thisExhCtrl.FlowControlTypeNum = flowControlTypeNum;
+                std::string flowControlTypeName =
+                    UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type"));
+                // std::string flowControlTypeName = UtilityRoutines::MakeUPPERCase(fields.at("flow_control_type").get<std::string>());
+                thisExhCtrl.FlowControlOption =
+                    static_cast<ZoneExhaustControl::FlowControlType>(getEnumerationValue(flowControlTypeNamesUC, flowControlTypeName));
 
                 std::string exhaustFlowFractionScheduleName =
                     ip->getAlphaFieldValue(objectFields, objectSchemaProps, "exhaust_flow_fraction_schedule_name");
@@ -605,7 +610,7 @@ namespace ExhaustAirSystemManager {
                 thisExhCtrl.SupplyNodeOrNodelistNum = supplyNodeOrNodelistNum;
                 // Verify these nodes are indeed supply nodes:
                 bool nodeNotFound = false;
-                if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
+                if (thisExhCtrl.FlowControlOption == ZoneExhaustControl::FlowControlType::FollowSupply) { // FollowSupply
                     for (size_t i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
                         CheckForSupplyNode(state, exhCtrlNum, nodeNotFound);
                         if (nodeNotFound) {
@@ -771,15 +776,15 @@ namespace ExhaustAirSystemManager {
                 FlowFrac = 0.0; // directly set flow rate to zero.
             }
 
-            if (thisExhCtrl.FlowControlTypeNum == 0) { // scheduled
-                MassFlow = DesignFlowRate * FlowFrac;
-            } else { // follow-supply
+            if (thisExhCtrl.FlowControlOption == ZoneExhaustControl::FlowControlType::FollowSupply) { // follow-supply
                 Real64 supplyFlowRate = 0.0;
                 int numOfSuppNodes = thisExhCtrl.SuppNodeNums.size();
                 for (int i = 1; i <= numOfSuppNodes; ++i) {
                     supplyFlowRate += state.dataLoopNodes->Node(thisExhCtrl.SuppNodeNums(i)).MassFlowRate;
                 }
                 MassFlow = supplyFlowRate * FlowFrac;
+            } else { // Scheduled or Invalid
+                MassFlow = DesignFlowRate * FlowFrac;
             }
 
             if (thisExhCtrl.BalancedExhFracScheduleNum > 0) {
@@ -878,7 +883,7 @@ namespace ExhaustAirSystemManager {
 
         Real64 designFlow = 0.0;
 
-        if (thisExhCtrl.FlowControlTypeNum == 1) { // FollowSupply
+        if (thisExhCtrl.FlowControlOption == ZoneExhaustControl::FlowControlType::FollowSupply) { // FollowSupply
             // size based on supply nodelist flow
             for (size_t i = 1; i <= NodeNums.size(); ++i) {
                 designFlow += state.dataLoopNodes->Node(NodeNums(i)).MassFlowRateMax;
