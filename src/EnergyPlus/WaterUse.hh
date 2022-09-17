@@ -130,10 +130,6 @@ namespace WaterUse {
         bool setupMyOutputVars = true;
         bool allowHotControl = false; // only certain configurations will use hot water flow and/or hot water temp schedule
 
-        WaterEquipmentType()
-        {
-        }
-
         // Reset Some Values to Zeros
         void reset()
         {
@@ -212,10 +208,6 @@ namespace WaterUse {
         PlantLocation plantLoc{};
         bool MyEnvrnFlag = true;
 
-        WaterConnectionsType()
-        {
-        }
-
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
@@ -261,13 +253,8 @@ struct WaterUseData : BaseGlobalStruct
     bool getWaterUseInputFlag = true;
     bool MyEnvrnFlagLocal = true;
     Array1D_bool CheckEquipName;
-    Array1D<WaterUse::WaterEquipmentType> WaterEquipment;
+    EPVector<WaterUse::WaterEquipmentType> WaterEquipment;
     EPVector<WaterUse::WaterConnectionsType> WaterConnections;
-
-    // Default Constructor
-    WaterUseData()
-    {
-    }
 
     void clear_state() override
     {
