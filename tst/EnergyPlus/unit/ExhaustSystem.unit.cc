@@ -430,6 +430,8 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
 
 TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
 {
+    // CheckForSupplyNode(EnergyPlusData & state, int const ExhCtrlNum, bool &NodeNotFound)
+
     std::string const idf_objects = delimited_string({
         "! Zone1,",
         "! Zone2,",
@@ -709,6 +711,29 @@ TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
     state->dataSize->FinalZoneSizing.allocate(4);
     state->dataSize->FinalZoneSizing(2).MinOA = 0.25;
 
+    state->dataZoneEquip->ZoneExhaustControlSystem.allocate(4);
+    state->dataZoneEquip->ZoneExhaustControlSystem(1).ZoneName = "ZONE1";
+    state->dataZoneEquip->ZoneExhaustControlSystem(2).ZoneName = "ZONE2";
+    state->dataZoneEquip->ZoneExhaustControlSystem(3).ZoneName = "ZONE3";
+    state->dataZoneEquip->ZoneExhaustControlSystem(4).ZoneName = "ZONE4";
+
+    state->dataZoneEquip->ZoneExhaustControlSystem(1).ZoneNum = 1;
+    state->dataZoneEquip->ZoneExhaustControlSystem(2).ZoneNum = 2;
+    state->dataZoneEquip->ZoneExhaustControlSystem(3).ZoneNum = 3;
+    state->dataZoneEquip->ZoneExhaustControlSystem(4).ZoneNum = 4;
+
+    // Expected input value:
+    state->dataZoneEquip->ZoneExhaustControlSystem(1).DesignExhaustFlowRate = 0.1;
+    state->dataZoneEquip->ZoneExhaustControlSystem(2).DesignExhaustFlowRate = 0.25;
+
+    state->dataZoneEquip->ZoneExhaustControlSystem(3).DesignExhaustFlowRate = 0.3;
+    state->dataZoneEquip->ZoneExhaustControlSystem(4).DesignExhaustFlowRate = 0.4;
+
+    state->dataZoneEquip->ZoneExhaustControlSystem(1).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
+    state->dataZoneEquip->ZoneExhaustControlSystem(2).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::FollowSupply;
+    state->dataZoneEquip->ZoneExhaustControlSystem(3).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
+    state->dataZoneEquip->ZoneExhaustControlSystem(4).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
+
     // state->dataGlobal->numSpaces = 1;
     // state->dataHeatBal->space.allocate(1);
     // state->dataHeatBal->space(1).Name = "LIVING ZONE";
@@ -717,7 +742,7 @@ TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE1";
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes);
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
@@ -727,7 +752,7 @@ TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "ZONE2";
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes);
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
     state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
