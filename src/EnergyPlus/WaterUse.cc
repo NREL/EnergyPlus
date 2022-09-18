@@ -1108,7 +1108,7 @@ namespace WaterUse {
                             TempDiff);
                     }
                 }
-            } else if (this->TargetTemp > this->HotTemp - EPSILON) {
+            } else if (this->TargetTemp > this->HotTemp + EPSILON) {
                 // don't need to mix (use hot) or cold water flow would be very small (use hot), or need to purge stagnant hot water temps (use hot)
                 this->HotMassFlowRate = this->TotalMassFlowRate;
                 if (!state.dataGlobal->WarmupFlag) {
