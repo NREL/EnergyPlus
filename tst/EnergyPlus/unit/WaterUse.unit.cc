@@ -448,8 +448,8 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     thisWaterEquipment.WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
     std::string const error_string1 = delimited_string({
-        "   ** Warning ** CalcEquipmentFlowRates: \"CORE_ZN WATER EQUIPMENT\" - Hot water temperature is less than the cold water temperature (5.00 "
-        "C)",
+        "   ** Warning ** CalcEquipmentFlowRates: \"CORE_ZN WATER EQUIPMENT\" - Hot water temperature is less than the cold water temperature by "
+        "(5.00 C)",
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   ** ...hot water temperature        = 10.00 C",
         "   **   ~~~   ** ...cold water temperature       = 15.00 C",
