@@ -4112,7 +4112,6 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
             int const firstSurfWin = thisSpace.WindowSurfaceFirst;
             int const lastSurfWin = thisSpace.WindowSurfaceLast;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                if (state.dataSurface->Surface(SurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
                 WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                     Real64 BlindEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
@@ -4152,76 +4151,70 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
     for (auto &thisRadEnclosure : state.dataViewFactor->EnclRadInfo) {
         if (!thisRadEnclosure.radReCalc) continue;
         Real64 SUM1 = 0.0;
-        for (int spaceNum : thisRadEnclosure.spaceNums) {
-            auto &thisSpace = state.dataHeatBal->space(spaceNum);
-            int const firstSurfWin = thisSpace.WindowSurfaceFirst;
-            int const lastSurfWin = thisSpace.WindowSurfaceLast;
-            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                auto &thisSurf = state.dataSurface->Surface(SurfNum);
-                int const ConstrNum = thisSurf.Construction;
-                WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
-                if (ShadeFlag != WinShadingType::SwitchableGlazing) {
-                    SUM1 += thisSurf.Area * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
-                } else { // Switchable glazing
-                    SUM1 +=
-                        thisSurf.Area * General::InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
+        for (int const SurfNum : thisRadEnclosure.SurfacePtr) {
+            auto &thisSurf = state.dataSurface->Surface(SurfNum);
+            int const ConstrNum = thisSurf.Construction;
+            WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
+            if (ShadeFlag != WinShadingType::SwitchableGlazing) {
+                SUM1 += thisSurf.Area * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
+            } else { // Switchable glazing
+                SUM1 += thisSurf.Area * General::InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
                                                           state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal,
                                                           state.dataConstruction->Construct(thisSurf.activeShadedConstruction).InsideAbsorpThermal);
-                }
+            }
 
-                // Window frame and divider effects
-                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0)
-                    SUM1 += state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
-                            state.dataSurface->SurfWinFrameEmis(SurfNum);
-                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
-                    Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum); // Window divider thermal absorptance
-                    // Suspended (between-glass) divider; relevant emissivity is inner glass emissivity
-                    if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended)
-                        DividerThermAbs = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
-                    if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
-                        // Interior shade or blind in place
-                        int const ConstrNumSh = thisSurf.activeShadedConstruction;
-                        if (state.dataSurface->SurfWinHasShadeOrBlindLayer(SurfNum)) {
-                            // Shade layer material number
-                            int MatNumSh =
-                                state.dataConstruction->Construct(ConstrNumSh).LayerPoint(state.dataConstruction->Construct(ConstrNumSh).TotLayers);
-                            // Shade or blind IR transmittance
-                            Real64 TauShIR = state.dataMaterial->Material(MatNumSh).TransThermal;
-                            // Effective emissivity of shade or blind
-                            Real64 EffShDevEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
-                            if (ShadeFlag == WinShadingType::IntBlind) {
-                                TauShIR = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).IRBackTrans(1);
-                                if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                                    int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
-                                    Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
-                                    TauShIR = General::InterpGeneral(
-                                        state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).IRBackTrans(SurfWinSlatsAngIndex),
-                                        state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum))
-                                            .IRBackTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
-                                        SurfWinSlatsAngInterpFac);
-                                    EffShDevEmiss = General::InterpGeneral(
-                                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(SurfWinSlatsAngIndex),
-                                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
-                                        SurfWinSlatsAngInterpFac);
-                                }
+            // Window frame and divider effects
+            if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0)
+                SUM1 += state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
+                        state.dataSurface->SurfWinFrameEmis(SurfNum);
+            if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
+                Real64 DividerThermAbs = state.dataSurface->SurfWinDividerEmis(SurfNum); // Window divider thermal absorptance
+                // Suspended (between-glass) divider; relevant emissivity is inner glass emissivity
+                if (state.dataSurface->SurfWinDividerType(SurfNum) == DataSurfaces::FrameDividerType::Suspended)
+                    DividerThermAbs = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
+                if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
+                    // Interior shade or blind in place
+                    int const ConstrNumSh = thisSurf.activeShadedConstruction;
+                    if (state.dataSurface->SurfWinHasShadeOrBlindLayer(SurfNum)) {
+                        // Shade layer material number
+                        int MatNumSh =
+                            state.dataConstruction->Construct(ConstrNumSh).LayerPoint(state.dataConstruction->Construct(ConstrNumSh).TotLayers);
+                        // Shade or blind IR transmittance
+                        Real64 TauShIR = state.dataMaterial->Material(MatNumSh).TransThermal;
+                        // Effective emissivity of shade or blind
+                        Real64 EffShDevEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
+                        if (ShadeFlag == WinShadingType::IntBlind) {
+                            TauShIR = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).IRBackTrans(1);
+                            if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
+                                int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
+                                Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
+                                TauShIR = General::InterpGeneral(
+                                    state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).IRBackTrans(SurfWinSlatsAngIndex),
+                                    state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum))
+                                        .IRBackTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                    SurfWinSlatsAngInterpFac);
+                                EffShDevEmiss = General::InterpGeneral(
+                                    state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(SurfWinSlatsAngIndex),
+                                    state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                    SurfWinSlatsAngInterpFac);
                             }
-                            SUM1 += state.dataSurface->SurfWinDividerArea(SurfNum) * (EffShDevEmiss + DividerThermAbs * TauShIR);
-                        } else {
-                            // this is for EMS activated shade/blind but the window construction has no shade/blind layer
-                            SUM1 += state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                    DividerThermAbs;
                         }
+                        SUM1 += state.dataSurface->SurfWinDividerArea(SurfNum) * (EffShDevEmiss + DividerThermAbs * TauShIR);
                     } else {
+                        // this is for EMS activated shade/blind but the window construction has no shade/blind layer
                         SUM1 += state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
                                 DividerThermAbs;
                     }
+                } else {
+                    SUM1 +=
+                        state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * DividerThermAbs;
                 }
+            }
 
-            } // End of loop over surfaces in zone/enclosure
-        }
+        } // End of loop over surfaces in zone/enclosure
         thisRadEnclosure.radThermAbsMult = 1.0 / SUM1;
 
-    } // End of loop over zones
+    } // End of loop over enclosures
 }
 
 void ComputeIntSWAbsorpFactors(EnergyPlusData &state)

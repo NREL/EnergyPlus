@@ -291,8 +291,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
     state->dataHeatBal->space(1).WindowSurfaceFirst = 1;
     state->dataHeatBal->space(1).WindowSurfaceLast = 1;
-    state->dataHeatBal->Zone(1).zoneRadEnclosureFirst = 1;
-    state->dataHeatBal->Zone(1).zoneRadEnclosureLast = 1;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
@@ -312,6 +310,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataViewFactor->NumOfRadiantEnclosures = 1;
     state->dataViewFactor->EnclRadInfo.allocate(1);
     state->dataViewFactor->EnclRadInfo(1).radReCalc = true;
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.emplace_back(1);
     state->dataViewFactor->EnclRadInfo(1).SurfacePtr.allocate(1);
     state->dataViewFactor->EnclRadInfo(1).SurfacePtr(1) = 1;
 
