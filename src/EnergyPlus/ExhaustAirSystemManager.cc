@@ -492,20 +492,19 @@ namespace ExhaustAirSystemManager {
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
-                int availSchNum = 0;
-                availSchNum = ScheduleManager::GetScheduleIndex(state, availSchName);
-
-                if (availSchNum > 0) {
-                    // normal conditions
-                } else if (availSchNum == 0) {
-                    // blank, treat as always available
+                if (availSchName == "") {
+                    // blank
+                    thisExhCtrl.AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
-                    availSchNum = 0;
-                    // a regular warning
-                    ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
-                    ShowContinueError(state, format("Avaiability Schedule Name = {} not found.", availSchName));
+                    thisExhCtrl.AvailScheduleNum = ScheduleManager::GetScheduleIndex(state, availSchName);
+                    if (thisExhCtrl.AvailScheduleNum == 0) {
+                        // mismatch, reset to always on
+                        thisExhCtrl.AvailScheduleNum == DataGlobalConstants::ScheduleAlwaysOn;
+                        ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
+                        ShowContinueError(state, format("Avaiability Schedule Name = {} not found.", availSchName));
+                        ShowContinueError(state, "Availability Schedule is reset to Always ON.");
+                    }
                 }
-                thisExhCtrl.AvailScheduleNum = availSchNum;
 
                 std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
                 thisExhCtrl.ZoneName = zoneName;
@@ -705,12 +704,14 @@ namespace ExhaustAirSystemManager {
         // Calculate a zonehvac exhaust control system
 
         auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(ZoneHVACExhaustControlNum);
+
         int InletNode = thisExhCtrl.InletNodeNum;
         int OutletNode = thisExhCtrl.OutletNodeNum;
         auto &thisExhInlet = state.dataLoopNodes->Node(InletNode);
         auto &thisExhOutlet = state.dataLoopNodes->Node(OutletNode);
         Real64 MassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         Real64 Tin = state.dataHeatBalFanSys->ZT(thisExhCtrl.ZoneNum);
+        Real64 thisExhCtrlAvailScheVal = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum);
 
         if (present(FlowRatio)) {
             thisExhCtrl.BalancedFlow *= FlowRatio;
@@ -719,7 +720,7 @@ namespace ExhaustAirSystemManager {
             thisExhInlet.MassFlowRate *= FlowRatio;
         } else {
             // Availability schedule:
-            if (ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) <= 0.0) {
+            if (thisExhCtrlAvailScheVal <= 0.0) {
                 MassFlow = 0.0;
                 thisExhInlet.MassFlowRate = 0.0;
             } else {
@@ -742,9 +743,7 @@ namespace ExhaustAirSystemManager {
             }
 
             bool runExhaust = true;
-            if (thisExhCtrl.AvailScheduleNum == 0 ||
-                (thisExhCtrl.AvailScheduleNum > 0 &&
-                 ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum) > 0.0)) { // available
+            if (thisExhCtrlAvailScheVal > 0.0) { // available
                 if (thisExhCtrl.MinZoneTempLimitScheduleNum > 0) {
                     if (Tin >= ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinZoneTempLimitScheduleNum)) {
                         runExhaust = true;
