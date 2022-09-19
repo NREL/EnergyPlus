@@ -96,7 +96,7 @@ namespace ExhaustAirSystemManager {
 
         std::string Name = "";
 
-        int AvailScheduleNum = 0;
+        int AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
 
         std::string ZoneName = "";
         int ZoneNum = 0;

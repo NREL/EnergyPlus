@@ -183,7 +183,7 @@ namespace ExhaustAirSystemManager {
 
                     centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
                     if (centralFanIndex >= 0) {
-                        availSchNum = state.dataHVACFan->fanObjs[centralFanIndex]->availSchedIndex;
+                        thisExhSys.AvailScheduleNum = state.dataHVACFan->fanObjs[centralFanIndex]->availSchedIndex;
                         // normal
 
                         BranchNodeConnections::SetUpCompSets(state,
@@ -259,7 +259,7 @@ namespace ExhaustAirSystemManager {
                             bool errFlag(false);
                             Fans::GetFanIndex(state, centralFanName, centralFanIndex, errFlag);
 
-                            availSchNum = state.dataFans->Fan(centralFanIndex).AvailSchedPtrNum;
+                            thisExhSys.AvailScheduleNum = state.dataFans->Fan(centralFanIndex).AvailSchedPtrNum;
 
                             BranchNodeConnections::SetUpCompSets(state,
                                                                  cCurrentModuleObject,
@@ -323,21 +323,6 @@ namespace ExhaustAirSystemManager {
                 }
                 thisExhSys.CentralFanName = centralFanName;
                 thisExhSys.CentralFanIndex = centralFanIndex;
-
-                if (availSchNum > 0) {
-                    // normal conditions
-                } else if (availSchNum == 0) {
-                    // mismatch, a regular warning
-                    ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
-                    ShowContinueError(state, "Could not find a match for Central Exhaust Fan's Availability Schedule.");
-                    ShowContinueError(state, format("Please check the availability schedule input for {}={}.", centralFanType, centralFanName));
-                    ErrorsFound = true;
-                } else { // no match
-                    // blank, treat as always avaialabe
-                    availSchNum = DataGlobalConstants::ScheduleAlwaysOn;
-                    //
-                }
-                thisExhSys.AvailScheduleNum = availSchNum;
 
                 // sizing
                 if (thisExhSys.SizingFlag) {
