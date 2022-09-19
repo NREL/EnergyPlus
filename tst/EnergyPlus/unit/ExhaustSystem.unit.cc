@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -64,6 +65,7 @@
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -430,279 +432,9 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
 
 TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
 {
-    // CheckForSupplyNode(EnergyPlusData & state, int const ExhCtrlNum, bool &NodeNotFound)
-
-    std::string const idf_objects = delimited_string({
-        "! Zone1,",
-        "! Zone2,",
-        "! Zone3,",
-        "! Zone4,",
-
-        "AirLoopHVAC:ZoneMixer,",
-        "    Mixer1,   !-Name",
-        "    Central_ExhFan_1_Inlet,     !-Outlet Node Name",
-        "    Zone1 Exhaust Outlet Node,  !-Inlet 1 Node Name",
-        "    Zone4 Exhaust Outlet Node;  !-Inlet 2 Node Name",
-
-        "AirLoopHVAC:ZoneMixer,",
-        "    Mixer2, !-Name",
-        "    Central_ExhFan_2_Inlet,    !-Outlet Node Name",
-        "    Zone2 Exhaust Outlet Node, !-Inlet 1 Node Name",
-        "    Zone3 Exhaust Outlet Node; !-Inlet 2 Node Name",
-
-        "Fan:SystemModel,",
-        "    CentralExhaustFan1,      !- Name",
-        "    Omni_Sched,              !- Availability Schedule Name",
-        "    Central_ExhFan_1_Inlet,  !- Air Inlet Node Name",
-        "    Central_ExhFan_1_Outlet, !- Air Outlet Node Name",
-        "    1,                       !- Design Maximum Air Flow Rate {m3/s}",
-        "    Discrete,                !- Speed Control Method",
-        "    0.2,                     !- Electric Power Minimum Flow Rate Fraction",
-        "    10,                      !- Design Pressure Rise {Pa}",
-        "    0.9,                     !- Motor Efficiency",
-        "    1,                       !- Motor In Air Stream Fraction",
-        "    autosize,                !- Design Electric Power Consumption {W}",
-        "    PowerPerFlowPerPressure, !- Design Power Sizing Method",
-        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
-        "    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
-        "    0.7,                     !- Fan Total Efficiency",
-        "    ,                        !- Electric Power Function of Flow Fraction Curve Name",
-        "    ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
-        "    ,                        !- Night Ventilation Mode Flow Fraction",
-        "    ,                        !- Motor Loss Zone Name",
-        "    ,                        !- Motor Loss Radiative Fraction",
-        "    General,                 !- End-Use Subcategory",
-        "    1;                       !- Number of Speeds",
-
-        "Fan:SystemModel,",
-        "    CentralExhaustFan2,      !- Name",
-        "    Omni_Sched,              !- Availability Schedule Name",
-        "    Central_ExhFan_2_Inlet,  !- Air Inlet Node Name",
-        "    Central_ExhFan_2_Outlet, !- Air Outlet Node Name",
-        "    1,                       !- Design Maximum Air Flow Rate {m3/s}",
-        "    Discrete,                !- Speed Control Method",
-        "    0.2,                     !- Electric Power Minimum Flow Rate Fraction",
-        "    15,                      !- Design Pressure Rise {Pa}",
-        "    0.9,                     !- Motor Efficiency",
-        "    1,                       !- Motor In Air Stream Fraction",
-        "    autosize,                !- Design Electric Power Consumption {W}",
-        "    PowerPerFlowPerPressure, !- Design Power Sizing Method",
-        "    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
-        "    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
-        "    0.7,                     !- Fan Total Efficiency",
-        "    ,                        !- Electric Power Function of Flow Fraction Curve Name",
-        "    ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
-        "    ,                        !- Night Ventilation Mode Flow Fraction",
-        "    ,                        !- Motor Loss Zone Name",
-        "    ,                        !- Motor Loss Radiative Fraction",
-        "    General,                 !- End-Use Subcategory",
-        "    1;                       !- Number of Speeds",
-
-        "AirLoopHVAC:ExhaustSystem,",
-        "    Central Exhaust 1,     !-Name",
-        "    Mixer1,                !-AirLoopHVAC:ZoneMixer Name",
-        "    Fan:SystemModel,       !-Fan Object Type",
-        "    CentralExhaustFan1;    !-Fan Name",
-
-        "AirLoopHVAC:ExhaustSystem,",
-        "    Central Exhaust 2,     !-Name",
-        "    Mixer2,                !-AirLoopHVAC:ZoneMixer Name",
-        "    Fan:SystemModel,       !-Fan Object Type",
-        "    CentralExhaustFan2;    !-Fan Name",
-
-        "ZoneHVAC:ExhaustControl,",
-        "    Zone1 Exhaust Control,              !-Name",
-        "    HVACOperationSchd,                  !- Availability Schedule Name",
-        "    Zone1,                              !- Zone Name",
-        "    Zone1 Exhaust Node,                 !- Inlet Node Name",
-        "    Zone1 Exhaust Oulet Node,           !- Outlet Node Name",
-        "    0.1,                                !- Design Flow Rate {m3/s}",
-        "    Scheduled,                          !- Flow Control Type (Scheduled, or FollowSupply)",
-        "    Zone1Exh Exhaust Flow Frac Sched,   !- Flow Fraction Schedule Name",
-        "    ,                                   !- Supply Node or NodeList Name (used with FollowSupply control type)",
-        "    ,                                   !- Minimum Zone Temperature Limit Schedule Name",
-        "    Zone1Exh Min Exhaust Flow Frac Sched,   !- Minimum Flow Fraction Schedule Name",
-        "    Zone1Exh FlowBalancedSched;         !-Balanced Exhaust Fraction Schedule Name",
-
-        "ZoneHVAC:ExhaustControl,",
-        "    Zone2 Exhaust Control,              !-Name",
-        "    HVACOperationSchd,                  !- Availability Schedule Name",
-        "    Zone2,                              !- Zone Name",
-        "    Zone2 Exhaust Node,                 !- Inlet Node Name",
-        "    Zone2 Exhaust Outlet Node,          !- Outlet Node Name",
-        "    autosize,                                !- Design Flow Rate {m3/s}",
-        "    FollowSupply,                       !- Flow Control Type (Scheduled, or FollowSupply)",
-        "    ,                                   !- Flow Fraction Schedule Name",
-        "    Zone2Exh_SupplyNode,                !- Supply Node or NodeList Name (used with FollowSupply control type)",
-        "    ,                                   !- Minimum Zone Temperature Limit Schedule Name",
-        "    Zone2Exh Min Exhaust Flow Frac Sched,   !- Minimum Flow Fraction Schedule Name",
-        "    Zone2Exh FlowBalancedSched;         !-Balanced Exhaust Fraction Schedule Name",
-
-        "ZoneHVAC:ExhaustControl,",
-        "    Zone3 Exhaust Control,              !-Name",
-        "    HVACOperationSchd,                  !- Availability Schedule Name",
-        "    Zone3,                              !- Zone Name",
-        "    Zone3 Exhaust Node,                 !- Inlet Node Name",
-        "    Zone3 Exhaust Outlet Node,          !- Outlet Node Name",
-        "    0.3,                                !- Design Flow Rate {m3/s}",
-        "    Scheduled,                          !- Flow Control Type (Scheduled, or FollowSupply)",
-        "    Zone3Exh Exhaust Flow Frac Sched,   !- Flow Fraction Schedule Name",
-        "    ,                                   !- Supply Node or NodeList Name (used with FollowSupply control type)",
-        "    ,                                   !- Minimum Zone Temperature Limit Schedule Name",
-        "    Zone3Exh Min Exhaust Flow Frac Sched,   !- Minimum Flow Fraction Schedule Name",
-        "    Zone3Exh FlowBalancedSched;         !-Balanced Exhaust Fraction Schedule Name",
-
-        "ZoneHVAC:ExhaustControl,",
-        "    Zone4 Exhaust Control,              !-Name",
-        "    HVACOperationSchd,                  !- Availability Schedule Name",
-        "    Zone4,                              !- Zone Name",
-        "    Zone4 Exhaust Node,                 !- Inlet Node Name",
-        "    Zone4 Exhaust Outlet Node,          !- Outlet Node Name",
-        "    0.4,                                !- Design Flow Rate {m3/s}",
-        // "! may consider an autosize here,",
-        "    Scheduled,                          !- Flow Control Type (Scheduled, or FollowSupply)",
-        "    Zone4Exh Exhaust Flow Frac Sched,   !- Flow Fraction Schedule Name",
-        "    ,                                   !- Supply Node or NodeList Name (used with FollowSupply control type)",
-        "    Zone4_MinZoneTempLimitSched,        !- Minimum Zone Temperature Limit Schedule Name",
-        "    Zone4Exh Min Exhaust Flow Frac Sched,   !- Minimum Flow Fraction Schedule Name",
-        "    Zone4Exh FlowBalancedSched;         !-Balanced Exhaust Fraction Schedule Name",
-
-        "Schedule:Compact,",
-        "    Omni_Sched,              !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00,1.0;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    HVACOperationSchd,       !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00,1.0;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone1Exh Exhaust Flow Frac Sched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00,1.0;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone1_MinZoneTempLimitSched,             !- Name",
-        "    ,                        !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 20;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone1Exh Min Exhaust Flow Frac Sched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 0.2;       !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone1Exh_FlowBalancedSched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 0.2;       !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone2Exh Exhaust Flow Frac Sched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00,1.0;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone2_MinZoneTempLimitSched,             !- Name",
-        "    ,                        !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 20;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone2Exh Min Exhaust Flow Frac Sched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 0.2;       !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone2Exh_FlowBalancedSched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 0.2;       !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone3Exh Exhaust Flow Frac Sched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00,1.0;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone3_MinZoneTempLimitSched,             !- Name",
-        "    ,                        !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 20;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone3Exh Min Exhaust Flow Frac Sched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 0.2;       !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone3Exh_FlowBalancedSched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 0.2;       !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone4Exh Exhaust Flow Frac Sched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00,1.0;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone4_MinZoneTempLimitSched,             !- Name",
-        "    ,                        !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 20;        !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone4Exh Min Exhaust Flow Frac Sched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 0.2;       !- Field 3",
-
-        "Schedule:Compact,",
-        "    Zone4Exh_FlowBalancedSched,             !- Name",
-        "    Fraction,                !- Schedule Type Limits Name",
-        "    Through: 12/31,          !- Field 1",
-        "    For: AllDays,            !- Field 2",
-        "    Until: 24:00, 0.2;       !- Field 3",
-
-        "ScheduleTypeLimits,",
-        "    Fraction,                !- Name",
-        "    0.0,                     !- Lower Limit Value",
-        "    1.0,                     !- Upper Limit Value",
-        "    CONTINUOUS;              !- Numeric Type",
-    });
-
     // Preset some elements
-    // state->dataGlobal->NumOfZones = 4;
-    state->dataHeatBal->Zone.allocate(4);
+    state->dataGlobal->NumOfZones = 4;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "ZONE1";
     state->dataHeatBal->Zone(2).Name = "ZONE2";
     state->dataHeatBal->Zone(3).Name = "ZONE3";
@@ -729,83 +461,119 @@ TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
     state->dataZoneEquip->ZoneExhaustControlSystem(3).DesignExhaustFlowRate = 0.3;
     state->dataZoneEquip->ZoneExhaustControlSystem(4).DesignExhaustFlowRate = 0.4;
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(1).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
+    state->dataZoneEquip->ZoneExhaustControlSystem(1).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::FollowSupply;
     state->dataZoneEquip->ZoneExhaustControlSystem(2).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::FollowSupply;
     state->dataZoneEquip->ZoneExhaustControlSystem(3).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
     state->dataZoneEquip->ZoneExhaustControlSystem(4).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
 
-    // state->dataGlobal->numSpaces = 1;
-    // state->dataHeatBal->space.allocate(1);
-    // state->dataHeatBal->space(1).Name = "LIVING ZONE";
-    // state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(4);
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE1";
-    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
-    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
 
-    state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "ZONE2";
-    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes);
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
-    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeExhaustNodeNum.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
-    state->dataZoneEquip->ZoneEquipConfig(2).SharedExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
+    std::string Zone1InletName = "Zone1_Inlet_Node";
+    int ExhCtrlNum = 1;
 
-    // int NumOfNodes = 10;
-    // state->dataLoopNodes->Node.allocate(NumOfNodes);
-    // state->dataLoopNodes->NodeID.allocate(NumOfNodes);
-    // state->dataLoopNodes->NodeID(1) = "ZoeNode";
-    // state->dataLoopNodes->NodeID(2) = "ZoeInletNode";
-    // state->dataLoopNodes->NodeID(3) = "";
-    // state->dataLoopNodes->NodeID(4) = "ZoeReturNode1";
-    // state->dataLoopNodes->NodeID(5) = "ZoeReturNode2";
-    // state->dataLoopNodes->NodeID(6) = "ZoeExhaustNode";
-    // state->dataLoopNodes->NodeID(7) = "ZoeSupplyNode";
-    // state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
-    // state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(2) = 5;
-    // state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 6;
-    // state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(1) = 6;
-    // state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(2) = 6;
-    // state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(1) = LightReturnExhaustConfig::Multi;
-    // state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(2) = LightReturnExhaustConfig::Shared;
+    bool ErrorsFound = false;
+    int inletNodeNum = NodeInputManager::GetOnlySingleNode(*state,
+                                                           Zone1InletName,
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                           state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).Name,
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::ConnectionType::ZoneInlet,
+                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           DataLoopNode::ObjectIsParent);
 
-    // state->dataHeatBal->spaceIntGainDevices.allocate(1);
-    // state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices = 2;
-    // state->dataHeatBal->spaceIntGainDevices(1).device.allocate(2);
-    // state->dataHeatBal->spaceIntGainDevices(1).device(1).ReturnAirNodeNum = 4;
-    // state->dataHeatBal->spaceIntGainDevices(1).device(2).ReturnAirNodeNum = 5;
-    // state->dataHeatBal->spaceIntGainDevices(1).device(1).ReturnAirConvGainRate = 50.0;
-    // state->dataHeatBal->spaceIntGainDevices(1).device(2).ReturnAirConvGainRate = 100.0;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ZoneName = "ZONE1";
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumReturnNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).InletNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes);
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).InletNode(1) = inletNodeNum;
 
-    // for (int Nodecount = 1; Nodecount <= NumOfNodes; ++Nodecount) {
-    //    state->dataLoopNodes->Node(Nodecount).Temp = 20.0;
-    //    state->dataLoopNodes->Node(Nodecount).HumRat = 0.001;
-    //}
-    // state->dataLoopNodes->Node(4).MassFlowRate = 0.01;
-    // state->dataLoopNodes->Node(5).MassFlowRate = 0.02;
-    // state->dataLoopNodes->Node(6).MassFlowRate = 0.015;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode(2) = 5;
 
-    // state->dataHeatBal->Zone(1).NoHeatToReturnAir = false;
-    // state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    // state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ExhaustNode(1) = 3;
 
-    // state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    // state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
-    // state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-    // state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
-    // state->dataZoneEquip->ZoneEquipList.allocate(1);
+    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SupplyNodeOrNodelistName = "Zone1_Inlet_Node";
 
-    ASSERT_TRUE(process_idf(idf_objects));
-    ScheduleManager::ProcessScheduleInput(*state);
+    bool NodeListError = false;
+    int NumParams = 1;
+    int NumNodes = 0;
 
-    // Call the processing codes
-    ExhaustAirSystemManager::GetZoneExhaustControlInput(*state);
+    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SuppNodeNums.dimension(NumParams, 0);
+
+    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SuppNodeNums =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SupplyNodeOrNodelistName,
+                                            ErrorsFound,
+                                            DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                            state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).Name,
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::ConnectionType::Sensor,
+                                            NodeInputManager::CompFluidStream::Primary,
+                                            DataLoopNode::ObjectIsParent);
+
+    bool NodeNotFound = false;
+    ExhaustAirSystemManager::CheckForSupplyNode(*state, ExhCtrlNum, NodeNotFound);
+
+    EXPECT_FALSE(NodeNotFound);
+
+    // Test another example where NodeNotFound will be true
+    std::string Zone2InletName = "Zone2_Inlet_Node";
+    ExhCtrlNum = 2;
+
+    ErrorsFound = false;
+    inletNodeNum = NodeInputManager::GetOnlySingleNode(*state,
+                                                       Zone2InletName,
+                                                       ErrorsFound,
+                                                       DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                       state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).Name,
+                                                       DataLoopNode::NodeFluidType::Air,
+                                                       DataLoopNode::ConnectionType::ZoneInlet,
+                                                       NodeInputManager::CompFluidStream::Primary,
+                                                       DataLoopNode::ObjectIsParent);
+
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ZoneName = "ZONE2";
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumReturnNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).InletNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes);
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).InletNode(1) = inletNodeNum;
+
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode(2) = 5;
+
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
+    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ExhaustNode(1) = 3;
+
+    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SupplyNodeOrNodelistName = "Zone22_Inlet_Node"; // set with an incorrect name
+
+    NodeListError = false;
+    NumParams = 1;
+    NumNodes = 0;
+
+    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SuppNodeNums.dimension(NumParams, 0);
+
+    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SuppNodeNums =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SupplyNodeOrNodelistName,
+                                            ErrorsFound,
+                                            DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                            state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).Name,
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::ConnectionType::Sensor,
+                                            NodeInputManager::CompFluidStream::Primary,
+                                            DataLoopNode::ObjectIsParent);
+
+    NodeNotFound = false;
+    ExhaustAirSystemManager::CheckForSupplyNode(*state, ExhCtrlNum, NodeNotFound);
+
+    EXPECT_TRUE(NodeNotFound);
+
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "GetExhaustControlInput: ZoneHVAC:ExhaustControl=");
 }
