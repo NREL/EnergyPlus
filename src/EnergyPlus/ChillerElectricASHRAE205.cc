@@ -263,15 +263,27 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         };
 
         thisChiller.SizFac = fields.at("sizing_factor").get<Real64>();
-        if (thisChiller.SizFac <= 0.0) thisChiller.SizFac = 1.0;
-
-        thisChiller.EvapVolFlowRate = fields.at("chilled_water_maximum_requested_flow_rate").get<Real64>();
-        if (thisChiller.EvapVolFlowRate == DataSizing::AutoSize) {
-            thisChiller.EvapVolFlowRateWasAutoSized = true;
+        if (thisChiller.SizFac <= 0.0) {
+            thisChiller.SizFac = 1.0;
         }
-        thisChiller.CondVolFlowRate = fields.at("condenser_maximum_requested_flow_rate").get<Real64>();
-        if (thisChiller.CondVolFlowRate == DataSizing::AutoSize) {
-            thisChiller.CondVolFlowRateWasAutoSized = true;
+
+        {
+            auto tmpFlowRate = fields.at("chilled_water_maximum_requested_flow_rate");
+            if (tmpFlowRate == "Autosize") {
+                thisChiller.EvapVolFlowRate = DataSizing::AutoSize;
+                thisChiller.EvapVolFlowRateWasAutoSized = true;
+            } else {
+                thisChiller.EvapVolFlowRate = tmpFlowRate.get<Real64>();
+            }
+        }
+        {
+            auto tmpFlowRate = fields.at("condenser_maximum_requested_flow_rate");
+            if (tmpFlowRate == "Autosize") {
+                thisChiller.CondVolFlowRate = DataSizing::AutoSize;
+                thisChiller.CondVolFlowRateWasAutoSized = true;
+            } else {
+                thisChiller.CondVolFlowRate = tmpFlowRate.get<Real64>();
+            }
         }
 
         thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(getEnumerationValue(
@@ -512,11 +524,12 @@ void ASHRAE205ChillerSpecs::oneTimeInit_new(EnergyPlusData &state)
             PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CDPlantLoc, this->HRPlantLoc, DataPlant::PlantEquipmentType::Chiller_ElectricASHRAE205, false);
         }
-
-        if (errFlag) {
-            ShowFatalError(state, "InitElecASHRAE205Chiller: Program terminated due to previous condition(s).");
-        }
 #endif // #if 0
+
+    if (errFlag) {
+        ShowFatalError(state, "InitElecASHRAE205Chiller: Program terminated due to previous condition(s).");
+    }
+
     if (this->FlowMode == DataPlant::FlowMode::Constant) {
         // reset flow priority
         DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc).FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
