@@ -56,7 +56,7 @@ void GridAxis::calc_spacing_multipliers() {
   // If you are sitting at the "0" along an edge of the hypercube, you want the "0" flavof
   if (grid.size() == 1) {
       set_interp_method(Method::LINEAR);
-      showMessage(MsgLevel::MSG_WARN, "A cubic interpolation method is not valid for grid axes with only one value. Interpolation method reset to linear.");
+      showMessage(MsgLevel::MSG_INFO, "A cubic interpolation method is not valid for grid axes with only one value. Interpolation method reset to linear.");
   }
   double center_spacing;
   for (std::size_t i = 0; i < grid.size() - 1; i++) {
@@ -170,7 +170,7 @@ std::size_t GriddedData::get_value_index_relative(const std::vector<std::size_t>
                                      const std::vector<short> &translation) {
   int new_coord;
   for (std::size_t dim = 0; dim < coords.size(); dim++) {
-    new_coord = coords[dim] + translation[dim];
+    new_coord = static_cast<int>(coords[dim]) + translation[dim];
     if (new_coord < 0) {
       temp_coords[dim] = 0u;
     } else if (new_coord >= (int)dimension_lengths[dim]) {
