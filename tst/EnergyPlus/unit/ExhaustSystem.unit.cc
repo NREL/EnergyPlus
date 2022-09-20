@@ -444,76 +444,81 @@ TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
     state->dataSize->FinalZoneSizing(2).MinOA = 0.25;
 
     state->dataZoneEquip->ZoneExhaustControlSystem.allocate(4);
-    state->dataZoneEquip->ZoneExhaustControlSystem(1).ZoneName = "ZONE1";
-    state->dataZoneEquip->ZoneExhaustControlSystem(2).ZoneName = "ZONE2";
-    state->dataZoneEquip->ZoneExhaustControlSystem(3).ZoneName = "ZONE3";
-    state->dataZoneEquip->ZoneExhaustControlSystem(4).ZoneName = "ZONE4";
+    auto &thisExhCtrl1 = state->dataZoneEquip->ZoneExhaustControlSystem(1);
+    auto &thisExhCtrl2 = state->dataZoneEquip->ZoneExhaustControlSystem(2);
+    auto &thisExhCtrl3 = state->dataZoneEquip->ZoneExhaustControlSystem(3);
+    auto &thisExhCtrl4 = state->dataZoneEquip->ZoneExhaustControlSystem(4);
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(1).ZoneNum = 1;
-    state->dataZoneEquip->ZoneExhaustControlSystem(2).ZoneNum = 2;
-    state->dataZoneEquip->ZoneExhaustControlSystem(3).ZoneNum = 3;
-    state->dataZoneEquip->ZoneExhaustControlSystem(4).ZoneNum = 4;
+    thisExhCtrl1.ZoneName = "ZONE1";
+    thisExhCtrl2.ZoneName = "ZONE2";
+    thisExhCtrl3.ZoneName = "ZONE3";
+    thisExhCtrl4.ZoneName = "ZONE4";
+
+    thisExhCtrl1.ZoneNum = 1;
+    thisExhCtrl2.ZoneNum = 2;
+    thisExhCtrl3.ZoneNum = 3;
+    thisExhCtrl4.ZoneNum = 4;
 
     // Expected input value:
-    state->dataZoneEquip->ZoneExhaustControlSystem(1).DesignExhaustFlowRate = 0.1;
-    state->dataZoneEquip->ZoneExhaustControlSystem(2).DesignExhaustFlowRate = 0.25;
+    thisExhCtrl1.DesignExhaustFlowRate = 0.1;
+    thisExhCtrl2.DesignExhaustFlowRate = 0.25;
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(3).DesignExhaustFlowRate = 0.3;
-    state->dataZoneEquip->ZoneExhaustControlSystem(4).DesignExhaustFlowRate = 0.4;
+    thisExhCtrl3.DesignExhaustFlowRate = 0.3;
+    thisExhCtrl4.DesignExhaustFlowRate = 0.4;
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(1).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::FollowSupply;
-    state->dataZoneEquip->ZoneExhaustControlSystem(2).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::FollowSupply;
-    state->dataZoneEquip->ZoneExhaustControlSystem(3).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
-    state->dataZoneEquip->ZoneExhaustControlSystem(4).FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
+    thisExhCtrl1.FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::FollowSupply;
+    thisExhCtrl2.FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::FollowSupply;
+    thisExhCtrl3.FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
+    thisExhCtrl4.FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(4);
 
     std::string Zone1InletName = "Zone1_Inlet_Node";
     int ExhCtrlNum = 1;
+    auto &ZoneEquipConf1 = state->dataZoneEquip->ZoneEquipConfig(1);
 
     bool ErrorsFound = false;
     int inletNodeNum = NodeInputManager::GetOnlySingleNode(*state,
                                                            Zone1InletName,
                                                            ErrorsFound,
                                                            DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
-                                                           state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).Name,
+                                                           thisExhCtrl1.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::ZoneInlet,
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsParent);
 
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ZoneName = "ZONE1";
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumReturnNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).InletNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes);
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).InletNode(1) = inletNodeNum;
+    ZoneEquipConf1.ZoneName = "ZONE1";
+    ZoneEquipConf1.NumInletNodes = 1;
+    ZoneEquipConf1.NumExhaustNodes = 1;
+    ZoneEquipConf1.NumReturnNodes = 2;
+    ZoneEquipConf1.InletNode.allocate(ZoneEquipConf1.NumInletNodes);
+    ZoneEquipConf1.InletNode(1) = inletNodeNum;
 
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode(1) = 4;
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode(2) = 5;
+    ZoneEquipConf1.ReturnNode.allocate(ZoneEquipConf1.NumReturnNodes);
+    ZoneEquipConf1.ReturnNode(1) = 4;
+    ZoneEquipConf1.ReturnNode(2) = 5;
 
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ExhaustNode(1) = 3;
+    ZoneEquipConf1.ExhaustNode.allocate(ZoneEquipConf1.NumExhaustNodes);
+    ZoneEquipConf1.ExhaustNode(1) = 3;
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SupplyNodeOrNodelistName = "Zone1_Inlet_Node";
+    thisExhCtrl1.SupplyNodeOrNodelistName = "Zone1_Inlet_Node";
 
     bool NodeListError = false;
     int NumParams = 1;
     int NumNodes = 0;
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SuppNodeNums.dimension(NumParams, 0);
+    thisExhCtrl1.SuppNodeNums.dimension(NumParams, 0);
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SuppNodeNums =
-        NodeInputManager::GetOnlySingleNode(*state,
-                                            state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SupplyNodeOrNodelistName,
-                                            ErrorsFound,
-                                            DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
-                                            state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).Name,
-                                            DataLoopNode::NodeFluidType::Air,
-                                            DataLoopNode::ConnectionType::Sensor,
-                                            NodeInputManager::CompFluidStream::Primary,
-                                            DataLoopNode::ObjectIsParent);
+    thisExhCtrl1.SuppNodeNums = NodeInputManager::GetOnlySingleNode(*state,
+                                                                    thisExhCtrl1.SupplyNodeOrNodelistName,
+                                                                    ErrorsFound,
+                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                                    thisExhCtrl1.Name,
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::ConnectionType::Sensor,
+                                                                    NodeInputManager::CompFluidStream::Primary,
+                                                                    DataLoopNode::ObjectIsParent);
 
     bool NodeNotFound = false;
     ExhaustAirSystemManager::CheckForSupplyNode(*state, ExhCtrlNum, NodeNotFound);
@@ -523,50 +528,50 @@ TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
     // Test another example where NodeNotFound will be true
     std::string Zone2InletName = "Zone2_Inlet_Node";
     ExhCtrlNum = 2;
+    auto &ZoneEquipConf2 = state->dataZoneEquip->ZoneEquipConfig(2);
 
     ErrorsFound = false;
     inletNodeNum = NodeInputManager::GetOnlySingleNode(*state,
                                                        Zone2InletName,
                                                        ErrorsFound,
                                                        DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
-                                                       state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).Name,
+                                                       thisExhCtrl2.Name,
                                                        DataLoopNode::NodeFluidType::Air,
                                                        DataLoopNode::ConnectionType::ZoneInlet,
                                                        NodeInputManager::CompFluidStream::Primary,
                                                        DataLoopNode::ObjectIsParent);
 
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ZoneName = "ZONE2";
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumInletNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumExhaustNodes = 1;
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).NumReturnNodes = 2;
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).InletNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes);
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).InletNode(1) = inletNodeNum;
+    ZoneEquipConf2.ZoneName = "ZONE2";
+    ZoneEquipConf2.NumInletNodes = 1;
+    ZoneEquipConf2.NumExhaustNodes = 1;
+    ZoneEquipConf2.NumReturnNodes = 2;
+    ZoneEquipConf2.InletNode.allocate(ZoneEquipConf2.NumInletNodes);
+    ZoneEquipConf2.InletNode(1) = inletNodeNum;
 
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes);
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode(1) = 4;
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ReturnNode(2) = 5;
+    ZoneEquipConf2.ReturnNode.allocate(ZoneEquipConf2.NumReturnNodes);
+    ZoneEquipConf2.ReturnNode(1) = 4;
+    ZoneEquipConf2.ReturnNode(2) = 5;
 
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ExhaustNode.allocate(state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes);
-    state->dataZoneEquip->ZoneEquipConfig(ExhCtrlNum).ExhaustNode(1) = 3;
+    ZoneEquipConf2.ExhaustNode.allocate(ZoneEquipConf2.NumExhaustNodes);
+    ZoneEquipConf2.ExhaustNode(1) = 3;
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SupplyNodeOrNodelistName = "Zone22_Inlet_Node"; // set with an incorrect name
+    thisExhCtrl2.SupplyNodeOrNodelistName = "Zone22_Inlet_Node"; // set with an incorrect name
 
     NodeListError = false;
     NumParams = 1;
     NumNodes = 0;
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SuppNodeNums.dimension(NumParams, 0);
+    thisExhCtrl2.SuppNodeNums.dimension(NumParams, 0);
 
-    state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SuppNodeNums =
-        NodeInputManager::GetOnlySingleNode(*state,
-                                            state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).SupplyNodeOrNodelistName,
-                                            ErrorsFound,
-                                            DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
-                                            state->dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum).Name,
-                                            DataLoopNode::NodeFluidType::Air,
-                                            DataLoopNode::ConnectionType::Sensor,
-                                            NodeInputManager::CompFluidStream::Primary,
-                                            DataLoopNode::ObjectIsParent);
+    thisExhCtrl2.SuppNodeNums = NodeInputManager::GetOnlySingleNode(*state,
+                                                                    thisExhCtrl2.SupplyNodeOrNodelistName,
+                                                                    ErrorsFound,
+                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                                    thisExhCtrl2.Name,
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::ConnectionType::Sensor,
+                                                                    NodeInputManager::CompFluidStream::Primary,
+                                                                    DataLoopNode::ObjectIsParent);
 
     NodeNotFound = false;
     ExhaustAirSystemManager::CheckForSupplyNode(*state, ExhCtrlNum, NodeNotFound);
