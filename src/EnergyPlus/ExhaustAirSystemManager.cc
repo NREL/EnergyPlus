@@ -175,7 +175,6 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.CentralFanTypeNum = centralFanTypeNum;
 
                 std::string centralFanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
-                int availSchNum = 0;
                 int centralFanIndex = -1; // zero based or 1 based
                 if (centralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                     // zero-based index
@@ -499,7 +498,7 @@ namespace ExhaustAirSystemManager {
                     thisExhCtrl.AvailScheduleNum = ScheduleManager::GetScheduleIndex(state, availSchName);
                     if (thisExhCtrl.AvailScheduleNum == 0) {
                         // mismatch, reset to always on
-                        thisExhCtrl.AvailScheduleNum == DataGlobalConstants::ScheduleAlwaysOn;
+                        thisExhCtrl.AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
                         ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
                         ShowContinueError(state, format("Avaiability Schedule Name = {} not found.", availSchName));
                         ShowContinueError(state, "Availability Schedule is reset to Always ON.");
@@ -902,7 +901,7 @@ namespace ExhaustAirSystemManager {
 
         bool ZoneNodeNotFound = true;
         bool ErrorsFound = false;
-        for (int i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
+        for (size_t i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
             int supplyNodeNum = thisExhCtrl.SuppNodeNums(i);
             for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(thisExhCtrl.ZoneNum).NumInletNodes; ++NodeNum) {
                 if (supplyNodeNum == state.dataZoneEquip->ZoneEquipConfig(thisExhCtrl.ZoneNum).InletNode(NodeNum)) {
