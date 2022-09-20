@@ -115,26 +115,6 @@ void tk205ErrCallback(tk205::MsgSeverity message_type, const std::string &messag
     }
 }
 
-void BtwxtMessageCallback(const Btwxt::MsgLevel messageType, const std::string message, void *contextPtr)
-{
-    std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)contextPtr;
-    std::string fullMessage = contextPair.second + ": " + message;
-    if (messageType == Btwxt::MsgLevel::MSG_ERR) {
-        ShowSevereError(*contextPair.first, fullMessage);
-        ShowFatalError(*contextPair.first, "Btwxt: Errors discovered, program terminates.");
-    } else {
-        if (static_cast<int>(messageType) >= Btwxt::LOG_LEVEL) {
-            if (messageType == Btwxt::MsgLevel::MSG_WARN) {
-                ShowWarningError(*contextPair.first, fullMessage);
-            } else if (messageType == Btwxt::MsgLevel::MSG_INFO) {
-                ShowMessage(*contextPair.first, fullMessage);
-            } else {
-                ShowMessage(*contextPair.first, fullMessage);
-            }
-        }
-    }
-}
-
 void getChillerASHRAE205Input(EnergyPlusData &state)
 {
     static constexpr std::string_view RoutineName("getChillerASHRAE205Input: "); // include trailing blank space
@@ -178,7 +158,6 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
                                                               format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
         tk205::set_error_handler(tk205ErrCallback, &callbackPair);
         Btwxt::LOG_LEVEL = static_cast<int>(Btwxt::MsgLevel::MSG_WARN);
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
         thisChiller.Representation =
             std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str()));
         if (nullptr == thisChiller.Representation) {
