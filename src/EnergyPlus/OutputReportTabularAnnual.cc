@@ -836,7 +836,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
             }
             fixUnitsPerSecond(curUnits, curConversionFactor);
             columnHead(columnRecount - 1) = fldStIt->m_colHead + curAggString + " [" + curUnits + ']';
-            columnHead(columnRecount) = fldStIt->m_colHead + " {TIMESTAMP} ";
+            columnHead(columnRecount) = fldStIt->m_colHead + " {TIMESTAMP}";
             minVal = storedMaxVal;
             maxVal = storedMinVal;
             for (unsigned int row = 0; row != m_objectNames.size(); row++) { // loop through by row.

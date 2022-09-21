@@ -76,11 +76,11 @@ This numeric field defines the cooling coefficient of performance (COP) at rated
 
 \paragraph{Field: Minimum Condenser Inlet Node Temperature in Cooling Mode}\label{field-minimum-condenser-inlet-node-temperature-in-cooling-mode-000}
 
-This numeric field defines the minimum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
+This numeric field defines the minimum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6$^\circ$C.
 
 \paragraph{Field: Maximum Condenser Inlet Node Temperature in Cooling Mode}\label{field-maximum-condenser-inlet-node-temperature-in-cooling-mode-000}
 
-This numeric field defines the maximum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
+This numeric field defines the maximum source inlet temperature allowed for cooling operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43$^\circ$C.
 
 \paragraph{Field: Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name}\label{field-cooling-capacity-ratio-modifier-function-of-low-temperature-curve-name}
 
@@ -136,11 +136,11 @@ This numeric field defines the heating coefficient of performance (COP) at rated
 
 \paragraph{Field: Minimum Condenser Inlet Node Temperature in Heating Mode}\label{field-minimum-condenser-inlet-node-temperature-in-heating-mode-000}
 
-This numeric field defines the minimum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
+This numeric field defines the minimum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Below this temperature, heating is disabled. If this field is left blank, the default value is -20$^\circ$C.
 
 \paragraph{Field: Maximum Condenser Inlet Node Temperature in Heating Mode}\label{field-maximum-condenser-inlet-node-temperature-in-heating-mode-000}
 
-This numeric field defines the maximum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC. This default temperature will likely disable water-cooled equipment and a more reasonable value should be entered.  Check manufacturers specifications.
+This numeric field defines the maximum source inlet temperature allowed for heating operation. For air-cooled equipment outdoor dry-bulb temperature is used. For water-cooled equipment inlet water temperature is used. Above this temperature, heating is disabled. If this field is left blank, the default value is 16$^\circ$C. This default temperature will likely disable water-cooled equipment and a more reasonable value should be entered.  Check manufacturers specifications.
 
 \paragraph{Field: Heating Capacity Ratio Modifier Function of Low Temperature Curve Name}\label{field-heating-capacity-ratio-modifier-function-of-low-temperature-curve-name}
 
@@ -254,7 +254,7 @@ This numeric field defines the size of the first stage compressor to the total c
 
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Crankcase Heater}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-000}
 
-This numeric field defines the maximum outdoor temperature, in degrees Celsius, below which the crankcase heater will operate. If this field is left blank, the default value is 0°C. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+This numeric field defines the maximum outdoor temperature, in degrees Celsius, below which the crankcase heater will operate. If this field is left blank, the default value is 0$^\circ$C. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
 
 \paragraph{Field: Defrost Strategy}\label{field-defrost-strategy-001}
 
@@ -674,23 +674,23 @@ This output field is an integer representation of the operating mode of the vari
 
 \paragraph{VRF Heat Pump Condenser Inlet Temperature {[}C{]}}\label{vrf-heat-pump-condenser-inlet-temperature-c}
 
-This is the inlet air temperature entering the condenser coil in degrees C. This value can represent the outdoor air dry-bulb temperature, wet-bulb temperature, or somewhere in between from the weather data being used, depending on the value used in the input field ``Evaporative Condenser Effectiveness''. The temperature reported here is used in the various modifier curves related to temperature (e.g., Total Cooling Capacity Modifier Curve {[}function of temperature{]}). (The use of the word \emph{Condenser} here is taken from cooling operation -- the same device can also be an evaporator during heating operation.)
+This is the inlet air temperature entering the condenser coil in degrees C. This value can represent the outdoor air dry-bulb temperature, wet-bulb temperature, or somewhere in between from the weather data being used, depending on the value used in the input field ``Evaporative Condenser Effectiveness''. The temperature reported here is used in the various modifier curves related to temperature (e.g., Total Cooling Capacity Modifier Curve {[}function of temperature{]}). (The use of the word \emph{Condenser} here is taken from cooling operation---the same device can also be an evaporator during heating operation.)
 
 \paragraph{VRF Heat Pump Condenser Outlet Temperature {[}C{]}}\label{vrf-heat-pump-condenser-outlet-temperature-c}
 
-This is the condenser coil outlet water temperature in degrees C. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This value is only reported for water-cooled systems.~ (The use of the word \emph{Condenser} here is taken from cooling operation -- the same device can also be an evaporator during heating operation.)
+This is the condenser coil outlet water temperature in degrees C. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This value is only reported for water-cooled systems.~ (The use of the word \emph{Condenser} here is taken from cooling operation---the same device can also be an evaporator during heating operation.)
 
 \paragraph{VRF Heat Pump Condenser Mass Flow Rate {[}kg/s{]}}\label{vrf-heat-pump-condenser-mass-flow-rate-kgs}
 
-This is the condenser coil outlet water mass flow rate in kilograms per second. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This value is only reported for water-cooled systems. (The use of the word \emph{Condenser} here is taken from cooling operation -- the same device can also be an evaporator during heating operation.)
+This is the condenser coil outlet water mass flow rate in kilograms per second. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This value is only reported for water-cooled systems. (The use of the word \emph{Condenser} here is taken from cooling operation---the same device can also be an evaporator during heating operation.)
 
 \paragraph{VRF Heat Pump Condenser Heat Transfer Rate {[}W{]}}\label{vrf-heat-pump-condenser-heat-transfer-rate-w}
 
-This is the condenser coil heat transfer rate in Watts. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This value is only reported for water-cooled systems. (The use of the word \emph{Condenser} here is taken from cooling operation -- the same device can also be an evaporator during heating operation.)
+This is the condenser coil heat transfer rate in Watts. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. This value is only reported for water-cooled systems. (The use of the word \emph{Condenser} here is taken from cooling operation---the same device can also be an evaporator during heating operation.)
 
 \paragraph{VRF Heat Pump Condenser Heat Transfer Energy {[}J{]}}\label{vrf-heat-pump-condenser-heat-transfer-energy-j}
 
-This is the condenser coil heat transfer in Joules. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This value is only reported for water-cooled systems. (The use of the word \emph{Condenser} here is taken from cooling operation -- the same device can also be an evaporator during heating operation.)
+This is the condenser coil heat transfer in Joules. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This value is only reported for water-cooled systems. (The use of the word \emph{Condenser} here is taken from cooling operation---the same device can also be an evaporator during heating operation.)
 
 \paragraph{VRF Heat Pump Maximum Capacity Cooling Rate {[}W{]}}\label{vrf-heat-pump-maximum-capacity-cooling-rate-w}
 
@@ -782,28 +782,27 @@ This numeric field defines the rated compressor power per Watt of rated evaporat
 
 \paragraph{Field: Minimum Outdoor Air Temperature in Cooling Mode}\label{field-minimum-outdoor-air-temperature-in-cooling-mode}
 
-This numeric field defines the minimum outdoor temperature allowed for cooling operations. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
- If this field is left blank, the default value is -20ºC.
+This numeric field defines the minimum outdoor temperature allowed for cooling operations. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6$^\circ$C.
 
 \paragraph{Field: Maximum Outdoor Air Temperature in Cooling Mode}\label{field-maximum-outdoor-air-temperature-in-cooling-mode}
 
-This numeric field defines the maximum outdoor temperature allowed for cooling operations. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
+This numeric field defines the maximum outdoor temperature allowed for cooling operations. Above this temperature, heating is disabled. If this field is left blank, the default value is 43$^\circ$C.
 
 \paragraph{Field: Minimum Outdoor Air Temperature in Heating Mode}\label{field-minimum-outdoor-air-temperature-in-heating-mode}
 
-This numeric field defines the minimum outdoor temperature allowed for heating operation. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
+This numeric field defines the minimum outdoor temperature allowed for heating operation. Below this temperature, heating is disabled. If this field is left blank, the default value is -20$^\circ$C.
 
 \paragraph{Field: Maximum Outdoor Air Temperature in Heating Mode}\label{field-maximum-outdoor-air-temperature-in-heating-mode}
 
-This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
+This numeric field defines the maximum outdoor temperature allowed for heating operation. Above this temperature, heating is disabled. If this field is left blank, the default value is 16$^\circ$C.
 
-\paragraph{Field: Outdoor Unit Reference Superheating}\label{field-outdoor-unit-reference-superheating}
+\paragraph{Field: Reference Outdoor Unit Superheating}\label{field-outdoor-unit-reference-superheating}
 
-This numeric field defines the reference superheating degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used.
+This numeric field defines the reference superheating degrees of the outdoor unit. If this field is blank, the default value of 3.0$^\circ$C is used.
 
-\paragraph{Field: Outdoor Unit Reference Subcooling}\label{field-outdoor-unit-reference-subcooling}
+\paragraph{Field: Reference Outdoor Unit Subcooling}\label{field-outdoor-unit-reference-subcooling}
 
-This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 3.0ºC is used.
+This numeric field defines the reference subcooling degrees of the outdoor unit. If this field is blank, the default value of 5.0$^\circ$C is used.
 
 \paragraph{Field: Refrigerant Temperature Control Algorithm for Indoor Unit}\label{field-refrigerant-temperature-control-algorithm-for-indoor-unit}
 
@@ -811,35 +810,35 @@ This alpha field specifies the algorithm for the refrigerant temperature control
 
 \paragraph{Field: Reference Evaporating Temperature for Indoor Unit}\label{field-reference-evaporating-temperature-for-indoor-unit}
 
-This numeric field defines the reference evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 6.0ºC is used.
+This numeric field defines the reference evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 6.0$^\circ$C is used.
 
 \paragraph{Field: Reference Condensing Temperature for Indoor Unit}\label{field-reference-condensing-temperature-for-indoor-unit}
 
-This numeric field defines the reference condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 44.0ºC is used.
+This numeric field defines the reference condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 44.0$^\circ$C is used.
 
 \paragraph{Field: Variable Evaporating Temperature Minimum for Indoor Unit}\label{field-variable-evaporating-temperature-minimum-for-indoor-unit}
 
-This numeric field defines the minimum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 4.0ºC is used.
+This numeric field defines the minimum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 4.0$^\circ$C is used.
 
 \paragraph{Field: Variable Evaporating Temperature Maximum for Indoor Unit}\label{field-variable-evaporating-temperature-maximum-for-indoor-unit}
 
-This numeric field defines the maximum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 13.0ºC is used.
+This numeric field defines the maximum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 13.0$^\circ$C is used.
 
 \paragraph{Field: Variable Condensing Temperature Minimum for Indoor Unit}\label{field-variable-condensing-temperature-minimum-for-indoor-unit}
 
-This numeric field defines the minimum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 42.0ºC is used.
+This numeric field defines the minimum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 42.0$^\circ$C is used.
 
 \paragraph{Field: Variable Condensing Temperature Maximum for Indoor Unit}\label{field-variable-condensing-temperature-maximum-for-indoor-unit}
 
-This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0ºC is used.
+This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0$^\circ$C is used.
 
 \paragraph{Field: Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity}\label{field-outdoor-unit-fan-power-per-unit-of-rated-evaporative-capacity}
 
-This numeric field defines the outdoor unit fan power per watt of rated evaporative capacity. If this field is blank, the default value of 4.25E-3 W/W is used.
+This numeric field defines the outdoor unit fan power per watt of rated evaporative capacity. If this field is blank, the default value of 4.25$\times$10$^{-3}$ W/W is used.
 
 \paragraph{Field: Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity}\label{field-outdoor-unit-fan-flow-rate-per-unit-of-rated-evaporative-capacity}
 
-This numeric field defines the outdoor unit fan volumetric flow rate per watt of rated evaporative capacity. If this field is blank, the default value of 7.50E-5 m\(^{3}\)/s-W is used.
+This numeric field defines the outdoor unit fan volumetric flow rate per watt of rated evaporative capacity. If this field is blank, the default value of 7.50$times$10$^{-5}$ m\(^{3}\)/s-W is used.
 
 \paragraph{Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name}\label{field-outdoor-unit-evaporating-temperature-function-of-superheating-curve-name}
 
@@ -863,7 +862,7 @@ This numeric field defines the equivalent length of main pipe connecting the out
 
 \paragraph{Field: Height Difference Between Outdoor Unit and Indoor Units}\label{field-height-difference-between-outdoor-unit-and-indoor-units}
 
-This numeric field defines the height difference between the outdoor unit node and indoor unit node of the main pipe. This value is used to calculate the piping loss of the refrigerant when going through the main pipe. The value can be positive, zero, or negative. Positive means outdoor unit is higher than indoor unit, while negative means outdoor unit is lower than indoor unit.
+This numeric field defines the height difference between the outdoor unit node and indoor unit node of the main pipe. This value is used to calculate the piping loss of the refrigerant when going through the main pipe. The value can be positive, zero, or negative. Positive means outdoor unit is higher than indoor unit, while negative means outdoor unit is lower than indoor unit. If this field is blank, the default value of 5m is used.
 
 \paragraph{Field: Main Pipe Insulation Thickness}\label{field-main-pipe-insulation-thickness}
 
@@ -887,7 +886,7 @@ This numeric field defines the size of the first stage compressor to the total c
 
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Crankcase Heater}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-1}
 
-This numeric field defines the maximum outdoor temperature, in degrees Celsius, below which the crankcase heater will operate. If this field is left blank, the default value is 5°C. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
+This numeric field defines the maximum outdoor temperature, in degrees Celsius, below which the crankcase heater will operate. If this field is left blank, the default value is 5$^\circ$C. This field is only used to calculate crankcase heater power and has no impact on heat pump performance.
 
 \paragraph{Field: Defrost Strategy}\label{field-defrost-strategy-1-000}
 
@@ -911,7 +910,7 @@ This numeric field defines the capacity of the resistive defrost heating element
 
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Defrost Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-defrost-operation-1-000}
 
-This numeric field defines the outdoor air dry-bulb temperature above which outdoor coil defrosting is disabled. If this input field is left blank, the default value is 5°C. Defrost can be completely eliminated by selecting a temperature lower than the minimum expected outdoor temperature found in the weather file.
+This numeric field defines the outdoor air dry-bulb temperature above which outdoor coil defrosting is disabled. If this input field is left blank, the default value is 5$^\circ$C. Defrost can be completely eliminated by selecting a temperature lower than the minimum expected outdoor temperature found in the weather file.
 
 \paragraph{Field: Compressor maximum delta Pressure}\label{field-compressor-maximum-delta-pressure}
 
@@ -923,7 +922,7 @@ This numeric field defines the number of compressor loading index entries. Loadi
 
 \paragraph{Field: Compressor Speed at Loading Index i}\label{field-compressor-speed-at-loading-index-i}
 
-This numeric field defines the compressor speed at the i-th loading index. The value must be greater than 0.
+This numeric field defines the compressor speed at the $i$-th loading index. The value must be greater than 0.
 
 \paragraph{Field: Loading Index i Evaporative Capacity Multiplier Function of Temperature Curve Name}\label{field-loading-index-i-evaporative-capacity-multiplier-function-of-temperature-curve-name}
 
@@ -1202,7 +1201,9 @@ This output field is the heat release rate of the VRF outdoor unit condenser in 
 
 % \hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrolhr]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR}
 \subsection{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR}\label{airconditionervariablerefrigerantflowfluidtemperaturecontrolhr}
+
 \subsubsection{Inputs}
+
 \paragraph{Field: Name}
 
 This alpha field defines a unique user-assigned name for an instance of a variable refrigerant flow heat recovery system. Any reference to this system will use this name. Since this object is not listed in an AirloopHVAC object, the most likely use of this name would be for reporting purposes.
@@ -1229,27 +1230,27 @@ This numeric field defines the rated compressor power per Watt of rated evaporat
 
 \paragraph{Field: Minimum Outdoor Air Temperature in Cooling Only Mode}
 
-This numeric field defines the minimum outdoor temperature allowed for cooling only mode. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6ºC.
+This numeric field defines the minimum outdoor temperature allowed for cooling only mode. Below this temperature, cooling is disabled. If this field is left blank, the default value is -6$^\circ$C.
 
 \paragraph{Field: Maximum Outdoor Air Temperature in Cooling Only Mode}
 
-This numeric field defines the maximum outdoor temperature allowed for cooling only mode. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43ºC.
+This numeric field defines the maximum outdoor temperature allowed for cooling only mode. Above this temperature, cooling is disabled. If this field is left blank, the default value is 43$^\circ$C.
 
 \paragraph{Field: Minimum Outdoor Air Temperature in Heating Only Mode}
 
-This numeric field defines the minimum outdoor temperature allowed for heating only mode. Below this temperature, heating is disabled. If this field is left blank, the default value is -20ºC.
+This numeric field defines the minimum outdoor temperature allowed for heating only mode. Below this temperature, heating is disabled. If this field is left blank, the default value is -20$^\circ$C.
 
 \paragraph{Field: Maximum Outdoor Air Temperature in Heating Only Mode}
 
-This numeric field defines the maximum outdoor temperature allowed for heating only mode. Above this temperature, heating is disabled. If this field is left blank, the default value is 16ºC.
+This numeric field defines the maximum outdoor temperature allowed for heating only mode. Above this temperature, heating is disabled. If this field is left blank, the default value is 16$^\circ$C.
 
 \paragraph{Field: Minimum Outdoor Air Temperature in Heat Recovery Mode}
 
-This numeric field defines the maximum outdoor temperature allowed for heat recovery operations. Below this temperature, heat recovery operations is disabled. If this field is left blank, the default value is -20ºC.
+This numeric field defines the maximum outdoor temperature allowed for heat recovery operations. Below this temperature, heat recovery operations is disabled. If this field is left blank, the default value is -20$^\circ$C.
 
 \paragraph{Field: Maximum Outdoor Air Temperature in Heat Recovery Mode}
 
-This numeric field defines the maximum outdoor temperature allowed for heat recovery operations. Above this temperature, heat recovery operations is disabled. If this field is left blank, the default value is 43ºC.
+This numeric field defines the maximum outdoor temperature allowed for heat recovery operations. Above this temperature, heat recovery operations is disabled. If this field is left blank, the default value is 43$^\circ$C.
 
 \paragraph{Field: Refrigerant Temperature Control Algorithm for Indoor Unit}
 
@@ -1257,35 +1258,35 @@ This alpha field specifies the algorithm for the refrigerant temperature control
 
 \paragraph{Field: Reference Evaporating Temperature for Indoor Unit}
 
-This numeric field defines the reference evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 6.0ºC is used.
+This numeric field defines the reference evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 6.0$^\circ$C is used.
 
 \paragraph{Field: Reference Condensing Temperature for Indoor Unit}
 
-This numeric field defines the reference condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 44.0ºC is used.
+This numeric field defines the reference condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is ConstantTemp. If this field is blank, the default value of 44.0$^\circ$C is used.
 
 \paragraph{Field: Variable Evaporating Temperature Minimum for Indoor Unit}
 
-This numeric field defines the minimum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 4.0ºC is used.
+This numeric field defines the minimum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 4.0$^\circ$C is used.
 
 \paragraph{Field: Variable Evaporating Temperature Maximum for Indoor Unit}
 
-This numeric field defines the maximum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 13.0ºC is used.
+This numeric field defines the maximum evaporating temperature for the indoor unit when VRF runs at cooling mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 13.0$^\circ$C is used.
 
 \paragraph{Field: Variable Condensing Temperature Minimum for Indoor Unit}
 
-This numeric field defines the minimum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 42.0ºC is used.
+This numeric field defines the minimum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 42.0$^\circ$C is used.
 
 \paragraph{Field: Variable Condensing Temperature Maximum for Indoor Unit}
 
-This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0ºC is used.
+This numeric field defines the maximum condensing temperature for the indoor unit when VRF runs at heating mode. This field is required if Refrigerant Temperature Control Algorithm is VariableTemp. If this field is blank, the default value of 46.0$^\circ$C is used.
 
 \paragraph{Field: Outdoor Unit Evaporator Reference Superheating}
 
-This numeric field defines the reference superheating degrees of the outdoor unit evaporator. If this field is blank, the default value of 3.0ºC is used.
+This numeric field defines the reference superheating degrees of the outdoor unit evaporator. If this field is blank, the default value of 3.0$^\circ$C is used.
 
 \paragraph{Field: Outdoor Unit Condenser Reference Subcooling}
 
-This numeric field defines the reference subcooling degrees of the outdoor unit condenser. If this field is blank, the default value of 5.0ºC is used.
+This numeric field defines the reference subcooling degrees of the outdoor unit condenser. If this field is blank, the default value of 5.0$^\circ$C is used.
 
 \paragraph{Field: Outdoor Unit Evaporator Rated Bypass Factor}
 
@@ -1297,7 +1298,7 @@ This numeric field defines the Rated Bypass Factor of the outdoor unit condenser
 
 \paragraph{Field: Difference between Outdoor Unit Evaporating Temperature and Outdoor Air Temperature in Heat Recovery Mode}
 
-This numeric field defines the difference between Outdoor Unit Evaporating Temperature and Outdoor Air Temperature in the Heat Recovery Mode. This is a key operational parameter that is used in the mode determinations. If this field is blank, the default value of 5.0ºC is used.
+This numeric field defines the difference between Outdoor Unit Evaporating Temperature and Outdoor Air Temperature in the Heat Recovery Mode. This is a key operational parameter that is used in the mode determinations. If this field is blank, the default value of 5.0$^\circ$C is used.
 
 \paragraph{Field: Outdoor Unit Heat Exchanger Capacity Ratio}
 
@@ -1305,11 +1306,11 @@ This numeric field defines the rated capacity ratio between the main and supplem
 
 \paragraph{Field: Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity}
 
-This numeric field defines the outdoor unit fan power per watt of rated evaporative capacity. If this field is blank, the default value of 4.25E-3 W/W is used.
+This numeric field defines the outdoor unit fan power per watt of rated evaporative capacity. If this field is blank, the default value of 4.25$\times$10$^{-3}$ W/W is used.
 
 \paragraph{Field: Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity}
 
-This numeric field defines the outdoor unit fan volumetric flow rate per watt of rated evaporative capacity. If this field is blank, the default value of 7.50E-5 m\(^{3}\)/s-W is used.
+This numeric field defines the outdoor unit fan volumetric flow rate per watt of rated evaporative capacity. If this field is blank, the default value of 7.50$\times$10$^{-5}$ m\(^{3}\)/s-W is used.
 
 \paragraph{Field: Outdoor Unit Evaporating Temperature Function of Superheating Curve Name}
 
@@ -1361,7 +1362,7 @@ This numeric field defines the size of the first stage compressor to the total c
 
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Crankcase Heater}
 
-This numeric field defines the maximum outdoor temperature, in degrees Celsius, below which the crankcase heater will operate. If this field is left blank, the default value is 5°C. This field is only used to calculate crankcase heater power and has no impact on VRF system performance.
+This numeric field defines the maximum outdoor temperature, in degrees Celsius, below which the crankcase heater will operate. If this field is left blank, the default value is 5$^\circ$C. This field is only used to calculate crankcase heater power and has no impact on VRF system performance.
 
 \paragraph{Field: Defrost Strategy}
 
@@ -1385,8 +1386,7 @@ This numeric field defines the capacity of the resistive defrost heating element
 
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Defrost Operation}
 
-This numeric field defines the outdoor air dry-bulb temperature above which outdoor coil defrosting is disabled. If this input field is left blank, the default value is 5°C. Defrost can be completely eliminated by selecting a temperature lower than the minimum expected outdoor temperature found in the weather file.
-
+This numeric field defines the outdoor air dry-bulb temperature above which outdoor coil defrosting is disabled. If this input field is left blank, the default value is 5$^\circ$C. Defrost can be completely eliminated by selecting a temperature lower than the minimum expected outdoor temperature found in the weather file.
 
 \paragraph{Field: Initial Heat Recovery Cooling Capacity Fraction}
 
@@ -1438,7 +1438,7 @@ This numeric field defines the number of compressor loading index entries. Loadi
 
 \paragraph{Field: Compressor Speed at Loading Index i}
 
-This numeric field defines the compressor speed at the i-th loading index. The value must be greater than 0.
+This numeric field defines the compressor speed at the $i$-th loading index. The value must be greater than 0.
 
 \paragraph{Field: Loading Index i Evaporative Capacity Multiplier Function of Temperature Curve Name}
 

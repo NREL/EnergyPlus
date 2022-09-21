@@ -10132,6 +10132,20 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
         std::string colHeader = col[0];
         EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
     }
+
+    // Test for #9436
+    auto extraSpaceAfterBracesHeaders = queryResult(
+        R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
+             WHERE ReportName LIKE "MONTHLY EXAMPLE%"
+             AND ColumnName LIKE "%} %")",
+        "TabularDataWithStrings");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // Should be none!
+    for (auto &col : extraSpaceAfterBracesHeaders) {
+        std::string colHeader = col[0];
+        ADD_FAILURE() << "Extra space after brace in monthly table for : '" << colHeader << "'";
+    }
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)

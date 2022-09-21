@@ -86,9 +86,9 @@ namespace tk205  {
 
 		const std::string_view PerformanceMap::lookup_variables_name = "lookup_variables";
 
-		LookupVariablesStruct PerformanceMap::calculate_performance(double output_power) {
+		LookupVariablesStruct PerformanceMap::calculate_performance(double output_power, Btwxt::Method performance_interpolation_method ) {
 			std::vector<double> target {output_power};
-			auto v = PerformanceMapBase::calculate_performance(target);
+			auto v = PerformanceMapBase::calculate_performance(target, performance_interpolation_method);
 			LookupVariablesStruct s {v[0], };
 			return s;
 		}

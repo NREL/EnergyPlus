@@ -696,8 +696,6 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).ControlZoneNum =
                 DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::FanCoil4Pipe, FanCoil(FanCoilNum).Name);
             if (FanCoil(FanCoilNum).ControlZoneNum == 0) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
-                ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
                 ErrorsFound = true;
             }
             if (state.dataFanCoilUnits->ATMixerType == ATMixer_InletSide) {
