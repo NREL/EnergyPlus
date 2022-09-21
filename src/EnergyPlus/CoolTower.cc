@@ -646,7 +646,8 @@ namespace CoolTower {
             if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
                 // check component operation
                 if (state.dataEnvrn->WindSpeed < MinWindSpeed || state.dataEnvrn->WindSpeed > MaxWindSpeed) continue;
-                if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp) continue;
+                if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp)
+                    continue;
 
                 // Unit is on and simulate this component
                 // Determine the temperature and air flow rate at the cooltower outlet
@@ -725,7 +726,7 @@ namespace CoolTower {
                 thisZoneHB.CTMFL = thisZoneHB.MCPC / AirSpecHeat;
 
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower =
-                    thisZoneHB.MCPC * std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - OutletTemp);
+                    thisZoneHB.MCPC * std::abs(state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZT - OutletTemp);
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower =
                     CVF_ZoneNum * std::abs(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) - OutletHumRat);
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletTemp = OutletTemp;

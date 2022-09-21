@@ -393,8 +393,8 @@ namespace MundtSimMgr {
         state.dataMundtSimMgr->ZoneAirDensity =
             PsyRhoAirFnPbTdbW(state,
                               state.dataEnvrn->OutBaroPress,
-                              state.dataHeatBalFanSys->MAT(ZoneNum),
-                              PsyWFnTdpPb(state, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataEnvrn->OutBaroPress));
+                              state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT,
+                              PsyWFnTdpPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT, state.dataEnvrn->OutBaroPress));
         ZoneMassFlowRate = state.dataLoopNodes->Node(ZoneNode).MassFlowRate;
         state.dataMundtSimMgr->SupplyAirVolumeRate = ZoneMassFlowRate / state.dataMundtSimMgr->ZoneAirDensity;
         if (ZoneMassFlowRate <= 0.0001) {
@@ -421,7 +421,8 @@ namespace MundtSimMgr {
             }
             // determine cooling load
             CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-            state.dataMundtSimMgr->QsysCoolTot = -(SumSysMCpT - ZoneMassFlowRate * CpAir * state.dataHeatBalFanSys->MAT(ZoneNum));
+            state.dataMundtSimMgr->QsysCoolTot =
+                -(SumSysMCpT - ZoneMassFlowRate * CpAir * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
         }
         // determine heat gains
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
@@ -436,7 +437,8 @@ namespace MundtSimMgr {
             state.dataMundtSimMgr->ConvIntGain += RetAirConvGain;
         }
 
-        state.dataMundtSimMgr->QventCool = -thisZoneHB.MCPI * (Zone(ZoneNum).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(ZoneNum));
+        state.dataMundtSimMgr->QventCool =
+            -thisZoneHB.MCPI * (Zone(ZoneNum).OutDryBulbTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
 
         // get surface data
         for (int SurfNum = 1; SurfNum <= state.dataMundtSimMgr->ZoneData(ZoneNum).NumOfSurfs; ++SurfNum) {
@@ -810,8 +812,8 @@ namespace MundtSimMgr {
                             state.dataMundtSimMgr->LineNode(state.dataMundtSimMgr->TstatNodeID, state.dataMundtSimMgr->MundtZoneNum).Temp;
                 state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
                 // d) Thermostat air temperature -> TempTstatAir(ZoneNum)
-                state.dataHeatBalFanSys->TempTstatAir(ZoneNum) =
-                    state.dataHeatBalFanSys->ZT(ZoneNum); // for indirect coupling, control air temp is equal to mean air temp?
+                state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum)
+                                                                     .ZT; // for indirect coupling, control air temp is equal to mean air temp?
             }
             // set flag to indicate that Mundt model is used for this zone at the present time
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
@@ -819,7 +821,7 @@ namespace MundtSimMgr {
             // Bulk air temperatures -> TempEffBulkAir(SurfNum)
             for (int SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
                 int hbSurfNum = state.dataMundtSimMgr->ZoneData(ZoneNum).HBsurfaceIndexes(SurfNum);
-                state.dataHeatBal->SurfTempEffBulkAir(hbSurfNum) = state.dataHeatBalFanSys->MAT(ZoneNum);
+                state.dataHeatBal->SurfTempEffBulkAir(hbSurfNum) = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                 // set flag for reference air temperature
                 state.dataSurface->SurfTAirRef(hbSurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
                 state.dataSurface->SurfTAirRefRpt(hbSurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(hbSurfNum)];

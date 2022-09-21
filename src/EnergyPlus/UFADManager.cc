@@ -1202,7 +1202,8 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
         NumberOfPlumes = 1.0;
         NumDiffusersPerPlume = 1.0;
     }
-    if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv) > state.dataHeatBalFanSys->MAT(ZoneNum)) {
+    if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) ||
+        (TSupK - DataGlobalConstants::KelvinConv) > state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT) {
         // The system will mix
         HeightFrac = 0.0;
     } else {
@@ -1730,7 +1731,8 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
         NumberOfPlumes = 1.0;
         NumDiffusersPerPlume = 1.0;
     }
-    if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv) > state.dataHeatBalFanSys->MAT(ZoneNum)) {
+    if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) ||
+        (TSupK - DataGlobalConstants::KelvinConv) > state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT) {
         // The system will mix
         HeightFrac = 0.0;
     } else {

@@ -88,6 +88,7 @@
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -1114,7 +1115,7 @@ namespace RoomAirModelAirflowNetwork {
 
                 if (state.dataSurface->SurfTAirRef(SurfNum) == DataSurfaces::RefAirTemp::ZoneMeanAirTemp) {
                     // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
-                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                    RefAirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                     SumHA += HA;
                 } else if (state.dataSurface->SurfTAirRef(SurfNum) == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
                     RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
@@ -1131,7 +1132,7 @@ namespace RoomAirModelAirflowNetwork {
                     RefAirTemp = SumSysMCpT / SumSysMCp;
                     SumHATref += HA * RefAirTemp;
                 } else {
-                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                    RefAirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                     SumHA = SumHA + HA;
                 }
 
@@ -1219,9 +1220,11 @@ namespace RoomAirModelAirflowNetwork {
                     RhoAirZone = PsyRhoAirFnPbTdbW(
                         state,
                         state.dataEnvrn->OutBaroPress,
-                        state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone),
-                        PsyRhFnTdbRhov(
-                            state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
+                        state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataSurface->Surface(SurfNum).Zone).MAT,
+                        PsyRhFnTdbRhov(state,
+                                       state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataSurface->Surface(SurfNum).Zone).MAT,
+                                       RhoVaporAirIn(SurfNum),
+                                       "RhoAirZone"));
 
                     Wsurf = PsyWFnTdbRhPb(state,
                                           state.dataHeatBalSurf->SurfTempInTmp(SurfNum),

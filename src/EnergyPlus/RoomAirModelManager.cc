@@ -85,6 +85,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UFADManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -2248,12 +2249,14 @@ namespace RoomAirModelManager {
                                        AirflowNetwork::iComponentTypeNum::SCR) { // surface type = CRACK
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Width =
                                     state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirModelMgr->Loop2).SurfNum).Width / 2;
-                                AinCV = state.afn->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNumber).coefficient /
-                                        (BaseDischargeCoef *
-                                         std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state,
-                                                                           state.dataEnvrn->OutBaroPress,
-                                                                           state.dataHeatBalFanSys->MAT(state.dataRoomAirModelMgr->Loop),
-                                                                           state.dataHeatBalFanSys->ZoneAirHumRat(state.dataRoomAirModelMgr->Loop))));
+                                AinCV =
+                                    state.afn->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNumber).coefficient /
+                                    (BaseDischargeCoef *
+                                     std::sqrt(2.0 / PsyRhoAirFnPbTdbW(
+                                                         state,
+                                                         state.dataEnvrn->OutBaroPress,
+                                                         state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataRoomAirModelMgr->Loop).MAT,
+                                                         state.dataHeatBalFanSys->ZoneAirHumRat(state.dataRoomAirModelMgr->Loop))));
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Height =
                                     AinCV / state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Width;
                             }

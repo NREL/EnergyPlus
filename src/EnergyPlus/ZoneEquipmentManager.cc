@@ -5234,12 +5234,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
     // Assign zone air temperature
     for (int j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
-        state.dataZoneEquip->ZMAT(j) = state.dataHeatBalFanSys->MAT(j);
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(j);
+        state.dataZoneEquip->ZMAT(j) = thisZoneHB.MAT;
         state.dataZoneEquip->ZHumRat(j) = state.dataHeatBalFanSys->ZoneAirHumRat(j);
         // This is only temporary fix for CR8867.  (L. Gu 8/12)
         if (SysTimestepLoop == 1) {
-            state.dataZoneEquip->ZMAT(j) = state.dataZoneTempPredictorCorrector->zoneHeatBalance(j).XMPT;
-            state.dataZoneEquip->ZHumRat(j) = state.dataZoneTempPredictorCorrector->zoneHeatBalance(j).WZoneTimeMinusP;
+            state.dataZoneEquip->ZMAT(j) = thisZoneHB.XMPT;
+            state.dataZoneEquip->ZHumRat(j) = thisZoneHB.WZoneTimeMinusP;
         }
     }
 

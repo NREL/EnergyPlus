@@ -107,7 +107,10 @@ namespace ZoneTempPredictorCorrector {
     struct ZoneSpaceHeatBalanceData
     {
         // Zone air drybulb conditions variables
-        Real64 MAT = DataHeatBalFanSys::ZoneInitialTemp;  // MEAN AIR TEMPERATURE (C) - duplicate of DataHeatBalFansys::MAT for now
+        Real64 MAT = DataHeatBalFanSys::ZoneInitialTemp;  // MEAN AIR TEMPERATURE (C)
+        Real64 ZTAV = DataHeatBalFanSys::ZoneInitialTemp; // Air Temperature Averaged over the Zone Time step
+        Real64 ZT;                                        // Air Temperature Averaged over the System Time Increment
+
         Real64 XMAT = DataHeatBalFanSys::ZoneInitialTemp; // Temporary zone/space temperature to test convergence
         Real64 XM2T = DataHeatBalFanSys::ZoneInitialTemp;
         Real64 XM3T = DataHeatBalFanSys::ZoneInitialTemp;

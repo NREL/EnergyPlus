@@ -80,6 +80,7 @@
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -288,7 +289,7 @@ namespace PlantPipingSystemsManager {
                     // Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
                     for (auto &z : thisDomain.ZoneCoupledSurfaces) {
                         int ZoneNum = z.Zone;
-                        ZoneTemp += state.dataHeatBalFanSys->ZTAV(ZoneNum);
+                        ZoneTemp += state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTAV;
                     }
 
                     ZoneTemp = ZoneTemp / thisDomain.ZoneCoupledSurfaces.size();

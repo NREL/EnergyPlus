@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -78,6 +77,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::MicroCHPElectricGenerator {
 
@@ -880,7 +880,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
 
     Real64 thisAmbientTemp;
     if (this->ZoneID > 0) {
-        thisAmbientTemp = state.dataHeatBalFanSys->MAT(this->ZoneID);
+        thisAmbientTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ZoneID).MAT;
     } else { // outdoor location, no zone
         thisAmbientTemp = state.dataEnvrn->OutDryBulbTemp;
     }

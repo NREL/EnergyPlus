@@ -6970,11 +6970,11 @@ namespace InternalHeatGains {
                 if (state.dataHeatBal->People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
                     if (!(state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ))) {
                         SensiblePeopleGain =
-                            NumberOccupants *
-                            (C[0] + ActivityLevel_WperPerson * (C[1] + ActivityLevel_WperPerson * C[2]) +
-                             state.dataHeatBalFanSys->MAT(NZ) *
-                                 ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
-                                  state.dataHeatBalFanSys->MAT(NZ) * (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
+                            NumberOccupants * (C[0] + ActivityLevel_WperPerson * (C[1] + ActivityLevel_WperPerson * C[2]) +
+                                               state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT *
+                                                   ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
+                                                    state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT *
+                                                        (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
                     } else { // UCSD - DV or UI
                         SensiblePeopleGain =
                             NumberOccupants *
@@ -7563,13 +7563,13 @@ namespace InternalHeatGains {
                     } else {
                         RecircFrac = state.dataHeatBal->ZoneITEq(Loop).DesignRecircFrac;
                     }
-                    TRecirc = state.dataHeatBalFanSys->MAT(NZ);
+                    TRecirc = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT;
                     WRecirc = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
                 } else if (AirConnection == ITEInletConnection::RoomAirModel) {
                     // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
-                    TAirIn = state.dataHeatBalFanSys->MAT(NZ);
+                    TAirIn = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT;
                     TSupply = TAirIn;
                     WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 } else {
@@ -7578,9 +7578,9 @@ namespace InternalHeatGains {
                         int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
                         TSupply = state.dataLoopNodes->Node(ZoneAirInletNode).Temp;
                     } else {
-                        TSupply = state.dataHeatBalFanSys->MAT(NZ);
+                        TSupply = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT;
                     }
-                    TAirIn = state.dataHeatBalFanSys->MAT(NZ);
+                    TAirIn = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT;
                     WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 }
             }

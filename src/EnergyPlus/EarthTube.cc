@@ -577,11 +577,12 @@ void CalcEarthTube(EnergyPlusData &state)
         thisEarthTube.FanPower = 0.0;
 
         // Skip this if the zone is below the minimum temperature limit
-        if (state.dataHeatBalFanSys->MAT(NZ) < thisEarthTube.MinTemperature) continue;
+        if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT < thisEarthTube.MinTemperature) continue;
         // Skip this if the zone is above the maximum temperature limit
-        if (state.dataHeatBalFanSys->MAT(NZ) > thisEarthTube.MaxTemperature) continue;
+        if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT > thisEarthTube.MaxTemperature) continue;
         // Skip if below the temperature difference limit
-        if (std::abs(state.dataHeatBalFanSys->MAT(NZ) - state.dataEnvrn->OutDryBulbTemp) < thisEarthTube.DelTemperature) continue;
+        if (std::abs(state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT - state.dataEnvrn->OutDryBulbTemp) < thisEarthTube.DelTemperature)
+            continue;
 
         AirDensity =
             Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
@@ -590,7 +591,8 @@ void CalcEarthTube(EnergyPlusData &state)
         thisZoneHB.MCPE =
             EVF * AirDensity * AirSpecHeat *
             (thisEarthTube.ConstantTermCoef +
-             std::abs(state.dataEnvrn->OutDryBulbTemp - state.dataHeatBalFanSys->MAT(NZ)) * thisEarthTube.TemperatureTermCoef +
+             std::abs(state.dataEnvrn->OutDryBulbTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT) *
+                 thisEarthTube.TemperatureTermCoef +
              state.dataEnvrn->WindSpeed * (thisEarthTube.VelocityTermCoef + state.dataEnvrn->WindSpeed * thisEarthTube.VelocitySQTermCoef));
 
         thisZoneHB.EAMFL = thisZoneHB.MCPE / AirSpecHeat;
@@ -732,7 +734,7 @@ void ReportEarthTube(EnergyPlusData &state)
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         auto &thisZone = state.dataEarthTube->ZnRptET(ZoneLoop);
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
-        auto &zoneTemp = state.dataHeatBalFanSys->ZT(ZoneLoop);
+        auto &zoneTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT;
 
         // Break the infiltration load into heat gain and loss components.
         Real64 const AirDensity =

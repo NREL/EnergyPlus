@@ -106,10 +106,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneQCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
 
     // Zone air drybulb conditions variables
-    Array1D<Real64> ZTAV;         // Zone Air Temperature Averaged over the Zone Time step
-    Array1D<Real64> MAT;          // MEAN AIR TEMPERATURE (C)
     Array1D<Real64> TempTstatAir; // temperature of air near the thermo stat
-    Array1D<Real64> ZT;           // Zone Air Temperature Averaged over the System Time Increment
 
     Array1D<Real64> ZTAVComf; // Zone Air Temperature Averaged over the Zone Time step used
     // in thermal comfort models (currently Fang model only)

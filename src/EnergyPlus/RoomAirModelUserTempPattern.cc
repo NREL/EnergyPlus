@@ -181,15 +181,15 @@ void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // Using/Aliasing
 
     // intialize in preperation for calculations
-    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataHeatBalFanSys->MAT(ZoneNum);
-    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataHeatBalFanSys->MAT(ZoneNum);
-    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataHeatBalFanSys->MAT(ZoneNum);
+    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+    state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
     for (auto &e : state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf)
-        e.TadjacentAir = state.dataHeatBalFanSys->MAT(ZoneNum);
+        e.TadjacentAir = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
 
     // the only input this method needs is the zone MAT or ZT or ZTAV  ?  (original was ZT)
     state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean =
-        state.dataHeatBalFanSys->MAT(ZoneNum); // this is lagged from previous corrector result
+        state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT; // this is lagged from previous corrector result
 }
 
 //*****************************************************************************************

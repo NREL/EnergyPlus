@@ -1719,6 +1719,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
 
     // Update zone CO2
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         if (ShortenTimeStepSys) {
 
@@ -1865,7 +1866,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
             if (ControlledCO2ZoneFlag) {
                 Real64 RhoAir = PsyRhoAirFnPbTdbW(state,
                                                   state.dataEnvrn->OutBaroPress,
-                                                  state.dataHeatBalFanSys->ZT(ZoneNum),
+                                                  thisZoneHB.ZT,
                                                   state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
                                                   RoutineName); // The density of air
 
@@ -1981,11 +1982,8 @@ void PredictZoneContaminants(EnergyPlusData &state,
 
             if (ControlledGCZoneFlag) {
                 // The density of air
-                Real64 RhoAir = PsyRhoAirFnPbTdbW(state,
-                                                  state.dataEnvrn->OutBaroPress,
-                                                  state.dataHeatBalFanSys->ZT(ZoneNum),
-                                                  state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
-                                                  RoutineName);
+                Real64 RhoAir = PsyRhoAirFnPbTdbW(
+                    state, state.dataEnvrn->OutBaroPress, thisZoneHB.ZT, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), RoutineName);
 
                 // Calculate generic contaminant from infiltration + humidity added from latent load
                 // to determine system added/subtracted moisture.
@@ -2477,8 +2475,8 @@ void CorrectZoneContaminants(EnergyPlusData &state,
         // zone humidity ratio.  The A, B, C coefficients are analogous to the
         // CO2 balance.  There are 2 cases that should be considered, system operating and system shutdown.
 
-        Real64 RhoAir = PsyRhoAirFnPbTdbW(
-            state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), RoutineName);
+        Real64 RhoAir =
+            PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.ZT, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), RoutineName);
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum) = RhoAir;
         // Calculate Co2 internal gain

@@ -86,6 +86,7 @@
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::SystemReports {
 
@@ -4516,8 +4517,10 @@ void ReportVentilationLoads(EnergyPlusData &state)
         }
 
         // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-        Real64 currentZoneAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
-            state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(CtrlZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatAvg(CtrlZoneNum));
+        Real64 currentZoneAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                                         state.dataEnvrn->OutBaroPress,
+                                                                         state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).MAT,
+                                                                         state.dataHeatBalFanSys->ZoneAirHumRatAvg(CtrlZoneNum));
         if (currentZoneAirDensity > 0.0) thisZoneVentRepVars.OAVolFlowCrntRho = thisZoneVentRepVars.OAMassFlow / currentZoneAirDensity;
         thisZoneVentRepVars.OAVolCrntRho = thisZoneVentRepVars.OAVolFlowCrntRho * TimeStepSys * DataGlobalConstants::SecInHour;
         if (ZoneVolume > 0.0) thisZoneVentRepVars.MechACH = (thisZoneVentRepVars.OAVolCrntRho / TimeStepSys) / ZoneVolume;
