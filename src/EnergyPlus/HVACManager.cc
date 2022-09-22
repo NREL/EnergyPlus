@@ -2387,7 +2387,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2000
     //       MODIFIED       Shirey, Jan 2008 (MIXING/CROSS MIXING outputs)
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the report variables for the AirHeatBalance.
@@ -2400,27 +2399,16 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     using Psychrometrics::PsyHgAirFnWTdb;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName3("ReportAirHeatBalance:3");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;                                     // Counter for the # of zones (nz)
-    int ZoneA;                                        // Mated zone number for pair pf zones sharing refrigeration door opening
-    int ZoneB;                                        // Mated zone number for pair pf zones sharing refrigeration door opening
-    int VentNum;                                      // Counter for ventilation statements
-    int FanNum;                                       // Counter for exhaust fans
     Real64 AirDensity;                                // Density of air (kg/m^3)
     Real64 CpAir;                                     // Heat capacity of air (J/kg-C)
     Real64 ADSCorrectionFactor;                       // Correction factor of air flow model values when ADS is simulated
     Real64 H2OHtOfVap;                                // Heat of vaporization of air
     Real64 TotalLoad;                                 // Total loss or gain
-    int MixNum;                                       // Counter for MIXING and Cross Mixing statements
     auto &MixSenLoad = state.dataHVACMgr->MixSenLoad; // Mixing sensible loss or gain
     auto &MixLatLoad = state.dataHVACMgr->MixLatLoad; // Mixing latent loss or gain
-    int j;                                            // Index in a do-loop
-    int VentZoneNum;                                  // Number of ventilation object per zone
-    Real64 VentZoneMassflow;                          // Total mass flow rate per zone
-    Real64 VentZoneAirTemp;                           // Average Zone inlet temperature
 
     state.dataHeatBal->ZoneTotalExfiltrationHeatLoss = 0.0;
     state.dataHeatBal->ZoneTotalExhaustHeatLoss = 0.0;
@@ -2440,7 +2428,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     }
 
     // Reports zone exhaust loss by exhaust fans
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
         ADSCorrectionFactor = 1.0;
@@ -2454,7 +2442,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         ZnAirRpt(ZoneLoop).ExhTotalLoss = 0;
         ZnAirRpt(ZoneLoop).ExhSensiLoss = 0;
 
-        for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
+        for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
             //  Add reportable vars
             if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
                 for (int ExhNum = 1; ExhNum <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ExhNum++) {
@@ -2486,7 +2474,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
     ReportInfiltrations(state);
 
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
 
         // Break the infiltration load into heat gain and loss components
@@ -2566,11 +2554,11 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         ZnAirRpt(ZoneLoop).VentilAirTemp = 0.0;
         ZnAirRpt(ZoneLoop).VentilHeatLoss = 0.0;
         ZnAirRpt(ZoneLoop).VentilHeatGain = 0.0;
-        VentZoneNum = 0;
-        VentZoneMassflow = 0.0;
-        VentZoneAirTemp = 0.0;
+        int VentZoneNum = 0.0;         // Number of ventilation object per zone
+        Real64 VentZoneMassflow = 0.0; // Total mass flow rate per zone
+        Real64 VentZoneAirTemp = 0.0;  // Average Zone inlet temperature
 
-        for (VentNum = 1; VentNum <= state.dataHeatBal->TotVentilation; ++VentNum) {
+        for (int VentNum = 1; VentNum <= state.dataHeatBal->TotVentilation; ++VentNum) {
             if (Ventilation(VentNum).ZonePtr == ZoneLoop) {
                 // moved into CalcAirFlowSimple
                 //        ZnAirRpt(ZoneLoop)%VentilFanElec  =
@@ -2640,7 +2628,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         ZnAirRpt(ZoneLoop).MixMdot = 0.0;           // ! zero reported mass flow rate prior to summations below
         //    MixingLoad = 0.0d0
 
-        for (MixNum = 1; MixNum <= state.dataHeatBal->TotMixing; ++MixNum) {
+        for (int MixNum = 1; MixNum <= state.dataHeatBal->TotMixing; ++MixNum) {
             if ((Mixing(MixNum).ZonePtr == ZoneLoop) && state.dataZoneEquip->MixingReportFlag(MixNum)) {
                 auto &fromZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(Mixing(MixNum).FromZone);
                 //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(Mixing(MixNum)%FromZone)
@@ -2675,7 +2663,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
             }
         }
 
-        for (MixNum = 1; MixNum <= state.dataHeatBal->TotCrossMixing; ++MixNum) {
+        for (int MixNum = 1; MixNum <= state.dataHeatBal->TotCrossMixing; ++MixNum) {
             if ((CrossMixing(MixNum).ZonePtr == ZoneLoop) && state.dataZoneEquip->CrossMixingReportFlag(MixNum)) {
                 auto &fromZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(CrossMixing(MixNum).FromZone);
                 //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(CrossMixing(MixNum)%FromZone)
@@ -2743,13 +2731,13 @@ void ReportAirHeatBalance(EnergyPlusData &state)
             //       Can't have a pair that has ZoneA zone number = NumOfZones because organized
             //       in input with lowest zone # first no matter how input in idf
             if (RefDoorMixing(ZoneLoop).RefDoorMixFlag) { // .TRUE. for both zoneA and zoneB
-                auto &zoneBHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneB);
                 if (RefDoorMixing(ZoneLoop).ZonePtr == ZoneLoop) {
-                    for (j = 1; j <= RefDoorMixing(ZoneLoop).NumRefDoorConnections; ++j) {
+                    for (int j = 1; j <= RefDoorMixing(ZoneLoop).NumRefDoorConnections; ++j) {
                         //    Capture impact when zoneloop is the 'primary zone'
                         //    that is, the zone of a pair with the lower zone number
                         if (RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) > 0.0) {
-                            ZoneB = RefDoorMixing(ZoneLoop).MateZonePtr(j);
+                            int ZoneB = RefDoorMixing(ZoneLoop).MateZonePtr(j);
+                            auto &zoneBHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneB);
                             AirDensity = PsyRhoAirFnPbTdbW(
                                 state,
                                 state.dataEnvrn->OutBaroPress,
@@ -2777,12 +2765,12 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                         } // flow > 0
                     }     // J-1, numref connections
                 }         // zone A (zoneptr = zoneloop)
-                for (ZoneA = 1; ZoneA <= (ZoneLoop - 1); ++ZoneA) {
+                for (int ZoneA = 1; ZoneA <= (ZoneLoop - 1); ++ZoneA) {
                     auto &zoneAHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA);
                     //    Capture impact when zoneloop is the 'mating zone'
                     //    that is, the zone of a pair with the higher zone number(matezoneptr = zoneloop)
                     if (RefDoorMixing(ZoneA).RefDoorMixFlag) {
-                        for (j = 1; j <= RefDoorMixing(ZoneA).NumRefDoorConnections; ++j) {
+                        for (int j = 1; j <= RefDoorMixing(ZoneA).NumRefDoorConnections; ++j) {
                             if (RefDoorMixing(ZoneA).MateZonePtr(j) == ZoneLoop) {
                                 if (RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) > 0.0) {
                                     AirDensity = PsyRhoAirFnPbTdbW(
@@ -2848,7 +2836,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         }
 
         // Reporting combined outdoor air flows
-        for (j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
+        for (int j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
             if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == DataHeatBalance::AirBalance::Quadrature &&
                 ZoneLoop == state.dataHeatBal->ZoneAirBalance(j).ZonePtr) {
                 if (thisZoneHB.MAT > Zone(ZoneLoop).OutDryBulbTemp) {
