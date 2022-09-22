@@ -58,6 +58,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -318,9 +319,9 @@ namespace CTElectricGenerator {
             }
 
             // Validate fuel type input
-            state.dataCTElectricGenerator->CTGenerator(genNum).FuelType = static_cast<UtilityRoutines::FuelType1>(
-                getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
-            if (state.dataCTElectricGenerator->CTGenerator(genNum).FuelType == UtilityRoutines::FuelType1::Invalid) {
+            state.dataCTElectricGenerator->CTGenerator(genNum).FuelType = static_cast<DataGlobalConstants::ResourceType>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+            if (state.dataCTElectricGenerator->CTGenerator(genNum).FuelType == DataGlobalConstants::ResourceType::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphArray(11));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
@@ -359,7 +360,7 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::setupOutputVars(EnergyPlusData &state)
     {
-        std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
+        std::string_view const sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Rate",
                             OutputProcessor::Unit::W,

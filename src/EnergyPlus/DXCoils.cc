@@ -4247,9 +4247,9 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A12; \field Fuel type, Validate fuel type input
-        state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum =
-            static_cast<UtilityRoutines::FuelType1>(getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(Alphas(12))));
-        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum == UtilityRoutines::FuelType1::Invalid) {
+        state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum = static_cast<DataGlobalConstants::ResourceType>(
+            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(12))));
+        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum == DataGlobalConstants::ResourceType::Invalid) {
             ShowSevereError(state,
                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, ",,,invalid choice for " + cAlphaFields(12) + ".  Entered choice = " + Alphas(12));
@@ -4546,7 +4546,7 @@ void GetDXCoils(EnergyPlusData &state)
 
             // Read waste heat modifier curve name
             state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(state, Alphas(18 + (I - 1) * 6)); // convert curve name to number
-            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                     // Verify Curve Object, only legal types are BiQuadratic
                     ErrorsFound |= CurveManager::CheckCurveDims(state,
@@ -4805,9 +4805,9 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A9; \field Fuel type, Validate fuel type input
-        state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum =
-            static_cast<UtilityRoutines::FuelType1>(getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(Alphas(9))));
-        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum == UtilityRoutines::FuelType1::Invalid) {
+        state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum = static_cast<DataGlobalConstants::ResourceType>(
+            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(9))));
+        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum == DataGlobalConstants::ResourceType::Invalid) {
             ShowSevereError(state,
                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, ",,,invalid choice for " + cAlphaFields(9) + ".  Entered choice = " + Alphas(9));
@@ -5074,7 +5074,7 @@ void GetDXCoils(EnergyPlusData &state)
 
             // Read waste heat modifier curve name
             state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(state, Alphas(15 + (I - 1) * 6)); // convert curve name to number
-            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                     // Verify Curve Object, only legal types are BiQuadratic
                     ErrorsFound |= CurveManager::CheckCurveDims(state,
@@ -6372,8 +6372,8 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
 
-            if (Coil.FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
-                std::string_view sFuelType = UtilityRoutines::fuelType1[static_cast<int>(Coil.FuelTypeNum)];
+            if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
+                std::string_view sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(Coil.FuelTypeNum)];
                 SetupOutputVariable(state,
                                     format("Cooling Coil {} Rate", sFuelType),
                                     OutputProcessor::Unit::W,
@@ -6530,8 +6530,8 @@ void GetDXCoils(EnergyPlusData &state)
                                 _,
                                 "System");
 
-            if (Coil.FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
-                std::string_view sFuelType = UtilityRoutines::fuelType1[static_cast<int>(Coil.FuelTypeNum)];
+            if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
+                std::string_view sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(Coil.FuelTypeNum)];
                 SetupOutputVariable(state,
                                     format("Heating Coil {} Rate", sFuelType),
                                     OutputProcessor::Unit::W,
@@ -6553,8 +6553,9 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System");
             }
 
-            if (Coil.FuelTypeNum != UtilityRoutines::FuelType1::Electricity && Coil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
-                std::string_view sFuelType = UtilityRoutines::fuelType1[static_cast<int>(Coil.FuelTypeNum)];
+            if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity &&
+                Coil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
+                std::string_view sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(Coil.FuelTypeNum)];
                 SetupOutputVariable(state,
                                     format("Heating Coil Defrost {} Rate", sFuelType),
                                     OutputProcessor::Unit::W,
@@ -7065,7 +7066,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
     if ((state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling ||
          state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) &&
         MyEnvrnFlag(DXCoilNum)) {
-        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).MSHPHeatRecActive) {
                 for (SpeedNum = 1; SpeedNum <= state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds; ++SpeedNum) {
                     if (state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
@@ -13580,7 +13581,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
             // Waste heat calculation
             // TODO: waste heat not considered even if defined in Cooling:DX:MultiSpeed, N16, \field Speed 1 Rated Waste Heat Fraction of
             // Power Input
-            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                     WasteHeatLS = state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                 } else {
@@ -13603,7 +13604,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
             }
 
             // Energy use for other fuel types
-            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 state.dataDXCoils->DXCoil(DXCoilNum).FuelUsed = state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
                 state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower = 0.0;
             }
@@ -13836,7 +13837,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
                 }
             }
             // Energy use for other fuel types
-            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 state.dataDXCoils->DXCoil(DXCoilNum).FuelUsed = state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
                 state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower = 0.0;
             }
@@ -14383,7 +14384,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             }
 
             // Waste heat calculation
-            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                     WasteHeatLS = state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                 } else {
@@ -14404,7 +14405,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
                     MSHPWasteHeat = state.dataDXCoils->DXCoil(DXCoilNum).MSFuelWasteHeat;
                 }
             }
-            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
 
                 state.dataDXCoils->DXCoil(DXCoilNum).FuelUsed = state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower;
                 state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower = 0.0;
@@ -14640,7 +14641,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
                 OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
             }
             if (state.dataDXCoils->DXCoil(DXCoilNum).MSHPHeatRecActive ||
-                state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+                state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
                     state.dataDXCoils->DXCoil(DXCoilNum).MSFuelWasteHeat =
                         state.dataDXCoils->DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower;
@@ -14653,7 +14654,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
                     MSHPWasteHeat = state.dataDXCoils->DXCoil(DXCoilNum).MSFuelWasteHeat;
                 }
             }
-            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
 
                 state.dataDXCoils->DXCoil(DXCoilNum).FuelUsed = state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower;
                 state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower = 0.0;
@@ -14806,7 +14807,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
     } break;
     case CoilDX_MultiSpeedHeating: {
         state.dataDXCoils->DXCoil(DXCoilNum).TotalHeatingEnergy = state.dataDXCoils->DXCoil(DXCoilNum).TotalHeatingEnergyRate * ReportingConstant;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum == UtilityRoutines::FuelType1::Electricity) {
+        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum == DataGlobalConstants::ResourceType::Electricity) {
             state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingConsumption = state.dataDXCoils->DXCoil(DXCoilNum).ElecHeatingPower * ReportingConstant;
         } else {
             state.dataDXCoils->DXCoil(DXCoilNum).FuelConsumed = state.dataDXCoils->DXCoil(DXCoilNum).FuelUsed * ReportingConstant;
@@ -14827,7 +14828,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
         state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecConsumption =
             state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecPower * ReportingConstant;
         state.dataDXCoils->DXCoil(DXCoilNum).EvapWaterConsump = state.dataDXCoils->DXCoil(DXCoilNum).EvapWaterConsumpRate * ReportingConstant;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum == UtilityRoutines::FuelType1::Electricity) {
+        if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum == DataGlobalConstants::ResourceType::Electricity) {
             state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingConsumption = state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower * ReportingConstant;
         } else {
             state.dataDXCoils->DXCoil(DXCoilNum).FuelConsumed = state.dataDXCoils->DXCoil(DXCoilNum).FuelUsed * ReportingConstant;
@@ -18496,7 +18497,7 @@ void SetMSHPDXCoilHeatRecoveryFlag(EnergyPlusData &state, int const DXCoilNum)
     // PURPOSE OF THIS SUBROUTINE:
     // Set the heat recovery flag true when the parent object requests heat recovery.
 
-    if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != UtilityRoutines::FuelType1::Electricity) {
+    if (state.dataDXCoils->DXCoil(DXCoilNum).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
         state.dataDXCoils->DXCoil(DXCoilNum).MSHPHeatRecActive = true;
     }
 }

@@ -57,6 +57,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -344,9 +345,9 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         // Validate fuel type input
-        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType =
-            static_cast<UtilityRoutines::FuelType1>(getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(AlphArray(5))));
-        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == UtilityRoutines::FuelType1::Invalid) {
+        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType = static_cast<DataGlobalConstants::ResourceType>(
+            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(5))));
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == DataGlobalConstants::ResourceType::Invalid) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "  = " + AlphArray(5));
@@ -881,7 +882,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
 void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
 {
-    std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
+    std::string_view const sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
     SetupOutputVariable(state,
                         "Generator Produced AC Electricity Rate",
                         OutputProcessor::Unit::W,

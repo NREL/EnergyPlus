@@ -58,6 +58,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -199,9 +200,9 @@ namespace BoilerSteam {
             thisBoiler.Name = state.dataIPShortCut->cAlphaArgs(1);
 
             // Validate fuel type input
-            thisBoiler.FuelType = static_cast<UtilityRoutines::FuelType1>(
-                getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
-            if (thisBoiler.FuelType == UtilityRoutines::FuelType1::Invalid) {
+            thisBoiler.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+            if (thisBoiler.FuelType == DataGlobalConstants::ResourceType::Invalid) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\",");
@@ -424,7 +425,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        std::string_view sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
+        std::string_view sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Boiler Heating Rate",
                             OutputProcessor::Unit::W,

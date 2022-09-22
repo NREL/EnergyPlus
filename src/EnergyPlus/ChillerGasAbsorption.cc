@@ -61,6 +61,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -518,9 +519,9 @@ void GetGasAbsorberInput(EnergyPlusData &state)
         thisChiller.SizFac = state.dataIPShortCut->rNumericArgs(17);
 
         // Validate fuel type input
-        thisChiller.FuelType = static_cast<UtilityRoutines::FuelType1>(
-            getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(17))));
-        if (thisChiller.FuelType == UtilityRoutines::FuelType1::Invalid) {
+        thisChiller.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(17))));
+        if (thisChiller.FuelType == DataGlobalConstants::ResourceType::Invalid) {
             ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid value");
             ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + '=' + state.dataIPShortCut->cAlphaArgs(17));
             ShowContinueError(
@@ -537,7 +538,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
 void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
 {
     std::string &ChillerName = this->Name;
-    std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
+    std::string_view const sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
 
     SetupOutputVariable(state,
                         "Chiller Heater Evaporator Cooling Rate",

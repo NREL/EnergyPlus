@@ -83,9 +83,9 @@ namespace Boilers {
     struct BoilerSpecs : PlantComponent
     {
         // Members
-        std::string Name;                                                            // user identifier
-        UtilityRoutines::FuelType1 FuelType = UtilityRoutines::FuelType1::Invalid;   // resource type assignment
-        DataPlant::PlantEquipmentType Type = DataPlant::PlantEquipmentType::Invalid; // plant loop type identifier
+        std::string Name;                                                                        // user identifier
+        DataGlobalConstants::ResourceType FuelType = DataGlobalConstants::ResourceType::Invalid; // resource type assignment
+        DataPlant::PlantEquipmentType Type = DataPlant::PlantEquipmentType::Invalid;             // plant loop type identifier
         PlantLocation plantLoc{};
         bool Available = false;                                      // TRUE if machine available in current time step
         bool ON = false;                                             // TRUE: simulate the machine at it's operating part load ratio

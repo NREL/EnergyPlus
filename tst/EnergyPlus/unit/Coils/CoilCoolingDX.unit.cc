@@ -395,7 +395,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
-    Coil.FuelTypeNum = UtilityRoutines::FuelType1::Electricity;
+    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
     Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     Coil.NumOfSpeeds = 2;
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
@@ -814,7 +814,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
-    Coil.FuelTypeNum = UtilityRoutines::FuelType1::Electricity;
+    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
     Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     Coil.NumOfSpeeds = 2;
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
@@ -1233,7 +1233,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
-    Coil.FuelTypeNum = UtilityRoutines::FuelType1::Electricity;
+    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
     Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     Coil.NumOfSpeeds = 2;
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
@@ -1467,7 +1467,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
-    Coil.FuelTypeNum = UtilityRoutines::FuelType1::Electricity;
+    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
     Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     Coil.NumOfSpeeds = 2;
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);

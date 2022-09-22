@@ -2381,9 +2381,9 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!lAlphaFieldBlanks(39)) {
             // A39; \field Fuel type, Validate fuel type input
-            state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum = static_cast<UtilityRoutines::FuelType1>(
-                getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(39))));
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum == UtilityRoutines::FuelType1::Invalid) {
+            state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum = static_cast<DataGlobalConstants::ResourceType>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(39))));
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum == DataGlobalConstants::ResourceType::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));
@@ -2541,7 +2541,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).Name = cAlphaArgs(1);
         state.dataHVACVarRefFlow->VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
         state.dataHVACVarRefFlow->VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmType::FluidTCtrl;
-        state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum = UtilityRoutines::FuelType1::Electricity;
+        state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
         if (lAlphaFieldBlanks(2)) {
             state.dataHVACVarRefFlow->VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -2965,7 +2965,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).HeatRecoveryUsed = true;
         state.dataHVACVarRefFlow->VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
         state.dataHVACVarRefFlow->VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmType::FluidTCtrl;
-        state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum = UtilityRoutines::FuelType1::Electricity;
+        state.dataHVACVarRefFlow->VRF(VRFNum).FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
 
         if (lAlphaFieldBlanks(2)) {
             state.dataHVACVarRefFlow->VRF(VRFNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -5140,7 +5140,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     }
 
     for (NumCond = 1; NumCond <= state.dataHVACVarRefFlow->NumVRFCond; ++NumCond) {
-        std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(state.dataHVACVarRefFlow->VRF(NumCond).FuelTypeNum)];
+        std::string_view const sFuelType =
+            DataGlobalConstants::ResourceTypeNames[static_cast<int>(state.dataHVACVarRefFlow->VRF(NumCond).FuelTypeNum)];
         SetupOutputVariable(state,
                             "VRF Heat Pump Total Cooling Rate",
                             OutputProcessor::Unit::W,
@@ -5330,7 +5331,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (state.dataHVACVarRefFlow->VRF(NumCond).DefrostStrategy == StandardRatings::DefrostStrat::Resistive ||
             (state.dataHVACVarRefFlow->VRF(NumCond).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-             state.dataHVACVarRefFlow->VRF(NumCond).FuelTypeNum == UtilityRoutines::FuelType1::Electricity)) {
+             state.dataHVACVarRefFlow->VRF(NumCond).FuelTypeNum == DataGlobalConstants::ResourceType::Electricity)) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Defrost Electricity Rate",
                                 OutputProcessor::Unit::W,

@@ -209,28 +209,6 @@ void ShowRecurringErrors(EnergyPlusData &state);
 
 namespace UtilityRoutines {
 
-    // This enum and paired string view arrays are a replacement for the ValidateFuelType* functions.
-    // As the other fuel-based functionality is converted to enums, these should all be collected into a single enum where possible.
-    enum class FuelType1
-    {
-        Invalid = -1,
-        Electricity,
-        NaturalGas,
-        Diesel,
-        Gasoline,
-        Coal,
-        FuelOilNo1,
-        FuelOilNo2,
-        Propane,
-        OtherFuel1,
-        OtherFuel2,
-        Num
-    };
-    static constexpr std::array<std::string_view, static_cast<int>(FuelType1::Num)> fuelType1UC = {
-        "ELECTRICITY", "NATURALGAS", "DIESEL", "GASOLINE", "COAL", "FUELOILNO1", "FUELOILNO2", "PROPANE", "OTHERFUEL1", "OTHERFUEL2"};
-    static constexpr std::array<std::string_view, static_cast<int>(FuelType1::Num)> fuelType1 = {
-        "Electricity", "NaturalGas", "Diesel", "Gasoline", "Coal", "FuelOilNo1", "FuelOilNo2", "Propane", "OtherFuel1", "OtherFuel2"};
-
     static constexpr std::array<std::string_view, 12> MonthNamesCC{
         "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 

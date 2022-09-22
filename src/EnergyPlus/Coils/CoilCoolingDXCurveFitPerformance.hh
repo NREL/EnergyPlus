@@ -122,7 +122,7 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 minOutdoorDrybulb = 0.0;
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     bool mySizeFlag = true;
-    UtilityRoutines::FuelType1 compressorFuelType = UtilityRoutines::FuelType1::Invalid;
+    DataGlobalConstants::ResourceType compressorFuelType = DataGlobalConstants::ResourceType::Invalid;
     Real64 compressorFuelRate = 0.0;
     Real64 compressorFuelConsumption = 0.0;
 

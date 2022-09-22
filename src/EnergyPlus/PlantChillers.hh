@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -265,7 +266,7 @@ namespace PlantChillers {
     struct EngineDrivenChillerSpecs : BaseChillerSpecs
     {
         // temperature at the chiller evaporator side outlet
-        UtilityRoutines::FuelType1 FuelType;
+        DataGlobalConstants::ResourceType FuelType;
         Array1D<Real64> CapRatCoef;                // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef;              // (EngineDriven ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef;              // (EngineDriven RPWRC() ) coeff of full load poly. fit
@@ -365,7 +366,7 @@ namespace PlantChillers {
     struct GTChillerSpecs : BaseChillerSpecs
     {
         // Members
-        UtilityRoutines::FuelType1 FuelType;
+        DataGlobalConstants::ResourceType FuelType;
         Array1D<Real64> CapRatCoef;   // (GT RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit

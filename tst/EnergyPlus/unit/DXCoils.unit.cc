@@ -457,7 +457,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelTypeNum = UtilityRoutines::FuelType1::Electricity;
+    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
     Coil.RegionNum = 4;
     Coil.MSRatedTotCap(1) = 2202.5268975202675;
     Coil.MSRatedCOP(1) = 4.200635910578916;
@@ -814,7 +814,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelTypeNum = UtilityRoutines::FuelType1::Electricity;
+    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
     Coil.RegionNum = 4;
 
     state->dataCurveManager->NumCurves = 5;
@@ -1313,13 +1313,13 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     // Case 1 test
     GetDXCoils(*state);
 
-    EXPECT_TRUE(compare_enums(UtilityRoutines::FuelType1::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum));
     EXPECT_EQ(0, state->dataDXCoils->DXCoil(1).MSWasteHeat(2));
 
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
-    state->dataDXCoils->DXCoil(1).FuelTypeNum = UtilityRoutines::FuelType1::NaturalGas;
+    state->dataDXCoils->DXCoil(1).FuelTypeNum = DataGlobalConstants::ResourceType::NaturalGas;
     state->dataDXCoils->DXCoil(1).MSHPHeatRecActive = false;
 
     state->dataEnvrn->OutDryBulbTemp = 35;

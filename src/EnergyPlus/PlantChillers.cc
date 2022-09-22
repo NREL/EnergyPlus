@@ -60,6 +60,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -2417,9 +2418,9 @@ namespace PlantChillers {
             thisChiller.DesignMinExitGasTemp = state.dataIPShortCut->rNumericArgs(24);
 
             // Validate fuel type input
-            thisChiller.FuelType = static_cast<UtilityRoutines::FuelType1>(
-                getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(12))));
-            if (thisChiller.FuelType == UtilityRoutines::FuelType1::Invalid) {
+            thisChiller.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(12))));
+            if (thisChiller.FuelType == DataGlobalConstants::ResourceType::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + state.dataIPShortCut->cAlphaArgs(12));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(
@@ -2695,7 +2696,7 @@ namespace PlantChillers {
             }
         }
 
-        std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
+        std::string_view const sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             format("Chiller {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
@@ -4466,9 +4467,9 @@ namespace PlantChillers {
             }
 
             // Fuel Type Case Statement
-            thisChiller.FuelType = static_cast<UtilityRoutines::FuelType1>(
-                getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
-            if (thisChiller.FuelType == UtilityRoutines::FuelType1::Invalid) {
+            thisChiller.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+            if (thisChiller.FuelType == DataGlobalConstants::ResourceType::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(
@@ -4683,7 +4684,7 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
+        std::string_view const sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             format("Chiller {} Rate", sFuelType),
                             OutputProcessor::Unit::W,

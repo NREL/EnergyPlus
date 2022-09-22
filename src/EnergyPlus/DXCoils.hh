@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -346,28 +347,28 @@ namespace DXCoils {
         Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
         Real64 TimeStepSysLast;    // last system time step (used to check for downshifting)
         // for multispeed DX coil type
-        UtilityRoutines::FuelType1 FuelTypeNum;     // Fuel type number
-        int NumOfSpeeds;                            // Number of speeds
-        bool PLRImpact;                             // Part load fraction applied to Speed Number > 1
-        bool LatentImpact;                          // Latent degradation applied to Speed Number > 1
-        Array1D_int MSErrIndex;                     // index flag for num speeds/recurring messages
-        Array1D<Real64> MSRatedTotCap;              // Rated cooling capacity for MS heat pump [W]
-        Array1D<Real64> MSRatedTotCapDes;           // Autosized Gross total cooling capacity at rated conditions [watts]
-        Array1D<Real64> MSRatedSHR;                 // Rated SHR for MS heat pump [dimensionless]
-        Array1D<Real64> MSRatedCOP;                 // Rated COP for MS heat pump [dimensionless]
-        Array1D<Real64> MSRatedAirVolFlowRate;      // Air volume flow rate through unit at rated conditions [m3/s]
-        Array1D<Real64> MSRatedAirMassFlowRate;     // Air mass flow rate through unit at rated conditions [m3/s]
-        Array1D<Real64> MSRatedCBF;                 // rated coil bypass factor
-        Array1D_int MSCCapFTemp;                    // index of total cooling capacity modifier curve
-        Array1D_int MSCCapFFlow;                    // index of total cooling capacity modifier curve
-        Array1D_int MSEIRFTemp;                     // index of energy input ratio modifier curve as a function of temperature
-        Array1D_int MSEIRFFlow;                     // index of energy input ratio modifier curve as a function of flow fraction
-        Array1D_int MSPLFFPLR;                      // index of part load factor as a function of part load ratio
-        Array1D_int MSWasteHeat;                    // index of waste heat as a function of temperature
-        Array1D<Real64> MSWasteHeatFrac;            // Waste heat fraction
-        Array1D<Real64> MSEvapCondEffect;           // effectiveness of the evaporatively cooled condenser
-        Array1D<Real64> MSEvapCondAirFlow;          // Air flow rate through the evap condenser for water use calcs [m3/s]
-        Array1D<Real64> MSEvapCondPumpElecNomPower; // Nominal power input to the evap condenser
+        DataGlobalConstants::ResourceType FuelTypeNum; // Fuel type number
+        int NumOfSpeeds;                               // Number of speeds
+        bool PLRImpact;                                // Part load fraction applied to Speed Number > 1
+        bool LatentImpact;                             // Latent degradation applied to Speed Number > 1
+        Array1D_int MSErrIndex;                        // index flag for num speeds/recurring messages
+        Array1D<Real64> MSRatedTotCap;                 // Rated cooling capacity for MS heat pump [W]
+        Array1D<Real64> MSRatedTotCapDes;              // Autosized Gross total cooling capacity at rated conditions [watts]
+        Array1D<Real64> MSRatedSHR;                    // Rated SHR for MS heat pump [dimensionless]
+        Array1D<Real64> MSRatedCOP;                    // Rated COP for MS heat pump [dimensionless]
+        Array1D<Real64> MSRatedAirVolFlowRate;         // Air volume flow rate through unit at rated conditions [m3/s]
+        Array1D<Real64> MSRatedAirMassFlowRate;        // Air mass flow rate through unit at rated conditions [m3/s]
+        Array1D<Real64> MSRatedCBF;                    // rated coil bypass factor
+        Array1D_int MSCCapFTemp;                       // index of total cooling capacity modifier curve
+        Array1D_int MSCCapFFlow;                       // index of total cooling capacity modifier curve
+        Array1D_int MSEIRFTemp;                        // index of energy input ratio modifier curve as a function of temperature
+        Array1D_int MSEIRFFlow;                        // index of energy input ratio modifier curve as a function of flow fraction
+        Array1D_int MSPLFFPLR;                         // index of part load factor as a function of part load ratio
+        Array1D_int MSWasteHeat;                       // index of waste heat as a function of temperature
+        Array1D<Real64> MSWasteHeatFrac;               // Waste heat fraction
+        Array1D<Real64> MSEvapCondEffect;              // effectiveness of the evaporatively cooled condenser
+        Array1D<Real64> MSEvapCondAirFlow;             // Air flow rate through the evap condenser for water use calcs [m3/s]
+        Array1D<Real64> MSEvapCondPumpElecNomPower;    // Nominal power input to the evap condenser
         // water circulation pump
         Array1D<Real64> MSTwet_Rated; // Nominal time for condensate to begin leaving the coil's
         // condensate drain line (sec)
@@ -488,16 +489,17 @@ namespace DXCoils {
               ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0), PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false),
               PrintHighAmbMessage(false), EvapWaterSupplyMode(EvapWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
               CondensateCollectMode(CondensateCollectAction::Discard), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
-              CondensateVol(0.0), CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelTypeNum(UtilityRoutines::FuelType1::Invalid), NumOfSpeeds(0),
-              PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0), MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true),
-              HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false), SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0),
-              SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0),
-              SecCoilSHRFF(0), SecCoilAirFlow(0.0), SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0),
-              SecCoilSensibleHeatGainRate(0.0), SecCoilTotalHeatRemovalRate(0.0), SecCoilSensibleHeatRemovalRate(0.0),
-              SecCoilLatentHeatRemovalRate(0.0), IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0), MSSpeedNumLS(1),
-              MSSpeedNumHS(2), MSSpeedRatio(0.0), MSCycRatio(0.0), VRFIUPtr(0), VRFOUPtr(0), EvaporatingTemp(4.0), CondensingTemp(40.0), C1Te(0.0),
-              C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), SH(0.0), SC(0.0), ActualSH(0.0), ActualSC(0.0), RateBFVRFIUEvap(0.0592),
-              RateBFVRFIUCond(0.1360), CAPFTErrIndex(0), EIRFTErrIndex(0), reportCoilFinalSizes(true), capModFacTotal(0.0), AirLoopNum(0)
+              CondensateVol(0.0), CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelTypeNum(DataGlobalConstants::ResourceType::Invalid),
+              NumOfSpeeds(0), PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0), MSHPHeatRecActive(false), MSHPDesignSpecIndex(0),
+              CoolingCoilPresent(true), HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false), SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0),
+              SHRFFlow(MaxModes, 0), SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false),
+              SecZonePtr(0), SecCoilSHRFT(0), SecCoilSHRFF(0), SecCoilAirFlow(0.0), SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0),
+              SecCoilSHR(1.0), EvapInletWetBulb(0.0), SecCoilSensibleHeatGainRate(0.0), SecCoilTotalHeatRemovalRate(0.0),
+              SecCoilSensibleHeatRemovalRate(0.0), SecCoilLatentHeatRemovalRate(0.0), IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false),
+              CompressorPartLoadRatio(0.0), MSSpeedNumLS(1), MSSpeedNumHS(2), MSSpeedRatio(0.0), MSCycRatio(0.0), VRFIUPtr(0), VRFOUPtr(0),
+              EvaporatingTemp(4.0), CondensingTemp(40.0), C1Te(0.0), C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), SH(0.0), SC(0.0),
+              ActualSH(0.0), ActualSC(0.0), RateBFVRFIUEvap(0.0592), RateBFVRFIUCond(0.1360), CAPFTErrIndex(0), EIRFTErrIndex(0),
+              reportCoilFinalSizes(true), capModFacTotal(0.0), AirLoopNum(0)
         {
         }
     };

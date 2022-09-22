@@ -56,6 +56,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -288,9 +289,9 @@ namespace ICEngineElectricGenerator {
             }
 
             // Validate fuel type input
-            state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType = static_cast<UtilityRoutines::FuelType1>(
-                getEnumerationValue(UtilityRoutines::fuelType1UC, UtilityRoutines::MakeUPPERCase(AlphArray(10))));
-            if (state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType == UtilityRoutines::FuelType1::Invalid) {
+            state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType = static_cast<DataGlobalConstants::ResourceType>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(10))));
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType == DataGlobalConstants::ResourceType::Invalid) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
@@ -306,7 +307,7 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        std::string_view const sFuelType = UtilityRoutines::fuelType1[static_cast<int>(this->FuelType)];
+        std::string_view const sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Rate",
                             OutputProcessor::Unit::W,

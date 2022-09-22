@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -164,7 +165,7 @@ namespace MicroturbineElectricGenerator {
         Real64 ThermalEfficiencyLHV;  // Reporting: Thermal (heat recovery to water) efficiency LHV (-)
         Real64 AncillaryEnergy;       // Reporting: Ancillary energy use (J)
         Real64 StandbyEnergy;         // Reporting: Standby energy use (J)
-        UtilityRoutines::FuelType1 FuelType;
+        DataGlobalConstants::ResourceType FuelType;
         bool myFlag;
 
         // Default Constructor
