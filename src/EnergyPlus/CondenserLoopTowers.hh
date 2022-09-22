@@ -436,11 +436,6 @@ namespace CondenserLoopTowers {
                           std::array<Real64, 6> const &Par // par(1) = tower number
         );
 
-        Real64 residualMerkelLoad(EnergyPlusData &state,
-                                  Real64 airFlowRateRatioLocal,    // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                  std::array<Real64, 8> const &Par // par(1) = Tower number
-        );
-
         static PlantComponent *factory(EnergyPlusData &state, std::string_view objectName);
     };
 

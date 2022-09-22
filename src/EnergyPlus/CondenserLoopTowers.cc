@@ -5557,18 +5557,15 @@ namespace CondenserLoopTowers {
 
         if ((MinSpeedFanQdot < std::abs(MyLoad)) && (std::abs(MyLoad) < FullSpeedFanQdot)) {
             // load can be refined by modulating fan speed, call regula-falsi
-
-            Par[0] = double(this->thisTowerNum);
-            Par[1] = MyLoad;
-            Par[2] = WaterMassFlowRatePerCell;
-            Par[3] = UAdesignPerCell;
-            Par[4] = UAwetbulbAdjFac;
-            Par[5] = UAwaterflowAdjFac;
-            Par[6] = CpWater;
-            Par[7] = this->WaterMassFlowRate;
-
-            auto f = std::bind(&CoolingTower::residualMerkelLoad, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
+            auto f = [&state, this, &MyLoad, &WaterMassFlowRatePerCell, &UAdesignPerCell, &UAwetbulbAdjFac, &UAwaterflowAdjFac, &CpWater](Real64 airFlowRateRatioLocal) {
+                Real64 const AirFlowRatePerCell = airFlowRateRatioLocal * this->HighSpeedAirFlowRate / this->NumCell;
+                Real64 const UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
+                Real64 const UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
+                Real64 OutletWaterTempTrial = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
+                Real64 const Qdot = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempTrial);
+                return std::abs(MyLoad) - Qdot;
+            };
+            General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0);
 
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -5628,54 +5625,6 @@ namespace CondenserLoopTowers {
             FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
         }
-    }
-
-    Real64 CoolingTower::residualMerkelLoad(EnergyPlusData &state,
-                                            Real64 airFlowRateRatioLocal,    // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                            std::array<Real64, 8> const &Par // par(1) = Tower number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // par(2) =MyLoad [W] , negative is cooling
-        // par(3) = water mass flow per cell
-        // par(4) = Design UA per cell
-        // par(5) = UA adjust factor for wetbulb
-        // par(6) = UA adjust factor for water flow rate
-        // par(7) = specific heat of water at inlet temp
-        // par(8) = water mass flow rate, total [kg/s]
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        int TowerNum = int(Par[0]);
-        auto const &TargetLoad = Par[1];
-        auto const &WaterMassFlowRatePerCell = Par[2];
-        auto const &UAdesignPerCell = Par[3];
-        auto const &UAwetbulbAdjFac = Par[4];
-        auto const &UAwaterflowAdjFac = Par[5];
-        auto const &CpWater = Par[6];
-        auto const &TotalWaterMassFlowRate = Par[7];
-
-        Real64 const AirFlowRatePerCell = airFlowRateRatioLocal * state.dataCondenserLoopTowers->towers(TowerNum).HighSpeedAirFlowRate /
-                                          state.dataCondenserLoopTowers->towers(TowerNum).NumCell;
-        Real64 const UAairflowAdjFac =
-            CurveManager::CurveValue(state, state.dataCondenserLoopTowers->towers(TowerNum).UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
-        Real64 const UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
-
-        Real64 OutletWaterTempTrial;
-        OutletWaterTempTrial = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
-
-        Real64 const Qdot =
-            TotalWaterMassFlowRate * CpWater *
-            (state.dataLoopNodes->Node(state.dataCondenserLoopTowers->towers(TowerNum).WaterInletNodeNum).Temp - OutletWaterTempTrial);
-        return std::abs(TargetLoad) - Qdot;
     }
 
     Real64 CoolingTower::calculateSimpleTowerOutletTemp(EnergyPlusData &state,
