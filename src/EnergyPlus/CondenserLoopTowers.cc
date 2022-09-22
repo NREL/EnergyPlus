@@ -2787,13 +2787,9 @@ namespace CondenserLoopTowers {
                         ShowFatalError(state, "Autosizing of cooling tower fails for tower = " + this->Name + '.');
                     }
 
-                    Par[0] = DesTowerLoad;
-                    Par[1] = double(this->thisTowerNum);
                     Real64 const solveWaterMassFlow = rho * tmpDesignWaterFlowRate; // design water mass flow rate
-                    Par[3] = tmpHighSpeedAirFlowRate;                               // design air volume flow rate
-                    Par[4] = Cp;
-                    UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
-                    UA1 = DesTowerLoad;          // Assume deltaT = 1K
+                    UA0 = 0.0001 * DesTowerLoad;                                    // Assume deltaT = 10000K (limit)
+                    UA1 = DesTowerLoad;                                             // Assume deltaT = 1K
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
@@ -2872,23 +2868,20 @@ namespace CondenserLoopTowers {
                                                                          RoutineName); // 85F design exiting water temp
 
                 DesTowerLoad = this->TowerNominalCapacity * this->HeatRejectCapNomCapSizingRatio;
-                Par[0] = DesTowerLoad;
-                Par[1] = double(this->thisTowerNum);
-                Par[2] = rho * tmpDesignWaterFlowRate;      // design water mass flow rate
-                Par[3] = tmpHighSpeedAirFlowRate;           // design air volume flow rate
-                Par[4] = Cp;                                // 85F design exiting water temp
-                UA0 = 0.0001 * DesTowerLoad;                // Assume deltaT = 10000K (limit)
-                UA1 = DesTowerLoad;                         // Assume deltaT = 1K
-                this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
-                this->AirTemp = this->DesInletAirDBTemp;    // 95F design inlet air dry-bulb temp
-                this->AirWetBulb = this->DesInletAirWBTemp; // 78F design inlet air wet-bulb temp
+                Real64 const solveWaterFlowRate = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                UA0 = 0.0001 * DesTowerLoad;                                    // Assume deltaT = 10000K (limit)
+                UA1 = DesTowerLoad;                                             // Assume deltaT = 1K
+                this->WaterTemp = this->DesInletWaterTemp;                      // 35.0; // 95F design inlet water temperature
+                this->AirTemp = this->DesInletAirDBTemp;                        // 95F design inlet air dry-bulb temp
+                this->AirWetBulb = this->DesInletAirWBTemp;                     // 78F design inlet air wet-bulb temp
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                //        Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, Par[2], Par[3], UA);
-                //        Real64 const CoolingOutput = Par[4] * Par[2] * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
-                //        return (Par[0] - CoolingOutput) / Par[0];
-                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                auto f = [&state, this, &DesTowerLoad, &solveWaterFlowRate, &tmpHighSpeedAirFlowRate, &Cp](Real64 UA) {
+                    Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlowRate, tmpHighSpeedAirFlowRate, UA);
+                    Real64 const CoolingOutput = Cp * solveWaterFlowRate * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                    return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
+                };
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -3059,21 +3052,22 @@ namespace CondenserLoopTowers {
                 DesTowerLoad = this->TowerLowSpeedNomCap * this->HeatRejectCapNomCapSizingRatio;
                 Par[0] = DesTowerLoad;
                 Par[1] = double(this->thisTowerNum);
-                Par[2] = rho * tmpDesignWaterFlowRate;      // design water mass flow rate
-                Par[3] = tmpLowSpeedAirFlowRate;            // Air volume flow rate at low fan speed
-                Par[4] = Cp;                                // 85F design exiting water temp
-                UA0 = 0.0001 * DesTowerLoad;                // Assume deltaT = 10000K (limit)
-                UA1 = DesTowerLoad;                         // Assume deltaT = 1K
-                this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
-                this->AirTemp = this->DesInletAirDBTemp;    // 35.0; // 95F design inlet air dry-bulb temp
-                this->AirWetBulb = this->DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
+                Real64 const solveWaterFlow = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                Par[3] = tmpLowSpeedAirFlowRate;                            // Air volume flow rate at low fan speed
+                Par[4] = Cp;                                                // 85F design exiting water temp
+                UA0 = 0.0001 * DesTowerLoad;                                // Assume deltaT = 10000K (limit)
+                UA1 = DesTowerLoad;                                         // Assume deltaT = 1K
+                this->WaterTemp = this->DesInletWaterTemp;                  // 35.0; // 95F design inlet water temperature
+                this->AirTemp = this->DesInletAirDBTemp;                    // 35.0; // 95F design inlet air dry-bulb temp
+                this->AirWetBulb = this->DesInletAirWBTemp;                 // 25.6; // 78F design inlet air wet-bulb temp
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                //        Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, Par[2], Par[3], UA);
-                //        Real64 const CoolingOutput = Par[4] * Par[2] * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
-                //        return (Par[0] - CoolingOutput) / Par[0];
-                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                auto f = [&state, this, &DesTowerLoad, &solveWaterFlow, &tmpLowSpeedAirFlowRate, &Cp](Real64 UA) {
+                    Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, tmpLowSpeedAirFlowRate, UA);
+                    Real64 const CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                    return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
+                };
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
