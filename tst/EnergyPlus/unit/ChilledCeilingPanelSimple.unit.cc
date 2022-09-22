@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -75,8 +76,8 @@ TEST_F(EnergyPlusFixture, SetCoolingPanelControlTemp)
     ZoneNum = 1;
 
     state->dataChilledCeilingPanelSimple->CoolingPanel.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 22.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 22.0;
     state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataHeatBal->ZoneMRT(1) = 20.0;
     state->dataHeatBal->Zone.allocate(1);

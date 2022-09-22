@@ -393,18 +393,18 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
 
     EXPECT_FALSE(ErrorsFound);
 
-    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataHeatBalFanSys->MAT(1) = 21.0;
-    state->dataHeatBalFanSys->MAT(2) = 22.0;
-    state->dataHeatBalFanSys->MAT(3) = 23.0;
-    state->dataHeatBalFanSys->MAT(4) = 24.0;
-    state->dataHeatBalFanSys->MAT(5) = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 22.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).MAT = 25.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
     state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.001;
@@ -4402,15 +4402,15 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
 
     state->dataEnvrn->OutBaroPress = 101400.;
 
-    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataHeatBalFanSys->MAT(1) = 21.0;
-    state->dataHeatBalFanSys->MAT(2) = 22.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 22.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0021;
     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0022;
 

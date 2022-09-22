@@ -75,6 +75,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
@@ -1642,6 +1643,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
     state->dataGlobal->NumOfZones = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataSurface->SurfWinShadingFlagEMSOn(2) = true;
     state->dataSurface->SurfWinShadingFlagEMSValue(2) = 1.0; // WinShadingType::IntShade
     SolarShading::WindowShadingManager(*state);

@@ -81,6 +81,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -204,13 +205,12 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 100000;
 
-    state->dataHeatBalFanSys->ZTAV.allocate(1);
-    state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
 
-    state->dataHeatBalFanSys->ZT(1) = 0.0;
-    state->dataHeatBalFanSys->ZTAV(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
     state->dataHeatBal->ZoneMRT(1) = 0.0;
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.0;
 
@@ -248,7 +248,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataSurface->SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.01);
     state->dataHeatBalFanSys->ZoneAirHumRat.dimension(1, 0.01);
-    state->dataHeatBalFanSys->MAT.dimension(1, T_in);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = T_in;
 
     // initial guess temperatures
     int numTemps = 2 + 2 * state->dataConstruction->Construct(cNum).TotGlassLayers;
@@ -545,8 +546,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
 
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
     state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQdotRadIntGainsInPerArea.allocate(3);
@@ -2814,9 +2815,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio(surfNum2) = 1.0024;
 
-    state->dataHeatBalFanSys->MAT.allocate(1);
-
-    state->dataHeatBalFanSys->MAT(1) = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
     state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
@@ -7675,13 +7675,12 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state->dataHeatBalFanSys->ZTAV.allocate(1);
-    state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
 
-    state->dataHeatBalFanSys->ZT(1) = 0.0;
-    state->dataHeatBalFanSys->ZTAV(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
     state->dataHeatBal->ZoneMRT(1) = 0.0;
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.0;
 
@@ -7707,7 +7706,8 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     }
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.01);
     state->dataHeatBalFanSys->ZoneAirHumRat.dimension(1, 0.01);
-    state->dataHeatBalFanSys->MAT.dimension(1, T_in);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = T_in;
 
     state->dataEnvrn->BeamSolarRad = I_s;
     if (I_s > 0.0) {

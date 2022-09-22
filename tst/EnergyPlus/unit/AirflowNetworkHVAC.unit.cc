@@ -82,6 +82,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -2237,13 +2238,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     // Test for #7162
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(4);
-    state->dataHeatBalFanSys->MAT.allocate(4);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(4);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataHeatBalFanSys->MAT(1) = 23.0;
-    state->dataHeatBalFanSys->MAT(2) = 23.0;
-    state->dataHeatBalFanSys->MAT(3) = 23.0;
-    state->dataHeatBalFanSys->MAT(4) = 5.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 5.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0007;
     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0011;
     state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.0012;
@@ -2271,8 +2272,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_NEAR(38.1554377, state->afn->AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
     EXPECT_NEAR(91.8528571, state->afn->AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
 
-    Real64 hg = Psychrometrics::PsyHgAirFnWTdb(state->dataHeatBalFanSys->ZoneAirHumRat(1), state->dataHeatBalFanSys->MAT(1));
-    Real64 hzone = Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1));
+    Real64 hg =
+        Psychrometrics::PsyHgAirFnWTdb(state->dataHeatBalFanSys->ZoneAirHumRat(1), state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT);
+    Real64 hzone =
+        Psychrometrics::PsyHFnTdbW(state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT, state->dataHeatBalFanSys->ZoneAirHumRat(1));
     Real64 hamb = Psychrometrics::PsyHFnTdbW(0.0, state->dataEnvrn->OutHumRat);
     Real64 hdiff = state->afn->AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
     Real64 sum = state->afn->AirflowNetworkReportData(1).MultiZoneInfiSenLossW - state->afn->AirflowNetworkReportData(1).MultiZoneInfiLatGainW;
@@ -6009,10 +6012,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     // #7977
     state->afn->calculate_balance();
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
-    state->dataHeatBalFanSys->MAT.allocate(5);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(5);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(5);
     state->dataZoneEquip->ZoneEquipConfig.allocate(5);
-    state->dataHeatBalFanSys->MAT = 23.0;
+    for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
+        thisZoneHB.MAT = 23.0;
+    }
     state->dataHeatBalFanSys->ZoneAirHumRat = 0.001;
     state->dataHeatBalFanSys->ZoneAirHumRatAvg = state->dataHeatBalFanSys->ZoneAirHumRat;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
@@ -10468,13 +10473,13 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
 
     state->afn->AirflowNetworkFanActivated = false;
 
-    state->dataHeatBalFanSys->MAT.allocate(5);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(5);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
-    state->dataHeatBalFanSys->MAT(1) = 23.0;
-    state->dataHeatBalFanSys->MAT(2) = 23.0;
-    state->dataHeatBalFanSys->MAT(3) = 23.0;
-    state->dataHeatBalFanSys->MAT(4) = 23.0;
-    state->dataHeatBalFanSys->MAT(5) = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).MAT = 23.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
     state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.001;
@@ -16227,11 +16232,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     state->afn->simulation_control.ductSizing.return_trunk_pressure_loss = 3.0;
     state->afn->simulation_control.ductSizing.return_branch_pressure_loss = 4.0;
 
-    state->dataHeatBalFanSys->MAT.allocate(3);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(3);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(3);
-    state->dataHeatBalFanSys->MAT(1) = 23.0;
-    state->dataHeatBalFanSys->MAT(2) = 23.0;
-    state->dataHeatBalFanSys->MAT(3) = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0008400;
     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0008400;
     state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.0008400;

@@ -9697,7 +9697,6 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterPower = 0.0;
 
     if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) != DataHeatBalance::RefrigCondenserType::WaterHeater) {
-        auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode) != 0) {
             OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
             // If node is not connected to anything, pressure = default, use weather data
@@ -9719,6 +9718,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+            auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorDryBulb = secZoneHB.ZT;
             OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
@@ -9735,11 +9735,11 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
         }
     }
 
-    auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
     if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) == DataHeatBalance::RefrigCondenserType::Air) {
         CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
         CompAmbTemp = OutdoorDryBulb;
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+            auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             CondInletTemp = secZoneHB.ZT;
             CompAmbTemp = CondInletTemp; // assumes compressor is in same location as secondary coil
             OutdoorDryBulb = CondInletTemp;
@@ -11418,7 +11418,6 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
     }
 
     auto &DXCT = state.dataHVACGlobal->DXCT;
-    auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
 
     // Get condenser outdoor node info from DX Heating Coil
     if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) != 0) {
@@ -11443,6 +11442,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
                 OutdoorWetBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).OutAirWetBulb;
             }
             if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+                auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                 OutdoorDryBulb = secZoneHB.ZT;
                 OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                 OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
@@ -11451,6 +11451,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
             }
         }
     } else if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+        auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
         OutdoorDryBulb = secZoneHB.ZT;
         OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
         OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
@@ -11927,7 +11928,6 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
         LocalForceOn = false;
     }
 
-    auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
     if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode) != 0) {
         OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
         // If node is not connected to anything, pressure = default, use weather data
@@ -11943,6 +11943,7 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
         }
         CompAmbTemp = OutdoorDryBulb;
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+            auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorDryBulb = secZoneHB.ZT;
             OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
@@ -11950,6 +11951,7 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
             CompAmbTemp = OutdoorDryBulb;
         }
     } else if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+        auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
         OutdoorDryBulb = secZoneHB.ZT;
         OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
         OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
@@ -13169,7 +13171,6 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
     Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total heating capacity
 
     auto &DXCT = state.dataHVACGlobal->DXCT;
-    auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
 
     if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode) != 0) {
         OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode)).Press;
@@ -13185,12 +13186,14 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
             OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, RoutineName);
         }
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+            auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorDryBulb = secZoneHB.ZT;
             OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         }
     } else if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+        auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
         OutdoorDryBulb = secZoneHB.ZT;
         OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
         OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
@@ -14090,7 +14093,6 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
     if (state.dataDXCoils->DXCoil(DXCoilNum).CompanionUpstreamDXCoil == 0) MSHPWasteHeat = 0.0;
 
     // Get condenser outdoor node info from DX Heating Coil
-    auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
     if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) != 0) {
         OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press;
         // If node is not connected to anything, pressure = default, use weather data
@@ -14103,12 +14105,14 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat;
         }
         if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+            auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorDryBulb = secZoneHB.ZT;
             OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             // OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         }
     } else if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
+        auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
         OutdoorDryBulb = secZoneHB.ZT;
         OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
         // OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;

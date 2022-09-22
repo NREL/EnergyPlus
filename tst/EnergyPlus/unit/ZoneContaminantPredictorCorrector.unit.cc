@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataHVACGlobal->UseZoneTimeStepHistory = false;
 
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZT.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
 
     state->dataGlobal->NumOfZones = 1;
@@ -223,7 +223,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataHeatBalFanSys->ZT(1) = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
 
     state->dataContaminantBalance->CO2PredictedRate.allocate(1);
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataHVACGlobal->UseZoneTimeStepHistory = false;
 
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZT.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
 
     state->dataGlobal->NumOfZones = 1;
@@ -357,7 +357,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataHeatBalFanSys->ZT(1) = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
 
     CorrectZoneContaminants(*state, state->dataHVACGlobal->UseZoneTimeStepHistory);
@@ -372,7 +372,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataHVACGlobal->UseZoneTimeStepHistory = false;
 
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(3);
-    state->dataHeatBalFanSys->ZT.allocate(3);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(3);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(3);
 
     state->dataGlobal->NumOfZones = 3;
@@ -527,11 +527,11 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataHeatBalFanSys->ZT(1) = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.008;
-    state->dataHeatBalFanSys->ZT(2) = 23.5;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZT = 23.5;
     state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.008;
-    state->dataHeatBalFanSys->ZT(3) = 24.5;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZT = 24.5;
     state->dataHeatBalFanSys->MixingMassFlowZone = 0.0;
 
     state->dataLoopNodes->Node(6).MassFlowRate = 0.01;
@@ -567,7 +567,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataHVACGlobal->UseZoneTimeStepHistory = false;
 
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(3);
-    state->dataHeatBalFanSys->ZT.allocate(3);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(3);
     state->dataHeatBalFanSys->MixingMassFlowZone.allocate(3);
 
     state->dataGlobal->NumOfZones = 3;
@@ -712,11 +712,11 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataHeatBalFanSys->ZT(1) = 24.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.008;
-    state->dataHeatBalFanSys->ZT(2) = 23.5;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZT = 23.5;
     state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.008;
-    state->dataHeatBalFanSys->ZT(3) = 24.5;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZT = 24.5;
     state->dataHeatBalFanSys->MixingMassFlowZone = 0.0;
 
     state->dataLoopNodes->Node(6).MassFlowRate = 0.01;

@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
-    state->dataHeatBalFanSys->ZTAV.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
     state->dataGlobal->TimeStepZone = 0.25;
@@ -105,7 +105,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 21.1;           // 70F
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
     CalcIfSetPointMet(*state);
@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 25.0;            // 77F
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
     CalcIfSetPointMet(*state);
@@ -129,7 +129,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleCooling;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 21.1;           // 70F
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
     CalcIfSetPointMet(*state);
@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 25.0;            // 77F
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
     CalcIfSetPointMet(*state);
@@ -153,7 +153,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeatCool;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 21.1;           // 70F
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
     CalcIfSetPointMet(*state);
@@ -163,7 +163,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 25.0;            // 77F
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
     CalcIfSetPointMet(*state);
@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 21.1;           // 70F
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
     CalcIfSetPointMet(*state);
@@ -187,7 +187,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 25.0;            // 77F
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
     CalcIfSetPointMet(*state);
@@ -927,7 +927,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
-    state->dataHeatBalFanSys->ZTAV.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLoAver.allocate(state->dataGlobal->NumOfZones);
@@ -941,7 +941,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
 
     // heating
-    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                        // 70F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 21.1;           // 70F
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                    // 72F
     state->dataHeatBalFanSys->ZoneThermostatSetPointLoAver(1) = 22.2;                // 72F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
@@ -952,7 +952,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                         // 77F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 25.0;            // 77F
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                     // 75F
     state->dataHeatBalFanSys->ZoneThermostatSetPointHiAver(1) = 23.9;                 // 75F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
@@ -963,7 +963,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // no cooling or heating
-    state->dataHeatBalFanSys->ZTAV(1) = 23.0;                                      // 73F
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 23.0;         // 73F
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0; // must be zero
     CalcIfSetPointMet(*state);
     EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);

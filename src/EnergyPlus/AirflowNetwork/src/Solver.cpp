@@ -8737,10 +8737,9 @@ namespace AirflowNetwork {
                 M = AirflowNetworkLinkageData(i).NodeNums[1];
                 ZN1 = AirflowNetworkNodeData(n).EPlusZoneNum;
                 ZN2 = AirflowNetworkNodeData(M).EPlusZoneNum;
-                auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
-                auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
                 // Find a linkage from a zone to outdoors
                 if (ZN1 > 0 && ZN2 == 0) {
+                    auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
                     if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfHasLinkedOutAirNode) {
                         Tamb = m_state.dataSurface->SurfOutDryBulbTemp(MultizoneSurfaceData(i).SurfNum);
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(m_state,
@@ -8807,6 +8806,7 @@ namespace AirflowNetwork {
                     }
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
+                    auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
                     if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfHasLinkedOutAirNode) {
                         Tamb = m_state.dataSurface->SurfOutDryBulbTemp(MultizoneSurfaceData(i).SurfNum);
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(m_state,
@@ -8874,6 +8874,8 @@ namespace AirflowNetwork {
                 }
 
                 if (ZN1 > 0 && ZN2 > 0) {
+                    auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
+                    auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
                     CpAir = PsyCpAirFnW((m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) + m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) / 2.0);
                     hg = Psychrometrics::PsyHgAirFnWTdb(
                         (m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN1) + m_state.dataHeatBalFanSys->ZoneAirHumRat(ZN2)) / 2.0,

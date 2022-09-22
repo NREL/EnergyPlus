@@ -66,6 +66,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 
@@ -113,8 +114,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataMstBal->RhoVaporAirIn.allocate(1);
     state->dataMstBal->HMassConvInFD.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0061285406810457849;
 
     // Construction
@@ -238,8 +239,8 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataMstBal->RhoVaporAirIn.allocate(1);
     state->dataMstBal->HMassConvInFD.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0061285406810457849;
 
     // Construction
@@ -328,8 +329,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(zoneNum);
     state->dataMstBal->RhoVaporAirIn.allocate(surfNum);
     state->dataMstBal->HMassConvInFD.allocate(surfNum);
-    state->dataHeatBalFanSys->MAT.allocate(zoneNum);
-    state->dataHeatBalFanSys->MAT(zoneNum) = 20.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(zoneNum);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT = 20.0;
     state->dataHeatBalFanSys->ZoneAirHumRat(zoneNum) = 0.0061285406810457849;
 
     // Construction

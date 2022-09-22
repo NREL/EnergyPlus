@@ -91,6 +91,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -210,6 +211,7 @@ protected:
         state->dataAirLoop->AirLoopControlInfo.allocate(1);
 
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(numZones);
+        state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(numZones);
 
         state->dataSize->ZoneSizingRunDone = true;
         state->dataSize->SysSizingRunDone = true;
@@ -2963,6 +2965,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
     state->dataDXCoils->DXCoil.allocate(NumCoils);
     int NumZones = 2;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(NumZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(NumZones);
 
     // Common Inputs
     CoolCoilIndex = 1;
@@ -3135,6 +3138,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -200.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputReqToCoolSP = -1100.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputReqToHeatSP = -1200.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(2);
 
     state->dataHVACVarRefFlow->CompOnMassFlow = 0.0; // system is off
     // Run and Check
@@ -3805,6 +3809,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     ProcessScheduleInput(*state);     // read schedules
     GetCurveInput(*state);            // read curves
@@ -4058,8 +4063,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo = 21.0;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlType = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
-    state->dataHeatBalFanSys->ZT.allocate(1);
-    state->dataHeatBalFanSys->ZT = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 25.0;
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 27.0;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
@@ -4162,7 +4167,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     }
 
     // ensure that TU turns off when fan heat exceeds the heating load
-    state->dataHeatBalFanSys->ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 20.0;
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp =
         20; // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
@@ -4195,7 +4200,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
 
     // ensure that TU operates when fan heat does not exceed the heating load
-    state->dataHeatBalFanSys->ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp =
         19.0; // within the heating temperature range of VRF outdoor unit
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 19.0;
@@ -4903,6 +4908,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     ProcessScheduleInput(*state);     // read schedules
     GetCurveInput(*state);            // read curves
@@ -5753,6 +5759,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     Array2D<Real64> DummyArray; // Sky temperature
     state->dataGlobal->NumOfTimeStepInHour = 4;
@@ -6673,6 +6680,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0; // No load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     // Initialize terminal unit
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // turn on TU
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // turn on fan
@@ -11422,6 +11430,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     ProcessScheduleInput(*state);
     GetCurveInput(*state);
     GetZoneData(*state, ErrorsFound);
@@ -13157,6 +13166,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     ProcessScheduleInput(*state);
     GetCurveInput(*state);
     GetZoneData(*state, ErrorsFound);
@@ -15226,6 +15236,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0; // No load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     // Initialize terminal unit
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
         1.0; // set continuous fan operating mode
@@ -15840,6 +15851,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     ProcessScheduleInput(*state);
     GetCurveInput(*state);
     GetZoneData(*state, ErrorsFound);

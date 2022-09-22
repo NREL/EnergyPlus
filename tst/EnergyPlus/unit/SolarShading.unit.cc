@@ -70,6 +70,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SolarShading;
@@ -2713,6 +2714,7 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
     state->dataHeatBal->space(1).WindowSurfaceFirst = 1;
     state->dataHeatBal->space(1).WindowSurfaceLast = 2;
     state->dataGlobal->NumOfZones = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     // the following enables calculation when sun is up with SolarOnWindow computed to be 3700
     int constexpr NumTimeSteps(6);

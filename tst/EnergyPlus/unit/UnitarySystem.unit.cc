@@ -15954,9 +15954,9 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
     state->dataLoopNodes->Node(1).Press = state->dataEnvrn->OutBaroPress;
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
-    state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = state->dataLoopNodes->Node(1).Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
@@ -16010,7 +16010,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataLoopNodes->Node(8).HumRat = 0.0121542; // 17C wb
     state->dataLoopNodes->Node(8).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(8).Temp, state->dataLoopNodes->Node(8).HumRat);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
-    state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = state->dataLoopNodes->Node(1).Temp;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -397.162;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -397.162;
@@ -17269,9 +17269,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     state->dataLoopNodes->Node(1).Press = state->dataEnvrn->OutBaroPress;
     state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
-    state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = state->dataLoopNodes->Node(1).Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 

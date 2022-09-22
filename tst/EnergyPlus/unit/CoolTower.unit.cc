@@ -85,14 +85,12 @@ TEST_F(EnergyPlusFixture, ExerciseCoolTower)
     ASSERT_TRUE(process_idf(idf_objects, false));
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = "ZONE 1";
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 20.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 1.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPC = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTC = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 1;
-    state->dataHeatBalFanSys->ZT.allocate(1);
-    state->dataHeatBalFanSys->ZT(1) = 1;
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 1;
     state->dataEnvrn->WindSpeed = 20.0;

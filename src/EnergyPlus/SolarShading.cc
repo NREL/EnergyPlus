@@ -9613,7 +9613,6 @@ void WindowShadingManager(EnergyPlusData &state)
 
                 int IShadingCtrl = state.dataSurface->Surface(ISurf).activeWindowShadingControl;
                 int IZone = state.dataSurface->Surface(ISurf).Zone;
-                auto &thisIZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(IZone);
                 // Setpoint for shading
                 Real64 SetPoint = state.dataSurface->WindowShadingControl(IShadingCtrl).SetPoint;   // Control setpoint
                 Real64 SetPoint2 = state.dataSurface->WindowShadingControl(IShadingCtrl).SetPoint2; // Second control setpoint
@@ -9645,6 +9644,7 @@ void WindowShadingManager(EnergyPlusData &state)
                 }
 
                 // Determine whether to deploy shading depending on type of control
+                auto &thisIZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(IZone);
 
                 bool shadingOn = false;
                 bool shadingOffButGlareControlOn = false;
