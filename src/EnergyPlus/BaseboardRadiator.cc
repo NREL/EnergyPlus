@@ -827,8 +827,6 @@ namespace BaseboardRadiator {
                     if (DesCoilLoad >= SmallLoad) {
                         // pick an air  mass flow rate that is twice the water mass flow rate (CR8842)
                         this->DesAirMassFlowRate = 2.0 * rho * this->WaterVolFlowRateMax;
-                        // pass along the coil number and the design load to the residual calculation
-                        std::array<Real64, 2> Par2 = {DesCoilLoad, Real64(baseboardNum)};
                         // set the lower and upper limits on the UA
                         UA0 = 0.001 * DesCoilLoad;
                         UA1 = DesCoilLoad;
@@ -843,9 +841,14 @@ namespace BaseboardRadiator {
                             SimHWConvective(state, baseboardNum, LoadMet);
 
                             if (LoadMet > DesCoilLoad) { // if the load met is greater than design load, OK to iterate on UA
-                                // Invert the baseboard model: given the design inlet conditions and the design load,
-                                // find the design UA.
-                                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par2);
+                                // Invert the baseboard model: given the design inlet conditions and the design load, find the design UA.
+                                auto f = [&state, &baseboardNum, &DesCoilLoad](Real64 UA) {
+                                    state.dataBaseboardRadiator->baseboards(baseboardNum).UA = UA;
+                                    Real64 LoadMet = 0.0;
+                                    SimHWConvective(state, baseboardNum, LoadMet);
+                                    return (DesCoilLoad - LoadMet) / DesCoilLoad;
+                                };
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                                 // if the numerical inversion failed, issue error messages.
                                 if (SolFla == -1) {
                                     ShowSevereError(state,
@@ -1101,41 +1104,6 @@ namespace BaseboardRadiator {
         // Set the outlet water nodes for the Coil
         state.dataLoopNodes->Node(WaterOutletNode).Temp = baseboard->baseboards(BaseboardNum).WaterOutletTemp;
         state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = baseboard->baseboards(BaseboardNum).WaterOutletEnthalpy;
-    }
-
-    Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 const UA,                 // UA of coil
-                                 std::array<Real64, 2> const &Par // par(1) = design coil load [W]
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   February 2002
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (Design Coil Load - Coil Heating Output) / Design Coil Load.
-        // Coil Heating Output depends on the UA which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Puts UA into the baseboard data structure, calls SimHWConvective, and calculates
-        // the residual as defined above.
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int BaseboardIndex;
-        Real64 LoadMet;
-
-        BaseboardIndex = int(Par[1]);
-        state.dataBaseboardRadiator->baseboards(BaseboardIndex).UA = UA;
-        SimHWConvective(state, BaseboardIndex, LoadMet);
-        Residuum = (Par[0] - LoadMet) / Par[0];
-
-        return Residuum;
     }
 
 } // namespace BaseboardRadiator

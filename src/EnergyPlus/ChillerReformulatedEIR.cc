@@ -1698,26 +1698,13 @@ void ReformulatedEIRChillerSpecs::control(EnergyPlusData &state, Real64 &MyLoad,
 
         if (CondTempMin > Tmin && CondTempMax < Tmax) {
 
-            std::array<Real64, 4> Par; // Pass parameters for RegulaFalsi solver
-
-            //    Initialize iteration parameters for RegulaFalsi function
-            Par[1] = MyLoad;
-            if (RunFlag) {
-                Par[2] = 1.0;
-            } else {
-                Par[2] = 0.0;
-            }
-            if (FirstIteration) {
-                Par[3] = 1.0;
-            } else {
-                Par[3] = 0.0;
-            }
-
             int SolFla;                    // Feedback flag from General::SolveRoot
             Real64 FalsiCondOutTemp = 0.0; // RegulaFalsi condenser outlet temperature result [C]
-            auto f = std::bind(
-                &ReformulatedEIRChillerSpecs::condOutTempResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            General::SolveRoot(state, Acc, MaxIter, SolFla, FalsiCondOutTemp, f, Tmin, Tmax, Par);
+            auto f = [&state, this, &MyLoad, &RunFlag, &FirstIteration](Real64 FalsiCondOutTemp) {
+                this->calculate(state, MyLoad, RunFlag, FalsiCondOutTemp);
+                return FalsiCondOutTemp - this->CondOutletTemp; // CondOutletTemp is module level variable, final value used for reporting
+            };
+            General::SolveRoot(state, Acc, MaxIter, SolFla, FalsiCondOutTemp, f, Tmin, Tmax);
 
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -1918,31 +1905,6 @@ void ReformulatedEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyL
             this->HeatRecMassFlow = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
         }
     }
-}
-
-Real64 ReformulatedEIRChillerSpecs::condOutTempResidual(EnergyPlusData &state, Real64 const FalsiCondOutTemp, std::array<Real64, 4> const &Par)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Richard Raustad
-    //       DATE WRITTEN   May 2006
-    //       MODIFIED       L.Gu, May 2006
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    //  Calculates residual function (desired condenser outlet temperature)
-    //  Reformulated EIR chiller requires condenser outlet temperature to calculate capacity and power.
-
-    // METHODOLOGY EMPLOYED:
-    //  Regula Falsi solver is used to calculate condenser outlet temperature.
-
-    Real64 MyLoad = Par[1];
-    bool RunFlag = (int(Par[2]) == 1);
-
-    this->calculate(state, MyLoad, RunFlag, FalsiCondOutTemp);
-    Real64 CondOutTempResidual = FalsiCondOutTemp - this->CondOutletTemp; // CondOutletTemp is module level variable, final value used for reporting
-
-    return CondOutTempResidual;
 }
 
 void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, Real64 const FalsiCondOutTemp)
