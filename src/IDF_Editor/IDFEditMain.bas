@@ -34,7 +34,7 @@ Attribute VB_Name = "IDFMain"
 ' command line argument /idd:iddfilename
 '
 
-Public Const ver = "1.52" 'current version of IDFEditor - less than 1 is a beta
+Public Const ver = "1.53" 'current version of IDFEditor - less than 1 is a beta
 Option Explicit
 Option Base 1
 

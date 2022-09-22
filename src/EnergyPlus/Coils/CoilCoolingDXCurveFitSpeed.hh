@@ -71,6 +71,7 @@ struct CoilCoolingDXCurveFitSpeedInputSpecification
     Real64 active_fraction_of_coil_face_area;
     Real64 rated_evaporative_condenser_pump_power_fraction;
     Real64 rated_evaporator_fan_power_per_volume_flow_rate;
+    Real64 rated_evaporator_fan_power_per_volume_flow_rate_2023;
     Real64 evaporative_condenser_effectiveness;
     std::string total_cooling_capacity_function_of_temperature_curve_name;
     std::string total_cooling_capacity_function_of_air_flow_fraction_curve_name;
@@ -116,6 +117,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 ratedCOP = 0.0;
     Real64 rated_total_capacity = 0.0;
     Real64 rated_evap_fan_power_per_volume_flow_rate = 0.0;
+    Real64 rated_evap_fan_power_per_volume_flow_rate_2023 = 0.0;
     Real64 ratedWasteHeatFractionOfPowerInput = 0.0; // rated waste heat fraction of power input
     Real64 evap_condenser_pump_power_fraction = 0.0;
     Real64 evap_condenser_effectiveness = 0.0;

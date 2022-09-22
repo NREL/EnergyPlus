@@ -2189,8 +2189,6 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     int VarNum;
     int VarNum1;
     int CtrlZoneNum;
-    std::string TypeOfComp;
-    std::string NameOfComp;
     bool ErrorsFound;
     bool ModeFlagOn;
     int NumInlets;
@@ -2198,7 +2196,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     int PlantLoopNum;
 
     // Dimension GetChildrenData arrays
-    Array1D_string SubCompTypes;
+    EPVector<DataLoopNode::ConnectionObjectType> SubCompTypes;
     Array1D_string SubCompNames;
     Array1D_string InletNodeNames;
     Array1D_int InletNodeNumbers;
@@ -2230,8 +2228,10 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
         for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
             for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                TypeOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
-                NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
+                DataLoopNode::ConnectionObjectType TypeOfComp = static_cast<DataLoopNode::ConnectionObjectType>(
+                    EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                                                    state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf));
+                std::string &NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
                 // Get complete list of components for complex branches
                 if (IsParentObject(state, TypeOfComp, NameOfComp)) {
 
@@ -2262,7 +2262,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         {
                             auto &thisSubComponent(
                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum));
-                            thisSubComponent.TypeOf = SubCompTypes(SubCompNum);
+                            thisSubComponent.TypeOf = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
                             thisSubComponent.Name = SubCompNames(SubCompNum);
                             thisSubComponent.NodeNameIn = InletNodeNames(SubCompNum);
                             thisSubComponent.NodeNameOut = OutletNodeNames(SubCompNum);
@@ -2286,10 +2286,14 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
                 // check for 'grandchildren'
                 for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
-                    TypeOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).TypeOf;
-                    NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).Name;
-                    if (IsParentObject(state, TypeOfComp, NameOfComp)) {
-                        NumGrandChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
+                    DataLoopNode::ConnectionObjectType TypeOfSubComp =
+                        static_cast<DataLoopNode::ConnectionObjectType>(EnergyPlus::getEnumerationValue(
+                            BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).TypeOf));
+                    std::string &NameOfSubComp =
+                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).Name;
+                    if (IsParentObject(state, TypeOfSubComp, NameOfSubComp)) {
+                        NumGrandChildren = GetNumChildren(state, TypeOfSubComp, NameOfSubComp);
                         SubCompTypes.allocate(NumGrandChildren);
                         SubCompNames.allocate(NumGrandChildren);
                         InletNodeNames.allocate(NumGrandChildren);
@@ -2303,8 +2307,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             .SubSubComp.allocate(NumGrandChildren);
 
                         GetChildrenData(state,
-                                        TypeOfComp,
-                                        NameOfComp,
+                                        TypeOfSubComp,
+                                        NameOfSubComp,
                                         NumGrandChildren,
                                         SubCompTypes,
                                         SubCompNames,
@@ -2321,7 +2325,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                                               .Comp(CompNum)
                                                               .SubComp(SubCompNum)
                                                               .SubSubComp(SubSubCompNum));
-                                thisSubSubComponent.TypeOf = SubCompTypes(SubSubCompNum);
+                                thisSubSubComponent.TypeOf = static_cast<std::string>(
+                                    BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))]);
                                 thisSubSubComponent.Name = SubCompNames(SubSubCompNum);
                                 thisSubSubComponent.NodeNameIn = InletNodeNames(SubSubCompNum);
                                 thisSubSubComponent.NodeNameOut = OutletNodeNames(SubSubCompNum);
@@ -2330,7 +2335,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 NumLeft = GetNumChildren(state, SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
                                 if (NumLeft > 0) {
                                     ShowSevereError(
-                                        state, "Hanging Children for component=" + SubCompTypes(SubSubCompNum) + ':' + SubCompNames(SubSubCompNum));
+                                        state, "Hanging Children for component=" + thisSubSubComponent.TypeOf + ':' + SubCompNames(SubSubCompNum));
                                 }
                             }
                         }
@@ -2359,8 +2364,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                 // Get complete list of components for complex branches
                 {
                     auto &thisComp(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum));
-                    TypeOfComp = thisComp.TypeOf;
-                    NameOfComp = thisComp.Name;
+                    std::string &TypeOfComp = thisComp.TypeOf;
+                    std::string &NameOfComp = thisComp.Name;
                     NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                     if (NumVariables > 0) {
                         VarIndexes.allocate(NumVariables);
@@ -2428,9 +2433,9 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     }
                     for (SubCompNum = 1; SubCompNum <= thisComp.NumSubComps; ++SubCompNum) {
                         // Get complete list of components for complex branches
-                        TypeOfComp = thisComp.SubComp(SubCompNum).TypeOf;
-                        NameOfComp = thisComp.SubComp(SubCompNum).Name;
-                        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
+                        std::string &TypeOfSubComp = thisComp.SubComp(SubCompNum).TypeOf;
+                        std::string &NameOfSubComp = thisComp.SubComp(SubCompNum).Name;
+                        NumVariables = GetNumMeteredVariables(state, TypeOfSubComp, NameOfSubComp);
                         if (NumVariables > 0) {
                             VarIndexes.allocate(NumVariables);
                             VarTypes.allocate(NumVariables);
@@ -2446,8 +2451,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             thisComp.SubComp(SubCompNum).MeteredVar.allocate(NumVariables);
 
                             GetMeteredVariables(state,
-                                                TypeOfComp,
-                                                NameOfComp,
+                                                TypeOfSubComp,
+                                                NameOfSubComp,
                                                 VarIndexes,
                                                 VarTypes,
                                                 IndexTypes,
@@ -2499,9 +2504,9 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
                         for (SubSubCompNum = 1; SubSubCompNum <= thisComp.SubComp(SubCompNum).NumSubSubComps; ++SubSubCompNum) {
                             // Get complete list of components for complex branches
-                            TypeOfComp = thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).TypeOf;
-                            NameOfComp = thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).Name;
-                            NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
+                            std::string &TypeOfSubSubComp = thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).TypeOf;
+                            std::string &NameOfSubSubComp = thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).Name;
+                            NumVariables = GetNumMeteredVariables(state, TypeOfSubSubComp, NameOfSubSubComp);
                             if (NumVariables > 0) {
                                 VarIndexes.allocate(NumVariables);
                                 VarTypes.allocate(NumVariables);
@@ -2518,8 +2523,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar.allocate(NumVariables);
 
                                 GetMeteredVariables(state,
-                                                    TypeOfComp,
-                                                    NameOfComp,
+                                                    TypeOfSubSubComp,
+                                                    NameOfSubSubComp,
                                                     VarIndexes,
                                                     VarTypes,
                                                     IndexTypes,
@@ -2581,10 +2586,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
         // Set index of air loop serving zone
         for (CompNum = 1; CompNum <= state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
-            TypeOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipType(CompNum);
-            NameOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipName(CompNum);
+            std::string &TypeOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipType(CompNum);
+            std::string &NameOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipName(CompNum);
+            DataLoopNode::ConnectionObjectType TypeOfCompNum = static_cast<DataLoopNode::ConnectionObjectType>(
+                EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfComp));
             GetComponentData(state,
-                             TypeOfComp,
+                             TypeOfCompNum,
                              NameOfComp,
                              IsParent,
                              NumInlets,
@@ -2680,8 +2687,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     Names.deallocate();
                 }
 
-                if (IsParentObject(state, TypeOfComp, NameOfComp)) {
-                    NumChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
+                if (IsParentObject(state, TypeOfCompNum, NameOfComp)) {
+                    NumChildren = GetNumChildren(state, TypeOfCompNum, NameOfComp);
                     thisEquipData.NumSubEquip = NumChildren;
 
                     SubCompTypes.allocate(NumChildren);
@@ -2693,7 +2700,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     thisEquipData.SubEquipData.allocate(NumChildren);
 
                     GetChildrenData(state,
-                                    TypeOfComp,
+                                    TypeOfCompNum,
                                     NameOfComp,
                                     NumChildren,
                                     SubCompTypes,
@@ -2705,7 +2712,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                     ErrorsFound);
 
                     for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
-                        thisEquipData.SubEquipData(SubCompNum).TypeOf = SubCompTypes(SubCompNum);
+                        thisEquipData.SubEquipData(SubCompNum).TypeOf =
+                            BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
                         thisEquipData.SubEquipData(SubCompNum).Name = SubCompNames(SubCompNum);
                         thisEquipData.SubEquipData(SubCompNum).OutletNodeNum = OutletNodeNumbers(SubCompNum);
                         thisEquipData.SubEquipData(SubCompNum).InletNodeNum = InletNodeNumbers(SubCompNum);
@@ -2722,10 +2730,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                 }
 
                 for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
-                    TypeOfComp = thisEquipData.SubEquipData(SubCompNum).TypeOf;
-                    NameOfComp = thisEquipData.SubEquipData(SubCompNum).Name;
-                    if (IsParentObject(state, TypeOfComp, NameOfComp)) {
-                        NumGrandChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
+                    std::string &TypeOfSubComp = thisEquipData.SubEquipData(SubCompNum).TypeOf;
+                    std::string &NameOfSubComp = thisEquipData.SubEquipData(SubCompNum).Name;
+                    DataLoopNode::ConnectionObjectType TypeOfSubCompNum = static_cast<DataLoopNode::ConnectionObjectType>(
+                        EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfSubComp));
+                    if (IsParentObject(state, TypeOfSubCompNum, NameOfSubComp)) {
+                        NumGrandChildren = GetNumChildren(state, TypeOfSubCompNum, NameOfSubComp);
                         thisEquipData.SubEquipData(SubCompNum).NumSubSubEquip = NumGrandChildren;
                         SubCompTypes.allocate(NumGrandChildren);
                         SubCompNames.allocate(NumGrandChildren);
@@ -2736,8 +2746,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         thisEquipData.SubEquipData(SubCompNum).SubSubEquipData.allocate(NumGrandChildren);
                         // Sankar added the array number for EquipData
                         GetChildrenData(state,
-                                        TypeOfComp,
-                                        NameOfComp,
+                                        TypeOfSubCompNum,
+                                        NameOfSubComp,
                                         NumGrandChildren,
                                         SubCompTypes,
                                         SubCompNames,
@@ -2748,7 +2758,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                         ErrorsFound);
 
                         for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
-                            thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).TypeOf = SubCompTypes(SubSubCompNum);
+                            thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).TypeOf =
+                                BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))];
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).Name = SubCompNames(SubSubCompNum);
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).OutletNodeNum = OutletNodeNumbers(SubSubCompNum);
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).InletNodeNum = InletNodeNumbers(SubSubCompNum);
@@ -2773,10 +2784,10 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             for (SubCompNum = 1; SubCompNum <= state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipData(CompNum).NumSubEquip; ++SubCompNum) {
                 {
                     auto &thisSubEquipData(state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipData(CompNum).SubEquipData(SubCompNum));
-                    TypeOfComp = thisSubEquipData.TypeOf;
-                    NameOfComp = thisSubEquipData.Name;
+                    std::string &TypeOfSubComp = thisSubEquipData.TypeOf;
+                    std::string &NameOfSubComp = thisSubEquipData.Name;
 
-                    NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
+                    NumVariables = GetNumMeteredVariables(state, TypeOfSubComp, NameOfSubComp);
                     thisSubEquipData.NumMeteredVars = NumVariables; // Sankar added this line
                     if (NumVariables > 0) {
                         VarIndexes.allocate(NumVariables);
@@ -2793,8 +2804,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         thisSubEquipData.MeteredVar.allocate(NumVariables);
 
                         GetMeteredVariables(state,
-                                            TypeOfComp,
-                                            NameOfComp,
+                                            TypeOfSubComp,
+                                            NameOfSubComp,
                                             VarIndexes,
                                             VarTypes,
                                             IndexTypes,
@@ -2843,10 +2854,10 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     }
 
                     for (SubSubCompNum = 1; SubSubCompNum <= thisSubEquipData.NumSubSubEquip; ++SubSubCompNum) {
-                        TypeOfComp = thisSubEquipData.SubSubEquipData(SubSubCompNum).TypeOf;
-                        NameOfComp = thisSubEquipData.SubSubEquipData(SubSubCompNum).Name;
+                        std::string &TypeOfSubSubComp = thisSubEquipData.SubSubEquipData(SubSubCompNum).TypeOf;
+                        std::string &NameOfSubSubComp = thisSubEquipData.SubSubEquipData(SubSubCompNum).Name;
 
-                        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
+                        NumVariables = GetNumMeteredVariables(state, TypeOfSubSubComp, NameOfSubSubComp);
                         thisSubEquipData.SubSubEquipData(SubSubCompNum).NumMeteredVars = NumVariables; // Sankar added this line
                         if (NumVariables > 0) {
                             VarIndexes.allocate(NumVariables);
@@ -2863,8 +2874,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar.allocate(NumVariables);
 
                             GetMeteredVariables(state,
-                                                TypeOfComp,
-                                                NameOfComp,
+                                                TypeOfSubSubComp,
+                                                NameOfSubSubComp,
                                                 VarIndexes,
                                                 VarTypes,
                                                 IndexTypes,
@@ -2949,12 +2960,14 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                 for (CompNum = 1; CompNum <= ThisReportData.Branch(BranchNum).TotalComponents; ++CompNum) {
                     {
                         auto &thisComp(ThisReportData.Branch(BranchNum).Comp(CompNum));
-                        TypeOfComp = thisComp.TypeOf;
-                        NameOfComp = thisComp.Name;
+                        std::string &TypeOfComp = thisComp.TypeOf;
+                        std::string &NameOfComp = thisComp.Name;
+                        DataLoopNode::ConnectionObjectType TypeOfCompNum = static_cast<DataLoopNode::ConnectionObjectType>(
+                            EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfComp));
                         // Get complete list of components for complex branches
-                        if (IsParentObject(state, TypeOfComp, NameOfComp)) {
+                        if (IsParentObject(state, TypeOfCompNum, NameOfComp)) {
 
-                            NumChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
+                            NumChildren = GetNumChildren(state, TypeOfCompNum, NameOfComp);
 
                             SubCompTypes.allocate(NumChildren);
                             SubCompNames.allocate(NumChildren);
@@ -2965,7 +2978,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             thisComp.SubComp.allocate(NumChildren);
 
                             GetChildrenData(state,
-                                            TypeOfComp,
+                                            TypeOfCompNum,
                                             NameOfComp,
                                             NumChildren,
                                             SubCompTypes,
@@ -2977,7 +2990,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                             ErrorsFound);
 
                             for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
-                                thisComp.SubComp(SubCompNum).TypeOf = SubCompTypes(SubCompNum);
+                                thisComp.SubComp(SubCompNum).TypeOf =
+                                    BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubCompNum))];
                                 thisComp.SubComp(SubCompNum).Name = SubCompNames(SubCompNum);
                                 thisComp.SubComp(SubCompNum).NodeNameIn = InletNodeNames(SubCompNum);
                                 thisComp.SubComp(SubCompNum).NodeNameOut = OutletNodeNames(SubCompNum);
@@ -2999,10 +3013,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
                         // check for 'grandchildren'
                         for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
-                            TypeOfComp = thisComp.SubComp(SubCompNum).TypeOf;
-                            NameOfComp = thisComp.SubComp(SubCompNum).Name;
-                            if (IsParentObject(state, TypeOfComp, NameOfComp)) {
-                                NumGrandChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
+                            std::string &TypeOfSubComp = thisComp.SubComp(SubCompNum).TypeOf;
+                            std::string NameOfSubComp = thisComp.SubComp(SubCompNum).Name;
+                            DataLoopNode::ConnectionObjectType TypeOfSubCompNum = static_cast<DataLoopNode::ConnectionObjectType>(
+                                EnergyPlus::getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfSubComp));
+                            if (IsParentObject(state, TypeOfSubCompNum, NameOfSubComp)) {
+                                NumGrandChildren = GetNumChildren(state, TypeOfSubCompNum, NameOfSubComp);
                                 SubCompTypes.allocate(NumGrandChildren);
                                 SubCompNames.allocate(NumGrandChildren);
                                 InletNodeNames.allocate(NumGrandChildren);
@@ -3012,8 +3028,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 thisComp.SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
                                 GetChildrenData(state,
-                                                TypeOfComp,
-                                                NameOfComp,
+                                                TypeOfSubCompNum,
+                                                NameOfSubComp,
                                                 NumGrandChildren,
                                                 SubCompTypes,
                                                 SubCompNames,
@@ -3026,7 +3042,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
                                     {
                                         auto &thisSubSubComp(thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum));
-                                        thisSubSubComp.TypeOf = SubCompTypes(SubSubCompNum);
+                                        thisSubSubComp.TypeOf =
+                                            BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(SubCompTypes(SubSubCompNum))];
                                         thisSubSubComp.Name = SubCompNames(SubSubCompNum);
                                         thisSubSubComp.NodeNameIn = InletNodeNames(SubSubCompNum);
                                         thisSubSubComp.NodeNameOut = OutletNodeNames(SubSubCompNum);
@@ -3077,8 +3094,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     // Get complete list of components for complex branches
                     {
                         auto &thisComp(ThisReportData.Branch(BranchNum).Comp(CompNum));
-                        TypeOfComp = thisComp.TypeOf;
-                        NameOfComp = thisComp.Name;
+                        std::string &TypeOfComp = thisComp.TypeOf;
+                        std::string &NameOfComp = thisComp.Name;
                         NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
                         if (NumVariables > 0) {
                             VarIndexes.allocate(NumVariables);
@@ -3146,9 +3163,9 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         }
                         for (SubCompNum = 1; SubCompNum <= thisComp.NumSubComps; ++SubCompNum) {
                             // Get complete list of components for complex branches
-                            TypeOfComp = thisComp.SubComp(SubCompNum).TypeOf;
-                            NameOfComp = thisComp.SubComp(SubCompNum).Name;
-                            NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
+                            std::string &TypeOfSubComp = thisComp.SubComp(SubCompNum).TypeOf;
+                            std::string &NameOfSubComp = thisComp.SubComp(SubCompNum).Name;
+                            NumVariables = GetNumMeteredVariables(state, TypeOfSubComp, NameOfSubComp);
                             if (NumVariables > 0) {
                                 VarIndexes.allocate(NumVariables);
                                 VarTypes.allocate(NumVariables);
@@ -3165,8 +3182,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 thisComp.SubComp(SubCompNum).MeteredVar.allocate(NumVariables);
 
                                 GetMeteredVariables(state,
-                                                    TypeOfComp,
-                                                    NameOfComp,
+                                                    TypeOfSubComp,
+                                                    NameOfSubComp,
                                                     VarIndexes,
                                                     VarTypes,
                                                     IndexTypes,

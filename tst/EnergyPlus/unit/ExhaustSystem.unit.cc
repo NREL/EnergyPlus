@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::Heat Recovery Unit Tests
+// EnergyPlus::Exhaust System Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -56,16 +56,18 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-// #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -86,7 +88,6 @@ using namespace EnergyPlus::HeatRecovery;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::SimAirServingZones;
-// using namespace EnergyPlus::ReturnAirPathManager;
 using namespace EnergyPlus::SimulationManager;
 
 TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
@@ -406,10 +407,14 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(3).DesignExhaustFlowRate, 0.3, 1e-5);
     EXPECT_NEAR(state->dataZoneEquip->ZoneExhaustControlSystem(4).DesignExhaustFlowRate, 0.4, 1e-5);
 
-    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(1).FlowControlTypeNum, 0);
-    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(2).FlowControlTypeNum, 0);
-    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(3).FlowControlTypeNum, 0);
-    EXPECT_EQ(state->dataZoneEquip->ZoneExhaustControlSystem(4).FlowControlTypeNum, 0);
+    EXPECT_TRUE((state->dataZoneEquip->ZoneExhaustControlSystem(1).FlowControlOption ==
+                 ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled));
+    EXPECT_TRUE((state->dataZoneEquip->ZoneExhaustControlSystem(2).FlowControlOption ==
+                 ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled));
+    EXPECT_TRUE((state->dataZoneEquip->ZoneExhaustControlSystem(3).FlowControlOption ==
+                 ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled));
+    EXPECT_TRUE((state->dataZoneEquip->ZoneExhaustControlSystem(4).FlowControlOption ==
+                 ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled));
 
     EXPECT_EQ(state->dataZoneEquip->NumExhaustAirSystems, 2);
     EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(1).Name, "CENTRAL EXHAUST 1");
@@ -423,4 +428,157 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
 
     EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(1).CentralFanName, "CENTRALEXHAUSTFAN1");
     EXPECT_EQ(state->dataZoneEquip->ExhaustAirSystem(2).CentralFanName, "CENTRALEXHAUSTFAN2");
+}
+
+TEST_F(EnergyPlusFixture, ZoneExhaustCtrl_CheckSupplyNode_Test)
+{
+    // Preset some elements
+    state->dataGlobal->NumOfZones = 4;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "ZONE1";
+    state->dataHeatBal->Zone(2).Name = "ZONE2";
+    state->dataHeatBal->Zone(3).Name = "ZONE3";
+    state->dataHeatBal->Zone(4).Name = "ZONE4";
+
+    state->dataSize->FinalZoneSizing.allocate(4);
+    state->dataSize->FinalZoneSizing(2).MinOA = 0.25;
+
+    state->dataZoneEquip->ZoneExhaustControlSystem.allocate(4);
+    auto &thisExhCtrl1 = state->dataZoneEquip->ZoneExhaustControlSystem(1);
+    auto &thisExhCtrl2 = state->dataZoneEquip->ZoneExhaustControlSystem(2);
+    auto &thisExhCtrl3 = state->dataZoneEquip->ZoneExhaustControlSystem(3);
+    auto &thisExhCtrl4 = state->dataZoneEquip->ZoneExhaustControlSystem(4);
+
+    thisExhCtrl1.ZoneName = "ZONE1";
+    thisExhCtrl2.ZoneName = "ZONE2";
+    thisExhCtrl3.ZoneName = "ZONE3";
+    thisExhCtrl4.ZoneName = "ZONE4";
+
+    thisExhCtrl1.ZoneNum = 1;
+    thisExhCtrl2.ZoneNum = 2;
+    thisExhCtrl3.ZoneNum = 3;
+    thisExhCtrl4.ZoneNum = 4;
+
+    // Expected input value:
+    thisExhCtrl1.DesignExhaustFlowRate = 0.1;
+    thisExhCtrl2.DesignExhaustFlowRate = 0.25;
+
+    thisExhCtrl3.DesignExhaustFlowRate = 0.3;
+    thisExhCtrl4.DesignExhaustFlowRate = 0.4;
+
+    thisExhCtrl1.FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::FollowSupply;
+    thisExhCtrl2.FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::FollowSupply;
+    thisExhCtrl3.FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
+    thisExhCtrl4.FlowControlOption = ExhaustAirSystemManager::ZoneExhaustControl::FlowControlType::Scheduled;
+
+    state->dataZoneEquip->ZoneEquipConfig.allocate(4);
+
+    std::string Zone1InletName = "Zone1_Inlet_Node";
+    int ExhCtrlNum = 1;
+    auto &ZoneEquipConf1 = state->dataZoneEquip->ZoneEquipConfig(1);
+
+    bool ErrorsFound = false;
+    int inletNodeNum = NodeInputManager::GetOnlySingleNode(*state,
+                                                           Zone1InletName,
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                           thisExhCtrl1.Name,
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::ConnectionType::ZoneInlet,
+                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           DataLoopNode::ObjectIsParent);
+
+    ZoneEquipConf1.ZoneName = "ZONE1";
+    ZoneEquipConf1.NumInletNodes = 1;
+    ZoneEquipConf1.NumExhaustNodes = 1;
+    ZoneEquipConf1.NumReturnNodes = 2;
+    ZoneEquipConf1.InletNode.allocate(ZoneEquipConf1.NumInletNodes);
+    ZoneEquipConf1.InletNode(1) = inletNodeNum;
+
+    ZoneEquipConf1.ReturnNode.allocate(ZoneEquipConf1.NumReturnNodes);
+    ZoneEquipConf1.ReturnNode(1) = 4;
+    ZoneEquipConf1.ReturnNode(2) = 5;
+
+    ZoneEquipConf1.ExhaustNode.allocate(ZoneEquipConf1.NumExhaustNodes);
+    ZoneEquipConf1.ExhaustNode(1) = 3;
+
+    thisExhCtrl1.SupplyNodeOrNodelistName = "Zone1_Inlet_Node";
+
+    bool NodeListError = false;
+    int NumParams = 1;
+    int NumNodes = 0;
+
+    thisExhCtrl1.SuppNodeNums.dimension(NumParams, 0);
+
+    thisExhCtrl1.SuppNodeNums = NodeInputManager::GetOnlySingleNode(*state,
+                                                                    thisExhCtrl1.SupplyNodeOrNodelistName,
+                                                                    ErrorsFound,
+                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                                    thisExhCtrl1.Name,
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::ConnectionType::Sensor,
+                                                                    NodeInputManager::CompFluidStream::Primary,
+                                                                    DataLoopNode::ObjectIsParent);
+
+    bool NodeNotFound = false;
+    ExhaustAirSystemManager::CheckForSupplyNode(*state, ExhCtrlNum, NodeNotFound);
+
+    EXPECT_FALSE(NodeNotFound);
+
+    // Test another example where NodeNotFound will be true
+    std::string Zone2InletName = "Zone2_Inlet_Node";
+    ExhCtrlNum = 2;
+    auto &ZoneEquipConf2 = state->dataZoneEquip->ZoneEquipConfig(2);
+
+    ErrorsFound = false;
+    inletNodeNum = NodeInputManager::GetOnlySingleNode(*state,
+                                                       Zone2InletName,
+                                                       ErrorsFound,
+                                                       DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                       thisExhCtrl2.Name,
+                                                       DataLoopNode::NodeFluidType::Air,
+                                                       DataLoopNode::ConnectionType::ZoneInlet,
+                                                       NodeInputManager::CompFluidStream::Primary,
+                                                       DataLoopNode::ObjectIsParent);
+
+    ZoneEquipConf2.ZoneName = "ZONE2";
+    ZoneEquipConf2.NumInletNodes = 1;
+    ZoneEquipConf2.NumExhaustNodes = 1;
+    ZoneEquipConf2.NumReturnNodes = 2;
+    ZoneEquipConf2.InletNode.allocate(ZoneEquipConf2.NumInletNodes);
+    ZoneEquipConf2.InletNode(1) = inletNodeNum;
+
+    ZoneEquipConf2.ReturnNode.allocate(ZoneEquipConf2.NumReturnNodes);
+    ZoneEquipConf2.ReturnNode(1) = 4;
+    ZoneEquipConf2.ReturnNode(2) = 5;
+
+    ZoneEquipConf2.ExhaustNode.allocate(ZoneEquipConf2.NumExhaustNodes);
+    ZoneEquipConf2.ExhaustNode(1) = 3;
+
+    thisExhCtrl2.SupplyNodeOrNodelistName = "Zone22_Inlet_Node"; // set with an incorrect name
+
+    NodeListError = false;
+    NumParams = 1;
+    NumNodes = 0;
+
+    thisExhCtrl2.SuppNodeNums.dimension(NumParams, 0);
+
+    thisExhCtrl2.SuppNodeNums = NodeInputManager::GetOnlySingleNode(*state,
+                                                                    thisExhCtrl2.SupplyNodeOrNodelistName,
+                                                                    ErrorsFound,
+                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACExhaustControl,
+                                                                    thisExhCtrl2.Name,
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::ConnectionType::Sensor,
+                                                                    NodeInputManager::CompFluidStream::Primary,
+                                                                    DataLoopNode::ObjectIsParent);
+
+    NodeNotFound = false;
+    ExhaustAirSystemManager::CheckForSupplyNode(*state, ExhCtrlNum, NodeNotFound);
+
+    EXPECT_TRUE(NodeNotFound);
+
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "GetExhaustControlInput: ZoneHVAC:ExhaustControl=");
 }

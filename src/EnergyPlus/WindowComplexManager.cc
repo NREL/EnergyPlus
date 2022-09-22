@@ -197,7 +197,7 @@ namespace WindowComplexManager {
                 continue; // Only BSDF windows
             // Simon Check: Thermal construction removed
             // ThConst = Construct(IConst)%BSDFInput%ThermalConstruction
-            state.dataSurface->SurfWinWindowModelType(ISurf) = WindowBSDFModel;
+            state.dataSurface->SurfWinWindowModelType(ISurf) = WindowModel::BSDF;
             state.dataHeatBal->AnyBSDF = true;
             ++state.dataWindowComplexManager->NumComplexWind;
             NumStates = 1;
@@ -849,7 +849,7 @@ namespace WindowComplexManager {
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) {
             BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
             JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
-            if (state.dataSurface->SurfWinWindowModelType(JSurf) == WindowBSDFModel) continue;
+            if (state.dataSurface->SurfWinWindowModelType(JSurf) == WindowModel::BSDF) continue;
             if (!(state.dataSurface->Surface(JSurf).Class == SurfaceClass::Window ||
                   state.dataSurface->Surface(JSurf).Class == SurfaceClass::GlassDoor))
                 continue;
@@ -1896,7 +1896,7 @@ namespace WindowComplexManager {
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) {  // back surface loop
             BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
             JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
-            if (state.dataSurface->SurfWinWindowModelType(JSurf) != WindowBSDFModel) continue;
+            if (state.dataSurface->SurfWinWindowModelType(JSurf) != WindowModel::BSDF) continue;
 
             //  Directional-hemispherical back reflectance
             Sum1 = 0.0;
@@ -3313,9 +3313,9 @@ namespace WindowComplexManager {
                     state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 // Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
-                if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir ||
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                    if (state.dataSurface->SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
+                if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor ||
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
+                    if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::Indoor) {
                         InletAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
                     } else { // AirflowSource = outside air
                         InletAirHumRat = state.dataEnvrn->OutHumRat;
@@ -3324,7 +3324,7 @@ namespace WindowComplexManager {
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
                     CpAirZone = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
-                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir) {
+                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor) {
                         state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
                         state.dataSurface->SurfWinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
                     } else {

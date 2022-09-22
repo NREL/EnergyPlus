@@ -3323,7 +3323,23 @@ Do While maxUsedValue + addedSpace > sizeValue
   sizeValue = sizeValue * 2
 Loop
 If sizeValue > orgSize Then
+  On Error Resume Next
   ReDim Preserve IDFValue(sizeValue)
+  If Err.Number <> 0 Then
+    MsgBox "Out of memory when resizing the IDFValue array" + _
+    vbCrLf + vbCrLf + "If you are using many Schedule:Compacts input objects in your file, one workaround so that you " + _
+    "can open the file in IDF Editor, is to reduce " + _
+    "the length of the Schedule:Compact that appears in the Energy+.idd file. Make a copy of the Energy+.idd file " + _
+    "called ORIGINAL-Energy+.idd so you can always go back to it if you have to. Then open the Energ+.idd file with " + _
+    "a text editor such as Notepad and find the section on Schedule:Compact. After A1000 change the comma to a " + _
+    "semi-colon and delete the lines that start with A1001 to A9981, the end of that Schedule:Compact input object" + _
+    "description. Save the modified Energy+.idd file and try opening the file in IDF Editor again. " + _
+    "If that doesn't fix the issue you might want to look at the issue where this was first uncovered:" + _
+    vbCrLf + vbCrLf + "https://github.com/NREL/EnergyPlus/issues/9010 ", vbCritical, "Critical Memory Error"
+    On Error GoTo 0
+    Exit Sub
+  End If
+  On Error GoTo 0
 End If
 'Debug.Print "Value array resized to: "; sizeValue
 End Sub

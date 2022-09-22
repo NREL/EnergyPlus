@@ -87,7 +87,7 @@ namespace HeatingCoils {
         std::string HeatingCoilType;  // Type of HeatingCoil ie. Heating or Cooling
         std::string HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
         int HCoilType_Num = 0;
-        DataGlobalConstants::ResourceType FuelType_Num =
+        DataGlobalConstants::ResourceType ResourceType =
             DataGlobalConstants::ResourceType::Invalid; // Type of fuel used, reference resource type integers
         std::string Schedule;                        // HeatingCoil Operation Schedule
         int SchedPtr = 0;                            // Pointer to the correct schedule

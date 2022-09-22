@@ -8,6 +8,7 @@
 
 #include <performance_map_base.h>
 #include <error_handling_tk205.h>
+#include "griddeddata.h"
 
 // ------------------------------------------------------------------------------------------------
 /// @class GridVariablesBase grid_variables_base.h
@@ -25,16 +26,10 @@ public:
     inline void add_grid_axis(PerformanceMapBase* performance_map, std::vector<double>& axis)
     {
        performance_map->add_grid_axis(axis);
-       std::ostringstream oss;
-       oss << "Adding grid axis with size " << axis.size();
-       tk205::show_message(tk205::MsgSeverity::INFO_205, oss.str());
     }
     inline void add_grid_axis(PerformanceMapBase* performance_map, std::vector<int>& axis)
     {
        performance_map->add_grid_axis(axis);
-       std::ostringstream oss;
-       oss << "Adding (int) grid axis with size " << axis.size();
-       tk205::show_message(tk205::MsgSeverity::INFO_205, oss.str());
     }
 };
 

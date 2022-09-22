@@ -23,7 +23,7 @@ namespace tk205 {
 
     //static
     std::shared_ptr<RSInstanceBase> RSInstanceFactory::create(std::string const& RS_ID, 
-                                                                const char* RS_instance_file)
+                                                              const char* RS_instance_file)
     {
     const auto factory = get_RS_factory_map()[RS_ID];
     

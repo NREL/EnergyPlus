@@ -105,7 +105,7 @@ namespace StandardRatings {
                          int const EIRFPLRCurveIndex,                  // Index for the EIR vs part-load ratio curve
                          Real64 const MinUnloadRat,                    // Minimum unloading ratio
                          Real64 &IPLV,
-                         Optional<Real64 const> EvapVolFlowRate,
+                         Optional<Real64 const> CondVolFlowRate,
                          Optional_int_const CondLoopNum,
                          Optional<Real64 const> OpenMotorEff);
 

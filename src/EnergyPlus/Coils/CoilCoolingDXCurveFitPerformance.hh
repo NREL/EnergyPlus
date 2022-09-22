@@ -154,6 +154,12 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 standardRatingEER = 0.0;             // energy efficiency ratio of single speed DX cooling coil
     Real64 standardRatingIEER = 0.0;            // Integrated energy efficiency ratio of single speed DX cooling coil
 
+    // standard rating stuff -- for now just 210/240 2023
+    Real64 standardRatingCoolingCapacity2023 = 0.0; // net cooling capacity of single speed DX cooling coil
+    Real64 standardRatingSEER2_User = 0.0;          // seasonal energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingSEER2_Standard = 0.0;
+    Real64 standardRatingEER2 = 0.0; // energy efficiency ratio of single speed DX cooling coil
+
     CoilCoolingDXCurveFitOperatingMode normalMode;
     int hasAlternateMode = 0;                          // 0 Normal, 1 Enhanced, 2 SubcoolReheat
     CoilCoolingDXCurveFitOperatingMode alternateMode;  // enhanced dehumidifcation or Subcool mode

@@ -1306,8 +1306,22 @@
     HumidityRatioDifference, !- Zone Latent Heating Design Supply Air Humidity Ratio Input Method
     ,                        !- Zone Humidification Design Supply Air Humidity Ratio
     0.004,                   !- Zone Heating Design Supply Air Humidity Ratio Difference
-    40,                      !- Zone Humidistat Dehumidification Set Point Schedule Name
-    45;                      !- Zone Humidistat Humidification Set Point Schedule Name
+    Zone Dehumidification Setpoint, !- Zone Humidistat Dehumidification Set Point Schedule Name
+    Zone Humidification Setpoint;   !- Zone Humidistat Humidification Set Point Schedule Name
+
+  Schedule:Compact,
+    Zone Dehumidification Setpoint, !- Name
+    Any Number,                     !- Schedule Type Limits Name
+    Through: 12/31,                 !- Field 1
+    For: AllDays,                   !- Field 2
+    Until: 24:00,45.0;              !- Field 3
+
+  Schedule:Compact,
+    Zone Humidification Setpoint,   !- Name
+    Any Number,                     !- Schedule Type Limits Name
+    Through: 12/31,                 !- Field 1
+    For: AllDays,                   !- Field 2
+    Until: 24:00,40.0;              !- Field 3
 
   DesignSpecification:OutdoorAir,
     SZ DSOA WEST ZONE,       !- Name
@@ -1351,8 +1365,8 @@
     HumidityRatioDifference, !- Zone Latent Heating Design Supply Air Humidity Ratio Input Method
     ,                        !- Zone Humidification Design Supply Air Humidity Ratio
     0.004,                    !- Zone Heating Design Supply Air Humidity Ratio Difference
-    40,                      !- Zone Humidistat Dehumidification Set Point Schedule Name
-    45;                      !- Zone Humidistat Humidification Set Point Schedule Name
+    Zone Dehumidification Setpoint, !- Zone Humidistat Dehumidification Set Point Schedule Name
+    Zone Humidification Setpoint;   !- Zone Humidistat Humidification Set Point Schedule Name
 
   DesignSpecification:OutdoorAir,
     SZ DSOA EAST ZONE,       !- Name
@@ -1396,8 +1410,8 @@
     HumidityRatioDifference, !- Zone Latent Heating Design Supply Air Humidity Ratio Input Method
     ,                        !- Zone Humidification Design Supply Air Humidity Ratio
     0.004,                   !- Zone Heating Design Supply Air Humidity Ratio Difference
-    40,                      !- Zone Humidistat Dehumidification Set Point Schedule Name
-    45;                      !- Zone Humidistat Humidification Set Point Schedule Name
+    Zone Dehumidification Setpoint, !- Zone Humidistat Dehumidification Set Point Schedule Name
+    Zone Humidification Setpoint;   !- Zone Humidistat Humidification Set Point Schedule Name
 
   DesignSpecification:OutdoorAir,
     SZ DSOA NORTH ZONE,      !- Name
