@@ -4453,7 +4453,7 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
                 // Set zone mixing incoming mass flow rate
                 if ((Iteration == 0) || state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnOnly ||
                     state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnThenMixing) {
-                    ZoneMixingAirMassFlowRate = state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum);
+                    ZoneMixingAirMassFlowRate = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MixingMassFlowZone;
                 } else {
                     ZoneMixingAirMassFlowRate = max(0.0,
                                                     ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate +
@@ -4606,7 +4606,7 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
                     Real64 sysUnbalancedFlow = sysUnbalExhaust + totalZoneReturnMassFlow - thisZoneEquip.TotInletAirMassFlowRate;
                     if (sysUnbalancedFlow > DataHVACGlobals::SmallMassFlow) {
                         // Now include infiltration, ventilation, and mixing flows (these are all entering the zone, so subtract them)
-                        Real64 incomingFlow = thisZoneHB.OAMFL + thisZoneHB.VAMFL + state.dataHeatBalFanSys->MixingMassFlowZone(zoneNum);
+                        Real64 incomingFlow = thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.MixingMassFlowZone;
                         Real64 unbalancedFlow = max(0.0, sysUnbalancedFlow - incomingFlow);
                         if (unbalancedFlow > DataHVACGlobals::SmallMassFlow) {
                             // Re-check on volume basis - use current zone density for incoming, standard density for HVAC sys
@@ -4630,7 +4630,7 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
                                                   format("  Infiltration: {:.6R}  Zone Ventilation: {:.6R}  Mixing (incoming): {:.6R}",
                                                          thisZoneHB.OAMFL / rhoZone,
                                                          thisZoneHB.VAMFL / rhoZone,
-                                                         state.dataHeatBalFanSys->MixingMassFlowZone(zoneNum) / rhoZone));
+                                                         thisZoneHB.MixingMassFlowZone / rhoZone));
                                 ShowContinueError(
                                     state,
                                     format("  Imbalance (excess outflow): {:.6R}  Total system OA flow (for all airloops serving this zone): {:.6R}",
@@ -5206,8 +5206,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         thisZoneHB.ThermChimAMFL = 0.0;
         thisZoneHB.MCPTThermChim = 0.0;
     }
-    state.dataHeatBalFanSys->MixingMassFlowZone = 0.0;
-    state.dataHeatBalFanSys->MixingMassFlowXHumRat = 0.0;
     state.dataZoneEquip->CrossMixingReportFlag = false;
     state.dataZoneEquip->MixingReportFlag = false;
     if (state.dataContaminantBalance->Contaminant.CO2Simulation &&
@@ -5236,7 +5234,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     for (int j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(j);
         state.dataZoneEquip->ZMAT(j) = thisZoneHB.MAT;
-        state.dataZoneEquip->ZHumRat(j) = state.dataHeatBalFanSys->ZoneAirHumRat(j);
+        state.dataZoneEquip->ZHumRat(j) = thisZoneHB.ZoneAirHumRat;
         // This is only temporary fix for CR8867.  (L. Gu 8/12)
         if (SysTimestepLoop == 1) {
             state.dataZoneEquip->ZMAT(j) = thisZoneHB.XMPT;
@@ -5655,9 +5653,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 thisZoneHB.MCPTM += MCP * TZM;
 
                 // Now to determine the moisture conditions
-                state.dataHeatBalFanSys->MixingMassFlowZone(n) += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
-                state.dataHeatBalFanSys->MixingMassFlowXHumRat(n) +=
-                    state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
+                thisZoneHB.MixingMassFlowZone += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
+                thisZoneHB.MixingMassFlowXHumRat += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     state.dataContaminantBalance->MixingMassFlowCO2(n) +=
                         state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
@@ -5691,9 +5688,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 thisZoneHB.MCPM += MCP;
                 thisZoneHB.MCPTM += MCP * TZM;
                 // Now to determine the moisture conditions
-                state.dataHeatBalFanSys->MixingMassFlowZone(n) += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
-                state.dataHeatBalFanSys->MixingMassFlowXHumRat(n) +=
-                    state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
+                thisZoneHB.MixingMassFlowZone += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
+                thisZoneHB.MixingMassFlowXHumRat += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     state.dataContaminantBalance->MixingMassFlowCO2(n) +=
                         state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
@@ -5727,9 +5723,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             thisZoneHB.MCPM += MCP;
             thisZoneHB.MCPTM += MCP * TZM;
             // Now to determine the moisture conditions
-            state.dataHeatBalFanSys->MixingMassFlowZone(n) += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
-            state.dataHeatBalFanSys->MixingMassFlowXHumRat(n) +=
-                state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
+            thisZoneHB.MixingMassFlowZone += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
+            thisZoneHB.MixingMassFlowXHumRat += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 state.dataContaminantBalance->MixingMassFlowCO2(n) +=
                     state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
@@ -5875,12 +5870,12 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 otherZoneHB.MCPTM += MCPxN * TZN;
 
                 // Now to determine the moisture conditions
-                state.dataHeatBalFanSys->MixingMassFlowZone(m) += state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity;
-                state.dataHeatBalFanSys->MixingMassFlowXHumRat(m) +=
+                otherZoneHB.MixingMassFlowZone += state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity;
+                otherZoneHB.MixingMassFlowXHumRat +=
                     state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(n);
 
-                state.dataHeatBalFanSys->MixingMassFlowZone(n) += state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity;
-                state.dataHeatBalFanSys->MixingMassFlowXHumRat(n) +=
+                thisZoneHB.MixingMassFlowZone += state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity;
+                thisZoneHB.MixingMassFlowXHumRat +=
                     state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     state.dataContaminantBalance->MixingMassFlowCO2(m) +=
@@ -5904,8 +5899,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         // Zone loops structured in getinput so only do each pair of zones bounding door once, even if multiple doors in one zone
         for (int ZoneA = 1; ZoneA <= (state.dataGlobal->NumOfZones - 1); ++ZoneA) {
             if (!state.dataHeatBal->RefDoorMixing(ZoneA).RefDoorMixFlag) continue;
+            auto &zoneAHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA);
             for (int j = 1; j <= state.dataHeatBal->RefDoorMixing(ZoneA).NumRefDoorConnections; ++j) {
                 int ZoneB = state.dataHeatBal->RefDoorMixing(ZoneA).MateZonePtr(j);
+                auto &zoneBHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneB);
                 Real64 TZoneA = state.dataZoneEquip->ZMAT(ZoneA);
                 Real64 TZoneB = state.dataZoneEquip->ZMAT(ZoneB);
                 Real64 HumRatZoneA = state.dataZoneEquip->ZHumRat(ZoneA);
@@ -5958,16 +5955,16 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 Real64 MassFlowXHumRatToA = MassFlowToA * HumRatZoneB;
                 Real64 MassFlowXHumRatToB = MassFlowToB * HumRatZoneA;
 
-                state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA).MCPM += MassFlowXCpToA;
-                state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneB).MCPM += MassFlowXCpToB;
-                state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA).MCPTM += MassFlowXCpXTempToA;
-                state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneB).MCPTM += MassFlowXCpXTempToB;
+                zoneAHB.MCPM += MassFlowXCpToA;
+                zoneBHB.MCPM += MassFlowXCpToB;
+                zoneAHB.MCPTM += MassFlowXCpXTempToA;
+                zoneBHB.MCPTM += MassFlowXCpXTempToB;
 
                 // Now to determine the moisture conditions
-                state.dataHeatBalFanSys->MixingMassFlowZone(ZoneA) += MassFlowToA;
-                state.dataHeatBalFanSys->MixingMassFlowZone(ZoneB) += MassFlowToB;
-                state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneA) += MassFlowXHumRatToA;
-                state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneB) += MassFlowXHumRatToB;
+                zoneAHB.MixingMassFlowZone += MassFlowToA;
+                zoneBHB.MixingMassFlowZone += MassFlowToB;
+                zoneAHB.MixingMassFlowXHumRat += MassFlowXHumRatToA;
+                zoneBHB.MixingMassFlowXHumRat += MassFlowXHumRatToB;
 
                 // Now to determine the CO2 and generic contaminant conditions
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {

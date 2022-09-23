@@ -56,7 +56,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/EarthTube.hh>
@@ -734,7 +733,6 @@ void ReportEarthTube(EnergyPlusData &state)
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         auto &thisZone = state.dataEarthTube->ZnRptET(ZoneLoop);
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
-        auto &zoneTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT;
 
         // Break the infiltration load into heat gain and loss components.
         Real64 const AirDensity =
@@ -755,14 +753,14 @@ void ReportEarthTube(EnergyPlusData &state)
                 thisZone.EarthTubeFanElecPower = thisEarthTube.FanPower;
 
                 // Break the EarthTube load into heat gain and loss components.
-                if (zoneTemp > thisEarthTube.AirTemp) {
-                    thisZone.EarthTubeHeatLoss = thisZoneHB.MCPE * (zoneTemp - thisEarthTube.AirTemp) * ReportingConstant;
-                    thisZone.EarthTubeHeatLossRate = thisZoneHB.MCPE * (zoneTemp - thisEarthTube.AirTemp);
+                if (thisZoneHB.ZT > thisEarthTube.AirTemp) {
+                    thisZone.EarthTubeHeatLoss = thisZoneHB.MCPE * (thisZoneHB.ZT - thisEarthTube.AirTemp) * ReportingConstant;
+                    thisZone.EarthTubeHeatLossRate = thisZoneHB.MCPE * (thisZoneHB.ZT - thisEarthTube.AirTemp);
                     thisZone.EarthTubeHeatGain = 0.0;
                     thisZone.EarthTubeHeatGainRate = 0.0;
-                } else if (zoneTemp <= thisEarthTube.AirTemp) {
-                    thisZone.EarthTubeHeatGain = thisZoneHB.MCPE * (thisEarthTube.AirTemp - zoneTemp) * ReportingConstant;
-                    thisZone.EarthTubeHeatGainRate = thisZoneHB.MCPE * (thisEarthTube.AirTemp - zoneTemp);
+                } else if (thisZoneHB.ZT <= thisEarthTube.AirTemp) {
+                    thisZone.EarthTubeHeatGain = thisZoneHB.MCPE * (thisEarthTube.AirTemp - thisZoneHB.ZT) * ReportingConstant;
+                    thisZone.EarthTubeHeatGainRate = thisZoneHB.MCPE * (thisEarthTube.AirTemp - thisZoneHB.ZT);
                     thisZone.EarthTubeHeatLoss = 0.0;
                     thisZone.EarthTubeHeatLossRate = 0.0;
                 }

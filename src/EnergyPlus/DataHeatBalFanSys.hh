@@ -108,21 +108,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
     // Zone air drybulb conditions variables
     Array1D<Real64> TempTstatAir; // temperature of air near the thermo stat
 
-    Array1D<Real64> ZTAVComf; // Zone Air Temperature Averaged over the Zone Time step used
-    // in thermal comfort models (currently Fang model only)
-    Array1D<Real64> ZoneAirHumRatAvgComf; // AIR Humidity Ratio averaged over the zone time
-    // step used in thermal comfort models (currently Fang model only)
-
-    // Zone Air moisture conditions variables
-    Array1D<Real64> ZoneAirHumRatAvg; // AIR Humidity Ratio averaged over the zone time step
-    Array1D<Real64> ZoneAirHumRat;    // AIR Humidity Ratio
-
-    Array1D<Real64> ZoneAirHumRatTemp; // Temp zone air humidity ratio at time plus 1
-    Array1D<Real64> ZoneAirHumRatOld;  // Last Time Steps Zone AIR Humidity Ratio
-
-    Array1D<Real64> MixingMassFlowZone;    // Mixing MASS FLOW (kg/s)
-    Array1D<Real64> MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio
-
     Array1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag
     Array1D_bool ZoneInfiltrationFlag; // Zone Infiltration flag
     Array1D_int ZoneReOrder;           // zone number reordered for zone mass balance

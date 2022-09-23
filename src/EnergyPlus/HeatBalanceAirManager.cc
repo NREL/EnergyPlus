@@ -4801,7 +4801,7 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
         // temperature of the air temperatures at the system time step for the
         // entire zone time step.
         state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirTemp = thisZoneHB.ZTAV;
-        state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneLoop);
+        state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = thisZoneHB.ZoneAirHumRatAvg;
         state.dataHeatBal->ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (thisZoneHB.ZTAV + state.dataHeatBal->ZoneMRT(ZoneLoop));
         state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirDewPointTemp =
             PsyTdpFnWPb(state, state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat, state.dataEnvrn->OutBaroPress);

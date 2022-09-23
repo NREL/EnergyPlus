@@ -6956,6 +6956,7 @@ namespace InternalHeatGains {
         //       The reported temperature range.
         for (int Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
             int NZ = state.dataHeatBal->People(Loop).ZonePtr;
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
             NumberOccupants =
                 state.dataHeatBal->People(Loop).NumberOfPeople * GetCurrentScheduleValue(state, state.dataHeatBal->People(Loop).NumberOfPeoplePtr);
             if (state.dataHeatBal->People(Loop).EMSPeopleOn) NumberOccupants = state.dataHeatBal->People(Loop).EMSNumberOfPeople;
@@ -6970,11 +6971,10 @@ namespace InternalHeatGains {
                 if (state.dataHeatBal->People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
                     if (!(state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ))) {
                         SensiblePeopleGain =
-                            NumberOccupants * (C[0] + ActivityLevel_WperPerson * (C[1] + ActivityLevel_WperPerson * C[2]) +
-                                               state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT *
-                                                   ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
-                                                    state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT *
-                                                        (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
+                            NumberOccupants *
+                            (C[0] + ActivityLevel_WperPerson * (C[1] + ActivityLevel_WperPerson * C[2]) +
+                             thisZoneHB.MAT * ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
+                                               thisZoneHB.MAT * (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
                     } else { // UCSD - DV or UI
                         SensiblePeopleGain =
                             NumberOccupants *
@@ -7536,6 +7536,7 @@ namespace InternalHeatGains {
         for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
             // Get schedules
             NZ = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
             int spaceNum = state.dataHeatBal->ZoneITEq(Loop).spaceIndex;
             OperSchedFrac = GetCurrentScheduleValue(state, state.dataHeatBal->ZoneITEq(Loop).OperSchedPtr);
             CPULoadSchedFrac = GetCurrentScheduleValue(state, state.dataHeatBal->ZoneITEq(Loop).CPULoadSchedPtr);
@@ -7563,25 +7564,25 @@ namespace InternalHeatGains {
                     } else {
                         RecircFrac = state.dataHeatBal->ZoneITEq(Loop).DesignRecircFrac;
                     }
-                    TRecirc = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT;
-                    WRecirc = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
+                    TRecirc = thisZoneHB.MAT;
+                    WRecirc = thisZoneHB.ZoneAirHumRat;
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
                 } else if (AirConnection == ITEInletConnection::RoomAirModel) {
                     // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
-                    TAirIn = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT;
+                    TAirIn = thisZoneHB.MAT;
                     TSupply = TAirIn;
-                    WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
+                    WAirIn = thisZoneHB.ZoneAirHumRat;
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
                     if (state.dataHeatBal->ZoneITEq(Loop).inControlledZone) {
                         int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
                         TSupply = state.dataLoopNodes->Node(ZoneAirInletNode).Temp;
                     } else {
-                        TSupply = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT;
+                        TSupply = thisZoneHB.MAT;
                     }
-                    TAirIn = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT;
-                    WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
+                    TAirIn = thisZoneHB.MAT;
+                    WAirIn = thisZoneHB.ZoneAirHumRat;
                 }
             }
             TDPAirIn = PsyTdpFnWPb(state, WAirIn, state.dataEnvrn->StdBaroPress, RoutineName);

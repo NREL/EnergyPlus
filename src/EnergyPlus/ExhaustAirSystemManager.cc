@@ -499,10 +499,10 @@ namespace ExhaustAirSystemManager {
                     if (thisExhCtrl.AvailScheduleNum == 0) {
                         // mismatch, reset to always on
                         thisExhCtrl.AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
-                    ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
-                    ShowContinueError(state, format("Avaiability Schedule Name = {} not found.", availSchName));
+                        ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
+                        ShowContinueError(state, format("Avaiability Schedule Name = {} not found.", availSchName));
                         ShowContinueError(state, "Availability Schedule is reset to Always ON.");
-                }
+                    }
                 }
 
                 std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
@@ -907,7 +907,7 @@ namespace ExhaustAirSystemManager {
                 if (supplyNodeNum == state.dataZoneEquip->ZoneEquipConfig(thisExhCtrl.ZoneNum).InletNode(NodeNum)) {
                     ZoneNodeNotFound = false;
                     break;
-    }
+                }
             }
             if (ZoneNodeNotFound) {
                 ShowSevereError(state, format("{}{}={}", RoutineName, CurrentModuleObject, thisExhCtrl.Name));

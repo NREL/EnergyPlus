@@ -899,19 +899,16 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // initialize local variables
     int SurfNum = this->SurfacePtr;                         // surface number of floor that is the pool
     int ZoneNum = state.dataSurface->Surface(SurfNum).Zone; // index to zone array
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     // Convection coefficient calculation
-    Real64 HConvIn = 0.22 * std::pow(std::abs(this->PoolWaterTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT), 1.0 / 3.0) *
-                     this->CurCoverConvFac; // convection coefficient for pool
-    calcSwimmingPoolEvap(state,
-                         EvapRate,
-                         SurfNum,
-                         state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT,
-                         state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+    Real64 HConvIn =
+        0.22 * std::pow(std::abs(this->PoolWaterTemp - thisZoneHB.MAT), 1.0 / 3.0) * this->CurCoverConvFac; // convection coefficient for pool
+    calcSwimmingPoolEvap(state, EvapRate, SurfNum, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
     this->MakeUpWaterMassFlowRate = EvapRate;
     Real64 EvapEnergyLossPerArea = -EvapRate *
-                                   Psychrometrics::PsyHfgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
-                                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT) /
+                                   Psychrometrics::PsyHfgAirFnWTdb(thisZoneHB.ZoneAirHumRat,
+                                                                   thisZoneHB.MAT) /
                                    state.dataSurface->Surface(SurfNum).Area; // energy effect of evaporation rate per unit area in W/m2
     this->EvapHeatLossRate = EvapEnergyLossPerArea * state.dataSurface->Surface(SurfNum).Area;
     // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
@@ -955,7 +952,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
 
     // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
     state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) =
-        SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
+        SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * thisZoneHB.MAT +
         (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / state.dataGlobal->TimeStepZoneSec)) * Cp /
             state.dataSurface->Surface(SurfNum).Area;
     state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) =
@@ -963,9 +960,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
 
     // Finally take care of the latent and convective gains resulting from the pool
     state.dataHeatBalFanSys->SumConvPool(ZoneNum) += this->RadConvertToConvect;
-    state.dataHeatBalFanSys->SumLatentPool(ZoneNum) +=
-        EvapRate * Psychrometrics::PsyHfgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
-                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+    state.dataHeatBalFanSys->SumLatentPool(ZoneNum) += EvapRate * Psychrometrics::PsyHfgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.MAT);
 }
 
 void SwimmingPoolData::calcSwimmingPoolEvap(EnergyPlusData &state,

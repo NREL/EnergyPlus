@@ -57,7 +57,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -1253,9 +1252,9 @@ namespace WaterUse {
                 this->LatentRate = 0.0;
                 this->LatentEnergy = 0.0;
             } else {
-                Real64 ZoneHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(this->Zone);
+                Real64 ZoneHumRat = thisZoneHB.ZoneAirHumRat;
                 Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(state,
-                                                                     state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->Zone).MAT,
+                                                                     thisZoneHB.MAT,
                                                                      1.0,
                                                                      state.dataEnvrn->OutBaroPress,
                                                                      RoutineName); // Humidratio at 100% relative humidity

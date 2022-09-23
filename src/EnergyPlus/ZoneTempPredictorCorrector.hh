@@ -107,10 +107,11 @@ namespace ZoneTempPredictorCorrector {
     struct ZoneSpaceHeatBalanceData
     {
         // Zone air drybulb conditions variables
-        Real64 MAT = DataHeatBalFanSys::ZoneInitialTemp;  // MEAN AIR TEMPERATURE (C)
-        Real64 ZTAV = DataHeatBalFanSys::ZoneInitialTemp; // Air Temperature Averaged over the Zone Time step
-        Real64 ZT;                                        // Air Temperature Averaged over the System Time Increment
-
+        Real64 MAT = DataHeatBalFanSys::ZoneInitialTemp;      // MEAN AIR TEMPERATURE (C)
+        Real64 ZTAV = DataHeatBalFanSys::ZoneInitialTemp;     // Air Temperature Averaged over the Zone Time step
+        Real64 ZT = DataHeatBalFanSys::ZoneInitialTemp;       // Air Temperature Averaged over the System Time Increment
+        Real64 ZTAVComf = DataHeatBalFanSys::ZoneInitialTemp; // Air Temperature Averaged over the Zone Time step used
+        // in thermal comfort models (currently Fang model only)
         Real64 XMAT = DataHeatBalFanSys::ZoneInitialTemp; // Temporary zone/space temperature to test convergence
         Real64 XM2T = DataHeatBalFanSys::ZoneInitialTemp;
         Real64 XM3T = DataHeatBalFanSys::ZoneInitialTemp;
@@ -126,7 +127,13 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZoneT1 = 0.0;                                 // Zone/space temperature at the previous time step used in Exact and Euler method
 
         // Zone Air moisture conditions variables
-        Real64 ZoneAirHumRat;           // AIR Humidity Ratio - duplicate of DataHeatBalFansys::ZoneAirHumRat for now
+        Real64 ZoneAirHumRat = 0.01;        // Air Humidity Ratio
+        Real64 ZoneAirHumRatAvg = 0.01;     // Air Humidity Ratio averaged over the zone time step
+        Real64 ZoneAirHumRatTemp = 0.01;    // Temp air humidity ratio at time plus 1
+        Real64 ZoneAirHumRatOld = 0.01;     // Last Time Steps air Humidity Ratio
+        Real64 ZoneAirHumRatAvgComf = 0.01; // Air Humidity Ratio averaged over the zone time
+                                            // step used in thermal comfort models (currently Fang model only)
+
         Real64 WZoneTimeMinus1 = 0.0;   // Humidity ratio history terms for 3rd order derivative
         Real64 WZoneTimeMinus2 = 0.0;   // Time Minus 2 Zone Time Steps Term
         Real64 WZoneTimeMinus3 = 0.0;   // Time Minus 3 Zone Time Steps Term
@@ -200,6 +207,8 @@ namespace ZoneTempPredictorCorrector {
         // HVAC time step
         Real64 MDotCPOA = 0.0; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
         Real64 MDotOA = 0.0;   // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
+        Real64 MixingMassFlowZone = 0.0;    // Mixing MASS FLOW (kg/s)
+        Real64 MixingMassFlowXHumRat = 0.0; // Mixing MASS FLOW * Humidity Ratio
 
         void CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac);
         void UpdateTemperatures(EnergyPlusData &state,

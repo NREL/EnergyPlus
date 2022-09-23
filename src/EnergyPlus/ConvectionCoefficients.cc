@@ -69,7 +69,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -3426,7 +3425,7 @@ void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
 
     Real64 ACH = CalcCeilingDiffuserACH(state, ZoneNum);
 
-    Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
+    Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
 
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
         auto &thisSpace = state.dataHeatBal->space(spaceNum);
@@ -4066,7 +4065,7 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
     // Get humidity ratio
     Real64 AirHumRat;
     if (Surface(SurfNum).Zone > 0) {
-        AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(Surface(SurfNum).Zone);
+        AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(Surface(SurfNum).Zone).ZoneAirHumRatAvg;
     } else {
         AirHumRat = state.dataEnvrn->OutHumRat;
     }
@@ -4831,8 +4830,6 @@ void EvaluateIntHcModels(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // central case statement for calling inside convection models
@@ -4842,16 +4839,12 @@ void EvaluateIntHcModels(EnergyPlusData &state,
     //     preparation of argument values for the function calls is contained in each Case block (repeats)
     //  - also updates the reference air temperature type for use in the surface heat balance calcs
 
-    // Using/Aliasing
-
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &Surface(state.dataSurface->Surface);
-
     Real64 tmpHc = 0.0;
 
-    int const ZoneNum = Surface(SurfNum).Zone;
-    Real64 &Tsurface = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
-    Real64 &Tzone = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+    auto const &thisSurface = state.dataSurface->Surface(SurfNum);
+    int const ZoneNum = thisSurface.Zone;
+    Real64 const Tsurface = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
+    Real64 const Tzone = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
 
     auto &HnFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in;
     // now call appropriate function to calculate Hc
@@ -4861,7 +4854,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         CalcUserDefinedInsideHcModel(state, SurfNum, state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum), tmpHc);
         break;
     case ConvectionConstants::HcInt_ASHRAEVerticalWall:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [](double Tsurf, double Tamb, double, double, double) -> double { return CalcASHRAEVerticalWall(Tsurf - Tamb); };
         } else {
             tmpHc = CalcASHRAEVerticalWall((Tsurface - Tzone));
@@ -4869,93 +4862,93 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_WaltonUnstableHorizontalOrTilt:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcWaltonUnstableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
             };
         } else {
-            tmpHc = CalcWaltonUnstableHorizontalOrTilt((Tsurface - Tzone), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+            tmpHc = CalcWaltonUnstableHorizontalOrTilt((Tsurface - Tzone), thisSurface.CosTilt); // TODO verify CosTilt in vs out
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_WaltonStableHorizontalOrTilt:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcWaltonStableHorizontalOrTilt(Tsurf - Tamb, cosTilt);
             };
         } else {
-            tmpHc = CalcWaltonStableHorizontalOrTilt((Tsurface - Tzone), Surface(SurfNum).CosTilt); // TODO verify CosTilt in vs out
+            tmpHc = CalcWaltonStableHorizontalOrTilt((Tsurface - Tzone), thisSurface.CosTilt); // TODO verify CosTilt in vs out
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_FisherPedersenCeilDiffuserFloor: {
         Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
-        Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
 
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                return CalcFisherPedersenCeilDiffuserFloor(state, AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
+                return CalcFisherPedersenCeilDiffuserFloor(state, AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, thisSurface.Height);
             };
         } else {
             tmpHc = CalcFisherPedersenCeilDiffuserFloor(state,
                                                         AirChangeRate,
                                                         Tsurface,
                                                         Tzone,
-                                                        Surface(SurfNum).CosTilt,
+                                                        thisSurface.CosTilt,
                                                         AirHumRat,
-                                                        Surface(SurfNum).Height,
-                                                        state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                                                        thisSurface.Height,
+                                                        state.dataConstruction->Construct(thisSurface.Construction).TypeIsWindow);
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     }
     case ConvectionConstants::HcInt_FisherPedersenCeilDiffuserCeiling: {
         Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
-        Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
 
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                return CalcFisherPedersenCeilDiffuserCeiling(state, AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
+                return CalcFisherPedersenCeilDiffuserCeiling(state, AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, thisSurface.Height);
             };
         } else {
             tmpHc = CalcFisherPedersenCeilDiffuserCeiling(state,
                                                           AirChangeRate,
                                                           Tsurface,
                                                           Tzone,
-                                                          Surface(SurfNum).CosTilt,
+                                                          thisSurface.CosTilt,
                                                           AirHumRat,
-                                                          Surface(SurfNum).Height,
-                                                          state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                                                          thisSurface.Height,
+                                                          state.dataConstruction->Construct(thisSurface.Construction).TypeIsWindow);
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     }
     case ConvectionConstants::HcInt_FisherPedersenCeilDiffuserWalls: {
         Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
-        Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
 
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                return CalcFisherPedersenCeilDiffuserWalls(state, AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, Surface(SurfNum).Height);
+                return CalcFisherPedersenCeilDiffuserWalls(state, AirChangeRate, Tsurf, Tamb, cosTilt, AirHumRat, thisSurface.Height);
             };
         } else {
             tmpHc = CalcFisherPedersenCeilDiffuserWalls(state,
                                                         AirChangeRate,
                                                         Tsurface,
                                                         Tzone,
-                                                        Surface(SurfNum).CosTilt,
+                                                        thisSurface.CosTilt,
                                                         AirHumRat,
-                                                        Surface(SurfNum).Height,
-                                                        state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                                                        thisSurface.Height,
+                                                        state.dataConstruction->Construct(thisSurface.Construction).TypeIsWindow);
         }
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
         }
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     }
     case ConvectionConstants::HcInt_AlamdariHammondStableHorizontal:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 HorizHydrDiam = state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcAlamdariHammondStableHorizontal(Tsurf - Tamb, HorizHydrDiam);
@@ -4966,7 +4959,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_AlamdariHammondVerticalWall:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 WallHeight = state.dataSurface->SurfIntConvZoneWallHeight(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcAlamdariHammondVerticalWall(Tsurf - Tamb, WallHeight);
@@ -4977,7 +4970,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_AlamdariHammondUnstableHorizontal:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 HorizHydrDiam = state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcAlamdariHammondStableHorizontal(Tsurf - Tamb, HorizHydrDiam);
@@ -4989,7 +4982,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_KhalifaEq3WallAwayFromHeat:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq3WallAwayFromHeat(Tsurf - Tamb); };
         } else {
             tmpHc = CalcKhalifaEq3WallAwayFromHeat((Tsurface - Tzone));
@@ -4997,7 +4990,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_KhalifaEq4CeilingAwayFromHeat:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq4CeilingAwayFromHeat(Tsurf - Tamb); };
         } else {
             tmpHc = CalcKhalifaEq4CeilingAwayFromHeat((Tsurface - Tzone));
@@ -5005,7 +4998,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_KhalifaEq5WallNearHeat:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq5WallsNearHeat(Tsurf - Tamb); };
         } else {
             tmpHc = CalcKhalifaEq5WallsNearHeat((Tsurface - Tzone));
@@ -5013,7 +5006,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_KhalifaEq6NonHeatedWalls:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq6NonHeatedWalls(Tsurf - Tamb); };
         } else {
             tmpHc = CalcKhalifaEq6NonHeatedWalls((Tsurface - Tzone));
@@ -5021,7 +5014,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_KhalifaEq7Ceiling:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKhalifaEq7Ceiling(Tsurf - Tamb); };
         } else {
             tmpHc = CalcKhalifaEq7Ceiling((Tsurface - Tzone));
@@ -5029,7 +5022,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_AwbiHattonHeatedFloor:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 HorizHydrDiam = state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcAwbiHattonHeatedFloor(Tsurf - Tamb, HorizHydrDiam);
@@ -5040,7 +5033,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_AwbiHattonHeatedWall:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 HorizHydrDiam = state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcAwbiHattonHeatedWall(Tsurf - Tamb, HorizHydrDiam); };
         } else {
@@ -5049,7 +5042,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_BeausoleilMorrisonMixedAssistingWall:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedAssistedWall(Tsurf - Tamb,
                                                                state.dataSurface->SurfIntConvZoneWallHeight(SurfNum),
@@ -5064,7 +5057,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_BeausoleilMorrisonMixedOppossingWall:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedOpposingWall(Tsurf - Tamb,
                                                                state.dataSurface->SurfIntConvZoneWallHeight(SurfNum),
@@ -5079,7 +5072,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_BeausoleilMorrisonMixedStableCeiling:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedStableCeiling(Tsurf - Tamb,
                                                                 state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum),
@@ -5094,7 +5087,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_BeausoleilMorrisonMixedUnstableCeiling:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedUnstableCeiling(Tsurf - Tamb,
                                                                   state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum),
@@ -5109,7 +5102,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_BeausoleilMorrisonMixedStableFloor:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedStableFloor(Tsurf - Tamb,
                                                               state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum),
@@ -5124,7 +5117,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_BeausoleilMorrisonMixedUnstableFloor:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcBeausoleilMorrisonMixedUnstableFloor(Tsurf - Tamb,
                                                                 state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum),
@@ -5139,7 +5132,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_FohannoPolidoriVerticalWall:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             Real64 QdotConvection = -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum);
             Real64 WallHeight = state.dataSurface->SurfIntConvZoneWallHeight(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
@@ -5159,7 +5152,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case ConvectionConstants::HcInt_KaradagChilledCeiling:
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double { return CalcKaradagChilledCeiling(Tsurf - Tamb); };
         } else {
             tmpHc = CalcKaradagChilledCeiling((Tsurface - Tzone));
@@ -5177,11 +5170,10 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                                                             state.dataSurface->SurfIntConvWindowWallRatio(SurfNum),
                                                             state.dataSurface->SurfIntConvWindowLocation(SurfNum),
                                                             ZoneNum);
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
         }
-        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-        if (ZoneNode > 0) {
+        if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
         } else {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
@@ -5191,11 +5183,10 @@ void EvaluateIntHcModels(EnergyPlusData &state,
     case ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWalls: {
         tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWall(
             state, state.dataSurface->SurfIntConvZonePerimLength(SurfNum), state.dataSurface->SurfIntConvWindowLocation(SurfNum), ZoneNum);
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
         }
-        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-        if (ZoneNode > 0) {
+        if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
         } else {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
@@ -5204,11 +5195,10 @@ void EvaluateIntHcModels(EnergyPlusData &state,
     }
     case ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserFloor: {
         tmpHc = CalcGoldsteinNovoselacCeilingDiffuserFloor(state.dataSurface->SurfIntConvZonePerimLength(SurfNum), ZoneNum);
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+        if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
         }
-        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-        if (ZoneNode > 0) {
+        if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
         } else {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;

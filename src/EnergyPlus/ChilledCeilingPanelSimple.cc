@@ -1257,7 +1257,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     // iterate like in the low temperature radiant systems because the inlet water condition is known
     // not calculated.  So, we can deal with this upfront rather than after calculation and then more
     // iteration.
-    DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
+    DewPointTemp = PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
 
     if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 
@@ -1485,9 +1485,8 @@ Real64 CoolingPanelParams::getCoolingPanelControlTemp(EnergyPlusData &state, int
         return state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
     } break;
     default: { // Should never get here
-        ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
-        ShowFatalError(state, "Preceding condition causes termination.");
-        return -99990; // Compiler doesn't understand that a fatal error means the program will exit, so give an invalid value
+        assert(false);
+        return -99990; // Compiler wants a return value for every path, so give an invalid value
     } break;
     }
 }

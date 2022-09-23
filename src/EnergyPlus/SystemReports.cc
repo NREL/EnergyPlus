@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -4517,10 +4516,11 @@ void ReportVentilationLoads(EnergyPlusData &state)
         }
 
         // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-        Real64 currentZoneAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
-                                                                         state.dataEnvrn->OutBaroPress,
-                                                                         state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).MAT,
-                                                                         state.dataHeatBalFanSys->ZoneAirHumRatAvg(CtrlZoneNum));
+        Real64 currentZoneAirDensity =
+            Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                              state.dataEnvrn->OutBaroPress,
+                                              state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).MAT,
+                                              state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).ZoneAirHumRatAvg);
         if (currentZoneAirDensity > 0.0) thisZoneVentRepVars.OAVolFlowCrntRho = thisZoneVentRepVars.OAMassFlow / currentZoneAirDensity;
         thisZoneVentRepVars.OAVolCrntRho = thisZoneVentRepVars.OAVolFlowCrntRho * TimeStepSys * DataGlobalConstants::SecInHour;
         if (ZoneVolume > 0.0) thisZoneVentRepVars.MechACH = (thisZoneVentRepVars.OAVolCrntRho / TimeStepSys) / ZoneVolume;

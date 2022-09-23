@@ -2252,11 +2252,13 @@ namespace RoomAirModelManager {
                                 AinCV =
                                     state.afn->MultizoneSurfaceCrackData(state.dataRoomAirModelMgr->TypeNumber).coefficient /
                                     (BaseDischargeCoef *
-                                     std::sqrt(2.0 / PsyRhoAirFnPbTdbW(
-                                                         state,
-                                                         state.dataEnvrn->OutBaroPress,
-                                                         state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataRoomAirModelMgr->Loop).MAT,
-                                                         state.dataHeatBalFanSys->ZoneAirHumRat(state.dataRoomAirModelMgr->Loop))));
+                                     std::sqrt(
+                                         2.0 /
+                                         PsyRhoAirFnPbTdbW(
+                                             state,
+                                             state.dataEnvrn->OutBaroPress,
+                                             state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataRoomAirModelMgr->Loop).MAT,
+                                             state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataRoomAirModelMgr->Loop).ZoneAirHumRat)));
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Height =
                                     AinCV / state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirModelMgr->Loop2).Width;
                             }

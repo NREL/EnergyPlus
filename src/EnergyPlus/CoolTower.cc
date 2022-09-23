@@ -725,10 +725,8 @@ namespace CoolTower {
                 thisZoneHB.MCPTC = thisZoneHB.MCPC * OutletTemp;
                 thisZoneHB.CTMFL = thisZoneHB.MCPC / AirSpecHeat;
 
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower =
-                    thisZoneHB.MCPC * std::abs(state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZT - OutletTemp);
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower =
-                    CVF_ZoneNum * std::abs(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) - OutletHumRat);
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower = thisZoneHB.MCPC * std::abs(thisZoneHB.ZT - OutletTemp);
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower = CVF_ZoneNum * std::abs(thisZoneHB.ZoneAirHumRat - OutletHumRat);
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletTemp = OutletTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletHumRat = OutletHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate = CVF_ZoneNum;

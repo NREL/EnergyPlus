@@ -60,7 +60,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -103,7 +102,6 @@ namespace WindowComplexManager {
     using namespace DataHeatBalance;
     using namespace DataShadowingCombinations;
     using namespace Vectors;
-    using namespace DataHeatBalFanSys;
 
     // Parameters for gas definitions
     enum class GasCoeffs
@@ -3316,15 +3314,15 @@ namespace WindowComplexManager {
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
                 if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor ||
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
+                    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                     if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::Indoor) {
-                        InletAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
+                        InletAirHumRat = thisZoneHB.ZoneAirHumRat;
                     } else { // AirflowSource = outside air
                         InletAirHumRat = state.dataEnvrn->OutHumRat;
                     }
-                    ZoneTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum)
-                                   .MAT; // this should be Tin (account for different reference temps)
+                    ZoneTemp = thisZoneHB.MAT; // this should be Tin (account for different reference temps)
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
-                    CpAirZone = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+                    CpAirZone = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor) {
                         state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;

@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -962,6 +961,7 @@ namespace RoomAirModelAirflowNetwork {
         } // ZoneSupPlenumNum
 
         // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         if (ControlledZoneAirFlag) {
             auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
             for (NodeNum = 1; NodeNum <= thisZoneEquipConfig.NumInletNodes; ++NodeNum) {
@@ -976,7 +976,7 @@ namespace RoomAirModelAirflowNetwork {
                         NodeW = state.dataLoopNodes->Node(thisZoneEquipConfig.InletNode(NodeNum)).HumRat;
                         MassFlowRate = state.dataLoopNodes->Node(thisZoneEquipConfig.InletNode(NodeNum)).MassFlowRate *
                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupplyFraction;
-                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+                        CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         SumSysM += MassFlowRate;
@@ -989,7 +989,7 @@ namespace RoomAirModelAirflowNetwork {
                 // Get node conditions
                 NodeTemp = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
-                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+                CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             } // NodeNum
@@ -1000,7 +1000,7 @@ namespace RoomAirModelAirflowNetwork {
                     ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = state.dataLoopNodes->Node(ADUInNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+                    CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -1008,7 +1008,7 @@ namespace RoomAirModelAirflowNetwork {
                     ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = state.dataLoopNodes->Node(ADUOutNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+                    CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -1017,7 +1017,7 @@ namespace RoomAirModelAirflowNetwork {
             // Get node conditions
             NodeTemp = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
             MassFlowRate = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
         }
@@ -1115,7 +1115,7 @@ namespace RoomAirModelAirflowNetwork {
 
                 if (state.dataSurface->SurfTAirRef(SurfNum) == DataSurfaces::RefAirTemp::ZoneMeanAirTemp) {
                     // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
-                    RefAirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                    RefAirTemp = thisZoneHB.MAT;
                     SumHA += HA;
                 } else if (state.dataSurface->SurfTAirRef(SurfNum) == DataSurfaces::RefAirTemp::AdjacentAirTemp) {
                     RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
@@ -1132,7 +1132,7 @@ namespace RoomAirModelAirflowNetwork {
                     RefAirTemp = SumSysMCpT / SumSysMCp;
                     SumHATref += HA * RefAirTemp;
                 } else {
-                    RefAirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                    RefAirTemp = thisZoneHB.MAT;
                     SumHA = SumHA + HA;
                 }
 

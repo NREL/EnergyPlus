@@ -3937,7 +3937,8 @@ namespace LowTempRadiantSystem {
             // A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
             // conditions.
             this->CondCausedShutDown = false;
-            DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
+            DewPointTemp =
+                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
 
             if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
@@ -5029,7 +5030,8 @@ namespace LowTempRadiantSystem {
             // A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
             // conditions.
             this->CondCausedShutDown = false;
-            DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(this->ZonePtr), state.dataEnvrn->OutBaroPress);
+            DewPointTemp =
+                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ZonePtr).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
 
             if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 

@@ -8143,10 +8143,11 @@ namespace UnitarySystems {
                 if (ZoneLoad < 0.0 && state.dataUnitarySystems->MoistureLoad <= 0.0 &&
                     (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
                      state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag)) {
-                    this->LoadSHR = ZoneLoad / (ZoneLoad + state.dataUnitarySystems->MoistureLoad *
-                                                               Psychrometrics::PsyHgAirFnWTdb(
-                                                                   state.dataHeatBalFanSys->ZoneAirHumRat(this->ControlZoneNum),
-                                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ControlZoneNum).MAT));
+                    this->LoadSHR =
+                        ZoneLoad / (ZoneLoad + state.dataUnitarySystems->MoistureLoad *
+                                                   Psychrometrics::PsyHgAirFnWTdb(
+                                                       state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ControlZoneNum).ZoneAirHumRat,
+                                                       state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ControlZoneNum).MAT));
                     if (this->LoadSHR < 0.0) {
                         this->LoadSHR = 0.0;
                     }

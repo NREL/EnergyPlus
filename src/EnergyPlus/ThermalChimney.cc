@@ -711,6 +711,7 @@ namespace ThermalChimney {
         for (int Loop = 1; Loop <= state.dataThermalChimneys->TotThermalChimney; ++Loop) {
 
             int ZoneNum = state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr;
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             // start off with first surface in zone widths
             int firstSpaceHTSurfaceFirst = state.dataHeatBal->space(state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1)).HTSurfaceFirst;
             majorW = state.dataSurface->Surface(firstSpaceHTSurfaceFirst).Width;
@@ -759,11 +760,8 @@ namespace ThermalChimney {
                 AbsorberWallWidthTC = state.dataThermalChimneys->ThermalChimneySys(Loop).AbsorberWallWidth;
             }
 
-            AirDensityThermalChim = PsyRhoAirFnPbTdbW(state,
-                                                      state.dataEnvrn->OutBaroPress,
-                                                      state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT,
-                                                      state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-            AirSpecHeatThermalChim = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+            AirDensityThermalChim = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
+            AirSpecHeatThermalChim = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             AirOutletCrossAreaTC = state.dataThermalChimneys->ThermalChimneySys(Loop).AirOutletCrossArea;
             DischargeCoeffTC = state.dataThermalChimneys->ThermalChimneySys(Loop).DischargeCoeff;
 
@@ -784,13 +782,12 @@ namespace ThermalChimney {
             Process2 = 0.0;
             for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                 TCZoneNumCounter = state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
-                Process1 += PsyHFnTdbW(state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter).MAT,
-                                       state.dataHeatBalFanSys->ZoneAirHumRat(TCZoneNumCounter)) *
+                auto &thisTCZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter);
+                Process1 += PsyHFnTdbW(thisTCZoneHB.MAT, thisTCZoneHB.ZoneAirHumRat) *
                             state.dataThermalChimneys->ThermalChimneySys(Loop).DistanceThermChimInlet(TCZoneNum) *
                             state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum);
                 Process2 += state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) *
-                            PsyHFnTdbW(state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter).MAT,
-                                       state.dataHeatBalFanSys->ZoneAirHumRat(TCZoneNumCounter));
+                            PsyHFnTdbW(state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter).MAT, thisTCZoneHB.ZoneAirHumRat);
             }
             OverallThermalChimLength = Process1 / Process2;
 
@@ -892,8 +889,8 @@ namespace ThermalChimney {
                 AirDensity = PsyRhoAirFnPbTdbW(state,
                                                state.dataEnvrn->OutBaroPress,
                                                state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter).MAT,
-                                               state.dataHeatBalFanSys->ZoneAirHumRat(TCZoneNumCounter));
-                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(TCZoneNumCounter));
+                                               thisTCZoneHB.ZoneAirHumRat);
+                CpAir = PsyCpAirFnW(thisTCZoneHB.ZoneAirHumRat);
                 thisTCZoneHB.MCPThermChim =
                     TCVolumeAirFlowRate * AirDensity * CpAir * state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum);
                 if (thisTCZoneHB.MCPThermChim <= 0.0) {
@@ -903,7 +900,6 @@ namespace ThermalChimney {
                 thisTCZoneHB.MCPTThermChim = thisTCZoneHB.MCPThermChim * state.dataHeatBal->Zone(TCZoneNumCounter).OutDryBulbTemp;
             }
 
-            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             thisZoneHB.MCPThermChim = TCVolumeAirFlowRate * AirDensity * CpAir;
             if (thisZoneHB.MCPThermChim <= 0.0) {
                 thisZoneHB.MCPThermChim = 0.0;
@@ -966,11 +962,9 @@ namespace ThermalChimney {
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
 
             // Break the infiltration load into heat gain and loss components.
-            AirDensity = PsyRhoAirFnPbTdbW(state,
-                                           state.dataEnvrn->OutBaroPress,
-                                           state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).MAT,
-                                           state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop));
-            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop));
+            AirDensity = PsyRhoAirFnPbTdbW(
+                state, state.dataEnvrn->OutBaroPress, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).MAT, thisZoneHB.ZoneAirHumRat);
+            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyVolume = (thisZoneHB.MCPThermChim / CpAir / AirDensity) * TSMult;
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyMass = (thisZoneHB.MCPThermChim / CpAir) * TSMult;
 
@@ -997,38 +991,12 @@ namespace ThermalChimney {
 
     void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC)
     {
-        // SUBROUTINE INFORMATION:
-
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine sovles linear algebraic equations using Gauss Elimination Method.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Argument array dimensioning
         EquaCoef.dim(NTC, NTC);
         EP_SIZE_CHECK(EquaConst, NTC);
         EP_SIZE_CHECK(ThermChimSubTemp, NTC);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Array1D<Real64> tempor(NTC);
         Real64 tempb;

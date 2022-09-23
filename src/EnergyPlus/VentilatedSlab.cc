@@ -2754,11 +2754,12 @@ namespace VentilatedSlab {
         RadSurfNum = ventSlab.NumOfSurfaces;
         Tinlet = state.dataLoopNodes->Node(InletNode).Temp;
         Toutdoor = state.dataLoopNodes->Node(OutsideAirNode).Temp;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         // Control Type Check
         switch (ventSlab.controlType) {
         case ControlType::MeanAirTemp: {
-            SetPointTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+            SetPointTemp = thisZoneHB.MAT;
             break;
         }
         case ControlType::MeanRadTemp: {
@@ -2766,7 +2767,7 @@ namespace VentilatedSlab {
             break;
         }
         case ControlType::OperativeTemp: {
-            SetPointTemp = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+            SetPointTemp = 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
             break;
         }
         case ControlType::OutdoorDryBulbTemp: {
@@ -2782,7 +2783,8 @@ namespace VentilatedSlab {
             break;
         }
         case ControlType::DewPointTemp: {
-            SetPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ventSlab.ZonePtr), state.dataEnvrn->OutBaroPress);
+            SetPointTemp = PsyTdpFnWPb(
+                state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZonePtr).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
             break;
         }
         default: {              // Should never get here
@@ -3711,6 +3713,7 @@ namespace VentilatedSlab {
         ZoneNum = ventSlab.ZonePtr;
         ZoneMult = double(state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
         AirMassFlow = state.dataLoopNodes->Node(ventSlab.RadInNode).MassFlowRate / ZoneMult;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         if (state.dataVentilatedSlab->OperatingMode == HeatingMode) {
 
@@ -3868,7 +3871,7 @@ namespace VentilatedSlab {
                                 state.dataLoopNodes->Node(FanOutletNode).Temp = state.dataLoopNodes->Node(ReturnAirNode).Temp;
                                 state.dataLoopNodes->Node(SlabInNode).Temp = state.dataLoopNodes->Node(FanOutletNode).Temp;
                             } else if (ventSlab.SysConfg == VentilatedSlabConfig::SlabAndZone) {
-                                state.dataLoopNodes->Node(ReturnAirNode).Temp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                                state.dataLoopNodes->Node(ReturnAirNode).Temp = thisZoneHB.MAT;
                                 state.dataLoopNodes->Node(SlabInNode).Temp = state.dataLoopNodes->Node(ReturnAirNode).Temp;
                                 state.dataLoopNodes->Node(FanOutletNode).Temp = state.dataLoopNodes->Node(SlabInNode).Temp;
                                 state.dataLoopNodes->Node(ZoneAirInNode).Temp = state.dataLoopNodes->Node(SlabInNode).Temp;
@@ -3884,7 +3887,7 @@ namespace VentilatedSlab {
                     // conditions.
 
                     if (state.dataVentilatedSlab->OperatingMode == CoolingMode) {
-                        DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ventSlab.ZonePtr), state.dataEnvrn->OutBaroPress);
+                        DewPointTemp = PsyTdpFnWPb(state, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= ventSlab.NumOfSurfaces; ++RadSurfNum2) {
                             if (state.dataHeatBalSurf->SurfInsideTempHist(1)(ventSlab.SurfacePtr(RadSurfNum2)) < (DewPointTemp + CondDeltaTemp)) {
                                 // Condensation warning--must shut off radiant system
@@ -4031,7 +4034,7 @@ namespace VentilatedSlab {
                         //         state.dataLoopNodes->Node(ReturnAirNode)%Temp = MAT(Zonenum)
                     } else {
                         state.dataLoopNodes->Node(ZoneAirInNode).Temp = state.dataLoopNodes->Node(SlabInNode).Temp;
-                        state.dataLoopNodes->Node(ReturnAirNode).Temp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                        state.dataLoopNodes->Node(ReturnAirNode).Temp = thisZoneHB.MAT;
                     }
                 }
 
@@ -4135,8 +4138,9 @@ namespace VentilatedSlab {
                     // conditions.
 
                     if (state.dataVentilatedSlab->OperatingMode == CoolingMode) {
-                        DewPointTemp =
-                            PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ventSlab.ZPtr(RadSurfNum)), state.dataEnvrn->OutBaroPress);
+                        DewPointTemp = PsyTdpFnWPb(state,
+                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZPtr(RadSurfNum)).ZoneAirHumRat,
+                                                   state.dataEnvrn->OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= ventSlab.NumOfSurfaces; ++RadSurfNum2) {
                             if (state.dataHeatBalSurf->SurfInsideTempHist(1)(ventSlab.SurfacePtr(RadSurfNum2)) < (DewPointTemp + CondDeltaTemp)) {
                                 // Condensation warning--must shut off radiant system
