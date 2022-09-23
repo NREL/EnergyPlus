@@ -91,8 +91,7 @@ TEST_F(EnergyPlusFixture, ExerciseCoolTower)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPC = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTC = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 1;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 1;
     state->dataEnvrn->WindSpeed = 20.0;
     CoolTower::ManageCoolTower(*state);
     // auto &thisTower = state->dataCoolTower->CoolTowerSys(1);
