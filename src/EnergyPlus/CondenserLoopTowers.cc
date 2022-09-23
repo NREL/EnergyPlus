@@ -5780,17 +5780,17 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;                                    // Flag of solver
-        std::array<Real64, 6> Par;                     // Parameter array for regula falsi solver
         Real64 constexpr VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
 
         //   determine tower outlet water temperature
-        Par[0] = this->thisTowerNum;    // Index to cooling tower
-        Par[1] = WaterFlowRateRatio;    // water flow rate ratio
-        Par[2] = airFlowRateRatioLocal; // air flow rate ratio
-        Par[3] = Twb;                   // inlet air wet-bulb temperature [C]
-        Real64 Tr;                      // range temperature which results in an energy balance
-        auto f = std::bind(&CoolingTower::residualTr, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp, Par);
+        Real64 Tr; // range temperature which results in an energy balance
+        auto f = [&state, this, &WaterFlowRateRatio, &airFlowRateRatioLocal, &Twb](Real64 Trange) {
+            // call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
+            Real64 Tapproach = this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, airFlowRateRatioLocal, Twb, Trange);
+            // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
+            return (Twb + Tapproach + Trange) - state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+        };
+        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp);
 
         Real64 OutletWaterTempLocal = this->WaterTemp - Tr;
 
