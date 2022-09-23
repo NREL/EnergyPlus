@@ -5255,17 +5255,11 @@ namespace CondenserLoopTowers {
 
                     // Setpoint was met with pump ON and fan ON at full flow
                     // Calculate the fraction of full air flow to exactly meet the setpoint temperature
-                    std::array<Real64, 6> Par;   // Parameter array for regula falsi solver
-                    Par[0] = this->thisTowerNum; // Index to cooling tower
-                    //         cap the water flow rate ratio and inlet air wet-bulb temperature to provide a stable output
-                    Par[1] = WaterFlowRateRatioCapped; // water flow rate ratio
-                    Par[2] = TwbCapped;                // Inlet air wet-bulb temperature [C]
-                    //         do not cap desired range and approach temperature to provide a valid (balanced) output for this simulation time step
-                    Par[3] = Tr;  // Tower range temperature [C]
-                    Par[4] = Ta;  // desired approach temperature [C]
-                    Par[5] = 1.0; // calculate the air flow rate ratio required for a balance
-                    auto f = std::bind(&CoolingTower::residualTa, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
+                    auto f = [&state, this, &WaterFlowRateRatioCapped, &TwbCapped, &Tr, &Ta](Real64 FlowRatio) {
+                        Real64 TapproachActual = this->calculateVariableSpeedApproach(state, WaterFlowRateRatioCapped, FlowRatio, TwbCapped, Tr);
+                        return Ta - TapproachActual;
+                    };
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag)
                             ShowWarningError(state,
@@ -6161,49 +6155,6 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(this->VSTower).PrintWFRRMessage = false;
             }
         }
-    }
-
-    Real64 CoolingTower::residualTa(EnergyPlusData &state,
-                                    Real64 FlowRatio,                // water or air flow ratio of cooling tower
-                                    std::array<Real64, 6> const &Par // par(1) = tower number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   Feb 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (Desired Approach - Model Approach Output)
-        // Tower Approach depends on the water (or air) flow rate ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // In SizeTower, calibrates tower water flow rate ratio at an air flow rate ratio of 1.
-        // In VariableSpeedTower, calculates air flow rate ratio at the inlet water flow rate ratio.
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = water or air flow ratio (opposite of input variable)
-        // par(3) = inlet air wet-bulb temp [C]
-        // par(4) = tower range [C]
-        // par(5) = desired approach [C]
-        // par(6) = 0.0 to calculate water flow rate ratio, 1.0 for air
-
-        Real64 AirFlowRateRatioLocal; // ratio of water flow rate to design water flow rate
-        Real64 WaterFlowRateRatio;    // ratio of water flow rate to design water flow rate
-        if (Par[5] == 0.0) {
-            AirFlowRateRatioLocal = Par[1];
-            WaterFlowRateRatio = FlowRatio;
-        } else {
-            AirFlowRateRatioLocal = FlowRatio;
-            WaterFlowRateRatio = Par[1];
-        }
-        Real64 InletAirWB = Par[2];       // inlet air wet-bulb temperature [C]
-        Real64 Trange = Par[3];           // tower range temperature [C]
-        Real64 TapproachDesired = Par[4]; // desired tower approach temperature [C]
-        // call model to determine tower approach temperature given other independent variables
-        Real64 TapproachActual = this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, AirFlowRateRatioLocal, InletAirWB, Trange);
-        return TapproachDesired - TapproachActual;
     }
 
     void CoolingTower::calculateWaterUsage(EnergyPlusData &state)

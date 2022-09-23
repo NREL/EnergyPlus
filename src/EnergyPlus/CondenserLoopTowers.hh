@@ -426,11 +426,6 @@ namespace CondenserLoopTowers {
 
         void report(EnergyPlusData &state, bool RunFlag);
 
-        Real64 residualTa(EnergyPlusData &state,
-                          Real64 FlowRatio,                // water or air flow ratio of cooling tower
-                          std::array<Real64, 6> const &Par // par(1) = tower number
-        );
-
         static PlantComponent *factory(EnergyPlusData &state, std::string_view objectName);
     };
 
