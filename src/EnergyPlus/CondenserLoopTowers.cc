@@ -3177,12 +3177,13 @@ namespace CondenserLoopTowers {
                                              this->TowerFreeConvNomCap));
 
                     Real64 OutWaterTemp; // outlet water temperature during sizing [C]
-                    OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, Par[2], Par[3], UA0);
-                    Real64 CoolingOutput = Par[4] * Par[2] * (this->WaterTemp - OutWaterTemp); // tower capacity during sizing [W]
+
+                    OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, this->FreeConvAirFlowRate, UA0);
+                    Real64 CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower capacity during sizing [W]
                     ShowContinueError(state, format("Tower capacity at lower UA guess ({:.4T}) = {:.0T} W.", UA0, CoolingOutput));
 
-                    OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, Par[2], Par[3], UA1);
-                    CoolingOutput = Par[4] * Par[2] * (this->WaterTemp - OutWaterTemp);
+                    OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, this->FreeConvAirFlowRate, UA1);
+                    CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp);
                     ShowContinueError(state, format("Tower capacity at upper UA guess ({:.4T}) = {:.0T} W.", UA1, CoolingOutput));
 
                     if (CoolingOutput < DesTowerLoad) {
@@ -3216,6 +3217,13 @@ namespace CondenserLoopTowers {
         // yields an approach temperature that matches user input
         if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:VariableSpeed")) {
 
+            Par[0] = this->thisTowerNum;   // Index to cooling tower
+            Par[1] = 1.0;                  // air flow rate ratio
+            Par[2] = this->DesignInletWB;  // inlet air wet-bulb temperature [C]
+            Par[3] = this->DesignRange;    // tower range temperature [C]
+            Par[4] = this->DesignApproach; // design approach temperature [C]
+            Par[5] = 0.0;                  // Calculation FLAG, 0.0 = calc water flow ratio, 1.0 calc air flow ratio
+
             //   check range for water flow rate ratio (make sure RegulaFalsi converges)
             Real64 MaxWaterFlowRateRatio = 0.5; // maximum water flow rate ratio which yields desired approach temp
             Real64 Tapproach = 0.0;             // temporary tower approach temp variable [C]
@@ -3244,12 +3252,6 @@ namespace CondenserLoopTowers {
             Real64 WaterFlowRatio(0.0); // tower water flow rate ratio found during model calibration
 
             if (ModelCalibrated) {
-                Par[0] = this->thisTowerNum;   // Index to cooling tower
-                Par[1] = 1.0;                  // air flow rate ratio
-                Par[2] = this->DesignInletWB;  // inlet air wet-bulb temperature [C]
-                Par[3] = this->DesignRange;    // tower range temperature [C]
-                Par[4] = this->DesignApproach; // design approach temperature [C]
-                Par[5] = 0.0;                  // Calculation FLAG, 0.0 = calc water flow ratio, 1.0 calc air flow ratio
                 auto f = [&state, this, &Par](Real64 FlowRatio) {
                     Real64 AirFlowRateRatioLocal; // ratio of water flow rate to design water flow rate
                     Real64 WaterFlowRateRatio;    // ratio of water flow rate to design water flow rate
@@ -5082,7 +5084,6 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla(0);             // Flag of solver
-        std::array<Real64, 6> Par; // Parameter array for regula falsi solver
         std::string OutputChar;    // character string used for warning messages
         std::string OutputChar2;   // character string used for warning messages
         std::string OutputChar3;   // character string used for warning messages
@@ -5256,7 +5257,7 @@ namespace CondenserLoopTowers {
 
                     // Setpoint was met with pump ON and fan ON at full flow
                     // Calculate the fraction of full air flow to exactly meet the setpoint temperature
-
+                    std::array<Real64, 6> Par; // Parameter array for regula falsi solver
                     Par[0] = this->thisTowerNum; // Index to cooling tower
                     //         cap the water flow rate ratio and inlet air wet-bulb temperature to provide a stable output
                     Par[1] = WaterFlowRateRatioCapped; // water flow rate ratio
