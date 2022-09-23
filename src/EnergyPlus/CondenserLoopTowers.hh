@@ -431,11 +431,6 @@ namespace CondenserLoopTowers {
                           std::array<Real64, 6> const &Par // par(1) = tower number
         );
 
-        Real64 residualTr(EnergyPlusData &state,
-                          Real64 Trange,                   // cooling tower range temperature [C]
-                          std::array<Real64, 6> const &Par // par(1) = tower number
-        );
-
         static PlantComponent *factory(EnergyPlusData &state, std::string_view objectName);
     };
 

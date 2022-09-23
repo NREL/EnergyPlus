@@ -2336,7 +2336,6 @@ namespace CondenserLoopTowers {
         Real64 UA0;                       // Lower bound for UA [W/C]
         Real64 UA1;                       // Upper bound for UA [W/C]
         Real64 UA;                        // Calculated UA value
-        std::array<Real64, 6> Par;        // Parameter array need for RegulaFalsi routine
         std::string OutputChar;           // report variable for warning messages
         std::string OutputChar2;          // report variable for warning messages
         std::string OutputCharLo;         // report variable for warning messages
@@ -3217,6 +3216,7 @@ namespace CondenserLoopTowers {
         // yields an approach temperature that matches user input
         if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:VariableSpeed")) {
 
+            std::array<Real64, 6> Par;     // Parameter array need for RegulaFalsi routine
             Par[0] = this->thisTowerNum;   // Index to cooling tower
             Par[1] = 1.0;                  // air flow rate ratio
             Par[2] = this->DesignInletWB;  // inlet air wet-bulb temperature [C]
@@ -3270,9 +3270,7 @@ namespace CondenserLoopTowers {
                         this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, AirFlowRateRatioLocal, InletAirWB, Trange);
                     return TapproachDesired - TapproachActual;
                 };
-                General::SolveRoot(
-                    state, Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio);
-
+                General::SolveRoot(state, Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio);
 
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower water flow ratio during calibration");
@@ -5083,12 +5081,12 @@ namespace CondenserLoopTowers {
         static constexpr std::string_view RoutineName("calculateVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla(0);             // Flag of solver
-        std::string OutputChar;    // character string used for warning messages
-        std::string OutputChar2;   // character string used for warning messages
-        std::string OutputChar3;   // character string used for warning messages
-        std::string OutputChar4;   // character string used for warning messages
-        std::string OutputChar5;   // character string used for warning messages
+        int SolFla(0);           // Flag of solver
+        std::string OutputChar;  // character string used for warning messages
+        std::string OutputChar2; // character string used for warning messages
+        std::string OutputChar3; // character string used for warning messages
+        std::string OutputChar4; // character string used for warning messages
+        std::string OutputChar5; // character string used for warning messages
 
         // Added for multi-cell. Determine the number of cells operating
         Real64 WaterMassFlowRatePerCellMin = 0.0;
@@ -5257,7 +5255,7 @@ namespace CondenserLoopTowers {
 
                     // Setpoint was met with pump ON and fan ON at full flow
                     // Calculate the fraction of full air flow to exactly meet the setpoint temperature
-                    std::array<Real64, 6> Par; // Parameter array for regula falsi solver
+                    std::array<Real64, 6> Par;   // Parameter array for regula falsi solver
                     Par[0] = this->thisTowerNum; // Index to cooling tower
                     //         cap the water flow rate ratio and inlet air wet-bulb temperature to provide a stable output
                     Par[1] = WaterFlowRateRatioCapped; // water flow rate ratio
@@ -5405,8 +5403,7 @@ namespace CondenserLoopTowers {
         static constexpr std::string_view RoutineName("calculateMerkelVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::array<Real64, 8> Par; // Parameter array passed to solver
-        int SolFla(0);             // Flag of solver
+        int SolFla(0); // Flag of solver
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -5868,78 +5865,40 @@ namespace CondenserLoopTowers {
         // York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
         // Form 160.00-SG2 (0502). 2002.
 
-        Real64 approach;
+        auto &tower = state.dataCondenserLoopTowers->towers(this->VSTower);
         if (this->TowerModelType == ModelType::YorkCalcModel || this->TowerModelType == ModelType::YorkCalcUserDefined) {
             Real64 PctAirFlow = airFlowRatioLocal;
             Real64 FlowFactor = PctWaterFlow / PctAirFlow;
-            approach = state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(1) +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(2) * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(3) * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(4) * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(5) * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(6) * Twb * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(7) * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(8) * Twb * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(9) * Twb * Twb * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(10) * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(11) * Twb * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(12) * Twb * Twb * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(13) * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(14) * Twb * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(15) * Twb * Twb * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(16) * Tr * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(17) * Twb * Tr * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(18) * Twb * Twb * Tr * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(19) * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(20) * Twb * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(21) * Twb * Twb * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(22) * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(23) * Twb * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(24) * Twb * Twb * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(25) * Tr * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(26) * Twb * Tr * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(27) * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
+            return tower.Coeff(1) + tower.Coeff(2) * Twb + tower.Coeff(3) * Twb * Twb + tower.Coeff(4) * Tr + tower.Coeff(5) * Twb * Tr +
+                   tower.Coeff(6) * Twb * Twb * Tr + tower.Coeff(7) * Tr * Tr + tower.Coeff(8) * Twb * Tr * Tr +
+                   tower.Coeff(9) * Twb * Twb * Tr * Tr + tower.Coeff(10) * FlowFactor + tower.Coeff(11) * Twb * FlowFactor +
+                   tower.Coeff(12) * Twb * Twb * FlowFactor + tower.Coeff(13) * Tr * FlowFactor + tower.Coeff(14) * Twb * Tr * FlowFactor +
+                   tower.Coeff(15) * Twb * Twb * Tr * FlowFactor + tower.Coeff(16) * Tr * Tr * FlowFactor +
+                   tower.Coeff(17) * Twb * Tr * Tr * FlowFactor + tower.Coeff(18) * Twb * Twb * Tr * Tr * FlowFactor +
+                   tower.Coeff(19) * FlowFactor * FlowFactor + tower.Coeff(20) * Twb * FlowFactor * FlowFactor +
+                   tower.Coeff(21) * Twb * Twb * FlowFactor * FlowFactor + tower.Coeff(22) * Tr * FlowFactor * FlowFactor +
+                   tower.Coeff(23) * Twb * Tr * FlowFactor * FlowFactor + tower.Coeff(24) * Twb * Twb * Tr * FlowFactor * FlowFactor +
+                   tower.Coeff(25) * Tr * Tr * FlowFactor * FlowFactor + tower.Coeff(26) * Twb * Tr * Tr * FlowFactor * FlowFactor +
+                   tower.Coeff(27) * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
 
         } else { // empirical model is CoolTools format
             //     the CoolTools model actually uses PctFanPower = AirFlowRatio^3 as an input to the model
             Real64 PctAirFlow = pow_3(airFlowRatioLocal);
-            approach = state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(1) +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(2) * PctAirFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(3) * PctAirFlow * PctAirFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(4) * PctAirFlow * PctAirFlow * PctAirFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(5) * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(6) * PctAirFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(7) * PctAirFlow * PctAirFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(8) * PctWaterFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(9) * PctAirFlow * PctWaterFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(10) * PctWaterFlow * PctWaterFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(11) * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(12) * PctAirFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(13) * PctAirFlow * PctAirFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(14) * PctWaterFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(15) * PctAirFlow * PctWaterFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(16) * PctWaterFlow * PctWaterFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(17) * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(18) * PctAirFlow * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(19) * PctWaterFlow * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(20) * Twb * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(21) * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(22) * PctAirFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(23) * PctAirFlow * PctAirFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(24) * PctWaterFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(25) * PctAirFlow * PctWaterFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(26) * PctWaterFlow * PctWaterFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(27) * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(28) * PctAirFlow * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(29) * PctWaterFlow * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(30) * Twb * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(31) * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(32) * PctAirFlow * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(33) * PctWaterFlow * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(34) * Twb * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(35) * Tr * Tr * Tr;
+            return tower.Coeff(1) + tower.Coeff(2) * PctAirFlow + tower.Coeff(3) * PctAirFlow * PctAirFlow +
+                   tower.Coeff(4) * PctAirFlow * PctAirFlow * PctAirFlow + tower.Coeff(5) * PctWaterFlow +
+                   tower.Coeff(6) * PctAirFlow * PctWaterFlow + tower.Coeff(7) * PctAirFlow * PctAirFlow * PctWaterFlow +
+                   tower.Coeff(8) * PctWaterFlow * PctWaterFlow + tower.Coeff(9) * PctAirFlow * PctWaterFlow * PctWaterFlow +
+                   tower.Coeff(10) * PctWaterFlow * PctWaterFlow * PctWaterFlow + tower.Coeff(11) * Twb + tower.Coeff(12) * PctAirFlow * Twb +
+                   tower.Coeff(13) * PctAirFlow * PctAirFlow * Twb + tower.Coeff(14) * PctWaterFlow * Twb +
+                   tower.Coeff(15) * PctAirFlow * PctWaterFlow * Twb + tower.Coeff(16) * PctWaterFlow * PctWaterFlow * Twb +
+                   tower.Coeff(17) * Twb * Twb + tower.Coeff(18) * PctAirFlow * Twb * Twb + tower.Coeff(19) * PctWaterFlow * Twb * Twb +
+                   tower.Coeff(20) * Twb * Twb * Twb + tower.Coeff(21) * Tr + tower.Coeff(22) * PctAirFlow * Tr +
+                   tower.Coeff(23) * PctAirFlow * PctAirFlow * Tr + tower.Coeff(24) * PctWaterFlow * Tr +
+                   tower.Coeff(25) * PctAirFlow * PctWaterFlow * Tr + tower.Coeff(26) * PctWaterFlow * PctWaterFlow * Tr +
+                   tower.Coeff(27) * Twb * Tr + tower.Coeff(28) * PctAirFlow * Twb * Tr + tower.Coeff(29) * PctWaterFlow * Twb * Tr +
+                   tower.Coeff(30) * Twb * Twb * Tr + tower.Coeff(31) * Tr * Tr + tower.Coeff(32) * PctAirFlow * Tr * Tr +
+                   tower.Coeff(33) * PctWaterFlow * Tr * Tr + tower.Coeff(34) * Twb * Tr * Tr + tower.Coeff(35) * Tr * Tr * Tr;
         }
-        return approach;
     }
 
     void CoolingTower::checkModelBounds(EnergyPlusData &state,
@@ -6202,40 +6161,6 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(this->VSTower).PrintWFRRMessage = false;
             }
         }
-    }
-
-    Real64 CoolingTower::residualTr(EnergyPlusData &state,
-                                    Real64 Trange,                   // cooling tower range temperature [C]
-                                    std::array<Real64, 6> const &Par // par(1) = tower number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   Feb 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (where residual shows a balance point of model and desired performance)
-        // Tower Approach depends on the range temperature which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Varies tower range temperature until a balance point exists where the model output corresponds
-        // to the desired independent variables
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = water flow ratio
-        // par(3) = air flow ratio
-        // par(4) = inlet air wet-bulb temperature [C]
-
-        Real64 WaterFlowRateRatio = Par[1];    // ratio of water flow rate to design water flow rate
-        Real64 AirFlowRateRatioLocal = Par[2]; // ratio of water flow rate to design water flow rate
-        Real64 InletAirWB = Par[3];            // inlet air wet-bulb temperature [C]
-
-        // call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
-        Real64 Tapproach = this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, AirFlowRateRatioLocal, InletAirWB, Trange);
-        // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
-        return (InletAirWB + Tapproach + Trange) - state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
     }
 
     Real64 CoolingTower::residualTa(EnergyPlusData &state,
