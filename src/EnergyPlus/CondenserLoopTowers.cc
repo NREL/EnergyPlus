@@ -5557,12 +5557,15 @@ namespace CondenserLoopTowers {
 
         if ((MinSpeedFanQdot < std::abs(MyLoad)) && (std::abs(MyLoad) < FullSpeedFanQdot)) {
             // load can be refined by modulating fan speed, call regula-falsi
-            auto f = [&state, this, &MyLoad, &WaterMassFlowRatePerCell, &UAdesignPerCell, &UAwetbulbAdjFac, &UAwaterflowAdjFac, &CpWater](Real64 airFlowRateRatioLocal) {
+            auto f = [&state, this, &MyLoad, &WaterMassFlowRatePerCell, &UAdesignPerCell, &UAwetbulbAdjFac, &UAwaterflowAdjFac, &CpWater](
+                         Real64 airFlowRateRatioLocal) {
                 Real64 const AirFlowRatePerCell = airFlowRateRatioLocal * this->HighSpeedAirFlowRate / this->NumCell;
                 Real64 const UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
                 Real64 const UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
-                Real64 OutletWaterTempTrial = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
-                Real64 const Qdot = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempTrial);
+                Real64 OutletWaterTempTrial =
+                    this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
+                Real64 const Qdot =
+                    this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempTrial);
                 return std::abs(MyLoad) - Qdot;
             };
             General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0);
