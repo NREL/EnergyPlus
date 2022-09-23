@@ -722,36 +722,36 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 
     //	compare_err_stream( "" );
 
-    state->dataHeatBalFanSys->ZTAVComf(1) = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 25.0;
     state->dataHeatBal->ZoneMRT(1) = 26.0;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvgComf = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -1.262, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 38.3, 0.1);
 
-    state->dataHeatBalFanSys->ZTAVComf(1) = 26.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 26.0;
     state->dataHeatBal->ZoneMRT(1) = 27.0;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvgComf = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -0.860, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 20.6, 0.1);
 
-    state->dataHeatBalFanSys->ZTAVComf(1) = 27.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 27.0;
     state->dataHeatBal->ZoneMRT(1) = 28.0;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvgComf = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -0.460, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 9.4, 0.1);
 
-    state->dataHeatBalFanSys->ZTAVComf(1) = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 25.0;
     state->dataHeatBal->ZoneMRT(1) = 26.0;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00629; // 0.002 to 0.006
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvgComf = 0.00629; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
 
@@ -985,9 +985,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZTAVComf.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->ZoneMRT.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneQdotRadHVACToPerson.allocate(state->dataGlobal->NumOfZones);
@@ -1051,10 +1049,10 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     Real64 ActMet = 1;
     Real64 CloUnit = 0.5;
 
-    state->dataHeatBalFanSys->ZTAVComf(1) = AirTemp;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = AirTemp;
     state->dataHeatBal->ZoneMRT(1) = RadTemp;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) =
-        Psychrometrics::PsyWFnTdbRhPb(*state, state->dataHeatBalFanSys->ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvgComf = Psychrometrics::PsyWFnTdbRhPb(
+        *state, state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf, RelHum, state->dataEnvrn->OutBaroPress);
     state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * ThermalComfort::ActLevelConv;
     state->dataScheduleMgr->Schedule(2).CurrentValue = CloUnit;
 
@@ -1616,9 +1614,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
 
     CalcThermalComfortFanger(*state);
 
-    EXPECT_NEAR(state->dataHeatBalFanSys->ZTAVComf(1), 14.863733439268286, 0.001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf, 14.863733439268286, 0.001);
 
-    EXPECT_NEAR(state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1), 0.010564839505489259, 0.0001);
+    EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvgComf, 0.010564839505489259, 0.0001);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -5.5896341565108720, 0.001);
 

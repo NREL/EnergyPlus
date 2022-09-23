@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -77,7 +76,6 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
-using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::InternalHeatGains;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
@@ -1154,11 +1152,10 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 22.99;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MAT = 23.0;
+        thisZoneHB.ZoneAirHumRat = 0.01;
     }
-    state->dataHeatBalFanSys->ZoneAirHumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 

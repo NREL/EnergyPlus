@@ -131,8 +131,7 @@ protected:
         state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-        state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-        state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.07;
+        state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.07;
 
         state->dataZoneEquip->ZoneEquipInputsFilled = false;
     }

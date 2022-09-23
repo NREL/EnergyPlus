@@ -109,7 +109,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataRoomAirMod->ZTMX.allocate(1);
     state->dataRoomAirMod->ZTM1MX.allocate(1);
     state->dataHeatBalFanSys->AIRRAT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
@@ -149,15 +148,13 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBalFanSys->SumConvHTRadSys(1) = 0.0;
     state->dataHeatBalFanSys->SumConvPool.allocate(1);
     state->dataHeatBalFanSys->SumConvPool(1) = 0.0;
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
-    state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    thisZoneHB.MixingMassFlowXHumRat = 0.0;
+    thisZoneHB.MixingMassFlowZone = 0.0;
+    thisZoneHB.ZT = 0.0;
     state->dataHeatBalFanSys->SumLatentPool.allocate(1);
     state->dataHeatBalFanSys->SumLatentPool(1) = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
 
     // CorrectZoneContaminants variable initialization
     state->dataContaminantBalance->AZ.allocate(1);
@@ -212,14 +209,14 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHybridModel->HybridModelZone(1).PeopleCountCalc_C = false;
     state->dataHybridModel->HybridModelZone(1).HybridStartDayOfYear = 1;
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 0.0;
+    thisZoneHB.MAT = 0.0;
     state->dataHeatBalFanSys->PreviousMeasuredZT1(1) = 0.1;
     state->dataHeatBalFanSys->PreviousMeasuredZT2(1) = 0.2;
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = 0.3;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -5.21;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.002083;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 1414.60;   // Assign TempDepCoef
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = -3335.10; // Assign TempIndCoef
+    thisZoneHB.ZoneAirHumRat = 0.002083;
+    thisZoneHB.MCPV = 1414.60;   // Assign TempDepCoef
+    thisZoneHB.MCPTV = -3335.10; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99166.67;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, true);
@@ -236,15 +233,15 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHybridModel->HybridModelZone(1).PeopleCountCalc_C = false;
     state->dataHybridModel->HybridModelZone(1).HybridStartDayOfYear = 1;
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 0.0;
+    thisZoneHB.MAT = 0.0;
     state->dataHeatBalFanSys->PreviousMeasuredZT1(1) = 0.02;
     state->dataHeatBalFanSys->PreviousMeasuredZT2(1) = 0.04;
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = 0.06;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 8.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.002083;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 539.49;  // Assign TempDepCoef
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = 270.10; // Assign TempIndCoef
+    thisZoneHB.ZoneAirHumRat = 0.002083;
+    thisZoneHB.MCPV = 539.49;  // Assign TempDepCoef
+    thisZoneHB.MCPTV = 270.10; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99250;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, true);
@@ -264,16 +261,16 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001120003;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = -6.08;
+    thisZoneHB.ZoneAirHumRat = 0.001120003;
+    thisZoneHB.ZT = -6.08;
     state->dataEnvrn->OutHumRat = 0.0011366887816818931;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat1(1) = 0.0011186324286;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat2(1) = 0.0011172070768;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat3(1) = 0.0011155109625;
     state->dataHybridModel->HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
     state->dataScheduleMgr->Schedule(state->dataHybridModel->HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.001120003;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 539.49;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = 270.10;
+    thisZoneHB.MCPV = 539.49;
+    thisZoneHB.MCPTV = 270.10;
     state->dataEnvrn->OutBaroPress = 99500;
 
     CorrectZoneHumRat(*state, 1);
@@ -291,16 +288,16 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHybridModel->HybridModelZone(1).HybridStartDayOfYear = 1;
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = -2.89;
+    thisZoneHB.MAT = -2.89;
     state->dataHeatBalFanSys->PreviousMeasuredZT1(1) = -2.887415174;
     state->dataHeatBalFanSys->PreviousMeasuredZT2(1) = -2.897557416;
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = -2.909294101;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0024964;
+    thisZoneHB.ZoneAirHumRat = 0.0024964;
     state->dataEnvrn->OutBaroPress = 98916.7;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 5163.5;    // Assign TempDepCoef
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = -15956.8; // Assign TempIndCoef
+    thisZoneHB.MCPV = 5163.5;    // Assign TempDepCoef
+    thisZoneHB.MCPTV = -15956.8; // Assign TempIndCoef
     state->dataHybridModel->HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
     state->dataScheduleMgr->Schedule(state->dataHybridModel->HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = -2.923892218;
 
@@ -321,13 +318,13 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0024964;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = -2.92;
+    thisZoneHB.ZoneAirHumRat = 0.0024964;
+    thisZoneHB.ZT = -2.92;
     state->dataEnvrn->OutHumRat = 0.0025365002784602363;
     state->dataEnvrn->OutBaroPress = 98916.7;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.700812;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneLatentGain = 211.2;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneLatentGainExceptPeople = 0.0;
+    thisZoneHB.OAMFL = 0.700812;
+    thisZoneHB.ZoneLatentGain = 211.2;
+    thisZoneHB.ZoneLatentGainExceptPeople = 0.0;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat1(1) = 0.002496356;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat2(1) = 0.002489048;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat3(1) = 0.002480404;
@@ -350,15 +347,15 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHybridModel->HybridModelZone(1).IncludeSystemSupplyParameters = true;
     state->dataHybridModel->HybridModelZone(1).HybridStartDayOfYear = 1;
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 15.56;
+    thisZoneHB.MAT = 15.56;
     state->dataHeatBalFanSys->PreviousMeasuredZT1(1) = 15.56;
     state->dataHeatBalFanSys->PreviousMeasuredZT2(1) = 15.56;
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = 15.56;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0077647;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 4456;   // Assign TempDepCoef
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = 60650; // Assign TempIndCoef
+    thisZoneHB.ZoneAirHumRat = 0.0077647;
+    thisZoneHB.MCPV = 4456;   // Assign TempDepCoef
+    thisZoneHB.MCPTV = 60650; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99500;
     state->dataEnvrn->OutHumRat = 0.00113669;
     state->dataHybridModel->HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
@@ -386,8 +383,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001120003;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = -6.08;
+    thisZoneHB.ZoneAirHumRat = 0.001120003;
+    thisZoneHB.ZT = -6.08;
     state->dataEnvrn->OutHumRat = 0.0011366887816818931;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat1(1) = 0.007855718;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat2(1) = 0.007852847;
@@ -415,16 +412,16 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHybridModel->HybridModelZone(1).IncludeSystemSupplyParameters = true;
     state->dataHybridModel->HybridModelZone(1).HybridStartDayOfYear = 1;
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = -2.89;
+    thisZoneHB.MAT = -2.89;
     state->dataHeatBalFanSys->PreviousMeasuredZT1(1) = 21.11;
     state->dataHeatBalFanSys->PreviousMeasuredZT2(1) = 21.11;
     state->dataHeatBalFanSys->PreviousMeasuredZT3(1) = 21.11;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0024964;
+    thisZoneHB.ZoneAirHumRat = 0.0024964;
     state->dataEnvrn->OutBaroPress = 98916.7;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV = 6616;      // Assign TempDepCoef
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTV = 138483.2; // Assign TempIndCoef
+    thisZoneHB.MCPV = 6616;      // Assign TempDepCoef
+    thisZoneHB.MCPTV = 138483.2; // Assign TempIndCoef
     state->dataHybridModel->HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
     state->dataHybridModel->HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr = 2;
     state->dataHybridModel->HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr = 3;
@@ -455,8 +452,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001120003;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = -6.08;
+    thisZoneHB.ZoneAirHumRat = 0.001120003;
+    thisZoneHB.ZT = -6.08;
     state->dataEnvrn->OutHumRat = 0.0011366887816818931;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat1(1) = 0.011085257;
     state->dataHeatBalFanSys->PreviousMeasuredHumRat2(1) = 0.011084959;
@@ -488,7 +485,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataRoomAirMod->AirModel.allocate(1);
     state->dataRoomAirMod->ZTOC.allocate(1);
     state->dataHeatBalFanSys->AIRRAT.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
@@ -520,12 +516,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataSize->ZoneEqSizing.allocate(1);
 
     // CorrectZoneContaminants variable initialization
-    state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
-    state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    thisZoneHB.MixingMassFlowZone = 0.0;
+    thisZoneHB.ZT = 0.0;
     state->dataContaminantBalance->AZ.allocate(1);
     state->dataContaminantBalance->BZ.allocate(1);
     state->dataContaminantBalance->CZ.allocate(1);
@@ -589,7 +583,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHybridModel->HybridModelZone(1).HybridStartDayOfYear = 1;
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001120003;
+    thisZoneHB.ZoneAirHumRat = 0.001120003;
     state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     state->dataEnvrn->OutHumRat = 0.001147;
     state->dataEnvrn->OutBaroPress = 99500;
@@ -617,11 +611,11 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -1.0394166434012677;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = -2.92;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.00112;
+    thisZoneHB.ZT = -2.92;
+    thisZoneHB.ZoneAirHumRat = 0.00112;
     state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     state->dataEnvrn->OutBaroPress = 98916.7;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.700812;
+    thisZoneHB.OAMFL = 0.700812;
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.00001989;
     state->dataContaminantBalance->CO2ZoneTimeMinus1(1) = 387.9962885;
     state->dataContaminantBalance->CO2ZoneTimeMinus2(1) = 387.676037;
@@ -644,8 +638,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHybridModel->HybridModelZone(1).HybridStartDayOfYear = 1;
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 15.56;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.00809;
+    thisZoneHB.ZT = 15.56;
+    thisZoneHB.ZoneAirHumRat = 0.00809;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.7;
     state->dataEnvrn->OutBaroPress = 99500;
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0;
@@ -676,8 +670,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHybridModel->HybridModelZone(1).HybridStartDayOfYear = 1;
     state->dataHybridModel->HybridModelZone(1).HybridEndDayOfYear = 2;
     state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 21.1;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.01102;
+    thisZoneHB.ZT = 21.1;
+    thisZoneHB.ZoneAirHumRat = 0.01102;
     state->dataEnvrn->OutBaroPress = 98933.3;
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.00003333814;
     state->dataContaminantBalance->ZoneCO2GainExceptPeople(1) = 0.0;

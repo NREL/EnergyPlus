@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -94,7 +93,6 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -413,7 +411,6 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
     SystemReports::AllocateAndSetUpVentReports(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 58469.99445;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;

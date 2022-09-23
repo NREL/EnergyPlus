@@ -136,8 +136,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1); // Zone temperature C
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    thisZoneHB.ZT = 24.0;
 
     state->dataHeatBal->space.allocate(1);
     state->dataHeatBal->spaceIntGainDevices.allocate(1);
@@ -149,17 +149,13 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(1);
-    state->dataHeatBalFanSys->MixingMassFlowZone.allocate(1);
-
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
-    state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
 
     state->dataRoomAirMod->AirModel.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
     // Case 1 - All flows at the same humrat
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1 = 0.008;
+    thisZoneHB.ZoneW1 = 0.008;
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
     state->dataLoopNodes->Node(1).HumRat = 0.008;
     state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
@@ -167,20 +163,20 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
     state->dataLoopNodes->Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
-    state->dataLoopNodes->Node(3).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
+    state->dataLoopNodes->Node(3).HumRat = thisZoneHB.ZoneW1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).VAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFLxHumRat = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 0.0;
+    thisZoneHB.ZoneAirHumRat = 0.008;
+    thisZoneHB.OAMFL = 0.0;
+    thisZoneHB.VAMFL = 0.0;
+    thisZoneHB.EAMFL = 0.0;
+    thisZoneHB.EAMFLxHumRat = 0.0;
+    thisZoneHB.CTMFL = 0.0;
     state->dataEnvrn->OutHumRat = 0.008;
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.0;
+    thisZoneHB.MixingMassFlowXHumRat = 0.0;
+    thisZoneHB.MixingMassFlowZone = 0.0;
+    thisZoneHB.MDotOA = 0.0;
 
     // HybridModel
     state->dataHybridModel->HybridModelZone(1).PeopleCountCalc_H = false;
@@ -189,7 +185,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Case 2 - Unbalanced exhaust flow
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1 = 0.008;
+    thisZoneHB.ZoneW1 = 0.008;
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
     state->dataLoopNodes->Node(1).HumRat = 0.008;
     state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
@@ -197,26 +193,26 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
     state->dataLoopNodes->Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
-    state->dataLoopNodes->Node(3).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
+    state->dataLoopNodes->Node(3).HumRat = thisZoneHB.ZoneW1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.01; // Zone return node
-    state->dataLoopNodes->Node(4).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
+    state->dataLoopNodes->Node(4).HumRat = thisZoneHB.ZoneW1;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).VAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFLxHumRat = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 0.0;
+    thisZoneHB.ZoneAirHumRat = 0.008;
+    thisZoneHB.OAMFL = 0.0;
+    thisZoneHB.VAMFL = 0.0;
+    thisZoneHB.EAMFL = 0.0;
+    thisZoneHB.EAMFLxHumRat = 0.0;
+    thisZoneHB.CTMFL = 0.0;
     state->dataEnvrn->OutHumRat = 0.004;
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.0;
+    thisZoneHB.MixingMassFlowXHumRat = 0.0;
+    thisZoneHB.MixingMassFlowZone = 0.0;
+    thisZoneHB.MDotOA = 0.0;
 
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Case 3 - Balanced exhaust flow with proper source flow from mixing
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1 = 0.008;
+    thisZoneHB.ZoneW1 = 0.008;
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
     state->dataLoopNodes->Node(1).HumRat = 0.008;
     state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
@@ -224,26 +220,26 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.02;
     state->dataLoopNodes->Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
-    state->dataLoopNodes->Node(3).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
+    state->dataLoopNodes->Node(3).HumRat = thisZoneHB.ZoneW1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
-    state->dataLoopNodes->Node(4).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
+    state->dataLoopNodes->Node(4).HumRat = thisZoneHB.ZoneW1;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).VAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFLxHumRat = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 0.0;
+    thisZoneHB.ZoneAirHumRat = 0.008;
+    thisZoneHB.OAMFL = 0.0;
+    thisZoneHB.VAMFL = 0.0;
+    thisZoneHB.EAMFL = 0.0;
+    thisZoneHB.EAMFLxHumRat = 0.0;
+    thisZoneHB.CTMFL = 0.0;
     state->dataEnvrn->OutHumRat = 0.004;
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.02 * 0.008;
-    state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.02;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.0;
+    thisZoneHB.MixingMassFlowXHumRat = 0.02 * 0.008;
+    thisZoneHB.MixingMassFlowZone = 0.02;
+    thisZoneHB.MDotOA = 0.0;
 
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Case 4 - Balanced exhaust flow without source flow from mixing
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1 = 0.008;
+    thisZoneHB.ZoneW1 = 0.008;
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
     state->dataLoopNodes->Node(1).HumRat = 0.008;
     state->dataLoopNodes->Node(2).MassFlowRate = 0.02; // Zone inlet node 2
@@ -251,20 +247,20 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.02;
     state->dataLoopNodes->Node(3).MassFlowRate = 0.02; // Zone exhaust node 1
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = state->dataLoopNodes->Node(3).MassFlowRate;
-    state->dataLoopNodes->Node(3).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
+    state->dataLoopNodes->Node(3).HumRat = thisZoneHB.ZoneW1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.01; // Zone return node
-    state->dataLoopNodes->Node(4).HumRat = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneW1;
+    state->dataLoopNodes->Node(4).HumRat = thisZoneHB.ZoneW1;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).OAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).VAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFL = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).EAMFLxHumRat = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 0.0;
+    thisZoneHB.ZoneAirHumRat = 0.008;
+    thisZoneHB.OAMFL = 0.0;
+    thisZoneHB.VAMFL = 0.0;
+    thisZoneHB.EAMFL = 0.0;
+    thisZoneHB.EAMFLxHumRat = 0.0;
+    thisZoneHB.CTMFL = 0.0;
     state->dataEnvrn->OutHumRat = 0.004;
-    state->dataHeatBalFanSys->MixingMassFlowXHumRat(1) = 0.0;
-    state->dataHeatBalFanSys->MixingMassFlowZone(1) = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MDotOA = 0.0;
+    thisZoneHB.MixingMassFlowXHumRat = 0.0;
+    thisZoneHB.MixingMassFlowZone = 0.0;
+    thisZoneHB.MDotOA = 0.0;
 
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
@@ -992,9 +988,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBalFanSys->SumLatentPool(1) = 0.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1); // Zone temperature C
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+    thisZoneHB.MAT = 24.0;
+    thisZoneHB.ZoneAirHumRat = 0.001;
 
     state->dataHeatBal->space.allocate(1);
     state->dataHeatBal->spaceIntGainDevices.allocate(1);
@@ -1040,8 +1036,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
-
-    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     CalcZoneSums(*state, ZoneNum);
 
@@ -1257,16 +1251,18 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataHeatBalFanSys->AIRRAT(1) = 2000;
     state->dataZoneTempPredictorCorrector->TempDepZnLd(1) = 1.0;
     state->dataZoneTempPredictorCorrector->TempIndZnLd(1) = 1.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneT1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    thisZoneHB.MAT = 20.0;
+    thisZoneHB.ZoneT1 = thisZoneHB.MAT;
     state->dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
 
     CalcZoneAirTempSetPoints(*state);
     PredictSystemLoads(*state, false, false, 0.01);
     EXPECT_EQ(24.0, state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1));
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneT1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    thisZoneHB.MAT = 23.0;
+    thisZoneHB.ZoneT1 = thisZoneHB.MAT;
     state->dataZoneCtrls->TempControlledZone(1).HeatModeLast = true;
     CalcZoneAirTempSetPoints(*state);
     PredictSystemLoads(*state, false, false, 0.01);
@@ -1279,8 +1275,8 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleCooling.allocate(1);
     state->dataZoneTempPredictorCorrector->SetPointSingleCooling(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 26.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneT1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    thisZoneHB.MAT = 25.0;
+    thisZoneHB.ZoneT1 = thisZoneHB.MAT;
 
     state->dataZoneCtrls->TempControlledZone(1).CoolModeLast = true;
     CalcZoneAirTempSetPoints(*state);
@@ -1288,8 +1284,8 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     EXPECT_EQ(26.0, state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1));
     state->dataZoneCtrls->TempControlledZone(1).CoolModeLast = false;
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 27.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneT1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    thisZoneHB.MAT = 27.0;
+    thisZoneHB.ZoneT1 = thisZoneHB.MAT;
     CalcZoneAirTempSetPoints(*state);
     PredictSystemLoads(*state, false, false, 0.01);
     EXPECT_EQ(24.0, state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1));
@@ -1300,8 +1296,8 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleHeatCool.allocate(1);
     state->dataZoneTempPredictorCorrector->SetPointSingleHeatCool(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneT1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    thisZoneHB.MAT = 25.0;
+    thisZoneHB.ZoneT1 = thisZoneHB.MAT;
 
     CalcZoneAirTempSetPoints(*state);
     PredictSystemLoads(*state, false, false, 0.01);
@@ -1317,8 +1313,8 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 22.0;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 26.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneT1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    thisZoneHB.MAT = 25.0;
+    thisZoneHB.ZoneT1 = thisZoneHB.MAT;
 
     state->dataZoneCtrls->TempControlledZone(1).CoolModeLast = true;
     state->dataZoneCtrls->TempControlledZone(1).HeatModeLast = true;
@@ -1329,8 +1325,8 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneCtrls->TempControlledZone(1).HeatModeLast = false;
 
     // DualSetPointWithDeadBand : Adjust heating setpoint
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneT1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    thisZoneHB.MAT = 21.0;
+    thisZoneHB.ZoneT1 = thisZoneHB.MAT;
     CalcZoneAirTempSetPoints(*state);
     PredictSystemLoads(*state, false, false, 0.01);
     EXPECT_EQ(24.0, state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1));
@@ -1338,8 +1334,8 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
 
     // DualSetPointWithDeadBand : Adjust cooling setpoint
     state->dataZoneCtrls->TempControlledZone(1).CoolModeLast = true;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 27.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneT1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    thisZoneHB.MAT = 27.0;
+    thisZoneHB.ZoneT1 = thisZoneHB.MAT;
     CalcZoneAirTempSetPoints(*state);
     PredictSystemLoads(*state, false, false, 0.01);
     EXPECT_EQ(22.0, state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1));
@@ -1389,8 +1385,10 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataHeatBalFanSys->AIRRAT(1) = 2000;
     state->dataZoneTempPredictorCorrector->TempDepZnLd(1) = 1.0;
     state->dataZoneTempPredictorCorrector->TempIndZnLd(1) = 1.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).XMPT = 23.0;
+
+    auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    thisZoneHB.MAT = 20.0;
+    thisZoneHB.XMPT = 23.0;
     state->dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
 
     CalcZoneAirTempSetPoints(*state);
@@ -1408,8 +1406,8 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleCooling.allocate(1);
     state->dataZoneTempPredictorCorrector->SetPointSingleCooling(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 26.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).XMPT = 27;
+    thisZoneHB.MAT = 25.0;
+    thisZoneHB.XMPT = 27;
 
     state->dataZoneCtrls->TempControlledZone(1).CoolModeLast = true;
     CalcZoneAirTempSetPoints(*state);
@@ -1428,8 +1426,8 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleHeatCool.allocate(1);
     state->dataZoneTempPredictorCorrector->SetPointSingleHeatCool(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).XMPT = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    thisZoneHB.MAT = 25.0;
+    thisZoneHB.XMPT = thisZoneHB.MAT;
 
     CalcZoneAirTempSetPoints(*state);
     PredictSystemLoads(*state, false, false, 0.01);
@@ -1445,8 +1443,8 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 22.0;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 26.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).XMPT = 21.0;
+    thisZoneHB.MAT = 25.0;
+    thisZoneHB.XMPT = 21.0;
 
     state->dataZoneCtrls->TempControlledZone(1).CoolModeLast = true;
     state->dataZoneCtrls->TempControlledZone(1).HeatModeLast = true;
@@ -1465,7 +1463,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
 
     // DualSetPointWithDeadBand : Adjust cooling setpoint
     state->dataZoneCtrls->TempControlledZone(1).CoolModeLastSave = true;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).XMPT = 27.0;
+    thisZoneHB.XMPT = 27.0;
     CalcZoneAirTempSetPoints(*state);
     PredictSystemLoads(*state, true, false, 0.01);
     EXPECT_EQ(22.0, state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1));
