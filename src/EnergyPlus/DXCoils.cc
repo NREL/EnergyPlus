@@ -18344,29 +18344,12 @@ Real64 FanSpdResidualCool([[maybe_unused]] EnergyPlusData &state,
     //       the zone cooling load.
     //
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 BF;                 // Bypass factor (-)
-    Real64 FanSpdResidualCool; // Modified fan speed ratio to meet actual zone load (-)
-    Real64 Garate;             // Nominal air mass flow rate (m3/s)
-    Real64 TcoilIn;            // Air temperature at indoor coil inlet (C)
-    Real64 Th2;                // Air temperature at the coil surface (C)
-    Real64 TotCap;             // Cooling capacity of the coil (W)
-    Real64 Tout;               // Air temperature at the indoor unit outlet (C)
-    Real64 ZnSenLoad;          // Zone sensible cooling load (W)
-
-    ZnSenLoad = Par[0];
-    Th2 = Par[1];
-    TcoilIn = Par[2];
-    Garate = Par[3];
-    BF = Par[4];
+    Real64 ZnSenLoad = Par[0];
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
-
-    Tout = TcoilIn - (TcoilIn - Th2) * (1 - BF);
-    TotCap = FanSpdRto * Garate * 1005.0 * (TcoilIn - Tout);
-    FanSpdResidualCool = (TotCap - ZnSenLoad) / ZnSenLoad;
-
-    return FanSpdResidualCool;
+    Real64 Tout = Par[2] - (Par[2] - Par[1]) * (1 - Par[4]);
+    Real64 TotCap = FanSpdRto * Par[3] * 1005.0 * (Par[2] - Tout);
+    return (TotCap - ZnSenLoad) / ZnSenLoad;
 }
 
 Real64 FanSpdResidualHeat([[maybe_unused]] EnergyPlusData &state,
@@ -18385,28 +18368,12 @@ Real64 FanSpdResidualHeat([[maybe_unused]] EnergyPlusData &state,
     //       the zone heating load.
     //
 
-    Real64 BF;                 // Bypass factor (-)
-    Real64 FanSpdResidualHeat; // Modified fan speed ratio to meet actual zone load (-)
-    Real64 Garate;             // Nominal air mass flow rate (m3/s)
-    Real64 TcoilIn;            // Air temperature at indoor coil inlet (C)
-    Real64 Th2;                // Air temperature at the coil surface (C)
-    Real64 TotCap;             // Heating capacity of the coil (W)
-    Real64 Tout;               // Air temperature at the indoor unit outlet (C)
-    Real64 ZnSenLoad;          // Zone sensible heating load (W)
-
-    ZnSenLoad = Par[0];
-    Th2 = Par[1];
-    TcoilIn = Par[2];
-    Garate = Par[3];
-    BF = Par[4];
+    Real64 ZnSenLoad = Par[0];
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
-
-    Tout = TcoilIn + (Th2 - TcoilIn) * (1 - BF);
-    TotCap = FanSpdRto * Garate * 1005.0 * (Tout - TcoilIn);
-    FanSpdResidualHeat = (TotCap - ZnSenLoad) / ZnSenLoad;
-
-    return FanSpdResidualHeat;
+    Real64 Tout = Par[2] + (Par[1] - Par[2]) * (1 - Par[4]);
+    Real64 TotCap = FanSpdRto * Par[3] * 1005.0 * (Tout - Par[2]);
+    return (TotCap - ZnSenLoad) / ZnSenLoad;
 }
 
 void SetMSHPDXCoilHeatRecoveryFlag(EnergyPlusData &state, int const DXCoilNum)
