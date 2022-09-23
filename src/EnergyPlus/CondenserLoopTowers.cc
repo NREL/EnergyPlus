@@ -3216,13 +3216,6 @@ namespace CondenserLoopTowers {
         // yields an approach temperature that matches user input
         if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:VariableSpeed")) {
 
-            Par[0] = this->thisTowerNum;   // Index to cooling tower
-            Par[1] = 1.0;                  // air flow rate ratio
-            Par[2] = this->DesignInletWB;  // inlet air wet-bulb temperature [C]
-            Par[3] = this->DesignRange;    // tower range temperature [C]
-            Par[4] = this->DesignApproach; // design approach temperature [C]
-            Par[5] = 0.0;                  // Calculation FLAG, 0.0 = calc water flow ratio, 1.0 calc air flow ratio
-
             //   check range for water flow rate ratio (make sure RegulaFalsi converges)
             Real64 MaxWaterFlowRateRatio = 0.5; // maximum water flow rate ratio which yields desired approach temp
             Real64 Tapproach = 0.0;             // temporary tower approach temp variable [C]
@@ -3251,9 +3244,34 @@ namespace CondenserLoopTowers {
             Real64 WaterFlowRatio(0.0); // tower water flow rate ratio found during model calibration
 
             if (ModelCalibrated) {
-                auto f = std::bind(&CoolingTower::residualTa, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+                Par[0] = this->thisTowerNum;   // Index to cooling tower
+                Par[1] = 1.0;                  // air flow rate ratio
+                Par[2] = this->DesignInletWB;  // inlet air wet-bulb temperature [C]
+                Par[3] = this->DesignRange;    // tower range temperature [C]
+                Par[4] = this->DesignApproach; // design approach temperature [C]
+                Par[5] = 0.0;                  // Calculation FLAG, 0.0 = calc water flow ratio, 1.0 calc air flow ratio
+                auto f = [&state, this, &Par](Real64 FlowRatio) {
+                    Real64 AirFlowRateRatioLocal; // ratio of water flow rate to design water flow rate
+                    Real64 WaterFlowRateRatio;    // ratio of water flow rate to design water flow rate
+                    if (Par[5] == 0.0) {
+                        AirFlowRateRatioLocal = Par[1];
+                        WaterFlowRateRatio = FlowRatio;
+                    } else {
+                        AirFlowRateRatioLocal = FlowRatio;
+                        WaterFlowRateRatio = Par[1];
+                    }
+                    Real64 InletAirWB = Par[2];       // inlet air wet-bulb temperature [C]
+                    Real64 Trange = Par[3];           // tower range temperature [C]
+                    Real64 TapproachDesired = Par[4]; // desired tower approach temperature [C]
+                    // call model to determine tower approach temperature given other independent variables
+                    Real64 TapproachActual =
+                        this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, AirFlowRateRatioLocal, InletAirWB, Trange);
+                    return TapproachDesired - TapproachActual;
+                };
                 General::SolveRoot(
-                    state, Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio, Par);
+                    state, Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio);
+
+
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower water flow ratio during calibration");
                     ShowContinueError(state,
