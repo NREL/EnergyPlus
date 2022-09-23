@@ -15175,19 +15175,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
 
         LowerBoundMassFlowRate = 0.01 * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
-        auto f = [&state,
-                  &DXCoilNum,
-                  &TempDryBulb_Leaving_Apoint,
-                  &TargetNetCapacity,
-                  &par3,
-                  &CoolingCoilInletAirWetBulbTempRated,
-                  &CoolingCoilInletAirDryBulbTempRated,
-                  &NetCoolingCapRated,
-                  &par7,
-                  &fanInNode,
-                  &fanOutNode,
-                  &externalStatic,
-                  &fanIndex](Real64 SupplyAirMassFlowRate) {
+        auto f = [&state, &DXCoilNum, &TempDryBulb_Leaving_Apoint, &TargetNetCapacity, &par3, &par7, &fanInNode, &fanOutNode, &externalStatic](
+                     Real64 SupplyAirMassFlowRate) {
             static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");
             auto &coil = state.dataDXCoils->DXCoil(DXCoilNum);
             Real64 AirMassFlowRatio = 0.0;
@@ -17908,7 +17897,6 @@ void ControlVRFIUCoil(EnergyPlusData &state,
     using Psychrometrics::PsyHFnTdbW;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::array<Real64, 5> Par;     // Parameter array for SolveRoot
     int MaxIter(500);              // Max iteration numbers (-)
     int SolFla;                    // Solving flag for SolveRoot (-)
     int constexpr FlagCoolMode(0); // Flag for cooling mode
@@ -17985,11 +17973,11 @@ void ControlVRFIUCoil(EnergyPlusData &state,
 
         if (QCoilSenCoolingLoad > QinSenMin1) {
             // Increase fan speed to meet room sensible load; SH is not updated
-
-            Par = {QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF};
-
             FanSpdRatioMax = 1.0;
-            General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
+            auto f = [&QCoilSenCoolingLoad, &Ts_1, &Tin, &Garate, &BF](Real64 FanSpdRto) {
+                return FanSpdResidualCool(FanSpdRto, QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF);
+            };
+            General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, f, FanSpdRatioMin, FanSpdRatioMax);
             if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
             FanSpdRatio = Ratio1;
             CoilOnOffRatio = 1.0;
@@ -18082,12 +18070,11 @@ void ControlVRFIUCoil(EnergyPlusData &state,
 
         if (QCoilSenHeatingLoad > QinSenMin1) {
             // Modulate fan speed to meet room sensible load; SC is not updated
-
-            Par = {QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF};
-
             FanSpdRatioMax = 1.0;
-
-            General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
+            auto f = [&QCoilSenHeatingLoad, &Ts_1, &Tin, &Garate, &BF](Real64 FanSpdRto) {
+                return FanSpdResidualHeat(FanSpdRto, QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF);
+            };
+            General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, f, FanSpdRatioMin, FanSpdRatioMax);
             // this will likely cause problems eventually, -1 and -2 mean different things
             if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
             FanSpdRatio = Ratio1;
@@ -18328,10 +18315,8 @@ void CalcVRFCoilCapModFac(EnergyPlusData &state,
     }
 }
 
-Real64 FanSpdResidualCool([[maybe_unused]] EnergyPlusData &state,
-                          Real64 const FanSpdRto,          // indoor unit fan speed ratio
-                          std::array<Real64, 5> const &Par // parameters
-)
+Real64 FanSpdResidualCool(
+    Real64 const FanSpdRto, Real64 const QCoilSenCoolingLoad, Real64 const Ts_1, Real64 const Tin, Real64 const Garate, Real64 const BF)
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         Xiufeng Pang (XP)
@@ -18343,20 +18328,17 @@ Real64 FanSpdResidualCool([[maybe_unused]] EnergyPlusData &state,
     //       This is used to modify the fan speed to adjust the coil cooling capacity to match
     //       the zone cooling load.
     //
-
-    Real64 ZnSenLoad = Par[0];
+    Real64 ZnSenLoad = QCoilSenCoolingLoad;
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
-    Real64 Tout = Par[2] - (Par[2] - Par[1]) * (1 - Par[4]);
-    Real64 TotCap = FanSpdRto * Par[3] * 1005.0 * (Par[2] - Tout);
+    Real64 Tout = Tin - (Tin - Ts_1) * (1 - BF);
+    Real64 TotCap = FanSpdRto * Garate * 1005.0 * (Tin - Tout);
     return (TotCap - ZnSenLoad) / ZnSenLoad;
 }
 
-Real64 FanSpdResidualHeat([[maybe_unused]] EnergyPlusData &state,
-                          Real64 const FanSpdRto,          // indoor unit fan speed ratio
-                          std::array<Real64, 5> const &Par // parameters
-)
+Real64 FanSpdResidualHeat(Real64 FanSpdRto, Real64 QCoilSenHeatingLoad, Real64 Ts_1, Real64 Tin, Real64 Garate, Real64 BF)
 {
+
     // FUNCTION INFORMATION:
     //       AUTHOR         Xiufeng Pang (XP)
     //       DATE WRITTEN   Mar 2013
@@ -18368,11 +18350,11 @@ Real64 FanSpdResidualHeat([[maybe_unused]] EnergyPlusData &state,
     //       the zone heating load.
     //
 
-    Real64 ZnSenLoad = Par[0];
+    Real64 ZnSenLoad = QCoilSenHeatingLoad;
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
-    Real64 Tout = Par[2] + (Par[1] - Par[2]) * (1 - Par[4]);
-    Real64 TotCap = FanSpdRto * Par[3] * 1005.0 * (Tout - Par[2]);
+    Real64 Tout = Tin + (Ts_1 - Tin) * (1 - BF);
+    Real64 TotCap = FanSpdRto * Garate * 1005.0 * (Tout - Tin);
     return (TotCap - ZnSenLoad) / ZnSenLoad;
 }
 
