@@ -401,7 +401,6 @@ namespace CrossVentMgr {
         MaxSurf = state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, ZoneNum);
         int const surfNum = state.afn->MultizoneSurfaceData(MaxSurf).SurfNum;
         auto const &thisSurface = state.dataSurface->Surface(surfNum);
-        auto const &extZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone);
         if (thisSurface.Zone == ZoneNum) {
             // this is a direct airflow network aperture
             SumToZone = state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, ZoneNum)).VolFLOW2;
@@ -443,7 +442,8 @@ namespace CrossVentMgr {
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
             if (thisSurface.ExtBoundCond > 0) {
-                state.dataRoomAirMod->Tin(ZoneNum) = extZoneHB.MAT;
+                state.dataRoomAirMod->Tin(ZoneNum) =
+                    state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone).MAT;
             } else if (thisSurface.ExtBoundCond == ExternalEnvironment) {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
             } else if (thisSurface.ExtBoundCond == Ground) {
@@ -581,7 +581,8 @@ namespace CrossVentMgr {
         if (ActiveSurfNum == 0) {
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
             if (thisSurface.ExtBoundCond > 0) {
-                state.dataRoomAirMod->Tin(ZoneNum) = extZoneHB.MAT;
+                state.dataRoomAirMod->Tin(ZoneNum) =
+                    state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone).MAT;
             } else if (thisSurface.ExtBoundCond == ExternalEnvironment) {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
             } else if (thisSurface.ExtBoundCond == Ground) {
@@ -629,7 +630,8 @@ namespace CrossVentMgr {
                 e.Ujet = e.Urec = 0.0;
             }
             if (thisSurface.ExtBoundCond > 0) {
-                state.dataRoomAirMod->Tin(ZoneNum) = extZoneHB.MAT;
+                state.dataRoomAirMod->Tin(ZoneNum) =
+                    state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone).MAT;
             } else if (thisSurface.ExtBoundCond == ExternalEnvironment) {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
             } else if (thisSurface.ExtBoundCond == Ground) {
@@ -772,7 +774,8 @@ namespace CrossVentMgr {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(surfNum);
             } else {
                 if (thisSurface.Zone == ZoneNum) {
-                    state.dataRoomAirMod->Tin(ZoneNum) = extZoneHB.MAT;
+                    state.dataRoomAirMod->Tin(ZoneNum) =
+                        state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone).MAT;
                 } else {
                     state.dataRoomAirMod->Tin(ZoneNum) = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisSurface.Zone).MAT;
                 }

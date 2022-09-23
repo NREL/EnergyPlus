@@ -64,6 +64,7 @@
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace CrossVentMgr;
@@ -77,6 +78,7 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     int MaxSurf = 2;
 
     state->dataRoomAirMod->RecInflowRatio.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV.allocate({0, MaxSurf}, state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, 1) = 1;

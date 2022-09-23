@@ -1049,6 +1049,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     Real64 ActMet = 1;
     Real64 CloUnit = 0.5;
 
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = AirTemp;
     state->dataHeatBal->ZoneMRT(1) = RadTemp;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvgComf = Psychrometrics::PsyWFnTdbRhPb(
