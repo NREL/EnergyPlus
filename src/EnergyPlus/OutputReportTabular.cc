@@ -11986,6 +11986,11 @@ void WriteVeriSumTable(EnergyPlusData &state)
                         totPlugProcess += state.dataHeatBal->ZoneHWEq(iPlugProc).DesignLevel;
                     }
                 }
+                for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotITEquip; ++iPlugProc) {
+                    if (iZone == state.dataHeatBal->ZoneITEq(iPlugProc).ZonePtr) {
+                        totPlugProcess += state.dataHeatBal->ZoneITEq(iPlugProc).DesignTotalPower;
+                    }
+                }
                 if (Zone(iZone).FloorArea > 0) {
                     tableBody(12, iZone) = RealToStr(totPlugProcess * state.dataOutRptTab->Wm2_unitConv / Zone(iZone).FloorArea, 4);
                 }
