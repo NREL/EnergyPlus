@@ -5205,6 +5205,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         thisZoneHB.MCPThermChim = 0.0;
         thisZoneHB.ThermChimAMFL = 0.0;
         thisZoneHB.MCPTThermChim = 0.0;
+        thisZoneHB.MixingMassFlowZone = 0.0;
+        thisZoneHB.MixingMassFlowXHumRat = 0.0;
     }
     state.dataZoneEquip->CrossMixingReportFlag = false;
     state.dataZoneEquip->MixingReportFlag = false;
