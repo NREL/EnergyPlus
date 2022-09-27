@@ -118,16 +118,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 //    "Predict" step is used to get zone loads for HVAC equipment
 //    "correct" step determines zone air temp with available HVAC
 
-// Using/Aliasing
-using namespace DataHVACGlobals;
-using namespace DataHeatBalance;
-using namespace Psychrometrics;
-using namespace DataRoomAirModel;
-using namespace DataZoneControls;
-using namespace FaultsManager;
-using namespace HybridModel;
-using ScheduleManager::GetCurrentScheduleValue;
-
 enum class ZoneControlTypes
 {
     Invalid = -1,
@@ -433,8 +423,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (TStatObjects(Item).ZoneListActive) {
                     cAlphaArgs(2) = Zone(ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                 }
-                int ZoneAssigned =
-                    UtilityRoutines::FindItemInList(cAlphaArgs(2), TempControlledZone, &ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
+                int ZoneAssigned = UtilityRoutines::FindItemInList(
+                    cAlphaArgs(2), TempControlledZone, &DataZoneControls::ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
                 if (ZoneAssigned == 0) {
                     TempControlledZone(TempControlledZoneNum).ZoneName = cAlphaArgs(2);
                     TempControlledZone(TempControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
@@ -1033,7 +1023,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     cAlphaArgs(2) = state.dataHeatBal->Zone(ZoneList(ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                 }
                 int ZoneAssigned = UtilityRoutines::FindItemInList(
-                    cAlphaArgs(2), ComfortControlledZone, &ZoneComfortControls::ZoneName, ComfortControlledZoneNum - 1);
+                    cAlphaArgs(2), ComfortControlledZone, &DataZoneControls::ZoneComfortControls::ZoneName, ComfortControlledZoneNum - 1);
                 if (ZoneAssigned == 0) {
                     ComfortControlledZone(ComfortControlledZoneNum).ZoneName = cAlphaArgs(2);
                     ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
@@ -1710,7 +1700,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     if (allocated(TComfortControlTypes)) TComfortControlTypes.deallocate();
 
     // Get the Hybrid Model setting inputs
-    GetHybridModelZone(state);
+    HybridModel::GetHybridModelZone(state);
 
     // Default multiplier values
     Real64 ZoneVolCapMultpSens = 1.0;
@@ -2332,8 +2322,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     cAlphaArgs(2) =
                         state.dataHeatBal->Zone(ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                 }
-                int ZoneAssigned =
-                    UtilityRoutines::FindItemInList(cAlphaArgs(2), StageControlledZone, &ZoneStagedControls::ZoneName, StageControlledZoneNum - 1);
+                int ZoneAssigned = UtilityRoutines::FindItemInList(
+                    cAlphaArgs(2), StageControlledZone, &DataZoneControls::ZoneStagedControls::ZoneName, StageControlledZoneNum - 1);
                 if (ZoneAssigned == 0) {
                     StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2);
                     StageControlledZone(StageControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
@@ -3454,7 +3444,6 @@ void PredictSystemLoads(EnergyPlusData &state,
 
     using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
     using RoomAirModelAirflowNetwork::LoadPredictionRoomAirModelAirflowNetwork;
-    using ScheduleManager::GetCurrentScheduleValue;
 
     auto &Zone = state.dataHeatBal->Zone;
     auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone;
@@ -3477,8 +3466,10 @@ void PredictSystemLoads(EnergyPlusData &state,
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ActualZoneNum);
             Real64 ZoneT = thisZoneHB.MAT; // Zone temperature at previous time step
             if (ShortenTimeStepSys) ZoneT = thisZoneHB.XMPT;
-            StageControlledZone(RelativeZoneNum).HeatSetPoint = GetCurrentScheduleValue(state, StageControlledZone(RelativeZoneNum).HSBchedIndex);
-            StageControlledZone(RelativeZoneNum).CoolSetPoint = GetCurrentScheduleValue(state, StageControlledZone(RelativeZoneNum).CSBchedIndex);
+            StageControlledZone(RelativeZoneNum).HeatSetPoint =
+                ScheduleManager::GetCurrentScheduleValue(state, StageControlledZone(RelativeZoneNum).HSBchedIndex);
+            StageControlledZone(RelativeZoneNum).CoolSetPoint =
+                ScheduleManager::GetCurrentScheduleValue(state, StageControlledZone(RelativeZoneNum).CSBchedIndex);
             if (StageControlledZone(RelativeZoneNum).HeatSetPoint >= StageControlledZone(RelativeZoneNum).CoolSetPoint) {
                 ++StageControlledZone(RelativeZoneNum).StageErrCount;
                 if (StageControlledZone(RelativeZoneNum).StageErrCount < 2) {
@@ -3677,8 +3668,8 @@ void PredictSystemLoads(EnergyPlusData &state,
         }
 
         AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
-                          PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat) *
-                          PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / (TimeStepSys * DataGlobalConstants::SecInHour);
+                          Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat) *
+                          Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / (TimeStepSys * DataGlobalConstants::SecInHour);
         Real64 AirCap = AIRRAT(ZoneNum);
         Real64 RAFNFrac = 0.0;
 
@@ -3825,9 +3816,6 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
     // This routine sets what the setpoints for each controlled zone should be based on schedules.
     // This is called each time step.
 
-    using ScheduleManager::GetCurrentScheduleValue;
-    using ScheduleManager::GetScheduleValuesForDay;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int RelativeZoneNum;
     int ActualZoneNum;
@@ -3866,7 +3854,8 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
         // What if this zone not controlled???
         ActualZoneNum = TempControlledZone(RelativeZoneNum).ActualZoneNum;
         TempControlSchedIndex = TempControlledZone(RelativeZoneNum).CTSchedIndex;
-        TempControlType(ActualZoneNum) = static_cast<DataHVACGlobals::ThermostatType>(GetCurrentScheduleValue(state, TempControlSchedIndex));
+        TempControlType(ActualZoneNum) =
+            static_cast<DataHVACGlobals::ThermostatType>(ScheduleManager::GetCurrentScheduleValue(state, TempControlSchedIndex));
         TempControlTypeRpt(ActualZoneNum) = static_cast<int>(TempControlType(ActualZoneNum));
         // Error detection for these values is done in the Get routine
 
@@ -3875,7 +3864,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
             break;
         case DataHVACGlobals::ThermostatType::SingleHeating:
             SchedNameIndex = TempControlledZone(RelativeZoneNum).SchIndx_SingleHeatSetPoint;
-            TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(state, SchedNameIndex);
+            TempZoneThermostatSetPoint(ActualZoneNum) = ScheduleManager::GetCurrentScheduleValue(state, SchedNameIndex);
             TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo = TempZoneThermostatSetPoint(ActualZoneNum);
 
             AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
@@ -3883,7 +3872,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
             break;
         case DataHVACGlobals::ThermostatType::SingleCooling:
             SchedNameIndex = TempControlledZone(RelativeZoneNum).SchIndx_SingleCoolSetPoint;
-            TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(state, SchedNameIndex);
+            TempZoneThermostatSetPoint(ActualZoneNum) = ScheduleManager::GetCurrentScheduleValue(state, SchedNameIndex);
             TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = TempZoneThermostatSetPoint(ActualZoneNum);
 
             // Added Jan 17 (X. Luo)
@@ -3902,7 +3891,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
 
             SchedNameIndex = TempControlledZone(RelativeZoneNum).SchIndx_SingleHeatCoolSetPoint;
 
-            TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(state, SchedNameIndex);
+            TempZoneThermostatSetPoint(ActualZoneNum) = ScheduleManager::GetCurrentScheduleValue(state, SchedNameIndex);
 
             // Added Jan 17 (X. Luo)
             // Adjust operative temperature based on adaptive comfort model
@@ -3923,7 +3912,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
                     DaySPValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
                 }
                 if (state.dataHVACGlobal->OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
-                    GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
+                    ScheduleManager::GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
                     OccStartTime = CEILING(state.dataHVACGlobal->OptStartData.OccStartTime(ActualZoneNum)) + 1;
                     TempZoneThermostatSetPoint(ActualZoneNum) = DaySPValues(1, OccStartTime);
                 }
@@ -3939,7 +3928,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
             SetPointTempSchedIndexHot = TempControlledZone(RelativeZoneNum).SchIndx_DualSetPointWDeadBandHeat;
             SetPointTempSchedIndexCold = TempControlledZone(RelativeZoneNum).SchIndx_DualSetPointWDeadBandCool;
 
-            ZoneThermostatSetPointHi(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndexCold);
+            ZoneThermostatSetPointHi(ActualZoneNum) = ScheduleManager::GetCurrentScheduleValue(state, SetPointTempSchedIndexCold);
             TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = ZoneThermostatSetPointHi(ActualZoneNum);
 
             // Added Jan 17 (X. Luo)
@@ -3951,7 +3940,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
 
             AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointHi(ActualZoneNum));
 
-            ZoneThermostatSetPointLo(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndexHot);
+            ZoneThermostatSetPointLo(ActualZoneNum) = ScheduleManager::GetCurrentScheduleValue(state, SetPointTempSchedIndexHot);
             TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo = ZoneThermostatSetPointLo(ActualZoneNum);
             AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointLo(ActualZoneNum));
 
@@ -3962,10 +3951,10 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
                     DaySPValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
                 }
                 if (state.dataHVACGlobal->OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
-                    GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
+                    ScheduleManager::GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
                     OccStartTime = CEILING(state.dataHVACGlobal->OptStartData.OccStartTime(ActualZoneNum)) + 1;
                     state.dataZoneCtrls->OccRoomTSetPointCool(ActualZoneNum) = DaySPValues(1, OccStartTime);
-                    GetScheduleValuesForDay(state, SetPointTempSchedIndexHot, DaySPValues);
+                    ScheduleManager::GetScheduleValuesForDay(state, SetPointTempSchedIndexHot, DaySPValues);
                     state.dataZoneCtrls->OccRoomTSetPointHeat(ActualZoneNum) = DaySPValues(1, OccStartTime);
                 }
 
@@ -3998,13 +3987,14 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
                                                 state.dataFaultsMgr->FaultsThermostatOffset(iFault).FaultyThermostatName)) {
 
                     // Check fault availability schedules
-                    if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).AvaiSchedPtr) > 0.0) {
+                    if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).AvaiSchedPtr) > 0.0) {
 
                         // Check fault severity schedules to update the reference thermostat offset
                         double rSchVal = 1.0;
                         double offsetUpdated;
                         if (state.dataFaultsMgr->FaultsThermostatOffset(iFault).SeveritySchedPtr >= 0) {
-                            rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).SeveritySchedPtr);
+                            rSchVal =
+                                ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).SeveritySchedPtr);
                         }
                         offsetUpdated = rSchVal * state.dataFaultsMgr->FaultsThermostatOffset(iFault).Offset;
 
@@ -4034,8 +4024,6 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine calculates the predicted system load for a time step.
-
-    using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 LoadToHeatingSetPoint;
@@ -4426,10 +4414,6 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
     // Routine FinalZnCalcs - FINAL ZONE CALCULATIONS, authored by Dale Herron
     // for BLAST.
 
-    // Using/Aliasing
-    using ScheduleManager::GetCurrentScheduleValue;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcPredictedHumidityRatio");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4472,9 +4456,9 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
     for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HumidControlledZoneNum) {
         auto &humidityControlZone = state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum);
         if (humidityControlZone.ActualZoneNum != ZoneNum) continue;
-        ZoneAirRH = PsyRhFnTdbWPb(state, thisMAT, zoneAirHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
-        ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue(state, humidityControlZone.HumidifyingSchedIndex);
-        ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue(state, humidityControlZone.DehumidifyingSchedIndex);
+        ZoneAirRH = Psychrometrics::PsyRhFnTdbWPb(state, thisMAT, zoneAirHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
+        ZoneRHHumidifyingSetPoint = ScheduleManager::GetCurrentScheduleValue(state, humidityControlZone.HumidifyingSchedIndex);
+        ZoneRHDehumidifyingSetPoint = ScheduleManager::GetCurrentScheduleValue(state, humidityControlZone.DehumidifyingSchedIndex);
 
         // Apply EMS values to overwrite the humidistat values
         if (humidityControlZone.EMSOverrideHumidifySetPointOn) {
@@ -4516,13 +4500,13 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
                                     IsThermostatFound = true;
 
                                     // Check fault availability schedules
-                                    if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).AvaiSchedPtr) >
-                                        0.0) {
+                                    if (ScheduleManager::GetCurrentScheduleValue(
+                                            state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).AvaiSchedPtr) > 0.0) {
 
                                         // Check fault severity schedules to update the reference thermostat offset
                                         double rSchVal = 1.0;
                                         if (state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr >= 0) {
-                                            rSchVal = GetCurrentScheduleValue(
+                                            rSchVal = ScheduleManager::GetCurrentScheduleValue(
                                                 state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr);
                                         }
                                         offsetThermostat = rSchVal * state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).Offset;
@@ -4545,16 +4529,16 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
 
                         if (offsetThermostat != 0.0) {
                             // Calculate the humidistat offset value from the thermostat offset value
-                            faultZoneWHumidifyingSetPoint = PsyWFnTdbRhPb(
+                            faultZoneWHumidifyingSetPoint = Psychrometrics::PsyWFnTdbRhPb(
                                 state, (thisMAT + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
-                            faultZoneWDehumidifyingSetPoint = PsyWFnTdbRhPb(
+                            faultZoneWDehumidifyingSetPoint = Psychrometrics::PsyWFnTdbRhPb(
                                 state, (thisMAT + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                             offsetZoneRHHumidifyingSetPoint =
                                 ZoneRHHumidifyingSetPoint -
-                                PsyRhFnTdbWPb(state, thisMAT, faultZoneWHumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
+                                Psychrometrics::PsyRhFnTdbWPb(state, thisMAT, faultZoneWHumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
                             offsetZoneRHDehumidifyingSetPoint =
                                 ZoneRHDehumidifyingSetPoint -
-                                PsyRhFnTdbWPb(state, thisMAT, faultZoneWDehumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
+                                Psychrometrics::PsyRhFnTdbWPb(state, thisMAT, faultZoneWDehumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
 
                             // Apply the calculated humidistat offset value
                             // Positive offset means the sensor reading is higher than the actual value
@@ -4570,13 +4554,14 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
                         // For Humidistat Offset Type II: ThermostatOffsetIndependent
 
                         // Check fault availability schedules
-                        if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).AvaiSchedPtr) > 0.0) {
+                        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).AvaiSchedPtr) > 0.0) {
 
                             // Check fault severity schedules to update the reference humidistat offset
                             double rSchVal = 1.0;
                             double offsetUpdated;
                             if (state.dataFaultsMgr->FaultsHumidistatOffset(iFault).SeveritySchedPtr >= 0) {
-                                rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).SeveritySchedPtr);
+                                rSchVal = ScheduleManager::GetCurrentScheduleValue(
+                                    state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).SeveritySchedPtr);
                             }
                             offsetUpdated = rSchVal * state.dataFaultsMgr->FaultsHumidistatOffset(iFault).Offset;
 
@@ -4628,10 +4613,10 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
                 auto &zoneSizingInput = state.dataSize->ZoneSizingInput(ZoneSizNum);
                 if (zoneSizingInput.zoneLatentSizing) {
                     ZoneRHDehumidifyingSetPoint = (zoneSizingInput.zoneRHDehumidifySchIndex)
-                                                      ? GetCurrentScheduleValue(state, zoneSizingInput.zoneRHDehumidifySchIndex)
+                                                      ? ScheduleManager::GetCurrentScheduleValue(state, zoneSizingInput.zoneRHDehumidifySchIndex)
                                                       : zoneSizingInput.zoneRHDehumidifySetPoint;
                     ZoneRHHumidifyingSetPoint = (zoneSizingInput.zoneRHHumidifySchIndex)
-                                                    ? GetCurrentScheduleValue(state, zoneSizingInput.zoneRHHumidifySchIndex)
+                                                    ? ScheduleManager::GetCurrentScheduleValue(state, zoneSizingInput.zoneRHHumidifySchIndex)
                                                     : zoneSizingInput.zoneRHHumidifySetPoint;
                     if (ZoneRHHumidifyingSetPoint > ZoneRHDehumidifyingSetPoint) ZoneRHHumidifyingSetPoint = ZoneRHDehumidifyingSetPoint;
                     if (ZoneRHHumidifyingSetPoint == ZoneRHDehumidifyingSetPoint) SingleSetPoint = true;
@@ -4657,8 +4642,8 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // are currently set to zero when the CTF only version is used.
 
         // The density of air and latent heat of vaporization are calculated as functions.
-        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZT, zoneAirHumRat, RoutineName);
-        H2OHtOfVap = PsyHgAirFnWTdb(zoneAirHumRat, thisZT);
+        RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZT, zoneAirHumRat, RoutineName);
+        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(zoneAirHumRat, thisZT);
 
         // Assume that the system will have flow
         if (state.afn->multizone_always_simulated ||
@@ -4679,7 +4664,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             auto &roomAFNInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum);
             RoomAirNode = roomAFNInfo.ControlAirNodeID;
-            H2OHtOfVap = PsyHgAirFnWTdb(roomAFNInfo.Node(RoomAirNode).HumRat, roomAFNInfo.Node(RoomAirNode).AirTemp);
+            H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(roomAFNInfo.Node(RoomAirNode).HumRat, roomAFNInfo.Node(RoomAirNode).AirTemp);
             A = roomAFNInfo.Node(RoomAirNode).SumLinkM + roomAFNInfo.Node(RoomAirNode).SumHmARa;
             B = (roomAFNInfo.Node(RoomAirNode).SumIntLatentGain / H2OHtOfVap) + roomAFNInfo.Node(RoomAirNode).SumLinkMW +
                 roomAFNInfo.Node(RoomAirNode).SumHmARaW;
@@ -4692,7 +4677,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // this amount of moisture must be added to the zone to reach the setpoint.  Negative values represent
         // the amount of moisture that must be removed by the system.
         // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
-        WZoneSetPoint = PsyWFnTdbRhPb(state, thisZT, (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
+        WZoneSetPoint = Psychrometrics::PsyWFnTdbRhPb(state, thisZT, (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
         Real64 exp_700_A_C(0.0);
         if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
             LoadToHumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
@@ -4711,7 +4696,8 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         }
         if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
         zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
-        WZoneSetPoint = PsyWFnTdbRhPb(state, thisZT, (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
+        WZoneSetPoint =
+            Psychrometrics::PsyWFnTdbRhPb(state, thisZT, (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
         if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
             LoadToDehumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
                                        (B + C * (3.0 * thisZoneHB.WZoneTimeMinus1Temp - (3.0 / 2.0) * thisZoneHB.WZoneTimeMinus2Temp +
@@ -4815,9 +4801,6 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
     using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
     using RoomAirModelManager::ManageAirModel;
-    using ScheduleManager::GetCurrentScheduleValue;
-    using ScheduleManager::GetScheduleMaxValue;
-    using ScheduleManager::GetScheduleMinValue;
 
     static constexpr std::string_view RoutineName("CorrectZoneAirTemp");
 
@@ -4860,9 +4843,10 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             thisZoneHB.WZoneTimeMinus3Temp = thisZoneHB.WZoneTimeMinus3;
         }
 
-        AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
-                          PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, RoutineName) *
-                          PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / (TimeStepSys * DataGlobalConstants::SecInHour);
+        AIRRAT(ZoneNum) =
+            Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
+            Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, RoutineName) *
+            Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
         Real64 AirCap = AIRRAT(ZoneNum);
 
@@ -4926,7 +4910,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
                 state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
             } else if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
                 // UCSDDV: Not fully mixed - calculate factor to correct load for fully mixed assumption
-                if (thisZoneHB.SumSysMCp > SmallMassFlow) {
+                if (thisZoneHB.SumSysMCp > DataHVACGlobals::SmallMassFlow) {
                     Real64 TempSupplyAir = thisZoneHB.SumSysMCpT / thisZoneHB.SumSysMCp; // Non-negligible flow, calculate supply air temperature
                     if (std::abs(TempSupplyAir - thisZoneHB.ZT) > state.dataHeatBal->TempConvergTol) {
                         state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) =
@@ -4944,7 +4928,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
                 }
             } else if (AirModel(ZoneNum).SimAirModel && ((AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UserDefined) ||
                                                          (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mundt))) {
-                if (thisZoneHB.SumSysMCp > SmallMassFlow) {
+                if (thisZoneHB.SumSysMCp > DataHVACGlobals::SmallMassFlow) {
                     Real64 TempSupplyAir = thisZoneHB.SumSysMCpT / thisZoneHB.SumSysMCp; // Non-negligible flow, calculate supply air temperature
                     if (std::abs(TempSupplyAir - thisZoneHB.ZT) > state.dataHeatBal->TempConvergTol) {
                         state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) =
@@ -4973,7 +4957,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
             }
 
             // Sensible load is the enthalpy into the zone minus the enthalpy that leaves the zone.
-            Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+            Real64 CpAir = Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             Real64 ZoneEnthalpyIn = thisZoneHB.SumSysMCpT;
 
             // SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
@@ -5058,7 +5042,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
         thisZoneHB.ZoneAirHumRat = thisZoneHB.ZoneAirHumRatTemp;
         state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) =
-            100.0 * PsyRhFnTdbWPb(state, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
+            100.0 * Psychrometrics::PsyRhFnTdbWPb(state, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
 
         // ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
         switch (ZoneAirSolutionAlgo) {
@@ -5160,7 +5144,7 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
         thisZoneHB.ZoneAirHumRat = thisZoneHB.ZoneAirHumRatTemp;
         thisZoneHB.WZoneTimeMinusP = thisZoneHB.ZoneAirHumRatTemp;
         state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) =
-            100.0 * PsyRhFnTdbWPb(state, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress, CorrectZoneAirTemp);
+            100.0 * Psychrometrics::PsyRhFnTdbWPb(state, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress, CorrectZoneAirTemp);
 
         if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
             AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
@@ -5440,8 +5424,9 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // heat balance.  There are 2 cases that should be considered, system
     // operating and system shutdown.
 
-    Real64 const RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, RoutineName);
-    Real64 const H2OHtOfVap = PsyHgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.ZT);
+    Real64 const RhoAir =
+        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, RoutineName);
+    Real64 const H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.ZT);
 
     Real64 B = (LatentGain / H2OHtOfVap) + ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.CTMFL) * state.dataEnvrn->OutHumRat) +
                thisZoneHB.EAMFLxHumRat + (MoistureMassFlowRate) + thisZoneHB.SumHmARaW + thisZoneHB.MixingMassFlowXHumRat +
@@ -5493,7 +5478,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
 
     // Check to make sure that is saturated there is condensation in the zone
     // by resetting to saturation conditions.
-    Real64 const WZSat = PsyWFnTdbRhPb(state, thisZoneHB.ZT, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
+    Real64 const WZSat = Psychrometrics::PsyWFnTdbRhPb(state, thisZoneHB.ZT, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
 
     if (zoneAirHumRatTemp > WZSat) zoneAirHumRatTemp = WZSat;
 
@@ -5519,7 +5504,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     int ZoneNodeNum = zone.SystemZoneNodeNumber;
     if (ZoneNodeNum > 0) {
         state.dataLoopNodes->Node(ZoneNodeNum).HumRat = thisZoneHB.ZoneAirHumRatTemp;
-        state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(thisZoneHB.ZT, thisZoneHB.ZoneAirHumRatTemp);
+        state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(thisZoneHB.ZT, thisZoneHB.ZoneAirHumRatTemp);
     }
     if (state.dataHeatBal->DoLatentSizing) {
         state.dataHeatBal->latentReports(ZoneNum).ZoneLTLoadHeatRate = std::abs(min(LatentGain, 0.0));
@@ -5536,9 +5521,9 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         } else {
             state.dataHeatBal->latentReports(ZoneNum).ZoneSensibleHeatRatio = 0.0;
         }
-        Real64 pSat = PsyPsatFnTemp(state, thisZoneHB.ZT, RoutineName);
+        Real64 pSat = Psychrometrics::PsyPsatFnTemp(state, thisZoneHB.ZT, RoutineName);
         Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, thisZoneHB.ZoneAirHumRatTemp, state.dataEnvrn->StdBaroPress);
-        state.dataHeatBal->latentReports(ZoneNum).ZoneVaporPressureDifference = pSat - PsyPsatFnTemp(state, Tdp, RoutineName);
+        state.dataHeatBal->latentReports(ZoneNum).ZoneVaporPressureDifference = pSat - Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName);
     }
 }
 
@@ -5638,7 +5623,7 @@ void InverseModelTemperature(EnergyPlusData &state,
     auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     int ZoneMult = zone.Multiplier * zone.ListMultiplier;
-    zone.ZoneMeasuredTemperature = GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredTemperatureSchedulePtr);
+    zone.ZoneMeasuredTemperature = ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredTemperatureSchedulePtr);
 
     // HM calculation only HM calculation period start
     if (state.dataEnvrn->DayOfYear >= hybridModelZone.HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= hybridModelZone.HybridEndDayOfYear) {
@@ -5652,12 +5637,15 @@ void InverseModelTemperature(EnergyPlusData &state,
             static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
 
             if (hybridModelZone.IncludeSystemSupplyParameters) {
-                zone.ZoneMeasuredSupplyAirTemperature = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirTemperatureSchedulePtr);
-                zone.ZoneMeasuredSupplyAirFlowRate = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirMassFlowRateSchedulePtr);
-                zone.ZoneMeasuredSupplyAirHumidityRatio = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirHumidityRatioSchedulePtr);
+                zone.ZoneMeasuredSupplyAirTemperature =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirTemperatureSchedulePtr);
+                zone.ZoneMeasuredSupplyAirFlowRate =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirMassFlowRateSchedulePtr);
+                zone.ZoneMeasuredSupplyAirHumidityRatio =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirHumidityRatioSchedulePtr);
                 // Calculate the air humidity ratio at supply air inlet.
                 Real64 CpAirInlet(0.0);
-                CpAirInlet = PsyCpAirFnW(zone.ZoneMeasuredSupplyAirHumidityRatio);
+                CpAirInlet = Psychrometrics::PsyCpAirFnW(zone.ZoneMeasuredSupplyAirHumidityRatio);
 
                 Real64 SumSysMCp_HM = zone.ZoneMeasuredSupplyAirFlowRate * CpAirInlet;
                 Real64 SumSysMCpT_HM = zone.ZoneMeasuredSupplyAirFlowRate * CpAirInlet * zone.ZoneMeasuredSupplyAirTemperature;
@@ -5676,9 +5664,9 @@ void InverseModelTemperature(EnergyPlusData &state,
                  (1.0 / 3.0) * state.dataHeatBalFanSys->PreviousMeasuredZT3(ZoneNum));
 
             Real64 delta_T = (zone.ZoneMeasuredTemperature - zone.OutDryBulbTemp);
-            Real64 CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-            Real64 AirDensity =
-                PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, zone.OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineNameInfiltration);
+            Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+            Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
+                state, state.dataEnvrn->OutBaroPress, zone.OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineNameInfiltration);
             zone.delta_T = delta_T;
 
             // s4 - Set ACH to 0 when delta_T <= 0.5, add max and min limits to ach
@@ -5732,11 +5720,11 @@ void InverseModelTemperature(EnergyPlusData &state,
             if (std::abs(thisZoneHB.ZT - state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
                 MultpHM = AirCapHM /
                           (zone.Volume *
-                           PsyRhoAirFnPbTdbW(state,
-                                             state.dataEnvrn->OutBaroPress,
-                                             thisZoneHB.ZT,
-                                             thisZoneHB.ZoneAirHumRat) *
-                           PsyCpAirFnW(thisZoneHB.ZoneAirHumRat)) *
+                           Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                             state.dataEnvrn->OutBaroPress,
+                                                             thisZoneHB.ZT,
+                                                             thisZoneHB.ZoneAirHumRat) *
+                           Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat)) *
                           (state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour); // Inverse equation
                 if ((MultpHM < 1.0) || (MultpHM > 30.0)) {                                   // Temperature capacity multiplier greater than
                                                                                              // 1 and less than 30
@@ -5767,14 +5755,16 @@ void InverseModelTemperature(EnergyPlusData &state,
 
         // Hybrid model people count calculation
         if (hybridModelZone.PeopleCountCalc_T && state.dataHVACGlobal->UseZoneTimeStepHistory) {
-            zone.ZoneMeasuredTemperature = GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredTemperatureSchedulePtr);
-            zone.ZonePeopleActivityLevel = GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleActivityLevelSchedulePtr);
-            zone.ZonePeopleSensibleHeatFraction = GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleSensibleFractionSchedulePtr);
-            zone.ZonePeopleRadiantHeatFraction = GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleRadiationFractionSchedulePtr);
+            zone.ZoneMeasuredTemperature = ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredTemperatureSchedulePtr);
+            zone.ZonePeopleActivityLevel = ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleActivityLevelSchedulePtr);
+            zone.ZonePeopleSensibleHeatFraction =
+                ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleSensibleFractionSchedulePtr);
+            zone.ZonePeopleRadiantHeatFraction =
+                ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleRadiationFractionSchedulePtr);
 
             Real64 FractionSensible = zone.ZonePeopleSensibleHeatFraction;
             Real64 FractionRadiation = zone.ZonePeopleRadiantHeatFraction;
-            Real64 ActivityLevel = GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleActivityLevelSchedulePtr);
+            Real64 ActivityLevel = ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleActivityLevelSchedulePtr);
 
             if (FractionSensible <= 0.0) {
                 FractionSensible = 0.6;
@@ -5791,12 +5781,15 @@ void InverseModelTemperature(EnergyPlusData &state,
             }
 
             if (hybridModelZone.IncludeSystemSupplyParameters) {
-                zone.ZoneMeasuredSupplyAirTemperature = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirTemperatureSchedulePtr);
-                zone.ZoneMeasuredSupplyAirFlowRate = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirMassFlowRateSchedulePtr);
-                zone.ZoneMeasuredSupplyAirHumidityRatio = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirHumidityRatioSchedulePtr);
+                zone.ZoneMeasuredSupplyAirTemperature =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirTemperatureSchedulePtr);
+                zone.ZoneMeasuredSupplyAirFlowRate =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirMassFlowRateSchedulePtr);
+                zone.ZoneMeasuredSupplyAirHumidityRatio =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirHumidityRatioSchedulePtr);
 
                 // Calculate the air humidity ratio at supply air inlet.
-                Real64 CpAirInlet = PsyCpAirFnW(zone.ZoneMeasuredSupplyAirHumidityRatio);
+                Real64 CpAirInlet = Psychrometrics::PsyCpAirFnW(zone.ZoneMeasuredSupplyAirHumidityRatio);
 
                 Real64 SumSysMCp_HM = zone.ZoneMeasuredSupplyAirFlowRate * CpAirInlet;
                 Real64 SumSysMCpT_HM = zone.ZoneMeasuredSupplyAirFlowRate * CpAirInlet * zone.ZoneMeasuredSupplyAirTemperature;
@@ -5862,7 +5855,7 @@ void InverseModelHumidity(EnergyPlusData &state,
     auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     // Get measured zone humidity ratio
-    zone.ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredHumidityRatioSchedulePtr);
+    zone.ZoneMeasuredHumidityRatio = ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredHumidityRatioSchedulePtr);
 
     if (state.dataEnvrn->DayOfYear >= hybridModelZone.HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= hybridModelZone.HybridEndDayOfYear) {
         thisZoneHB.ZoneAirHumRat = zone.ZoneMeasuredHumidityRatio;
@@ -5871,8 +5864,10 @@ void InverseModelHumidity(EnergyPlusData &state,
         if (hybridModelZone.InfiltrationCalc_H && state.dataHVACGlobal->UseZoneTimeStepHistory) {
             // Conditionally calculate the time dependent and time independent terms
             if (hybridModelZone.IncludeSystemSupplyParameters) {
-                zone.ZoneMeasuredSupplyAirFlowRate = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirMassFlowRateSchedulePtr);
-                zone.ZoneMeasuredSupplyAirHumidityRatio = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirHumidityRatioSchedulePtr);
+                zone.ZoneMeasuredSupplyAirFlowRate =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirMassFlowRateSchedulePtr);
+                zone.ZoneMeasuredSupplyAirHumidityRatio =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirHumidityRatioSchedulePtr);
 
                 Real64 SumSysM_HM = zone.ZoneMeasuredSupplyAirFlowRate;
                 Real64 SumSysMHumRat_HM = zone.ZoneMeasuredSupplyAirFlowRate * zone.ZoneMeasuredSupplyAirHumidityRatio;
@@ -5895,7 +5890,8 @@ void InverseModelHumidity(EnergyPlusData &state,
 
             Real64 delta_HR = (zone.ZoneMeasuredHumidityRatio - state.dataEnvrn->OutHumRat);
 
-            Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, zone.OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineName);
+            Real64 AirDensity =
+                Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, zone.OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineName);
 
             Real64 M_inf = 0.0;
             if (std::abs(zone.ZoneMeasuredHumidityRatio - state.dataEnvrn->OutHumRat) > 0.0000001) {
@@ -5911,9 +5907,11 @@ void InverseModelHumidity(EnergyPlusData &state,
 
         // Hybrid Model calculate people count
         if (hybridModelZone.PeopleCountCalc_H && state.dataHVACGlobal->UseZoneTimeStepHistory) {
-            zone.ZonePeopleActivityLevel = GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleActivityLevelSchedulePtr);
-            zone.ZonePeopleSensibleHeatFraction = GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleSensibleFractionSchedulePtr);
-            zone.ZonePeopleRadiantHeatFraction = GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleRadiationFractionSchedulePtr);
+            zone.ZonePeopleActivityLevel = ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleActivityLevelSchedulePtr);
+            zone.ZonePeopleSensibleHeatFraction =
+                ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleSensibleFractionSchedulePtr);
+            zone.ZonePeopleRadiantHeatFraction =
+                ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZonePeopleRadiationFractionSchedulePtr);
 
             Real64 FractionSensible = zone.ZonePeopleSensibleHeatFraction;
 
@@ -5928,8 +5926,10 @@ void InverseModelHumidity(EnergyPlusData &state,
             // Conditionally calculate the humidity-dependent and humidity-independent
             // terms.
             if (hybridModelZone.IncludeSystemSupplyParameters) {
-                zone.ZoneMeasuredSupplyAirFlowRate = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirMassFlowRateSchedulePtr);
-                zone.ZoneMeasuredSupplyAirHumidityRatio = GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirHumidityRatioSchedulePtr);
+                zone.ZoneMeasuredSupplyAirFlowRate =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirMassFlowRateSchedulePtr);
+                zone.ZoneMeasuredSupplyAirHumidityRatio =
+                    ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneSupplyAirHumidityRatioSchedulePtr);
 
                 Real64 SumSysM_HM = zone.ZoneMeasuredSupplyAirFlowRate;
                 Real64 SumSysMHumRat_HM = zone.ZoneMeasuredSupplyAirFlowRate * zone.ZoneMeasuredSupplyAirHumidityRatio;
@@ -6048,7 +6048,7 @@ void CalcZoneSums(EnergyPlusData &state,
                 // Get node conditions, this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
                 //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
                 auto const &node(state.dataLoopNodes->Node(zec.InletNode(NodeNum)));
-                Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                Real64 CpAir = Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                 Real64 const MassFlowRate_CpAir(node.MassFlowRate * CpAir);
                 SumSysMCp += MassFlowRate_CpAir;
                 SumSysMCpT += MassFlowRate_CpAir * node.Temp;
@@ -6059,7 +6059,7 @@ void CalcZoneSums(EnergyPlusData &state,
             Real64 const air_hum_rat(thisZoneHB.ZoneAirHumRat);
             for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                 auto const &node(state.dataLoopNodes->Node(zrpc.InletNode(NodeNum)));
-                Real64 const MassFlowRate_CpAir(node.MassFlowRate * PsyCpAirFnW(air_hum_rat));
+                Real64 const MassFlowRate_CpAir(node.MassFlowRate * Psychrometrics::PsyCpAirFnW(air_hum_rat));
                 SumSysMCp += MassFlowRate_CpAir;
                 SumSysMCpT += MassFlowRate_CpAir * node.Temp;
             }
@@ -6067,12 +6067,12 @@ void CalcZoneSums(EnergyPlusData &state,
             for (int ADUListIndex = 1, ADUListIndex_end = zrpc.NumADUs; ADUListIndex <= ADUListIndex_end; ++ADUListIndex) {
                 auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(zrpc.ADUIndex(ADUListIndex));
                 if (airDistUnit.UpStreamLeak) {
-                    Real64 const MassFlowRate_CpAir(airDistUnit.MassFlowRateUpStrLk * PsyCpAirFnW(air_hum_rat));
+                    Real64 const MassFlowRate_CpAir(airDistUnit.MassFlowRateUpStrLk * Psychrometrics::PsyCpAirFnW(air_hum_rat));
                     SumSysMCp += MassFlowRate_CpAir;
                     SumSysMCpT += MassFlowRate_CpAir * state.dataLoopNodes->Node(airDistUnit.InletNodeNum).Temp;
                 }
                 if (airDistUnit.DownStreamLeak) {
-                    Real64 const MassFlowRate_CpAir(airDistUnit.MassFlowRateDnStrLk * PsyCpAirFnW(air_hum_rat));
+                    Real64 const MassFlowRate_CpAir(airDistUnit.MassFlowRateDnStrLk * Psychrometrics::PsyCpAirFnW(air_hum_rat));
                     SumSysMCp += MassFlowRate_CpAir;
                     SumSysMCpT += MassFlowRate_CpAir * state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).Temp;
                 }
@@ -6080,7 +6080,7 @@ void CalcZoneSums(EnergyPlusData &state,
 
         } else if (ZoneSupPlenumAirFlag) {
             Real64 MassFlowRate = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(zone.PlenumCondNum).InletNode).MassFlowRate;
-            Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+            Real64 CpAir = Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(zone.PlenumCondNum).InletNode).Temp;
         }
@@ -6407,8 +6407,8 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     }
     // now calculate air energy storage source term.
     // capacitance is volume * density * heat capacity
-    Real64 CpAir = PsyCpAirFnW(zoneAirHumRat);
-    Real64 RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisMAT, zoneAirHumRat);
+    Real64 CpAir = Psychrometrics::PsyCpAirFnW(zoneAirHumRat);
+    Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisMAT, zoneAirHumRat);
 
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
@@ -6471,7 +6471,7 @@ bool VerifyThermostatInZone(EnergyPlusData &state, std::string const &ZoneName) 
         state.dataZoneCtrls->GetZoneAirStatsInputFlag = false;
     }
     if (state.dataZoneCtrls->NumTempControlledZones > 0) {
-        if (UtilityRoutines::FindItemInList(ZoneName, state.dataZoneCtrls->TempControlledZone, &ZoneTempControls::ZoneName) > 0) {
+        if (UtilityRoutines::FindItemInList(ZoneName, state.dataZoneCtrls->TempControlledZone, &DataZoneControls::ZoneTempControls::ZoneName) > 0) {
             return true;
         } else {
             return false;
@@ -6578,7 +6578,7 @@ void DetectOscillatingZoneTemp(EnergyPlusData &state)
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     if (state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded) {
         // precalc the negative value for performance
-        Real64 NegOscillateMagnitude = -OscillateMagnitude;
+        Real64 NegOscillateMagnitude = -DataHVACGlobals::OscillateMagnitude;
         // assume no zone is oscillating
         bool isAnyZoneOscillating = false;
         bool isAnyZoneOscillatingDuringOccupancy = false;
@@ -6597,16 +6597,16 @@ void DetectOscillatingZoneTemp(EnergyPlusData &state)
             Real64 Diff12 =
                 state.dataZoneTempPredictorCorrector->ZoneTempHist(1, iZone) - state.dataZoneTempPredictorCorrector->ZoneTempHist(2, iZone);
             // roll out the conditionals for increased performance
-            if (Diff12 > OscillateMagnitude) {
+            if (Diff12 > DataHVACGlobals::OscillateMagnitude) {
                 if (Diff23 < NegOscillateMagnitude) {
-                    if (Diff34 > OscillateMagnitude) {
+                    if (Diff34 > DataHVACGlobals::OscillateMagnitude) {
                         isOscillate = true;
                     }
                 }
             }
             // now try the opposite sequence of swings
             if (Diff12 < NegOscillateMagnitude) {
-                if (Diff23 > OscillateMagnitude) {
+                if (Diff23 > DataHVACGlobals::OscillateMagnitude) {
                     if (Diff34 < NegOscillateMagnitude) {
                         isOscillate = true;
                     }
@@ -6664,8 +6664,9 @@ void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempContr
     if (!(tempControlledZone.OperativeTempControl)) return; // do nothing to setpoint
 
     // is operative temp radiative fraction scheduled or fixed?
-    thisMRTFraction = (tempControlledZone.OpTempCntrlModeScheduled) ? GetCurrentScheduleValue(state, tempControlledZone.OpTempRadiativeFractionSched)
-                                                                    : tempControlledZone.FixedRadiativeFraction;
+    thisMRTFraction = (tempControlledZone.OpTempCntrlModeScheduled)
+                          ? ScheduleManager::GetCurrentScheduleValue(state, tempControlledZone.OpTempRadiativeFractionSched)
+                          : tempControlledZone.FixedRadiativeFraction;
 
     // get mean radiant temperature for zone
     Real64 thisMRT = state.dataHeatBal->ZoneMRT(ActualZoneNum);
@@ -7539,7 +7540,7 @@ void ZoneSpaceHeatBalanceData::UpdateTemperatures(EnergyPlusData &state,
                 zoneNode.Temp = this->XMAT;
                 state.dataHeatBalFanSys->TempTstatAir(zoneNum) = this->XMAT;
                 zoneNode.HumRat = this->WZoneTimeMinus1;
-                zoneNode.Enthalpy = PsyHFnTdbW(this->XMAT, this->WZoneTimeMinus1);
+                zoneNode.Enthalpy = Psychrometrics::PsyHFnTdbW(this->XMAT, this->WZoneTimeMinus1);
             }
         }
 
@@ -7662,8 +7663,6 @@ void ZoneSpaceHeatBalanceData::UpdateTemperatures(EnergyPlusData &state,
 void ZoneSpaceHeatBalanceData::CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac)
 {
     // Calculate the predicted system load for a time step.
-
-    using ScheduleManager::GetCurrentScheduleValue;
 
     Real64 LoadToHeatingSetPoint;
     Real64 LoadToCoolingSetPoint;
