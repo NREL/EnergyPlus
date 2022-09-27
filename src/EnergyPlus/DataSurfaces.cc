@@ -56,7 +56,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -81,7 +80,6 @@ namespace EnergyPlus::DataSurfaces {
 using namespace DataVectorTypes;
 using namespace DataBSDFWindow;
 using namespace DataHeatBalance;
-using namespace DataHeatBalFanSys;
 using namespace DataZoneEquipment;
 using namespace DataLoopNode;
 using namespace Psychrometrics;

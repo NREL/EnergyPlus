@@ -2380,7 +2380,6 @@ namespace WindowManager {
             }
             // end new TC code
 
-            int ZoneNum = surface.Zone;
             TotLay = state.dataConstruction->Construct(ConstrNum).TotLayers;
             TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
             state.dataWindowManager->ngllayer = TotGlassLay;

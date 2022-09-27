@@ -55,7 +55,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -98,7 +97,6 @@ namespace ThermalChimney {
 
     // Using/Aliasing
     using namespace DataEnvironment;
-    using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace DataHeatBalSurface;

@@ -168,7 +168,6 @@ namespace CrossVentMgr {
         // initial calculations and averages the final result comparing the position of the surface with
         // the interface subzone height.
 
-        using namespace DataHeatBalFanSys;
         using namespace DataEnvironment;
         using namespace DataHeatBalance;
         using ScheduleManager::GetScheduleIndex; // , GetDayScheduleValues
@@ -371,7 +370,6 @@ namespace CrossVentMgr {
         // Subroutine for parameter actualization in the UCSD Cross Ventilation model.
 
         using namespace Psychrometrics;
-        using namespace DataHeatBalFanSys;
 
         Real64 constexpr MinUin(0.2);
 
@@ -802,7 +800,6 @@ namespace CrossVentMgr {
         // Work funded by the California Energy Comission. More information on the model can found in:
         // "Simplified Models for Heat Transfer in Rooms" G. Carrilho da Graca, Ph.D. thesis UCSD. December 2003.
 
-        using namespace DataHeatBalFanSys;
         using namespace DataEnvironment;
         using namespace DataHeatBalance;
         using InternalHeatGains::SumAllInternalConvectionGains;
