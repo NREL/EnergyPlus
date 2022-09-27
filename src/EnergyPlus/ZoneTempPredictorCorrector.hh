@@ -210,7 +210,13 @@ namespace ZoneTempPredictorCorrector {
         Real64 MixingMassFlowZone = 0.0;    // Mixing MASS FLOW (kg/s)
         Real64 MixingMassFlowXHumRat = 0.0; // Mixing MASS FLOW * Humidity Ratio
 
-        void CalcSpacePredictedSystemLoad(EnergyPlusData &state, int const spaceNum, Real64 const RAFNFrac);
+        Real64 ZoneSetPointLast = 0.0;
+        Real64 TempIndZnLd = 0.0;
+        Real64 TempDepZnLd = 0.0;
+        Real64 ZoneAirRelHum = 0.0; // Zone relative humidity in percent
+
+        void CalcPredictedSystemLoad(EnergyPlusData &state, int const zoneNum, Real64 const RAFNFrac, int const spaceNum = 0);
+
         void UpdateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,
                                 bool const UseZoneTimeStepHistory,
@@ -246,7 +252,7 @@ namespace ZoneTempPredictorCorrector {
     void
     CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
-    void CalcPredictedSystemLoad(EnergyPlusData &state, int ZoneNum, Real64 RAFNFrac);
+//    void CalcPredictedSystemLoad(EnergyPlusData &state, int ZoneNum, Real64 RAFNFrac);
 
     void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
                                            Real64 &TotalHeatLoad,
@@ -396,11 +402,6 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
     int NumStageCtrZone = 0;
     // Number of zone with onoff thermostat
     int NumOnOffCtrZone = 0;
-
-    Array1D<Real64> ZoneSetPointLast;
-    Array1D<Real64> TempIndZnLd;
-    Array1D<Real64> TempDepZnLd;
-    Array1D<Real64> ZoneAirRelHum; // Zone relative humidity in percent
 
     // Zone temperature history - used only for oscillation test
     Array2D<Real64> ZoneTempHist;

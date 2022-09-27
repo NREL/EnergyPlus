@@ -473,15 +473,11 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataHeatBalFanSys->TempControlTypeRpt.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(state->dataZoneCtrls->NumTempControlledZones);
-    state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataZoneEnergyDemand->Setback.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataHeatBalFanSys->AIRRAT.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
-    state->dataZoneTempPredictorCorrector->TempDepZnLd.allocate(state->dataZoneCtrls->NumTempControlledZones);
-    state->dataZoneTempPredictorCorrector->TempIndZnLd.allocate(state->dataZoneCtrls->NumTempControlledZones);
-    state->dataZoneTempPredictorCorrector->TempDepZnLd = 0.0;
-    state->dataZoneTempPredictorCorrector->TempIndZnLd = 0.0;
 
     state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(state->dataZoneCtrls->NumTempControlledZones);
@@ -511,7 +507,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired =
         0.0; // no load and no thermostat since control type is set to 0 above
     CalcZoneAirTempSetPoints(*state);
-    CalcPredictedSystemLoad(*state, DualZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).CalcPredictedSystemLoad(*state, DualZoneNum, 1.0);
 
     EXPECT_EQ(0.0,
               state->dataHeatBalFanSys->TempZoneThermostatSetPoint(
@@ -527,12 +523,12 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     int SetPointTempSchedIndex = state->dataZoneCtrls->TempControlledZone(HeatZoneNum).SchIndx_SingleHeatSetPoint;
     state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue = 20.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired = -1000.0; // cooling load
-    state->dataZoneTempPredictorCorrector->TempDepZnLd(HeatZoneNum) =
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(HeatZoneNum).TempDepZnLd =
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired /
         state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue;
 
     CalcZoneAirTempSetPoints(*state);
-    CalcPredictedSystemLoad(*state, HeatZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(HeatZoneNum).CalcPredictedSystemLoad(*state, HeatZoneNum, 1.0);
 
     EXPECT_EQ(20.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(HeatZoneNum));
     EXPECT_EQ(-1000.0,
@@ -543,21 +539,21 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     SetPointTempSchedIndex = state->dataZoneCtrls->TempControlledZone(HeatZoneNum).SchIndx_SingleHeatSetPoint;
     state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue = 21.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired = 1000.0; // heating load
-    state->dataZoneTempPredictorCorrector->TempDepZnLd(HeatZoneNum) =
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(HeatZoneNum).TempDepZnLd =
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(HeatZoneNum).TotalOutputRequired /
         state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue;
 
     SetPointTempSchedIndex = state->dataZoneCtrls->TempControlledZone(CoolZoneNum).SchIndx_SingleCoolSetPoint;
     state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue = 23.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CoolZoneNum).TotalOutputRequired = -3000.0; // cooling load
-    state->dataZoneTempPredictorCorrector->TempDepZnLd(CoolZoneNum) =
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(CoolZoneNum).TempDepZnLd =
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CoolZoneNum).TotalOutputRequired /
         state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue;
 
     SetPointTempSchedIndex = state->dataZoneCtrls->TempControlledZone(CoolHeatZoneNum).SchIndx_SingleHeatCoolSetPoint;
     state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue = 22.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CoolHeatZoneNum).TotalOutputRequired = -4000.0; // cooling load
-    state->dataZoneTempPredictorCorrector->TempDepZnLd(CoolHeatZoneNum) =
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(CoolHeatZoneNum).TempDepZnLd =
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CoolHeatZoneNum).TotalOutputRequired /
         state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue;
 
@@ -566,12 +562,12 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     SetPointTempSchedIndex = state->dataZoneCtrls->TempControlledZone(DualZoneNum).SchIndx_DualSetPointWDeadBandHeat;
     state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue = 20.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired = 2500.0; // heating load
-    state->dataZoneTempPredictorCorrector->TempDepZnLd(DualZoneNum) =
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).TempDepZnLd =
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired /
         state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue;
 
     CalcZoneAirTempSetPoints(*state);
-    CalcPredictedSystemLoad(*state, HeatZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(HeatZoneNum).CalcPredictedSystemLoad(*state, HeatZoneNum, 1.0);
 
     EXPECT_EQ(21.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(HeatZoneNum));
     EXPECT_FALSE(state->dataZoneEnergyDemand->CurDeadBandOrSetback(HeatZoneNum)); // Tstat should show there is load on a single heating SP
@@ -579,7 +575,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
               state->dataZoneEnergyDemand->ZoneSysEnergyDemand(HeatZoneNum)
                   .TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-    CalcPredictedSystemLoad(*state, CoolZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(CoolZoneNum).CalcPredictedSystemLoad(*state, CoolZoneNum, 1.0);
 
     EXPECT_EQ(23.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(CoolZoneNum));
     EXPECT_FALSE(state->dataZoneEnergyDemand->CurDeadBandOrSetback(CoolZoneNum)); // Tstat should show there is load on a single cooling SP
@@ -587,7 +583,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
               state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CoolZoneNum)
                   .TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-    CalcPredictedSystemLoad(*state, CoolHeatZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(CoolHeatZoneNum).CalcPredictedSystemLoad(*state, CoolHeatZoneNum, 1.0);
 
     ASSERT_EQ(22.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(CoolHeatZoneNum));
     EXPECT_FALSE(
@@ -596,7 +592,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
               state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CoolHeatZoneNum)
                   .TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-    CalcPredictedSystemLoad(*state, DualZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).CalcPredictedSystemLoad(*state, DualZoneNum, 1.0);
 
     EXPECT_EQ(20.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(DualZoneNum));
     EXPECT_FALSE(state->dataZoneEnergyDemand->CurDeadBandOrSetback(DualZoneNum)); // Tstat should show there is load on a dual SP
@@ -608,13 +604,13 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue = 25.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired = 1000.0;
     // LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
-    state->dataZoneTempPredictorCorrector->TempDepZnLd(DualZoneNum) =
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).TempDepZnLd =
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired /
         state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue;
-    state->dataZoneTempPredictorCorrector->TempIndZnLd(DualZoneNum) = 3500.0; // results in a cooling load
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).TempIndZnLd = 3500.0; // results in a cooling load
 
     CalcZoneAirTempSetPoints(*state);
-    CalcPredictedSystemLoad(*state, DualZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).CalcPredictedSystemLoad(*state, DualZoneNum, 1.0);
 
     EXPECT_EQ(25.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(DualZoneNum));
     EXPECT_FALSE(state->dataZoneEnergyDemand->CurDeadBandOrSetback(DualZoneNum)); // Tstat should show there is load on a dual SP
@@ -1222,11 +1218,8 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataHeatBalFanSys->AIRRAT.allocate(1);
-    state->dataZoneTempPredictorCorrector->TempDepZnLd.allocate(1);
-    state->dataZoneTempPredictorCorrector->TempIndZnLd.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
-    state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
 
     state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(1);
@@ -1249,8 +1242,8 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0;
     state->dataHeatBalFanSys->AIRRAT(1) = 2000;
-    state->dataZoneTempPredictorCorrector->TempDepZnLd(1) = 1.0;
-    state->dataZoneTempPredictorCorrector->TempIndZnLd(1) = 1.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempDepZnLd = 1.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempIndZnLd = 1.0;
 
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
     thisZoneHB.MAT = 20.0;
@@ -1356,11 +1349,8 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataHeatBalFanSys->AIRRAT.allocate(1);
-    state->dataZoneTempPredictorCorrector->TempDepZnLd.allocate(1);
-    state->dataZoneTempPredictorCorrector->TempIndZnLd.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
-    state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
 
     state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(1);
@@ -1383,8 +1373,8 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0;
     state->dataHeatBalFanSys->AIRRAT(1) = 2000;
-    state->dataZoneTempPredictorCorrector->TempDepZnLd(1) = 1.0;
-    state->dataZoneTempPredictorCorrector->TempIndZnLd(1) = 1.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempDepZnLd = 1.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempIndZnLd = 1.0;
 
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
     thisZoneHB.MAT = 20.0;
