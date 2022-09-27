@@ -121,7 +121,6 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 // Using/Aliasing
 using namespace DataHVACGlobals;
 using namespace DataHeatBalance;
-using namespace DataHeatBalFanSys;
 using namespace Psychrometrics;
 using namespace DataRoomAirModel;
 using namespace DataZoneControls;

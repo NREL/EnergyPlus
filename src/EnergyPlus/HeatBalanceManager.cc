@@ -144,7 +144,6 @@ namespace HeatBalanceManager {
     // Using/Aliasing
     using namespace DataComplexFenestration;
     using namespace DataEnvironment;
-    using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataRoomAirModel;

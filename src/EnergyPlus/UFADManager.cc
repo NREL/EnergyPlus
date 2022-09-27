@@ -665,7 +665,6 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
     // the interface subzone height.
 
     // Using/Aliasing
-    using namespace DataHeatBalFanSys;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
 
@@ -1001,7 +1000,6 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     // Using/Aliasing
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using namespace DataHeatBalFanSys;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using InternalHeatGains::SumInternalConvectionGainsByTypes;
     using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
@@ -1513,7 +1511,6 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     // Using/Aliasing
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using namespace DataHeatBalFanSys;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     using InternalHeatGains::SumInternalConvectionGainsByTypes;
     using InternalHeatGains::SumReturnAirConvectionGainsByTypes;

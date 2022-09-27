@@ -5123,7 +5123,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     // This subroutine calculates the air component of the heat balance.
 
     // Using/Aliasing
-    using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
     using CoolTower::ManageCoolTower;
     using DataHVACGlobals::CycleOn;

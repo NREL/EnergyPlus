@@ -1972,7 +1972,6 @@ namespace RoomAirModelManager {
 
         // Using/Aliasing
         using namespace DataEnvironment;
-        using namespace DataHeatBalFanSys;
         using namespace DataSurfaces;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 

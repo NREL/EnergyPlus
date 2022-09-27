@@ -150,7 +150,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 // Use statements for data only modules
 // Using/Aliasing
 using namespace DataEnvironment;
-using namespace DataHeatBalFanSys;
 using namespace DataHeatBalance;
 using namespace DataHeatBalSurface;
 using namespace DataSurfaces;
@@ -1313,7 +1312,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         state.dataHeatBalFanSys->CTFTuserConstPart.dimension(state.dataSurface->TotSurfaces, 0.0);
     }
 
-    state.dataHeatBal->SurfTempEffBulkAir.dimension(state.dataSurface->TotSurfaces, ZoneInitialTemp);
+    state.dataHeatBal->SurfTempEffBulkAir.dimension(state.dataSurface->TotSurfaces, DataHeatBalFanSys::ZoneInitialTemp);
     state.dataHeatBalSurf->SurfHConvInt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfHcExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfHAirExt.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -2126,7 +2125,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
 
     // First do the "bulk" initializations of arrays sized to NumOfZones
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        state.dataHeatBal->ZoneMRT(zoneNum) = ZoneInitialTemp; // module level array
+        state.dataHeatBal->ZoneMRT(zoneNum) = DataHeatBalFanSys::ZoneInitialTemp; // module level array
         // TODO: Reinitializing this entire stuct may cause diffs
         new (&state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum)) ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData();
         // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
@@ -2134,7 +2133,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         thisZoneHB.ZoneAirHumRatAvg = state.dataEnvrn->OutHumRat;
         thisZoneHB.ZoneAirHumRat = state.dataEnvrn->OutHumRat;
         thisZoneHB.ZoneAirHumRatOld = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->TempTstatAir(zoneNum) = ZoneInitialTemp;
+        state.dataHeatBalFanSys->TempTstatAir(zoneNum) = DataHeatBalFanSys::ZoneInitialTemp;
     }
     // Reset spaceHeatBalance even if doSpaceHeatBalance is false, beause spaceHB is used to gether zoneHB
     for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
@@ -6792,7 +6791,6 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
     // Using/Aliasing
     using namespace DataEnvironment;
-    using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataSurfaces;
@@ -9207,7 +9205,6 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
 
     // Using/Aliasing
     using namespace DataEnvironment;
-    using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataSurfaces;

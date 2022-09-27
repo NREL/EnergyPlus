@@ -103,7 +103,6 @@ namespace EnergyPlus::HeatBalanceAirManager {
 
 // USE STATEMENTS:
 using namespace DataEnvironment;
-using namespace DataHeatBalFanSys;
 using namespace DataHeatBalance;
 using namespace DataSurfaces;
 

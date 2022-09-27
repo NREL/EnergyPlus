@@ -58,7 +58,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -667,7 +666,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyTdpFnWPb;
     using ScheduleManager::GetCurrentScheduleValue;
-    using namespace DataHeatBalFanSys;
 
     Real64 constexpr TOL(0.0001); // convergence tolerance
 

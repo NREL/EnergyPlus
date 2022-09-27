@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -7320,8 +7319,6 @@ namespace InternalHeatGains {
                 thisEnclosure.radQThermalRad += spaceQL;
             }
         }
-
-        state.dataHeatBalFanSys->SumConvHTRadSys = 0.0;
 
         pulseMultipler = 0.01; // the W/sqft pulse for the zone
         if (state.dataGlobal->CompLoadReportIsReq) {

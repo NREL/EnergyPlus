@@ -176,7 +176,6 @@ void HcUCSDDV(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
     // the interface subzone height.
 
     // Using/Aliasing
-    using namespace DataHeatBalFanSys;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using ScheduleManager::GetScheduleIndex;
@@ -515,7 +514,6 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     // "Simplified Models for Heat Transfer in Rooms" G. Carrilho da Graca, Ph.D. thesis UCSD. December 2003.
 
     // Using/Aliasing
-    using namespace DataHeatBalFanSys;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
