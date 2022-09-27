@@ -252,8 +252,6 @@ namespace ZoneTempPredictorCorrector {
     void
     CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
-//    void CalcPredictedSystemLoad(EnergyPlusData &state, int ZoneNum, Real64 RAFNFrac);
-
     void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
                                            Real64 &TotalHeatLoad,
                                            Real64 &TotalCoolLoad,
