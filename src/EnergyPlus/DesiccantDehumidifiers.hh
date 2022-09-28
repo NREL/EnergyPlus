@@ -322,7 +322,7 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
 
     void clear_state() override
     {
-        *this = DesiccantDehumidifiersData();
+        new (this) DesiccantDehumidifiersData();
     }
 };
 

@@ -288,7 +288,6 @@ namespace CondenserLoopTowers {
                 state, UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
-            tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_SingleSpd;
             tower.TowerMassFlowRateMultiplier = 2.5;
             tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -615,7 +614,6 @@ namespace CondenserLoopTowers {
 
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
-            tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_TwoSpd;
             tower.TowerMassFlowRateMultiplier = 2.5;
             tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -980,7 +978,6 @@ namespace CondenserLoopTowers {
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.VSTower = VariableSpeedTowerNumber;
             tower.Name = AlphArray(1);
-            tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_VarSpd;
             tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                           AlphArray(2),
@@ -1033,50 +1030,47 @@ namespace CondenserLoopTowers {
                 }
             }
 
-            state.dataCondenserLoopTowers->towers(VariableSpeedTowerNumber).Coeff.allocate(35);
-            state.dataCondenserLoopTowers->towers(VariableSpeedTowerNumber).Coeff = 0.0;
-
             auto &vstower = state.dataCondenserLoopTowers->towers(tower.VSTower);
 
             if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
                 tower.TowerModelType = ModelType::CoolToolsXFModel;
                 //     set cross-flow model coefficients
                 //       Outputs approach in C
-                vstower.Coeff(1) = 0.52049709836241;
-                vstower.Coeff(2) = -10.617046395344;
-                vstower.Coeff(3) = 10.7292974722538;
-                vstower.Coeff(4) = -2.74988377158227;
-                vstower.Coeff(5) = 4.73629943913743;
-                vstower.Coeff(6) = -8.25759700874711;
-                vstower.Coeff(7) = 1.57640938114136;
-                vstower.Coeff(8) = 6.51119643791324;
-                vstower.Coeff(9) = 1.50433525206692;
-                vstower.Coeff(10) = -3.2888529287801;
-                vstower.Coeff(11) = 0.0257786145353773;
-                vstower.Coeff(12) = 0.182464289315254;
-                vstower.Coeff(13) = -0.0818947291400898;
-                vstower.Coeff(14) = -0.215010003996285;
-                vstower.Coeff(15) = 0.0186741309635284;
-                vstower.Coeff(16) = 0.0536824177590012;
-                vstower.Coeff(17) = -0.00270968955115031;
-                vstower.Coeff(18) = 0.00112277498589279;
-                vstower.Coeff(19) = -0.00127758497497718;
-                vstower.Coeff(20) = 0.0000760420796601607;
-                vstower.Coeff(21) = 1.43600088336017;
-                vstower.Coeff(22) = -0.5198695909109;
-                vstower.Coeff(23) = 0.117339576910507;
-                vstower.Coeff(24) = 1.50492810819924;
-                vstower.Coeff(25) = -0.135898905926974;
-                vstower.Coeff(26) = -0.152577581866506;
-                vstower.Coeff(27) = -0.0533843828114562;
-                vstower.Coeff(28) = 0.00493294869565511;
-                vstower.Coeff(29) = -0.00796260394174197;
-                vstower.Coeff(30) = 0.000222619828621544;
-                vstower.Coeff(31) = -0.0543952001568055;
-                vstower.Coeff(32) = 0.00474266879161693;
-                vstower.Coeff(33) = -0.0185854671815598;
-                vstower.Coeff(34) = 0.00115667701293848;
-                vstower.Coeff(35) = 0.000807370664460284;
+                vstower.Coeff[0] = 0.52049709836241;
+                vstower.Coeff[1] = -10.617046395344;
+                vstower.Coeff[2] = 10.7292974722538;
+                vstower.Coeff[3] = -2.74988377158227;
+                vstower.Coeff[4] = 4.73629943913743;
+                vstower.Coeff[5] = -8.25759700874711;
+                vstower.Coeff[6] = 1.57640938114136;
+                vstower.Coeff[7] = 6.51119643791324;
+                vstower.Coeff[8] = 1.50433525206692;
+                vstower.Coeff[9] = -3.2888529287801;
+                vstower.Coeff[10] = 0.0257786145353773;
+                vstower.Coeff[11] = 0.182464289315254;
+                vstower.Coeff[12] = -0.0818947291400898;
+                vstower.Coeff[13] = -0.215010003996285;
+                vstower.Coeff[14] = 0.0186741309635284;
+                vstower.Coeff[15] = 0.0536824177590012;
+                vstower.Coeff[16] = -0.00270968955115031;
+                vstower.Coeff[17] = 0.00112277498589279;
+                vstower.Coeff[18] = -0.00127758497497718;
+                vstower.Coeff[19] = 0.0000760420796601607;
+                vstower.Coeff[20] = 1.43600088336017;
+                vstower.Coeff[21] = -0.5198695909109;
+                vstower.Coeff[22] = 0.117339576910507;
+                vstower.Coeff[23] = 1.50492810819924;
+                vstower.Coeff[24] = -0.135898905926974;
+                vstower.Coeff[25] = -0.152577581866506;
+                vstower.Coeff[26] = -0.0533843828114562;
+                vstower.Coeff[27] = 0.00493294869565511;
+                vstower.Coeff[28] = -0.00796260394174197;
+                vstower.Coeff[29] = 0.000222619828621544;
+                vstower.Coeff[30] = -0.0543952001568055;
+                vstower.Coeff[31] = 0.00474266879161693;
+                vstower.Coeff[32] = -0.0185854671815598;
+                vstower.Coeff[33] = 0.00115667701293848;
+                vstower.Coeff[34] = 0.000807370664460284;
 
                 //       set minimum and maximum boundaries for CoolTools crossflow model input variables
                 vstower.MinInletAirWBTemp = -1.0;
@@ -1092,33 +1086,33 @@ namespace CondenserLoopTowers {
                 tower.TowerModelType = ModelType::YorkCalcModel;
                 //     set counter-flow model coefficients
                 //       Outputs approach in C
-                vstower.Coeff(1) = -0.359741205;
-                vstower.Coeff(2) = -0.055053608;
-                vstower.Coeff(3) = 0.0023850432;
-                vstower.Coeff(4) = 0.173926877;
-                vstower.Coeff(5) = -0.0248473764;
-                vstower.Coeff(6) = 0.00048430224;
-                vstower.Coeff(7) = -0.005589849456;
-                vstower.Coeff(8) = 0.0005770079712;
-                vstower.Coeff(9) = -0.00001342427256;
-                vstower.Coeff(10) = 2.84765801111111;
-                vstower.Coeff(11) = -0.121765149;
-                vstower.Coeff(12) = 0.0014599242;
-                vstower.Coeff(13) = 1.680428651;
-                vstower.Coeff(14) = -0.0166920786;
-                vstower.Coeff(15) = -0.0007190532;
-                vstower.Coeff(16) = -0.025485194448;
-                vstower.Coeff(17) = 0.0000487491696;
-                vstower.Coeff(18) = 0.00002719234152;
-                vstower.Coeff(19) = -0.0653766255555556;
-                vstower.Coeff(20) = -0.002278167;
-                vstower.Coeff(21) = 0.0002500254;
-                vstower.Coeff(22) = -0.0910565458;
-                vstower.Coeff(23) = 0.00318176316;
-                vstower.Coeff(24) = 0.000038621772;
-                vstower.Coeff(25) = -0.0034285382352;
-                vstower.Coeff(26) = 0.00000856589904;
-                vstower.Coeff(27) = -0.000001516821552;
+                vstower.Coeff[0] = -0.359741205;
+                vstower.Coeff[1] = -0.055053608;
+                vstower.Coeff[2] = 0.0023850432;
+                vstower.Coeff[3] = 0.173926877;
+                vstower.Coeff[4] = -0.0248473764;
+                vstower.Coeff[5] = 0.00048430224;
+                vstower.Coeff[6] = -0.005589849456;
+                vstower.Coeff[7] = 0.0005770079712;
+                vstower.Coeff[8] = -0.00001342427256;
+                vstower.Coeff[9] = 2.84765801111111;
+                vstower.Coeff[10] = -0.121765149;
+                vstower.Coeff[11] = 0.0014599242;
+                vstower.Coeff[12] = 1.680428651;
+                vstower.Coeff[13] = -0.0166920786;
+                vstower.Coeff[14] = -0.0007190532;
+                vstower.Coeff[15] = -0.025485194448;
+                vstower.Coeff[16] = 0.0000487491696;
+                vstower.Coeff[17] = 0.00002719234152;
+                vstower.Coeff[18] = -0.0653766255555556;
+                vstower.Coeff[19] = -0.002278167;
+                vstower.Coeff[20] = 0.0002500254;
+                vstower.Coeff[21] = -0.0910565458;
+                vstower.Coeff[22] = 0.00318176316;
+                vstower.Coeff[23] = 0.000038621772;
+                vstower.Coeff[24] = -0.0034285382352;
+                vstower.Coeff[25] = 0.00000856589904;
+                vstower.Coeff[26] = -0.000001516821552;
 
                 //       set minimum and maximum boundaries for YorkCalc model input variables
                 vstower.MinInletAirWBTemp = -34.4;
@@ -1158,7 +1152,7 @@ namespace CondenserLoopTowers {
                         vstower.MaxWaterFlowRatio = NumArray2(8);
 
                         for (CoeffNum = 9; CoeffNum <= NumNums2; ++CoeffNum) {
-                            vstower.Coeff(CoeffNum - 8) = NumArray2(CoeffNum);
+                            vstower.Coeff[CoeffNum - 9] = NumArray2(CoeffNum);
                         }
                     }
                     break;
@@ -1198,7 +1192,7 @@ namespace CondenserLoopTowers {
                         vstower.MaxLiquidToGasRatio = NumArray2(9);
 
                         for (CoeffNum = 10; CoeffNum <= NumNums2; ++CoeffNum) {
-                            vstower.Coeff(CoeffNum - 9) = NumArray2(CoeffNum);
+                            vstower.Coeff[CoeffNum - 10] = NumArray2(CoeffNum);
                         }
                     }
                     break;
@@ -1471,7 +1465,6 @@ namespace CondenserLoopTowers {
                 state, UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
-            tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_VarSpdMerkel;
             tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                           AlphArray(2),
@@ -5841,35 +5834,35 @@ namespace CondenserLoopTowers {
         if (this->TowerModelType == ModelType::YorkCalcModel || this->TowerModelType == ModelType::YorkCalcUserDefined) {
             Real64 PctAirFlow = airFlowRatioLocal;
             Real64 FlowFactor = PctWaterFlow / PctAirFlow;
-            return tower.Coeff(1) + tower.Coeff(2) * Twb + tower.Coeff(3) * Twb * Twb + tower.Coeff(4) * Tr + tower.Coeff(5) * Twb * Tr +
-                   tower.Coeff(6) * Twb * Twb * Tr + tower.Coeff(7) * Tr * Tr + tower.Coeff(8) * Twb * Tr * Tr +
-                   tower.Coeff(9) * Twb * Twb * Tr * Tr + tower.Coeff(10) * FlowFactor + tower.Coeff(11) * Twb * FlowFactor +
-                   tower.Coeff(12) * Twb * Twb * FlowFactor + tower.Coeff(13) * Tr * FlowFactor + tower.Coeff(14) * Twb * Tr * FlowFactor +
-                   tower.Coeff(15) * Twb * Twb * Tr * FlowFactor + tower.Coeff(16) * Tr * Tr * FlowFactor +
-                   tower.Coeff(17) * Twb * Tr * Tr * FlowFactor + tower.Coeff(18) * Twb * Twb * Tr * Tr * FlowFactor +
-                   tower.Coeff(19) * FlowFactor * FlowFactor + tower.Coeff(20) * Twb * FlowFactor * FlowFactor +
-                   tower.Coeff(21) * Twb * Twb * FlowFactor * FlowFactor + tower.Coeff(22) * Tr * FlowFactor * FlowFactor +
-                   tower.Coeff(23) * Twb * Tr * FlowFactor * FlowFactor + tower.Coeff(24) * Twb * Twb * Tr * FlowFactor * FlowFactor +
-                   tower.Coeff(25) * Tr * Tr * FlowFactor * FlowFactor + tower.Coeff(26) * Twb * Tr * Tr * FlowFactor * FlowFactor +
-                   tower.Coeff(27) * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
+            return tower.Coeff[0] + tower.Coeff[1] * Twb + tower.Coeff[2] * Twb * Twb + tower.Coeff[3] * Tr + tower.Coeff[4] * Twb * Tr +
+                   tower.Coeff[5] * Twb * Twb * Tr + tower.Coeff[6] * Tr * Tr + tower.Coeff[7] * Twb * Tr * Tr +
+                   tower.Coeff[8] * Twb * Twb * Tr * Tr + tower.Coeff[9] * FlowFactor + tower.Coeff[10] * Twb * FlowFactor +
+                   tower.Coeff[11] * Twb * Twb * FlowFactor + tower.Coeff[12] * Tr * FlowFactor + tower.Coeff[13] * Twb * Tr * FlowFactor +
+                   tower.Coeff[14] * Twb * Twb * Tr * FlowFactor + tower.Coeff[15] * Tr * Tr * FlowFactor +
+                   tower.Coeff[16] * Twb * Tr * Tr * FlowFactor + tower.Coeff[17] * Twb * Twb * Tr * Tr * FlowFactor +
+                   tower.Coeff[18] * FlowFactor * FlowFactor + tower.Coeff[19] * Twb * FlowFactor * FlowFactor +
+                   tower.Coeff[20] * Twb * Twb * FlowFactor * FlowFactor + tower.Coeff[21] * Tr * FlowFactor * FlowFactor +
+                   tower.Coeff[22] * Twb * Tr * FlowFactor * FlowFactor + tower.Coeff[23] * Twb * Twb * Tr * FlowFactor * FlowFactor +
+                   tower.Coeff[24] * Tr * Tr * FlowFactor * FlowFactor + tower.Coeff[25] * Twb * Tr * Tr * FlowFactor * FlowFactor +
+                   tower.Coeff[26] * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
 
         } else { // empirical model is CoolTools format
             //     the CoolTools model actually uses PctFanPower = AirFlowRatio^3 as an input to the model
             Real64 PctAirFlow = pow_3(airFlowRatioLocal);
-            return tower.Coeff(1) + tower.Coeff(2) * PctAirFlow + tower.Coeff(3) * PctAirFlow * PctAirFlow +
-                   tower.Coeff(4) * PctAirFlow * PctAirFlow * PctAirFlow + tower.Coeff(5) * PctWaterFlow +
-                   tower.Coeff(6) * PctAirFlow * PctWaterFlow + tower.Coeff(7) * PctAirFlow * PctAirFlow * PctWaterFlow +
-                   tower.Coeff(8) * PctWaterFlow * PctWaterFlow + tower.Coeff(9) * PctAirFlow * PctWaterFlow * PctWaterFlow +
-                   tower.Coeff(10) * PctWaterFlow * PctWaterFlow * PctWaterFlow + tower.Coeff(11) * Twb + tower.Coeff(12) * PctAirFlow * Twb +
-                   tower.Coeff(13) * PctAirFlow * PctAirFlow * Twb + tower.Coeff(14) * PctWaterFlow * Twb +
-                   tower.Coeff(15) * PctAirFlow * PctWaterFlow * Twb + tower.Coeff(16) * PctWaterFlow * PctWaterFlow * Twb +
-                   tower.Coeff(17) * Twb * Twb + tower.Coeff(18) * PctAirFlow * Twb * Twb + tower.Coeff(19) * PctWaterFlow * Twb * Twb +
-                   tower.Coeff(20) * Twb * Twb * Twb + tower.Coeff(21) * Tr + tower.Coeff(22) * PctAirFlow * Tr +
-                   tower.Coeff(23) * PctAirFlow * PctAirFlow * Tr + tower.Coeff(24) * PctWaterFlow * Tr +
-                   tower.Coeff(25) * PctAirFlow * PctWaterFlow * Tr + tower.Coeff(26) * PctWaterFlow * PctWaterFlow * Tr +
-                   tower.Coeff(27) * Twb * Tr + tower.Coeff(28) * PctAirFlow * Twb * Tr + tower.Coeff(29) * PctWaterFlow * Twb * Tr +
-                   tower.Coeff(30) * Twb * Twb * Tr + tower.Coeff(31) * Tr * Tr + tower.Coeff(32) * PctAirFlow * Tr * Tr +
-                   tower.Coeff(33) * PctWaterFlow * Tr * Tr + tower.Coeff(34) * Twb * Tr * Tr + tower.Coeff(35) * Tr * Tr * Tr;
+            return tower.Coeff[0] + tower.Coeff[1] * PctAirFlow + tower.Coeff[2] * PctAirFlow * PctAirFlow +
+                   tower.Coeff[3] * PctAirFlow * PctAirFlow * PctAirFlow + tower.Coeff[4] * PctWaterFlow +
+                   tower.Coeff[5] * PctAirFlow * PctWaterFlow + tower.Coeff[6] * PctAirFlow * PctAirFlow * PctWaterFlow +
+                   tower.Coeff[7] * PctWaterFlow * PctWaterFlow + tower.Coeff[8] * PctAirFlow * PctWaterFlow * PctWaterFlow +
+                   tower.Coeff[9] * PctWaterFlow * PctWaterFlow * PctWaterFlow + tower.Coeff[10] * Twb + tower.Coeff[11] * PctAirFlow * Twb +
+                   tower.Coeff[12] * PctAirFlow * PctAirFlow * Twb + tower.Coeff[13] * PctWaterFlow * Twb +
+                   tower.Coeff[14] * PctAirFlow * PctWaterFlow * Twb + tower.Coeff[15] * PctWaterFlow * PctWaterFlow * Twb +
+                   tower.Coeff[16] * Twb * Twb + tower.Coeff[17] * PctAirFlow * Twb * Twb + tower.Coeff[18] * PctWaterFlow * Twb * Twb +
+                   tower.Coeff[19] * Twb * Twb * Twb + tower.Coeff[20] * Tr + tower.Coeff[21] * PctAirFlow * Tr +
+                   tower.Coeff[22] * PctAirFlow * PctAirFlow * Tr + tower.Coeff[23] * PctWaterFlow * Tr +
+                   tower.Coeff[24] * PctAirFlow * PctWaterFlow * Tr + tower.Coeff[25] * PctWaterFlow * PctWaterFlow * Tr +
+                   tower.Coeff[26] * Twb * Tr + tower.Coeff[27] * PctAirFlow * Twb * Tr + tower.Coeff[28] * PctWaterFlow * Twb * Tr +
+                   tower.Coeff[29] * Twb * Twb * Tr + tower.Coeff[30] * Tr * Tr + tower.Coeff[31] * PctAirFlow * Tr * Tr +
+                   tower.Coeff[32] * PctWaterFlow * Tr * Tr + tower.Coeff[33] * Twb * Tr * Tr + tower.Coeff[34] * Tr * Tr * Tr;
         }
     }
 
