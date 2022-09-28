@@ -2677,7 +2677,7 @@ namespace CondenserLoopTowers {
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                    auto f1 = [&state, this, DesTowerLoad, solveDesignWaterMassFlow, tmpHighSpeedAirFlowRate, Cp](Real64 UA) {
+                    auto f1 = [&state, this, &DesTowerLoad, &solveDesignWaterMassFlow, &tmpHighSpeedAirFlowRate, &Cp](Real64 UA) {
                         Real64 const OutWaterTemp =
                             this->calculateSimpleTowerOutletTemp(state, solveDesignWaterMassFlow, tmpHighSpeedAirFlowRate, UA);
                         Real64 const CoolingOutput = Cp * solveDesignWaterMassFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
@@ -2794,7 +2794,7 @@ namespace CondenserLoopTowers {
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                    auto f = [&state, this, DesTowerLoad, solveWaterMassFlow, tmpHighSpeedAirFlowRate, Cp](Real64 UA) {
+                    auto f = [&state, this, &DesTowerLoad, &solveWaterMassFlow, &tmpHighSpeedAirFlowRate, &Cp](Real64 UA) {
                         Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterMassFlow, tmpHighSpeedAirFlowRate, UA);
                         Real64 const CoolingOutput = Cp * solveWaterMassFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
                         return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
@@ -2875,7 +2875,7 @@ namespace CondenserLoopTowers {
                 this->AirWetBulb = this->DesInletAirWBTemp;                     // 78F design inlet air wet-bulb temp
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = [&state, this, DesTowerLoad, solveWaterFlowRate, tmpHighSpeedAirFlowRate, Cp](Real64 UA) {
+                auto f = [&state, this, &DesTowerLoad, &solveWaterFlowRate, &tmpHighSpeedAirFlowRate, &Cp](Real64 UA) {
                     Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlowRate, tmpHighSpeedAirFlowRate, UA);
                     Real64 const CoolingOutput = Cp * solveWaterFlowRate * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
                     return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
@@ -3057,7 +3057,7 @@ namespace CondenserLoopTowers {
                 this->AirWetBulb = this->DesInletAirWBTemp;                 // 25.6; // 78F design inlet air wet-bulb temp
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = [&state, this, DesTowerLoad, solveWaterFlow, tmpLowSpeedAirFlowRate, Cp](Real64 UA) {
+                auto f = [&state, this, &DesTowerLoad, &solveWaterFlow, &tmpLowSpeedAirFlowRate, &Cp](Real64 UA) {
                     Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, tmpLowSpeedAirFlowRate, UA);
                     Real64 const CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
                     return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
@@ -3156,7 +3156,7 @@ namespace CondenserLoopTowers {
                 this->AirWetBulb = this->DesInletAirWBTemp;                    // 25.6; // 78F design inlet air wet-bulb temp
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = [&state, this, DesTowerLoad, solveWaterFlow, Cp](Real64 UA) {
+                auto f = [&state, this, &DesTowerLoad, &solveWaterFlow, &Cp](Real64 UA) {
                     Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, this->FreeConvAirFlowRate, UA);
                     Real64 const CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
                     return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
@@ -3813,7 +3813,7 @@ namespace CondenserLoopTowers {
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = [&state, this, solveLoad, solveWaterFlow, tmpDesignAirFlowRate, Cp](Real64 UA) {
+                auto f = [&state, this, &solveLoad, &solveWaterFlow, &tmpDesignAirFlowRate, &Cp](Real64 UA) {
                     Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, tmpDesignAirFlowRate, UA);
                     Real64 const CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
                     return (solveLoad - CoolingOutput) / solveLoad;
@@ -3851,7 +3851,7 @@ namespace CondenserLoopTowers {
                 this->AirWetBulb = this->DesInletAirWBTemp;            // 25.6;
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f2 = [&state, this, solveLoad1, solveWaterFlow1, tmpFreeConvAirFlowRate, Cp](Real64 UA) {
+                auto f2 = [&state, this, &solveLoad1, &solveWaterFlow1, &tmpFreeConvAirFlowRate, &Cp](Real64 UA) {
                     Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow1, tmpFreeConvAirFlowRate, UA);
                     Real64 const CoolingOutput = Cp * solveWaterFlow1 * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
                     return (solveLoad1 - CoolingOutput) / solveLoad1;
@@ -4140,7 +4140,7 @@ namespace CondenserLoopTowers {
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                    auto f = [&state, this, solveLoad, solveWaterFlow, tmpDesignAirFlowRate, Cp](Real64 UA) {
+                    auto f = [&state, this, &solveLoad, &solveWaterFlow, &tmpDesignAirFlowRate, &Cp](Real64 UA) {
                         Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, tmpDesignAirFlowRate, UA);
                         Real64 const CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
                         return (solveLoad - CoolingOutput) / solveLoad;
@@ -4178,7 +4178,7 @@ namespace CondenserLoopTowers {
                     this->AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                    auto f3 = [&state, this, solveLoad2, solveWaterFlow2, tmpFreeConvAirFlowRate, Cp](Real64 UA) {
+                    auto f3 = [&state, this, &solveLoad2, &solveWaterFlow2, &tmpFreeConvAirFlowRate, &Cp](Real64 UA) {
                         Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow2, tmpFreeConvAirFlowRate, UA);
                         Real64 const CoolingOutput = Cp * solveWaterFlow2 * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
                         return (solveLoad2 - CoolingOutput) / solveLoad2;
@@ -5233,7 +5233,7 @@ namespace CondenserLoopTowers {
 
                     // Setpoint was met with pump ON and fan ON at full flow
                     // Calculate the fraction of full air flow to exactly meet the setpoint temperature
-                    auto f = [&state, this, WaterFlowRateRatioCapped, TwbCapped, Tr, Ta](Real64 FlowRatio) {
+                    auto f = [&state, this, &WaterFlowRateRatioCapped, &TwbCapped, &Tr, &Ta](Real64 FlowRatio) {
                         Real64 TapproachActual = this->calculateVariableSpeedApproach(state, WaterFlowRateRatioCapped, FlowRatio, TwbCapped, Tr);
                         return Ta - TapproachActual;
                     };
@@ -5545,7 +5545,7 @@ namespace CondenserLoopTowers {
 
         if ((MinSpeedFanQdot < std::abs(MyLoad)) && (std::abs(MyLoad) < FullSpeedFanQdot)) {
             // load can be refined by modulating fan speed, call regula-falsi
-            auto f = [&state, this, MyLoad, WaterMassFlowRatePerCell, UAdesignPerCell, UAwetbulbAdjFac, &UAwaterflowAdjFac, &CpWater](
+            auto f = [&state, this, &MyLoad, &WaterMassFlowRatePerCell, &UAdesignPerCell, &UAwetbulbAdjFac, &UAwaterflowAdjFac, &CpWater](
                          Real64 airFlowRateRatioLocal) {
                 Real64 const AirFlowRatePerCell = airFlowRateRatioLocal * this->HighSpeedAirFlowRate / this->NumCell;
                 Real64 const UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
@@ -5772,7 +5772,7 @@ namespace CondenserLoopTowers {
 
         //   determine tower outlet water temperature
         Real64 Tr; // range temperature which results in an energy balance
-        auto f = [&state, this, WaterFlowRateRatio, airFlowRateRatioLocal, Twb](Real64 Trange) {
+        auto f = [&state, this, &WaterFlowRateRatio, &airFlowRateRatioLocal, &Twb](Real64 Trange) {
             // call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
             Real64 Tapproach = this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, airFlowRateRatioLocal, Twb, Trange);
             // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
