@@ -9027,10 +9027,9 @@ namespace AirflowNetwork {
                     M = AirflowNetworkLinkageData(i).NodeNums[1];
                     ZN1 = AirflowNetworkNodeData(n).EPlusZoneNum;
                     ZN2 = AirflowNetworkNodeData(M).EPlusZoneNum;
-                    auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
-                    auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
                     // Find a linkage from a zone to outdoors
                     if (ZN1 > 0 && ZN2 == 0) {
+                        auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
                         if (AirflowNetworkNodeData(n).AirLoopNum > 0 && AirflowNetworkNodeData(n).AirLoopNum != AirLoopNum) continue;
                         if (AirflowNetworkNodeData(n).AirLoopNum == AirLoopNum) {
                             RepOnOffFanRunTimeFraction = LoopOnOffFanRunTimeFraction(AirLoopNum);
@@ -9099,6 +9098,7 @@ namespace AirflowNetwork {
                         }
                     }
                     if (ZN1 == 0 && ZN2 > 0) {
+                        auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
                         if (AirflowNetworkNodeData(M).AirLoopNum > 0 && AirflowNetworkNodeData(M).AirLoopNum != AirLoopNum) continue;
                         if (AirflowNetworkNodeData(M).AirLoopNum == AirLoopNum) {
                             RepOnOffFanRunTimeFraction = LoopOnOffFanRunTimeFraction(AirLoopNum);
@@ -9168,6 +9168,8 @@ namespace AirflowNetwork {
                     }
 
                     if (ZN1 > 0 && ZN2 > 0) {
+                        auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
+                        auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
                         ReportingFraction = (1.0 - MaxOnOffFanRunTimeFraction);
                         CpAir = PsyCpAirFnW(zn1HB.ZoneAirHumRat);
                         if (zn1HB.MAT > zn2HB.MAT) {
