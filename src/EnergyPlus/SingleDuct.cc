@@ -6275,6 +6275,11 @@ void GetATMixers(EnergyPlusData &state)
                                                                               state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
                                                                               false,
                                                                               false);
+                            state.dataSingleDuct->SysATMixer(ATMixerNum).ADEff =
+                                std::min(state.dataSize->ZoneSizingInput(SizingInputNum).ZoneADEffCooling,
+                                         state.dataSize->ZoneSizingInput(SizingInputNum).ZoneADEffHeating);
+                            state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate /=
+                                state.dataSingleDuct->SysATMixer(ATMixerNum).ADEff;
                             state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
                         }
                     }
@@ -6355,7 +6360,7 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
             airLoopOAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
             if (airLoopOAFrac > 0.0) {
                 vDotOAReq = DataSizing::calcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
-                mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / airLoopOAFrac;
+                mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / (airLoopOAFrac * this->ADEff);
             } else {
                 mDotFromOARequirement = state.dataLoopNodes->Node(this->PriInNode).MassFlowRate;
             }
