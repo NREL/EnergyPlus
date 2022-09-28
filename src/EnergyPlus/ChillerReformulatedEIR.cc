@@ -1700,8 +1700,10 @@ void ReformulatedEIRChillerSpecs::control(EnergyPlusData &state, Real64 &MyLoad,
 
             int SolFla;                    // Feedback flag from General::SolveRoot
             Real64 FalsiCondOutTemp = 0.0; // RegulaFalsi condenser outlet temperature result [C]
-            auto f = [&state, this, &MyLoad, &RunFlag](Real64 FalsiCondOutTemp) {
-                this->calculate(state, MyLoad, RunFlag, FalsiCondOutTemp);
+            Real64 thisLoad =
+                MyLoad; // using a temporary because a reference is necessary in the lambda, but we don't want to overwrite the outer value
+            auto f = [&state, this, &thisLoad, RunFlag](Real64 FalsiCondOutTemp) {
+                this->calculate(state, thisLoad, RunFlag, FalsiCondOutTemp);
                 return FalsiCondOutTemp - this->CondOutletTemp; // CondOutletTemp is module level variable, final value used for reporting
             };
             General::SolveRoot(state, Acc, MaxIter, SolFla, FalsiCondOutTemp, f, Tmin, Tmax);

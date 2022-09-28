@@ -1453,7 +1453,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         Real64 constexpr accuracy{0.0001};
         int constexpr maxIter{500};
         int solFla{0};
-        auto f = [&MyLoad, this](Real64 partLoadSeqNum) {
+        auto f = [MyLoad, this](Real64 partLoadSeqNum) {
             this->QEvaporator = this->Representation->performance.performance_map_cooling
                                     .calculate_performance(this->EvapVolFlowRate,
                                                            this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
