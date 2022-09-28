@@ -533,6 +533,7 @@ if(APPLE)
 
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
+  install(FILES "${PROJECT_SOURCE_DIR}/doc/man/energyplus.1" DESTINATION "./" COMPONENT Symlinks)
 
   # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
   set(CPACK_IFW_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/release/ep.icns")
@@ -602,7 +603,7 @@ elseif(UNIX)
 
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
-  install(FILES doc/man/energyplus.1 DESTINATION "./")
+  install(FILES "${PROJECT_SOURCE_DIR}/doc/man/energyplus.1" DESTINATION "./" COMPONENT Symlinks)
 endif()
 
 # TODO: Unused now
