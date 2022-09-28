@@ -842,7 +842,7 @@ namespace BaseboardRadiator {
 
                             if (LoadMet > DesCoilLoad) { // if the load met is greater than design load, OK to iterate on UA
                                 // Invert the baseboard model: given the design inlet conditions and the design load, find the design UA.
-                                auto f = [&state, &baseboardNum, &DesCoilLoad](Real64 UA) {
+                                auto f = [&state, &baseboardNum, DesCoilLoad](Real64 UA) {
                                     state.dataBaseboardRadiator->baseboards(baseboardNum).UA = UA;
                                     Real64 LoadMet = 0.0;
                                     SimHWConvective(state, baseboardNum, LoadMet);
