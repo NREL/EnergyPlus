@@ -6275,11 +6275,6 @@ void GetATMixers(EnergyPlusData &state)
                                                                               state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
                                                                               false,
                                                                               false);
-                            state.dataSingleDuct->SysATMixer(ATMixerNum).ADEff =
-                                std::min(state.dataSize->ZoneSizingInput(SizingInputNum).ZoneADEffCooling,
-                                         state.dataSize->ZoneSizingInput(SizingInputNum).ZoneADEffHeating);
-                            state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate /=
-                                state.dataSingleDuct->SysATMixer(ATMixerNum).ADEff;
                             state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
                         }
                     }

@@ -323,7 +323,6 @@ namespace SingleDuct {
         Real64 DesignPrimaryAirVolRate;                           // System sizing adjustments, filled from design OA spec using sizing mode flags.
         DataZoneEquipment::PerPersonVentRateMode OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
         bool printWarning;                                        // flag to print warnings only once
-        Real64 ADEff = 1.0;
         // Default Constructor
         AirTerminalMixerData()
             : MixerType(0), ZoneHVACUnitType(0), SecInNode(0), PriInNode(0), MixedAirOutNode(0), ZoneInletNode(0), ZoneAirTemp(0.0),
