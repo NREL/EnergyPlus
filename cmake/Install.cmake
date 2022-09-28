@@ -361,12 +361,14 @@ install(
 set(RULES_XLS Rules22-1-0-to-22-2-0.md)
 install(FILES "${PROJECT_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/favicon.png" DESTINATION "./")
-install(FILES "${PROJECT_SOURCE_DIR}/release/readme.html" DESTINATION "./")
-install(FILES "${PROJECT_SOURCE_DIR}/release/Deprecation.html" DESTINATION "./")
+configure_file("${PROJECT_SOURCE_DIR}/release/readme.in.html" "${PROJECT_BINARY_DIR}/release/readme.html" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/release/readme.html" DESTINATION "./")
+configure_file("${PROJECT_SOURCE_DIR}/release/Deprecation.in.html" "${PROJECT_BINARY_DIR}/release/Deprecation.html" @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/release/Deprecation.html" DESTINATION "./")
 if(LINK_WITH_PYTHON)
   install(FILES "${PROJECT_SOURCE_DIR}/release/PythonLicense.txt" DESTINATION "./")
 endif()
-set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/release/readme.html")
+set(CPACK_RESOURCE_FILE_README "${PROJECT_BINARY_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/CurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
@@ -531,6 +533,7 @@ if(APPLE)
 
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
+  install(FILES "${PROJECT_SOURCE_DIR}/doc/man/energyplus.1" DESTINATION "./" COMPONENT Symlinks)
 
   # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
   set(CPACK_IFW_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/release/ep.icns")
@@ -600,7 +603,7 @@ elseif(UNIX)
 
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
-  install(FILES doc/man/energyplus.1 DESTINATION "./")
+  install(FILES "${PROJECT_SOURCE_DIR}/doc/man/energyplus.1" DESTINATION "./" COMPONENT Symlinks)
 endif()
 
 # TODO: Unused now

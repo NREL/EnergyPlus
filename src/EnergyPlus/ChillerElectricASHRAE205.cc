@@ -151,9 +151,17 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
         auto rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
         fs::path rep_file_path = DataSystemVariables::CheckForActualFilePath(state, fs::path(rep_file_name), std::string(RoutineName));
+        if (rep_file_path.empty()) {
+            ErrorsFound = true;
+            // Given that several of the following expressions require the representation file to be present, we'll just throw a fatal here.
+            // The ErrorsFound flag is still set to true here so that in the future, if we defer the fatal until later in this routine, it will still
+            // be set The CheckForActualFilePath function emits some nice information to the ERR file, so we just need a simple fatal here
+            ShowFatalError(state, "Program terminates due to the missing ASHRAE 205 RS0001 representation file.");
+        }
         std::pair<EnergyPlusData *, std::string> callbackPair{&state,
                                                               format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
         tk205::set_error_handler(tk205ErrCallback, &callbackPair);
+        Btwxt::LOG_LEVEL = static_cast<int>(Btwxt::MsgLevel::MSG_WARN);
         thisChiller.Representation =
             std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str()));
         if (nullptr == thisChiller.Representation) {
@@ -263,15 +271,27 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         };
 
         thisChiller.SizFac = fields.at("sizing_factor").get<Real64>();
-        if (thisChiller.SizFac <= 0.0) thisChiller.SizFac = 1.0;
-
-        thisChiller.EvapVolFlowRate = fields.at("chilled_water_maximum_requested_flow_rate").get<Real64>();
-        if (thisChiller.EvapVolFlowRate == DataSizing::AutoSize) {
-            thisChiller.EvapVolFlowRateWasAutoSized = true;
+        if (thisChiller.SizFac <= 0.0) {
+            thisChiller.SizFac = 1.0;
         }
-        thisChiller.CondVolFlowRate = fields.at("condenser_maximum_requested_flow_rate").get<Real64>();
-        if (thisChiller.CondVolFlowRate == DataSizing::AutoSize) {
-            thisChiller.CondVolFlowRateWasAutoSized = true;
+
+        {
+            auto tmpFlowRate = fields.at("chilled_water_maximum_requested_flow_rate");
+            if (tmpFlowRate == "Autosize") {
+                thisChiller.EvapVolFlowRate = DataSizing::AutoSize;
+                thisChiller.EvapVolFlowRateWasAutoSized = true;
+            } else {
+                thisChiller.EvapVolFlowRate = tmpFlowRate.get<Real64>();
+            }
+        }
+        {
+            auto tmpFlowRate = fields.at("condenser_maximum_requested_flow_rate");
+            if (tmpFlowRate == "Autosize") {
+                thisChiller.CondVolFlowRate = DataSizing::AutoSize;
+                thisChiller.CondVolFlowRateWasAutoSized = true;
+            } else {
+                thisChiller.CondVolFlowRate = tmpFlowRate.get<Real64>();
+            }
         }
 
         thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(getEnumerationValue(
@@ -512,11 +532,12 @@ void ASHRAE205ChillerSpecs::oneTimeInit_new(EnergyPlusData &state)
             PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CDPlantLoc, this->HRPlantLoc, DataPlant::PlantEquipmentType::Chiller_ElectricASHRAE205, false);
         }
-
-        if (errFlag) {
-            ShowFatalError(state, "InitElecASHRAE205Chiller: Program terminated due to previous condition(s).");
-        }
 #endif // #if 0
+
+    if (errFlag) {
+        ShowFatalError(state, "InitElecASHRAE205Chiller: Program terminated due to previous condition(s).");
+    }
+
     if (this->FlowMode == DataPlant::FlowMode::Constant) {
         // reset flow priority
         DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc).FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;

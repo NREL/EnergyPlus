@@ -45,7 +45,7 @@ build
 /build*/
 /Build*/
 /debug*/
-/release*/
+/release?*/
 
 # by default CLion uses cmake-build-debug as the build folder, so add that as well
 cmake-build-*
@@ -65,4 +65,3 @@ CMakeSettings.json
 
 # py2app puts things inside dist/ and build/, build/ is already ignored, just add dist/
 dist
-
