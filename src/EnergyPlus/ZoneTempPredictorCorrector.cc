@@ -4700,48 +4700,26 @@ void ZoneSpaceHeatBalanceData::correctAirTemp(
         100.0 * Psychrometrics::PsyRhFnTdbWPb(state, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
 
     // tempChange is used by HVACManager to determine if the timestep needs to be shortened.
+    bool isMixed = !((state.dataRoomAirMod->IsZoneDV(zoneNum) && !state.dataRoomAirMod->ZoneDVMixedFlag(zoneNum)) ||
+                     (state.dataRoomAirMod->IsZoneUI(zoneNum) && !state.dataRoomAirMod->ZoneUFMixedFlag(zoneNum)));
     switch (ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-        if (state.dataRoomAirMod->IsZoneDV(zoneNum)) {
-            if (state.dataRoomAirMod->ZoneDVMixedFlag(zoneNum) == 0) {
-                tempChange = max(tempChange,
-                                 max(std::abs(state.dataRoomAirMod->ZTOC(zoneNum) - state.dataRoomAirMod->ZTM1OC(zoneNum)),
-                                     std::abs(state.dataRoomAirMod->ZTMX(zoneNum) - state.dataRoomAirMod->ZTM1MX(zoneNum))));
-            } else {
-                tempChange = max(tempChange, std::abs(thisZoneHB.ZT - thisZoneHB.ZTM1));
-            }
-        } else if (state.dataRoomAirMod->IsZoneUI(zoneNum)) {
-            if (state.dataRoomAirMod->ZoneUFMixedFlag(zoneNum) == 0) {
-                tempChange = max(tempChange,
-                                 max(std::abs(state.dataRoomAirMod->ZTOC(zoneNum) - state.dataRoomAirMod->ZTM1OC(zoneNum)),
-                                     std::abs(state.dataRoomAirMod->ZTMX(zoneNum) - state.dataRoomAirMod->ZTM1MX(zoneNum))));
-            } else {
-                tempChange = max(tempChange, std::abs(thisZoneHB.ZT - thisZoneHB.ZTM1));
-            }
-        } else {
+        if (isMixed) {
             tempChange = max(tempChange, std::abs(thisZoneHB.ZT - thisZoneHB.ZTM1));
+        } else {
+            tempChange = max(tempChange,
+                             max(std::abs(state.dataRoomAirMod->ZTOC(zoneNum) - state.dataRoomAirMod->ZTM1OC(zoneNum)),
+                                 std::abs(state.dataRoomAirMod->ZTMX(zoneNum) - state.dataRoomAirMod->ZTM1MX(zoneNum))));
         }
     } break;
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution:
     case DataHeatBalance::SolutionAlgo::EulerMethod: {
-        if (state.dataRoomAirMod->IsZoneDV(zoneNum)) {
-            if (state.dataRoomAirMod->ZoneDVMixedFlag(zoneNum) == 0) {
-                tempChange = max(tempChange,
-                                 max(std::abs(state.dataRoomAirMod->ZTOC(zoneNum) - state.dataRoomAirMod->Zone1OC(zoneNum)),
-                                     std::abs(state.dataRoomAirMod->ZTMX(zoneNum) - state.dataRoomAirMod->Zone1MX(zoneNum))));
-            } else {
-                tempChange = max(tempChange, std::abs(thisZoneHB.ZT - thisZoneHB.ZoneT1));
-            }
-        } else if (state.dataRoomAirMod->IsZoneUI(zoneNum)) {
-            if (state.dataRoomAirMod->ZoneUFMixedFlag(zoneNum) == 0) {
-                tempChange = max(tempChange,
-                                 max(std::abs(state.dataRoomAirMod->ZTOC(zoneNum) - state.dataRoomAirMod->Zone1OC(zoneNum)),
-                                     std::abs(state.dataRoomAirMod->ZTMX(zoneNum) - state.dataRoomAirMod->Zone1MX(zoneNum))));
-            } else {
-                tempChange = max(tempChange, std::abs(thisZoneHB.ZT - thisZoneHB.ZoneT1));
-            }
-        } else {
+        if (isMixed) {
             tempChange = max(tempChange, std::abs(thisZoneHB.ZT - thisZoneHB.ZoneT1));
+        } else {
+            tempChange = max(tempChange,
+                             max(std::abs(state.dataRoomAirMod->ZTOC(zoneNum) - state.dataRoomAirMod->Zone1OC(zoneNum)),
+                                 std::abs(state.dataRoomAirMod->ZTMX(zoneNum) - state.dataRoomAirMod->Zone1MX(zoneNum))));
         }
     } break;
     default:
