@@ -431,11 +431,8 @@ namespace EvaporativeCoolers {
 
     void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                                      int UnitNum,           // unit number
-                                     int ZoneNum,           // number of zone being served
                                      Real64 ZoneCoolingLoad // target cooling load
     );
-
-    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 FanSpeedRatio, std::array<Real64, 5> const &Par);
 
     void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum); // unit number
 
