@@ -15175,7 +15175,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
 
         LowerBoundMassFlowRate = 0.01 * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
-        auto f = [&state, &DXCoilNum, &TempDryBulb_Leaving_Apoint, &TargetNetCapacity, &par3, &par7, &fanInNode, &fanOutNode, &externalStatic](
+        auto f = [&state, DXCoilNum, TempDryBulb_Leaving_Apoint, TargetNetCapacity, par3, par7, fanInNode, fanOutNode, externalStatic](
                      Real64 SupplyAirMassFlowRate) {
             static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");
             auto &coil = state.dataDXCoils->DXCoil(DXCoilNum);
@@ -17974,7 +17974,7 @@ void ControlVRFIUCoil(EnergyPlusData &state,
         if (QCoilSenCoolingLoad > QinSenMin1) {
             // Increase fan speed to meet room sensible load; SH is not updated
             FanSpdRatioMax = 1.0;
-            auto f = [&QCoilSenCoolingLoad, &Ts_1, &Tin, &Garate, &BF](Real64 FanSpdRto) {
+            auto f = [QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF](Real64 FanSpdRto) {
                 return FanSpdResidualCool(FanSpdRto, QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF);
             };
             General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, f, FanSpdRatioMin, FanSpdRatioMax);
@@ -18071,7 +18071,7 @@ void ControlVRFIUCoil(EnergyPlusData &state,
         if (QCoilSenHeatingLoad > QinSenMin1) {
             // Modulate fan speed to meet room sensible load; SC is not updated
             FanSpdRatioMax = 1.0;
-            auto f = [&QCoilSenHeatingLoad, &Ts_1, &Tin, &Garate, &BF](Real64 FanSpdRto) {
+            auto f = [QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF](Real64 FanSpdRto) {
                 return FanSpdResidualHeat(FanSpdRto, QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF);
             };
             General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, f, FanSpdRatioMin, FanSpdRatioMax);
