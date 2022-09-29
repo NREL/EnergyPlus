@@ -11842,9 +11842,10 @@ namespace SurfaceGeometry {
 
                 // Only include Base Surfaces in Calc.
 
-                if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Wall &&
-                    state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Floor &&
-                    state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Roof) {
+                if ((state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Wall &&
+                     state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Floor &&
+                     state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Roof) ||
+                    has_prefix(state.dataSurface->Surface(SurfNum).Name, "iz-")) {
                     ++notused;
                     surfacenotused(notused) = SurfNum;
                     continue;
