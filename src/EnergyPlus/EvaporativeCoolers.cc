@@ -2432,7 +2432,6 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     Real64 EvapCoolerTotalElectricPowerDry; // evaporative cooler current total electric power drawn
     Real64 EvapCoolerTotalElectricPowerWet; // evaporative cooler current total electric power drawn
     int SolFla;                             // Flag of solver
-    std::array<Real64, 6> Par = {0.0};      // Parameter array passed to solver
     Real64 QHXLatent;                       // evaporative cooler latent heat transfer rate
     Real64 hfg;                             // latent heat of vaporization of water at the secondary air inlet condition
 
@@ -2470,14 +2469,15 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     PartLoad = thisEvapCond.PartLoadFract;
     {
         if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::DryModulated) {
-            Par[0] = double(EvapCoolNum);
-            Par[1] = double(OperatingMode::DryModulated);
-            Par[2] = SysTempSetPoint;
-            Par[3] = InletDryBulbTempSec;
-            Par[4] = InletWetBulbTempSec;
-            Par[5] = InletHumRatioSec;
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::DryModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -2534,15 +2534,15 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             thisEvapCond.EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryFull, FlowRatioSec);
             thisEvapCond.IECOperatingStatus = 1;
         } else if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::DryWetModulated) {
-            Par[0] = double(EvapCoolNum);
-            Par[2] = SysTempSetPoint;
-            Par[3] = InletDryBulbTempSec;
-            Par[4] = InletWetBulbTempSec;
-            Par[5] = InletHumRatioSec;
-            // get dry operation performance first
-            Par[1] = double(OperatingMode::DryModulated);
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::DryModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -2592,9 +2592,15 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             AirMassFlowSecDry = AirMassFlowSec;
             EvapCoolerTotalElectricPowerDry = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryModulated, FlowRatioSecDry);
             // get wet operation performance
-            Par[1] = double(OperatingMode::WetModulated);
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f2 = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::WetModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f2, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -2662,14 +2668,15 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 thisEvapCond.IECOperatingStatus = 2;
             }
         } else if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::WetModulated) {
-            Par[0] = double(EvapCoolNum);
-            Par[1] = double(OperatingMode::WetModulated);
-            Par[2] = SysTempSetPoint;
-            Par[3] = InletDryBulbTempSec;
-            Par[4] = InletWetBulbTempSec;
-            Par[5] = InletHumRatioSec;
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::WetModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -2865,52 +2872,6 @@ OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(EnergyPlusData &sta
         OperatingMode = OperatingMode::None; // this condition should not happen unless the bounds do not cover all combinations possible
     }
     return OperatingMode;
-}
-
-Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state,
-                                      Real64 const AirMassFlowSec,     // secondary air mass flow rate in kg/s
-                                      std::array<Real64, 6> const &Par // Par(2) is desired outlet temperature of Evap Cooler
-)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         B. Nigusse
-    //       DATE WRITTEN   Sep 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Indirect research special evaporative cooler part load operation:
-    // determines the secondary air flow rate
-
-    // METHODOLOGY EMPLOYED:
-    // Uses regula falsi to minimize setpoint temperature residual to by varying the
-    // secondary air flow rate.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int EvapCoolIndex;                   // evaporative cooler index
-    OperatingMode DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
-    Real64 EDBTSecAirSide;               // current entering dry bulb temperature of the secondary side
-    Real64 EWBTSecAirSide;               // current entering wet bulb temperature of the secondary side
-    Real64 EHumRatSecAirSide;            // current entering humidity ratio of the secondary side
-    Real64 OutletAirTemp;                // evap Coler outlet air temperature
-    Real64 SysTempSetPoint;              // evaporative cooler outlet setpoint temperature, drybulb
-    Real64 Residuum;                     // Residual to be minimized to zero
-
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
-
-    EvapCoolIndex = int(Par[0]);
-    DryOrWetOperatingMode = OperatingMode(int(Par[1]));
-    SysTempSetPoint = Par[2];
-    EDBTSecAirSide = Par[3];
-    EWBTSecAirSide = Par[4];
-    EHumRatSecAirSide = Par[5];
-    state.dataEvapCoolers->EvapCond(EvapCoolIndex).SecInletMassFlowRate = AirMassFlowSec;
-    CalcIndirectRDDEvapCoolerOutletTemp(
-        state, EvapCoolIndex, DryOrWetOperatingMode, AirMassFlowSec, EDBTSecAirSide, EWBTSecAirSide, EHumRatSecAirSide);
-    OutletAirTemp = EvapCond(EvapCoolIndex).OutletTemp;
-    Residuum = SysTempSetPoint - OutletAirTemp;
-
-    return Residuum;
 }
 
 void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,

@@ -379,8 +379,6 @@ namespace EvaporativeCoolers {
                                              Real64 EWBTSec,
                                              Real64 EHumRatSec);
 
-    Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state, Real64 AirMassFlowSec, std::array<Real64, 6> const &Par);
-
     Real64 IndEvapCoolerPower(EnergyPlusData &state,
                               int EvapCoolIndex,        // Unit index
                               OperatingMode DryWetMode, // dry or wet operating mode of evaporator cooler
