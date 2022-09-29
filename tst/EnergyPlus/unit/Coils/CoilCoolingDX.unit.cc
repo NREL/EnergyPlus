@@ -1728,7 +1728,8 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
         "    0.77,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    ,                        !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    CAPFT,                   !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -1749,7 +1750,8 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
         "    0.77,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    ,                        !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    CAPFT,                   !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -1770,7 +1772,8 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
         "    0.77,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    ,                        !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    CAPFT,                   !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -1791,7 +1794,8 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
         "    0.77,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
-        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    ,                        !- Evaporative Condenser Pump Power Fraction",
         "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
         "    CAPFT,                   !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
@@ -1826,7 +1830,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->CurSysNum = 1;
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
     state->dataSize->FinalSysSizing.allocate(1);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 12.0;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.0085;

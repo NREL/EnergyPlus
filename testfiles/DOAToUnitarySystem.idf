@@ -2348,6 +2348,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     Autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPACE1-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE1-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2484,6 +2485,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     Autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPACE2-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE2-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2543,6 +2545,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     Autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPACE3-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE3-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2602,6 +2605,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     Autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPACE4-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE4-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
@@ -2661,6 +2665,7 @@
     3.0,                     !- Gross Rated Cooling COP {W/W}
     Autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     SPACE5-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE5-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name

@@ -3106,6 +3106,7 @@
     3.7988306741603,         !- Speed 1 Gross Rated Cooling COP {W/W}
     1.27484,                 !- Speed 1 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -3125,6 +3126,7 @@
     3.7988306741603,         !- Speed 2 Gross Rated Cooling COP {W/W}
     1.91226,                 !- Speed 2 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -3164,6 +3166,7 @@
     3.7988306741603,         !- Speed 1 Gross Rated Cooling COP {W/W}
     0.906886666666667,       !- Speed 1 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -3183,6 +3186,7 @@
     3.7988306741603,         !- Speed 2 Gross Rated Cooling COP {W/W}
     1.36033,                 !- Speed 2 Rated Air Flow Rate {m3/s}
     0,                       !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Speed 2 Energy Input Ratio Function of Temperature Curve Name

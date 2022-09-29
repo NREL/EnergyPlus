@@ -467,6 +467,8 @@ namespace AirLoopHVACDOAS {
 
                 // get inlet and outlet node number from equipment list
                 CurrentModuleObject = "AirLoopHVAC:OutdoorAirSystem:EquipmentList";
+                int CoolingCoilOrder = 0;
+                int FanOrder = 0;
                 for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents; ++CompNum) {
                     auto &CompType = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum);
                     auto &CompName = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum);
@@ -520,16 +522,9 @@ namespace AirLoopHVACDOAS {
                         thisDOAS.m_FanInletNodeNum = thisInletNodeNum;
                         thisDOAS.m_FanOutletNodeNum = thisOutletNodeNum;
                         if (CompNum == 1) {
-                            thisDOAS.FanBlowTroughFlag = true;
+                            thisDOAS.FanBeforeCoolingCoilFlag = true;
                         }
-                        if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
-                            ShowSevereError(state,
-                                            format("The fan placement is either first as blow through or last as draw through in{} = {}",
-                                                   CurrentModuleObject,
-                                                   CompName));
-                            ShowContinueError(state, format("The current position is number {}", CompNum));
-                            errorsFound = true;
-                        }
+                        FanOrder = CompNum;
                         break;
 
                     case ValidEquipListType::FanComponentModel:
@@ -537,20 +532,13 @@ namespace AirLoopHVACDOAS {
                         Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound);
                         thisDOAS.FanName = CompName;
                         if (CompNum == 1) {
-                            thisDOAS.FanBlowTroughFlag = true;
+                            thisDOAS.FanBeforeCoolingCoilFlag = true;
                         }
                         thisInletNodeNum = Fans::GetFanInletNode(state, typeNameUC, CompName, InletNodeErrFlag);
                         thisOutletNodeNum = Fans::GetFanOutletNode(state, typeNameUC, CompName, OutletNodeErrFlag);
                         thisDOAS.m_FanInletNodeNum = thisInletNodeNum;
                         thisDOAS.m_FanOutletNodeNum = thisOutletNodeNum;
-                        if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
-                            ShowSevereError(state,
-                                            format("The fan placement is either first as blow through or last as draw through in{} = {}",
-                                                   CurrentModuleObject,
-                                                   CompName));
-                            ShowContinueError(state, format("The current position is number {}", CompNum));
-                            errorsFound = true;
-                        }
+                        FanOrder = CompNum;
                         break;
 
                     case ValidEquipListType::CoilCoolingWater:
@@ -565,6 +553,7 @@ namespace AirLoopHVACDOAS {
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
+                        CoolingCoilOrder = CompNum;
                         break;
 
                     case ValidEquipListType::CoilHeatingWater:
@@ -607,6 +596,7 @@ namespace AirLoopHVACDOAS {
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
+                        CoolingCoilOrder = CompNum;
                         break;
 
                     case ValidEquipListType::CoilHeatingElectric:
@@ -633,6 +623,7 @@ namespace AirLoopHVACDOAS {
                         thisOutletNodeNum = state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum)
                                                 .compPointer[CompNum]
                                                 ->getAirOutNode(state, CompName, 0, OutletNodeErrFlag);
+                        CoolingCoilOrder = CompNum;
                         break;
 
                     case ValidEquipListType::CoilSystemHeatingDX:
@@ -698,6 +689,9 @@ namespace AirLoopHVACDOAS {
                                                CompName,
                                                state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum)));
                         errorsFound = true;
+                    }
+                    if (CoolingCoilOrder > FanOrder && !thisDOAS.FanBeforeCoolingCoilFlag) {
+                        thisDOAS.FanBeforeCoolingCoilFlag = true;
                     }
                     if (InletNodeErrFlag) {
                         ShowSevereError(state, "Inlet node number is not found in " + CurrentModuleObject + " = " + std::string{CompName});
@@ -913,10 +907,6 @@ namespace AirLoopHVACDOAS {
             state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = this->SumMassFlowRate;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = this->SumMassFlowRate;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = this->SumMassFlowRate;
-            if (!this->FanBlowTroughFlag) {
-                state.dataLoopNodes->Node(state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).InletNodeNum(1)).MassFlowRateMaxAvail =
-                    this->SumMassFlowRate;
-            }
         }
         ManageOutsideAirSystem(state, this->OASystemName, FirstHVACIteration, 0, this->m_OASystemNum);
         Real64 Temp = state.dataLoopNodes->Node(this->m_OutletNodeNum).Temp;

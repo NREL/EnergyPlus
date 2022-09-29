@@ -1995,14 +1995,14 @@
 
   ZoneMixing,
     Deli Exhaust Fanmixing_0,!- Name
-    Deli,                    !- Zone Name
+    Deli,                    !- Zone or Space Name
     HVACOperationSchd,       !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     1.0785,                  !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Sales,                   !- Source Zone Name
+    Sales,                   !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
 ! ***HVAC EQUIPMENT***
@@ -2177,6 +2177,7 @@
     3.66668442928701,        !- Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}
     PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- Air Outlet Node Name
     Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name

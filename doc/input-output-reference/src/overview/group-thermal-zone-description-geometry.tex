@@ -193,7 +193,9 @@ The outdoor air wet-bulb temperature calculated at the height above ground of th
 
 The outdoor wind speed calculated at the height above ground of the zone centroid.
 
-\subsection{Space Thermal Output(s)}\label{Space-thermal-outputs}
+\subsection{Space and Zone Thermal Output(s)}\label{Space-thermal-outputs}
+
+\subsubsection{Space Thermal Outputs Overview}
 
 \begin{itemize}
 \item
@@ -218,7 +220,7 @@ The outdoor wind speed calculated at the height above ground of the zone centroi
   Zone,Average,Space Total Internal Total Heating Rate {[}W{]}
 \end{itemize}
 
-\subsection{Zone Thermal Output(s)}\label{zone-thermal-outputs}
+\subsubsection{Zone Thermal Outputs Overview}\label{zone-thermal-outputs}
 
 In addition to the canned Surface reports (view the Reports section later in this document) and surface variables (above), the following variables are available for all zones:
 
@@ -315,63 +317,65 @@ HVAC,Average,Zone Air Temperature [C]
 
 These two variable outputs are/should be identical. However, note that they can be reported at different time intervals. ``Zone Mean Air Temperature'' is only available on the Zone/HB timestep (Number of Timesteps per Hour) whereas ``Zone Air Temperature'' can be reported at the HVAC timestep (which can vary).
 
-\subsubsection{Zone Mean Air Temperature {[}C{]}}\label{zone-mean-air-temperature-c}
+\subsubsection{Space and Zone Thermal Outputs Details}
+
+\paragraph{Zone Mean Air Temperature {[}C{]}}\label{zone-mean-air-temperature-c}
 
 From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone.
 
-\subsubsection{Zone Air Temperature {[}C{]}}\label{zone-air-temperature-c}
+\paragraph{Zone Air Temperature {[}C{]}}\label{zone-air-temperature-c}
 
 This is very similar to the mean air temperature in the last field. The ``well stirred'' model for the zone is the basis, but this temperature is also available at the ``detailed'' system timestep.
 
-\subsubsection{Zone Mean Air Dewpoint Temperature {[}C{]}}\label{zone-mean-air-dewpoint-temperature-c}
+\paragraph{Zone Mean Air Dewpoint Temperature {[}C{]}}\label{zone-mean-air-dewpoint-temperature-c}
 
 This is the dewpoint temperature of the zone calculated from the Zone Mean Air Temperature (above), the Zone Air Humidity Ratio (below) and the outdoor barometric pressure.
 
-\subsubsection{Zone Thermostat Air Temperature {[}C{]}}\label{zone-thermostat-air-temperature-c}
+\paragraph{Zone Thermostat Air Temperature {[}C{]}}\label{zone-thermostat-air-temperature-c}
 
 This is the zone air node temperature for the well-mixed room air model, which is the default room air model type (\hyperref[roomairmodeltype]{RoomAirModelType} = Mixing). But for other types of Room Air Model (the RoomAir:TemperaturePattern:* and RoomAirSettings:* objects) the zone thermostat air temperature may depend on the Thermostat Height and Thermostat Offset.
 
-\subsubsection{Zone Mean Radiant Temperature {[}C{]}}\label{zone-mean-radiant-temperature-c}
+\paragraph{Zone Mean Radiant Temperature {[}C{]}}\label{zone-mean-radiant-temperature-c}
 
-The Mean Radiant Temperature (MRT) in degrees Celsius of a space is a measure of the combined effects of temperatures of surfaces within that space. Specifically it is the surface area × emissivity weighted average of the zone inside surface temperatures (ref. Surface Inside Temperature), where emissivity is the Thermal Absorptance of the inside material layer of each surface.
+The Mean Radiant Temperature (MRT) in degrees Celsius of a space is a measure of the combined effects of temperatures of surfaces within that space. Specifically it is the surface area $\times$ emissivity weighted average of the zone inside surface temperatures (ref. Surface Inside Temperature), where emissivity is the Thermal Absorptance of the inside material layer of each surface.
 
-\subsubsection{Zone Operative Temperature {[}C{]}}\label{zone-operative-temperature-c}
+\paragraph{Zone Operative Temperature {[}C{]}}\label{zone-operative-temperature-c}
 
-Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT), OT = 0.5*MAT + 0.5*MRT. This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems. See also Zone Thermostat Operative Temperature.
+Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT), OT = 0.5$\cdot$MAT + 0.5$\cdot$MRT. This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems. See also Zone Thermostat Operative Temperature.
 
-\subsubsection{Zone Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-internal-convective-heat-gain-rate-w}
+\paragraph{Zone Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-internal-convective-heat-gain-rate-w}
 
 The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains, including people, lights, equipment etc. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
 
-\subsubsection{Zone Air Heat Balance Surface Convection Rate {[}W{]}}\label{zone-air-heat-balance-surface-convection-rate-w}
+\paragraph{Zone Air Heat Balance Surface Convection Rate {[}W{]}}\label{zone-air-heat-balance-surface-convection-rate-w}
 
 The Zone Air Heat Balance Surface Convection Rate is the sum, in watts, of heat transferred to the zone air from all the surfaces. This field is not multiplied by zone or group multipliers.
 
-\subsubsection{Zone Air Heat Balance Interzone Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-interzone-air-transfer-rate-w}
+\paragraph{Zone Air Heat Balance Interzone Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-interzone-air-transfer-rate-w}
 
 The Zone Air Heat Balance Interzone Air Transfer Rate is the sum, in watts, of heat transferred to the zone air from all the transfers of air from other thermal zones. This field is not multiplied by zone or group multipliers.
 
-\subsubsection{Zone Air Heat Balance Outdoor Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-outdoor-air-transfer-rate-w}
+\paragraph{Zone Air Heat Balance Outdoor Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-outdoor-air-transfer-rate-w}
 
 The Zone Air Heat Balance Outdoor Air Transfer Rate is the sum, in watts, of heat transferred to the zone air from all the transfers of air from the out side, such as infiltration. This field is not multiplied by zone or group multipliers.
 
-\subsubsection{Zone Air Heat Balance System Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-system-air-transfer-rate-w}
+\paragraph{Zone Air Heat Balance System Air Transfer Rate {[}W{]}}\label{zone-air-heat-balance-system-air-transfer-rate-w}
 
 The Zone Air Heat Balance System Air Transfer Rate is the sum, in watts, of heat transferred to the zone air by HVAC forced-air systems and air terminal units. Such HVAC systems are connected to the zone by an inlet node (see \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} input field called Zone Air Inlet Node or Node List Name) This field is not multiplied by zone or group multipliers. The Zone Air Heat Balance System Air Transfer Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
 
-\subsubsection{Zone Air Heat Balance System Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-system-convective-heat-gain-rate-w}
+\paragraph{Zone Air Heat Balance System Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-system-convective-heat-gain-rate-w}
 
 The Zone Air Heat Balance System Convective Heat Gain Rate is the sum, in watts, of heat transferred directly to the zone air by ``non-air'' HVAC systems. Such HVAC systems are not connected to the zone by an inlet node but rather add or subtract heat directly to the zone air in a manner similar to internal gains. These include the convective fraction of zone HVAC baseboards and high temperature radiant systems, zone HVAC refrigeration chiller set, and the extra convective cooling provided by the cooled beam air terminal unit. This field is not multiplied by zone or group multipliers.
 
-\subsubsection{Zone Air Heat Balance Air Energy Storage Rate {[}W{]}}\label{zone-air-heat-balance-air-energy-storage-rate-w}
+\paragraph{Zone Air Heat Balance Air Energy Storage Rate {[}W{]}}\label{zone-air-heat-balance-air-energy-storage-rate-w}
 
 The Zone Air Heat Balance Air Energy Storage Rate is the heat stored, in watts, in the zone air as result of zone air temperature changing from one timestep to the next. This field is not multiplied by zone or group multipliers.
 
-\subsubsection{Zone Air Heat Balance Deviation Rate {[}W{]}}\label{zone-air-heat-balance-deviation-rate-w}
+\paragraph{Zone Air Heat Balance Deviation Rate {[}W{]}}\label{zone-air-heat-balance-deviation-rate-w}
 
 The Zone Air Heat Balance Deviation Rate is the imbalance, in watts, in the energy balance for zone air. The value should be near zero but will become non-zero if zone conditions are changing rapidly or erratically. This field is not multiplied by zone or group multipliers. (This output variable is only generated if the user has set a computer system environment variable DisplayAdvancedReportVariables equal to ``yes''.)
 
-\subsubsection{Zone Air System Sensible Heating Energy {[}J{]}}\label{zone-air-system-sensible-heating-energy-j}
+\paragraph{Zone Air System Sensible Heating Energy {[}J{]}}\label{zone-air-system-sensible-heating-energy-j}
 
 This output variable represents the sensible heating energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible heating rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
@@ -402,99 +406,99 @@ This means that system output from equipment such as high and low temperature ra
 Finally, note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variables will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
 \end{callout}
 
-\subsubsection{Zone Air System Sensible Cooling Energy {[}J{]}}\label{zone-air-system-sensible-cooling-energy-j}
+\paragraph{Zone Air System Sensible Cooling Energy {[}J{]}}\label{zone-air-system-sensible-cooling-energy-j}
 
 This output variable represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
-\subsubsection{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w}
+\paragraph{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w}
 
 This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
-\subsubsection{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w}
+\paragraph{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w}
 
 This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
-\subsubsection{Zone Air Humidity Ratio {[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratio-kgwaterkgdryair}
+\paragraph{Zone Air Humidity Ratio {[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratio-kgwaterkgdryair}
 
 This output variable represents the air humidity ratio after the correct step for each zone. The humidity ratio is the mass of water vapor to the mass of dry air contained in the zone in (kg water/kg air) and is unitless.
 
-\subsubsection{Zone Air Relative Humidity {[}\%{]}}\label{zone-air-relative-humidity}
+\paragraph{Zone Air Relative Humidity {[}\%{]}}\label{zone-air-relative-humidity}
 
 This output variable represents the air relative humidity after the correct step for each zone. The relative humidity is in percent and uses the Zone Air Temperature, the Zone Air Humidity Ratio and the Outside Barometric Pressure for calculation.
 
-\subsubsection{Zone Air System Latent Heating Energy {[}J{]}}\label{zone-air-system-latent-heating-energy-j}
+\paragraph{Zone Air System Latent Heating Energy {[}J{]}}\label{zone-air-system-latent-heating-energy-j}
 
-\subsubsection{Zone Air System Latent Cooling Energy {[}J{]}}\label{zone-air-system-latent-cooling-energy-j}
+\paragraph{Zone Air System Latent Cooling Energy {[}J{]}}\label{zone-air-system-latent-cooling-energy-j}
 
 These output variables represent the latent heating/cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible heating/cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
 
-\subsubsection{Zone Air System Latent Heating Rate {[}W{]}}\label{zone-air-system-latent-heating-rate-w}
+\paragraph{Zone Air System Latent Heating Rate {[}W{]}}\label{zone-air-system-latent-heating-rate-w}
 
 This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
-\subsubsection{Zone Air System Latent Cooling Rate {[}W{]}}\label{zone-air-system-latent-cooling-rate-w}
+\paragraph{Zone Air System Latent Cooling Rate {[}W{]}}\label{zone-air-system-latent-cooling-rate-w}
 
 This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
-\subsubsection{Zone Air System Sensible Heat Ratio {[}{]}}\label{zone-air-system-sensible-heat-ratio}
+\paragraph{Zone Air System Sensible Heat Ratio {[}{]}}\label{zone-air-system-sensible-heat-ratio}
 
 This output variable represents the zone sensible heat transfer divided by the total heat transfer for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module.
 
-\subsubsection{Zone Air Vapor Pressure Difference {[}Pa{]}}\label{zone-air-vapor-pressure-difference-pa}
+\paragraph{Zone Air Vapor Pressure Difference {[}Pa{]}}\label{zone-air-vapor-pressure-difference-pa}
 
 This output variable represents the zone vapor pressure difference, or depression, in pascals for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This value represents the saturated air vapor pressure minus the actual zone air vapor pressure and is indicative of the dryness of the zone air when latent loads are of interest.
 
-\subsubsection{Space or Zone Total Internal Radiant Heating Rate {[}W{]}}\label{zone-total-internal-radiant-heating-rate-w}
+\paragraph{Space or Zone Total Internal Radiant Heating Rate {[}W{]}}\label{zone-total-internal-radiant-heating-rate-w}
 
-\subsubsection{Space or Zone Total Internal Radiant Heating Energy {[}J{]}}\label{zone-total-internal-radiant-heating-energy-j}
+\paragraph{Space or Zone Total Internal Radiant Heating Energy {[}J{]}}\label{zone-total-internal-radiant-heating-energy-j}
 
 These output variables represent the sum of radiant gains from specific internal sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes radiant gain from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 
-\subsubsection{Space or Zone Total Internal Visible Radiation Heating Rate {[}W{]}}\label{zone-total-internal-visible-radiation-heating-rate-w}
+\paragraph{Space or Zone Total Internal Visible Radiation Heating Rate {[}W{]}}\label{zone-total-internal-visible-radiation-heating-rate-w}
 
-\subsubsection{Space or Zone Total Internal Visible Radiation Heating Energy {[}J{]}}\label{zone-total-internal-visible-radiation-heating-energy-j}
+\paragraph{Space or Zone Total Internal Visible Radiation Heating Energy {[}J{]}}\label{zone-total-internal-visible-radiation-heating-energy-j}
 
-These output variables expresse the sum of heat gain in Watts (for rate) or joules that is the calculated short wavelength radiation gain from lights in the space or zones. This calculation uses the total energy from lights and the fraction visible to realize this value, summed over the space or zones in the simulation.
+These output variables express the sum of heat gain in Watts (for rate) or joules that is the calculated short wavelength radiation gain from lights in the space or zones. This calculation uses the total energy from lights and the fraction visible to realize this value, summed over the space or zones in the simulation.
 
-\subsubsection{Space or Zone Total Internal Convective Heating Rate {[}W{]}}\label{zone-total-internal-convective-heating-rate-w}
+\paragraph{Space or Zone Total Internal Convective Heating Rate {[}W{]}}\label{zone-total-internal-convective-heating-rate-w}
 
-\subsubsection{Space or Zone Total Internal Convective Heating Energy {[}J{]}}\label{zone-total-internal-convective-heating-energy-j}
+\paragraph{Space or Zone Total Internal Convective Heating Energy {[}J{]}}\label{zone-total-internal-convective-heating-energy-j}
 
 These output variables represent the sum of convective gains from specific sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes convective gain from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 
-\subsubsection{Space or Zone Total Internal Latent Gain Rate {[}W{]}}\label{zone-total-internal-latent-gain-rate-w}
+\paragraph{Space or Zone Total Internal Latent Gain Rate {[}W{]}}\label{zone-total-internal-latent-gain-rate-w}
 
-\subsubsection{Space or Zone Total Internal Latent Gain Energy {[}J{]}}\label{zone-total-internal-latent-gain-energy-j}
+\paragraph{Space or Zone Total Internal Latent Gain Energy {[}J{]}}\label{zone-total-internal-latent-gain-energy-j}
 
 These output variables represent the sum of latent gains from specific internal sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes latent gain from \hyperref[people]{People}, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 
-\subsubsection{Space or Zone Total Internal Total Heating Rate {[}W{]}}\label{zone-total-internal-total-heating-rate-w}
+\paragraph{Space or Zone Total Internal Total Heating Rate {[}W{]}}\label{zone-total-internal-total-heating-rate-w}
 
-\subsubsection{Space or Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
+\paragraph{Space or Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
 
 These output variables represent the sum of all heat gains throughout the space or zone in Watts (for rate) or joules. This includes all heat gains from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 
-\subsubsection{Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-heat-transfer-rate-w}
+\paragraph{Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-heat-transfer-rate-w}
 
-\subsubsection{Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-sensible-heat-transfer-rate-w}
+\paragraph{Zone Exfiltration Sensible Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-sensible-heat-transfer-rate-w}
 
-\subsubsection{Zone Exfiltration Latent Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-latent-heat-transfer-rate-w}
+\paragraph{Zone Exfiltration Latent Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-latent-heat-transfer-rate-w}
 
 These output variables represent the heat emitted to ambient from exfiltration in Watts. The exfiltration rate is calculated by solving a mass flow balance on the zone including infiltration, ventilation, outdoor air mixing, zone-to-zone mixing, and all of the zone inlet, exhaust, and return nodes. The latent parts are determined by taking the difference between the total and the sensible rate. Positive values indicate the zone injects heat to the environment, while negative values indicate the building extracts heat from the environment. 
 
-\subsubsection{Zone Exhaust Air Heat Transfer Rate {[}W{]}}\label{zone-exhaust-heat-transfer-rate-w}
+\paragraph{Zone Exhaust Air Heat Transfer Rate {[}W{]}}\label{zone-exhaust-heat-transfer-rate-w}
 
-\subsubsection{Zone Exhaust Air Sensible Heat Transfer Rate {[}W{]}}\label{zone-exhaust-sensible-heat-transfer-rate-w}
+\paragraph{Zone Exhaust Air Sensible Heat Transfer Rate {[}W{]}}\label{zone-exhaust-sensible-heat-transfer-rate-w}
 
-\subsubsection{Zone Exhaust Air Latent Heat Transfer Rate {[}W{]}}\label{zone-exhaust-latent-heat-transfer-rate-w}
+\paragraph{Zone Exhaust Air Latent Heat Transfer Rate {[}W{]}}\label{zone-exhaust-latent-heat-transfer-rate-w}
 
 These output variables represent the heat emitted to ambient from exhaust air in Watts. The zone exhaust air flow rate is aggregated from the zone exhaust nodes. Positive values indicate the building injects heat to the environment, while negative values indicate the building extracts heat from the environment. 
 
-\subsubsection{Site Total Zone Exfiltration Heat Loss {[}W{]}}\label{site-total-exfiltration-heat-transfer-rate-w}
+\paragraph{Site Total Zone Exfiltration Heat Loss {[}W{]}}\label{site-total-exfiltration-heat-transfer-rate-w}
 
 These output variables represent the total amount of heat emitted to ambient from all zones by exfiltration in Watts. Positive values indicate the building injects heat to the environment, while negative values indicate the building extracts heat from the environment. This includes both sensible and latent heat loss from zone exfiltration.
 
-\subsubsection{Site Total Zone Exhaust Air Heat Loss {[}W{]}}\label{site-total-exhaust-heat-transfer-rate-w}
+\paragraph{Site Total Zone Exhaust Air Heat Loss {[}W{]}}\label{site-total-exhaust-heat-transfer-rate-w}
 
 These output variables represent the total amount of heat emitted to ambient from all zones by exhaust air in Watts. Positive values indicate the building injects heat to the environment, while negative values indicate the building extracts heat from the environment. This includes both sensible and latent heat loss from zone exhaust air.
 
@@ -738,7 +742,7 @@ If geometry is correct, conditions 1, 3, and 7 should take care of all surfaces,
 
 Before the surface objects are explained in detail, a description of geometric parameters used in EnergyPlus will be given. Since the input of surface vertices is common to most of the surface types, it will also be given a separate discussion.
 
-Some flexibility is allowed in specifying surface vertices. This flexibility is embodied in the GlobalGeometryRules class/object in the input file. Note that the parameters specified in this statement are used for all surface vertice inputs -- there is no further ``flexibility'' allowed.
+Some flexibility is allowed in specifying surface vertices. This flexibility is embodied in the GlobalGeometryRules class/object in the input file. Note that the parameters specified in this statement are used for all surface vertices inputs---there is no further ``flexibility'' allowed.
 
 In order to perform shadowing calculations, the building surfaces must be specified. EnergyPlus uses a three dimensional (3D) Cartesian coordinate system for surface vertex specification. This Right Hand coordinate system has the X-axis pointing east, the Y-axis pointing north, and the Z-axis pointing up. See figure below.
 
@@ -4464,6 +4468,15 @@ The following control types can be used to reduce zone cooling load. They are ap
 
 \emph{OnIfHighZoneAirTempAndHighHorizontalSolar:} Shading is on if the zone air temperature exceeds the Setpoint (C) and if the horizontal solar radiation exceeds SetPoint 2 (W/m\(^{2}\)).
 
+The following three control types can be used to model human behavior of turning on shading during the day to reduce view luminance or solar gain and leaving shading on until a certain time point. They can only be used in zones with daylighting controls. Window view luminance at the first daylighting reference point is used to compare with luminance setpoint. They are applicable to any Shading Type except ExteriorScreen.
+
+\emph{OnIfHighSolarOrHighLuminanceTillMidnight:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till midnight.
+
+\emph{OnIfHighSolarOrHighLuminanceTillSunset:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunset.
+
+\emph{OnIfHighSolarOrHighLuminanceTillNextMorning:} Shading is on if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) or the luminance from the window exceeds SetPoint 2 (cd/m\(^{2}\)). When shading is on, it remains on till sunrise next day.
+
+
 \paragraph{Field: Schedule Name}\label{field-schedule-name-007}
 
 Required if Shading Control Is Scheduled = Yes. If schedule value \textgreater{} 0 , shading control is active, i.e., shading can be on only if the shading control test passes. If schedule value = 0, shading is off whether or not the control test passes. If Schedule Name is not specified, shading control is assumed to be active at all times.
@@ -4523,7 +4536,7 @@ This is the name of a schedule of slat angles that is used when Type of Slat Ang
 
 \paragraph{Field: Setpoint 2}\label{field-setpoint-2}
 
-Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar
+Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, OnIfHighZoneAirTempAndHighHorizontalSolar, OnIfHighSolarOrHighLuminanceTillMidnight, OnIfHighSolarOrHighLuminanceTillSunset, and OnIfHighSolarOrHighLuminanceTillNextMorning.
 
 \paragraph{Field: Daylighting Controls Object Name}\label{field-daylighting-controls-object-name}
 
@@ -4598,7 +4611,7 @@ WindowShadingControl,
        ,                             !- Material Name of Shading Device
        ,                             !- Type of Slat Angle Control for Blinds
        ,                             !- Slat Angle Schedule Name
-       ,                             !- Setpoint 2 {W/m2 or deg C}
+       ,                             !- Setpoint 2 {W/m2, deg C or cd/m2}
        West Zone_DaylCtrl,           !- Daylighting Control Object Name
        Sequential,                   !- Multiple Surface Control Type
        Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name
@@ -4669,7 +4682,7 @@ WindowShadingControl,
        ROLL SHADE,                   !- Material Name of Shading Device
        ,                             !- Type of Slat Angle Control for Blinds
        ,                             !- Slat Angle Schedule Name
-       ,                             !- Setpoint 2 {W/m2 or deg C}
+       ,                             !- Setpoint 2 {W/m2, deg C or cd/m2}
        West Zone_DaylCtrl,           !- Daylighting Control Object Name
        Sequential,                   !- Multiple Surface Control Type
        Zn001:Wall001:Win001;         !- Fenestration Surface 1 Name
@@ -5171,115 +5184,7 @@ If there is a window called ConstructionName on the Window data file, the data f
 \subsection{Using LBNLs Windows Calculation Engine}\label{windowscalculationengine}
 This is new windows simulation engine that will be used in both EnergyPlus and Berkeley Lab WINDOW. The intent is for this engine to replace all other window calculation modules in EnergyPlus. For the time being, other modules will still be available. To use the new Window Calculation Engine, insert the following into IDF:
 
- \begin{lstlisting}
- WindowsCalculationEngine,
- ExternalWindowsModel;
- \end{lstlisting}
-
-\subsection{Zone Thermal Output(s)}\label{zone-thermal-outputs-1}
-
-In addition to the canned Surface reports (view the Reports section later in this document) and surface variables (above), the following variables are available for all zones:
-
 \begin{lstlisting}
-Zone,Sum,Zone Total Internal Radiant Heating Energy [J]
-Zone,Sum,Zone Total Internal Visible Radiation Heating Energy [J]
-Zone,Sum,Zone Total Internal Convective Heating Energy [J]
-Zone,Sum,Zone Total Internal Latent Gain Energy [J]
-Zone,Sum,Zone Total Internal Total Heating Energy [J]
-Zone,Average,Zone Mean Air Temperature [C]
-HVAC,Average,Zone Air Temperature [C]
-Zone,Average,Zone Mean Radiant Temperature [C]
-Zone,Average,Zone Operative Temperature [C]
-Zone,Average,Zone Heat Index [C]
-Zone,Average,Zone Humidity Index [C]
-HVAC,Sum,Zone Air System Sensible Heating Energy [J]
-HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
-HVAC,Average,Zone Air System Sensible Heating Rate [W]
-HVAC,Average,Zone Air System Sensible Cooling Rate [W]
-HVAC,Average,Zone Air Humidity Ratio[kgWater/kgDryAir]
-HVAC,Average,Zone Air Relative Humidity[%]
+WindowsCalculationEngine,
+ExternalWindowsModel;
 \end{lstlisting}
-
-Two of these are of particular interest:
-
-\begin{lstlisting}
-Zone,Average,Zone Mean Air Temperature [C]
-HVAC,Average,Zone Air Temperature [C]
-\end{lstlisting}
-
-These two variable outputs are/should be identical. However, note that they can be reported at different time intervals. ``Zone Mean Air Temperature'' is only available on the Zone/HB timestep (Number of Timesteps per Hour) whereas ``Zone Air Temperature'' can be reported at the HVAC timestep (which can vary).
-
-\subsubsection{Zone Mean Air Temperature {[}C{]}}\label{zone-mean-air-temperature-c-1}
-
-From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone.
-
-\subsubsection{Zone Air Temperature {[}C{]}}\label{zone-air-temperature-c-1}
-
-This is very similar to the mean air temperature in the last field. The ``well stirred'' model for the zone is the basis, but this temperature is also available at the ``detailed'' system timestep.
-
-\subsubsection{Zone Mean Radiant Temperature {[}C{]}}\label{zone-mean-radiant-temperature-c-1}
-
-The Mean Radiant Temperature (MRT) in degrees Celsius of a space is really the measure of the combined effects of temperatures of surfaces within that space. The larger the surface area and the closer one is to it, the more effect the surface temperature of that surface has on each other. The MRT is the measure of all these surface areas and temperatures.
-
-\subsubsection{Zone Operative Temperature {[}C{]}}\label{zone-operative-temperature-c-1}
-
-Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT), OT = 0.5*MAT + 0.5*MRT. This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems.~ See also Zone Thermostat Operative Temperature.
-
-\subsubsection{Zone Heat Index {[}C{]}}\label{zone-heat-index-c-1}
-
-Zone heat index (HI) is an index that combines air temperature and relative humidity in shaded areas, to posit a human-perceived equivalent temperature, as how hot it would feel if the humidity were some other value in the shade. The HI measures the temperature feels like to the human body when relative humidity is combined with the air temperature. Zone Heat Index is only reported when ThermalResilienceSummary is declared in Output:Table:SummaryReports.  
-
-
-\subsubsection{Zone Humdity Index {[}C{]}}\label{zone-humidity-index-c-1}
-
-The Humdity Index (humidex) is an index number used by Canadian meteorologists to describe how hot the weather feels to the average person, by combining the effect of heat and humidity. The humidex is a nominally dimensionless quantity (though generally recognized by the public as equivalent to the degree Celsius) based on the dew-point temperature. Zone Humdity Index is only reported when ThermalResilienceSummary is declared in Output:Table:SummaryReports.  
-
-\subsubsection{Zone Air System Sensible Heating Energy {[}J{]}}\label{zone-air-system-sensible-heating-energy-j-1}
-
-This field represents the sensible heating energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible heating rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
-
-\begin{callout}
-Zone Air System Sensible Heating (and Cooling) Energy (and Rate) all report the heating or cooling delivered by the HVAC system to a zone. These values are calculated by multiplying the supply air mass flow rate by the difference between the supply air temperature and the zone air temperature. This does not always indicate the operation of heating or cooling coils. For example, cooling will be reported if the supply air is cooled due to the introduction of outside air, even if all coils are off.
-
-Note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variable will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
-\end{callout}
-
-\subsubsection{Zone Air System Sensible Cooling Energy {[}J{]}}\label{zone-air-system-sensible-cooling-energy-j-1}
-
-This field represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
-
-\subsubsection{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w-1}
-
-This field represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. The Zone Air System Sensible Heating Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
-
-\subsubsection{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w-1}
-
-This field represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. The Zone Air System Sensible Cooling Rate may not agree exactly with the equipment-level delivered energy transfer rate when the zone temperature is changing significantly over a timestep (e.g. during thermostat setback and setup), but the energy will balance out over time.
-
-\subsubsection{Zone Air Humidity Ratio{[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratiokgwaterkgdryair}
-
-This field represents the air humidity ratio after the correct step for each zone. The humidity ratio is the mass of water vapor to the mass of dry air contained in the zone in (kg water/kg air) and is unitless.
-
-\subsubsection{Zone Air Relative Humidity{[}\%{]}}\label{zone-air-relative-humidity-1}
-
-This field represents the air relative humidity ratio after the correct step for each zone. The relative humidity is in percent and uses the Zone Air Temperature, the Zone Air Humidity Ratio and the Outside Barometric Pressure for calculation.
-
-\subsubsection{Zone Total Internal Radiant Heating Energy {[}J{]}}\label{zone-total-internal-radiant-heating-energy-j-1}
-
-This field represents the sum of radiant gains from specific internal sources (e.g.~equipment) throughout the zone in joules. This includes radiant gain from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
-
-\subsubsection{Zone-Total Internal Visible Heat Gain {[}J{]}}\label{zone-total-internal-visible-heat-gain-j}
-
-This field expresses the sum of heat gain in joules that is the calculated short wavelength radiation gain from lights in the zones. This calculation uses the total energy from lights and the fraction visible to realize this value, summed over the zones in the simulation.
-
-\subsubsection{Zone Total Internal Convective Heating Energy {[}J{]}}\label{zone-total-internal-convective-heating-energy-j-1}
-
-This field represents the sum of convective gains from specific sources (e.g.~equipment) throughout the zone in joules. This includes convective gain from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
-
-\subsubsection{Zone Total Internal Latent Gain Energy {[}J{]}}\label{zone-total-internal-latent-gain-energy-j-1}
-
-This field represents the sum of latent gains from specific internal sources (e.g.~equipment) throughout the zone in joules. This includes latent gain from \hyperref[people]{People}, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
-
-\subsubsection{Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j-1}
-
-This field represents the sum of all heat gains throughout the zone in joules. This includes all heat gains from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.

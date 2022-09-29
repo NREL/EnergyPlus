@@ -13217,14 +13217,14 @@
 
   ZoneMixing,
     Kitchen_Flr_5 Exhaust Fanmixing_0,  !- Name
-    Kitchen_Flr_5,           !- Zone Name
+    Kitchen_Flr_5,           !- Zone or Space Name
     HVACOperationSchd,       !- Schedule Name
     Flow/Zone,               !- Design Flow Rate Calculation Method
     0.749970410062731,       !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    Dining_Flr_5,            !- Source Zone Name
+    Dining_Flr_5,            !- Source Zone or Space Name
     0.0;                     !- Delta Temperature {deltaC}
 
 ! ***HVAC EQUIPMENT***

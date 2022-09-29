@@ -11,7 +11,7 @@
    <key>CFBundleInfoDictionaryVersion</key>
    <string>6.0</string>
    <key>CFBundleVersion</key>
-   <string>0.15.0.2.0</string>
+   <string>0.16.0.2.0</string>
    <key>CFBundleDevelopmentRegion</key>
    <string>en</string>
    <key>CFBundlePackageType</key>
@@ -19,9 +19,9 @@
    <key>CFBundleSignature</key>
    <string>????</string>
    <key>NSHumanReadableCopyright</key>
-   <string>0.15</string>
+   <string>0.16</string>
    <key>CFBundleShortVersionString</key>
-   <string>0.15</string>
+   <string>0.16</string>
    <key>CFBundleIconFile</key>
    <string>App</string>
    <key>LSMinimumSystemVersion</key>
@@ -70,6 +70,10 @@
       <dict>
          <key>UTTypeIdentifier</key>
          <string>public.data</string>
+         <key>UTTypeConformsTo</key>
+         <array>
+            <string>public.data</string>
+         </array>
          <key>UTTypeTagSpecification</key>
          <dict>
             <key>public.filename-extension</key>
@@ -85,6 +89,10 @@
       <dict>
          <key>UTTypeIdentifier</key>
          <string>public.data</string>
+         <key>UTTypeConformsTo</key>
+         <array>
+            <string>public.data</string>
+         </array>
          <key>UTTypeTagSpecification</key>
          <dict>
             <key>public.filename-extension</key>

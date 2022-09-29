@@ -72,6 +72,8 @@ public:
 
   void calculateSurfaceAverages();
   double getSurfaceAverageValue(std::pair<Surface::SurfaceType, GroundOutput::OutputType> output);
+  std::array<double, 3> calculateHeatFlux(std::size_t index);
+  void writeCSV(std::string path);
 
 private:
   double timestep; // in seconds

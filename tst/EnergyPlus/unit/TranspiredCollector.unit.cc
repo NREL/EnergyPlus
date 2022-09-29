@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
         "    0.000,                   !- Y Origin {m}",
         "    0.000,                   !- Z Origin {m}",
         "    1,                       !- Type",
-        "    1.000,                   !- Multiplier",
+        "    1,                       !- Multiplier",
         "    3.000,                   !- Ceiling Height {m}",
         "    644.812;                 !- Volume {m3}",
 

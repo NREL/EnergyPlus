@@ -357,33 +357,33 @@ The individual \emph{h\(_{c}\)} model equations and their respective references 
 
 \subsubsection{ASHRAE Vertical Wall}\label{ashrae-vertical-wall}
 
-Walton adopted the following equation for natural convection from ASHRAE .
+Walton adopted the following equation for natural convection from ASHRAE:
 
 \begin{equation}
 h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}
 \end{equation}
 
-This is usually bound at a minimum of .1 in EnergyPlus. This is a component of the TARP overall algorithm described below.
+This is also a component of the TARP overall algorithm described below.
 
 \subsubsection{Walton Unstable Horizontal Or Tilt}\label{walton-unstable-horizontal-or-tilt}
 
-Walton (1983) developed the following equation by fitting curves from various sources.
+Walton (1983) developed the following equation by fitting curves from various sources:
 
 \begin{equation}
 h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.238 - \left| {\cos \Sigma } \right|}}
 \end{equation}
 
-Unstable refers to the direction of heat flow and the associated buoyancy relative to the surfaces. Unstable is when the natural tendency is to enhance flow in the sense that rising warmer air, or falling cooler air, is free to move away from the surface. This is usually bound at a minimum of .1 in EnergyPlus. This is a component of the TARP overall algorithm described below.
+where $\Sigma$ is the surface tilt angle. Unstable refers to the direction of heat flow and the associated buoyancy relative to the surfaces. Unstable is when the natural tendency is to enhance flow in the sense that rising warmer air, or falling cooler air, is free to move away from the surface. This is also a component of the TARP overall algorithm described below.
 
 \subsubsection{Walton Stable Horizontal Or Tilt}\label{walton-stable-horizontal-or-tilt}
 
-Walton (1983) developed the following equation by fitting curves from various sources.
+Walton (1983) developed the following equation by fitting curves from various sources:
 
 \begin{equation}
 h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}
 \end{equation}
 
-Stable refers to the direction of heat flow and the associated buoyancy relative to the surfaces. Stable is when the natural tendency is to retard flow in the sense that rising warmer air, or falling cooler air, is driven against the surface. This is usually bound at a minimum of .1 in EnergyPlus. This is a component of the TARP overall algorithm described below.
+where $\Sigma$ is the surface tilt angle. Stable refers to the direction of heat flow and the associated buoyancy relative to the surfaces. Stable is when the natural tendency is to retard flow in the sense that rising warmer air, or falling cooler air, is driven against the surface. This is also a component of the TARP overall algorithm described below.
 
 \subsubsection{Fisher Pedersen Ceiling Diffuser Walls}\label{fisher-pedersen-ceiling-diffuser-walls}
 
@@ -790,21 +790,29 @@ Separate from the above model structure, there are also other comprehensive algo
 
 \subsubsection{TARP Algorithm}\label{tarp-algorithm}
 
-The comprehensive natural convection model, accessed using the keyword ``TARP,'' correlates the convective heat transfer coefficient to the surface orientation and the difference between the surface and zone air temperatures (where DT = Surface Temperature - Air Temperature).~ The algorithm is taken directly from Walton (1983).~ Walton derived his algorithm from ASHRAE literature which can now be found for example in the ASHRAE Handbook (HoF 2001), Table 5 on p.~3.12, which gives equations for natural convection heat transfer coefficients in the turbulent range for large, vertical plates and for large, horizontal plates facing upward when heated (or downward when cooled).~~ A note in the text also gives an approximation for large, horizontal plates facing downward when heated (or upward when cooled) recommending that it should be half of the facing upward value.~ Walton adds a curve fit as a function of the cosine of the tilt angle to provide intermediate values between vertical and horizontal.~ The curve fit values at the extremes match the ASHRAE values very well.
+The comprehensive natural convection model, accessed using the keyword ``TARP,'' correlates the convective heat transfer coefficient to the surface orientation and the difference between the surface and zone air temperatures (where $\Delta$T = Surface Temperature - Air Temperature).~ The algorithm is taken directly from Walton (1983).~ Walton derived his algorithm from ASHRAE literature which can be found in the ASHRAE Handbook (for example , the  ASHRAE Handbook of Fundamentals 2001, Table 5 on p.~3.12) which gives equations for natural convection heat transfer coefficients in the turbulent range for large, vertical plates and for large, horizontal plates facing upward when heated (or downward when cooled).~~ A note in the text also gives an approximation for large, horizontal plates facing downward when heated (or upward when cooled) recommending that it should be half of the facing upward value.~ Walton adds a curve fit as a function of the cosine of the tilt angle to provide intermediate values between vertical and horizontal.~ The curve fit values at the extremes match the ASHRAE values very well.
 
-For no temperature difference OR a vertical surface the following correlation is used:
+For no temperature difference OR a vertical surface, the following correlation is used:
 
-\(h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (90)
+\begin{equation}
+h = 1.31{\left| {\Delta T} \right|^{\frac{1}{3}}}
+\end{equation}
 
-For ($\Delta$T \textless{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textgreater{} 0.0 AND an downward facing surface) an enhanced convection correlation is used:
+It should be noted that h is zero when the temperature difference is zero.
 
-\(h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.238 - \left| {\cos \Sigma } \right|}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (91)
+For ($\Delta$T \textless{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textgreater{} 0.0 AND an downward facing surface), an enhanced convection correlation is used:
+
+\begin{equation}
+h = \frac{{9.482{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{7.238 - \left| {\cos \Sigma } \right|}}
+\end{equation}
 
 where $\Sigma$ is the surface tilt angle.
 
-For ($\Delta$T \textgreater{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textless{} 0.0 AND an downward facing surface) a reduced convection correlation is used:
+For ($\Delta$T \textgreater{} 0.0 AND an upward facing surface)~ OR~ ($\Delta$T \textless{} 0.0 AND an downward facing surface)], a reduced convection correlation is used:
 
-\(h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ (92)
+\begin{equation}
+h = \frac{{1.810{{\left| {\Delta T} \right|}^{\frac{1}{3}}}}}{{1.382 + \left| {\cos \Sigma } \right|}}
+\end{equation}
 
 where $\Sigma$ is the surface tilt angle.
 

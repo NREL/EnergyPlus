@@ -77,7 +77,6 @@ namespace SimAirServingZones {
         OAMixer_Num,
         Fan_Simple_CV,
         Fan_Simple_VAV,
-        WaterCoil_SimpleCool,
         WaterCoil_Cooling,
         WaterCoil_SimpleHeat,
         SteamCoil_AirHeat,
@@ -85,7 +84,6 @@ namespace SimAirServingZones {
         Coil_ElectricHeat,
         Coil_GasHeat,
         WaterCoil_CoolingHXAsst,
-        DXCoil_CoolingHXAsst,
         Coil_DeSuperHeat,
         DXSystem,
         HeatXchngr,
@@ -105,7 +103,6 @@ namespace SimAirServingZones {
         UnitarySystemModel,
         ZoneVRFasAirLoopEquip,
         PVT_AirBased,
-        VRFTerminalUnit,
         CoilSystemWater,
         Num
     };

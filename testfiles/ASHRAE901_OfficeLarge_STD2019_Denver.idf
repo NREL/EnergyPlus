@@ -11035,6 +11035,9 @@
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
     3.878739046,             !- Gross Rated Cooling COP {W/W}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     WAHPCoolCapCurveTot 1,   !- Total Cooling Capacity Curve Name
     WAHPCoolCapCurveSens 1,  !- Sensible Cooling Capacity Curve Name
     WAHPCoolPowCurve 1,      !- Cooling Power Consumption Curve Name
@@ -11052,6 +11055,9 @@
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
     4.005260634,             !- Gross Rated Cooling COP {W/W}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     WAHPCoolCapCurveTot 2,   !- Total Cooling Capacity Curve Name
     WAHPCoolCapCurveSens 2,  !- Sensible Cooling Capacity Curve Name
     WAHPCoolPowCurve 2,      !- Cooling Power Consumption Curve Name
@@ -11069,6 +11075,9 @@
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
     4.005260634,             !- Gross Rated Cooling COP {W/W}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     WAHPCoolCapCurveTot 3,   !- Total Cooling Capacity Curve Name
     WAHPCoolCapCurveSens 3,  !- Sensible Cooling Capacity Curve Name
     WAHPCoolPowCurve 3,      !- Cooling Power Consumption Curve Name
@@ -11086,6 +11095,9 @@
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
     4.005260634,             !- Gross Rated Cooling COP {W/W}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     WAHPCoolCapCurveTot 4,   !- Total Cooling Capacity Curve Name
     WAHPCoolCapCurveSens 4,  !- Sensible Cooling Capacity Curve Name
     WAHPCoolPowCurve 4,      !- Cooling Power Consumption Curve Name
@@ -11104,6 +11116,9 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
     4.2,                     !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     WAHPHeatCapCurve 1,      !- Heating Capacity Curve Name
     WAHPHeatPowCurve 1;      !- Heating Power Consumption Curve Name
 
@@ -11117,6 +11132,9 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
     4.2,                     !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     WAHPHeatCapCurve 2,      !- Heating Capacity Curve Name
     WAHPHeatPowCurve 2;      !- Heating Power Consumption Curve Name
 
@@ -11130,6 +11148,9 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
     4.2,                     !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     WAHPHeatCapCurve 3,      !- Heating Capacity Curve Name
     WAHPHeatPowCurve 3;      !- Heating Power Consumption Curve Name
 
@@ -11143,6 +11164,9 @@
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Heating Capacity {W}
     4.2,                     !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     WAHPHeatCapCurve 4,      !- Heating Capacity Curve Name
     WAHPHeatPowCurve 4;      !- Heating Power Consumption Curve Name
 
@@ -15846,11 +15870,11 @@
 
   Curve:QuadLinear,
     WAHPCoolCapCurveTot 1,   !- Name
-    -4.30266987344639,       !- Coefficient1 Constant
-    7.18536990534372,        !- Coefficient2 w
-    -2.23946714486189,       !- Coefficient3 x
-    0.139995928440879,       !- Coefficient4 y
-    0.102660179888915,       !- Coefficient5 z
+    -4.50025090963202,       !- Coefficient1 Constant
+    7.51532615879379,        !- Coefficient2 w
+    -2.34230474384112,       !- Coefficient3 x
+    0.14642462072188,       !- Coefficient4 y
+    0.107374393461896,       !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -15862,11 +15886,11 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 1,      !- Name
-    -5.67775976415698,       !- Coefficient1 Constant
-    0.438988156976704,       !- Coefficient2 w
-    5.845277342193,          !- Coefficient3 x
-    0.141605667000125,       !- Coefficient4 y
-    -0.168727936032429,      !- Coefficient5 z
+    -5.64270843812028,       !- Coefficient1 Constant
+    0.436278088630104,        !- Coefficient2 w
+    5.80919185594373,       !- Coefficient3 x
+    0.140731472492284,       !- Coefficient4 y
+    -0.167686303743809,       !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -15878,11 +15902,11 @@
 
   Curve:QuadLinear,
     WAHPCoolCapCurveTot 2,   !- Name
-    -4.30266987344639,       !- Coefficient1 Constant
-    7.18536990534372,        !- Coefficient2 w
-    -2.23946714486189,       !- Coefficient3 x
-    0.139995928440879,       !- Coefficient4 y
-    0.102660179888915,       !- Coefficient5 z
+    -4.50025090963202,       !- Coefficient1 Constant
+    7.51532615879379,        !- Coefficient2 w
+    -2.34230474384112,       !- Coefficient3 x
+    0.14642462072188,       !- Coefficient4 y
+    0.107374393461896,       !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -15894,11 +15918,11 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 2,      !- Name
-    -5.67775976415698,       !- Coefficient1 Constant
-    0.438988156976704,       !- Coefficient2 w
-    5.845277342193,          !- Coefficient3 x
-    0.141605667000125,       !- Coefficient4 y
-    -0.168727936032429,      !- Coefficient5 z
+    -5.64270843812028,       !- Coefficient1 Constant
+    0.436278088630104,        !- Coefficient2 w
+    5.80919185594373,       !- Coefficient3 x
+    0.140731472492284,       !- Coefficient4 y
+    -0.167686303743809,       !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -15910,11 +15934,11 @@
 
   Curve:QuadLinear,
     WAHPCoolCapCurveTot 3,   !- Name
-    -4.30266987344639,       !- Coefficient1 Constant
-    7.18536990534372,        !- Coefficient2 w
-    -2.23946714486189,       !- Coefficient3 x
-    0.139995928440879,       !- Coefficient4 y
-    0.102660179888915,       !- Coefficient5 z
+    -4.50025090963202,       !- Coefficient1 Constant
+    7.51532615879379,        !- Coefficient2 w
+    -2.34230474384112,       !- Coefficient3 x
+    0.14642462072188,       !- Coefficient4 y
+    0.107374393461896,       !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -15926,11 +15950,11 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 3,      !- Name
-    -5.67775976415698,       !- Coefficient1 Constant
-    0.438988156976704,       !- Coefficient2 w
-    5.845277342193,          !- Coefficient3 x
-    0.141605667000125,       !- Coefficient4 y
-    -0.168727936032429,      !- Coefficient5 z
+    -5.64270843812028,       !- Coefficient1 Constant
+    0.436278088630104,        !- Coefficient2 w
+    5.80919185594373,       !- Coefficient3 x
+    0.140731472492284,       !- Coefficient4 y
+    -0.167686303743809,       !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -15942,11 +15966,11 @@
 
   Curve:QuadLinear,
     WAHPCoolCapCurveTot 4,   !- Name
-    -4.30266987344639,       !- Coefficient1 Constant
-    7.18536990534372,        !- Coefficient2 w
-    -2.23946714486189,       !- Coefficient3 x
-    0.139995928440879,       !- Coefficient4 y
-    0.102660179888915,       !- Coefficient5 z
+    -4.50025090963202,       !- Coefficient1 Constant
+    7.51532615879379,        !- Coefficient2 w
+    -2.34230474384112,       !- Coefficient3 x
+    0.14642462072188,       !- Coefficient4 y
+    0.107374393461896,       !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -15958,11 +15982,11 @@
 
   Curve:QuadLinear,
     WAHPCoolPowCurve 4,      !- Name
-    -5.67775976415698,       !- Coefficient1 Constant
-    0.438988156976704,       !- Coefficient2 w
-    5.845277342193,          !- Coefficient3 x
-    0.141605667000125,       !- Coefficient4 y
-    -0.168727936032429,      !- Coefficient5 z
+    -5.64270843812028,       !- Coefficient1 Constant
+    0.436278088630104,        !- Coefficient2 w
+    5.80919185594373,       !- Coefficient3 x
+    0.140731472492284,       !- Coefficient4 y
+    -0.167686303743809,       !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -15974,11 +15998,11 @@
 
   Curve:QuadLinear,
     WAHPHeatCapCurve 1,      !- Name
-    0.237847462869254,       !- Coefficient1 Constant
-    -3.35823796081626,       !- Coefficient2 w
-    3.80640467406376,        !- Coefficient3 x
-    0.179200417311554,       !- Coefficient4 y
-    0.12860719846082,        !- Coefficient5 z
+    0.235574246265812,       !- Coefficient1 Constant
+    -3.32614175008211,       !- Coefficient2 w
+    3.77002512979569,        !- Coefficient3 x
+    0.177487717251347,       !- Coefficient4 y
+    0.127378040851416,        !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -15990,11 +16014,11 @@
 
   Curve:QuadLinear,
     WAHPHeatPowCurve 1,      !- Name
-    -3.79175529243238,       !- Coefficient1 Constant
-    3.38799239505527,        !- Coefficient2 w
-    1.5022612076303,         !- Coefficient3 x
-    -0.177653510577989,      !- Coefficient4 y
-    -0.103079864171839,      !- Coefficient5 z
+    -3.82822342994465,       !- Coefficient1 Constant
+    3.42057724376637,        !- Coefficient2 w
+    1.51670957364394,         !- Coefficient3 x
+    -0.179362136835128,      !- Coefficient4 y
+    -0.104071260074646,      !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -16006,11 +16030,11 @@
 
   Curve:QuadLinear,
     WAHPHeatCapCurve 2,      !- Name
-    0.237847462869254,       !- Coefficient1 Constant
-    -3.35823796081626,       !- Coefficient2 w
-    3.80640467406376,        !- Coefficient3 x
-    0.179200417311554,       !- Coefficient4 y
-    0.12860719846082,        !- Coefficient5 z
+    0.235574246265812,       !- Coefficient1 Constant
+    -3.32614175008211,       !- Coefficient2 w
+    3.77002512979569,        !- Coefficient3 x
+    0.177487717251347,       !- Coefficient4 y
+    0.127378040851416,        !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -16022,11 +16046,11 @@
 
   Curve:QuadLinear,
     WAHPHeatPowCurve 2,      !- Name
-    -3.79175529243238,       !- Coefficient1 Constant
-    3.38799239505527,        !- Coefficient2 w
-    1.5022612076303,         !- Coefficient3 x
-    -0.177653510577989,      !- Coefficient4 y
-    -0.103079864171839,      !- Coefficient5 z
+    -3.82822342994465,       !- Coefficient1 Constant
+    3.42057724376637,        !- Coefficient2 w
+    1.51670957364394,         !- Coefficient3 x
+    -0.179362136835128,      !- Coefficient4 y
+    -0.104071260074646,      !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -16038,11 +16062,11 @@
 
   Curve:QuadLinear,
     WAHPHeatCapCurve 3,      !- Name
-    0.237847462869254,       !- Coefficient1 Constant
-    -3.35823796081626,       !- Coefficient2 w
-    3.80640467406376,        !- Coefficient3 x
-    0.179200417311554,       !- Coefficient4 y
-    0.12860719846082,        !- Coefficient5 z
+    0.235574246265812,       !- Coefficient1 Constant
+    -3.32614175008211,       !- Coefficient2 w
+    3.77002512979569,        !- Coefficient3 x
+    0.177487717251347,       !- Coefficient4 y
+    0.127378040851416,        !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -16054,11 +16078,11 @@
 
   Curve:QuadLinear,
     WAHPHeatPowCurve 3,      !- Name
-    -3.79175529243238,       !- Coefficient1 Constant
-    3.38799239505527,        !- Coefficient2 w
-    1.5022612076303,         !- Coefficient3 x
-    -0.177653510577989,      !- Coefficient4 y
-    -0.103079864171839,      !- Coefficient5 z
+    -3.82822342994465,       !- Coefficient1 Constant
+    3.42057724376637,        !- Coefficient2 w
+    1.51670957364394,         !- Coefficient3 x
+    -0.179362136835128,      !- Coefficient4 y
+    -0.104071260074646,      !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -16070,11 +16094,11 @@
 
   Curve:QuadLinear,
     WAHPHeatCapCurve 4,      !- Name
-    0.237847462869254,       !- Coefficient1 Constant
-    -3.35823796081626,       !- Coefficient2 w
-    3.80640467406376,        !- Coefficient3 x
-    0.179200417311554,       !- Coefficient4 y
-    0.12860719846082,        !- Coefficient5 z
+    0.235574246265812,       !- Coefficient1 Constant
+    -3.32614175008211,       !- Coefficient2 w
+    3.77002512979569,        !- Coefficient3 x
+    0.177487717251347,       !- Coefficient4 y
+    0.127378040851416,        !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -16086,11 +16110,11 @@
 
   Curve:QuadLinear,
     WAHPHeatPowCurve 4,      !- Name
-    -3.79175529243238,       !- Coefficient1 Constant
-    3.38799239505527,        !- Coefficient2 w
-    1.5022612076303,         !- Coefficient3 x
-    -0.177653510577989,      !- Coefficient4 y
-    -0.103079864171839,      !- Coefficient5 z
+    -3.82822342994465,       !- Coefficient1 Constant
+    3.42057724376637,        !- Coefficient2 w
+    1.51670957364394,         !- Coefficient3 x
+    -0.179362136835128,      !- Coefficient4 y
+    -0.104071260074646,      !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -16104,12 +16128,12 @@
 
   Curve:QuintLinear,
     WAHPCoolCapCurveSens 1,  !- Name
-    6.0019444814887,         !- Coefficient1 Constant
-    22.6300677244073,        !- Coefficient2 v
-    -26.7960783730934,       !- Coefficient3 w
-    -1.72374720346819,       !- Coefficient4 x
-    0.490644802367817,       !- Coefficient5 y
-    0.0693119353468141,      !- Coefficient6 z
+    5.67639816011815,         !- Coefficient1 Constant
+    21.4026096359879,        !- Coefficient2 v
+    -25.3426552752253,       !- Coefficient3 w
+    -1.63025091025978,       !- Coefficient4 x
+    0.464032158581614,       !- Coefficient5 y
+    0.0655524461264753,      !- Coefficient6 z
     -100,                    !- Minimum Value of v
     100,                     !- Maximum Value of v
     -100,                    !- Minimum Value of w
@@ -16123,12 +16147,12 @@
 
   Curve:QuintLinear,
     WAHPCoolCapCurveSens 2,  !- Name
-    6.0019444814887,         !- Coefficient1 Constant
-    22.6300677244073,        !- Coefficient2 v
-    -26.7960783730934,       !- Coefficient3 w
-    -1.72374720346819,       !- Coefficient4 x
-    0.490644802367817,       !- Coefficient5 y
-    0.0693119353468141,      !- Coefficient6 z
+    5.67639816011815,         !- Coefficient1 Constant
+    21.4026096359879,        !- Coefficient2 v
+    -25.3426552752253,       !- Coefficient3 w
+    -1.63025091025978,       !- Coefficient4 x
+    0.464032158581614,       !- Coefficient5 y
+    0.0655524461264753,      !- Coefficient6 z
     -100,                    !- Minimum Value of v
     100,                     !- Maximum Value of v
     -100,                    !- Minimum Value of w
@@ -16142,12 +16166,12 @@
 
   Curve:QuintLinear,
     WAHPCoolCapCurveSens 3,  !- Name
-    6.0019444814887,         !- Coefficient1 Constant
-    22.6300677244073,        !- Coefficient2 v
-    -26.7960783730934,       !- Coefficient3 w
-    -1.72374720346819,       !- Coefficient4 x
-    0.490644802367817,       !- Coefficient5 y
-    0.0693119353468141,      !- Coefficient6 z
+    5.67639816011815,         !- Coefficient1 Constant
+    21.4026096359879,        !- Coefficient2 v
+    -25.3426552752253,       !- Coefficient3 w
+    -1.63025091025978,       !- Coefficient4 x
+    0.464032158581614,       !- Coefficient5 y
+    0.0655524461264753,      !- Coefficient6 z
     -100,                    !- Minimum Value of v
     100,                     !- Maximum Value of v
     -100,                    !- Minimum Value of w
@@ -16161,12 +16185,12 @@
 
   Curve:QuintLinear,
     WAHPCoolCapCurveSens 4,  !- Name
-    6.0019444814887,         !- Coefficient1 Constant
-    22.6300677244073,        !- Coefficient2 v
-    -26.7960783730934,       !- Coefficient3 w
-    -1.72374720346819,       !- Coefficient4 x
-    0.490644802367817,       !- Coefficient5 y
-    0.0693119353468141,      !- Coefficient6 z
+    5.67639816011815,         !- Coefficient1 Constant
+    21.4026096359879,        !- Coefficient2 v
+    -25.3426552752253,       !- Coefficient3 w
+    -1.63025091025978,       !- Coefficient4 x
+    0.464032158581614,       !- Coefficient5 y
+    0.0655524461264753,      !- Coefficient6 z
     -100,                    !- Minimum Value of v
     100,                     !- Maximum Value of v
     -100,                    !- Minimum Value of w

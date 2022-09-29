@@ -129,7 +129,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
         "	0.75,                          !- Gross Rated Sensible Heat Ratio",
         "	3.1,                           !- Gross Rated Cooling COP { W / W }",
         "	0.20,                          !- Rated Air Flow Rate { m3 / s }",
-        "	,                              !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "	,                              !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "	,                              !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "	Fan Out Node,                  !- Air Inlet Node Name",
         "	Cooling Coil Out Node,         !- Air Outlet Node Name",
         "	BiquadraticCurve,              !- Total Cooling Capacity Function of Temperature Curve Name",
@@ -144,7 +145,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
         "   4000.0,                        !- Gross Rated Heating Capacity {W}",
         "   3.1,                           !- Gross Rated Heating COP {W/W}",
         "   0.20,                          !- Rated Air Flow Rate {m3/s}",
-        "   ,                              !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   ,                              !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   ,                              !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "   Cooling Coil Out Node,         !- Air Inlet Node Name",
         "   Heating Coil Out Node,         !- Air Outlet Node Name",
         "   BiquadraticCurve,              !- Heating Capacity Function of Temperature Curve Name",
@@ -259,13 +261,13 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     state->dataBranchNodeConnections->NumCompSets = 2;
     state->dataBranchNodeConnections->CompSets.allocate(2);
-    state->dataBranchNodeConnections->CompSets(1).CType = "Coil:Cooling:DX:SingleSpeed";
+    state->dataBranchNodeConnections->CompSets(1).ComponentObjectType = DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed;
     state->dataBranchNodeConnections->CompSets(1).CName = "CoolingCoil";
-    state->dataBranchNodeConnections->CompSets(1).ParentCType = "ZoneHVAC:PackagedTerminalHeatPump";
+    state->dataBranchNodeConnections->CompSets(1).ParentObjectType = DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalHeatPump;
     state->dataBranchNodeConnections->CompSets(1).ParentCName = "AirSystem";
-    state->dataBranchNodeConnections->CompSets(2).CType = "Coil:Heating:DX:SingleSpeed";
+    state->dataBranchNodeConnections->CompSets(2).ComponentObjectType = DataLoopNode::ConnectionObjectType::CoilHeatingDXSingleSpeed;
     state->dataBranchNodeConnections->CompSets(2).CName = "HeatingCoil";
-    state->dataBranchNodeConnections->CompSets(2).ParentCType = "ZoneHVAC:PackagedTerminalHeatPump";
+    state->dataBranchNodeConnections->CompSets(2).ParentObjectType = DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalHeatPump;
     state->dataBranchNodeConnections->CompSets(2).ParentCName = "AirSystem";
 
     state->dataEnvrn->OutDryBulbTemp = 30.0;
