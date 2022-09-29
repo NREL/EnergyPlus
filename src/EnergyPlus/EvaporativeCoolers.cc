@@ -4331,9 +4331,14 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
 
     // calculate part load ratio
     if (FullFlowSensibleOutput < ZoneCoolingLoad) {
-        std::array<Real64, 2> Par = {Real64(UnitNum), ZoneCoolingLoad}; // Parameters passed to root solver
-
-        General::SolveRoot(state, Tol, MaxIte, SolFla, PartLoadRatio, ZoneEvapUnitLoadResidual, 0.0, 1.0, Par);
+        auto f = [&state, UnitNum, ZoneCoolingLoad](Real64 PartLoadRatio) {
+            // calculates cooling load residual by varying part load ratio
+            Real64 QSensOutputProvided; // sensible output at a given PLR
+            Real64 QLatOutputProvided;  // latent output at a given PLR
+            CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, QSensOutputProvided, QLatOutputProvided);
+            return QSensOutputProvided - ZoneCoolingLoad;
+        };
+        General::SolveRoot(state, Tol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
             if (ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex == 0) {
                 ShowWarningError(state, "Iteration limit exceeded calculating evap unit part load ratio, for unit=" + ZoneEvapUnit(UnitNum).Name);
@@ -4368,18 +4373,6 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
         PartLoadRatio = 1.0;
     }
     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-}
-
-Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio, std::array<Real64, 2> const &Par // parameters
-)
-{
-    // calculates cooling load residual by varying part load ratio
-    int UnitNum = int(Par[0]);
-    Real64 LoadToBeMet = Par[1];
-    Real64 QSensOutputProvided; // sensible output at a given PLR
-    Real64 QLatOutputProvided;  // latent output at a given PLR
-    CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, QSensOutputProvided, QLatOutputProvided);
-    return QSensOutputProvided - LoadToBeMet;
 }
 
 void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
