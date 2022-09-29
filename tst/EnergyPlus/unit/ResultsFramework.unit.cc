@@ -496,4 +496,227 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_convertToMonth)
     EXPECT_THROW(convertToMonth(*state, datetime), FatalError);
 }
 
+TEST_F(ResultsFrameworkFixture, ResultsFramework_RVIFilter_explicit_keys)
+{
+
+    json OutputData;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
+    int reportId = 1;
+
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
+    state->dataResultsFramework->resultsFramework->addReportVariable(
+        "SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+
+    reportId++;
+    Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var1);
+    state->dataResultsFramework->resultsFramework->addReportVariable(
+        "SALESFLOOR INLET NODE", "System Node Humidity Ratio", "kgWater/kgDryAir", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 5.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 6.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 7.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 8.0);
+
+    // If add one more, it also should go to the top of json cols array
+    reportId++;
+    Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var2);
+    state->dataResultsFramework->resultsFramework->addReportVariable(
+        "SALESFLOOR OUTLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 9.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 10.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 11.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 12.0);
+    OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
+
+    std::vector<std::string> const rvi_keys = {"SALESFLOOR OUTLET NODE:System Node Temperature [C](TimeStep)",
+                                               "SALESFLOOR INLET NODE:System Node Temperature [C](TimeStep)"};
+
+    auto outputs = getCSVOutputs(*state,
+                                 state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
+                                 *state->dataResultsFramework->resultsFramework,
+                                 OutputProcessor::ReportingFrequency::TimeStep,
+                                 rvi_keys);
+
+    std::map<std::string, std::vector<std::string>> expected_output = {
+        {"02/25 00:45:00", {"9.0", "1.0"}},
+        {"02/25 01:00:00", {"10.0", "2.0"}},
+        {"02/25 23:45:00", {"11.0", "3.0"}},
+        {"02/25 24:00:00", {"12.0", "4.0"}}
+    };
+
+    EXPECT_EQ(expected_output, outputs);
+}
+
+TEST_F(ResultsFrameworkFixture, ResultsFramework_RVIFilter_pattern_key)
+{
+
+    json OutputData;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
+    int reportId = 1;
+
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
+    state->dataResultsFramework->resultsFramework->addReportVariable(
+        "SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+
+    reportId++;
+    Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var1);
+    state->dataResultsFramework->resultsFramework->addReportVariable(
+        "SALESFLOOR INLET NODE", "System Node Humidity Ratio", "kgWater/kgDryAir", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 5.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 6.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 7.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 8.0);
+
+    // If add one more, it also should go to the top of json cols array
+    reportId++;
+    Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var2);
+    state->dataResultsFramework->resultsFramework->addReportVariable(
+        "SALESFLOOR OUTLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 9.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 10.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 11.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 12.0);
+    OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
+
+    std::vector<std::string> const rvi_keys = {"System Node Temperature", };
+
+    auto outputs = getCSVOutputs(*state,
+                                 state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
+                                 *state->dataResultsFramework->resultsFramework,
+                                 OutputProcessor::ReportingFrequency::TimeStep,
+                                 rvi_keys);
+
+    std::map<std::string, std::vector<std::string>> expected_output = {
+        {"02/25 00:45:00", {"1.0", "9.0"}},
+        {"02/25 01:00:00", {"2.0", "10.0"}},
+        {"02/25 23:45:00", {"3.0", "11.0"}},
+        {"02/25 24:00:00", {"4.0", "12.0"}}
+    };
+
+    EXPECT_EQ(expected_output, outputs);
+}
+
+TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_explicit_key)
+{
+    json OutputData;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
+    int reportId = 1;
+
+//    Electricity:Facility,NaturalGas:Plant,NaturalGas:Facility
+    Variable var0("Electricity:Facility", ReportingFrequency::TimeStep, indexType, reportId, Unit::J);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
+    state->dataResultsFramework->resultsFramework->addReportMeter("Electricity:Facility", "J", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+
+    reportId++;
+    Variable var1("NaturalGas:Facility", ReportingFrequency::TimeStep, indexType, reportId, Unit::J);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var1);
+    state->dataResultsFramework->resultsFramework->addReportMeter("NaturalGas:Facility", "J", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 5.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 6.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 7.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 8.0);
+
+    OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
+
+    std::vector<std::string> const mvi_keys = {"Electricity:Facility", };
+
+    auto outputs = getCSVOutputs(*state,
+                                 state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
+                                 *state->dataResultsFramework->resultsFramework,
+                                 OutputProcessor::ReportingFrequency::TimeStep,
+                                 mvi_keys);
+
+    std::map<std::string, std::vector<std::string>> expected_output = {
+        {"02/25 00:45:00", {"1.0"}},
+        {"02/25 01:00:00", {"2.0"}},
+        {"02/25 23:45:00", {"3.0"}},
+        {"02/25 24:00:00", {"4.0"}}
+    };
+
+    EXPECT_EQ(expected_output, outputs);
+}
+
+
+TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_pattern_key)
+{
+    json OutputData;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
+    int reportId = 1;
+
+    //    Electricity:Facility,NaturalGas:Plant,NaturalGas:Facility
+    Variable var0("Electricity:Facility", ReportingFrequency::TimeStep, indexType, reportId, Unit::J);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
+    state->dataResultsFramework->resultsFramework->addReportMeter("Electricity:Facility", "J", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+
+    reportId++;
+    Variable var1("NaturalGas:Facility", ReportingFrequency::TimeStep, indexType, reportId, Unit::J);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var1);
+    state->dataResultsFramework->resultsFramework->addReportMeter("NaturalGas:Facility", "J", ReportingFrequency::TimeStep);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 5.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 6.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 7.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 8.0);
+
+    OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
+
+    std::vector<std::string> const mvi_keys = {"Electricity:Facility [J](TimeStep)", };
+
+    auto outputs = getCSVOutputs(*state,
+                                 state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
+                                 *state->dataResultsFramework->resultsFramework,
+                                 OutputProcessor::ReportingFrequency::TimeStep,
+                                 mvi_keys);
+
+    std::map<std::string, std::vector<std::string>> expected_output = {
+        {"02/25 00:45:00", {"1.0"}},
+        {"02/25 01:00:00", {"2.0"}},
+        {"02/25 23:45:00", {"3.0"}},
+        {"02/25 24:00:00", {"4.0"}}
+    };
+
+    EXPECT_EQ(expected_output, outputs);
+}
+
+
 } // namespace EnergyPlus

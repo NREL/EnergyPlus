@@ -83,12 +83,16 @@ namespace ResultsFramework {
     class BaseResultObject
     {
     public:
-        BaseResultObject(){};
+        BaseResultObject()= default;
+        virtual ~BaseResultObject() = default;
     };
 
     class SimInfo : public BaseResultObject
     {
     public:
+        SimInfo() = default;
+        ~SimInfo() override = default;
+
         void setProgramVersion(const std::string &programVersion);
         std::string getProgramVersion() const;
         void setSimulationEnvironment(const std::string &simulationEnvironment);
@@ -113,6 +117,7 @@ namespace ResultsFramework {
     {
     public:
         Variable() = default;
+        ~Variable() override = default;
         Variable(const std::string &VarName,
                  const OutputProcessor::ReportingFrequency reportFrequency,
                  const OutputProcessor::TimeStepType timeStepType,
@@ -176,6 +181,7 @@ namespace ResultsFramework {
                        const int ReportID,
                        OutputProcessor::Unit units,
                        const std::string &customUnits);
+        ~OutputVariable() override = default;
     };
 
     class MeterVariable : public Variable
@@ -188,6 +194,7 @@ namespace ResultsFramework {
                       OutputProcessor::Unit units,
                       const bool MeterOnly,
                       const bool Acculumative = false);
+        ~MeterVariable() override = default;
 
         bool accumulative() const;
         void setAccumulative(bool state);
@@ -207,7 +214,7 @@ namespace ResultsFramework {
         typedef std::pair<int, Variable> VarPtrPair;
 
         explicit DataFrame(const std::string &ReportFreq);
-        virtual ~DataFrame() = default;
+        ~DataFrame() override = default;
 
         void addVariable(Variable const &var);
 
@@ -249,7 +256,7 @@ namespace ResultsFramework {
     {
     public:
         explicit MeterDataFrame(const std::string &ReportFreq) : DataFrame(ReportFreq){};
-        virtual ~MeterDataFrame() = default;
+        ~MeterDataFrame() override = default;
 
         void addVariable(MeterVariable const &var);
 
@@ -264,6 +271,9 @@ namespace ResultsFramework {
     class Table : public BaseResultObject
     {
     public:
+        Table() = default;
+        ~Table() override = default;
+
         std::string TableName;
         std::string FootnoteText;
         std::vector<std::string> ColHeaders;
@@ -286,6 +296,9 @@ namespace ResultsFramework {
         std::string ReportForString;
         std::vector<Table> Tables;
 
+        Report() = default;
+        ~Report() override = default;
+
         json getJSON() const;
     };
 
@@ -295,6 +308,7 @@ namespace ResultsFramework {
         typedef std::pair<std::string, Report> RptPtrPair;
 
         ReportsCollection();
+        ~ReportsCollection() override = default;
 
         void addReportTable(Array2D_string const &body,
                             Array1D_string const &rowLabels,
@@ -322,16 +336,79 @@ namespace ResultsFramework {
     {
     public:
         CSVWriter() = default;
+        ~CSVWriter() override = default;
         explicit CSVWriter(std::size_t num_output_variables)
         {
             outputVariableIndices = std::vector<bool>(num_output_variables, false);
         }
 
-        void writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl);
-        void parseTSOutputs(EnergyPlusData &state,
-                            json const &data,
-                            std::vector<std::string> const &outputVariables,
-                            OutputProcessor::ReportingFrequency reportingFrequency);
+        CSVWriter(
+            std::vector<std::string> const &key_names,
+            std::vector<std::string> const &output_variables,
+            std::map<std::string, std::vector<std::string>> const &outputVariableKeyNames
+            )
+        {
+            outputVariableIndices = std::vector<bool>(output_variables.size(), false);
+//            keyNames = key_names;
+            outputVariableIndexToKeyNameIndexMapping = std::vector<int>(output_variables.size(), -1);
+            for (std::size_t i = 0; i < output_variables.size(); ++i) {
+//                auto const colon_index = output_variables[i].find_first_of(':') + 1; // get index after ':'
+//                auto const bracket_index = output_variables[i].find_first_of('[');
+//                auto outputVariableKeyName = output_variables[i].substr(colon_index, bracket_index - colon_index - 1); // extra -1 for space at end
+//                std::transform(outputVariableKeyName.begin(), outputVariableKeyName.end(), outputVariableKeyName.begin(), ::tolower);
+//                auto it = outputVariableKeyNames.find(outputVariableKeyName);
+//                if (it != outputVariableKeyNames.end()) {
+//                    it->second.emplace_back(output_variables[i]);
+//                } else {
+//                    outputVariableKeyNames.emplace(outputVariableKeyName, std::vector<std::string>({output_variables[i]}));
+//                }
+                outputVariables.emplace(output_variables[i], i);
+            }
+
+            int index = 0;
+            for (auto const & keyName : key_names) {
+
+                auto exact_match = outputVariables.find(keyName);
+                if (exact_match != outputVariables.end()) {
+                    keyNames.emplace_back(exact_match->first);
+                    outputVariableIndexToKeyNameIndexMapping[exact_match->second] = index;
+                    ++index;
+                    continue;
+                }
+
+                std::string lowerKeyName = keyName;
+                std::transform(keyName.begin(), keyName.end(), lowerKeyName.begin(), ::tolower);
+                auto it = outputVariableKeyNames.find(lowerKeyName);
+                if (it != outputVariableKeyNames.end()) {
+                    for (auto const & outputVariableIndex : it->second) {
+                        outputVariableIndexToKeyNameIndexMapping[outputVariables.at(outputVariableIndex)] = index;
+                        keyNames.emplace_back(outputVariableIndex);
+                        ++index;
+                    }
+                }
+            }
+
+//            for (int i = 0; i < keyNames.size(); ++i) {
+//                auto const & keyName = keyNames[i];
+//                std::string lowerKeyName = keyName;
+//                std::transform(keyName.begin(), keyName.end(), lowerKeyName.begin(), ::tolower);
+//                auto it = outputVariableKeyNames.find(lowerKeyName);
+//                if (it != outputVariableKeyNames.end()) {
+//                    for (auto const outputVariableIndex : it->second) {
+//                        outputVariableIndexToKeyNameIndexMapping[outputVariableIndex] = static_cast<int>(i);
+//                    }
+//                }
+//            }
+        }
+
+        // This adds overloaded function
+        // void writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl);
+        void writeOutput(EnergyPlusData &state, InputOutputFile &outputFile, bool outputControl);
+        // void parseTSOutputs(EnergyPlusData &state,
+        //                     json const &data,
+        //                     std::vector<std::string> const &outputVariables,
+        //                     OutputProcessor::ReportingFrequency reportingFrequency);
+        void parseTSOutputs(EnergyPlusData &state, json const &data, OutputProcessor::ReportingFrequency reportingFrequency);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;
@@ -341,6 +418,10 @@ namespace ResultsFramework {
         OutputProcessor::ReportingFrequency smallestReportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
         std::map<std::string, std::vector<std::string>> outputs;
         std::vector<bool> outputVariableIndices;
+        std::map<std::string, int> outputVariables;
+//        std::map<std::string, std::vector<std::string>> outputVariableKeyNames;
+        std::vector<std::string> keyNames;
+        std::vector<int> outputVariableIndexToKeyNameIndexMapping;
 
         static std::string &convertToMonth(EnergyPlusData &state, std::string &datetime);
         void updateReportingFrequency(OutputProcessor::ReportingFrequency reportingFrequency);
@@ -353,7 +434,7 @@ namespace ResultsFramework {
     public:
         ResultsFramework() = default;
 
-        virtual ~ResultsFramework() = default;
+        ~ResultsFramework() override = default;
 
         void setupOutputOptions(EnergyPlusData &state);
 
@@ -401,7 +482,7 @@ namespace ResultsFramework {
                                std::string const &units,
                                OutputProcessor::ReportingFrequency const reportingInterval);
 
-        void addReportMeter(std::string const &meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval);
+        void addReportMeter(std::string_view const meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval);
 
         SimInfo SimulationInformation;
 
@@ -416,6 +497,7 @@ namespace ResultsFramework {
         bool outputCBOR = false;
         bool outputMsgPack = false;
         std::vector<std::string> outputVariables;
+        std::map<std::string, std::vector<std::string>> outputVariableKeyNames;
 
         void writeTimeSeriesReports(JsonOutputFilePaths &jsonOutputFilePaths);
 

@@ -737,63 +737,128 @@ namespace ResultsFramework {
         return root;
     }
 
+    // Overloaded function
     void CSVWriter::parseTSOutputs(EnergyPlusData &state,
                                    json const &data,
-                                   std::vector<std::string> const &outputVariables,
                                    OutputProcessor::ReportingFrequency reportingFrequency)
     {
+        //     parseTSOutputs(state, data, keyNames, reportingFrequency);
+        // }
+
+
+        // // Unit conversions here
+        // void CSVWriter::parseTSOutputs(EnergyPlusData &state,
+        //                                json const &data,
+        //                                std::vector<std::string> const &outputVariables,
+        //                                OutputProcessor::ReportingFrequency reportingFrequency)
+        // {
         if (data.empty()) return;
         updateReportingFrequency(reportingFrequency);
         std::vector<int> indices;
         std::unordered_set<std::string> seen;
         std::string search_string;
 
+        std::vector<int> keyNameToOutputData(keyNames.size());
+
+        // keyNames can interact with std::vector of rvi/mvi key names
+
         std::string reportFrequency = data.at("ReportFrequency").get<std::string>();
         if (reportFrequency == "Detailed-HVAC" || reportFrequency == "Detailed-Zone") {
             reportFrequency = "Each Call";
         }
+        // Need to work directly with data and not outputVariables - 5/31/22!
         auto const &columns = data.at("Cols");
+        int column_index = 0;
         for (auto const &column : columns) {
             search_string =
                 fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), reportFrequency);
-            auto found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
+            auto found = outputVariables.find(search_string);
+            // auto found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
             if (found == outputVariables.end()) {
                 search_string =
                     fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), "Each Call");
-                found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
+                found = outputVariables.find(search_string);
+                // found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
             }
-            if (found == outputVariables.end()) {
+            // if (found == outputVariables.end()) {
+            //     //ShowFatalError(state, fmt::format("Output variable ({0}) not found output variable list", search_string));
+            //     continue;
+            // }
+            // auto it = outputVariables.find(found);
+            if (found != outputVariables.end()) {
+                outputVariableIndices[found->second] = true;
+                indices.emplace_back(found->second);
+                auto const keyNameIndex = outputVariableIndexToKeyNameIndexMapping[found->second];
+                if (keyNameIndex != -1) {
+                    keyNameToOutputData[keyNameIndex] = column_index;
+                }
+                // TODO: This is overwriting index 0 in the unit test
+            } else {
                 ShowFatalError(state, fmt::format("Output variable ({0}) not found output variable list", search_string));
             }
-            outputVariableIndices[std::distance(outputVariables.begin(), found)] = true;
-            indices.emplace_back(std::distance(outputVariables.begin(), found));
+            // outputVariableIndices[std::distance(outputVariables.begin(), found)] = true;
+            // indices.emplace_back(std::distance(outputVariables.begin(), found));
+            ++column_index;
         }
-
+        // rework logic to match length of ouputVariables to length of data
+        // loop through indices rather than columns (in this loop and one above?)
         auto const &rows = data.at("Rows");
         for (auto const &row : rows) {
             for (auto &el : row.items()) {
                 auto found_key = outputs.find(el.key());
                 if (found_key == outputs.end()) {
-                    std::vector<std::string> output(outputVariables.size());
-                    int i = 0;
-                    for (auto const &col : el.value()) {
-                        if (col.is_null()) {
-                            output[indices[i]] = "";
-                        } else {
+                    std::vector<std::string> output(keyNames.size(), "");
+                    for (int i = 0; i < keyNames.size(); ++i) {
+                        auto const &col = el.value()[keyNameToOutputData[i]];
+                        if (!col.is_null()) {
                             dtoa(col.get<double>(), s);
-                            output[indices[i]] = s;
+                            output[i] = s;
                         }
-                        ++i;
                     }
+
+                    // for (int i = 0; i != indices.size(); ++i) {
+                    //     int const outputIndex = outputVariableIndexToKeyNameIndexMapping[indices[i]];
+                    //     assert(outputIndex < keyNames.size());
+                    //     auto const &col = el.value()[outputIndex];
+                    //     if (col.is_null()) {
+                    //         output[i] = "";
+                    //     } else {
+                    //         dtoa(col.get<double>(), s);
+                    //         output[i] = s;
+                    //     }
+                    // }
+                    // int i = 0;
+                    // for (auto const &col : el.value()) {
+                    //     int const outputIndex = outputVariableIndexToKeyNameIndexMapping[indices[i]];
+                    //     assert(outputIndex < keyNames.size());
+                    //     if (outputIndex != -1 && !col.is_null()) {
+                    //         dtoa(col.get<double>(), s);
+                    //         output[outputIndex] = s;
+                    //     }
+                    //     ++i;
+                    // }
                     outputs[el.key()] = output;
                 } else {
+                    // for (int i = 0; i != indices.size(); ++i) {
+                    //     auto const &col = el.value()[indices[i]];
+                    //     if (col.is_null()) {
+                    //         found_key->second[i] = "";
+                    //     } else {
+                    //         dtoa(col.get<double>(), s);
+                    //         found_key->second[i] = s;
+                    //     }
+                    // }
                     int i = 0;
                     for (auto const &col : el.value()) {
-                        if (col.is_null()) {
-                            found_key->second[indices[i]] = "";
-                        } else {
-                            dtoa(col.get<double>(), s);
-                            found_key->second[indices[i]] = s;
+                        int const outputIndex = outputVariableIndexToKeyNameIndexMapping[indices[i]];
+                        assert(outputIndex < keyNames.size());
+                        if (outputIndex != -1) {
+                            if (col.is_null()) {
+                                found_key->second[outputIndex] = "";
+                            } else {
+                                dtoa(col.get<double>(), s);
+                                found_key->second[outputIndex] = s;
+                            }
                         }
                         ++i;
                     }
@@ -838,18 +903,52 @@ namespace ResultsFramework {
         return datetime;
     }
 
+    // Overload
     void
-    CSVWriter::writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl)
+    CSVWriter::writeOutput(EnergyPlusData &state, InputOutputFile &outputFile, bool outputControl)
     {
+        //     writeOutput(state, keyNames, outputFile, outputControl);
+        // }
+
+
+        // // sorting and ordering here
+        // void
+        // CSVWriter::writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl)
+        // {
         outputFile.ensure_open(state, "OpenOutputFiles", outputControl);
+
+        //       for (auto rvi_input : outputVariables) {
+        //           if (outputVariables.find(rvi_input))
+        //      }
+
+        // test what happens if keyNames is empty (no rvi or mvi object)
+
+        std::vector<int> keyNameToOutputs;
 
         print<FormatSyntax::FMT>(outputFile, "{}", "Date/Time,");
         std::string sep;
-        for (auto it = outputVariables.begin(); it != outputVariables.end(); ++it) {
-            if (!outputVariableIndices[std::distance(outputVariables.begin(), it)]) continue;
-            print<FormatSyntax::FMT>(outputFile, "{}{}", sep, *it);
+        for (std::size_t i = 0; i < keyNames.size(); ++i) {
+            print<FormatSyntax::FMT>(outputFile, "{}{}", sep, keyNames[i]);
             if (sep.empty()) sep = ",";
         }
+
+        // for (std::size_t i = 0; i < outputVariables.size(); ++i) {
+        //     // Check if output variable was in data
+        //     if (!outputVariableIndices[i]) continue;
+        //     // Check if filtered and reordered by RVI/MVI
+        //     int const keyNameIndex = outputVariableIndexToKeyNameIndexMapping[i];
+        //     if (outputVariableIndexToKeyNameIndexMapping[i] < 0) continue;
+        //     print<FormatSyntax::FMT>(outputFile, "{}{}", sep, keyNames[keyNameIndex]);
+        //     keyNameToOutputs.emplace_back(keyNameIndex);
+        //     if (sep.empty()) sep = ",";
+        // }
+        // for (auto it = outputVariables.begin(); it != outputVariables.end(); ++it) {
+        //     if (!outputVariableIndices[std::distance(outputVariables.begin(), it)]) continue;
+        //     // filter out variables that are not in rvi list
+        //     // if (std::find(keyNames.begin(), keyNames.end(), *it) == keyNames.end()) continue;
+        //     print<FormatSyntax::FMT>(outputFile, "{}{}", sep, *it);
+        //     if (sep.empty()) sep = ",";
+        // }
         print<FormatSyntax::FMT>(outputFile, "{}", '\n');
 
         for (auto &item : outputs) {
@@ -860,21 +959,32 @@ namespace ResultsFramework {
                 convertToMonth(state, datetime);
             }
             print<FormatSyntax::FMT>(outputFile, " {},", datetime);
-            item.second.erase(std::remove_if(item.second.begin(),
-                                             item.second.end(),
-                                             [&](const std::string &d) {
-                                                 auto pos = (&d - &*item.second.begin());
-                                                 return !outputVariableIndices[pos];
-                                             }),
-                              item.second.end());
-            auto result = std::find_if(item.second.rbegin(), item.second.rend(), [](std::string const &v) { return !v.empty(); });
-            auto last = item.second.end() - 1;
-            if (result != item.second.rend()) {
-                last = (result + 1).base();
-            }
 
-            print<FormatSyntax::FMT>(outputFile, "{},", fmt::join(item.second.begin(), last, ","));
-            print<FormatSyntax::FMT>(outputFile, "{}\n", *last);
+            std::string sep;
+            for (std::size_t i = 0; i < item.second.size(); ++i) {
+                print<FormatSyntax::FMT>(outputFile, "{}{}", sep, item.second[i]);
+                if (sep.empty()) sep = ",";
+            }
+            print<FormatSyntax::FMT>(outputFile, "{}", '\n');
+
+            // item.second.erase(std::remove_if(item.second.begin(),
+            //                                  item.second.end(),
+            //                                  [&](const std::string &d) {
+            //                                      auto pos = (&d - &*item.second.begin());
+            //                                      // filter out variables that are not in rvi list
+            //                                      //bool filtered = std::find(keyNames.begin(), keyNames.end(), d) == keyNames.end();
+            //                                      // return !outputVariableIndices[pos] && filtered;
+            //                                      return !outputVariableIndices[pos];
+            //     }),
+            //                   item.second.end());
+            // auto result = std::find_if(item.second.rbegin(), item.second.rend(), [](std::string const &v) { return !v.empty(); });
+            // auto last = item.second.end() - 1;
+            // if (result != item.second.rend()) {
+            //     last = (result + 1).base();
+            // }
+
+            // print<FormatSyntax::FMT>(outputFile, "{},", fmt::join(item.second.begin(), last, ","));
+            // print<FormatSyntax::FMT>(outputFile, "{}\n", *last);
         }
 
         outputFile.close();
@@ -1319,82 +1429,89 @@ namespace ResultsFramework {
         if (!hasOutputData()) {
             return;
         }
-        CSVWriter csv(outputVariables.size());
-        CSVWriter mtr_csv(outputVariables.size());
+        //CSVWriter csv(outputVariables.size());
+        //CSVWriter mtr_csv(outputVariables.size());
+
+        // if rvi or mvi exist (are not empty), pass those lists to the CSVWriter instead of outputVariables
+        // if rvi or mvi, dont fatal error -> continue
+        // if rvi or mvi is not a subset of outputVariables, error
+
+        CSVWriter csv(state.files.outputControl.rviKeyNames, outputVariables, outputVariableKeyNames);
+        CSVWriter mtr_csv(state.files.outputControl.mviKeyNames, outputVariables, outputVariableKeyNames);
 
         // Output yearly time series data
         if (hasRIYearlyTSData()) {
-            csv.parseTSOutputs(state, RIYearlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
+            csv.parseTSOutputs(state, RIYearlyTSData.getJSON(), OutputProcessor::ReportingFrequency::Yearly);
         }
 
         if (hasYRMeters()) {
-            csv.parseTSOutputs(state, YRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
-            mtr_csv.parseTSOutputs(state, YRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
+            csv.parseTSOutputs(state, YRMeters.getJSON(true), OutputProcessor::ReportingFrequency::Yearly);
+            mtr_csv.parseTSOutputs(state, YRMeters.getJSON(), OutputProcessor::ReportingFrequency::Yearly);
         }
 
         // Output run period time series data
         if (hasRIRunPeriodTSData()) {
-            csv.parseTSOutputs(state, RIRunPeriodTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
+            csv.parseTSOutputs(state, RIRunPeriodTSData.getJSON(), OutputProcessor::ReportingFrequency::Simulation);
         }
 
         if (hasSMMeters()) {
-            csv.parseTSOutputs(state, SMMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
-            mtr_csv.parseTSOutputs(state, SMMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
+            csv.parseTSOutputs(state, SMMeters.getJSON(true), OutputProcessor::ReportingFrequency::Simulation);
+            mtr_csv.parseTSOutputs(state, SMMeters.getJSON(), OutputProcessor::ReportingFrequency::Simulation);
         }
 
         // Output monthly time series data
         if (hasRIMonthlyTSData()) {
-            csv.parseTSOutputs(state, RIMonthlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
+            csv.parseTSOutputs(state, RIMonthlyTSData.getJSON(), OutputProcessor::ReportingFrequency::Monthly);
         }
 
         if (hasMNMeters()) {
-            csv.parseTSOutputs(state, MNMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
-            mtr_csv.parseTSOutputs(state, MNMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
+            csv.parseTSOutputs(state, MNMeters.getJSON(true), OutputProcessor::ReportingFrequency::Monthly);
+            mtr_csv.parseTSOutputs(state, MNMeters.getJSON(), OutputProcessor::ReportingFrequency::Monthly);
         }
 
         // Output daily time series data
         if (hasRIDailyTSData()) {
-            csv.parseTSOutputs(state, RIDailyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
+            csv.parseTSOutputs(state, RIDailyTSData.getJSON(), OutputProcessor::ReportingFrequency::Daily);
         }
 
         if (hasDYMeters()) {
-            csv.parseTSOutputs(state, DYMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Daily);
-            mtr_csv.parseTSOutputs(state, DYMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
+            csv.parseTSOutputs(state, DYMeters.getJSON(true), OutputProcessor::ReportingFrequency::Daily);
+            mtr_csv.parseTSOutputs(state, DYMeters.getJSON(), OutputProcessor::ReportingFrequency::Daily);
         }
 
         // Output hourly time series data
         if (hasRIHourlyTSData()) {
-            csv.parseTSOutputs(state, RIHourlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
+            csv.parseTSOutputs(state, RIHourlyTSData.getJSON(), OutputProcessor::ReportingFrequency::Hourly);
         }
 
         if (hasHRMeters()) {
-            csv.parseTSOutputs(state, HRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
-            mtr_csv.parseTSOutputs(state, HRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
+            csv.parseTSOutputs(state, HRMeters.getJSON(true), OutputProcessor::ReportingFrequency::Hourly);
+            mtr_csv.parseTSOutputs(state, HRMeters.getJSON(), OutputProcessor::ReportingFrequency::Hourly);
         }
 
         // Output timestep time series data
         if (hasRITimestepTSData()) {
-            csv.parseTSOutputs(state, RITimestepTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
+            csv.parseTSOutputs(state, RITimestepTSData.getJSON(), OutputProcessor::ReportingFrequency::TimeStep);
         }
 
         if (hasTSMeters()) {
-            csv.parseTSOutputs(state, TSMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
-            mtr_csv.parseTSOutputs(state, TSMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
+            csv.parseTSOutputs(state, TSMeters.getJSON(true), OutputProcessor::ReportingFrequency::TimeStep);
+            mtr_csv.parseTSOutputs(state, TSMeters.getJSON(), OutputProcessor::ReportingFrequency::TimeStep);
         }
 
         // Output detailed HVAC time series data
         if (hasRIDetailedHVACTSData()) {
-            csv.parseTSOutputs(state, RIDetailedHVACTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
+            csv.parseTSOutputs(state, RIDetailedHVACTSData.getJSON(), OutputProcessor::ReportingFrequency::EachCall);
         }
 
         // Output detailed Zone time series data
         if (hasRIDetailedZoneTSData()) {
-            csv.parseTSOutputs(state, RIDetailedZoneTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
+            csv.parseTSOutputs(state, RIDetailedZoneTSData.getJSON(), OutputProcessor::ReportingFrequency::EachCall);
         }
 
-        csv.writeOutput(state, outputVariables, state.files.csv, state.files.outputControl.csv);
+        csv.writeOutput(state, state.files.csv, state.files.outputControl.csv);
         if (hasMeterData()) {
-            mtr_csv.writeOutput(state, outputVariables, state.files.mtr_csv, state.files.outputControl.csv);
+            mtr_csv.writeOutput(state, state.files.mtr_csv, state.files.outputControl.csv);
         }
     }
 
@@ -1557,13 +1674,33 @@ namespace ResultsFramework {
                                              std::string const &units,
                                              OutputProcessor::ReportingFrequency const reportingInterval)
     {
-        outputVariables.emplace_back(fmt::format("{0}:{1} [{2}]({3})", keyedValue, variableName, units, reportingFrequency(reportingInterval)));
+        auto const reportVariable = fmt::format("{0}:{1} [{2}]({3})", keyedValue, variableName, units, reportingFrequency(reportingInterval));
+        outputVariables.emplace_back(reportVariable);
+
+        std::string outputVariableKeyName(variableName.begin(), variableName.end());
+        std::transform(variableName.begin(), variableName.end(), outputVariableKeyName.begin(), ::tolower);
+        auto it = outputVariableKeyNames.find(outputVariableKeyName);
+        if (it != outputVariableKeyNames.end()) {
+            it->second.emplace_back(reportVariable);
+        } else {
+            outputVariableKeyNames.emplace(outputVariableKeyName, std::vector<std::string>({reportVariable}));
+        }
     }
 
     void
-    ResultsFramework::addReportMeter(std::string const &meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval)
+    ResultsFramework::addReportMeter(std::string_view const meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval)
     {
-        outputVariables.emplace_back(fmt::format("{0} [{1}]({2})", meter, units, reportingFrequency(reportingInterval)));
+        auto const meterVariable = fmt::format("{0} [{1}]({2})", meter, units, reportingFrequency(reportingInterval));
+        outputVariables.emplace_back(meterVariable);
+
+        std::string outputVariableKeyName(meter.begin(), meter.end());
+        std::transform(meter.begin(), meter.end(), outputVariableKeyName.begin(), ::tolower);
+        auto it = outputVariableKeyNames.find(outputVariableKeyName);
+        if (it != outputVariableKeyNames.end()) {
+            it->second.emplace_back(meterVariable);
+        } else {
+            outputVariableKeyNames.emplace(outputVariableKeyName, std::vector<std::string>({meterVariable}));
+        }
     }
 
 } // namespace ResultsFramework

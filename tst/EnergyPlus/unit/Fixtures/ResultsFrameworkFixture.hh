@@ -84,6 +84,30 @@ protected:
     {
         return ResultsFramework::CSVWriter::convertToMonth(state, datetime);
     }
+
+    std::map<std::string, std::vector<std::string>> getCSVOutputs(EnergyPlusData &state,
+                                                                  json const &data,
+//                                                                  ResultsFramework::ResultsFramework const &resultsFramework,
+                                                                  OutputProcessor::ReportingFrequency reportingFrequency,
+                                                                  std::vector<std::string> const& keyNames,
+                                                                  std::vector<std::string> const& outputVariables,
+                                                                  std::map<std::string, std::vector<std::string>> const &outputVariableKeyNames)
+    {
+        ResultsFramework::CSVWriter csv(keyNames, outputVariables, outputVariableKeyNames);
+        csv.parseTSOutputs(state, data, reportingFrequency);
+        return csv.outputs;
+    }
+
+    // pass in vector to getCSVOutputs (in different version - rename from getCSVOutputs) to test, instead of outputVariables
+    std::map<std::string, std::vector<std::string>> getCSVOutputs(EnergyPlusData &state,
+                                                                  json const &data,
+                                                                  ResultsFramework::ResultsFramework const &resultsFramework,
+                                                                  OutputProcessor::ReportingFrequency reportingFrequency,
+                                                                  std::vector<std::string> const& keyNames)
+    {
+        return getCSVOutputs(state, data, reportingFrequency, keyNames, resultsFramework.outputVariables, resultsFramework.outputVariableKeyNames);
+    }
+
 };
 
 } // namespace EnergyPlus
