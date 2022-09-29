@@ -737,21 +737,10 @@ namespace ResultsFramework {
         return root;
     }
 
-    // Overloaded function
     void CSVWriter::parseTSOutputs(EnergyPlusData &state,
                                    json const &data,
                                    OutputProcessor::ReportingFrequency reportingFrequency)
     {
-        //     parseTSOutputs(state, data, keyNames, reportingFrequency);
-        // }
-
-
-        // // Unit conversions here
-        // void CSVWriter::parseTSOutputs(EnergyPlusData &state,
-        //                                json const &data,
-        //                                std::vector<std::string> const &outputVariables,
-        //                                OutputProcessor::ReportingFrequency reportingFrequency)
-        // {
         if (data.empty()) return;
         updateReportingFrequency(reportingFrequency);
         std::vector<int> indices;
@@ -760,31 +749,23 @@ namespace ResultsFramework {
 
         std::vector<int> keyNameToOutputData(keyNames.size());
 
-        // keyNames can interact with std::vector of rvi/mvi key names
-
         std::string reportFrequency = data.at("ReportFrequency").get<std::string>();
         if (reportFrequency == "Detailed-HVAC" || reportFrequency == "Detailed-Zone") {
             reportFrequency = "Each Call";
         }
-        // Need to work directly with data and not outputVariables - 5/31/22!
+
         auto const &columns = data.at("Cols");
         int column_index = 0;
         for (auto const &column : columns) {
             search_string =
                 fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), reportFrequency);
             auto found = outputVariables.find(search_string);
-            // auto found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
             if (found == outputVariables.end()) {
                 search_string =
                     fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), "Each Call");
                 found = outputVariables.find(search_string);
-                // found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
             }
-            // if (found == outputVariables.end()) {
-            //     //ShowFatalError(state, fmt::format("Output variable ({0}) not found output variable list", search_string));
-            //     continue;
-            // }
-            // auto it = outputVariables.find(found);
+
             if (found != outputVariables.end()) {
                 outputVariableIndices[found->second] = true;
                 indices.emplace_back(found->second);
@@ -792,16 +773,12 @@ namespace ResultsFramework {
                 if (keyNameIndex != -1) {
                     keyNameToOutputData[keyNameIndex] = column_index;
                 }
-                // TODO: This is overwriting index 0 in the unit test
             } else {
                 ShowFatalError(state, fmt::format("Output variable ({0}) not found output variable list", search_string));
             }
-            // outputVariableIndices[std::distance(outputVariables.begin(), found)] = true;
-            // indices.emplace_back(std::distance(outputVariables.begin(), found));
             ++column_index;
         }
-        // rework logic to match length of ouputVariables to length of data
-        // loop through indices rather than columns (in this loop and one above?)
+
         auto const &rows = data.at("Rows");
         for (auto const &row : rows) {
             for (auto &el : row.items()) {
@@ -815,39 +792,8 @@ namespace ResultsFramework {
                             output[i] = s;
                         }
                     }
-
-                    // for (int i = 0; i != indices.size(); ++i) {
-                    //     int const outputIndex = outputVariableIndexToKeyNameIndexMapping[indices[i]];
-                    //     assert(outputIndex < keyNames.size());
-                    //     auto const &col = el.value()[outputIndex];
-                    //     if (col.is_null()) {
-                    //         output[i] = "";
-                    //     } else {
-                    //         dtoa(col.get<double>(), s);
-                    //         output[i] = s;
-                    //     }
-                    // }
-                    // int i = 0;
-                    // for (auto const &col : el.value()) {
-                    //     int const outputIndex = outputVariableIndexToKeyNameIndexMapping[indices[i]];
-                    //     assert(outputIndex < keyNames.size());
-                    //     if (outputIndex != -1 && !col.is_null()) {
-                    //         dtoa(col.get<double>(), s);
-                    //         output[outputIndex] = s;
-                    //     }
-                    //     ++i;
-                    // }
                     outputs[el.key()] = output;
                 } else {
-                    // for (int i = 0; i != indices.size(); ++i) {
-                    //     auto const &col = el.value()[indices[i]];
-                    //     if (col.is_null()) {
-                    //         found_key->second[i] = "";
-                    //     } else {
-                    //         dtoa(col.get<double>(), s);
-                    //         found_key->second[i] = s;
-                    //     }
-                    // }
                     int i = 0;
                     for (auto const &col : el.value()) {
                         int const outputIndex = outputVariableIndexToKeyNameIndexMapping[indices[i]];
@@ -903,52 +849,19 @@ namespace ResultsFramework {
         return datetime;
     }
 
-    // Overload
     void
     CSVWriter::writeOutput(EnergyPlusData &state, InputOutputFile &outputFile, bool outputControl)
     {
-        //     writeOutput(state, keyNames, outputFile, outputControl);
-        // }
-
-
-        // // sorting and ordering here
-        // void
-        // CSVWriter::writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl)
-        // {
         outputFile.ensure_open(state, "OpenOutputFiles", outputControl);
-
-        //       for (auto rvi_input : outputVariables) {
-        //           if (outputVariables.find(rvi_input))
-        //      }
-
-        // test what happens if keyNames is empty (no rvi or mvi object)
-
         std::vector<int> keyNameToOutputs;
 
         print<FormatSyntax::FMT>(outputFile, "{}", "Date/Time,");
         std::string sep;
-        for (std::size_t i = 0; i < keyNames.size(); ++i) {
-            print<FormatSyntax::FMT>(outputFile, "{}{}", sep, keyNames[i]);
+        for (auto const & keyName : keyNames) {
+            print<FormatSyntax::FMT>(outputFile, "{}{}", sep, keyName);
             if (sep.empty()) sep = ",";
         }
 
-        // for (std::size_t i = 0; i < outputVariables.size(); ++i) {
-        //     // Check if output variable was in data
-        //     if (!outputVariableIndices[i]) continue;
-        //     // Check if filtered and reordered by RVI/MVI
-        //     int const keyNameIndex = outputVariableIndexToKeyNameIndexMapping[i];
-        //     if (outputVariableIndexToKeyNameIndexMapping[i] < 0) continue;
-        //     print<FormatSyntax::FMT>(outputFile, "{}{}", sep, keyNames[keyNameIndex]);
-        //     keyNameToOutputs.emplace_back(keyNameIndex);
-        //     if (sep.empty()) sep = ",";
-        // }
-        // for (auto it = outputVariables.begin(); it != outputVariables.end(); ++it) {
-        //     if (!outputVariableIndices[std::distance(outputVariables.begin(), it)]) continue;
-        //     // filter out variables that are not in rvi list
-        //     // if (std::find(keyNames.begin(), keyNames.end(), *it) == keyNames.end()) continue;
-        //     print<FormatSyntax::FMT>(outputFile, "{}{}", sep, *it);
-        //     if (sep.empty()) sep = ",";
-        // }
         print<FormatSyntax::FMT>(outputFile, "{}", '\n');
 
         for (auto &item : outputs) {
@@ -960,31 +873,12 @@ namespace ResultsFramework {
             }
             print<FormatSyntax::FMT>(outputFile, " {},", datetime);
 
-            std::string sep;
-            for (std::size_t i = 0; i < item.second.size(); ++i) {
-                print<FormatSyntax::FMT>(outputFile, "{}{}", sep, item.second[i]);
+            sep = "";
+            for (auto & data : item.second) {
+                print<FormatSyntax::FMT>(outputFile, "{}{}", sep, data);
                 if (sep.empty()) sep = ",";
             }
             print<FormatSyntax::FMT>(outputFile, "{}", '\n');
-
-            // item.second.erase(std::remove_if(item.second.begin(),
-            //                                  item.second.end(),
-            //                                  [&](const std::string &d) {
-            //                                      auto pos = (&d - &*item.second.begin());
-            //                                      // filter out variables that are not in rvi list
-            //                                      //bool filtered = std::find(keyNames.begin(), keyNames.end(), d) == keyNames.end();
-            //                                      // return !outputVariableIndices[pos] && filtered;
-            //                                      return !outputVariableIndices[pos];
-            //     }),
-            //                   item.second.end());
-            // auto result = std::find_if(item.second.rbegin(), item.second.rend(), [](std::string const &v) { return !v.empty(); });
-            // auto last = item.second.end() - 1;
-            // if (result != item.second.rend()) {
-            //     last = (result + 1).base();
-            // }
-
-            // print<FormatSyntax::FMT>(outputFile, "{},", fmt::join(item.second.begin(), last, ","));
-            // print<FormatSyntax::FMT>(outputFile, "{}\n", *last);
         }
 
         outputFile.close();
@@ -1429,12 +1323,6 @@ namespace ResultsFramework {
         if (!hasOutputData()) {
             return;
         }
-        //CSVWriter csv(outputVariables.size());
-        //CSVWriter mtr_csv(outputVariables.size());
-
-        // if rvi or mvi exist (are not empty), pass those lists to the CSVWriter instead of outputVariables
-        // if rvi or mvi, dont fatal error -> continue
-        // if rvi or mvi is not a subset of outputVariables, error
 
         CSVWriter csv(state.files.outputControl.rviKeyNames, outputVariables, outputVariableKeyNames);
         CSVWriter mtr_csv(state.files.outputControl.mviKeyNames, outputVariables, outputVariableKeyNames);

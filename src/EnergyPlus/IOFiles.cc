@@ -458,8 +458,6 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
                 auto const &extensiblesArray = extensibles.value();
                 rviKeyNames.reserve(extensiblesArray.size());
                 for (auto extensibleInstance = extensiblesArray.begin(); extensibleInstance != extensiblesArray.end(); ++extensibleInstance) {
-                    // std::string keyName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "key_name");
-                    // rviKeyNames.push_back(keyName);
                     rviKeyNames.emplace_back(ip->getAlphaFieldValue(extensibleInstance.value(), extensionSchemaProps, "key_name"));
                 }
             }
@@ -480,8 +478,6 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
                 auto const &extensiblesArray = extensibles.value();
                 mviKeyNames.reserve(extensiblesArray.size());
                 for (auto extensibleInstance = extensiblesArray.begin(); extensibleInstance != extensiblesArray.end(); ++extensibleInstance) {
-                    // std::string keyName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "key_name");
-                    // rviKeyNames.push_back(keyName);
                     mviKeyNames.emplace_back(ip->getAlphaFieldValue(extensibleInstance.value(), extensionSchemaProps, "key_name"));
                 }
             }

@@ -87,7 +87,6 @@ protected:
 
     std::map<std::string, std::vector<std::string>> getCSVOutputs(EnergyPlusData &state,
                                                                   json const &data,
-//                                                                  ResultsFramework::ResultsFramework const &resultsFramework,
                                                                   OutputProcessor::ReportingFrequency reportingFrequency,
                                                                   std::vector<std::string> const& keyNames,
                                                                   std::vector<std::string> const& outputVariables,
@@ -98,7 +97,6 @@ protected:
         return csv.outputs;
     }
 
-    // pass in vector to getCSVOutputs (in different version - rename from getCSVOutputs) to test, instead of outputVariables
     std::map<std::string, std::vector<std::string>> getCSVOutputs(EnergyPlusData &state,
                                                                   json const &data,
                                                                   ResultsFramework::ResultsFramework const &resultsFramework,
