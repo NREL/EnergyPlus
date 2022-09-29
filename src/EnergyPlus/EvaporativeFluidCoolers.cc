@@ -1529,7 +1529,7 @@ namespace EvaporativeFluidCoolers {
                     this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                     this->inletConds.AirHumRat =
                         Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                    auto f = [&state, this, &DesEvapFluidCoolerLoad, &par1, &par2, &Cp](Real64 UA) {
+                    auto f = [&state, this, DesEvapFluidCoolerLoad, par1, par2, Cp](Real64 UA) {
                         Real64 OutWaterTemp; // outlet water temperature [C]
                         this->SimSimpleEvapFluidCooler(state, par1, par2, UA, OutWaterTemp);
                         Real64 const CoolingOutput = Cp * par1 * (this->inletConds.WaterTemp - OutWaterTemp);
@@ -1654,7 +1654,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                auto f = [&state, this, &DesEvapFluidCoolerLoad, &par1, &par2, &Cp](Real64 UA) {
+                auto f = [&state, this, DesEvapFluidCoolerLoad, par1, par2, Cp](Real64 UA) {
                     Real64 OutWaterTemp; // outlet water temperature [C]
                     this->SimSimpleEvapFluidCooler(state, par1, par2, UA, OutWaterTemp);
                     Real64 const CoolingOutput = Cp * par1 * (this->inletConds.WaterTemp - OutWaterTemp);
@@ -1733,7 +1733,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                auto f = [&state, this, &DesEvapFluidCoolerLoad, &par1, &par2, &Cp](Real64 UA) {
+                auto f = [&state, this, DesEvapFluidCoolerLoad, par1, par2, Cp](Real64 UA) {
                     Real64 OutWaterTemp; // outlet water temperature [C]
                     this->SimSimpleEvapFluidCooler(state, par1, par2, UA, OutWaterTemp);
                     Real64 const CoolingOutput = Cp * par1 * (this->inletConds.WaterTemp - OutWaterTemp);
@@ -1892,7 +1892,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                auto f = [&state, this, &DesEvapFluidCoolerLoad, &par1, &par2, &Cp](Real64 UA) {
+                auto f = [&state, this, DesEvapFluidCoolerLoad, par1, par2, Cp](Real64 UA) {
                     Real64 OutWaterTemp; // outlet water temperature [C]
                     this->SimSimpleEvapFluidCooler(state, par1, par2, UA, OutWaterTemp);
                     Real64 const CoolingOutput = Cp * par1 * (this->inletConds.WaterTemp - OutWaterTemp);
@@ -1954,7 +1954,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                auto f = [&state, this, &DesEvapFluidCoolerLoad, &par1, &par2, &Cp](Real64 UA) {
+                auto f = [&state, this, DesEvapFluidCoolerLoad, par1, par2, Cp](Real64 UA) {
                     Real64 OutWaterTemp; // outlet water temperature [C]
                     this->SimSimpleEvapFluidCooler(state, par1, par2, UA, OutWaterTemp);
                     Real64 const CoolingOutput = Cp * par1 * (this->inletConds.WaterTemp - OutWaterTemp);
