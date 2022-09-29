@@ -59,7 +59,7 @@ struct EnergyPlusData;
 
 namespace RoomAirModelManager {
 
-    void ManageAirModel(EnergyPlusData &state, int &ZoneNum);
+    void ManageAirModel(EnergyPlusData &state, int const ZoneNum);
 
     void GetAirModelDatas(EnergyPlusData &state);
 
@@ -75,7 +75,7 @@ namespace RoomAirModelManager {
 
     void GetUFADZoneData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void SharedDVCVUFDataInit(EnergyPlusData &state, int &ZoneNum);
+    void SharedDVCVUFDataInit(EnergyPlusData &state, int const ZoneNum);
 
     void GetRoomAirflowNetworkData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 

@@ -104,7 +104,7 @@ namespace RoomAirModelManager {
     // Using/Aliasing
     using namespace DataRoomAirModel;
 
-    void ManageAirModel(EnergyPlusData &state, int &ZoneNum)
+    void ManageAirModel(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1951,7 +1951,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    void SharedDVCVUFDataInit(EnergyPlusData &state, int &ZoneNum)
+    void SharedDVCVUFDataInit(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:

@@ -223,6 +223,12 @@ namespace ZoneTempPredictorCorrector {
                                 Real64 const PriorTimeStep,
                                 int const zoneNum,
                                 int const spaceNum = 0);
+
+        void correctAirTemp(EnergyPlusData &state,
+                            Real64 &tempChange,          // Temperature change in zone air between previous and current timestep
+                            bool useZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
+                            int const zoneNum,
+                            int const spaceNum = 0);
     };
 
     // Functions
@@ -275,9 +281,9 @@ namespace ZoneTempPredictorCorrector {
                                         Real64 ZoneMultiplier,
                                         Real64 ZoneMultiplierList);
 
-    void CorrectZoneAirTemp(EnergyPlusData &state,
-                            Real64 &ZoneTempChange,     // Temperature change in zone air between previous and current timestep
-                            bool UseZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
+    void correctZoneAirTemps(EnergyPlusData &state,
+                             Real64 &maxTempChange,      // Temperature change in zone air between previous and current timestep
+                             bool useZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
     );
 
     void PushZoneTimestepHistories(EnergyPlusData &state);
