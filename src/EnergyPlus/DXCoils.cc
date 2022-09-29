@@ -15175,8 +15175,17 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
 
         LowerBoundMassFlowRate = 0.01 * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
-        auto f = [&state, DXCoilNum, TempDryBulb_Leaving_Apoint, TargetNetCapacity, par3, par7, fanInNode, fanOutNode, externalStatic](
-                     Real64 SupplyAirMassFlowRate) {
+        auto f = [&state,
+                  DXCoilNum,
+                  TempDryBulb_Leaving_Apoint,
+                  TargetNetCapacity,
+                  par3,
+                  par7,
+                  fanInNode,
+                  fanOutNode,
+                  externalStatic,
+                  CoolingCoilInletAirDryBulbTempRated,
+                  CoolingCoilInletAirWetBulbTempRated](Real64 SupplyAirMassFlowRate) {
             static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");
             auto &coil = state.dataDXCoils->DXCoil(DXCoilNum);
             Real64 AirMassFlowRatio = 0.0;
