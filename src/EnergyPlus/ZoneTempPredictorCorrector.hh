@@ -218,6 +218,11 @@ namespace ZoneTempPredictorCorrector {
 
         void calcPredictedSystemLoad(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum = 0);
 
+        void calcZoneSums(EnergyPlusData &state,
+                          int const zoneNum,
+                          bool const CorrectorFlag = true, // Corrector call flag
+                          int const spaceNum = 0);
+
         void updateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,
                                 bool const UseZoneTimeStepHistory,
@@ -327,11 +332,6 @@ namespace ZoneTempPredictorCorrector {
                               Real64 const MoistureMassFlowRate,   // Zone moisture mass flow rate
                               Real64 const H2OHtOfVap,             // Heat of vaporization of air
                               Real64 const RhoAir                  // Air density
-    );
-
-    void CalcZoneSums(EnergyPlusData &state,
-                      int ZoneNum,              // Zone number
-                      bool CorrectorFlag = true // Corrector call flag
     );
 
     void CalcZoneComponentLoadSums(EnergyPlusData &state,
