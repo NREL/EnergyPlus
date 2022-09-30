@@ -3651,10 +3651,10 @@ void PredictSystemLoads(EnergyPlusData &state,
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         // Update zone/space temperatures
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-        thisZoneHB.UpdateTemperatures(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep, ZoneNum);
+        thisZoneHB.updateTemperatures(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep, ZoneNum);
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).UpdateTemperatures(
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).updateTemperatures(
                     state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep, ZoneNum, spaceNum);
             }
         }
@@ -3768,12 +3768,13 @@ void PredictSystemLoads(EnergyPlusData &state,
         }
 
         // Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
-        thisZoneHB.CalcPredictedSystemLoad(state, ZoneNum, RAFNFrac);
-        // if (state.dataHeatBal->doSpaceHeatBalance) {
-        //     for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-        //         state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).CalcSpacePredictedSystemLoad(state, spaceNum, RAFNFrac);
-        //     }
-        // }
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).calcPredictedSystemLoad(state, RAFNFrac, ZoneNum, spaceNum);
+            }
+        } else {
+            thisZoneHB.calcPredictedSystemLoad(state, RAFNFrac, ZoneNum);
+        }
 
         // Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
         CalcPredictedHumidityRatio(state, ZoneNum, RAFNFrac);
@@ -7149,7 +7150,7 @@ temperatureAndCountInSch(EnergyPlusData &state, int const scheduleIndex, bool co
     return std::make_tuple(valueAtSelectTime, countOfSame, monthName);
 }
 
-void ZoneSpaceHeatBalanceData::UpdateTemperatures(EnergyPlusData &state,
+void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
                                                   bool const ShortenTimeStepSys,
                                                   bool const UseZoneTimeStepHistory,
                                                   Real64 const PriorTimeStep,
@@ -7276,7 +7277,7 @@ void ZoneSpaceHeatBalanceData::UpdateTemperatures(EnergyPlusData &state,
     }
 }
 
-void ZoneSpaceHeatBalanceData::CalcPredictedSystemLoad(EnergyPlusData &state, int const zoneNum, Real64 const RAFNFrac, int const spaceNum)
+void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum)
 {
     // Calculate the predicted system load for a time step.
 
