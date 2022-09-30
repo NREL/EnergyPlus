@@ -557,7 +557,6 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     Real64 NumberOfPlumes;
     Real64 SumMCp;
     Real64 SumMCpT;
-    Real64 AirCap;
     Real64 TempHistTerm;
     Real64 PowerPerPlume;
     Real64 HeightMixedSubzoneAve;    // Height of center of mixed air subzone
@@ -830,7 +829,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                 state.dataRoomAirMod->ZTM1MX(ZoneNum) = state.dataRoomAirMod->DSXMATMX(ZoneNum);
             }
 
-            AirCap = state.dataRoomAirMod->AIRRATFloor(ZoneNum);
+            Real64 AirCap = state.dataRoomAirMod->AIRRATFloor(ZoneNum);
             TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTM1Floor(ZoneNum) - (3.0 / 2.0) * state.dataRoomAirMod->ZTM2Floor(ZoneNum) +
                                      OneThird * state.dataRoomAirMod->ZTM3Floor(ZoneNum));
             TempDepCoef = state.dataDispVentMgr->HA_FLOOR + MCp_Total;
@@ -945,7 +944,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
         Real64 const thisZoneT1 = thisZoneHB.ZoneT1;
-        AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
+        Real64 AirCap = thisZoneHB.AirPowerCap;
         TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + OneThird * thisZoneHB.ZTM3);
 
         for (Ctd = 1; Ctd <= 3; ++Ctd) {

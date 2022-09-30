@@ -214,6 +214,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 TempIndZnLd = 0.0;
         Real64 TempDepZnLd = 0.0;
         Real64 ZoneAirRelHum = 0.0; // Zone relative humidity in percent
+        Real64 AirPowerCap = 0.0;   // "air power capacity"  Vol*VolMult*rho*Cp/timestep [W/degK]
 
         void CalcPredictedSystemLoad(EnergyPlusData &state, int const zoneNum, Real64 const RAFNFrac, int const spaceNum = 0);
 

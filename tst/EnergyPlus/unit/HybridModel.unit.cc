@@ -108,7 +108,6 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataRoomAirMod->ZTOC.allocate(1);
     state->dataRoomAirMod->ZTMX.allocate(1);
     state->dataRoomAirMod->ZTM1MX.allocate(1);
-    state->dataHeatBalFanSys->AIRRAT.allocate(1);
     state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
@@ -483,7 +482,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(1);
     state->dataRoomAirMod->ZTOC.allocate(1);
-    state->dataHeatBalFanSys->AIRRAT.allocate(1);
     state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);

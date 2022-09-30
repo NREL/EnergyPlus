@@ -476,7 +476,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataZoneEnergyDemand->Setback.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataZoneCtrls->NumTempControlledZones);
-    state->dataHeatBalFanSys->AIRRAT.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
@@ -1217,7 +1216,6 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    state->dataHeatBalFanSys->AIRRAT.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
@@ -1241,7 +1239,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating.allocate(1);
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0;
-    state->dataHeatBalFanSys->AIRRAT(1) = 2000;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).AirPowerCap = 2000;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempDepZnLd = 1.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempIndZnLd = 1.0;
 
@@ -1348,7 +1346,6 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    state->dataHeatBalFanSys->AIRRAT.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
@@ -1372,7 +1369,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating.allocate(1);
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0;
-    state->dataHeatBalFanSys->AIRRAT(1) = 2000;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).AirPowerCap = 2000;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempDepZnLd = 1.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempIndZnLd = 1.0;
 

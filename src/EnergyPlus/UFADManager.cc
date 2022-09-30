@@ -1055,7 +1055,6 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     Real64 ThrowAngle;   // diffuser slot angle relative to vertical [radians]
     Real64 SourceHeight; // height of plume sources above the floor [m]
     int Ctd;
-    Real64 AirCap;
     Real64 TempHistTerm;
     Real64 ZTAveraged;
     Real64 HeightUpSubzoneAve;       // Height of center of upper air subzone
@@ -1267,7 +1266,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
                 state.dataRoomAirMod->ZTM1MX(ZoneNum) = state.dataRoomAirMod->DSXMATMX(ZoneNum);
             }
 
-            AirCap = state.dataRoomAirMod->AIRRATOC(ZoneNum);
+            Real64 AirCap = state.dataRoomAirMod->AIRRATOC(ZoneNum);
             TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTM1OC(ZoneNum) - (3.0 / 2.0) * state.dataRoomAirMod->ZTM2OC(ZoneNum) +
                                      (1.0 / 3.0) * state.dataRoomAirMod->ZTM3OC(ZoneNum));
             // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
@@ -1351,7 +1350,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
         state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-        AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
+        Real64 AirCap = thisZoneHB.AirPowerCap;
         TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
 
         for (Ctd = 1; Ctd <= 3; ++Ctd) {
@@ -1908,7 +1907,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
         state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-        AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
+        Real64 AirCap = thisZoneHB.AirPowerCap;
         TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
 
         for (Ctd = 1; Ctd <= 3; ++Ctd) {

@@ -151,7 +151,6 @@ struct HeatBalFanSysData : BaseGlobalStruct
 
     Array1D<Real64> LoadCorrectionFactor; // PH 3/3/04
 
-    Array1D<Real64> AIRRAT; // "air power capacity"  PH 3/5/04
     // Hybrid Modeling
     Array1D<Real64> PreviousMeasuredZT1;     // Measured zone air temperature at previous timestep1
     Array1D<Real64> PreviousMeasuredZT2;     // Measured zone air temperature at previous timestep2
