@@ -151,9 +151,6 @@ namespace HeatBalanceIntRadExchange {
         auto &SurfaceTempInKto4th(state.dataHeatBalIntRadExchg->SurfaceTempInKto4th);
         auto &SurfaceEmiss(state.dataHeatBalIntRadExchg->SurfaceEmiss);
 
-#ifdef EP_Detailed_Timings
-        epStartTime("CalcInteriorRadExchange=");
-#endif
         if (state.dataHeatBalIntRadExchg->CalcInteriorRadExchangefirstTime) {
             SurfaceTempRad.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
             SurfaceTempInKto4th.allocate(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs);
@@ -243,7 +240,7 @@ namespace HeatBalanceIntRadExchange {
                             WinShadingType ShadeFlagPrev = state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum);
                             if (ShadeFlagPrev != ShadeFlag && (ANY_INTERIOR_SHADE_BLIND(ShadeFlagPrev) || ANY_INTERIOR_SHADE_BLIND(ShadeFlag)))
                                 IntShadeOrBlindStatusChanged = true;
-                            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
+                            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL &&
                                 state.dataWindowEquivLayer
                                     ->CFS(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr)
                                     .ISControlled) {
@@ -265,7 +262,7 @@ namespace HeatBalanceIntRadExchange {
                             ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                             zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                         }
-                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
+                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL &&
                             state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
                             zone_info.Emissivity(ZoneSurfNum) = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
                         }
@@ -429,10 +426,6 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
         }
-
-#ifdef EP_Detailed_Timings
-        epStopTime("CalcInteriorRadExchange=");
-#endif
     }
 
     void UpdateMovableInsulationFlag(EnergyPlusData &state, bool &MovableInsulationChange, int const SurfNum)

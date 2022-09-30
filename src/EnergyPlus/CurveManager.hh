@@ -119,123 +119,101 @@ namespace CurveManager {
     {
         // Members
         // this structure is for 27 coefficient full triquadratic (!)
-        Real64 CoeffA0;
-        Real64 CoeffA1;
-        Real64 CoeffA2;
-        Real64 CoeffA3;
-        Real64 CoeffA4;
-        Real64 CoeffA5;
-        Real64 CoeffA6;
-        Real64 CoeffA7;
-        Real64 CoeffA8;
-        Real64 CoeffA9;
-        Real64 CoeffA10;
-        Real64 CoeffA11;
-        Real64 CoeffA12;
-        Real64 CoeffA13;
-        Real64 CoeffA14;
-        Real64 CoeffA15;
-        Real64 CoeffA16;
-        Real64 CoeffA17;
-        Real64 CoeffA18;
-        Real64 CoeffA19;
-        Real64 CoeffA20;
-        Real64 CoeffA21;
-        Real64 CoeffA22;
-        Real64 CoeffA23;
-        Real64 CoeffA24;
-        Real64 CoeffA25;
-        Real64 CoeffA26;
-
-        // Default Constructor
-        TriQuadraticCurveDataStruct()
-            : CoeffA0(0.0), CoeffA1(0.0), CoeffA2(0.0), CoeffA3(0.0), CoeffA4(0.0), CoeffA5(0.0), CoeffA6(0.0), CoeffA7(0.0), CoeffA8(0.0),
-              CoeffA9(0.0), CoeffA10(0.0), CoeffA11(0.0), CoeffA12(0.0), CoeffA13(0.0), CoeffA14(0.0), CoeffA15(0.0), CoeffA16(0.0), CoeffA17(0.0),
-              CoeffA18(0.0), CoeffA19(0.0), CoeffA20(0.0), CoeffA21(0.0), CoeffA22(0.0), CoeffA23(0.0), CoeffA24(0.0), CoeffA25(0.0), CoeffA26(0.0)
-        {
-        }
+        Real64 CoeffA0 = 0.0;
+        Real64 CoeffA1 = 0.0;
+        Real64 CoeffA2 = 0.0;
+        Real64 CoeffA3 = 0.0;
+        Real64 CoeffA4 = 0.0;
+        Real64 CoeffA5 = 0.0;
+        Real64 CoeffA6 = 0.0;
+        Real64 CoeffA7 = 0.0;
+        Real64 CoeffA8 = 0.0;
+        Real64 CoeffA9 = 0.0;
+        Real64 CoeffA10 = 0.0;
+        Real64 CoeffA11 = 0.0;
+        Real64 CoeffA12 = 0.0;
+        Real64 CoeffA13 = 0.0;
+        Real64 CoeffA14 = 0.0;
+        Real64 CoeffA15 = 0.0;
+        Real64 CoeffA16 = 0.0;
+        Real64 CoeffA17 = 0.0;
+        Real64 CoeffA18 = 0.0;
+        Real64 CoeffA19 = 0.0;
+        Real64 CoeffA20 = 0.0;
+        Real64 CoeffA21 = 0.0;
+        Real64 CoeffA22 = 0.0;
+        Real64 CoeffA23 = 0.0;
+        Real64 CoeffA24 = 0.0;
+        Real64 CoeffA25 = 0.0;
+        Real64 CoeffA26 = 0.0;
     };
 
     struct PerformanceCurveData
     {
         // Members
-        std::string Name;                                 // Curve Name
-        std::string ObjectType;                           // Curve object type
-        CurveType curveType;                              // Curve type (see parameter definitions above)
-        InterpType InterpolationType;                     // Table interpolation method
-        int DataFormat;                                   // format of tabular data
-        int TableIndex;                                   // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
-        int NumDims;                                      // Number of dimensions (AKA, independent variables)
-        int NumIVLowErrorIndex;                           // Index to table object error message for too few IV's
-        int NumIVHighErrorIndex;                          // Index to table object error message for too many IV's
-        int X1SortOrder;                                  // sort order for table data for X1
-        int X2SortOrder;                                  // sort order for table data for X2
-        int GridValueIndex;                               // Index of output within RGI for new Table:Lookup
-        Real64 NormalizationValue;                        // normalization value (TODO: Move from Table object)
-        Real64 Coeff1;                                    // constant coefficient
-        Real64 Coeff2;                                    // linear coeff (1st independent variable)
-        Real64 Coeff3;                                    // quadratic coeff (1st independent variable)
-        Real64 Coeff4;                                    // linear coeff (2nd ind var) or cubic coeff
-        Real64 Coeff5;                                    // quadratic coeff (2nd independent variable)
-        Real64 Coeff6;                                    // cross coeff (1st & 2nd ind var)
-        Real64 Coeff7;                                    // cubic coeff for bicubic (1st ind var)
-        Real64 Coeff8;                                    // cubic coeff for bicubic (2nd ind var)
-        Real64 Coeff9;                                    // cross coeff for bicubic (1st quadratic & 2nd linear)
-        Real64 Coeff10;                                   // cross coeff for bicubic (1st linear & 2nd quadratic)
-        Real64 Coeff11;                                   // cross coeff
-        Real64 Coeff12;                                   // cross coeff
-        Real64 Var1Max;                                   // maximum of 1st independent variable
-        Real64 Var1Min;                                   // minimum of 1st independent variable
-        Real64 Var2Max;                                   // maximum of 2nd independent variable
-        Real64 Var2Min;                                   // minimum of 2nd independent variable
-        Real64 Var3Max;                                   // maximum of 3rd independent variable
-        Real64 Var3Min;                                   // minimum of 3rd independent variable
-        Real64 Var4Max;                                   // maximum of 4th independent variable
-        Real64 Var4Min;                                   // minimum of 4th independent variable
-        Real64 Var5Max;                                   // maximum of 5th independent variable
-        Real64 Var5Min;                                   // minimum of 5th independent variable
-        Real64 Var6Max;                                   // maximum of 6th independent variable
-        Real64 Var6Min;                                   // minimum of 6th independent variable
-        Real64 CurveMin;                                  // minimum value of curve output
-        Real64 CurveMax;                                  // maximum value of curve output
-        bool CurveMinPresent;                             // If TRUE, then cap minimum curve output
-        bool CurveMaxPresent;                             // if TRUE, then cap maximum curve output
-        bool Var1MinPresent;                              // uses data set limit to set Var1Min if false
-        bool Var1MaxPresent;                              // uses data set limit to set Var1Max if false
-        bool Var2MinPresent;                              // uses data set limit to set Var2Min if false
-        bool Var2MaxPresent;                              // uses data set limit to set Var2Max if false
-        bool Var3MinPresent;                              // uses data set limit to set Var3Min if false
-        bool Var3MaxPresent;                              // uses data set limit to set Var3Max if false
-        bool Var4MinPresent;                              // uses data set limit to set Var4Min if false
-        bool Var4MaxPresent;                              // uses data set limit to set Var4Max if false
-        bool Var5MinPresent;                              // uses data set limit to set Var5Min if false
-        bool Var5MaxPresent;                              // uses data set limit to set Var5Max if false
-        bool Var6MinPresent;                              // uses data set limit to set Var6Min if false
-        bool Var6MaxPresent;                              // uses data set limit to set Var6Max if false
+        std::string Name;                                   // Curve Name
+        std::string ObjectType;                             // Curve object type
+        CurveType curveType = CurveType::Invalid;           // Curve type (see parameter definitions above)
+        InterpType InterpolationType = InterpType::Invalid; // Table interpolation method
+        int DataFormat = 0;                                 // format of tabular data
+        int TableIndex = 0;                               // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
+        int NumDims = 0;                                  // Number of dimensions (AKA, independent variables)
+        int NumIVLowErrorIndex = 0;                       // Index to table object error message for too few IV's
+        int NumIVHighErrorIndex = 0;                      // Index to table object error message for too many IV's
+        int X1SortOrder = 1;                              // sort order for table data for X1
+        int X2SortOrder = 1;                              // sort order for table data for X2
+        int GridValueIndex = 0;                           // Index of output within RGI for new Table:Lookup
+        Real64 NormalizationValue = 1.0;                  // normalization value (TODO: Move from Table object)
+        Real64 Coeff1 = 0.0;                              // constant coefficient
+        Real64 Coeff2 = 0.0;                              // linear coeff (1st independent variable)
+        Real64 Coeff3 = 0.0;                              // quadratic coeff (1st independent variable)
+        Real64 Coeff4 = 0.0;                              // linear coeff (2nd ind var) or cubic coeff
+        Real64 Coeff5 = 0.0;                              // quadratic coeff (2nd independent variable)
+        Real64 Coeff6 = 0.0;                              // cross coeff (1st & 2nd ind var)
+        Real64 Coeff7 = 0.0;                              // cubic coeff for bicubic (1st ind var)
+        Real64 Coeff8 = 0.0;                              // cubic coeff for bicubic (2nd ind var)
+        Real64 Coeff9 = 0.0;                              // cross coeff for bicubic (1st quadratic & 2nd linear)
+        Real64 Coeff10 = 0.0;                             // cross coeff for bicubic (1st linear & 2nd quadratic)
+        Real64 Coeff11 = 0.0;                             // cross coeff
+        Real64 Coeff12 = 0.0;                             // cross coeff
+        Real64 Var1Max = 0.0;                             // maximum of 1st independent variable
+        Real64 Var1Min = 0.0;                             // minimum of 1st independent variable
+        Real64 Var2Max = 0.0;                             // maximum of 2nd independent variable
+        Real64 Var2Min = 0.0;                             // minimum of 2nd independent variable
+        Real64 Var3Max = 0.0;                             // maximum of 3rd independent variable
+        Real64 Var3Min = 0.0;                             // minimum of 3rd independent variable
+        Real64 Var4Max = 0.0;                             // maximum of 4th independent variable
+        Real64 Var4Min = 0.0;                             // minimum of 4th independent variable
+        Real64 Var5Max = 0.0;                             // maximum of 5th independent variable
+        Real64 Var5Min = 0.0;                             // minimum of 5th independent variable
+        Real64 Var6Max = 0.0;                             // maximum of 6th independent variable
+        Real64 Var6Min = 0.0;                             // minimum of 6th independent variable
+        Real64 CurveMin = 0.0;                            // minimum value of curve output
+        Real64 CurveMax = 0.0;                            // maximum value of curve output
+        bool CurveMinPresent = false;                     // If TRUE, then cap minimum curve output
+        bool CurveMaxPresent = false;                     // if TRUE, then cap maximum curve output
+        bool Var1MinPresent = false;                      // uses data set limit to set Var1Min if false
+        bool Var1MaxPresent = false;                      // uses data set limit to set Var1Max if false
+        bool Var2MinPresent = false;                      // uses data set limit to set Var2Min if false
+        bool Var2MaxPresent = false;                      // uses data set limit to set Var2Max if false
+        bool Var3MinPresent = false;                      // uses data set limit to set Var3Min if false
+        bool Var3MaxPresent = false;                      // uses data set limit to set Var3Max if false
+        bool Var4MinPresent = false;                      // uses data set limit to set Var4Min if false
+        bool Var4MaxPresent = false;                      // uses data set limit to set Var4Max if false
+        bool Var5MinPresent = false;                      // uses data set limit to set Var5Min if false
+        bool Var5MaxPresent = false;                      // uses data set limit to set Var5Max if false
+        bool Var6MinPresent = false;                      // uses data set limit to set Var6Min if false
+        bool Var6MaxPresent = false;                      // uses data set limit to set Var6Max if false
         Array1D<TriQuadraticCurveDataStruct> Tri2ndOrder; // structure for triquadratic curve data
-        bool EMSOverrideOn;                               // if TRUE, then EMS is calling to override curve value
-        Real64 EMSOverrideCurveValue;                     // Value of curve result EMS is directing to use
-        Real64 CurveOutput;                               // curve output or result
-        Real64 CurveInput1;                               // curve input #1 (e.g., x or X1 variable)
-        Real64 CurveInput2;                               // curve input #2 (e.g., y or X2 variable)
-        Real64 CurveInput3;                               // curve input #3 (e.g., z or X3 variable)
-        Real64 CurveInput4;                               // curve input #4 (e.g., X4 variable)
-        Real64 CurveInput5;                               // curve input #5 (e.g., X5 variable)
-        Real64 CurveInput6;                               // curve input #6 (e.g., X6 variable)
-
-        // Default Constructor
-        PerformanceCurveData()
-            : curveType(CurveType::Invalid), InterpolationType(InterpType::Invalid), DataFormat(0), TableIndex(0), NumDims(0), NumIVLowErrorIndex(0),
-              NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), GridValueIndex(0), NormalizationValue(1.0), Coeff1(0.0), Coeff2(0.0),
-              Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0), Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0), Coeff11(0.0), Coeff12(0.0),
-              Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0), Var3Max(0.0), Var3Min(0.0), Var4Max(0.0), Var4Min(0.0), Var5Max(0.0),
-              Var5Min(0.0), Var6Max(0.0), Var6Min(0.0), CurveMin(0.0), CurveMax(0.0), CurveMinPresent(false), CurveMaxPresent(false),
-              Var1MinPresent(false), Var1MaxPresent(false), Var2MinPresent(false), Var2MaxPresent(false), Var3MinPresent(false),
-              Var3MaxPresent(false), Var4MinPresent(false), Var4MaxPresent(false), Var5MinPresent(false), Var5MaxPresent(false),
-              Var6MinPresent(false), Var6MaxPresent(false), EMSOverrideOn(false), EMSOverrideCurveValue(0.0), CurveOutput(0.0), CurveInput1(0.0),
-              CurveInput2(0.0), CurveInput3(0.0), CurveInput4(0.0), CurveInput5(0.0), CurveInput6(0.0)
-        {
-        }
+        bool EMSOverrideOn = false;                       // if TRUE, then EMS is calling to override curve value
+        Real64 EMSOverrideCurveValue = 0.0;               // Value of curve result EMS is directing to use
+        Real64 CurveOutput = 0.0;                         // curve output or result
+        Real64 CurveInput1 = 0.0;                         // curve input #1 (e.g., x or X1 variable)
+        Real64 CurveInput2 = 0.0;                         // curve input #2 (e.g., y or X2 variable)
+        Real64 CurveInput3 = 0.0;                         // curve input #3 (e.g., z or X3 variable)
+        Real64 CurveInput4 = 0.0;                         // curve input #4 (e.g., X4 variable)
+        Real64 CurveInput5 = 0.0;                         // curve input #5 (e.g., X5 variable)
+        Real64 CurveInput6 = 0.0;                         // curve input #6 (e.g., X6 variable)
     };
 
     // Table file objects
@@ -413,13 +391,7 @@ struct CurveManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumCurves = 0;
-        this->GetCurvesInputFlag = true;
-        this->CurveValueMyBeginTimeStepFlag = false;
-        this->FrictionFactorErrorHasOccurred = false;
-        PerfCurve.deallocate();
-        btwxtManager.clear();
-        UniqueCurveNames.clear();
+        *this = CurveManagerData();
     }
 };
 

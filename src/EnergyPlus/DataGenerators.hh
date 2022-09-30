@@ -198,40 +198,36 @@ namespace DataGenerators {
     {
         // Members
         // user input data
-        std::string Name;                                 // name of this fuel supply module
-        DataGenerators::FuelTemperatureMode FuelTempMode; // temperature of fuel node
-        DataGenerators::FuelMode FuelTypeMode;            // type of fuel, gasous or liquid
-        std::string NodeName;                             // node name for temperature at input
-        int NodeNum;                                      // node number for temperature at input
-        int SchedNum;                                     // fuel temperature at input
-        int CompPowerCurveID;                             // "pointer" to compressor power cubic curve
-        Real64 CompPowerLossFactor;
+        std::string Name;                                                                                // name of this fuel supply module
+        DataGenerators::FuelTemperatureMode FuelTempMode = DataGenerators::FuelTemperatureMode::Invalid; // temperature of fuel node
+        DataGenerators::FuelMode FuelTypeMode = DataGenerators::FuelMode::Invalid;                       // type of fuel, gasous or liquid
+        std::string NodeName;                                                                            // node name for temperature at input
+        int NodeNum = 0;                                                                                 // node number for temperature at input
+        int SchedNum = 0;                                                                                // fuel temperature at input
+        int CompPowerCurveID = 0;                                                                        // "pointer" to compressor power cubic curve
+        Real64 CompPowerLossFactor = 0.0;
         int NumConstituents = 0; // number of constituents in fue supply
         Array1D_string ConstitName;
         Array1D<Real64> ConstitMolalFract;
         // calculated data (except some for generic liquid)
-        Array1D_int GasLibID;        // lookup ID in Gas Phase ThermoChemistry Structure Array
-        Real64 LHV;                  // lower heating value of gaseous fuel (kJ/mol)
-        Real64 LHVJperkg;            // lower heating value of gaseous fuel (J/kg)
-        Real64 LHVliquid;            // userdefined lhv for generic liquid (J/kg)
-        Real64 HHV;                  // higher heating value of fuel (J/kg)
-        Real64 MW;                   // molecular weight g/mol
-        Real64 eCO2;                 // mass flow based CO2 emmissions factor for complete combustion (-)
-        Real64 KmolPerSecToKgPerSec; // conversion from moles to kilograms for this fuel. (
-        Real64 StoicOxygenRate;
-        Real64 TfuelIntoCompress; // inlet fuel temperature
-        Real64 TfuelIntoFCPM;     // compressed fuel temp
-        Real64 PfuelCompEl;       // fuel compressor power
-        Real64 QskinLoss;         // pumping losses for zone
-        Real64 CO2ProductGasCoef; // molar multiplier for stoic products of this fuel
-        Real64 H2OProductGasCoef; // molar multiplier for stoic products of this fuel
+        Array1D_int GasLibID;              // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Real64 LHV = 0.0;                  // lower heating value of gaseous fuel (kJ/mol)
+        Real64 LHVJperkg = 0.0;            // lower heating value of gaseous fuel (J/kg)
+        Real64 LHVliquid = 0.0;            // userdefined lhv for generic liquid (J/kg)
+        Real64 HHV = 0.0;                  // higher heating value of fuel (J/kg)
+        Real64 MW = 0.0;                   // molecular weight g/mol
+        Real64 eCO2 = 0.0;                 // mass flow based CO2 emmissions factor for complete combustion (-)
+        Real64 KmolPerSecToKgPerSec = 0.0; // conversion from moles to kilograms for this fuel. (
+        Real64 StoicOxygenRate = 0.0;
+        Real64 TfuelIntoCompress = 0.0; // inlet fuel temperature
+        Real64 TfuelIntoFCPM = 0.0;     // compressed fuel temp
+        Real64 PfuelCompEl = 0.0;       // fuel compressor power
+        Real64 QskinLoss = 0.0;         // pumping losses for zone
+        Real64 CO2ProductGasCoef = 0.0; // molar multiplier for stoic products of this fuel
+        Real64 H2OProductGasCoef = 0.0; // molar multiplier for stoic products of this fuel
 
         // Default Constructor
-        GeneratorFuelSupplyDataStruct()
-            : FuelTempMode(DataGenerators::FuelTemperatureMode::Invalid), FuelTypeMode(DataGenerators::FuelMode::Invalid), NodeNum(0), SchedNum(0),
-              CompPowerCurveID(0), CompPowerLossFactor(0.0), ConstitName(14), ConstitMolalFract(14, 0.0), GasLibID(14, 0), LHV(0.0), LHVJperkg(0.0),
-              LHVliquid(0.0), HHV(0.0), MW(0.0), eCO2(0.0), KmolPerSecToKgPerSec(0.0), StoicOxygenRate(0.0), TfuelIntoCompress(0.0),
-              TfuelIntoFCPM(0.0), PfuelCompEl(0.0), QskinLoss(0.0), CO2ProductGasCoef(0.0), H2OProductGasCoef(0.0)
+        GeneratorFuelSupplyDataStruct() : ConstitName(14), ConstitMolalFract(14, 0.0), GasLibID(14, 0)
         {
         }
     };
@@ -241,35 +237,27 @@ namespace DataGenerators {
         // Members
         std::string ConstituentName;
         std::string ConstituentFormula;
-        Real64 StdRefMolarEnthOfForm;
-        DataGenerators::ThermodynamicMode ThermoMode; // method of calculation for thermodynamics
-        Real64 ShomateA;
-        Real64 ShomateB;
-        Real64 ShomateC;
-        Real64 ShomateD;
-        Real64 ShomateE;
-        Real64 ShomateF;
-        Real64 ShomateG;
-        Real64 ShomateH;
-        Real64 NumCarbons;
-        Real64 NumHydrogens;
-        Real64 NumOxygens;
-        Real64 MolecularWeight;
-        Real64 NASA_A1;
-        Real64 NASA_A2;
-        Real64 NASA_A3;
-        Real64 NASA_A4;
-        Real64 NASA_A5;
-        Real64 NASA_A6;
-        Real64 NASA_A7;
-
-        // Default Constructor
-        GasPropertyDataStruct()
-            : StdRefMolarEnthOfForm(0.0), ThermoMode(DataGenerators::ThermodynamicMode::Invalid), ShomateA(0.0), ShomateB(0.0), ShomateC(0.0),
-              ShomateD(0.0), ShomateE(0.0), ShomateF(0.0), ShomateG(0.0), ShomateH(0.0), NumCarbons(0.0), NumHydrogens(0.0), NumOxygens(0.0),
-              MolecularWeight(0.0), NASA_A1(0.0), NASA_A2(0.0), NASA_A3(0.0), NASA_A4(0.0), NASA_A5(0.0), NASA_A6(0.0), NASA_A7(0.0)
-        {
-        }
+        Real64 StdRefMolarEnthOfForm = 0.0;
+        DataGenerators::ThermodynamicMode ThermoMode = DataGenerators::ThermodynamicMode::Invalid; // method of calculation for thermodynamics
+        Real64 ShomateA = 0.0;
+        Real64 ShomateB = 0.0;
+        Real64 ShomateC = 0.0;
+        Real64 ShomateD = 0.0;
+        Real64 ShomateE = 0.0;
+        Real64 ShomateF = 0.0;
+        Real64 ShomateG = 0.0;
+        Real64 ShomateH = 0.0;
+        Real64 NumCarbons = 0.0;
+        Real64 NumHydrogens = 0.0;
+        Real64 NumOxygens = 0.0;
+        Real64 MolecularWeight = 0.0;
+        Real64 NASA_A1 = 0.0;
+        Real64 NASA_A2 = 0.0;
+        Real64 NASA_A3 = 0.0;
+        Real64 NASA_A4 = 0.0;
+        Real64 NASA_A5 = 0.0;
+        Real64 NASA_A6 = 0.0;
+        Real64 NASA_A7 = 0.0;
     };
 
     struct GeneratorDynamicsManagerStruct
@@ -277,74 +265,58 @@ namespace DataGenerators {
         // Members
         // user input data
         std::string Name;
-        Real64 PelMin;              // minimum operating point for electrical power Pel
-        Real64 PelMax;              // maximum operating point for electrical power Pel
-        Real64 UpTranLimit;         // power up transient limit W/s
-        Real64 DownTranLimit;       // power down tran limit  W/s
-        Real64 UpTranLimitFuel;     // fuel up transient limit kg/s
-        Real64 DownTranLimitFuel;   // fuel down transient limit kg/s
-        bool WarmUpByTimeDelay;     // Warm up mode control
-        bool WarmUpByEngineTemp;    // Warm up mode control
-        Real64 StartUpTimeDelay;    // time for start up [hours]
-        Real64 WarmUpDelay;         // time for warm up delay [s]
-        Real64 StartUpFuel;         // fuel use during start up
-        Real64 StartUpElectConsum;  // electricity used during start up
-        Real64 StartUpElectProd;    // electricity produced during start up
-        Real64 ShutDownFuel;        // fuel consumed during shut down
-        Real64 ShutDownElectConsum; // Elect consumed during shut down
-        Real64 PcoolDown;           // power during cool down
-        Real64 CoolDownDelay;       // time for cool down delay [hours]
-        int NumCyclesInit;          // number of start stop cycles at beginning
-        Real64 NumRunHoursInit;     // number of hours of operation beginning
-        Real64 Pstandby;            // standby power [w]
-        Real64 MCeng;               // aggregated thermal mass of engine [  ]
-        Real64 MCcw;                // aggregated thermal mass of heat recovery [   ]
-        Real64 kf;                  // coefficient k_f for warmup fuel flow rate
-        Real64 TnomEngOp;           // nominal engine operating temperature [C]
-        Real64 kp;                  // coefficient k_p for warmup power
-        bool MandatoryFullCoolDown;
-        bool WarmRestartOkay;
-        int AvailabilitySchedID;
+        Real64 PelMin = 0.0;              // minimum operating point for electrical power Pel
+        Real64 PelMax = 0.0;              // maximum operating point for electrical power Pel
+        Real64 UpTranLimit = 0.0;         // power up transient limit W/s
+        Real64 DownTranLimit = 0.0;       // power down tran limit  W/s
+        Real64 UpTranLimitFuel = 0.0;     // fuel up transient limit kg/s
+        Real64 DownTranLimitFuel = 0.0;   // fuel down transient limit kg/s
+        bool WarmUpByTimeDelay = false;   // Warm up mode control
+        bool WarmUpByEngineTemp = true;   // Warm up mode control
+        Real64 StartUpTimeDelay = 0.0;    // time for start up [hours]
+        Real64 WarmUpDelay = 0.0;         // time for warm up delay [s]
+        Real64 StartUpFuel = 0.0;         // fuel use during start up
+        Real64 StartUpElectConsum = 0.0;  // electricity used during start up
+        Real64 StartUpElectProd = 0.0;    // electricity produced during start up
+        Real64 ShutDownFuel = 0.0;        // fuel consumed during shut down
+        Real64 ShutDownElectConsum = 0.0; // Elect consumed during shut down
+        Real64 PcoolDown = 0.0;           // power during cool down
+        Real64 CoolDownDelay = 0.0;       // time for cool down delay [hours]
+        int NumCyclesInit = 0;            // number of start stop cycles at beginning
+        Real64 NumRunHoursInit = 0.0;     // number of hours of operation beginning
+        Real64 Pstandby = 0.0;            // standby power [w]
+        Real64 MCeng = 0.0;               // aggregated thermal mass of engine [  ]
+        Real64 MCcw = 0.0;                // aggregated thermal mass of heat recovery [   ]
+        Real64 kf = 0.0;                  // coefficient k_f for warmup fuel flow rate
+        Real64 TnomEngOp = 0.0;           // nominal engine operating temperature [C]
+        Real64 kp = 0.0;                  // coefficient k_p for warmup power
+        bool MandatoryFullCoolDown = false;
+        bool WarmRestartOkay = true;
+        int AvailabilitySchedID = 0;
         // Calculated values and input from elsewhere
-        DataGenerators::OperatingMode CurrentOpMode; // current operating mode, uses params like OpModeNormal
-        DataGenerators::OperatingMode LastOpMode;
-        Real64 FractionalDayofLastShutDown;
-        Real64 FractionalDayofLastStartUp;
-        bool HasBeenOn;
-        bool DuringStartUp;
-        bool DuringShutDown;
-        Real64 FuelMdotLastTimestep;
-        Real64 PelLastTimeStep;
-        int NumCycles;
-        Real64 PLRforSubtimestepStartUp;
-        Real64 PLRforSubtimestepShutDown; // part load for not in shut down, shut down part is (1 - PLR)
-        Real64 ElectEffNom;               // efficiency to use for control decisions
-        Real64 ThermEffNom;               // thermal efficiency to use fo control decisions
-        Real64 QdotHXMax;                 // Thermal power max
-        Real64 QdotHXMin;                 // thermal power min
-        Real64 QdotHXOpt;                 // thermal power nominal/optimal
-
-        // Default Constructor
-        GeneratorDynamicsManagerStruct()
-            : PelMin(0.0), PelMax(0.0), UpTranLimit(0.0), DownTranLimit(0.0), UpTranLimitFuel(0.0), DownTranLimitFuel(0.0), WarmUpByTimeDelay(false),
-              WarmUpByEngineTemp(true), StartUpTimeDelay(0.0), WarmUpDelay(0.0), StartUpFuel(0.0), StartUpElectConsum(0.0), StartUpElectProd(0.0),
-              ShutDownFuel(0.0), ShutDownElectConsum(0.0), PcoolDown(0.0), CoolDownDelay(0.0), NumCyclesInit(0), NumRunHoursInit(0.0), Pstandby(0.0),
-              MCeng(0.0), MCcw(0.0), kf(0.0), TnomEngOp(0.0), kp(0.0), MandatoryFullCoolDown(false), WarmRestartOkay(true), AvailabilitySchedID(0),
-              CurrentOpMode(DataGenerators::OperatingMode::Off), LastOpMode(DataGenerators::OperatingMode::Off), FractionalDayofLastShutDown(0.0),
-              FractionalDayofLastStartUp(0.0), HasBeenOn(false), DuringStartUp(false), DuringShutDown(false), FuelMdotLastTimestep(0.0),
-              PelLastTimeStep(0.0), NumCycles(0), PLRforSubtimestepStartUp(0.0), PLRforSubtimestepShutDown(0.0), ElectEffNom(0.0), ThermEffNom(0.0),
-              QdotHXMax(0.0), QdotHXMin(0.0), QdotHXOpt(0.0)
-        {
-        }
+        DataGenerators::OperatingMode CurrentOpMode = DataGenerators::OperatingMode::Off; // current operating mode, uses params like OpModeNormal
+        DataGenerators::OperatingMode LastOpMode = DataGenerators::OperatingMode::Off;
+        Real64 FractionalDayofLastShutDown = 0.0;
+        Real64 FractionalDayofLastStartUp = 0.0;
+        bool HasBeenOn = false;
+        bool DuringStartUp = false;
+        bool DuringShutDown = false;
+        Real64 FuelMdotLastTimestep = 0.0;
+        Real64 PelLastTimeStep = 0.0;
+        int NumCycles = 0;
+        Real64 PLRforSubtimestepStartUp = 0.0;
+        Real64 PLRforSubtimestepShutDown = 0.0; // part load for not in shut down, shut down part is (1 - PLR)
+        Real64 ElectEffNom = 0.0;               // efficiency to use for control decisions
+        Real64 ThermEffNom = 0.0;               // thermal efficiency to use fo control decisions
+        Real64 QdotHXMax = 0.0;                 // Thermal power max
+        Real64 QdotHXMin = 0.0;                 // thermal power min
+        Real64 QdotHXOpt = 0.0;                 // thermal power nominal/optimal
     };
 
 } // namespace DataGenerators
 
 struct GeneratorsData : BaseGlobalStruct
 {
-    int NumFuelConstit = 0;
-    int NumGeneratorFuelSups = 0;
-    int NumGensWDynamics = 0; // number of dynamics controls for generators
     Array1D<DataGenerators::GasPropertyDataStruct> GasPhaseThermoChemistryData;
     Array1D<DataGenerators::GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
     Array1D<DataGenerators::GeneratorDynamicsManagerStruct> GeneratorDynamics;
@@ -357,17 +329,7 @@ struct GeneratorsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        NumFuelConstit = 0;
-        NumGeneratorFuelSups = 0;
-        NumGensWDynamics = 0;
-        GasPhaseThermoChemistryData.deallocate();
-        FuelSupply.deallocate();
-        GeneratorDynamics.deallocate();
-        this->InletCWnode = 0;
-        this->InternalFlowControl = false;
-        this->TcwIn = 0.0;
-        this->TrialMdotcw = 0.0;
-        this->LimitMinMdotcw = 0.0;
+        *this = GeneratorsData();
     }
 };
 

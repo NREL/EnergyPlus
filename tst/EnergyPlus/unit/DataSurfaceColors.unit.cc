@@ -78,3 +78,11 @@ TEST_F(EnergyPlusFixture, TestMatchAndSetColorTextString)
     colorSet = DataSurfaceColors::MatchAndSetColorTextString(*state, testStr, setVal, "DXF");
     ASSERT_FALSE(colorSet);
 }
+
+TEST_F(EnergyPlusFixture, TestSetupColorSchemes)
+{
+    std::string const idf_object = "OutputControl:SurfaceColorScheme, highlight PV, Photovoltaics, 2;";
+    ASSERT_TRUE(process_idf(idf_object, false));
+    DataSurfaceColors::SetUpSchemeColors(*state, "HIGHLIGHT PV", "DXF");
+    ASSERT_EQ(state->dataSurfColor->DXFcolorno[10], 2); // TODO: Should take off DXF argument to these functions, and these magic numbers should go
+}

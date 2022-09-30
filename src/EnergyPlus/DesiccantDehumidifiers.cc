@@ -270,7 +270,6 @@ namespace DesiccantDehumidifiers {
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using SteamCoils::GetSteamCoilControlNodeNum;
-        using SteamCoils::GetTypeOfCoil;
         using SteamCoils::SetSteamCoilData;
         using WaterCoils::SetWaterCoilData;
 

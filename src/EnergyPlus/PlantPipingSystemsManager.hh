@@ -490,7 +490,7 @@ namespace PlantPipingSystemsManager {
 
         Real64 normalArea(Direction direction) const;
 
-        void EvaluateNeighborCoordinates(Direction CurDirection, int &NX, int &NY, int &NZ);
+        void EvaluateNeighborCoordinates(Direction CurDirection, int &NX, int &NY, int &NZ) const;
     };
 
     struct MeshExtents
@@ -648,7 +648,7 @@ namespace PlantPipingSystemsManager {
             return this->Name == a;
         }
 
-        static Segment *factory(EnergyPlusData &state, std::string segmentName);
+        static Segment *factory(EnergyPlusData &state, const std::string &segmentName);
     };
 
     struct Circuit : public PlantComponent
@@ -702,7 +702,7 @@ namespace PlantPipingSystemsManager {
 
         void initInOutCells(CartesianCell const &in, CartesianCell const &out);
 
-        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType, const std::string &objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
@@ -715,7 +715,7 @@ namespace PlantPipingSystemsManager {
             return this->Name == a;
         }
 
-        static Circuit *factory(EnergyPlusData &state, std::string circuit, bool &errorsFound);
+        static Circuit *factory(EnergyPlusData &state, const std::string &circuit, bool &errorsFound);
 
         void oneTimeInit(EnergyPlusData &state) override;
 
@@ -899,9 +899,9 @@ namespace PlantPipingSystemsManager {
 
         void setupPipeCircuitInOutCells();
 
-        int getCellWidthsCount(RegionType dir);
+        int getCellWidthsCount(RegionType dir) const;
 
-        void getCellWidths(GridRegion &g, RegionType direction);
+        void getCellWidths(GridRegion &g, RegionType direction) const;
 
         void addNeighborInformation(int X,
                                     int Y,
@@ -921,11 +921,11 @@ namespace PlantPipingSystemsManager {
 
         void UpdateZoneSurfaceTemperatures(EnergyPlusData &state);
 
-        Real64 GetAverageTempByType(EnergyPlusData &state, CellType cellType);
+        Real64 GetAverageTempByType(EnergyPlusData &state, CellType cellType) const;
 
         void InitializeSoilMoistureCalcs();
 
-        void EvaluateSoilRhoCp(Real64 CellTemp, Real64 &rhoCp);
+        void EvaluateSoilRhoCp(Real64 CellTemp, Real64 &rhoCp) const;
 
         void ShiftTemperaturesForNewTimeStep();
 
@@ -933,7 +933,7 @@ namespace PlantPipingSystemsManager {
 
         bool IsConverged_CurrentToPrevIteration();
 
-        bool CheckForOutOfRangeTemps();
+        bool CheckForOutOfRangeTemps() const;
 
         void EvaluateNeighborCharacteristics(
             CartesianCell &ThisCell, Direction CurDirection, Real64 &NeighborTemp, Real64 &Resistance, Real64 &AdiabaticMultiplier);

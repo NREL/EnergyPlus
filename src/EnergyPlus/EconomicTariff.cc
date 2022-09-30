@@ -1239,7 +1239,7 @@ void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound) // 
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // Monetary Unit
-        for (i = 1; i <= state.dataCostEstimateManager->numMonetaryUnit; ++i) {
+        for (i = 1; i <= (int)state.dataCostEstimateManager->monetaryUnit.size(); ++i) {
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), state.dataCostEstimateManager->monetaryUnit(i).code)) {
                 state.dataCostEstimateManager->selectedMonetaryUnit = i;
                 break;
@@ -1385,8 +1385,8 @@ void initializeMonetaryUnit(EnergyPlusData &state)
 
     //   www.xe.com/symbols.php
 
-    state.dataCostEstimateManager->numMonetaryUnit = 111;
-    state.dataCostEstimateManager->monetaryUnit.allocate(state.dataCostEstimateManager->numMonetaryUnit);
+    int numMonetaryUnit = 111;
+    state.dataCostEstimateManager->monetaryUnit.allocate(numMonetaryUnit);
     state.dataCostEstimateManager->monetaryUnit(1).code = "USD";
     state.dataCostEstimateManager->monetaryUnit(2).code = "AFN";
     state.dataCostEstimateManager->monetaryUnit(3).code = "ALL";

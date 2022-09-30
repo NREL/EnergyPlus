@@ -145,9 +145,13 @@ namespace DataLoopNode {
     enum class ConnectionObjectType
     {
         Invalid = -1,
+        Undefined,
         AirConditionerVariableRefrigerantFlow,
         AirLoopHVAC,
+        AirLoopHVACDedicatedOutdoorAirSystem,
+        AirLoopHVACExhaustSystem,
         AirLoopHVACMixer,
+        AirLoopHVACOutdoorAirsystem,
         AirLoopHVACReturnPath,
         AirLoopHVACReturnPlenum,
         AirLoopHVACSupplyPath,
@@ -164,8 +168,14 @@ namespace DataLoopNode {
         AirLoopHVACZoneMixer,
         AirLoopHVACZoneSplitter,
         AirTerminalDualDuctConstantVolume,
+        AirTerminalDualDuctConstantVolumeCool,
+        AirTerminalDualDuctConstantVolumeHeat,
         AirTerminalDualDuctVAV,
+        AirTerminalDualDuctVAVCool,
+        AirTerminalDualDuctVAVHeat,
         AirTerminalDualDuctVAVOutdoorAir,
+        AirTerminalDualDuctVAVOutdoorAirOutdoorAir,
+        AirTerminalDualDuctVAVOutdoorAirRecirculatedAir,
         AirTerminalSingleDuctConstantVolumeCooledBeam,
         AirTerminalSingleDuctConstantVolumeFourPipeBeam,
         AirTerminalSingleDuctConstantVolumeFourPipeInduction,
@@ -196,6 +206,7 @@ namespace DataLoopNode {
         ChillerElectric,
         ChillerElectricEIR,
         ChillerElectricReformulatedEIR,
+        ChillerElectricASHRAE205,
         ChillerEngineDriven,
         ChillerHeaterAbsorptionDirectFired,
         ChillerHeaterAbsorptionDoubleEffect,
@@ -239,6 +250,7 @@ namespace DataLoopNode {
         CoilSystemCoolingDXHeatExchangerAssisted,
         CoilSystemCoolingWater,
         CoilSystemCoolingWaterHeatExchangerAssisted,
+        CoilSystemHeatingDX,
         CoilSystemIntegratedHeatPumpAirSource,
         Condenser,
         CondenserLoop,
@@ -408,606 +420,68 @@ namespace DataLoopNode {
         Num,
     };
 
-    constexpr static std::array<std::string_view, static_cast<int>(ConnectionObjectType::Num)> ConnectionObjectTypeNames = {
-        "AirConditioner:VariableRefrigerantFlow",
-        "AirLoopHVAC",
-        "AirLoopHVAC:Mixer",
-        "AirLoopHVAC:ReturnPath",
-        "AirLoopHVAC:ReturnPlenum",
-        "AirLoopHVAC:SupplyPath",
-        "AirLoopHVAC:SupplyPlenum",
-        "AirLoopHVAC:Unitary:Furnace:HeatCool",
-        "AirLoopHVAC:Unitary:Furnace:HeatOnly",
-        "AirLoopHVAC:UnitaryHeatCool",
-        "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass",
-        "AirLoopHVAC:UnitaryHeatOnly",
-        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
-        "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed",
-        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
-        "AirLoopHVAC:UnitarySystem",
-        "AirLoopHVAC:ZoneMixer",
-        "AirLoopHVAC:ZoneSplitter",
-        "AirTerminal:DualDuct:ConstantVolume",
-        "AirTerminal:DualDuct:VAV",
-        "AirTerminal:DualDuct:VAV:OutdoorAir",
-        "AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
-        "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam",
-        "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction",
-        "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
-        "AirTerminal:SingleDuct:ConstantVolume:Reheat",
-        "AirTerminal:SingleDuct:Mixer",
-        "AirTerminal:SingleDuct:ParallelPIU:Reheat",
-        "AirTerminal:SingleDuct:SeriesPIU:Reheat",
-        "AirTerminal:SingleDuct:UserDefined",
-        "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat",
-        "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat",
-        "AirTerminal:SingleDuct:VAV:NoReheat",
-        "AirTerminal:SingleDuct:VAV:Reheat",
-        "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
-        "AvailabilityManager:DifferentialThermostat",
-        "AvailabilityManager:HighTemperatureTurnOff",
-        "AvailabilityManager:HighTemperatureTurnOn",
-        "AvailabilityManager:LowTemperatureTurnOff",
-        "AvailabilityManager:LowTemperatureTurnOn",
-        "Boiler:HotWater",
-        "Boiler:Steam",
-        "Branch",
-        "CentralHeatPumpSystem",
-        "Chiller:Absorption",
-        "Chiller:Absorption:Indirect",
-        "Chiller:CombustionTurbine",
-        "Chiller:ConstantCOP",
-        "Chiller:Electric",
-        "Chiller:Electric:EIR",
-        "Chiller:Electric:ReformulatedEIR",
-        "Chiller:EngineDriven",
-        "ChillerHeater:Absorption:DirectFired",
-        "ChillerHeater:Absorption:DoubleEffect",
-        "Coil:Cooling:DX",
-        "Coil:Cooling:DX:CurveFit:Speed",
-        "Coil:Cooling:DX:MultiSpeed",
-        "Coil:Cooling:DX:SingleSpeed",
-        "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-        "Coil:Cooling:DX:SubcoolReheat",
-        "Coil:Cooling:DX:TwoSpeed",
-        "Coil:Cooling:DX:TwoStageWithHumidityControlMode",
-        "Coil:Cooling:DX:VariableRefrigerantFlow",
-        "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl",
-        "Coil:Cooling:DX:VariableSpeed",
-        "Coil:Cooling:Water",
-        "Coil:Cooling:Water:DetailedGeometry",
-        "Coil:Cooling:WaterToAirHeatPump:EquationFit",
-        "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation",
-        "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit",
-        "Coil:Heating:DX:MultiSpeed",
-        "Coil:Heating:DX:SingleSpeed",
-        "Coil:Heating:DX:VariableRefrigerantFlow",
-        "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
-        "Coil:Heating:DX:VariableSpeed",
-        "Coil:Heating:Desuperheater",
-        "Coil:Heating:Electric",
-        "Coil:Heating:Electric:MultiStage",
-        "Coil:Heating:Fuel",
-        "Coil:Heating:Gas:MultiStage",
-        "Coil:Heating:Steam",
-        "Coil:Heating:Water",
-        "Coil:Heating:WaterToAirHeatPump:EquationFit",
-        "Coil:Heating:WaterToAirHeatPump:ParameterEstimation",
-        "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit",
-        "Coil:UserDefined",
-        "Coil:WaterHeating:AirToWaterHeatPump:Pumped",
-        "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
-        "Coil:WaterHeating:AirToWaterHeatPump:Wrapped",
-        "Coil:WaterHeating:Desuperheater",
-        "CoilSystem:Cooling:DX",
-        "CoilSystem:Cooling:DX:HeatExchangerAssisted",
-        "CoilSystem:Cooling:Water",
-        "CoilSystem:Cooling:Water:HeatExchangerAssisted",
-        "CoilSystem:IntegratedHeatPump:AirSource",
-        "Condenser",
-        "CondenserLoop",
-        "Connector:Mixer",
-        "Connector:Splitter",
-        "Controller:OutdoorAir",
-        "Controller:WaterCoil",
-        "CoolingTower:SingleSpeed",
-        "CoolingTower:TwoSpeed",
-        "CoolingTower:VariableSpeed",
-        "CoolingTower:VariableSpeed:Merkel",
-        "Dehumidifier:Desiccant:NoFans",
-        "Dehumidifier:Desiccant:System",
-        "DistrictCooling",
-        "DistrictHeating",
-        "Duct",
-        "ElectricEquipment:ITE:AirCooled",
-        "EvaporativeCooler:Direct:CelDekPad",
-        "EvaporativeCooler:Direct:ResearchSpecial",
-        "EvaporativeCooler:Indirect:CelDekPad",
-        "EvaporativeCooler:Indirect:ResearchSpecial",
-        "EvaporativeCooler:Indirect:WetCoil",
-        "EvaporativeFluidCooler:SingleSpeed",
-        "EvaporativeFluidCooler:TwoSpeed",
-        "Fan:ComponentModel",
-        "Fan:ConstantVolume",
-        "Fan:OnOff",
-        "Fan:SystemModel",
-        "Fan:VariableVolume",
-        "Fan:ZoneExhaust",
-        "FluidCooler:SingleSpeed",
-        "FluidCooler:TwoSpeed",
-        "Generator:CombustionTurbine",
-        "Generator:FuelCell:AirSupply",
-        "Generator:FuelCell:ExhaustGasToWaterHeatExchanger",
-        "Generator:FuelCell:PowerModule",
-        "Generator:FuelCell:StackCooler",
-        "Generator:FuelCell:WaterSupply",
-        "Generator:FuelSupply",
-        "Generator:InternalCombustionEngine",
-        "Generator:MicroCHP",
-        "Generator:MicroTurbine",
-        "GroundHeatExchanger:HorizontalTrench",
-        "GroundHeatExchanger:Pond",
-        "GroundHeatExchanger:Slinky",
-        "GroundHeatExchanger:Surface",
-        "GroundHeatExchanger:System",
-        "HeaderedPumps:ConstantSpeed",
-        "HeaderedPumps:VariableSpeed",
-        "HeatExchanger:AirToAir:FlatPlate",
-        "HeatExchanger:AirToAir:SensibleAndLatent",
-        "HeatExchanger:Desiccant:BalancedFlow",
-        "HeatExchanger:FluidToFluid",
-        "HeatPump:PlantLoop:EIR:Cooling",
-        "HeatPump:PlantLoop:EIR:Heating",
-        "HeatPump:WaterToWater:EquationFit:Cooling",
-        "HeatPump:WaterToWater:EquationFit:Heating",
-        "HeatPump:WaterToWater:ParameterEstimation:Cooling",
-        "HeatPump:WaterToWater:ParameterEstimation:Heating",
-        "Humidifier:Steam:Electric",
-        "Humidifier:Steam:Gas",
-        "Lights",
-        "LoadProfile:Plant",
-        "OutdoorAir:Mixer",
-        "OutdoorAir:Node",
-        "OutdoorAir:NodeList",
-        "Pipe:Adiabatic",
-        "Pipe:Adiabatic:Steam",
-        "Pipe:Indoor",
-        "Pipe:Outdoor",
-        "Pipe:Underground",
-        "PipingSystem:Underground:PipeCircuit",
-        "PlantComponent:TemperatureSource",
-        "PlantComponent:UserDefined",
-        "PlantEquipmentOperation:ComponentSetpoint",
-        "PlantEquipmentOperation:OutdoorDewpointDifference",
-        "PlantEquipmentOperation:OutdoorDrybulbDifference",
-        "PlantEquipmentOperation:OutdoorWetbulbDifference",
-        "PlantEquipmentOperation:ThermalEnergyStorage",
-        "PlantLoop",
-        "Pump:ConstantSpeed",
-        "Pump:ConstantVolume",
-        "Pump:VariableSpeed",
-        "Pump:VariableSpeed:Condensate",
-        "Refrigeration:CompressorRack",
-        "Refrigeration:Condenser:AirCooled",
-        "Refrigeration:Condenser:EvaporativeCooled",
-        "Refrigeration:Condenser:WaterCooled",
-        "Refrigeration:GasCooler:AirCooled",
-        "SetpointManager:Coldest",
-        "SetpointManager:CondenserEnteringReset",
-        "SetpointManager:CondenserEnteringReset:Ideal",
-        "SetpointManager:FollowGroundTemperature",
-        "SetpointManager:FollowOutdoorAirTemperature",
-        "SetpointManager:FollowSystemNodeTemperature",
-        "SetpointManager:MixedAir",
-        "SetpointManager:MultiZone:Cooling:Average",
-        "SetpointManager:MultiZone:Heating:Average",
-        "SetpointManager:MultiZone:Humidity:Maximum",
-        "SetpointManager:MultiZone:Humidity:Minimum",
-        "SetpointManager:MultiZone:MaximumHumidity:Average",
-        "SetpointManager:MultiZone:MinimumHumidity:Average",
-        "SetpointManager:OutdoorAirPretreat",
-        "SetpointManager:OutdoorAirReset",
-        "SetpointManager:ReturnTemperature:ChilledWater",
-        "SetpointManager:ReturnTemperature:HotWater",
-        "SetpointManager:Scheduled",
-        "SetpointManager:Scheduled:DualSetpoint",
-        "SetpointManager:SingleZone:Cooling",
-        "SetpointManager:SingleZone:Heating",
-        "SetpointManager:SingleZone:Humidity:Maximum",
-        "SetpointManager:SingleZone:Humidity:Minimum",
-        "SetpointManager:SingleZone:OneStageCooling",
-        "SetpointManager:SingleZone:OneStageHeating",
-        "SetpointManager:SingleZone:Reheat",
-        "SetpointManager:SystemNodeReset:Temperature",
-        "SetpointManager:SystemNodeReset:Humidity",
-        "SetpointManager:Warmest",
-        "SetpointManager:WarmestTemperatureFlow",
-        "SolarCollector:FlatPlate:PhotovoltaicThermal",
-        "SolarCollector:FlatPlate:Water",
-        "SolarCollector:IntegralCollectorStorage",
-        "SolarCollector:UnglazedTranspired",
-        "SurfaceProperty:LocalEnvironment",
-        "SwimmingPool:Indoor",
-        "TemperingValve",
-        "ThermalStorage:ChilledWater:Mixed",
-        "ThermalStorage:ChilledWater:Stratified",
-        "ThermalStorage:Ice:Detailed",
-        "ThermalStorage:Ice:Simple",
-        "WaterHeater:HeatPump",
-        "WaterHeater:HeatPump:PumpedCondenser",
-        "WaterHeater:HeatPump:WrappedCondenser",
-        "WaterHeater:Mixed",
-        "WaterHeater:Stratified",
-        "WaterUse:Connections",
-        "ZoneHVAC:AirDistributionUnit",
-        "ZoneHVAC:Baseboard:Convective:Electric",
-        "ZoneHVAC:Baseboard:Convective:Water",
-        "ZoneHVAC:Baseboard:RadiantConvective:Electric",
-        "ZoneHVAC:Baseboard:RadiantConvective:Steam",
-        "ZoneHVAC:Baseboard:RadiantConvective:Water",
-        "ZoneHVAC:CoolingPanel:RadiantConvective:Water",
-        "ZoneHVAC:Dehumidifier:DX",
-        "ZoneHVAC:EnergyRecoveryVentilator",
-        "ZoneHVAC:EquipmentConnections",
-        "ZoneHVAC:EvaporativeCoolerUnit",
-        "ZoneHVAC:ExhaustControl",
-        "ZoneHVAC:ForcedAir:UserDefined",
-        "ZoneHVAC:FourPipeFanCoil",
-        "ZoneHVAC:HighTemperatureRadiant",
-        "ZoneHVAC:HybridUnitaryHVAC",
-        "ZoneHVAC:IdealLoadsAirSystem",
-        "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
-        "ZoneHVAC:LowTemperatureRadiant:VariableFlow",
-        "ZoneHVAC:OutdoorAirUnit",
-        "ZoneHVAC:PackagedTerminalAirConditioner",
-        "ZoneHVAC:PackagedTerminalHeatPump",
-        "ZoneHVAC:RefrigerationChillerSet",
-        "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow",
-        "ZoneHVAC:UnitHeater",
-        "ZoneHVAC:UnitVentilator",
-        "ZoneHVAC:VentilatedSlab",
-        "ZoneHVAC:WaterToAirHeatPump",
-        "ZoneHVAC:WindowAirConditioner",
-        "ZoneProperty:LocalEnvironment",
-    };
-
-    constexpr static std::array<std::string_view, static_cast<int>(ConnectionObjectType::Num)> ConnectionObjectTypeNamesUC = {
-        "AIRCONDITIONER:VARIABLEREFRIGERANTFLOW",
-        "AIRLOOPHVAC",
-        "AIRLOOPHVAC:MIXER",
-        "AIRLOOPHVAC:RETURNPATH",
-        "AIRLOOPHVAC:RETURNPLENUM",
-        "AIRLOOPHVAC:SUPPLYPATH",
-        "AIRLOOPHVAC:SUPPLYPLENUM",
-        "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",
-        "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY",
-        "AIRLOOPHVAC:UNITARYHEATCOOL",
-        "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS",
-        "AIRLOOPHVAC:UNITARYHEATONLY",
-        "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR",
-        "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED",
-        "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR",
-        "AIRLOOPHVAC:UNITARYSYSTEM",
-        "AIRLOOPHVAC:ZONEMIXER",
-        "AIRLOOPHVAC:ZONESPLITTER",
-        "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME",
-        "AIRTERMINAL:DUALDUCT:VAV",
-        "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR",
-        "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM",
-        "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM",
-        "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION",
-        "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT",
-        "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",
-        "AIRTERMINAL:SINGLEDUCT:MIXER",
-        "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
-        "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
-        "AIRTERMINAL:SINGLEDUCT:USERDEFINED",
-        "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT",
-        "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT",
-        "AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT",
-        "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",
-        "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN",
-        "AVAILABILITYMANAGER:DIFFERENTIALTHERMOSTAT",
-        "AVAILABILITYMANAGER:HIGHTEMPERATURETURNOFF",
-        "AVAILABILITYMANAGER:HIGHTEMPERATURETURNON",
-        "AVAILABILITYMANAGER:LOWTEMPERATURETURNOFF",
-        "AVAILABILITYMANAGER:LOWTEMPERATURETURNON",
-        "BOILER:HOTWATER",
-        "BOILER:STEAM",
-        "BRANCH",
-        "CENTRALHEATPUMPSYSTEM",
-        "CHILLER:ABSORPTION",
-        "CHILLER:ABSORPTION:INDIRECT",
-        "CHILLER:COMBUSTIONTURBINE",
-        "CHILLER:CONSTANTCOP",
-        "CHILLER:ELECTRIC",
-        "CHILLER:ELECTRIC:EIR",
-        "CHILLER:ELECTRIC:REFORMULATEDEIR",
-        "CHILLER:ENGINEDRIVEN",
-        "CHILLERHEATER:ABSORPTION:DIRECTFIRED",
-        "CHILLERHEATER:ABSORPTION:DOUBLEEFFECT",
-        "COIL:COOLING:DX",
-        "COIL:COOLING:DX:CURVEFIT:SPEED",
-        "COIL:COOLING:DX:MULTISPEED",
-        "COIL:COOLING:DX:SINGLESPEED",
-        "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
-        "COIL:COOLING:DX:SUBCOOLREHEAT",
-        "COIL:COOLING:DX:TWOSPEED",
-        "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE",
-        "COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW",
-        "COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL",
-        "COIL:COOLING:DX:VARIABLESPEED",
-        "COIL:COOLING:WATER",
-        "COIL:COOLING:WATER:DETAILEDGEOMETRY",
-        "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT",
-        "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
-        "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
-        "COIL:HEATING:DX:MULTISPEED",
-        "COIL:HEATING:DX:SINGLESPEED",
-        "COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW",
-        "COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL",
-        "COIL:HEATING:DX:VARIABLESPEED",
-        "COIL:HEATING:DESUPERHEATER",
-        "COIL:HEATING:ELECTRIC",
-        "COIL:HEATING:ELECTRIC:MULTISTAGE",
-        "COIL:HEATING:FUEL",
-        "COIL:HEATING:GAS:MULTISTAGE",
-        "COIL:HEATING:STEAM",
-        "COIL:HEATING:WATER",
-        "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT",
-        "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
-        "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
-        "COIL:USERDEFINED",
-        "COIL:WATERHEATING:AIRTOWATERHEATPUMP:PUMPED",
-        "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
-        "COIL:WATERHEATING:AIRTOWATERHEATPUMP:WRAPPED",
-        "COIL:WATERHEATING:DESUPERHEATER",
-        "COILSYSTEM:COOLING:DX",
-        "COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED",
-        "COILSYSTEM:COOLING:WATER",
-        "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED",
-        "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE",
-        "CONDENSER",
-        "CONDENSERLOOP",
-        "CONNECTOR:MIXER",
-        "CONNECTOR:SPLITTER",
-        "CONTROLLER:OUTDOORAIR",
-        "CONTROLLER:WATERCOIL",
-        "COOLINGTOWER:SINGLESPEED",
-        "COOLINGTOWER:TWOSPEED",
-        "COOLINGTOWER:VARIABLESPEED",
-        "COOLINGTOWER:VARIABLESPEED:MERKEL",
-        "DEHUMIDIFIER:DESICCANT:NOFANS",
-        "DEHUMIDIFIER:DESICCANT:SYSTEM",
-        "DISTRICTCOOLING",
-        "DISTRICTHEATING",
-        "DUCT",
-        "ELECTRICEQUIPMENT:ITE:AIRCOOLED",
-        "EVAPORATIVECOOLER:DIRECT:CELDEKPAD",
-        "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL",
-        "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD",
-        "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL",
-        "EVAPORATIVECOOLER:INDIRECT:WETCOIL",
-        "EVAPORATIVEFLUIDCOOLER:SINGLESPEED",
-        "EVAPORATIVEFLUIDCOOLER:TWOSPEED",
-        "FAN:COMPONENTMODEL",
-        "FAN:CONSTANTVOLUME",
-        "FAN:ONOFF",
-        "FAN:SYSTEMMODEL",
-        "FAN:VARIABLEVOLUME",
-        "FAN:ZONEEXHAUST",
-        "FLUIDCOOLER:SINGLESPEED",
-        "FLUIDCOOLER:TWOSPEED",
-        "GENERATOR:COMBUSTIONTURBINE",
-        "GENERATOR:FUELCELL:AIRSUPPLY",
-        "GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER",
-        "GENERATOR:FUELCELL:POWERMODULE",
-        "GENERATOR:FUELCELL:STACKCOOLER",
-        "GENERATOR:FUELCELL:WATERSUPPLY",
-        "GENERATOR:FUELSUPPLY",
-        "GENERATOR:INTERNALCOMBUSTIONENGINE",
-        "GENERATOR:MICROCHP",
-        "GENERATOR:MICROTURBINE",
-        "GROUNDHEATEXCHANGER:HORIZONTALTRENCH",
-        "GROUNDHEATEXCHANGER:POND",
-        "GROUNDHEATEXCHANGER:SLINKY",
-        "GROUNDHEATEXCHANGER:SURFACE",
-        "GROUNDHEATEXCHANGER:SYSTEM",
-        "HEADEREDPUMPS:CONSTANTSPEED",
-        "HEADEREDPUMPS:VARIABLESPEED",
-        "HEATEXCHANGER:AIRTOAIR:FLATPLATE",
-        "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
-        "HEATEXCHANGER:DESICCANT:BALANCEDFLOW",
-        "HEATEXCHANGER:FLUIDTOFLUID",
-        "HEATPUMP:PLANTLOOP:EIR:COOLING",
-        "HEATPUMP:PLANTLOOP:EIR:HEATING",
-        "HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING",
-        "HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING",
-        "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING",
-        "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING",
-        "HUMIDIFIER:STEAM:ELECTRIC",
-        "HUMIDIFIER:STEAM:GAS",
-        "LIGHTS",
-        "LOADPROFILE:PLANT",
-        "OUTDOORAIR:MIXER",
-        "OUTDOORAIR:NODE",
-        "OUTDOORAIR:NODELIST",
-        "PIPE:ADIABATIC",
-        "PIPE:ADIABATIC:STEAM",
-        "PIPE:INDOOR",
-        "PIPE:OUTDOOR",
-        "PIPE:UNDERGROUND",
-        "PIPINGSYSTEM:UNDERGROUND:PIPECIRCUIT",
-        "PLANTCOMPONENT:TEMPERATURESOURCE",
-        "PLANTCOMPONENT:USERDEFINED",
-        "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT",
-        "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE",
-        "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE",
-        "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE",
-        "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE",
-        "PLANTLOOP",
-        "PUMP:CONSTANTSPEED",
-        "PUMP:CONSTANTVOLUME",
-        "PUMP:VARIABLESPEED",
-        "PUMP:VARIABLESPEED:CONDENSATE",
-        "REFRIGERATION:COMPRESSORRACK",
-        "REFRIGERATION:CONDENSER:AIRCOOLED",
-        "REFRIGERATION:CONDENSER:EVAPORATIVECOOLED",
-        "REFRIGERATION:CONDENSER:WATERCOOLED",
-        "REFRIGERATION:GASCOOLER:AIRCOOLED",
-        "SETPOINTMANAGER:COLDEST",
-        "SETPOINTMANAGER:CONDENSERENTERINGRESET",
-        "SETPOINTMANAGER:CONDENSERENTERINGRESET:IDEAL",
-        "SETPOINTMANAGER:FOLLOWGROUNDTEMPERATURE",
-        "SETPOINTMANAGER:FOLLOWOUTDOORAIRTEMPERATURE",
-        "SETPOINTMANAGER:FOLLOWSYSTEMNODETEMPERATURE",
-        "SETPOINTMANAGER:MIXEDAIR",
-        "SETPOINTMANAGER:MULTIZONE:COOLING:AVERAGE",
-        "SETPOINTMANAGER:MULTIZONE:HEATING:AVERAGE",
-        "SETPOINTMANAGER:MULTIZONE:HUMIDITY:MAXIMUM",
-        "SETPOINTMANAGER:MULTIZONE:HUMIDITY:MINIMUM",
-        "SETPOINTMANAGER:MULTIZONE:MAXIMUMHUMIDITY:AVERAGE",
-        "SETPOINTMANAGER:MULTIZONE:MINIMUMHUMIDITY:AVERAGE",
-        "SETPOINTMANAGER:OUTDOORAIRPRETREAT",
-        "SETPOINTMANAGER:OUTDOORAIRRESET",
-        "SETPOINTMANAGER:RETURNTEMPERATURE:CHILLEDWATER",
-        "SETPOINTMANAGER:RETURNTEMPERATURE:HOTWATER",
-        "SETPOINTMANAGER:SCHEDULED",
-        "SETPOINTMANAGER:SCHEDULED:DUALSETPOINT",
-        "SETPOINTMANAGER:SINGLEZONE:COOLING",
-        "SETPOINTMANAGER:SINGLEZONE:HEATING",
-        "SETPOINTMANAGER:SINGLEZONE:HUMIDITY:MAXIMUM",
-        "SETPOINTMANAGER:SINGLEZONE:HUMIDITY:MINIMUM",
-        "SETPOINTMANAGER:SINGLEZONE:ONESTAGECOOLING",
-        "SETPOINTMANAGER:SINGLEZONE:ONESTAGEHEATING",
-        "SETPOINTMANAGER:SINGLEZONE:REHEAT",
-        "SETPOINTMANAGER:SYSTEMNODERESET:TEMPERATURE",
-        "SETPOINTMANAGER:SYSTEMNODERESET:HUMIDITY",
-        "SETPOINTMANAGER:WARMEST",
-        "SETPOINTMANAGER:WARMESTTEMPERATUREFLOW",
-        "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL",
-        "SOLARCOLLECTOR:FLATPLATE:WATER",
-        "SOLARCOLLECTOR:INTEGRALCOLLECTORSTORAGE",
-        "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED",
-        "SURFACEPROPERTY:LOCALENVIRONMENT",
-        "SWIMMINGPOOL:INDOOR",
-        "TEMPERINGVALVE",
-        "THERMALSTORAGE:CHILLEDWATER:MIXED",
-        "THERMALSTORAGE:CHILLEDWATER:STRATIFIED",
-        "THERMALSTORAGE:ICE:DETAILED",
-        "THERMALSTORAGE:ICE:SIMPLE",
-        "WATERHEATER:HEATPUMP",
-        "WATERHEATER:HEATPUMP:PUMPEDCONDENSER",
-        "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER",
-        "WATERHEATER:MIXED",
-        "WATERHEATER:STRATIFIED",
-        "WATERUSE:CONNECTIONS",
-        "ZONEHVAC:AIRDISTRIBUTIONUNIT",
-        "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC",
-        "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",
-        "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC",
-        "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",
-        "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",
-        "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
-        "ZONEHVAC:DEHUMIDIFIER:DX",
-        "ZONEHVAC:ENERGYRECOVERYVENTILATOR",
-        "ZONEHVAC:EQUIPMENTCONNECTIONS",
-        "ZONEHVAC:EVAPORATIVECOOLERUNIT",
-        "ZONEHVAC:EXHAUSTCONTROL",
-        "ZONEHVAC:FORCEDAIR:USERDEFINED",
-        "ZONEHVAC:FOURPIPEFANCOIL",
-        "ZONEHVAC:HIGHTEMPERATURERADIANT",
-        "ZONEHVAC:HYBRIDUNITARYHVAC",
-        "ZONEHVAC:IDEALLOADSAIRSYSTEM",
-        "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW",
-        "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW",
-        "ZONEHVAC:OUTDOORAIRUNIT",
-        "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER",
-        "ZONEHVAC:PACKAGEDTERMINALHEATPUMP",
-        "ZONEHVAC:REFRIGERATIONCHILLERSET",
-        "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
-        "ZONEHVAC:UNITHEATER",
-        "ZONEHVAC:UNITVENTILATOR",
-        "ZONEHVAC:VENTILATEDSLAB",
-        "ZONEHVAC:WATERTOAIRHEATPUMP",
-        "ZONEHVAC:WINDOWAIRCONDITIONER",
-        "ZONEPROPERTY:LOCALENVIRONMENT",
-    };
-
     // Types
     struct NodeData
     {
         // Members
-        NodeFluidType FluidType;     // must be one of the valid parameters
-        int FluidIndex;              // For Fluid Properties
-        Real64 Temp;                 // {C}
-        Real64 TempMin;              // {C}
-        Real64 TempMax;              // {C}
-        Real64 TempSetPoint;         // {C}
-        Real64 TempLastTimestep;     // [C}
-        Real64 MassFlowRateRequest;  // {kg/s}
-        Real64 MassFlowRate;         // {kg/s}
-        Real64 MassFlowRateMin;      // {kg/s}
-        Real64 MassFlowRateMax;      // {kg/s}
-        Real64 MassFlowRateMinAvail; // {kg/s}
-        Real64 MassFlowRateMaxAvail; // {kg/s}
-        Real64 MassFlowRateSetPoint; // {kg/s}
-        Real64 Quality;              // {0.0-1.0 vapor fraction/percent}
-        Real64 Press;                // {Pa}
-        Real64 Enthalpy;             // {J/kg}
-        Real64 EnthalpyLastTimestep; // {J/kg}
-        Real64 HumRat;               // {}
-        Real64 HumRatMin;            // {}
-        Real64 HumRatMax;            // {}
-        Real64 HumRatSetPoint;       // {}
-        Real64 TempSetPointHi;       // {C}
-        Real64 TempSetPointLo;       // {C}
-        Real64 Height;               // {m}
+        NodeFluidType FluidType = NodeFluidType::Blank; // must be one of the valid parameters
+        int FluidIndex = 0;                             // For Fluid Properties
+        Real64 Temp = 0.0;                              // {C}
+        Real64 TempMin = 0.0;                           // {C}
+        Real64 TempMax = 0.0;                           // {C}
+        Real64 TempSetPoint = SensedNodeFlagValue;      // {C}
+        Real64 TempLastTimestep = 0.0;                  // [C}
+        Real64 MassFlowRateRequest = 0.0;               // {kg/s}
+        Real64 MassFlowRate = 0.0;                      // {kg/s}
+        Real64 MassFlowRateMin = 0.0;                   // {kg/s}
+        Real64 MassFlowRateMax = SensedNodeFlagValue;   // {kg/s}
+        Real64 MassFlowRateMinAvail = 0.0;              // {kg/s}
+        Real64 MassFlowRateMaxAvail = 0.0;              // {kg/s}
+        Real64 MassFlowRateSetPoint = 0.0;              // {kg/s}
+        Real64 Quality = 0.0;                           // {0.0-1.0 vapor fraction/percent}
+        Real64 Press = 0.0;                             // {Pa}
+        Real64 Enthalpy = 0.0;                          // {J/kg}
+        Real64 EnthalpyLastTimestep = 0.0;              // {J/kg}
+        Real64 HumRat = 0.0;                            // {}
+        Real64 HumRatMin = SensedNodeFlagValue;         // {}
+        Real64 HumRatMax = SensedNodeFlagValue;         // {}
+        Real64 HumRatSetPoint = SensedNodeFlagValue;    // {}
+        Real64 TempSetPointHi = SensedNodeFlagValue;    // {C}
+        Real64 TempSetPointLo = SensedNodeFlagValue;    // {C}
+        Real64 Height = -1.0;                           // {m}
 
         //  Following are for Outdoor Air Nodes Scheduled Properties
-        bool IsLocalNode;
-        int OutAirDryBulbSchedNum;
-        int OutAirWetBulbSchedNum;
-        int OutAirWindSpeedSchedNum;
-        int OutAirWindDirSchedNum;
+        bool IsLocalNode = false;
+        int OutAirDryBulbSchedNum = 0;
+        int OutAirWetBulbSchedNum = 0;
+        int OutAirWindSpeedSchedNum = 0;
+        int OutAirWindDirSchedNum = 0;
 
         //  Following are for Outdoor Air Nodes "read only"
-        Real64 OutAirDryBulb;              // {C}
-        bool EMSOverrideOutAirDryBulb;     // if true, the EMS is calling to override outdoor air node drybulb setting
-        Real64 EMSValueForOutAirDryBulb;   // value EMS is directing to use for outdoor air node's drybulb {C}
-        Real64 OutAirWetBulb;              // {C}
-        bool EMSOverrideOutAirWetBulb;     // if true, the EMS is calling to override outdoor air node wetbulb setting
-        Real64 EMSValueForOutAirWetBulb;   // value EMS is directing to use for outdoor air node's wetbulb {C}
-        Real64 OutAirWindSpeed;            // {m/s}
-        bool EMSOverrideOutAirWindSpeed;   // if true, the EMS is calling to override outdoor air node wind speed setting
-        Real64 EMSValueForOutAirWindSpeed; // value EMS is directing to use for outdoor air node's drybulb {m/s}
-        Real64 OutAirWindDir;              // {degree}
-        bool EMSOverrideOutAirWindDir;     // if true, the EMS is calling to override outdoor air node wind direction setting
-        Real64 EMSValueForOutAirWindDir;   // value EMS is directing to use for outdoor air node's wind directio {degree}
+        Real64 OutAirDryBulb = 0.0;              // {C}
+        bool EMSOverrideOutAirDryBulb = false;   // if true, the EMS is calling to override outdoor air node drybulb setting
+        Real64 EMSValueForOutAirDryBulb = 0.0;   // value EMS is directing to use for outdoor air node's drybulb {C}
+        Real64 OutAirWetBulb = 0.0;              // {C}
+        bool EMSOverrideOutAirWetBulb = false;   // if true, the EMS is calling to override outdoor air node wetbulb setting
+        Real64 EMSValueForOutAirWetBulb = 0.0;   // value EMS is directing to use for outdoor air node's wetbulb {C}
+        Real64 OutAirWindSpeed = 0.0;            // {m/s}
+        bool EMSOverrideOutAirWindSpeed = false; // if true, the EMS is calling to override outdoor air node wind speed setting
+        Real64 EMSValueForOutAirWindSpeed = 0.0; // value EMS is directing to use for outdoor air node's drybulb {m/s}
+        Real64 OutAirWindDir = 0.0;              // {degree}
+        bool EMSOverrideOutAirWindDir = false;   // if true, the EMS is calling to override outdoor air node wind direction setting
+        Real64 EMSValueForOutAirWindDir = 0.0;   // value EMS is directing to use for outdoor air node's wind directio {degree}
         // Contaminant
-        Real64 CO2;                // {ppm}
-        Real64 CO2SetPoint;        // {ppm}
-        Real64 GenContam;          // {ppm}
-        Real64 GenContamSetPoint;  // {ppm}
-        bool SPMNodeWetBulbRepReq; // Set to true when node has SPM which follows wetbulb
+        Real64 CO2 = 0.0;                  // {ppm}
+        Real64 CO2SetPoint = 0.0;          // {ppm}
+        Real64 GenContam = 0.0;            // {ppm}
+        Real64 GenContamSetPoint = 0.0;    // {ppm}
+        bool SPMNodeWetBulbRepReq = false; // Set to true when node has SPM which follows wetbulb
 
         // error message flag
-        bool plantNodeErrorMsgIssued;
+        bool plantNodeErrorMsgIssued = false;
 
         // Default Constructor
-        NodeData()
-            : FluidType(NodeFluidType::Blank), FluidIndex(0), Temp(0.0), TempMin(0.0), TempMax(0.0), TempSetPoint(SensedNodeFlagValue),
-              TempLastTimestep(0.0), MassFlowRateRequest(0.0), MassFlowRate(0.0), MassFlowRateMin(0.0), MassFlowRateMax(SensedNodeFlagValue),
-              MassFlowRateMinAvail(0.0), MassFlowRateMaxAvail(0.0), MassFlowRateSetPoint(0.0), Quality(0.0), Press(0.0), Enthalpy(0.0),
-              EnthalpyLastTimestep(0.0), HumRat(0.0), HumRatMin(SensedNodeFlagValue), HumRatMax(SensedNodeFlagValue),
-              HumRatSetPoint(SensedNodeFlagValue), TempSetPointHi(SensedNodeFlagValue), TempSetPointLo(SensedNodeFlagValue), Height(-1.0),
-              IsLocalNode(false), OutAirDryBulbSchedNum(0), OutAirWetBulbSchedNum(0), OutAirWindSpeedSchedNum(0), OutAirWindDirSchedNum(0),
-              OutAirDryBulb(0.0), EMSOverrideOutAirDryBulb(false), EMSValueForOutAirDryBulb(0.0), OutAirWetBulb(0.0), EMSOverrideOutAirWetBulb(false),
-              EMSValueForOutAirWetBulb(0.0), OutAirWindSpeed(0.0), EMSOverrideOutAirWindSpeed(false), EMSValueForOutAirWindSpeed(0.0),
-              OutAirWindDir(0.0), EMSOverrideOutAirWindDir(false), EMSValueForOutAirWindDir(0.0), CO2(0.0), CO2SetPoint(0.0), GenContam(0.0),
-              GenContamSetPoint(0.0), SPMNodeWetBulbRepReq(false), plantNodeErrorMsgIssued(false)
-        {
-        }
+        NodeData() = default;
 
         // Member Constructor
         NodeData(NodeFluidType const FluidType,     // must be one of the valid parameters
@@ -1080,57 +554,38 @@ namespace DataLoopNode {
     struct MoreNodeData
     {
         // Members
-        Real64 RelHumidity;        // {%}
-        Real64 ReportEnthalpy;     // specific enthalpy calculated at the HVAC timestep [J/kg]
-        Real64 VolFlowRateStdRho;  // volume flow rate at standard density [m3/s]
-        Real64 VolFlowRateCrntRho; // volume flow rate at current density, only used for air nodes [m3/s]
-        Real64 WetBulbTemp;        // wetbulb temperature [C]
-        Real64 Density;            // reported density at current temperature [kg/m3]
-        Real64 AirDewPointTemp;    // reported system node dewpoint temperature [C]
-        Real64 SpecificHeat;       // reported node specific heat [J/kg-C]
-
-        // Default Constructor
-        MoreNodeData()
-            : RelHumidity(0.0), ReportEnthalpy(0.0), VolFlowRateStdRho(0.0), VolFlowRateCrntRho(0.0), WetBulbTemp(0.0), Density(0.0),
-              AirDewPointTemp(0.0), SpecificHeat(0.0)
-        {
-        }
+        Real64 RelHumidity = 0.0;        // {%}
+        Real64 ReportEnthalpy = 0.0;     // specific enthalpy calculated at the HVAC timestep [J/kg]
+        Real64 VolFlowRateStdRho = 0.0;  // volume flow rate at standard density [m3/s]
+        Real64 VolFlowRateCrntRho = 0.0; // volume flow rate at current density, only used for air nodes [m3/s]
+        Real64 WetBulbTemp = 0.0;        // wetbulb temperature [C]
+        Real64 Density = 0.0;            // reported density at current temperature [kg/m3]
+        Real64 AirDewPointTemp = 0.0;    // reported system node dewpoint temperature [C]
+        Real64 SpecificHeat = 0.0;       // reported node specific heat [J/kg-C]
     };
 
     struct MarkedNodeData
     {
         // Members
-        bool IsMarked;                   // true if this is a marked node
-        ConnectionObjectType ObjectType; // Object Type that needs it "marked"
-        std::string ObjectName;          // Object Name that needs it "marked"
-        std::string FieldName;           // FieldName that needs it "marked"
-
-        // Default Constructor
-        MarkedNodeData() : IsMarked(false), ObjectType(ConnectionObjectType::Invalid)
-        {
-        }
+        bool IsMarked = false;                                           // true if this is a marked node
+        ConnectionObjectType ObjectType = ConnectionObjectType::Invalid; // Object Type that needs it "marked"
+        std::string ObjectName;                                          // Object Name that needs it "marked"
+        std::string FieldName;                                           // FieldName that needs it "marked"
     };
 
     // A struct to defer checking whether a node did correctly get a setpoint via the API / PythonPlugin
     struct NodeSetpointCheckData
     {
-        bool needsSetpointChecking;
-        bool checkTemperatureSetPoint;
-        bool checkTemperatureMinSetPoint;
-        bool checkTemperatureMaxSetPoint;
-        bool checkHumidityRatioSetPoint;
-        bool checkHumidityRatioMinSetPoint;
-        bool checkHumidityRatioMaxSetPoint;
-        bool checkMassFlowRateSetPoint;
-        bool checkMassFlowRateMinSetPoint;
-        bool checkMassFlowRateMaxSetPoint;
-
-        NodeSetpointCheckData()
-            : needsSetpointChecking(false), checkTemperatureSetPoint(false), checkTemperatureMinSetPoint(false), checkTemperatureMaxSetPoint(false),
-              checkHumidityRatioSetPoint(false), checkHumidityRatioMinSetPoint(false), checkHumidityRatioMaxSetPoint(false),
-              checkMassFlowRateSetPoint(false), checkMassFlowRateMinSetPoint(false), checkMassFlowRateMaxSetPoint(false)
-        {
-        }
+        bool needsSetpointChecking = false;
+        bool checkTemperatureSetPoint = false;
+        bool checkTemperatureMinSetPoint = false;
+        bool checkTemperatureMaxSetPoint = false;
+        bool checkHumidityRatioSetPoint = false;
+        bool checkHumidityRatioMinSetPoint = false;
+        bool checkHumidityRatioMaxSetPoint = false;
+        bool checkMassFlowRateSetPoint = false;
+        bool checkMassFlowRateMinSetPoint = false;
+        bool checkMassFlowRateMaxSetPoint = false;
     };
 } // namespace DataLoopNode
 
@@ -1206,62 +661,7 @@ struct LoopNodeData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumOfNodes = 0;
-        this->NumofSplitters = 0;
-        this->NumofMixers = 0;
-        this->NodeID.deallocate();
-        this->Node.deallocate();
-        this->DefaultNodeValues = DataLoopNode::NodeData(DataLoopNode::NodeFluidType::Blank,
-                                                         0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         DataLoopNode::SensedNodeFlagValue,
-                                                         -1.0,
-                                                         false,
-                                                         0,
-                                                         0,
-                                                         0,
-                                                         0,
-                                                         0.0,
-                                                         false,
-                                                         0.0,
-                                                         0.0,
-                                                         false,
-                                                         0.0,
-                                                         0.0,
-                                                         false,
-                                                         0.0,
-                                                         0.0,
-                                                         false,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         0.0,
-                                                         false,
-                                                         false);
-        this->MoreNodeInfo.deallocate();
-        this->MarkedNode.deallocate();
-        this->NodeSetpointCheck.deallocate();
+        *this = LoopNodeData();
     }
 };
 

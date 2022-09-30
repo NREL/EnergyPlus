@@ -98,31 +98,24 @@ namespace DataBSDFWindow {
     {
         // Members
         // The following are in the local coordinate system corresponding to the matrix
-        Real64 Theta;     // Centroid Theta value
-        Real64 Phi;       // Centroid Phi value
-        Real64 dTheta;    // Element width, Theta
-        Real64 dPhi;      // Element width, Phi
-        Real64 UpprTheta; // Patch upper edge, Theta
-        Real64 LwrTheta;  // Patch lower edge, Theta
-        Real64 UpprPhi;   // Patch upper edge, Phi
-        Real64 LwrPhi;    // Patch lower edge, Phi
+        Real64 Theta = 0.0;     // Centroid Theta value
+        Real64 Phi = 0.0;       // Centroid Phi value
+        Real64 dTheta = 0.0;    // Element width, Theta
+        Real64 dPhi = 0.0;      // Element width, Phi
+        Real64 UpprTheta = 0.0; // Patch upper edge, Theta
+        Real64 LwrTheta = 0.0;  // Patch lower edge, Theta
+        Real64 UpprPhi = 0.0;   // Patch upper edge, Phi
+        Real64 LwrPhi = 0.0;    // Patch lower edge, Phi
         // Note: The dimension index of the BasisElementDescription object corresponds to
         // the position (index) of this element in the row or column of property matrix
         // Note:  the following are intended to be used for interpolating directions among basis elements
-        int INNbInL;  // Index of inward (lower Theta) neighbor, lower phi
-        int INNbInH;  // Index of inward (lower Theta) neighbor, higher phi
-        int INNbOutL; // Index of outward (higher Theta) neighbor, lower phi
-        int INNbOutH; // Index of outward (higher Theta) neighbor, higher phi
-        int INNbLft;  // Index of leftward (higher Phi) neighbor (same Theta)
-        int INNbRt;   // Index of rightward (lower Phi) neighbor (same Theta)
+        int INNbInL = 0;  // Index of inward (lower Theta) neighbor, lower phi
+        int INNbInH = 0;  // Index of inward (lower Theta) neighbor, higher phi
+        int INNbOutL = 0; // Index of outward (higher Theta) neighbor, lower phi
+        int INNbOutH = 0; // Index of outward (higher Theta) neighbor, higher phi
+        int INNbLft = 0;  // Index of leftward (higher Phi) neighbor (same Theta)
+        int INNbRt = 0;   // Index of rightward (lower Phi) neighbor (same Theta)
         // These indices are in the BasisElement array, which matches the row/column of the matrix
-
-        // Default Constructor
-        BasisElemDescr()
-            : Theta(0.0), Phi(0.0), dTheta(0.0), dPhi(0.0), UpprTheta(0.0), LwrTheta(0.0), UpprPhi(0.0), LwrPhi(0.0), INNbInL(0), INNbInH(0),
-              INNbOutL(0), INNbOutH(0), INNbLft(0), INNbRt(0)
-        {
-        }
     };
 
     struct BSDFDaylghtPosition
@@ -148,23 +141,18 @@ namespace DataBSDFWindow {
     struct BasisStruct
     {
         // Members
-        Basis BasisType;                 // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
-        BasisSymmetry BasisSymmetryType; // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
-        int BasisMatIndex;               // pointer to matrix for basis
-        int NBasis;                      // No. elements in basis
-        Array1D<Real64> Lamda;           // Vector of diagonal Lamda matrix elems for grid
-        Array1D<Real64> SolAng;          // Vector of basis element solid angles for grid
-        int NThetas;                     // No. Theta values in basis
-        Array1D<Real64> Thetas;          // List of basis theta values
-        Array1D_int NPhis;               // No. basis phi values for each theta
-        Array2D<Real64> Phis;            // List of basis phi values for each theta
-        Array2D_int BasisIndex;          // Index of basis element for theta, phi
-        Array1D<BasisElemDescr> Grid;    // actual basis (to be constructed from matrix)
-
-        // Default Constructor
-        BasisStruct() : BasisType(Basis::Invalid), BasisSymmetryType(BasisSymmetry::Invalid), BasisMatIndex(0), NBasis(0), NThetas(0)
-        {
-        }
+        Basis BasisType = Basis::Invalid;                         // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
+        BasisSymmetry BasisSymmetryType = BasisSymmetry::Invalid; // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
+        int BasisMatIndex = 0;                                    // pointer to matrix for basis
+        int NBasis = 0;                                           // No. elements in basis
+        Array1D<Real64> Lamda;                                    // Vector of diagonal Lamda matrix elems for grid
+        Array1D<Real64> SolAng;                                   // Vector of basis element solid angles for grid
+        int NThetas = 0;                                          // No. Theta values in basis
+        Array1D<Real64> Thetas;                                   // List of basis theta values
+        Array1D_int NPhis;                                        // No. basis phi values for each theta
+        Array2D<Real64> Phis;                                     // List of basis phi values for each theta
+        Array2D_int BasisIndex;                                   // Index of basis element for theta, phi
+        Array1D<BasisElemDescr> Grid;                             // actual basis (to be constructed from matrix)
     };
 
     struct BSDFGeomDescr
@@ -175,11 +163,11 @@ namespace DataBSDFWindow {
         Array1D<BSDFDaylghtPosition> pInc; // azimuth and altitude of incidence vectors
         Array1D<Real64> CosInc;            // cosine of incident angle
         Array1D<Real64> DAInc;             // cosine of incident angle times delta theta time delta phi (used in daylighting calculations)
-        int NSkyUnobs;                     // Number of Inc basis rays from unobstructed sky
-        int NGndUnobs;                     // Number of Inc basis rays from unobstructed ground
-        int NSky;                          // Number of Inc basis rays from sky
-        int NGnd;                          // Number of Inc basis rays from gnd
-        int NReflSurf;                     // Number of Inc basis rays from (potentially reflecting) surfaces
+        int NSkyUnobs = 0;                 // Number of Inc basis rays from unobstructed sky
+        int NGndUnobs = 0;                 // Number of Inc basis rays from unobstructed ground
+        int NSky = 0;                      // Number of Inc basis rays from sky
+        int NGnd = 0;                      // Number of Inc basis rays from gnd
+        int NReflSurf = 0;                 // Number of Inc basis rays from (potentially reflecting) surfaces
         Array1D_int SkyIndex;              // list of sky basis indices
         Array1D_int GndIndex;              // list of gnd basis indices
         Array1D<Vector> GndPt;             // gnd intersection pt of gnd basis ray (z=0)
@@ -210,12 +198,7 @@ namespace DataBSDFWindow {
         Array2D<Real64>
             ARhoVisOverlap; // Overlap areas multiplied with surface reflectance for each outgoing direction (Trn) (no of outgoing dir, NBKSurf)
         Array1D<Real64> AveRhoVisOverlap; // Average visible reflectance from overlap surface which originates from one outgoing direction
-        bool InitState;                   // Flag for marking that state needs to be initialized
-
-        // Default Constructor
-        BSDFGeomDescr() : NSkyUnobs(0), NGndUnobs(0), NSky(0), NGnd(0), NReflSurf(0), InitState(true)
-        {
-        }
+        bool InitState = true;            // Flag for marking that state needs to be initialized
     };
 
     struct BSDFRefPoints
@@ -237,9 +220,6 @@ namespace DataBSDFWindow {
         Array1D_int RefPointIndex;    // outgoing direction which containts reference point (# window el)
         Array1D_bool RefPointIntersection; // determines if reference point is laying in light tube of bsdf outgoing direction (NTrnBasis)
         Array1D<Real64> RefPtIntPosFac; // position factors for intersections from reference point to window for each outgoing direction (NTrnBasis)
-
-        // Default Constructor
-        BSDFRefPoints() = default;
     };
 
     struct BSDFDaylghtGeomDescr
@@ -248,9 +228,6 @@ namespace DataBSDFWindow {
         Array2D<BSDFRefPoints>
             IlluminanceMap; // array to keep bsdf coefficients for different illuminance maps (# of illuminance maps, # of reference points)
         Array1D<BSDFRefPoints> RefPoint; // keep reference points daylight coefficients (# of reference points)
-
-        // Default Constructor
-        BSDFDaylghtGeomDescr() = default;
     };
 
     struct BSDFBkSurfDescr
@@ -264,31 +241,28 @@ namespace DataBSDFWindow {
         // Performance May be faster in (layer,hr,timestep) order (loops are not consistent)
         // Note:  WinDHBkRefl and WinDirBkAbs are the same for all hours & timesteps if the back surface window is a
         // Complex Fenestration; they depend on the sun direction if the back surface window is a regular window
-
-        // Default Constructor
-        BSDFBkSurfDescr() = default;
     };
 
     struct BSDFStateDescr
     {
         // Members
-        int Konst; // pointer to construction for this state; property matrices are in the construction
+        int Konst = 0; // pointer to construction for this state; property matrices are in the construction
         // INTEGER      :: ThermConst =0  ! pointer to thermal construction for this state
-        Real64 WinDiffTrans; // Window hemispherical ave diff trans
+        Real64 WinDiffTrans = 0.0; // Window hemispherical ave diff trans
         // for use in corrections requiring a diffuse trans
         // that have not been redone in detail for Compex Fen
-        Real64 WinDiffVisTrans;          // Window hemispherical ave diff trans for visible spectrum
+        Real64 WinDiffVisTrans = 0.0;    // Window hemispherical ave diff trans for visible spectrum
         Array2D<Real64> WinDirHemiTrans; // Directional-hemispherical transmittance(hr,ts)
         Array2D<Real64> WinDirSpecTrans; // Directional specular transmittance(hr,ts)
-        Real64 WinSkyTrans;              // Transmittance for sky radiation (weighted average over sky viewed)
-        Real64 WinSkyGndTrans;           // Transmittance for sky radiation reflected from ground (average over
+        Real64 WinSkyTrans = 0.0;        // Transmittance for sky radiation (weighted average over sky viewed)
+        Real64 WinSkyGndTrans = 0.0;     // Transmittance for sky radiation reflected from ground (average over
         // viewed part of ground)
         Array2D<Real64> WinBmGndTrans; // Transmittance (hour, timestep) for beam radiation reflected
         // from ground (average over unshaded ground viewed)
-        Real64 WinBkHemRefl;    // Window back hemispherical reflectance
-        Real64 WinBkHemVisRefl; // Window back hemispherical reflectance (visible spectrum)
+        Real64 WinBkHemRefl = 0.0;    // Window back hemispherical reflectance
+        Real64 WinBkHemVisRefl = 0.0; // Window back hemispherical reflectance (visible spectrum)
         //(for reflection of interior diffuse radiation)
-        int NLayers;                  // Number of absorbing layers in this window
+        int NLayers = 0;              // Number of absorbing layers in this window
         Array3D<Real64> WinBmFtAbs;   // Front directional absorptance (hour, timestep, layer)
         Array1D<Real64> WinSkyFtAbs;  // Front absorptance (layer) averaged over sky
         Array1D<Real64> WinSkyGndAbs; // Front absorptance (layer) averaged over ground
@@ -309,13 +283,6 @@ namespace DataBSDFWindow {
         Array1D<Real64> IntegratedBkAbs;   // Sum of all back layer absorptances (for each back direction)
         Array1D<Real64> IntegratedBkRefl;  // Integrated back layer reflectance (for each back direction)
         Array1D<Real64> IntegratedBkTrans; // Integrated back layer transmittance (for each back direction)
-
-        // Default Constructor
-        BSDFStateDescr()
-            : Konst(0), WinDiffTrans(0.0), WinDiffVisTrans(0.0), WinSkyTrans(0.0), WinSkyGndTrans(0.0), WinBkHemRefl(0.0), WinBkHemVisRefl(0.0),
-              NLayers(0)
-        {
-        }
     };
 
     struct BSDFRefPointsGeomDescr
@@ -323,9 +290,6 @@ namespace DataBSDFWindow {
         // Members
         Array1D<Real64> SolidAngle;    // Solid angle from daylighting reference point to each window element (# window el)
         Array1D<Vector> SolidAngleVec; // unit vector from reference point towards center of window element (# window el)
-
-        // Default Constructor
-        BSDFRefPointsGeomDescr() = default;
     };
 
     struct BSDFWindowGeomDescr
@@ -334,11 +298,11 @@ namespace DataBSDFWindow {
         // This contains all the geometry info that we don't want to carry around in SurfaceWindow
         // This is dimensioned like SurfaceWindow, but only surfaces that are complex windows
         // will have the structure below allocated
-        int NumStates;                             // Number of states for this window
+        int NumStates = 0;                         // Number of states for this window
         Array1D<BSDFGeomDescr> Geom;               // This is dimensioned with number of states
         Array1D<BSDFDaylghtGeomDescr> DaylghtGeom; // This is dimensioned with number of states
-        bool DaylightingInitialized;               // used for one time initialization only
-        int NBkSurf;                               // Number of back (interior) surfaces viewed by this window
+        bool DaylightingInitialized = false;       // used for one time initialization only
+        int NBkSurf = 0;                           // Number of back (interior) surfaces viewed by this window
         Array1D<Vector> sWinSurf;                  // Unit vector from window center to center of IBkSurf
         Array1D<Real64> sdotN;                     // Dot product of unit vector s with back surface normal
         // here s is vector from center of window to center of back surface
@@ -346,18 +310,13 @@ namespace DataBSDFWindow {
         Array2D<BSDFRefPointsGeomDescr>
             IlluminanceMap; // array to keep bsdf coefficients for different illuminance maps (# of illuminance maps, # of reference points)
         Array1D<BSDFRefPointsGeomDescr> RefPoint; // keep reference points daylight coefficients (# of reference points)
-
-        // Default Constructor
-        BSDFWindowGeomDescr() : NumStates(0), DaylightingInitialized(false), NBkSurf(0)
-        {
-        }
     };
 
     struct BSDFWindowDescript
     {
         // Members
-        int NumStates;                   // Number of states for this window
-        int CurrentState;                // Current state of this window
+        int NumStates = 0;               // Number of states for this window
+        int CurrentState = 1;            // Current state of this window
         Array2D<Real64> ResultAllStates; // Array to hold calculated
         // quantities for all states.
         // Currently unallocated.  To be defined when control
@@ -370,68 +329,49 @@ namespace DataBSDFWindow {
         // some information about all the states to decide where to
         // set the state variable for the next time step
         Array1D<BSDFStateDescr> State; // State description, dimensioned with number of states
-
-        // Default Constructor
-        BSDFWindowDescript() : NumStates(0), CurrentState(1)
-        {
-        }
     };
 
     struct BSDFLayerAbsorpStruct
     {
         // Members
-        int MaterialIndex;      // pointer to material layer
-        int FrtAbsIndex;        // pointer to matrix for Front directional absorptance vector
-        int AbsNcols;           // Number of elements (columns) in each of the absorption (row) vectors
+        int MaterialIndex = 0;  // pointer to material layer
+        int FrtAbsIndex = 0;    // pointer to matrix for Front directional absorptance vector
+        int AbsNcols = 0;       // Number of elements (columns) in each of the absorption (row) vectors
         Array2D<Real64> FrtAbs; // Front directional absorptance vector
-        int BkAbsIndex;         // pointer to matrix for Back directional absorptance vector
+        int BkAbsIndex = 0;     // pointer to matrix for Back directional absorptance vector
         Array2D<Real64> BkAbs;  // Back directional absorptance vector
-
-        // Default Constructor
-        BSDFLayerAbsorpStruct() : MaterialIndex(0), FrtAbsIndex(0), AbsNcols(0), BkAbsIndex(0)
-        {
-        }
     };
 
     struct BSDFWindowInputStruct
     {
         // Members
         // nested data for Construction
-        Basis BasisType;
-        BasisSymmetry BasisSymmetryType;
-        int ThermalModel;            // Pointer to thermal model
-        int BasisMatIndex;           // pointer to matrix for basis
-        int BasisMatNrows;           // No. rows in matrix
-        int BasisMatNcols;           // No. columns in matrix
-        int NBasis;                  // No. elements in basis
+        Basis BasisType = Basis::Invalid;
+        BasisSymmetry BasisSymmetryType = BasisSymmetry::Invalid;
+        int ThermalModel = 0;        // Pointer to thermal model
+        int BasisMatIndex = 0;       // pointer to matrix for basis
+        int BasisMatNrows = 0;       // No. rows in matrix
+        int BasisMatNcols = 0;       // No. columns in matrix
+        int NBasis = 0;              // No. elements in basis
         Array2D<Real64> BasisMat;    // basis matrix
-        int SolFrtTransIndex;        // pointer to matrix for Front optical transmittance matrix
-        int SolFrtTransNrows;        // No. rows in matrix
-        int SolFrtTransNcols;        // No. columns in matrix
+        int SolFrtTransIndex = 0;    // pointer to matrix for Front optical transmittance matrix
+        int SolFrtTransNrows = 0;    // No. rows in matrix
+        int SolFrtTransNcols = 0;    // No. columns in matrix
         Array2D<Real64> SolFrtTrans; // Front optical transmittance matrix
-        int SolBkReflIndex;          // pointer to matrix for Back optical reflectance matrix
-        int SolBkReflNrows;          // No. rows in matrix
-        int SolBkReflNcols;          // No. columns in matrix
+        int SolBkReflIndex = 0;      // pointer to matrix for Back optical reflectance matrix
+        int SolBkReflNrows = 0;      // No. rows in matrix
+        int SolBkReflNcols = 0;      // No. columns in matrix
         Array2D<Real64> SolBkRefl;   // Back optical reflectance matrix
-        int VisFrtTransIndex;        // pointer to matrix for Front visible transmittance matrix
-        int VisFrtTransNrows;        // No. rows in matrix
-        int VisFrtTransNcols;        // No. columns in matrix
+        int VisFrtTransIndex = 0;    // pointer to matrix for Front visible transmittance matrix
+        int VisFrtTransNrows = 0;    // No. rows in matrix
+        int VisFrtTransNcols = 0;    // No. columns in matrix
         Array2D<Real64> VisFrtTrans; // Front visible transmittance matrix
-        int VisBkReflIndex;          // pointer to matrix for Back visible reflectance matrix
-        int VisBkReflNrows;          // No. rows in matrix
-        int VisBkReflNcols;          // No. columns in matrix
+        int VisBkReflIndex = 0;      // pointer to matrix for Back visible reflectance matrix
+        int VisBkReflNrows = 0;      // No. rows in matrix
+        int VisBkReflNcols = 0;      // No. columns in matrix
         Array2D<Real64> VisBkRefl;   // Back visible reflectance matrix
-        int NumLayers;
+        int NumLayers = 0;
         Array1D<BSDFLayerAbsorpStruct> Layer;
-
-        // Default Constructor
-        BSDFWindowInputStruct()
-            : BasisType(Basis::Invalid), BasisSymmetryType(BasisSymmetry::Invalid), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0),
-              BasisMatNcols(0), NBasis(0), SolFrtTransIndex(0), SolFrtTransNrows(0), SolFrtTransNcols(0), SolBkReflIndex(0), SolBkReflNrows(0),
-              SolBkReflNcols(0), VisFrtTransIndex(0), VisFrtTransNrows(0), VisFrtTransNcols(0), VisBkReflIndex(0), VisBkReflNrows(0),
-              VisBkReflNcols(0), NumLayers(0)
-        {
-        }
     };
 
 } // namespace DataBSDFWindow
@@ -451,13 +391,7 @@ struct BSDFWindowData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->TotComplexFenStates = 0;
-        this->FirstBSDF = 0;
-        this->MaxBkSurf = 20;
-        this->TotThermalModels = 0;
-        this->SUNCOSTS = Array2D<Vector3<Real64>>(60, 24);
-        this->BSDFTempMtrx.deallocate();
-        this->ComplexWind.deallocate();
+        *this = BSDFWindowData();
     }
 };
 

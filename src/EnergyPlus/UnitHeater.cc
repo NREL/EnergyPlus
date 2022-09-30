@@ -358,9 +358,10 @@ namespace UnitHeater {
                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
 
                     {
-                        auto const SELECT_CASE_var(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num);
-                        if ((SELECT_CASE_var == FanType_SimpleConstVolume) || (SELECT_CASE_var == FanType_SimpleVAV) ||
-                            (SELECT_CASE_var == FanType_SimpleOnOff)) {
+                        switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num) {
+                        case FanType_SimpleConstVolume:
+                        case FanType_SimpleVAV:
+                        case FanType_SimpleOnOff:
                             // Get fan outlet node
                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode =
                                 GetFanOutletNode(state,
@@ -373,7 +374,8 @@ namespace UnitHeater {
                                                       state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name + "\".");
                                 ErrorsFound = true;
                             }
-                        } else {
+                            break;
+                        default:
                             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + Alphas(1) + "\"");
                             ShowContinueError(state, "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume");
                             ErrorsFound = true;

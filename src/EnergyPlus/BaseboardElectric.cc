@@ -83,8 +83,7 @@ namespace BaseboardElectric {
     const char *cCMO_BBRadiator_Electric = "ZoneHVAC:Baseboard:Convective:Electric";
     constexpr Real64 SimpConvAirFlowSpeed(0.5); // m/s
 
-    void SimElectricBaseboard(
-        EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
+    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -137,7 +136,7 @@ namespace BaseboardElectric {
 
         InitBaseboard(state, BaseboardNum, ControlledZoneNum);
 
-        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToHeatSP;
 
         // Simulate baseboard
         SimElectricConvective(state, BaseboardNum, QZnReq);
@@ -188,9 +187,6 @@ namespace BaseboardElectric {
         int NumNums;
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
-
-        int CtrlZone;         // index to constrolled zone number
-        int ZoneEquipTypeNum; // index to zone equipment in a zone equipment list
 
         auto &baseboard = state.dataBaseboardElectric;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -332,15 +328,8 @@ namespace BaseboardElectric {
                     ErrorsFound = true;
                 }
 
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++ZoneEquipTypeNum) {
-                        if (state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeEnum(ZoneEquipTypeNum) ==
-                                DataZoneEquipment::ZoneEquip::BBElectricConvective &&
-                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(ZoneEquipTypeNum) == thisBaseboard.EquipName) {
-                            thisBaseboard.ZonePtr = CtrlZone;
-                        }
-                    }
-                }
+                thisBaseboard.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
+                    state, DataZoneEquipment::ZoneEquip::BBElectricConvective, thisBaseboard.EquipName);
             }
 
             if (ErrorsFound) {
@@ -404,25 +393,11 @@ namespace BaseboardElectric {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
         auto &baseboard = state.dataBaseboardElectric;
-
-        // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!baseboard->baseboards(BaseboardNum).ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            baseboard->baseboards(BaseboardNum).ZoneEquipmentListChecked = true;
-            if (!DataZoneEquipment::CheckZoneEquipmentList(
-                    state, baseboard->baseboards(BaseboardNum).EquipType, baseboard->baseboards(BaseboardNum).EquipName)) {
-                ShowSevereError(state,
-                                "InitBaseboard: Unit=[" + baseboard->baseboards(BaseboardNum).EquipType + ',' +
-                                    baseboard->baseboards(BaseboardNum).EquipName +
-                                    "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
-            }
-        }
 
         if (!state.dataGlobal->SysSizingCalc && baseboard->baseboards(BaseboardNum).MySizeFlag) {
             // for each coil, do the sizing once.

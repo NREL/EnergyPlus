@@ -54,7 +54,7 @@ These material property objects are used in conjunction with the basic material 
 
 This definition should be used when the four main thermal properties (thickness, conductivity, density, and specific heat) of the material are known. This syntax is used to describe opaque construction elements only.
 
-When a Material is used for the Construction of a building surface, care should be taken to not attempt to model assemblies that were not included in the intended scope of applicability for the underlying heat transfer models.~ The building surface models are for normal applications to building energy efficiency where the main focus is on assemblies with some thermal resistance. Extremely thin and/or highly conductive material layers should be neglected from the Construction rather than included because they will not contribute to the assembly's overall thermal resistance or heat capacity. For some cases, thin and/or highly conductive materials are a serious problem for the heat transfer modeling and the values for thickness, conductivity, density and specific heat are checked for appropriateness. This check calculates the Material's thermal diffusivity from the inputs for conductivity, density, and specific heat and compares it to a maximum threshold of 1.E-5 (m\(^{2}\)/s). If the diffusivity is above this threshold, then the program checks if the layer is sufficiently thick and may issue a warning if it is too thin and highly conductive.
+When a Material is used for the Construction of a building surface, care should be taken to not attempt to model assemblies that were not included in the intended scope of applicability for the underlying heat transfer models.~ The building surface models are for normal applications to building energy efficiency where the main focus is on assemblies with some thermal resistance. Extremely thin and/or highly conductive material layers should be neglected from the Construction rather than included because they will not contribute to the assembly's overall thermal resistance or heat capacity. For some cases, thin and/or highly conductive materials are a serious problem for the heat transfer modeling and the values for thickness, conductivity, density and specific heat are checked for appropriateness. This check calculates the Material's thermal diffusivity from the inputs for conductivity, density, and specific heat and compares it to a maximum threshold of $10^{-5}$ (m\(^{2}\)/s). If the diffusivity is above this threshold, then the program checks if the layer is sufficiently thick and may issue a warning if it is too thin and highly conductive.
 
 The absorptance values in this object impart surface properties to the construction and should be applied to the thermally significant inner and outer layers in the overall assembly.~ Attempting to trick the program by modeling thin ``paint'' layers to apply surface properties is not a good idea; the models were not intended to support such strategies.
 
@@ -90,11 +90,11 @@ The thermal absorptance field in the Material input syntax represents the fracti
 
 \paragraph{Field: Solar Absorptance}\label{field-solar-absorptance}
 
-The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation (0.3 to 2.537 microns) includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
+The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation (0.3 to 2.537 $\mu{}m$) includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 \paragraph{Field: Visible Absorptance}\label{field-visible-absorptance}
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation ( 0.37 to 0.78 microns weighted by photopic response) is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation (0.37 to 0.78 $\mu{}m$ weighted by photopic response) is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 An IDF example:
 
@@ -131,26 +131,26 @@ This field is used to enter the thermal resistance (R-value) of the material lay
 
 \paragraph{Field: Thermal Absorptance}\label{field-thermal-absorptance-1}
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength (>2.5 microns) radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). The default value for this field is 0.9.
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength (>2.5 $\mu{}m$) radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). The default value for this field is 0.9.
 
 \paragraph{Field: Solar Absorptance}\label{field-solar-absorptance-1}
 
-The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation (0.3 to 2.537 microns) includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
+The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation (0.3 to 2.537 $\mu{}m$) includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 \paragraph{Field: Visible Absorptance}\label{field-visible-absorptance-1}
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation ( 0.37 to 0.78 microns weighted by photopic response) is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation (0.37 to 0.78 $\mu{}m$ weighted by photopic response) is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. The default value for this field is 0.7.
 
 An IDF example:
 
 \begin{lstlisting}
-
-Material:NoMass,R13LAYER,  ! Material Name
-   Rough,  ! Roughness
-     2.290965    ,  ! Resistance {M**2K/W}
-    0.9000000    ,   ! Thermal Absorptance
-    0.7500000    ,   ! Solar Absorptance
-    0.7500000    ;   ! Visible Absorptance
+Material:NoMass,
+    R13LAYER,  ! Material Name
+    Rough,     ! Roughness
+    2.290965,  ! Resistance {M**2K/W}
+    0.9000000, ! Thermal Absorptance
+    0.7500000, ! Solar Absorptance
+    0.7500000; ! Visible Absorptance
 \end{lstlisting}
 
 \subsection{Material:InfraredTransparent}\label{materialinfraredtransparent}
@@ -240,168 +240,98 @@ An IDF example:
 
 \begin{lstlisting}
 
-Material:AirGap,B1 - AIRSPACE RESISTANCE,  ! Material Name
-    0.1603675    ;  ! Resistance {M**2K/W}
+Material:AirGap,
+    B1 - AIRSPACE RESISTANCE,  ! Material Name
+    0.1603675;                 ! Resistance {M**2K/W}
 \end{lstlisting}
 
 \subsection{MaterialProperty:MoisturePenetrationDepth:Settings}\label{materialpropertymoisturepenetrationdepthsettings}
 
-This material is used to describe the nine moisture material properties
-that are used in the EMPD (Effective Moisture Penetration Depth) heat
-balance solution algorithm. The EMPD algorithm is a simplified, lumped
-moisture model that simulates moisture storage and release from interior
-surfaces. The model uses convective mass transfer
-coefficients that are determined by existing heat and mass transfer
-relationships, e.g.~the Lewis relation. The EMPD model includes two
-fictitious layers of material with uniform moisture content: a surface
-layer, which accounts for short-term moisture buffering, and a deep
-layer, which accounts for more slowly responding moisture buffering. The
-model calculates the moisture transfer between the air and the surface
-layer and between the surface layer and the deep layer. This moisture
-transfer impacts the zone humidity, and also impacts the zone
-temperature through latent-to-sensible conversion from the heat of
-adsorption.
+This material is used to describe the nine moisture material properties that are used in the EMPD (Effective Moisture Penetration Depth) heat balance solution algorithm. The EMPD algorithm is a simplified, lumped moisture model that simulates moisture storage and release from interior surfaces. The model uses convective mass transfer coefficients that are determined by existing heat and mass transfer relationships, e.g.~the Lewis relation. The EMPD model includes two fictitious layers of material with uniform moisture content: a surface layer, which accounts for short-term moisture buffering, and a deep layer, which accounts for more slowly responding moisture buffering. The model calculates the moisture transfer between the air and the surface layer and between the surface layer and the deep layer. This moisture transfer impacts the zone humidity, and also impacts the zone temperature through latent-to-sensible conversion from the heat of adsorption.
 
-This moisture model is used when the appropriate EMPD moisture
-materials are specified and the Solution Algorithm parameter is set to
-MoisturePenetrationDepthConductionTransferFunction.
+This moisture model is used when the appropriate EMPD moisture materials are specified and the Solution Algorithm parameter is set to MoisturePenetrationDepthConductionTransferFunction.
 
 \subsubsection{Inputs}\label{empd-inputs}
 
 \paragraph{Field: Name}\label{materialpropertymoisturepenetrationdepthsettings-field-name}
 
-This field is a unique reference name that the user assigns to a
-particular material. This name can then be referred to by other input
-data (ref: Construction object).
+This field is a unique reference name that the user assigns to a particular material. This name can then be referred to by other input data (ref: Construction object).
 
-\paragraph{Field: Water Vapor Diffusion Resistance
-	Factor}\label{field-water-vapor-diffusion-resistance-factor}
+\paragraph{Field: Water Vapor Diffusion Resistance Factor}\label{field-water-vapor-diffusion-resistance-factor}
 
-The vapor diffusion resistance factor is the resistance to water vapor
-diffusion \emph{relative} to the resistance to water vapor diffusion in
-stagnant air. In other words, \(\mu\) equals 1 for air, and is generally
-greater than 1 for building materials.
+The vapor diffusion resistance factor is the resistance to water vapor diffusion \emph{relative} to the resistance to water vapor diffusion in stagnant air. In other words, \(\mu\) equals 1 for air, and is generally greater than 1 for building materials.
 
 The equation for \(\mu\) is:
 
 \[ \mu = \frac {\delta_{perm,air}} {\delta_{perm}} \]
 
-where \(\delta_{perm,air}\) is the permeability of water vapor in air
-{[}kg/m-s-Pa{]}, and \(\delta_{perm}\) is the permeability of water
-vapor in the material. The permeability of water vapor in air can be
-estimated as:
+where \(\delta_{perm,air}\) is the permeability of water vapor in air {[}kg/m-s-Pa{]}, and \(\delta_{perm}\) is the permeability of water vapor in the material. The permeability of water vapor in air can be estimated as:
 
 \[ \delta_{perm,air} = \frac {2 \times 10^{-7} \cdot T^{0.81}} {P_{ambient}} \]
 
-where \(T\) is the temperature {[}C{]} and \(P_{ambient}\) the ambient
-atmospheric pressure {[}Pa{]}.
+where \(T\) is the temperature {[}C{]} and \(P_{ambient}\) the ambient atmospheric pressure {[}Pa{]}.
 
-\paragraph{Fields: Moisture equilibrium
-	constants}\label{fields-moisture-equilibrium-constants}
+\paragraph{Fields: Moisture equilibrium constants}\label{fields-moisture-equilibrium-constants}
 
-The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d},
-define the sorption isotherm curve used for building materials under
-equilibrium conditions. They define the relationship between
-the material's moisture content and the surface air relative humidity
-(ref: Effective Moisture Penetration Depth (EMPD) Model in the
-Engineering Reference):
+The next four fields, coefficients \emph{a}, \emph{b}, \emph{c}, and \emph{d}, define the sorption isotherm curve used for building materials under equilibrium conditions. They define the relationship between the material's moisture content and the surface air relative humidity (ref: Effective Moisture Penetration Depth (EMPD) Model in the Engineering Reference):
 
 \[ u = a \cdot \phi^b + c \cdot \phi^d \]
 
 where
 
-\(a,b,c,d\) = Coefficients to define the relationship between the
-material's moisture content and the surface air relative humidity
+\(a,b,c,d\) = Coefficients to define the relationship between the material's moisture content and the surface air relative humidity;
 
-\(u\) = Moisture content defined as the mass fraction of water contained
-in a material, per mass of dry material {[}kg/kg{]}
+\(u\) = Moisture content defined as the mass fraction of water contained in a material, per mass of dry material {[}kg/kg{]};
 
-\(\phi\) = Surface air relative humidity {[}0 to 1{]},
+\(\phi\) = Surface air relative humidity {[}0 to 1{]}.
 
-\paragraph{Field: Surface Layer Penetration
-	Depth}\label{field-surface-layer-penetration-depth}
+\paragraph{Field: Surface Layer Penetration Depth}\label{field-surface-layer-penetration-depth}
 
-The Surface Layer Penetration Depth is the fictitious thickness of the
-surface layer in meters, and is used to calculate the volume of material
-that participates in short-term moisture transfer and storage. This
-layer has a uniform moisture content, and can be considered a
-\emph{lumped-capacitance}. The penetration depth is based on the amount
-of material that interacts with the zone air when subject to a cyclic
-relative humidity variation. It also impacts the mass transfer resistance
-between the zone air and this layer, with thinner depths resulting in lower
-mass transfer resistances (ref: Effective Moisture Penetration Depth (EMPD) Model
-in the Engineering Reference). For this reason very small values can lead to
-instabilities depending on the timestep.The surface penetration depth can be
-estimated with the following equation:
+The Surface Layer Penetration Depth is the fictitious thickness of the surface layer in meters, and is used to calculate the volume of material that participates in short-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a \emph{lumped-capacitance}. The penetration depth is based on the amount of material that interacts with the zone air when subject to a cyclic relative humidity variation. It also impacts the mass transfer resistance between the zone air and this layer, with thinner depths resulting in lower mass transfer resistances (ref: Effective Moisture Penetration Depth (EMPD) Model in the Engineering Reference). For this reason very small values can lead to instabilities depending on the timestep.The surface penetration depth can be estimated with the following equation:
 
 \[ d_{EMPD,surf} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{surf}}{\rho_{material} \frac{du}{d\phi} \pi}} \]
 
 where
 
-\(\delta_{perm}\) = water vapor permeability in the material, kg/m-s-Pa
-(see Vapor diffusion resistance factor above)
+\(\delta_{perm}\) = water vapor permeability in the material, kg/m-s-Pa (see Vapor diffusion resistance factor above);
 
-\(P_{sat}\) = saturated vapor pressure at some nominal temperature, Pa
+\(P_{sat}\) = saturated vapor pressure at some nominal temperature, Pa;
 
-\(\tau_{surf}\) = cycle period of typical RH variations, s. 24 hours
-(87600 s) is often used.
+\(\tau_{surf}\) = cycle period of typical RH variations, s. 24 hours (86,400 s) is often used.
 
-\(\rho_{material}\) = dry density of material, kg/m\^{}3
+\(\rho_{material}\) = dry density of material, kg/m$^3$;
 
-\(\frac{du}{d\phi}\) = slope of moisture soprtion curve,
-\(a b \phi^{b-1} + c d \phi^{d-1}\)
+\(\frac{du}{d\phi}\) = slope of moisture soprtion curve, \(a b \phi^{b-1} + c d \phi^{d-1}\).
 
-If this field is left blank or set to \texttt{autocalculate},
-the above equation will be used to calculate the surface layer penetration depth
-assuming a $\tau_{surf}$ of 24 hours.
+If this field is left blank or set to \texttt{autocalculate}, the above equation will be used to calculate the surface layer penetration depth assuming a $\tau_{surf}$ of 24 hours.
+
 To use a period different than 24 hours, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{surf}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}. If calculating $d_{EMPD,surf}$, the assumed value of $\tau_{surf}$ should not be less than 4x the simulation timestep to ensure an accurate and stable solution.
 
-\paragraph{Field: Deep Layer Penetration
-	Depth}\label{field-deep-layer-penetration-depth}
+\paragraph{Field: Deep Layer Penetration Depth}\label{field-deep-layer-penetration-depth}
 
-The Deep Layer Penetration Depth is the fictitious thickness of the deep
-layer in meters, and is used to calculate the volume of material that
-participates in long-term moisture transfer and storage. This layer has
-a uniform moisture content, and can be considered a
-\emph{lumped-capacitance}. The deep penetration depth is based on the
-amount of material that interacts with the surface layer when subject to
-cyclic relative humidity variation. The deep penetration depth can be
-estimated with the following equation:
+The Deep Layer Penetration Depth is the fictitious thickness of the deep layer in meters, and is used to calculate the volume of material that participates in long-term moisture transfer and storage. This layer has a uniform moisture content, and can be considered a \emph{lumped-capacitance}. The deep penetration depth is based on the amount of material that interacts with the surface layer when subject to cyclic relative humidity variation. The deep penetration depth can be estimated with the following equation:
 
 \[ d_{EMPD,deep} = \sqrt{\frac{\delta_{perm} P_{sat} \tau_{deep}} {\rho_{material} \frac{du}{d\phi} \pi}} \]
 
-where each term is the same as the surface layer, except that the cycle
-period is different. This is usually on the order of weeks for the deep
-layer.
+where each term is the same as the surface layer, except that the cycle period is different. This is usually on the order of weeks for the deep layer.
 
-If this field is left blank or set to \texttt{autocalculate},
-the above equation will be used to calculate the deep layer penetration depth
-assuming a $\tau_{deep}$ of three weeks. To use a period different than 3 weeks, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{deep}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}.
+If this field is left blank or set to \texttt{autocalculate}, the above equation will be used to calculate the deep layer penetration depth assuming a $\tau_{deep}$ of three weeks. To use a period different than 3 weeks, the equation above can be used to calculate the penetration depth based on a different value of $\tau_{deep}$. The penetration depth can also be entered as an empirical value, as in \href{http://dx.doi.org/10.1016/j.enbuild.2016.02.008}{\emph{Woods and Winkler, 2016}}.
 
+\paragraph{Field: Coating Layer	Thickness}\label{field-coating-layer-thickness}
 
-\paragraph{Field: Coating Layer
-	Thickness}\label{field-coating-layer-thickness}
-
-The Coating Layer Thickness (in meters) adds an additional resistance
-between the surface layer and the zone and represents a thin coating,
-such as paint, plaster, or other wall coverings.
+The Coating Layer Thickness (in meters) adds an additional resistance between the surface layer and the zone and represents a thin coating, such as paint, plaster, or other wall coverings.
 
 This input is optional, and an input of zero implies no coating.
 
-\paragraph{Field: Coating Layer Water Vapor Diffusion Resistance
-	Factor}\label{field-coating-layer-water-vapor-diffusion-resistance-factor}
+\paragraph{Field: Coating Layer Water Vapor Diffusion Resistance Factor}\label{field-coating-layer-water-vapor-diffusion-resistance-factor}
 
-The vapor diffusion resistance factor of the coating is the coating's
-resistance to water vapor diffusion \emph{relative} to the resistance to
-water vapor diffusion in stagnant air (see Vapor diffusion resistance
-factor section above).
+The vapor diffusion resistance factor of the coating is the coating's resistance to water vapor diffusion \emph{relative} to the resistance to water vapor diffusion in stagnant air (see Vapor diffusion resistance factor section above).
 
 This input is optional, and an input of zero implies no coating.
 
 Below are two IDF examples:
 
-This set of inputs can be used for aerated concrete (assuming linear
-sorption curve). Density, input elsewhere, is 650 kg/m\^{}3:
+This set of inputs can be used for aerated concrete (assuming linear sorption curve). Density, input elsewhere, is 650 kg/m$^3$:
 
 \begin{lstlisting}
 MaterialProperty:MoisturePenetrationDepth:Settings,
@@ -417,8 +347,7 @@ Concrete,            !- Name
 1;                   !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 \end{lstlisting}
 
-This set of inputs is for gypsum board with density 750 kg/m\^{}3. This
-also assumes 2 coats of latex paint:
+This set of inputs is for gypsum board with density 750 kg/m$^3$. This also assumes 2 coats of latex paint:
 
 \begin{lstlisting}
 MaterialProperty:MoisturePenetrationDepth:Settings,
@@ -434,9 +363,7 @@ Concrete,            !- Name
 6000;                !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 \end{lstlisting}
 
-Finally, here are values representing the empirical whole-house inputs
-from Woods et al., 2014 (see Engineering Reference). Density is 800
-kg/m\^{}3:
+Finally, here are values representing the empirical whole-house inputs from Woods et al., 2014 (see Engineering Reference). Density is 800 kg/m$^3$:
 
 \begin{lstlisting}
 MaterialProperty:MoisturePenetrationDepth:Settings,
@@ -452,85 +379,52 @@ Concrete,            !- Name
 1;                   !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
 \end{lstlisting}
 
-Other materials inputs can be estimated using the equations above and
-material properties from a variety of sources, such as
-\href{http://www.iea-ebc.org/fileadmin/user_upload/images/Pictures/EBC_Annex_24_Report_3.pdf}{\emph{Kumaran,
-		1996}}, the \href{http://WUFI.de/en/}{\emph{WUFI}} simulation software,
-or the \href{http://www.techstreet.com/products/1719052}{\emph{ASHRAE
-		1018-RP}} report.
+Other materials inputs can be estimated using the equations above and material properties from a variety of sources, such as \href{http://www.iea-ebc.org/fileadmin/user_upload/images/Pictures/EBC_Annex_24_Report_3.pdf}{\emph{Kumaran, 		1996}}, the \href{http://WUFI.de/en/}{\emph{WUFI}} simulation software, or the \href{http://www.techstreet.com/products/1719052}{\emph{ASHRAE 1018-RP}} report.
 
 \subsubsection{Outputs}\label{moisture-penetration-depth-empd-outputs}
 
-\paragraph{EMPD Surface Inside Face Water Vapor Density
-	{[}kg/m3{]}}\label{empd-surface-inside-face-water-vapor-density-kgm3}
+\paragraph{EMPD Surface Inside Face Water Vapor Density {[}kg/m3{]}}\label{empd-surface-inside-face-water-vapor-density-kgm3}
 
-The vapor density at the inside face of the surface, where the EMPD
-moisture balance solution algorithm is applied. This is the
-\emph{actual} surface, separated from the zone air only by the
-convective mass transfer coefficient.
+The vapor density at the inside face of the surface, where the EMPD moisture balance solution algorithm is applied. This is the \emph{actual} surface, separated from the zone air only by the convective mass transfer coefficient.
 
 Units are kg of water per cubic meter of air.
 
-\paragraph{EMPD Surface Layer Moisture Content
-	{[}kg/kg{]}}\label{empd-surface-layer-moisture-content-kgkg}
+\paragraph{EMPD Surface Layer Moisture Content {[}kg/kg{]}}\label{empd-surface-layer-moisture-content-kgkg}
 
-The moisture content, \emph{u}, of the fictitious surface layer. The
-surface layer node is not at the actual surface, but is instead at the
-center of surface layer, which has a uniform moisture content. This node
-is separated from the inside face of the surface by a diffusive
-resistance, as described in the Engineering Reference.
+The moisture content, \emph{u}, of the fictitious surface layer. The surface layer node is not at the actual surface, but is instead at the center of surface layer, which has a uniform moisture content. This node is separated from the inside face of the surface by a diffusive resistance, as described in the Engineering Reference.
 
 Units are kg of water per kg of solid material (e.g., gypsum).
 
 \paragraph{EMPD Deep Layer Moisture Content
 	{[}kg/kg{]}}\label{empd-deep-layer-moisture-content-kgkg}
 
-The moisture content, \emph{u}, of the fictitious deep layer. The deep
-layer node interacts only with the surface layer node through a
-diffusive resistance.
+The moisture content, \emph{u}, of the fictitious deep layer. The deep layer node interacts only with the surface layer node through a diffusive resistance.
 
 Units are kg of water per kg of solid material.
 
-\paragraph{EMPD Surface Layer Equivalent Relative Humidity
-	{[}\%{]}}\label{empd-surface-layer-equivalent-relative-humidity}
+\paragraph{EMPD Surface Layer Equivalent Relative Humidity {[}\%{]}}\label{empd-surface-layer-equivalent-relative-humidity}
 
-The equivalent relative humidity of the surface layer, converted from
-the surface-layer moisture content discussed above and the surface
-temperature. The moisture content is related to the relative humidity
-through the slope of the moisture curve, the surface penetration depth,
-and the material density, as discussed in the engineering reference.
+The equivalent relative humidity of the surface layer, converted from the surface-layer moisture content discussed above and the surface temperature. The moisture content is related to the relative humidity through the slope of the moisture curve, the surface penetration depth, and the material density, as discussed in the engineering reference.
 
-\paragraph{EMPD Deep Layer Equivalent Relative Humidity
-	{[}\%{]}}\label{empd-deep-layer-equivalent-relative-humidity}
+\paragraph{EMPD Deep Layer Equivalent Relative Humidity {[}\%{]}}\label{empd-deep-layer-equivalent-relative-humidity}
 
-The equivalent relative humidity of the deep layer, converted from the
-deep-layer moisture content discussed above and the surface temperature.
+The equivalent relative humidity of the deep layer, converted from the deep-layer moisture content discussed above and the surface temperature.
 
-\paragraph{EMPD Surface Layer Equivalent Humidity Ratio
-	{[}kgWater/kgDryAir{]}}\label{empd-surface-layer-equivalent-humidity-ratio-kgwaterkgdryair}
+\paragraph{EMPD Surface Layer Equivalent Humidity Ratio	{[}kgWater/kgDryAir{]}}\label{empd-surface-layer-equivalent-humidity-ratio-kgwaterkgdryair}
 
-The equivalent humidity ratio of the surface layer. Units are kg of
-water per kg of dry air.
+The equivalent humidity ratio of the surface layer. Units are kg of water per kg of dry air.
 
-\paragraph{EMPD Deep Layer Equivalent Humidity Ratio
-	{[}kgWater/kgDryAir{]}}\label{empd-deep-layer-equivalent-humidity-ratio-kgwaterkgdryair}
+\paragraph{EMPD Deep Layer Equivalent Humidity Ratio {[}kgWater/kgDryAir{]}}\label{empd-deep-layer-equivalent-humidity-ratio-kgwaterkgdryair}
 
-The equivalent humidity ratio of the deep layer. Units are kg of water
-per kg of dry air.
+The equivalent humidity ratio of the deep layer. Units are kg of water per kg of dry air.
 
-\paragraph{EMPD Surface Moisture Flux to Zone
-	{[}kg/m2-s{]}}\label{empd-surface-moisture-flux-to-zone-kgm2-s}
+\paragraph{EMPD Surface Moisture Flux to Zone {[}kg/m2-s{]}}\label{empd-surface-moisture-flux-to-zone-kgm2-s}
 
-The mass flux of water vapor from the surface layer of a specific
-surface to the zone air. A positive mass flux is from the surface to the
-zone.
+The mass flux of water vapor from the surface layer of a specific surface to the zone air. A positive mass flux is from the surface to the zone.
 
-\paragraph{EMPD Deep Layer Moisture Flux
-	{[}kg/m2-s{]}}\label{empd-deep-layer-moisture-flux-kgm2-s}
+\paragraph{EMPD Deep Layer Moisture Flux {[}kg/m2-s{]}}\label{empd-deep-layer-moisture-flux-kgm2-s}
 
-The mass flux of water vapor from the deep layer of a specific surface
-to the surface layer of that surface. A positive flux is from the
-surface layer to the deep layer.
+The mass flux of water vapor from the deep layer of a specific surface to the surface layer of that surface. A positive flux is from the surface layer to the deep layer.
 
 \subsection{MaterialProperty:PhaseChange}\label{materialpropertyphasechange}
 
@@ -552,13 +446,13 @@ k = {k_o} + {k_1}({T_i} - 20)
 
 where:
 
-k\(_{o}\) is the 20C value of thermal conductivity(normal idf~ input)
+k\(_{o}\) is the 20$^\circ$C value of thermal conductivity(normal idf~ input);
 
-k\(_{1}\) is the change in conductivity per degree temperature difference from 20C
+k\(_{1}\) is the change in conductivity per degree temperature difference from 20$^\circ$C;
 
 \paragraph{Field Set: Temperature-Enthalpy}\label{field-set-temperature-enthalpy}
 
-The temperature -- enthalpy set of inputs specify a two column tabular temperature-enthalpy function for the basic material. Sixteen pairs can be specified. Specify only the number of pairs necessary. The tabular function must cover the entire temperature range that will be seen by the material in the simulation. It is suggested that the function start at a low temperature, and extend to 100C. Note that the function has no negative slopes and the lowest slope that will occur is the base material specific heat. Temperature values should be strictly increasing. Enthalpy contributions of the phase change are always added to the enthalpy that would result from a constant specific heat base material. An example of a simple enthalpy temperature function is shown below.
+The temperature-enthalpy set of inputs specify a two column tabular temperature-enthalpy function for the basic material. Sixteen pairs can be specified. Specify only the number of pairs necessary. The tabular function must cover the entire temperature range that will be seen by the material in the simulation. It is suggested that the function start at a low temperature, and extend to 100$^\circ$C. Note that the function has no negative slopes and the lowest slope that will occur is the base material specific heat. Temperature values should be strictly increasing. Enthalpy contributions of the phase change are always added to the enthalpy that would result from a constant specific heat base material. An example of a simple Enthalpy Temperature function is shown below.
 
 \begin{figure}[htbp]
 \centering
@@ -568,7 +462,7 @@ The temperature -- enthalpy set of inputs specify a two column tabular temperatu
 
 \paragraph{Field: Temperature x}\label{field-temperature-x}
 
-This field is used to specify the temperature of the temperature-enthalpy function for the basic material. Units are C.
+This field is used to specify the temperature of the temperature-enthalpy function for the basic material. Units are in degree Celsius.
 
 \paragraph{Field: Enthalpy x}\label{field-enthalpy-x}
 
@@ -615,23 +509,21 @@ HeatBalanceAlgorithm,
 
 \subsection{MaterialProperty:PhaseChangeHysteresis}\label{materialpropertyphasechangehysteresis}
 
-This object is used to describe an advanced level of physics belonging to phase change materials used in building envelopes.
-The base phase change input object describes a single process curve whereby a material moves from a crystallized to liquid state and back.
-This input object adds a hysteresis effect, allowing the melting/freezing process to follow different curves, representing an effect that is commonly seen in actual building envelope phase change material applications.
-This object also allows users to enter characteristic properties of the processes instead of a detailed temperature/enthalpy curve, making it more amenable for studies in which the user does not have the detailed test data required to generate the temperature/enthalpy curve.  For more information on the use of phase change materials (PCM) with hysteresis, see the Conduction Finite Difference Solution Algorithm section of the EnergyPlus Engineering Reference document.
+This object is used to describe an advanced level of physics belonging to phase change materials used in building envelopes. The base phase change input object describes a single process curve whereby a material moves from a crystallized to liquid state and back. This input object adds a hysteresis effect, allowing the melting/freezing process to follow different curves, representing an effect that is commonly seen in actual building envelope phase change material applications.
+
+This object also allows users to enter characteristic properties of the processes instead of a detailed temperature/enthalpy curve, making it more amenable for studies in which the user does not have the detailed test data required to generate the temperature/enthalpy curve. For more information on the use of phase change materials (PCM) with hysteresis, see the Conduction Finite Difference Solution Algorithm section of the EnergyPlus Engineering Reference document.
 
 \subsubsection{Inputs}\label{materialpropertyphasechangehysteresis-inputs}
 
-The \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object includes the following inputs.  For the characteristic curve properties, see the engineering reference.
+The \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object includes the following inputs. For the characteristic curve properties, see the engineering reference.
 
 \paragraph{Field: Name}\label{materialpropertyphasechangehysteresis-name}
 
-This input must match the name of a material defined elsewhere within EnergyPlus.  The thermal properies of that material are then overridden by the properties defind in this object.
+This input must match the name of a material defined elsewhere within EnergyPlus. The thermal properties of that material are then overridden by the properties defined in this object.
 
 \paragraph{Field: Latent Heat during the Entire Phase Change Process}\label{materialpropertyphasechangehysteresis-inputs-latent-heat-during-the-entire-phase-change-process}
 
-This is the total amount of latent heat absorbed or discharged during the transition from solid to liquid or back, in Joules.
-The shapes of the enthalpy curves differ based on direction, but the total amount of energy from one state to the other does not.
+This is the total amount of latent heat absorbed or discharged during the transition from solid to liquid or back, in Joules. The shapes of the enthalpy curves differ based on direction, but the total amount of energy from one state to the other does not.
 
 \paragraph{Field: Liquid State Thermal Conductivity}\label{materialpropertyphasechangehysteresis-inputs-liquidk}
 
@@ -647,7 +539,7 @@ This is the constant specific heat while the material is fully liquid, in J/kg-K
 
 \paragraph{Field: High Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-high-temperature-difference-of-melting-curve}
 
-This is the width of the enthalpy/specific heat melting curve, on the high side of the peak melting temperature, in Celsius (technically it is ``change in Celsius'').
+This is the width of the enthalpy/specific heat melting curve, on the high side of the peak melting temperature, in degree Celsius (technically it is ``change in Celsius'').
 
 \paragraph{Field: Peak Melting Temperature}\label{materialpropertyphasechangehysteresis-inputs-peak-melting-temperature}
 
@@ -720,9 +612,9 @@ An IDF example using hysteresis in conjunction with an actual Material definitio
 
 \subsubsection{Outputs}\label{materialpropertyphasechangehysteresis-outputs}
 
-The \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object also includes the following outputs.  The Conduction Finite Difference solution algorithm uses a finite difference solution technique where the surfaces are divided into a nodal arrangement. These outputs are specific to Conduction Finite Difference solution.
+The \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object also includes the following outputs. The Conduction Finite Difference solution algorithm uses a finite difference solution technique where the surfaces are divided into a nodal arrangement. These outputs are specific to Conduction Finite Difference solution.
 
-The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference.  Note that the ``X'' in the list and descriptions below must be replaced by a number that indicates the node at which the variables are being reported.  So, for example, to report the surface temperature for node 7, one would use ``CondFD Surface Temperature Node 7''.
+The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference. Note that the ``X'' in the list and descriptions below must be replaced by a number that indicates the node at which the variables are being reported.  So, for example, to report the surface temperature for node 7, one would use ``CondFD Surface Temperature Node 7''.
 
 \begin{itemize}
 \item
@@ -768,7 +660,7 @@ This will output the conductivity for a node in the surfaces being simulated wit
 
 \paragraph{CondFD Phase Change Node Specific Heat \textless{}X\textgreater{} {[}J/kg-K{]}}\label{condfd-phase-change-node-specific-heat-x-j-kg-k}
 
-This will output the specific heat for a node in the surfaces being simulated with ConductionFiniteDifference.  The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file.  This output is specific to surfaces that use the Conduction Finite Difference solution technique and have a \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object in the input file.  The units for this output field are J/kg-K.
+This will output the specific heat for a node in the surfaces being simulated with ConductionFiniteDifference.  The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file.  This output is specific to surfaces that use the Conduction Finite Difference solution technique and have a \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object in the input file. The units for this output field are J/kg-K.
 
 \subsection{MaterialProperty:VariableThermalConductivity}\label{materialpropertyvariablethermalconductivity}
 
@@ -918,7 +810,7 @@ MaterialProperty:HeatAndMoistureTransfer:Settings,
 
 \textbf{Advanced/Research Usage:} This material property is used in conjunction with the CombinedHeatAndMoistureFiniteElement heat balance solution algorithm.
 
-The Isotherm data relates the moisture, or water content {[}kg/m3{]} of a material with the relative humidity (RH). The water content is expected to increase as relative humidity increases, starting at zero content at 0.0relative humidity fraction and reaching a maximum, defined by the porosity, at 1.0 relative humidity fraction, which corresponds to 100\% relative humidity. Relative humidities are entered as fraction for this object ranging from 0.0 to 1.0. These two extremes (0.0 and 1.0) are automatically set by the HAMT solution. However, if they are entered they will be used as extra data points. Data should be provided with increasing RH and moisture content up to as high an RH as possible to provide a stable solution. One possible reason for the following error message may be that a material has a very rapid increase in water content for a small change in RH, which can happen if the last entered water content point is at a low RH and the material has a very high porosity.
+The Isotherm data relates the moisture, or water content {[}kg/m3{]} of a material with the relative humidity (RH). The water content is expected to increase as relative humidity increases, starting at zero content at 0.0 relative humidity fraction and reaching a maximum, defined by the porosity, at 1.0 relative humidity fraction, which corresponds to 100\% relative humidity. Relative humidities are entered as fraction for this object ranging from 0.0 to 1.0. These two extremes (0.0 and 1.0) are automatically set by the HAMT solution. However, if they are entered they will be used as extra data points. Data should be provided with increasing RH and moisture content up to as high an RH as possible to provide a stable solution. One possible reason for the following error message may be that a material has a very rapid increase in water content for a small change in RH, which can happen if the last entered water content point is at a low RH and the material has a very high porosity.
 
 \begin{lstlisting}
   ** Warning ** HeatAndMoistureTransfer: Large Latent Heat for Surface ROOF
@@ -1036,7 +928,7 @@ This field is a unique reference name that the user assigns to a particular mate
 
 A maximum of 25 points can be specified.
 
-\paragraph{Field Set: Moisture Content-- Liquid Transport Coefficient}\label{field-set-moisture-content-liquid-transport-coefficient-1}
+\paragraph{Field Set: Moisture Content--Liquid Transport Coefficient}\label{field-set-moisture-content-liquid-transport-coefficient-1}
 
 \paragraph{Field: Moisture Content x}\label{field-moisture-content-x-2}
 
@@ -1258,7 +1150,7 @@ If Optical Data Type = Spectral, then, in the following field, you must enter th
 
 If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with a curve or table object with two independent variables. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
 
-If Optical Data Type = BSDF, the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object must be used to define the window construction layers. The \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
+If Optical Data Type = BSDF, the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object must be used to define the window construction layers. In this case, the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers.
 
 \paragraph{Field: Window Glass Spectral Data Set Name}\label{field-window-glass-spectral-data-set-name}
 
@@ -1360,7 +1252,7 @@ In a zone with Daylighting:Detailed, translucent glazing---which is often used i
 
 \paragraph{Field: Young's modulus}\label{field-youngs-modulus}
 
-A measure of the stiffness of an elastic material.~ It is defined as the ratio of the uniaxial stress over the uniaxial strain in the range of stress in which Hooke's Law holds. It is used only with complex fenestration systems defined through the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object. The default value for glass is 7.2e10 Pa.
+A measure of the stiffness of an elastic material.~ It is defined as the ratio of the uniaxial stress over the uniaxial strain in the range of stress in which Hooke's Law holds. It is used only with complex fenestration systems defined through the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object. The default value for glass is 7.2$\times$10$^{10}$ Pa.
 
 \paragraph{Field: Poisson's ratio}\label{field-poissons-ratio}
 
@@ -1551,7 +1443,7 @@ WindowMaterial:Glazing:RefractionExtinctionMethod,
 
 \subsubsection{Conversion from Glass Optical Properties Specified as Index of Refraction and Transmittance at Normal Incidence}\label{conversion-from-glass-optical-properties-specified-as-index-of-refraction-and-transmittance-at-normal-incidence}
 
-The optical properties of uncoated glass are sometimes specified by index of refraction, n, and transmittance at normal incidence, T.
+The optical properties of uncoated glass are sometimes specified by index of refraction, $n$, and transmittance at normal incidence, $T$.
 
 The following equations show how to convert from this set of values to the transmittance and reflectance values required by \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}. These equations apply only to \underline{uncoated} glass, and can be used to convert either spectral-average solar properties or spectral-average visible properties (in general, \(n\) and \(T\) are different for the solar and visible). Note that since the glass is uncoated, the front and back reflectances are the same and equal to the \(R\) that is solved for in the following equations.
 
@@ -1611,7 +1503,7 @@ This object is extensible, so additional sets of the next two fields can be adde
 
 \paragraph{Field:Optical Data Temperature \textless{}N\textgreater{}}\label{fieldoptical-data-temperature-n}
 
-The temperature of the TC glass layer corresponding to the optical data of the TC layer. Unit is °C.
+The temperature of the TC glass layer corresponding to the optical data of the TC layer. Unit is degree Celsius ($^\circ$C).
 
 \paragraph{Field: Window Material Glazing Name \textless{}N\textgreater{}}\label{field-window-material-glazing-name-n}
 
@@ -2068,7 +1960,7 @@ The thickness (m) of the gap layer.
 
 \paragraph{Field: Pressure}\label{field-pressure-000}
 
-The pressure (Pa) of the gas in the gap layer, used to calculate the gas properties of the glazing system gap. Default is atmospheric pressure, 101325 Pa.When modeling vacuum glazing, this value should represent the pressure in the evacuated glazing system. If this pressure is less that the ThermalModelParams:PressureLimit value, the the glazing system will be modeled as a vacuum glazing.
+The pressure (Pa) of the gas in the gap layer, used to calculate the gas properties of the glazing system gap. The default value is one standard atmospheric pressure (101,325 Pa). When modeling vacuum glazing, this value should represent the pressure in the evacuated glazing system. If this pressure is less that the ThermalModelParams:PressureLimit value, the the glazing system will be modeled as a vacuum glazing.
 
 \paragraph{Field: Deflection State}\label{field-deflection-state}
 
@@ -2129,7 +2021,7 @@ Unique name of the deflection state.
 
 \paragraph{Field: Deflected Thickness}\label{field-deflected-thickness}
 
-The thickness (m) of the gap in deflected state.~ It represents value of deflection at point of maximum which is usually at the center poing of glazing system.~ It is used only with tarcog algorithm set to Measured Deflection (\hyperref[windowthermalmodelparams]{WindowThermalModel:Params}), otherwise this field will be ignored.
+The thickness (m) of the gap in deflected state.~ It represents value of deflection at point of maximum which is usually at the center point of glazing system.~ It is used only with tarcog algorithm set to Measured Deflection (\hyperref[windowthermalmodelparams]{WindowThermalModel:Params}), otherwise this field will be ignored.
 
 An IDF example where \hyperref[windowthermalmodelparams]{WindowThermalModel:Params} Deflection Model = MeasuredDeflection:
 
@@ -2172,7 +2064,7 @@ Distance (m) between support pillar centers (see the Engineering reference docum
 
 The radius (m) of the support pillar (see Engineering reference document for more information).
 
-An IDF example for vacuum glazing (see Vacuum Glazing example in \hyperref[windowmaterialgap]{WindowMaterial:Gap} above)
+An IDF example for vacuum glazing (see Vacuum Glazing example in \hyperref[windowmaterialgap]{WindowMaterial:Gap} above) is as follows:
 
 \begin{lstlisting}
 
@@ -2200,12 +2092,9 @@ The name of the glazing system.~ This value is unique across all constructions.
 
 \paragraph{Field: U-Factor}\label{field-u-factor}
 
-This field describes the value for window system U-Factor, or overall heat transfer coefficient. Units are in W/m\(^{2}\)·K. This is the rated (NFRC) value for U-factor under winter heating conditions. The U-factor is assumed to be for vertically mounted products.
-In versions up till 9.6.0, the maximum allowable input is U-7.0 W/m\(^{2}\)·K,
-and the effective upper limit of the glazing generated by the underlying model
-is around U-5.8 W/m\(^{2}\)·K. In later versions, such upper bound of the input
-U value is removed. So is the mis-match between the user input U and the
-effective U is resolved.
+This field describes the value for window system U-Factor, or overall heat transfer coefficient. Units are in W/m$^{2}$-K. This is the rated (NFRC) value for U-factor under winter heating conditions. The U-factor is assumed to be for vertically mounted products.
+
+In versions up till 9.6.0, the maximum allowable input is U-7.0 W/m$^{2}$-K, and the effective upper limit of the glazing generated by the underlying model is around U-5.8 W/m$^{2}$-K. In later versions, such upper bound of the input U value is removed. So is the mismatch between the user input U and the effective U is resolved.
 
 \paragraph{Field: Solar Heat Gain Coefficient}\label{field-solar-heat-gain-coefficient}
 
@@ -2215,7 +2104,7 @@ This field describes the value for SHGC, or solar heat gain coefficient. There a
 
 This field is optional. If it is omitted, then the visible transmittance properties are taken from the solar properties. If it is included then the model includes it when developing properties for the glazing system. This is the rated (NFRC) value for visible transmittance at normal incidence.
 
-An example of this object.
+An example of this object is as follows:
 
 \begin{lstlisting}
 
@@ -2242,27 +2131,35 @@ There are two methods of assigning a shade to a window:
 
 \paragraph{Method 1:}\label{method-1}
 
-1)~~~Define the construction of the window without the shade, the so-called ``bare'' construction.
+\begin{itemize}
 
-2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
+\item 1) Define the construction of the window without the shade, the so-called ``bare'' construction.
+	
+\item 2) Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
-3)~~~Define the WindowMaterial:Shade.
+\item 3) Define the WindowMaterial:Shade.
 
-4)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) specify that this WindowMaterial:Shade is the window's shading device and (b) specify how the shade is controlled.
+\item 4) Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) specify that this WindowMaterial:Shade is the window's shading device and (b) specify how the shade is controlled.
+
+\end{itemize}
 
 \paragraph{Method 2:}\label{method-2}
 
-1)~~~Define the Construction of the window without the shade, the so-called ``bare'' construction.
+\begin{itemize}
 
-2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
+\item 1) Define the Construction of the window without the shade, the so-called ``bare'' construction.
 
-3)~~~Define the WindowMaterial:Shade.
+\item 2) Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
-4)~~~Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Shade.
+\item 3) Define the WindowMaterial:Shade.
 
-5)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) reference the shaded construction and (b) specify how the shade is controlled.
+\item 4) Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Shade.
+
+\item 5) Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) reference the shaded construction and (b) specify how the shade is controlled.
 
 Note that \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} has to be used with either method, even if the shade is in place at all times. You will get an error message if you try to reference a shaded construction directly from \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed}.
+
+\end{itemize}
 
 \paragraph{Field: Name}\label{field-name-16-009}
 
@@ -2318,9 +2215,9 @@ Shade material conductivity (W/m-K).
 
 \paragraph{Field: Shade to Glass Distance}\label{field-shade-to-glass-distance}
 
-Distance from shade to adjacent glass (m). This is denoted by \emph{s} in Figure~\ref{fig:vertical-section-a-and-perspective-view-b-of} and Figure~\ref{fig:examples-of-air-flow-openings-for-an-interior}, below. If the shade is not flat, such as for pleated pull-down shades or folded drapery, the average shade-to-glass distance should be used. (The shade-to-glass distance is used in calculating the natural convective air flow between glass and shade produced by buoyancy effects.). Not used for between-glass shades.
+Distance from shade to adjacent glass (m). This is denoted by \emph{s} in Figure~\ref{fig:vertical-section-a-and-perspective-view-b-of} and Figure~\ref{fig:examples-of-air-flow-openings-for-an-interior}, below. If the shade is not flat, such as for pleated pull-down shades or folded drapery, the average shade-to-glass distance should be used. (The shade-to-glass distance is used in calculating the natural convective air flow between glass and shade produced by buoyancy effects.) Not used for between-glass shades.
 
-In the following, \emph{H} is the glazing height and \emph{W} is the glazing width.
+In the following, $H$ is the glazing height and $W$ is the glazing width.
 
 \paragraph{Field: Top Opening Multiplier}\label{field-top-opening-multiplier}
 
@@ -2386,30 +2283,35 @@ There are two methods of assigning a blind to a window:
 \subsubsection{Inputs}\label{inputs-23-005}
 
 \paragraph{Method 1:}\label{method-1-1}
+\begin{itemize}
+\item 1) Define the construction of the window without the blind, the so-called ``bare'' construction.
 
-1)~~~Define the construction of the window without the blind, the so-called ``bare'' construction.
+\item 2) Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
-2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
+\item 3) Define the WindowMaterial:Blind.
 
-3)~~~Define the WindowMaterial:Blind.
+\item 4) Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) specify that this WindowMaterial:Blind is the window's shading device and (b) specify how the blind is controlled.
 
-4)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) specify that this WindowMaterial:Blind is the window's shading device and (b) specify how the blind is controlled.
+\end{itemize}
 
 \paragraph{Method 2:}\label{method-2-1}
 
-1)~~~Define the Construction of the window without the blind, the so-called ``bare'' construction.
+\begin{itemize}
+\item 1) Define the Construction of the window without the blind, the so-called ``bare'' construction.
 
-2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
+\item 2) Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
-3)~~~Define the WindowMaterial:Blind.
+\item 3) Define the WindowMaterial:Blind.
 
-4)~~~Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Blind.
+\item 4) Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Blind.
 
-5)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) reference the shaded construction and (b) specify how the blind is controlled.
+\item[5)] Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) reference the shaded construction and (b) specify how the blind is controlled.
 
 Note that \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} has to be used with either method, even if the blind is in place at all times. You will get an error message if you try to reference a construction with a blind directly from Window objects (\hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} or Window).
 
 Note also that \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} is used to determine not only when the blind is in place, but how its slat angle is controlled.
+
+\end{itemize}
 
 \paragraph{Field: Name}\label{field-name-17-007}
 
@@ -2808,28 +2710,33 @@ There are two methods of assigning a screen to a window:
 \subsubsection{Inputs}\label{inputs-25-003}
 
 \paragraph{Method 1:}\label{method-1-2}
+\begin{itemize}
+\item 1) Define the construction of the window without the screen, the so-called ``bare'' construction.
 
-1)~~~Define the construction of the window without the screen, the so-called ``bare'' construction.
+\item 2) Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
-2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
+\item 3) Define the WindowMaterial:Screen object.
 
-3)~~~Define the WindowMaterial:Screen object.
+\item 4) Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) specify that this Material:WindowScreen is the window's shading device, and (b) specify how the screen is controlled.
 
-4)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) specify that this Material:WindowScreen is the window's shading device, and (b) specify how the screen is controlled.
+\end{itemize}
 
 \paragraph{Method 2:}\label{method-2-2}
 
-1)~~~Define the Construction of the window without the screen, the so-called ``bare'' construction.
+\begin{itemize}
+\item 1) Define the Construction of the window without the screen, the so-called ``bare'' construction.
 
-2)~~~Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
+\item 2) Reference the bare construction in the \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} for the window.
 
-3)~~~Define the WindowMaterial:Screen object.
+\item 3) Define the WindowMaterial:Screen object.
 
-4)~~~Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Screen.
+\item 4) Define another Construction, called the ``shaded construction,'' that includes the WindowMaterial:Screen.
 
-5)~~~Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) reference the shaded construction, and (b) specify how the screen is controlled.
+\item 5) Define a \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} for the window in which you (a) reference the shaded construction, and (b) specify how the screen is controlled.
 
 Note that \hyperref[windowpropertyshadingcontrol]{WindowShadingControl} has to be used with either method, even if the screen is in place at all times. You will get an error message if you try to reference a shaded construction directly from a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} object.
+
+\end{itemize}
 
 \paragraph{Field: Name}\label{field-name-19-004}
 
@@ -2864,7 +2771,7 @@ Commercially-available gray scale or grayscale reflecting chart references can b
 
 Long-wave emissivity \(\varepsilon\) of the screen material itself (not the effective value for the overall screen ``assembly'' including open spaces between the screen material). The emissivity is assumed to be the same for both sides of the screen.
 
-For most non-metallic materials, \(\varepsilon\) is about 0.9. For metallic materials, \(\varepsilon\) is dependent on material, its surface condition, and temperature. Typical values for metallic materials range from 0.05 -- 0.1 with lower values representing a more finished surface (e.g.~low oxidation, polished surface). Material emissivities may be found in Table~\ref{table:atmospheric-variables-at-two-different} from the 2005 ASHRAE Handbook of Fundamentals, page 3.9. The value for this input field must be between 0 and 1, with a default value of 0.9 if this field is left blank.
+For most non-metallic materials, \(\varepsilon\) is about 0.9. For metallic materials, \(\varepsilon\) is dependent on material, its surface condition, and temperature. Typical values for metallic materials range from 0.05--0.1 with lower values representing a more finished surface (e.g.~low oxidation, polished surface). Material emissivities may be found in Table~\ref{table:atmospheric-variables-at-two-different} from the 2005 ASHRAE Handbook of Fundamentals, page 3.9. The value for this input field must be between 0 and 1, with a default value of 0.9 if this field is left blank.
 
 \paragraph{Field: Conductivity}\label{field-conductivity-5}
 
@@ -2948,7 +2855,7 @@ WindowMaterial:Screen,
       EXTERIOR SCREEN,         !- Material Name of Shading Device
       ,                        !- Type of Slat Angle Control for Blinds
       ,                        !- Slat Angle Schedule Name
-      ,                        !- Setpoint 2 {W/m2 or deg C}
+      ,                        !- Setpoint 2 {W/m2, deg C or cd/m2}
       ,                        !- Daylighting Control Object Name
       Sequential,              !- Multiple Surface Control Type
       Zn001:Wall001:Win001;    !- Fenestration Surface 1 Name
@@ -3569,7 +3476,7 @@ The molecular weight for gas.~ The molecular weight is the mass of 1 mol of the 
 
 \paragraph{Field: Specific Heat Ratio}\label{field-specific-heat-ratio-3}
 
-The specific heat ratio for gas.~ The specific heat ratio of a gas is the ratio of the specific heat at contant pressure, to the specific heat at constant volume.~ Used only if Gas Type = Custom.
+The specific heat ratio for gas.~ The specific heat ratio of a gas is the ratio of the specific heat at constant pressure, to the specific heat at constant volume.~ Used only if Gas Type = Custom.
 
 An IDF example for this object, is shown below:
 
@@ -3632,11 +3539,11 @@ This alpha field defines the relative roughness of a particular material layer. 
 
 \paragraph{Field: Thickness}\label{field-thickness-9}
 
-This field characterizes the thickness of the material layer in meters. This should be the dimension of the layer in the direction perpendicular to the main path of heat conduction. This value must be a positive number. Depths of .10m (4 inches) and .15m (6 inches) are common. Default if this field is left blank is .1. Maximum is .7m. Must be greater than .05 m.
+This field characterizes the thickness of the material layer in meters. This should be the dimension of the layer in the direction perpendicular to the main path of heat conduction. This value must be a positive number. Depths of 0.10 m (4 inches) and 0.15 m (6 inches) are common. Default if this field is left blank is 0.1. Maximum is 0.7 m. Must be greater than 0.05 m.
 
 \paragraph{Field: Conductivity of Dry Soil}\label{field-conductivity-of-dry-soil}
 
-This field is used to enter the thermal conductivity of the material layer. Units for this parameter are W/(m-K). Thermal conductivity must be greater than zero. Typical soils have values from .3 to .5. The minimum is .2, the default is .35, and the maximum is 1.5.
+This field is used to enter the thermal conductivity of the material layer. Units for this parameter are W/(m-K). Thermal conductivity must be greater than zero. Typical soils have values from 0.3 to 0.5. The minimum is 0.2, the default is 0.35, and the maximum is 1.5.
 
 \paragraph{Field: Density of Dry Soil}\label{field-density-of-dry-soil}
 
@@ -3648,15 +3555,15 @@ This field represents the specific heat of the material layer in units of J/(kg-
 
 \paragraph{Field: Thermal Absorptance}\label{field-thermal-absorptance-2}
 
-The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength (>2.5 microns) radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). Typical values are from .9 to .98. The default value for this field is 0.9.
+The thermal absorptance field in the Material input syntax represents the fraction of incident long wavelength (>2.5 microns) radiation that is absorbed by the material. This parameter is used when calculating the long wavelength radiant exchange between various surfaces and affects the surface heat balances (both inside and outside as appropriate). For long wavelength radiant exchange, thermal emissivity and thermal emittance are equal to thermal absorptance. Values for this field must be between 0.0 and 1.0 (with 1.0 representing ``black body'' conditions). Typical values are from 0.9 to 0.98. The default value for this field is 0.9.
 
 \paragraph{Field: Solar Absorptance}\label{field-solar-absorptance-2}
 
-The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation (0.3 to 2.537 microns) includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. Typical values are from .6 to .85. The default value for this field is 0.7.
+The solar absorptance field in the Material input syntax represents the fraction of incident~ solar radiation that is absorbed by the material. Solar radiation (0.3 to 2.537 $\mu{}m$) includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident solar radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate). If solar reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.0 and 1.0. Typical values are from .6 to .85. The default value for this field is 0.7.
 
 \paragraph{Field: Visible Absorptance}\label{field-visible-absorptance-2}
 
-The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation ( 0.37 to 0.78 microns weighted by photopic response) is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.5 and 1.0. The default value for this field is 0.75.
+The visible absorptance field in the Material input syntax represents the fraction of incident visible wavelength radiation that is absorbed by the material. Visible wavelength radiation ( 0.37 to 0.78 $\mu{}m$ weighted by photopic response) is slightly different than solar radiation in that the visible band of wavelengths is much more narrow while solar radiation includes the visible spectrum as well as infrared and ultraviolet wavelengths. This parameter is used when calculating the amount of incident visible radiation absorbed by various surfaces and affects the surface heat balances (both inside and outside as appropriate) as well as the daylighting calculations. If visible reflectance (or reflectivity) data is available, then absorptance is equal to 1.0 minus reflectance (for opaque materials). Values for this field must be between 0.5 and 1.0. The default value for this field is 0.75.
 
 \paragraph{Field: Saturation Volumetric Moisture Content of the Soil Layer}\label{field-saturation-volumetric-moisture-content-of-the-soil-layer}
 
@@ -3664,11 +3571,11 @@ The field allows for user input of the saturation moisture content of the soil l
 
 \paragraph{Field: Residual Volumetric Moisture Content of the Soil Layer}\label{field-residual-volumetric-moisture-content-of-the-soil-layer}
 
-The field allows for user input of the residual moisture content of the soil layer. Default is .01, range is {[}.01,.1{]}.
+The field allows for user input of the residual moisture content of the soil layer. Default is 0.01, range is {[}0.01, 0.1{]}.
 
 \paragraph{Field: Initial Volumetric Moisture Content of the Soil Layer}\label{field-initial-volumetric-moisture-content-of-the-soil-layer}
 
-The field allows for user input of the initial moisture content of the soil layer. Range is (.05, .5{]} with the default being .1.
+The field allows for user input of the initial moisture content of the soil layer. Range is (0.05, 0.5{]} with the default being 0.1.
 
 \paragraph{Field: Moisture Diffusion Calculation Method}\label{field-moisture-diffusion-calculation-method}
 
@@ -3739,7 +3646,7 @@ Construction,
       ASHRAE 90.1-2004_Sec 5.5-2_MAT-METAL;  !- Layer \#3
 \end{lstlisting}
 
-\subsection{Ecoroof / RoofVegetation outputs}\label{ecoroof-roofvegetation-outputs}
+\subsubsection{Ecoroof / RoofVegetation outputs}\label{ecoroof-roofvegetation-outputs}
 
 The following outputs are available for the Roof Vegetation surface.
 
@@ -3782,68 +3689,67 @@ The following outputs are available for the Roof Vegetation surface.
   Zone,Sum,Green Roof Current Evapotranspiration Depth {[}m{]}
 \end{itemize}
 
-\subsubsection{Green Roof Soil Temperature {[}C{]}}\label{green-roof-soil-temperature-c}
+\paragraph{Green Roof Soil Temperature {[}C{]}}\label{green-roof-soil-temperature-c}
 
 Temperature of the Soil layer temperature in C. Note that \hyperref[surface-outside-face-temperature-c]{Surface Outside Face Temperature} of Roof, one of the surface output variables, is the temperature at the interface between the soil and the next material layer.
 
+\paragraph{Green Roof Vegetation Temperature {[}C{]}}\label{green-roof-vegetation-temperature-c}
 
-\subsubsection{Green Roof Vegetation Temperature {[}C{]}}\label{green-roof-vegetation-temperature-c}
+Temperature of the Vegetation layer temperature in degree Celsius ($^\circ$C).
 
-Temperature of the Vegetation layer temperature in C.
-
-\subsubsection{Green Roof Soil Root Moisture Ratio {[]}}\label{green-roof-soil-root-moisture-ratio}
+\paragraph{Green Roof Soil Root Moisture Ratio {[]}}\label{green-roof-soil-root-moisture-ratio}
 
 Mean value of root moisture (m\(^{3}\)/m\(^{3}\))
 
-\subsubsection{Green Roof Soil Near Surface Moisture Ratio {[]}}\label{green-roof-soil-near-surface-moisture-ratio}
+\paragraph{Green Roof Soil Near Surface Moisture Ratio {[]}}\label{green-roof-soil-near-surface-moisture-ratio}
 
 The moisture content in the soil near the surface (m\(^{3}\)/m\(^{3}\))
 
-\subsubsection{Green Roof Soil Sensible Heat Transfer Rate per Area {[}W/m2{]}}\label{green-roof-soil-sensible-heat-transfer-rate-per-area-wm2}
+\paragraph{Green Roof Soil Sensible Heat Transfer Rate per Area {[}W/m2{]}}\label{green-roof-soil-sensible-heat-transfer-rate-per-area-wm2}
 
 Sensible heat flux to ground (W/m\(^{2}\))
 
-\subsubsection{Green Roof Vegetation Sensible Heat Transfer Rate per Area {[}W/m2{]}}\label{green-roof-vegetation-sensible-heat-transfer-rate-per-area-wm2}
+\paragraph{Green Roof Vegetation Sensible Heat Transfer Rate per Area {[}W/m2{]}}\label{green-roof-vegetation-sensible-heat-transfer-rate-per-area-wm2}
 
 Sensible heat transfer to foliage (W/m\(^{2}\))
 
-\subsubsection{Green Roof Vegetation Moisture Transfer Rate {[}m/s{]}}\label{green-roof-vegetation-moisture-transfer-rate-ms}
+\paragraph{Green Roof Vegetation Moisture Transfer Rate {[}m/s{]}}\label{green-roof-vegetation-moisture-transfer-rate-ms}
 
 Water evapotranspiration rate associated with latent heat from vegetation (m/s)
 
-\subsubsection{Green Roof Soil Moisture Transfer Rate {[}m/s{]}}\label{green-roof-soil-moisture-transfer-rate-ms}
+\paragraph{Green Roof Soil Moisture Transfer Rate {[}m/s{]}}\label{green-roof-soil-moisture-transfer-rate-ms}
 
 Water evapotranspiration rate associated with latent heat from ground surface (m/s)
 
-\subsubsection{Green Roof Vegetation Latent Heat Transfer Rate per Area {[}W/m2{]}}\label{green-roof-vegetation-latent-heat-transfer-rate-per-area-wm2}
+\paragraph{Green Roof Vegetation Latent Heat Transfer Rate per Area {[}W/m2{]}}\label{green-roof-vegetation-latent-heat-transfer-rate-per-area-wm2}
 
 Latent heat flux from vegetation (W/m\(^{2}\))
 
-\subsubsection{Green Roof Soil Latent Heat Transfer Rate per Area {[}W/m2{]}}\label{green-roof-soil-latent-heat-transfer-rate-per-area-wm2}
+\paragraph{Green Roof Soil Latent Heat Transfer Rate per Area {[}W/m2{]}}\label{green-roof-soil-latent-heat-transfer-rate-per-area-wm2}
 
 Latent heat flux from ground surface (W/m\(^{2}\))
 
-\subsubsection{Green Roof Cumulative Precipitation Depth {[}m{]}}\label{green-roof-cumulative-precipitation-depth-m}
+\paragraph{Green Roof Cumulative Precipitation Depth {[}m{]}}\label{green-roof-cumulative-precipitation-depth-m}
 
-\subsubsection{Green Roof Current Precipitation Depth {[}m{]}}\label{green-roof-current-precipitation-depth-m}
+\paragraph{Green Roof Current Precipitation Depth {[}m{]}}\label{green-roof-current-precipitation-depth-m}
 
 Cumulative or current precipitation (m)
 
-\subsubsection{Green Roof Cumulative Irrigation Depth {[}m{]}}\label{green-roof-cumulative-irrigation-depth-m}
+\paragraph{Green Roof Cumulative Irrigation Depth {[}m{]}}\label{green-roof-cumulative-irrigation-depth-m}
 
-\subsubsection{Green Roof Current Irrigation Depth {[}m{]}}\label{green-roof-current-irrigation-depth-m}
+\paragraph{Green Roof Current Irrigation Depth {[}m{]}}\label{green-roof-current-irrigation-depth-m}
 
 Cumulative or current irrigation (m)
 
-\subsubsection{Green Roof Cumulative Runoff Depth {[}m{]}}\label{green-roof-cumulative-runoff-depth-m}
+\paragraph{Green Roof Cumulative Runoff Depth {[}m{]}}\label{green-roof-cumulative-runoff-depth-m}
 
-\subsubsection{Green Roof Current Runoff Depth {[}m{]}}\label{green-roof-current-runoff-depth-m}
+\paragraph{Green Roof Current Runoff Depth {[}m{]}}\label{green-roof-current-runoff-depth-m}
 
 Cumulative or current runoff (m). Multiply by roof area to get volume.
 
-\subsubsection{Green Roof Cumulative Evapotranspiration Depth {[}m{]}}\label{green-roof-cumulative-evapotranspiration-depth-m}
+\paragraph{Green Roof Cumulative Evapotranspiration Depth {[}m{]}}\label{green-roof-cumulative-evapotranspiration-depth-m}
 
-\subsubsection{Green Roof Current Evapotranspiration Depth {[}m{]}}\label{green-roof-current-evapotranspiration-depth-m}
+\paragraph{Green Roof Current Evapotranspiration Depth {[}m{]}}\label{green-roof-current-evapotranspiration-depth-m}
 
 Cumulative or current evapotranspiration from soil and plants (m).
 
@@ -4120,7 +4026,7 @@ A few things should be noted about requesting two-dimensional solutions. First, 
 
 \paragraph{Field: Tube Spacing}\label{field-tube-spacing}
 
-This field defines the distance between adjacent hydronic tubes spaced in the direction perpendicular to the main direction of heat transfer. The value for this parameter must be greater than 0.01m (or a tube spacing of 1 cm) and less than 1.0m (or a tube spacing of 1m). Note that this parameter is only used for two-dimensional solutions (see previous field) or when the user requests that the tube length for a hydronic radiant system ( \textbf{\hyperref[zonehvaclowtemperatureradiantvariableflow]{variable flow}} or  \textbf{\hyperref[zonehvaclowtemperatureradiantconstantflow]{constant flow}}) be autosized.  In the case of autosizing the tube length, this parameter is used along with the dimensions of the surface to approximate the tube length.
+This field defines the distance between adjacent hydronic tubes spaced in the direction perpendicular to the main direction of heat transfer. The value for this parameter must be greater than or equal to 0.01m (or a tube spacing of 1 cm) and less than or equal to 1.0m (or a tube spacing of 1m). Note that this parameter is only used for two-dimensional solutions (see previous field) or when the user requests that the tube length for a hydronic radiant system ( \textbf{\hyperref[zonehvaclowtemperatureradiantvariableflow]{variable flow}} or  \textbf{\hyperref[zonehvaclowtemperatureradiantconstantflow]{constant flow}}) be autosized.  In the case of autosizing the tube length, this parameter is used along with the dimensions of the surface to approximate the tube length.
 
 \paragraph{Field: Two-Dimensional Temperature Calculation Position}\label{field-two-dimensional-temperature-calculation-position}
 
@@ -4233,7 +4139,7 @@ Complete description of the CompositeWallConstructions data set are found in the
 
 \subsection{Construction:ComplexFenestrationState}\label{constructioncomplexfenestrationstate}
 
-This input object is used to describe the properties of a single state for complex fenestration.~ There are two parts to the input, 1) layer-by-layer physical description of fenestration system and 2) a set of matrices that describe overall system optical performance.~ Each layer also has associated with it two matrices that give the layer absorptance (for front and back incidence on the system.
+This input object is used to describe the properties of a single state for complex fenestration.~ There are two parts to the input, 1) layer-by-layer physical description of fenestration system and 2) a set of matrices that describe overall system optical performance.~ Each layer also has associated with it two matrices that give the layer absorptance (for front and back incidence on the system).
 
 The optical properties are given as a two-dimensional matrix describing the basis and four two-dimensional matrices of system bidirectional optical properties.
 
@@ -4242,6 +4148,8 @@ These input objects will generally be exported directly from the WINDOW program 
 Multiple instances of this object are used to define the separate operating states of complex fenestration.~ For example, blinds could be deployed or redirected to create a new state, or electrochromic glazings could change transmittance.~ Each separate state defines the materials present and the overall optical performance.~ If the glazing system has only one state, then only one of these objects is needed.
 
 If there is more than one complex fenestration state, it will be controlled using the EMS actuator called ``Surface'' with the control type ``Construction State'' and the EMS input object called \hyperref[energymanagementsystemconstructionindexvariable]{EnergyManagementSystem:ConstructionIndexVariable}.
+
+Note that when using the Solar Distribution method of \textbf{FullInteriorAndExterior} or \textbf{FullInteriorAndExteriorWithReflections}, the Construction:ComplexFenestrationState windows are not suggested to be mix-used together with regular windows (windows constructed from ``actual'' materials descriptions, or simple layers) in the same zone, due to the limitations of the current models. When these two solar distribution methods are used, it is suggested using either all regular windows or all Complex Fenestration windows in the same zone, but not a mix of these two types of windows.
 
 \subsubsection{Inputs}\label{inputs-39}
 
@@ -4462,7 +4370,7 @@ It is used to define the Basis Matrix for BSDF input data, and is also used to d
 
 The data are entered in row-major order: all the elements of row 1, followed by all the elements of row 2, etc.~ The number of values to be entered depends on the number of rows and the number of columns.~ Blank fields are treated as having been set to zero.
 
-See example IDF file ``SmOff\_ CmplxGlz\_IntExtShading.idf'' for the definition of two complex shading layers with matrix data defined.
+See example IDF file ``CmplxGlz\_{}SmOff\_{}IntExtShading.idf'' for the definition of two complex shading layers with matrix data defined.
 
 \subsubsection{Field: Name}\label{field-name-34-000}
 
@@ -4530,7 +4438,7 @@ This field is a user specified name that will be used as a reference by other in
 
 Each equivalent layer window construction must have at least one layer. This field defines the material name associated with the layer on the outside of the construction---outside referring to the side that is exposed to the outdoor environment or another zone. Material layers for equivalent layer window model are defined based on their thermal properties elsewhere in the input file (ref: WindowEquivalentLayerMaterialNames)
 
-\paragraph{Field: Layer 2 - Layer11}\label{field-layer-2---layer11}
+\paragraph{Field: Layer 2 -- Layer11}\label{field-layer-2---layer11}
 
 The next fields are optional and the number of them showing up in a particular equivalent layer window construction definition depends solely on the number of material layers present in that construction. The data expected is identical to the outside layer field (see previous field description). The order of the remaining layers is important and should be listed in order of occurrence from the one just inside the outside layer until the inside layer is reached. As noted above, the inside layer should NOT be a film coefficient since EnergyPlus will calculate inside convection and radiation heat transfer more precisely.
 
@@ -4565,7 +4473,7 @@ This is the name of a window on the Window data file. An error will result if En
 
 \paragraph{Field: File Name}\label{field-file-name-000}
 
-This is the file name of the Window data file that contains the Window referenced in the previous field. The field may include a full path with file name, for precise results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+This is the file name of the Window data file that contains the Window referenced in the previous field. The field may include a full path with file name, for precise results. The field must be \textless{}= 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
 
 If this field is left blank, the file name is defaulted to Window5DataFile.dat.
 

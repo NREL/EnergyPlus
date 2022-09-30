@@ -155,9 +155,9 @@ namespace CostEstimateManager {
         int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
-        state.dataCostEstimateManager->NumLineItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
+        int NumLineItems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ComponentCost:LineItem");
 
-        if (state.dataCostEstimateManager->NumLineItems == 0) {
+        if (NumLineItems == 0) {
             state.dataCostEstimateManager->DoCostEstimate = false;
             return;
         } else {
@@ -166,12 +166,12 @@ namespace CostEstimateManager {
         }
 
         if (!allocated(state.dataCostEstimateManager->CostLineItem)) {
-            state.dataCostEstimateManager->CostLineItem.allocate(state.dataCostEstimateManager->NumLineItems);
+            state.dataCostEstimateManager->CostLineItem.allocate(NumLineItems);
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ComponentCost:LineItem";
 
-        for (Item = 1; Item <= state.dataCostEstimateManager->NumLineItems; ++Item) {
+        for (Item = 1; Item <= NumLineItems; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
@@ -283,7 +283,7 @@ namespace CostEstimateManager {
         int thisPV;
 
         // Setup working data structure for line items
-        for (Item = 1; Item <= state.dataCostEstimateManager->NumLineItems; ++Item) { // Loop thru cost line items
+        for (Item = 1; Item <= (int)state.dataCostEstimateManager->CostLineItem.size(); ++Item) { // Loop thru cost line items
 
             state.dataCostEstimateManager->CostLineItem(Item).LineNumber = Item;
 
@@ -320,40 +320,36 @@ namespace CostEstimateManager {
                 // test if too many pricing methods are set in user input
                 if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) &&
                     (state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0)) {
-                    ShowSevereError(
-                        state,
-                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
-                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                               format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                    ShowSevereError(state,
+                                    format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                           state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                           ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                     ErrorsFound = true;
                 }
                 if ((state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) &&
                     (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                    ShowSevereError(
-                        state,
-                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
-                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                               format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                    ShowSevereError(state,
+                                    format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                           state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                           ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                     ErrorsFound = true;
                 }
                 if ((state.dataCostEstimateManager->CostLineItem(Item).PerEach > 0.0) &&
                     (state.dataCostEstimateManager->CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                    ShowSevereError(
-                        state,
-                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
-                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                               format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                    ShowSevereError(state,
+                                    format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                           state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                           ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                     ErrorsFound = true;
                 }
                 //  check for wildcard * in object name..
                 if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
 
                 } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    ShowSevereError(
-                        state,
-                        format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
-                               state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                               format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                    ShowSevereError(state,
+                                    format("ComponentCost:LineItem: \"{}\", {}, too many pricing methods specified",
+                                           state.dataCostEstimateManager->CostLineItem(Item).LineName,
+                                           ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                     ErrorsFound = true;
 
                 } else { // assume name is probably useful
@@ -372,7 +368,7 @@ namespace CostEstimateManager {
                             state,
                             format("ComponentCost:LineItem: \"{}\", {}, invalid coil specified",
                                    state.dataCostEstimateManager->CostLineItem(Item).LineName,
-                                   format(ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)])));
+                                   ParentObjectNamesUC[static_cast<int>(state.dataCostEstimateManager->CostLineItem(Item).ParentObjType)]));
                         ShowContinueError(state,
                                           format("Coil Specified=\"{}\", calculations will not be completed for this item.",
                                                  state.dataCostEstimateManager->CostLineItem(Item).ParentObjName));
@@ -598,7 +594,7 @@ namespace CostEstimateManager {
         Real64 Multipliers;
 
         // Setup working data structure for line items
-        for (Item = 1; Item <= state.dataCostEstimateManager->NumLineItems; ++Item) { // Loop thru cost line items
+        for (Item = 1; Item <= (int)state.dataCostEstimateManager->CostLineItem.size(); ++Item) { // Loop thru cost line items
 
             state.dataCostEstimateManager->CostLineItem(Item).LineNumber = Item;
 

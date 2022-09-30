@@ -120,12 +120,12 @@ namespace HeatBalanceKivaManager {
         void
         setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions(EnergyPlusData &state);
-        void plotDomain();
         Real64 floorWeight;
         int constructionNum = 0;
         class KivaManager *kmPtr;
 
 #ifdef GROUND_PLOT
+        void plotDomain(EnergyPlusData &state);
         Kiva::SnapshotSettings ss;
         Kiva::GroundPlot gp;
         std::string debugDir;
@@ -212,14 +212,6 @@ namespace HeatBalanceKivaManager {
     };
 
 } // namespace HeatBalanceKivaManager
-
-struct HeatBalanceKivaMgrData : BaseGlobalStruct
-{
-
-    void clear_state() override
-    {
-    }
-};
 
 } // namespace EnergyPlus
 

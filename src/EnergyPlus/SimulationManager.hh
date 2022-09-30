@@ -87,11 +87,9 @@ namespace SimulationManager {
 
     void ReportLoopConnections(EnergyPlusData &state);
 
-    void ReportParentChildren(EnergyPlusData &state);
-
-    void ReportCompSetMeterVariables(EnergyPlusData &state);
-
     void PostIPProcessing(EnergyPlusData &state);
+
+    void isInputObjectUsed(EnergyPlusData &state);
 
 } // namespace SimulationManager
 

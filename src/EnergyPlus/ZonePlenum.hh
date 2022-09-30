@@ -68,24 +68,23 @@ namespace ZonePlenum {
 
     struct ZoneReturnPlenumConditions
     {
-        // Members
         std::string ZonePlenumName;
         std::string ZoneName;
         std::string ZoneNodeName;
-        Real64 ZoneTemp;
-        Real64 ZoneHumRat;
-        Real64 ZoneEnthalpy;
-        Real64 OutletTemp;
-        Real64 OutletHumRat;
-        Real64 OutletEnthalpy;
-        Real64 OutletPressure;
-        int ZoneNodeNum;
-        int ActualZoneNum;
-        int OutletNode;
-        Real64 OutletMassFlowRate;         // MassFlow through the ZonePlenum being Simulated [kg/Sec]
-        Real64 OutletMassFlowRateMaxAvail; // [kg/Sec]
-        Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
-        int NumInducedNodes;
+        Real64 ZoneTemp = 0.0;
+        Real64 ZoneHumRat = 0.0;
+        Real64 ZoneEnthalpy = 0.0;
+        Real64 OutletTemp = 0.0;
+        Real64 OutletHumRat = 0.0;
+        Real64 OutletEnthalpy = 0.0;
+        Real64 OutletPressure = 0.0;
+        int ZoneNodeNum = 0;
+        int ActualZoneNum = 0;
+        int OutletNode = 0;
+        Real64 OutletMassFlowRate = 0.0;         // MassFlow through the ZonePlenum being Simulated [kg/Sec]
+        Real64 OutletMassFlowRateMaxAvail = 0.0; // [kg/Sec]
+        Real64 OutletMassFlowRateMinAvail = 0.0; // [kg/Sec]
+        int NumInducedNodes = 0;
         Array1D_int InducedNode;
         Array1D<Real64> InducedMassFlowRate;
         Array1D<Real64> InducedMassFlowRateMaxAvail;
@@ -96,8 +95,8 @@ namespace ZonePlenum {
         Array1D<Real64> InducedPressure;
         Array1D<Real64> InducedCO2;
         Array1D<Real64> InducedGenContam;
-        bool InitFlag;
-        int NumInletNodes;
+        bool InitFlag = false;
+        int NumInletNodes = 0;
         Array1D_int InletNode;
         Array1D<Real64> InletMassFlowRate;
         Array1D<Real64> InletMassFlowRateMaxAvail;
@@ -109,37 +108,29 @@ namespace ZonePlenum {
         Array1D_int ADUIndex;  // index to AirDistUnit leaking to this plenum
         int NumADUs;           // number of ADU's that can leak to this plenum
         Array1D_int ZoneEqNum; // list of zone equip config indices for this plenum
-
-        // Default Constructor
-        ZoneReturnPlenumConditions()
-            : ZoneTemp(0.0), ZoneHumRat(0.0), ZoneEnthalpy(0.0), OutletTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0), OutletPressure(0.0),
-              ZoneNodeNum(0), ActualZoneNum(0), OutletNode(0), OutletMassFlowRate(0.0), OutletMassFlowRateMaxAvail(0.0),
-              OutletMassFlowRateMinAvail(0.0), NumInducedNodes(0), InitFlag(false), NumInletNodes(0)
-        {
-        }
+        bool checkEquipName = true;
     };
 
     struct ZoneSupplyPlenumConditions
     {
-        // Members
         std::string ZonePlenumName;
         std::string ZoneName;
         std::string ZoneNodeName;
-        Real64 ZoneTemp;
-        Real64 ZoneHumRat;
-        Real64 ZoneEnthalpy;
-        Real64 InletTemp;
-        Real64 InletHumRat;
-        Real64 InletEnthalpy;
-        Real64 InletPressure;
-        int ZoneNodeNum;
-        int ActualZoneNum;
-        int InletNode;
-        Real64 InletMassFlowRate;         // MassFlow through the ZonePlenum being Simulated [kg/Sec]
-        Real64 InletMassFlowRateMaxAvail; // [kg/Sec]
-        Real64 InletMassFlowRateMinAvail; // [kg/Sec]
-        bool InitFlag;
-        int NumOutletNodes;
+        Real64 ZoneTemp = 0.0;
+        Real64 ZoneHumRat = 0.0;
+        Real64 ZoneEnthalpy = 0.0;
+        Real64 InletTemp = 0.0;
+        Real64 InletHumRat = 0.0;
+        Real64 InletEnthalpy = 0.0;
+        Real64 InletPressure = 0.0;
+        int ZoneNodeNum = 0;
+        int ActualZoneNum = 0;
+        int InletNode = 0;
+        Real64 InletMassFlowRate = 0.0;         // MassFlow through the ZonePlenum being Simulated [kg/Sec]
+        Real64 InletMassFlowRateMaxAvail = 0.0; // [kg/Sec]
+        Real64 InletMassFlowRateMinAvail = 0.0; // [kg/Sec]
+        bool InitFlag = false;
+        int NumOutletNodes = 0;
         Array1D_int OutletNode;
         Array1D<Real64> OutletMassFlowRate;
         Array1D<Real64> OutletMassFlowRateMaxAvail;
@@ -148,21 +139,12 @@ namespace ZonePlenum {
         Array1D<Real64> OutletHumRat;
         Array1D<Real64> OutletEnthalpy;
         Array1D<Real64> OutletPressure;
-
-        // Default Constructor
-        ZoneSupplyPlenumConditions()
-            : ZoneTemp(0.0), ZoneHumRat(0.0), ZoneEnthalpy(0.0), InletTemp(0.0), InletHumRat(0.0), InletEnthalpy(0.0), InletPressure(0.0),
-              ZoneNodeNum(0), ActualZoneNum(0), InletNode(0), InletMassFlowRate(0.0), InletMassFlowRateMaxAvail(0.0), InletMassFlowRateMinAvail(0.0),
-              InitFlag(false), NumOutletNodes(0)
-        {
-        }
+        bool checkEquipName = true;
     };
-
-    // Functions
 
     void SimAirZonePlenum(EnergyPlusData &state,
                           std::string_view CompName,
-                          DataZoneEquipment::AirLoopHVACZone const iCompType,
+                          DataZoneEquipment::AirLoopHVACZone iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
                           Optional_bool_const FirstCall = _,          // Autodesk:OPTIONAL Used without PRESENT check
@@ -171,17 +153,17 @@ namespace ZonePlenum {
 
     void GetZonePlenumInput(EnergyPlusData &state);
 
-    void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
+    void InitAirZoneReturnPlenum(EnergyPlusData &state, int ZonePlenumNum);
 
-    void InitAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
+    void InitAirZoneSupplyPlenum(EnergyPlusData &state, int ZonePlenumNum, bool FirstHVACIteration, bool FirstCall);
 
-    void CalcAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
+    void CalcAirZoneReturnPlenum(EnergyPlusData &state, int ZonePlenumNum);
 
-    void CalcAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstCall);
+    void CalcAirZoneSupplyPlenum(EnergyPlusData &state, int ZonePlenumNum, bool FirstCall);
 
-    void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
+    void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int ZonePlenumNum);
 
-    void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
+    void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int ZonePlenumNum, bool &PlenumInletChanged, bool FirstCall);
 
     int GetReturnPlenumIndex(EnergyPlusData &state, int ExNodeNum);
 
@@ -189,46 +171,30 @@ namespace ZonePlenum {
 
     int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int InNodeNum);
 
-    bool ValidateInducedNode(EnergyPlusData &state, int const InduceNodeNum, int const NumReturnNodes, Array1D<int> const &ReturnNode);
+    bool ValidateInducedNode(EnergyPlusData &state, int InduceNodeNum, int NumReturnNodes, Array1D<int> const &ReturnNode);
 
 } // namespace ZonePlenum
 
 struct ZonePlenumData : BaseGlobalStruct
 {
 
-    bool GetInputFlag; // Flag set to make sure you get input once
-    bool InitAirZoneReturnPlenumEnvrnFlag;
-    bool InitAirZoneReturnPlenumOneTimeFlag;
+    bool GetInputFlag = true;     // Flag set to make sure you get input once
+    int NumZoneReturnPlenums = 0; // The Number of ZoneReturnPlenums found in the Input
+    int NumZoneSupplyPlenums = 0; // The Number of ZoneSupplyPlenums found in the Input
 
-    int NumZonePlenums;       // The Number of ZonePlenums found in the Input
-    int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
-    int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
-    Array1D_bool CheckRetEquipName;
-    Array1D_bool CheckSupEquipName;
+    // these should be removed from state and just made individual flags on each plenum
+    // however, this will require going into a few functions and changing them from looping over all plenums to only operating on the current plenum
+    // this is the right step, but will possibly cause diffs, so pushing this for later.
+    bool InitAirZoneReturnPlenumEnvrnFlag = true;
+    bool InitAirZoneReturnPlenumOneTimeFlag = true;
+    bool MyEnvrnFlag = true;
 
-    // Object Data
     EPVector<ZonePlenum::ZoneReturnPlenumConditions> ZoneRetPlenCond;
     EPVector<ZonePlenum::ZoneSupplyPlenumConditions> ZoneSupPlenCond;
-    bool MyEnvrnFlag = true;
 
     void clear_state() override
     {
-        this->GetInputFlag = true;
-        this->InitAirZoneReturnPlenumEnvrnFlag = true;
-        this->InitAirZoneReturnPlenumOneTimeFlag = true;
-        this->NumZonePlenums = 0;
-        this->NumZoneReturnPlenums = 0;
-        this->NumZoneSupplyPlenums = 0;
-        this->ZoneRetPlenCond.deallocate();
-        this->ZoneSupPlenCond.deallocate();
-        this->MyEnvrnFlag = true;
-    }
-
-    // Default Constructor
-    ZonePlenumData()
-        : GetInputFlag(true), InitAirZoneReturnPlenumEnvrnFlag(true), InitAirZoneReturnPlenumOneTimeFlag(true), NumZonePlenums(0),
-          NumZoneReturnPlenums(0), NumZoneSupplyPlenums(0)
-    {
+        *this = ZonePlenumData();
     }
 };
 

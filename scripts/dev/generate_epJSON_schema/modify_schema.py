@@ -170,6 +170,7 @@ extension_renaming = {
     'Foundation:Kiva': 'blocks',
     'SurfaceProperty:ExposedFoundationPerimeter': 'surfaces',
     'SurfaceProperty:SurroundingSurfaces': 'surfaces',
+    'SurfaceProperty:GroundSurfaces': 'ground_surfaces',
     'ZoneHVAC:HybridUnitaryHVAC': 'modes',
     'ShadowCalculation': 'shading_zone_groups',
     'Schedule:Year': 'schedule_weeks',
@@ -182,6 +183,8 @@ extension_renaming = {
     'PythonPlugin:Variables': 'global_py_vars',
     'PythonPlugin:SearchPaths': 'py_search_paths',
     'Output:Diagnostics': 'diagnostics',
+    'OutputControl:RVI': 'output_variables',
+    'OutputControl:MVI': 'output_meters'
 }
 remaining_objects = [
     'Site:SpectrumData',

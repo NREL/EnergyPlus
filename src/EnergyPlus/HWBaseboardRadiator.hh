@@ -177,7 +177,6 @@ namespace HWBaseboardRadiator {
 
     void SimHWBaseboard(EnergyPlusData &state,
                         std::string const &EquipName,
-                        int const ActualZoneNum,
                         int const ControlledZoneNum,
                         bool const FirstHVACIteration,
                         Real64 &PowerMet,
@@ -185,7 +184,7 @@ namespace HWBaseboardRadiator {
 
     void GetHWBaseboardInput(EnergyPlusData &state);
 
-    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
     void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
@@ -239,7 +238,6 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
     Array1D<HWBaseboardRadiator::HWBaseboardDesignNumericFieldData> HWBaseboardDesignNumericFields;
     bool GetInputFlag = true; // One time get input flag
     bool MyOneTimeFlag = true;
-    bool ZoneEquipmentListChecked = false;
     int Iter = 0;
     bool MyEnvrnFlag2 = true;
     Array1D_bool MyEnvrnFlag;
@@ -264,7 +262,6 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
         this->HWBaseboardDesignNumericFields.clear();
         this->GetInputFlag = true;
         this->MyOneTimeFlag = true;
-        this->ZoneEquipmentListChecked = false;
         this->MyEnvrnFlag.clear();
         this->Iter = 0;
         this->MyEnvrnFlag2 = true;

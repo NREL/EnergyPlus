@@ -64,7 +64,7 @@ namespace EnergyPlus {
 struct MoistureBalanceData : BaseGlobalStruct
 {
     // This is more or less the traditional value from BLAST.
-    static constexpr Real64 Lam = 2500000.0; // heat of adsorption for building materials
+    // static constexpr Real64 Lam = 2500000.0; // heat of adsorption for building materials
     // Public Variables that will also be used in the Moisture Surface Balance
     Array3D<Real64> FluxH;  // transfer function coeff for calculating the CPF Flux history term
     Array5D<Real64> IcoefH; // transfer function coeff for calculating the CPF history term
@@ -95,27 +95,7 @@ struct MoistureBalanceData : BaseGlobalStruct
     Array1D<Real64> HAirFD;         // Air Convection Coefficient
     void clear_state() override
     {
-        this->FluxH.deallocate();
-        this->IcoefH.deallocate();
-        this->Icoef.deallocate();
-        this->DiffC.deallocate();
-        this->mtinc.deallocate();
-        this->S1.deallocate();
-        this->R2.deallocate();
-        this->TempOutsideAirFD.deallocate();
-        this->mhstry.deallocate();
-        this->CMTF.deallocate();
-        this->Nmrf.deallocate();
-        this->RhoVaporAirOut.deallocate();
-        this->RhoVaporAirIn.deallocate();
-        this->HConvExtFD.deallocate();
-        this->HMassConvExtFD.deallocate();
-        this->HConvInFD.deallocate();
-        this->HMassConvInFD.deallocate();
-        this->RhoVaporSurfIn.deallocate();
-        this->HSkyFD.deallocate();
-        this->HGrndFD.deallocate();
-        this->HAirFD.deallocate();
+        *this = MoistureBalanceData();
     }
 };
 

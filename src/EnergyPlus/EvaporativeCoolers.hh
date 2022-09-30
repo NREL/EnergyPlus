@@ -115,8 +115,7 @@ namespace EvaporativeCoolers {
 
     struct EvapConditions
     {
-        // Members
-        std::string EvapCoolerName; // Name of the EvapCooler
+        std::string Name; // Name of the EvapCooler
         int EquipIndex;
         EvapCoolerType evapCoolerType; // Type of the EvapCooler
         std::string EvapControlType;   // Type of Control for the EvapCooler
@@ -242,7 +241,6 @@ namespace EvaporativeCoolers {
 
     struct ZoneEvapCoolerUnitStruct
     {
-        // Members
         std::string Name; // user identifier
         int ZoneNodeNum;
         int AvailSchedIndex;              // pointer to local availability schedule
@@ -333,47 +331,21 @@ namespace EvaporativeCoolers {
         }
     };
 
-    struct ZoneEvapCoolerUnitFieldData
-    {
-        // Members
-        Array1D_string FieldNames;
-
-        // Default Constructor
-        ZoneEvapCoolerUnitFieldData() = default;
-    };
-
-    // Functions
-
     void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIndex, Real64 PartLoadRatio = 1.0);
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetEvapInput(EnergyPlusData &state);
-
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
 
     void InitEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
     void SizeEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
-    // End Initialization Section of the Module
-    //******************************************************************************
+    void CalcDirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 PartLoadRatio);
 
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
+    void CalcDryIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcDirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
+    void CalcWetIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 PartLoadRatio);
 
-    void CalcDryIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
-
-    void CalcWetIndirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 PartLoadRatio);
-
-    void CalcResearchSpecialPartLoad(EnergyPlusData &state, int &EvapCoolNum);
+    void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum);
 
     void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                                                        int EvapCoolNum,
@@ -407,9 +379,7 @@ namespace EvaporativeCoolers {
                                              Real64 EWBTSec,
                                              Real64 EHumRatSec);
 
-    Real64
-    CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state, Real64 AirMassFlowSec, std::array<Real64, 6> const &Par // Par( 6 ) is desired temperature C
-    );
+    Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state, Real64 AirMassFlowSec, std::array<Real64, 6> const &Par);
 
     Real64 IndEvapCoolerPower(EnergyPlusData &state,
                               int EvapCoolIndex,        // Unit index
@@ -421,26 +391,9 @@ namespace EvaporativeCoolers {
 
     void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 FanPLR = 1.0);
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the EvapCooler Module
-    // *****************************************************************************
-
     void UpdateEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
-    //        End of Update subroutines for the EvapCooler Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the EvapCooler Module
-    // *****************************************************************************
-
     void ReportEvapCooler(EnergyPlusData &state, int EvapCoolNum);
-
-    //***************
-    // Begin routines for zone HVAC Evaporative cooler unit
-    //_______________________________________________________________________________________________________________________
-    //***************
 
     void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
                                       std::string_view CompName,      // name of the packaged terminal heat pump
@@ -489,15 +442,10 @@ namespace EvaporativeCoolers {
                                      Real64 ZoneCoolingLoad // target cooling load
     );
 
-    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 FanSpeedRatio, std::array<Real64, 5> const &Par // parameters
-    );
+    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 FanSpeedRatio, std::array<Real64, 5> const &Par);
 
     void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum); // unit number
 
-    //        End of Reporting subroutines for the EvaporativeCoolers Module
-    // *****************************************************************************
-
-    // Used to clear global data between Unit Tests, should not be normally called
     int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound);
 
     int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound);
@@ -515,25 +463,13 @@ struct EvaporativeCoolersData : BaseGlobalStruct
     bool GetInputZoneEvapUnit = true;
     Array1D<EvaporativeCoolers::EvapConditions> EvapCond;
     Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
-    Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
     std::unordered_map<std::string, std::string> UniqueEvapCondNames;
     bool MySetPointCheckFlag = true;
     bool ZoneEquipmentListChecked = false;
 
     void clear_state() override
     {
-        this->NumEvapCool = 0;
-        this->EvapCond.clear();
-        this->NumZoneEvapUnits = 0;
-        this->ZoneEvapUnit.clear();
-        this->ZoneEvapCoolerUnitFields.clear();
-        this->GetInputEvapComponentsFlag = true;
-        this->GetInputZoneEvapUnit = true;
-        this->CheckEquipName.clear();
-        this->CheckZoneEvapUnitName.clear();
-        this->UniqueEvapCondNames.clear();
-        this->MySetPointCheckFlag = true;
-        this->ZoneEquipmentListChecked = false;
+        *this = EvaporativeCoolersData();
     }
 };
 

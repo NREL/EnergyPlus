@@ -112,7 +112,6 @@ extern "C" {
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PluginManager.hh>
@@ -140,8 +139,6 @@ namespace SimulationManager {
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   January 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This module contains the main driver routine which manages the major
@@ -173,8 +170,6 @@ namespace SimulationManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   January 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver of the simulation manager module.
@@ -182,57 +177,11 @@ namespace SimulationManager {
         // simulation.  This includes the environment loop, a day loop, an
         // hour loop, and a time step loop.
 
-        // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-        using BranchInputManager::ManageBranchInput;
-        using BranchInputManager::TestBranchIntegrity;
-        using BranchNodeConnections::CheckNodeConnections;
-        using BranchNodeConnections::TestCompSetInletOutletNodes;
-        using CostEstimateManager::SimCostEstimate;
-        using CurveManager::InitCurveReporting;
-        using DemandManager::InitDemandManagers;
-        using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
-        using EconomicLifeCycleCost::GetInputForLifeCycleCost;
-        using EconomicTariff::ComputeTariff; // added for computing annual utility costs
-        using EconomicTariff::WriteTabularTariffReports;
-        using EMSManager::CheckIfAnyEMS;
-        using EMSManager::ManageEMS;
-        using ExteriorEnergyUse::ManageExteriorEnergyUse;
-        using FaultsManager::CheckAndReadFaults;
-        using HVACControllers::DumpAirLoopStatistics;
-        using MixedAir::CheckControllerLists;
-        using NodeInputManager::CheckMarkedNodes;
-        using NodeInputManager::SetupNodeVarsForReporting;
-        using OutputProcessor::ReportForTabularReports;
-        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
-        using OutputProcessor::SetupTimePointers;
-        using OutputReportPredefined::SetPredefinedTables;
-        using OutputReportTabular::CloseOutputTabularFile;
-        using OutputReportTabular::OpenOutputTabularFile;
-        using OutputReportTabular::ResetTabularReports;
-        using OutputReportTabular::WriteTabularReports;
-        using PlantManager::CheckIfAnyPlant;
-        using PlantPipingSystemsManager::CheckIfAnyBasements;
-        using PlantPipingSystemsManager::CheckIfAnySlabs;
-        using PlantPipingSystemsManager::SimulateGroundDomains;
-        using PollutionModule::CheckPollutionMeterReporting;
-        using PollutionModule::SetupPollutionCalculations;
-        using PollutionModule::SetupPollutionMeterReporting;
-        using Psychrometrics::InitializePsychRoutines;
-        using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
-        using SizingManager::ManageSizing;
-        using SystemReports::CreateEnergyReportStructure;
-        using SystemReports::ReportAirLoopConnections;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool Available; // an environment is available to process
         bool ErrorsFound(false);
         bool TerminalError(false);
-        bool SimsDone;
-        bool ErrFound;
         bool oneTimeUnderwaterBoundaryCheck = true;
         bool AnyUnderwaterBoundaries = false;
-        int EnvCount;
 
         state.files.outputControl.getInput(state);
         state.dataResultsFramework->resultsFramework->setupOutputOptions(state);
@@ -252,7 +201,6 @@ namespace SimulationManager {
         PostIPProcessing(state);
 
         state.dataGlobal->BeginSimFlag = true;
-        state.dataGlobal->BeginFullSimFlag = false;
         state.dataGlobal->DoOutputReporting = false;
         state.dataReportFlag->DisplayPerfSimulationFlag = false;
         state.dataReportFlag->DoWeatherInitReporting = false;
@@ -263,34 +211,30 @@ namespace SimulationManager {
 
         OpenOutputFiles(state);
         GetProjectData(state);
-        InitializePsychRoutines(state);
+        Psychrometrics::InitializePsychRoutines(state);
         CheckForMisMatchedEnvironmentSpecifications(state);
         CheckForRequestedReporting(state);
-        SetPredefinedTables(state);
+        OutputReportPredefined::SetPredefinedTables(state);
         SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
-        SetupTimePointers(
+        OutputProcessor::SetupTimePointers(
             state, OutputProcessor::SOVTimeStepType::Zone, state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers(state, OutputProcessor::SOVTimeStepType::HVAC, TimeStepSys);
+        OutputProcessor::SetupTimePointers(state, OutputProcessor::SOVTimeStepType::HVAC, state.dataHVACGlobal->TimeStepSys);
 
-        CheckIfAnyEMS(state);
-        CheckIfAnyPlant(state);
-        CheckIfAnySlabs(state);
-        CheckIfAnyBasements(state);
-        CheckIfAnyIdealCondEntSetPoint(state);
         createFacilityElectricPowerServiceObject(state);
         createCoilSelectionReportObj(state);
+        // read object information early in simulation
+        isInputObjectUsed(state);
 
-        ManageBranchInput(state); // just gets input and returns.
+        BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
         // Create a new plugin manager which starts up the Python interpreter
         state.dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
 
         state.dataGlobal->DoingSizing = true;
-        ManageSizing(state);
+        SizingManager::ManageSizing(state);
 
-        state.dataGlobal->BeginFullSimFlag = true;
-        SimsDone = false;
+        bool SimsDone = false;
         if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoHVACSizingSimulation) {
             state.dataGlobal->DoOutputReporting = true;
         }
@@ -302,7 +246,13 @@ namespace SimulationManager {
                              "ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl "
                              "object). Succeeding warnings/errors may be confusing.");
         }
-        Available = true;
+        bool Available = true; // an environment is available to process
+
+        if (state.dataGlobal->DoPureLoadCalc) {
+            state.dataGlobal->DoOutputReporting = true;
+            Available = false;
+            state.dataOutRptTab->WriteTabularFiles = true;
+        }
 
         if (state.dataBranchInputManager->InvalidBranchDefinitions) {
             ShowFatalError(state, "Preceding error(s) in Branch Input cause termination.");
@@ -320,9 +270,9 @@ namespace SimulationManager {
         ResetEnvironmentCounter(state);
         SetupSimulation(state, ErrorsFound);
 
-        CheckAndReadFaults(state);
+        FaultsManager::CheckAndReadFaults(state);
 
-        InitCurveReporting(state);
+        CurveManager::InitCurveReporting(state);
 
         state.dataErrTracking->AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         state.dataGlobal->KickOffSimulation = false;
@@ -330,52 +280,46 @@ namespace SimulationManager {
         state.dataReportFlag->DoWeatherInitReporting = true;
 
         //  Note:  All the inputs have been 'gotten' by the time we get here.
-        ErrFound = false;
+        bool ErrFound = false;
         if (state.dataGlobal->DoOutputReporting) {
             DisplayString(state, "Reporting Surfaces");
 
             ReportSurfaces(state);
 
-            SetupNodeVarsForReporting(state);
+            NodeInputManager::SetupNodeVarsForReporting(state);
             state.dataGlobal->MetersHaveBeenInitialized = true;
-            SetupPollutionMeterReporting(state);
+            PollutionModule::SetupPollutionMeterReporting(state);
             SystemReports::AllocateAndSetUpVentReports(state);
             if (state.dataPluginManager->pluginManager) {
                 EnergyPlus::PluginManagement::PluginManager::setupOutputVariables(state);
             }
             UpdateMeterReporting(state);
-            CheckPollutionMeterReporting(state);
+            PollutionModule::CheckPollutionMeterReporting(state);
             state.dataElectPwrSvcMgr->facilityElectricServiceObj->verifyCustomMetersElecPowerMgr(state);
-            SetupPollutionCalculations(state);
-            InitDemandManagers(state);
-            TestBranchIntegrity(state, ErrFound);
+            PollutionModule::SetupPollutionCalculations(state);
+            DemandManager::InitDemandManagers(state);
+            BranchInputManager::TestBranchIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckMarkedNodes(state, ErrFound);
+            NodeInputManager::CheckMarkedNodes(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckNodeConnections(state, ErrFound);
+            BranchNodeConnections::CheckNodeConnections(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestCompSetInletOutletNodes(state, ErrFound);
+            BranchNodeConnections::TestCompSetInletOutletNodes(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckControllerLists(state, ErrFound);
+            MixedAir::CheckControllerLists(state, ErrFound);
             if (ErrFound) TerminalError = true;
 
-            if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) {
+            if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoPureLoadCalc) {
                 ReportLoopConnections(state);
-                ReportAirLoopConnections(state);
+                SystemReports::ReportAirLoopConnections(state);
                 ReportNodeConnections(state);
-                // Debug reports
-                //      CALL ReportCompSetMeterVariables
-                //      CALL ReportParentChildren
             }
-            CreateEnergyReportStructure(state);
+            SystemReports::CreateEnergyReportStructure(state);
             bool anyEMSRan;
-            ManageEMS(state,
-                      EMSManager::EMSCallFrom::SetupSimulation,
-                      anyEMSRan,
-                      ObjexxFCL::Optional_int_const()); // point to finish setup processing EMS, sensor ready now
-
+            // point to finish setup processing EMS, sensor ready now
+            EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::SetupSimulation, anyEMSRan, ObjexxFCL::Optional_int_const());
             ProduceRDDMDD(state);
 
             if (TerminalError) {
@@ -392,7 +336,7 @@ namespace SimulationManager {
             state.dataSQLiteProcedures->sqlite->sqliteCommit();
         }
 
-        GetInputForLifeCycleCost(state); // must be prior to WriteTabularReports -- do here before big simulation stuff.
+        EconomicLifeCycleCost::GetInputForLifeCycleCost(state); // must be prior to WriteTabularReports -- do here before big simulation stuff.
 
         // check for variable latitude/location/etc
         WeatherManager::ReadVariableLocationOrientation(state);
@@ -402,12 +346,13 @@ namespace SimulationManager {
             ManageHVACSizingSimulation(state, ErrorsFound);
         }
 
-        ShowMessage(state, "Beginning Simulation");
-        DisplayString(state, "Beginning Primary Simulation");
-
+        if (!state.dataGlobal->DoPureLoadCalc) {
+            ShowMessage(state, "Beginning Simulation");
+            DisplayString(state, "Beginning Primary Simulation");
+        }
         ResetEnvironmentCounter(state);
 
-        EnvCount = 0;
+        int EnvCount = 0;
         state.dataGlobal->WarmupFlag = true;
 
         while (Available) {
@@ -439,16 +384,6 @@ namespace SimulationManager {
             DisplayString(state, "Initializing New Environment Parameters");
 
             state.dataGlobal->BeginEnvrnFlag = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) &&
-                (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                     .suppressBegEnvReset)) {
-                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
-                // easily converge fewer warmup days are allowed
-                DisplayString(state, "Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
-                state.dataGlobal->beginEnvrnWarmStartFlag = true;
-            } else {
-                state.dataGlobal->beginEnvrnWarmStartFlag = false;
-            }
             state.dataGlobal->EndEnvrnFlag = false;
             state.dataEnvrn->EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
@@ -498,7 +433,7 @@ namespace SimulationManager {
                     }
                     static constexpr std::string_view Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, state.dataReportFlag->NumOfWarmupDays);
-                    ResetAccumulationWhenWarmupComplete(state);
+                    OutputProcessor::ResetAccumulationWhenWarmupComplete(state);
                 } else if (state.dataReportFlag->DisplayPerfSimulationFlag) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                         DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
@@ -511,7 +446,7 @@ namespace SimulationManager {
                 if ((state.dataGlobal->DayOfSim > 365) && ((state.dataGlobal->NumOfDayInEnvrn - state.dataGlobal->DayOfSim) == 364) &&
                     !state.dataGlobal->WarmupFlag) {
                     DisplayString(state, "Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
-                    ResetTabularReports(state);
+                    OutputReportTabular::ResetTabularReports(state);
                 }
 
                 for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
@@ -525,7 +460,7 @@ namespace SimulationManager {
                         if (state.dataGlobal->stopSimulation) break;
 
                         if (state.dataGlobal->AnySlabsInModel || state.dataGlobal->AnyBasementsInModel) {
-                            SimulateGroundDomains(state, false);
+                            PlantPipingSystemsManager::SimulateGroundDomains(state, false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -559,7 +494,7 @@ namespace SimulationManager {
 
                         ManageWeather(state);
 
-                        ManageExteriorEnergyUse(state);
+                        ExteriorEnergyUse::ManageExteriorEnergyUse(state);
 
                         ManageHeatBalance(state);
 
@@ -572,7 +507,6 @@ namespace SimulationManager {
                         state.dataGlobal->BeginDayFlag = false;
                         state.dataGlobal->BeginEnvrnFlag = false;
                         state.dataGlobal->BeginSimFlag = false;
-                        state.dataGlobal->BeginFullSimFlag = false;
                     } // TimeStep loop
 
                     state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
@@ -589,6 +523,7 @@ namespace SimulationManager {
         } // ... End environment loop.
 
         state.dataGlobal->WarmupFlag = false;
+
         if (!SimsDone && state.dataGlobal->DoDesDaySim) {
             if ((state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
                 ShowWarningError(state,
@@ -606,33 +541,27 @@ namespace SimulationManager {
 
         if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->sqliteBegin(); // for final data to write
 
-#ifdef EP_Detailed_Timings
-        epStartTime("Closeout Reporting=");
-#endif
-        SimCostEstimate(state);
+        CostEstimateManager::SimCostEstimate(state);
 
-        ComputeTariff(state); //     Compute the utility bills
+        EconomicTariff::ComputeTariff(state); //     Compute the utility bills
 
         EMSManager::checkForUnusedActuatorsAtEnd(state);
         EMSManager::checkSetpointNodesAtEnd(state);
 
-        ReportForTabularReports(state); // For Energy Meters (could have other things that need to be pushed to after simulation)
+        OutputProcessor::ReportForTabularReports(state); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
-        OpenOutputTabularFile(state);
+        OutputReportTabular::OpenOutputTabularFile(state);
 
-        WriteTabularReports(state); //     Create the tabular reports at completion of each
+        OutputReportTabular::WriteTabularReports(state); // Create the tabular reports at completion of each
 
-        WriteTabularTariffReports(state);
+        EconomicTariff::WriteTabularTariffReports(state);
 
-        ComputeLifeCycleCostAndReport(state); // must be after WriteTabularReports and WriteTabularTariffReports
+        EconomicLifeCycleCost::ComputeLifeCycleCostAndReport(state); // must be after WriteTabularReports and WriteTabularTariffReports
 
-        CloseOutputTabularFile(state);
+        OutputReportTabular::CloseOutputTabularFile(state);
 
-        DumpAirLoopStatistics(state); // Dump runtime statistics for air loop controller simulation to csv file
+        HVACControllers::DumpAirLoopStatistics(state); // Dump runtime statistics for air loop controller simulation to csv file
 
-#ifdef EP_Detailed_Timings
-        epStopTime("Closeout Reporting=");
-#endif
         CloseOutputFiles(state);
 
         // state.dataSQLiteProcedures->sqlite->createZoneExtendedOutput();
@@ -741,14 +670,9 @@ namespace SimulationManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            {
-                auto const SELECT_CASE_var(Alphas(1));
-                if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
-                    (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED") || (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCESIMPLIFIED")) {
-                    CondFDAlgo = true;
-                } else {
-                }
-            }
+            static constexpr std::array<std::string_view, 4> condFDTypes = {
+                "CONDUCTIONFINITEDIFFERENCE", "CONDFD", "CONDUCTIONFINITEDIFFERENCEDETAILED", "CONDUCTIONFINITEDIFFERENCESIMPLIFIED"};
+            CondFDAlgo = std::find(condFDTypes.begin(), condFDTypes.end(), Alphas(1)) != condFDTypes.end();
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -766,14 +690,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(Alphas(2));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-
-                    } else {
-                    }
-                }
+                if (Alphas(2) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
@@ -792,13 +709,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(Alphas(3));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-                    } else {
-                    }
-                }
+                if (Alphas(3) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
@@ -817,13 +728,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-                    } else {
-                    }
-                }
+                if (state.dataIPShortCut->cAlphaArgs(2) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
         CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
@@ -842,13 +747,7 @@ namespace SimulationManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
-                    if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                        CondFDAlgo = true;
-                    } else {
-                    }
-                }
+                if (state.dataIPShortCut->cAlphaArgs(2) == "CONDUCTIONFINITEDIFFERENCE") CondFDAlgo = true;
             }
         }
 
@@ -1151,6 +1050,11 @@ namespace SimulationManager {
         if (state.dataSysVars->FullAnnualRun) {
             state.dataGlobal->DoDesDaySim = false;
             state.dataGlobal->DoWeathSim = true;
+        }
+
+        if ((!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim && !state.dataGlobal->DoHVACSizingSimulation) &&
+            (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing)) {
+            state.dataGlobal->DoPureLoadCalc = true;
         }
 
         CurrentModuleObject = "PerformancePrecisionTradeoffs";
@@ -1609,15 +1513,17 @@ namespace SimulationManager {
                                  "file specified; but no weather file specified.");
             }
         }
+
         if (!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
-            ShowWarningError(state,
-                             "\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will "
-                             "be performed, and most input will not be read.");
-        }
-        if (!state.dataGlobal->DoZoneSizing && !state.dataGlobal->DoSystemSizing && !state.dataGlobal->DoPlantSizing &&
-            !state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim) {
-            ShowSevereError(state, "All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates.");
-            ErrorsFound = true;
+            // This amounts to checking: (!DoHVACSizingSimulation && !DoZoneSizing && !DoSystemSizing)
+            if (!state.dataGlobal->DoHVACSizingSimulation && !state.dataGlobal->DoPureLoadCalc) {
+                ShowSevereError(state, "All elements of SimulationControl are set to \"No\". No simulations can be done. Program terminates.");
+                ErrorsFound = true;
+            } else {
+                ShowWarningError(state,
+                                 "\"Run Simulation for Sizing Periods\" and \"Run Simulation for Weather File Run Periods\" are both set to \"No\". "
+                                 "No simulations will be performed, and most input will not be read.");
+            }
         }
 
         if (ErrorsFound) {
@@ -1650,7 +1556,7 @@ namespace SimulationManager {
                       state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 ||
                       state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
 
-        if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) && SimPeriods) {
+        if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoPureLoadCalc) && SimPeriods) {
             ReportingRequested = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
                                   state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
@@ -1943,10 +1849,6 @@ namespace SimulationManager {
         using CostEstimateManager::SimCostEstimate;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
 
-        using PlantPipingSystemsManager::CheckIfAnyBasements;
-        using PlantPipingSystemsManager::CheckIfAnySlabs;
-        using PlantPipingSystemsManager::SimulateGroundDomains;
-
         bool Available = true;
 
         while (Available) { // do for each environment
@@ -1987,7 +1889,6 @@ namespace SimulationManager {
             state.dataGlobal->BeginDayFlag = false;
             state.dataGlobal->BeginEnvrnFlag = false;
             state.dataGlobal->BeginSimFlag = false;
-            state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
             if (state.dataSysVars->DeveloperFlag)
@@ -2016,7 +1917,7 @@ namespace SimulationManager {
         } // ... End environment loop.
 
         if (state.dataGlobal->AnySlabsInModel || state.dataGlobal->AnyBasementsInModel) {
-            SimulateGroundDomains(state, true);
+            PlantPipingSystemsManager::SimulateGroundDomains(state, true);
         }
 
         if (!ErrorsFound) SimCostEstimate(state); // basically will get and check input
@@ -2066,7 +1967,8 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                      state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
                   DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
@@ -2129,7 +2031,8 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Non-Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                      state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
                   DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
@@ -2162,7 +2065,6 @@ namespace SimulationManager {
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2001
         //       MODIFIED       March 2003; added other reporting
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reports on the node connections in various parts of the
@@ -2170,15 +2072,6 @@ namespace SimulationManager {
         // return air paths, controlled zones.
         // This information should be useful in diagnosing node connection input errors.
 
-        // Using/Aliasing
-        using namespace DataAirLoop;
-        using namespace DataBranchNodeConnections;
-        using namespace DataHVACGlobals;
-        using namespace DataPlant;
-        using namespace DataZoneEquipment;
-        using DualDuct::ReportDualDuctConnections;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr static auto errstring("**error**");
 
         // Formats
@@ -2215,15 +2108,19 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Component Set,{},{},{},{},{},{},{},{}\n",
                   Count,
-                  state.dataBranchNodeConnections->CompSets(Count).ParentCType,
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                      state.dataBranchNodeConnections->CompSets(Count).ParentObjectType)],
                   state.dataBranchNodeConnections->CompSets(Count).ParentCName,
-                  state.dataBranchNodeConnections->CompSets(Count).CType,
+                  BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                      state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)],
                   state.dataBranchNodeConnections->CompSets(Count).CName,
                   state.dataBranchNodeConnections->CompSets(Count).InletNodeName,
                   state.dataBranchNodeConnections->CompSets(Count).OutletNodeName,
                   state.dataBranchNodeConnections->CompSets(Count).Description);
 
-            if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" ||
+            std::string_view const CType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)];
+            if (state.dataBranchNodeConnections->CompSets(Count).ParentObjectType == DataLoopNode::ConnectionObjectType::Undefined ||
                 state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
                 state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
                 if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
@@ -2233,13 +2130,14 @@ namespace SimulationManager {
                     state.dataSimulationManager->WarningOut = false;
                 }
                 ShowWarningError(state,
-                                 "Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType +
-                                     ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
-                ShowContinueError(state, "  " + state.dataBranchNodeConnections->CompSets(Count).Description + " not on any Branch or Parent Object");
-                ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
-                ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
+                                 format("Node Connection Error for object {}={}", CType, state.dataBranchNodeConnections->CompSets(Count).CName));
+                ShowContinueError(state,
+                                  format("  {} not on any Branch or Parent Object", state.dataBranchNodeConnections->CompSets(Count).Description));
+                ShowContinueError(state, format("  Inlet Node : {}", state.dataBranchNodeConnections->CompSets(Count).InletNodeName));
+                ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutletNodeName));
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
-                if (UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(Count).CType, "SolarCollector:UnglazedTranspired")) {
+                if (state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType ==
+                    DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired) {
                     ShowContinueError(state, "This report does not necessarily indicate a problem for a MultiSystem Transpired Collector");
                 }
             }
@@ -2250,9 +2148,9 @@ namespace SimulationManager {
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
                 }
-                ShowWarningError(state,
-                                 "Potential Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType +
-                                     ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                ShowWarningError(
+                    state,
+                    format("Potential Node Connection Error for object {}, name={}", CType, state.dataBranchNodeConnections->CompSets(Count).CName));
                 ShowContinueError(state, "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
                 ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
                 ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
@@ -2262,7 +2160,9 @@ namespace SimulationManager {
 
         for (int Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
             for (int Count1 = Count + 1; Count1 <= state.dataBranchNodeConnections->NumCompSets; ++Count1) {
-                if (state.dataBranchNodeConnections->CompSets(Count).CType != state.dataBranchNodeConnections->CompSets(Count1).CType) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType !=
+                    state.dataBranchNodeConnections->CompSets(Count1).ComponentObjectType)
+                    continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Count1).CName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName)
                     continue;
@@ -2275,18 +2175,18 @@ namespace SimulationManager {
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
                 }
+                std::string_view const CType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                    state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)];
+                std::string_view const ParentCType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                    state.dataBranchNodeConnections->CompSets(Count1).ParentObjectType)];
+                std::string_view const ParentCType1 = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
+                    state.dataBranchNodeConnections->CompSets(Count).ParentObjectType)];
                 ShowWarningError(state, "Component plus inlet/outlet node pair used more than once:");
-                ShowContinueError(state,
-                                  "  Component  : " + state.dataBranchNodeConnections->CompSets(Count).CType +
-                                      ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
-                ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
-                ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
-                ShowContinueError(state,
-                                  "  Used by    : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ' ' +
-                                      state.dataBranchNodeConnections->CompSets(Count).ParentCName);
-                ShowContinueError(state,
-                                  "  and  by    : " + state.dataBranchNodeConnections->CompSets(Count1).ParentCType + ' ' +
-                                      state.dataBranchNodeConnections->CompSets(Count1).ParentCName);
+                ShowContinueError(state, format("  Component  : {}={}", CType, state.dataBranchNodeConnections->CompSets(Count).CName));
+                ShowContinueError(state, format("  Inlet Node : {}", state.dataBranchNodeConnections->CompSets(Count).InletNodeName));
+                ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutletNodeName));
+                ShowContinueError(state, format("  Used by    : {}={}", ParentCType, state.dataBranchNodeConnections->CompSets(Count).ParentCName));
+                ShowContinueError(state, format("  and  by    : {}={}", ParentCType1, state.dataBranchNodeConnections->CompSets(Count1).ParentCName));
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
             }
         }
@@ -2317,15 +2217,7 @@ namespace SimulationManager {
             for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 //  Plant Supply Side Loop
                 // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant
-                const auto LoopString = [&]() {
-                    if (LoopSideNum == LoopSideLocation::Demand) {
-                        return "Demand";
-                    } else if (LoopSideNum == LoopSideLocation::Supply) {
-                        return "Supply";
-                    } else {
-                        return "";
-                    }
-                }();
+                std::string_view const LoopString = DataPlant::DemandSupplyNames[static_cast<int>(LoopSideNum)];
 
                 print(state.files.bnd,
                       " Plant Loop,{},{},{},{},{},{}\n",
@@ -2434,13 +2326,13 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNameIn);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNameIn);
 
         } //  Plant Demand Side Loop
 
@@ -2474,9 +2366,9 @@ namespace SimulationManager {
                 //  Plant Supply Side Loop
                 // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant
                 const auto LoopString = [&]() {
-                    if (LoopSideNum == LoopSideLocation::Demand) {
+                    if (LoopSideNum == DataPlant::LoopSideLocation::Demand) {
                         return "Demand";
-                    } else if (LoopSideNum == LoopSideLocation::Supply) {
+                    } else if (LoopSideNum == DataPlant::LoopSideLocation::Supply) {
                         return "Supply";
                     } else {
                         return "";
@@ -2592,13 +2484,13 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNameIn);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNameIn);
 
         } //  Plant Demand Side Loop
 
@@ -2694,7 +2586,7 @@ namespace SimulationManager {
         }
 
         // Report Dual Duct Dampers to BND File
-        ReportDualDuctConnections(state);
+        DualDuct::ReportDualDuctConnections(state);
 
         if (state.dataBranchNodeConnections->NumNodeConnectionErrors == 0) {
             ShowMessage(state, "No node connection errors were found.");
@@ -2707,233 +2599,6 @@ namespace SimulationManager {
         }
 
         state.dataErrTracking->AskForConnectionsReport = false;
-    }
-
-    void ReportParentChildren(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   May 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Reports parent compsets with ensuing children data.
-
-        // METHODOLOGY EMPLOYED:
-        // Uses IsParentObject,GetNumChildren,GetChildrenData
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-
-        using namespace DataBranchNodeConnections;
-        using namespace BranchNodeConnections;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop;
-        int Loop1;
-        Array1D_string ChildCType;
-        Array1D_string ChildCName;
-        Array1D_string ChildInNodeName;
-        Array1D_string ChildOutNodeName;
-        Array1D_int ChildInNodeNum;
-        Array1D_int ChildOutNodeNum;
-        int NumChildren;
-        bool ErrorsFound;
-
-        ErrorsFound = false;
-        print(state.files.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
-        for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
-
-            auto ctypeStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentType)]);
-
-            NumChildren = GetNumChildren(state, ctypeStr, state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName);
-            if (NumChildren > 0) {
-                ChildCType.allocate(NumChildren);
-                ChildCName.allocate(NumChildren);
-                ChildInNodeName.allocate(NumChildren);
-                ChildOutNodeName.allocate(NumChildren);
-                ChildInNodeNum.allocate(NumChildren);
-                ChildOutNodeNum.allocate(NumChildren);
-                ChildCType = std::string{};
-                ChildCName = std::string{};
-                ChildInNodeName = std::string{};
-                ChildOutNodeName = std::string{};
-                ChildInNodeNum = 0;
-                ChildOutNodeNum = 0;
-                GetChildrenData(state,
-                                ctypeStr,
-                                state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName,
-                                NumChildren,
-                                ChildCType,
-                                ChildCName,
-                                ChildInNodeName,
-                                ChildInNodeNum,
-                                ChildOutNodeName,
-                                ChildOutNodeNum,
-                                ErrorsFound);
-                if (Loop > 1) print(state.files.debug, "{}\n", std::string(60, '='));
-
-                print(state.files.debug,
-                      " Parent Node,{}:{},{},{}\n",
-                      ctypeStr,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).InletNodeName,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).OutletNodeName);
-                for (Loop1 = 1; Loop1 <= NumChildren; ++Loop1) {
-                    print(state.files.debug,
-                          "..ChildNode,{}:{},{},{}\n",
-                          ChildCType(Loop1),
-                          ChildCName(Loop1),
-                          ChildInNodeName(Loop1),
-                          ChildOutNodeName(Loop1));
-                }
-                ChildCType.deallocate();
-                ChildCName.deallocate();
-                ChildInNodeName.deallocate();
-                ChildOutNodeName.deallocate();
-                ChildInNodeNum.deallocate();
-                ChildOutNodeNum.deallocate();
-            } else {
-                if (Loop > 1) print(state.files.debug, "{}\n", std::string(60, '='));
-                print(state.files.debug,
-                      " Parent Node (no children),{}:{},{},{}\n",
-                      ctypeStr,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).InletNodeName,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).OutletNodeName);
-            }
-        }
-    }
-
-    void ReportCompSetMeterVariables(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   May 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Reports comp set meter variables.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataBranchNodeConnections;
-        using namespace BranchNodeConnections;
-        using namespace DataGlobalConstants;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop;
-        int Loop1;
-        int NumVariables;
-        Array1D_int VarIndexes;
-        Array1D_int VarIDs;
-        Array1D<OutputProcessor::TimeStepType> IndexTypes;
-        Array1D<OutputProcessor::VariableType> VarTypes;
-        Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
-        Array1D_string VarNames;
-        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;
-        Array1D_string EndUses;
-        Array1D_string Groups;
-
-        print(state.files.debug, "{}\n", " CompSet,ComponentType,ComponentName,NumMeteredVariables");
-        print(state.files.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
-
-        for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-            NumVariables = GetNumMeteredVariables(
-                state, state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName);
-            print(state.files.debug,
-                  "CompSet, {}, {}, {:5}\n",
-                  state.dataBranchNodeConnections->CompSets(Loop).CType,
-                  state.dataBranchNodeConnections->CompSets(Loop).CName,
-                  NumVariables);
-            if (NumVariables <= 0) continue;
-            VarIndexes.dimension(NumVariables, 0);
-            VarIDs.dimension(NumVariables, 0);
-            IndexTypes.dimension(NumVariables, 0);
-            VarTypes.dimension(NumVariables, 0);
-            VarNames.allocate(NumVariables);
-            unitsForVar.allocate(NumVariables);
-
-            for (int idx = 1; idx <= NumVariables; ++idx) {
-                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::None));
-            }
-
-            EndUses.allocate(NumVariables);
-            Groups.allocate(NumVariables);
-            GetMeteredVariables(state,
-                                state.dataBranchNodeConnections->CompSets(Loop).CType,
-                                state.dataBranchNodeConnections->CompSets(Loop).CName,
-                                VarIndexes,
-                                VarTypes,
-                                IndexTypes,
-                                unitsForVar,
-                                ResourceTypes,
-                                EndUses,
-                                Groups,
-                                VarNames,
-                                VarIDs);
-            for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
-                print(state.files.debug,
-                      "RepVar,{:5},{:5},{},[{}],{},{},{},{:5}\n",
-                      VarIndexes(Loop1),
-                      VarIDs(Loop1),
-                      VarNames(Loop1),
-                      unitEnumToString(unitsForVar(Loop1)),
-                      GetResourceTypeChar(ResourceTypes.at(Loop1)),
-                      EndUses(Loop1),
-                      Groups(Loop1)
-                      // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
-                      ,
-                      static_cast<int>(IndexTypes(Loop1)));
-            }
-            VarIndexes.deallocate();
-            IndexTypes.deallocate();
-            VarTypes.deallocate();
-            VarIDs.deallocate();
-            VarNames.deallocate();
-            unitsForVar.deallocate();
-            EndUses.deallocate();
-            Groups.deallocate();
-        }
     }
 
     void PostIPProcessing(EnergyPlusData &state)
@@ -2960,6 +2625,24 @@ namespace SimulationManager {
         }
 
         state.dataInputProcessing->inputProcessor->preScanReportingVariables(state);
+    }
+
+    void isInputObjectUsed(EnergyPlusData &state)
+    {
+        // there is a need to know if certain object are used in the simulation
+        // this may not be the best place to do this but it's a start at early reading of input data
+        // this concept could grow to include reading all inputs prior to the start of the simulation so all data is available
+        // once inputs are processed, read in all getInputs. They will be read early and will not be read again so there is no duplication
+
+        // for example, AirLoopHVAC:DOAS systems autosize on weather data, and WeatherManager processes that data
+        // there is no need to process that data if there are no DOAS used in the simulation
+        state.dataGlobal->AirLoopHVACDOASUsedInSim =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:DedicatedOutdoorAirSystem") > 0;
+        EMSManager::CheckIfAnyEMS(state);
+        PlantManager::CheckIfAnyPlant(state);
+        PlantPipingSystemsManager::CheckIfAnySlabs(state);
+        PlantPipingSystemsManager::CheckIfAnyBasements(state);
+        SetPointManager::CheckIfAnyIdealCondEntSetPoint(state);
     }
 
 } // namespace SimulationManager

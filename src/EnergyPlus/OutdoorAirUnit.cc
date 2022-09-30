@@ -507,15 +507,17 @@ namespace OutdoorAirUnit {
             }
 
             // Process the unit control type
-
             if (!lAlphaBlanks(9)) {
-                {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
-                    if (SELECT_CASE_var == "NEUTRALCONTROL") {
-                        OutAirUnit(OAUnitNum).controlType = OAUnitCtrlType::Neutral;
-                    } else if (SELECT_CASE_var == "TEMPERATURECONTROL") {
-                        OutAirUnit(OAUnitNum).controlType = OAUnitCtrlType::Temperature;
-                    }
+                constexpr std::array<std::string_view, static_cast<int>(OAUnitCtrlType::Num)> ctrlTypeNamesUC = {
+                    "NEUTRALCONTROL", "INVALID-UNCONDITIONED", "TEMPERATURECONTROL"};
+                auto tmpCtrlType = static_cast<OAUnitCtrlType>(getEnumerationValue(ctrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
+                switch (tmpCtrlType) {
+                case OAUnitCtrlType::Neutral:
+                case OAUnitCtrlType::Temperature:
+                    OutAirUnit(OAUnitNum).controlType = tmpCtrlType;
+                    break;
+                default:
+                    break; // just leave it alone, nothing was done here
                 }
             } else {
                 ShowSevereError(state,

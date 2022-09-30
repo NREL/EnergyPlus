@@ -771,22 +771,23 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 } else {
                     CheckSysSizing(state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name);
+                    auto &thisFinalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
                     if (state.dataSize->CurOASysNum > 0) {
-                        DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                        DesignVolFlowRateDes = thisFinalSysSizing.DesOutAirVolFlow;
                     } else {
-                        {
-                            auto const SELECT_CASE_var(state.dataSize->CurDuctType);
-                            if (SELECT_CASE_var == DataHVACGlobals::Main) {
-                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                                       state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                            } else if (SELECT_CASE_var == DataHVACGlobals::Cooling) {
-                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                                       state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
-                            } else if (SELECT_CASE_var == DataHVACGlobals::Heating) {
-                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
-                            } else {
-                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                            }
+                        switch (state.dataSize->CurDuctType) {
+                        case DataHVACGlobals::AirDuctType::Main: {
+                            DesignVolFlowRateDes = thisFinalSysSizing.SysAirMinFlowRat * thisFinalSysSizing.DesMainVolFlow;
+                        } break;
+                        case DataHVACGlobals::AirDuctType::Cooling: {
+                            DesignVolFlowRateDes = thisFinalSysSizing.SysAirMinFlowRat * thisFinalSysSizing.DesCoolVolFlow;
+                        } break;
+                        case DataHVACGlobals::AirDuctType::Heating: {
+                            DesignVolFlowRateDes = thisFinalSysSizing.DesHeatVolFlow;
+                        } break;
+                        default: {
+                            DesignVolFlowRateDes = thisFinalSysSizing.DesMainVolFlow;
+                        } break;
                         }
                     }
                     Real64 DesMassFlow = state.dataEnvrn->StdRhoAir * DesignVolFlowRateDes;

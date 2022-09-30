@@ -83,12 +83,7 @@ struct CrossVentMgrData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->HAT_J = 0.0;
-        this->HA_J = 0.0;
-        this->HAT_R = 0.0;
-        this->HA_R = 0.0;
-        this->InitUCSDCV_MyOneTimeFlag = true;
-        this->InitUCSDCV_MyEnvrnFlag.deallocate();
+        *this = CrossVentMgrData();
     }
 };
 

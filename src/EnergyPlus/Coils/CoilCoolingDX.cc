@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataWater.hh>
@@ -132,6 +133,11 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     this->original_input_specs = input_data;
     bool errorsFound = false;
     this->name = input_data.name;
+
+    // initialize reclaim heat parameters
+    this->reclaimHeat.Name = this->name;
+    this->reclaimHeat.SourceType = state.dataCoilCooingDX->coilCoolingDXObjectName;
+
     this->performance = CoilCoolingDXCurveFitPerformance(state, input_data.performance_object_name);
 
     if (!this->performance.original_input_specs.base_operating_mode_name.empty() &&
@@ -169,16 +175,6 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                    DataLoopNode::ObjectIsNotParent);
-
-    // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
-    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, this->condInletNodeIndex)) {
-        ShowWarningError(state,
-                         std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
-        ShowContinueError(state,
-                          "Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
-                              "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-        ShowContinueError(state, "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
-    }
 
     this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
                                                                     input_data.condenser_outlet_node_name,
@@ -961,6 +957,9 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
             this->reportCoilFinalSizes = false;
         }
     }
+
+    // update available reclaim heat
+    this->reclaimHeat.AvailCapacity = this->totalCoolingEnergyRate + this->elecCoolingPower;
 }
 
 void CoilCoolingDX::setToHundredPercentDOAS()
@@ -991,7 +990,6 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
 
 void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
 {
-
     if (!state.dataCoilCooingDX->coilCoolingDXs.empty()) {
         Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
         static constexpr std::string_view Format_990(
@@ -1028,6 +1026,44 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
                 state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
             OutputReportPredefined::addFootNoteSubTable(
                 state, state.dataOutRptPredefined->pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
+
+            // AHRI 2023 Standard SEER2 Calculations
+            static constexpr std::string_view Format_991_(
+                " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {}\n");
+            print(state.files.eio,
+                  Format_991_,
+                  "Coil:Cooling:DX",
+                  coil.name,
+                  coil.performance.standardRatingCoolingCapacity2023,
+                  coil.performance.standardRatingEER2,
+                  coil.performance.standardRatingEER2 * ConvFromSIToIP,
+                  coil.performance.standardRatingSEER2_User * ConvFromSIToIP,
+                  coil.performance.standardRatingSEER2_Standard * ConvFromSIToIP,
+                  ' ');
+
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, coil.name, "Coil:Cooling:DX");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI_2023, coil.name, coil.performance.standardRatingCoolingCapacity2023, 1);
+            // W/W is the same as Btuh/Btuh so that's fine too
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXCoolCoilCOP_2023, coil.name, coil.performance.standardRatingEER2, 2);
+            // Btu/W-h will convert to itself
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP_2023, coil.name, coil.performance.standardRatingEER2 * ConvFromSIToIP, 2);
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023,
+                                                     coil.name,
+                                                     coil.performance.standardRatingSEER2_User * ConvFromSIToIP,
+                                                     2);
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023,
+                                                     coil.name,
+                                                     coil.performance.standardRatingSEER2_Standard * ConvFromSIToIP,
+                                                     2);
+            // OutputReportPredefined::PreDefTableEntry(
+            // state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
+            OutputReportPredefined::addFootNoteSubTable(
+                state, state.dataOutRptPredefined->pdstDXCoolCoil_2023, "ANSI/AHRI 2023 ratings account for supply air fan heat and electric power.");
         }
     }
     state.dataCoilCooingDX->stillNeedToReportStandardRatings = false;

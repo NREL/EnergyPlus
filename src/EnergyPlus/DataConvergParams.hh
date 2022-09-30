@@ -176,15 +176,7 @@ struct ConvergParamsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->MinTimeStepSys = (1.0 / 60.0); // =1 minute
-        this->MinTimeStepTol = 1.0e-4;       // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
-        this->MaxZoneTempDiff = 0.3;         // 0.3 C = (1% OF 300 C) = max allowable difference between
-        this->MaxIter = 20;                  // maximum number of iterations allowed
-        this->MaxPlantSubIterations = 8;     // Iteration Max for Plant Simulation sub iterations
-        this->MinPlantSubIterations = 2;     // Iteration Min for Plant Simulation sub iterations
-        this->ZoneInletConvergence.deallocate();
-        this->AirLoopConvergence.deallocate();
-        this->PlantConvergence.deallocate();
+        *this = ConvergParamsData();
     }
 };
 

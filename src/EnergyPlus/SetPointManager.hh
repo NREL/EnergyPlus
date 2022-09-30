@@ -230,28 +230,21 @@ namespace SetPointManager {
     struct DefineOutsideAirSetPointManager : SPBase // Derived type for Outside Air Setpoint Manager Data
     {
         // Members
-        Real64 OutLowSetPt1;  // 1st setpoint at outside low
-        Real64 OutLow1;       // 1st Outside low
-        Real64 OutHighSetPt1; // 1st setpoint at outside high
-        Real64 OutHigh1;      // 1st Outside high
-        std::string Sched;    // Optional schedule
-        int SchedPtr;         // Schedule index
-        Real64 OutLowSetPt2;  // 2nd setpoint at outside low (optional)
-        Real64 OutLow2;       // 2nd Outside low (optional)
-        Real64 OutHighSetPt2; // 2nd setpoint at outside high (optional)
-        Real64 OutHigh2;      // 2nd Outside high (optional)
-        int NumCtrlNodes;
+        Real64 OutLowSetPt1 = 0.0;         // 1st setpoint at outside low
+        Real64 OutLow1 = 0.0;              // 1st Outside low
+        Real64 OutHighSetPt1 = 0.0;        // 1st setpoint at outside high
+        Real64 OutHigh1 = 0.0;             // 1st Outside high
+        int SchedPtr = 0;                  // Schedule index
+        int invalidSchedValErrorIndex = 0; // index for recurring error when schedule is not 1 or 2
+        int setPtErrorCount = 0;           // countfor recurring error when schedule is not 1 or 2
+        Real64 OutLowSetPt2 = 0.0;         // 2nd setpoint at outside low (optional)
+        Real64 OutLow2 = 0.0;              // 2nd Outside low (optional)
+        Real64 OutHighSetPt2 = 0.0;        // 2nd setpoint at outside high (optional)
+        Real64 OutHigh2 = 0.0;             // 2nd Outside high (optional)
+        int NumCtrlNodes = 0;
         std::string CtrlNodeListName;
         Array1D_int CtrlNodes;
-        Real64 SetPt; // current setpoint value
-
-        // Default Constructor
-        DefineOutsideAirSetPointManager()
-            : OutLowSetPt1(0.0), OutLow1(0.0), OutHighSetPt1(0.0), OutHigh1(0.0), SchedPtr(0), OutLowSetPt2(0.0), OutLow2(0.0), OutHighSetPt2(0.0),
-              OutHigh2(0.0), NumCtrlNodes(0), SetPt(0.0)
-
-        {
-        }
+        Real64 SetPt = 0.0; // current setpoint value
 
         void calculate(EnergyPlusData &state);
     };
@@ -336,7 +329,6 @@ namespace SetPointManager {
         int NumZones;            // number of zones whose humidity is being controlled
         int NumCtrlNodes;        // number of nodes whose humidity ratio is being set
         Array1D_int ZoneNodes;   // zone node numbers of zones being controlled
-        Array1D_int ZoneNum;     // actual zone number ( index into Zone array)
         Array1D_int CtrlZoneNum; // index into ZoneEquipConfig
         Array1D_int CtrlNodes;   // nodes where humidity ratio is being set
         Real64 SetPt;            // the setpoint
@@ -355,7 +347,6 @@ namespace SetPointManager {
         int NumZones;            // number of zones whose humidity is being controlled
         int NumCtrlNodes;        // number of nodes whose humidity ratio is being set
         Array1D_int ZoneNodes;   // zone node numbers of zones being controlled
-        Array1D_int ZoneNum;     // actual zone number (index into Zone array)
         Array1D_int CtrlZoneNum; // index into ZoneEquipConfig
         Array1D_int CtrlNodes;   // nodes where humidity ratio is being set
         Real64 SetPt;            // the setpoint

@@ -3761,18 +3761,19 @@ namespace LowTempRadiantSystem {
         // loop and then applying the equations derived on pp. 113-118 of the dissertation.
 
         // Set the conditions on the water side inlet
-        {
-            auto const SELECT_CASE_var(this->OperatingMode);
-            if (SELECT_CASE_var == HeatingMode) {
-                WaterNodeIn = this->HotWaterInNode;
-            } else if (SELECT_CASE_var == CoolingMode) {
-                WaterNodeIn = this->ColdWaterInNode;
-            } else {
-                WaterNodeIn = 0; // Suppress uninitialized warning
-                ShowSevereError(state, "Illegal low temperature radiant system operating mode");
-                ShowContinueError(state, "Occurs in Radiant System=" + this->Name);
-                ShowFatalError(state, "Preceding condition causes termination.");
-            }
+        switch (this->OperatingMode) {
+        case HeatingMode: {
+            WaterNodeIn = this->HotWaterInNode;
+        } break;
+        case CoolingMode: {
+            WaterNodeIn = this->ColdWaterInNode;
+        } break;
+        default: {
+            WaterNodeIn = 0; // Suppress uninitialized warning
+            ShowSevereError(state, "Illegal low temperature radiant system operating mode");
+            ShowContinueError(state, "Occurs in Radiant System=" + this->Name);
+            ShowFatalError(state, "Preceding condition causes termination.");
+        } break;
         }
         ZoneNum = this->ZonePtr;
         SysWaterMassFlow = state.dataLoopNodes->Node(WaterNodeIn).MassFlowRate;
@@ -4775,17 +4776,18 @@ namespace LowTempRadiantSystem {
         state.dataLowTempRadSys->WaterTempOut = this->WaterInletTemp;
 
         // Set the conditions on the water side inlet
-        {
-            auto const SELECT_CASE_var(this->OperatingMode);
-            if (SELECT_CASE_var == HeatingMode) {
-                WaterNodeIn = this->HotWaterInNode;
-            } else if (SELECT_CASE_var == CoolingMode) {
-                WaterNodeIn = this->ColdWaterInNode;
-            } else {
-                ShowSevereError(state, "Illegal low temperature radiant system operating mode");
-                ShowContinueError(state, "Occurs in Radiant System=" + this->Name);
-                ShowFatalError(state, "Preceding condition causes termination.");
-            }
+        switch (this->OperatingMode) {
+        case HeatingMode: {
+            WaterNodeIn = this->HotWaterInNode;
+        } break;
+        case CoolingMode: {
+            WaterNodeIn = this->ColdWaterInNode;
+        } break;
+        default: {
+            ShowSevereError(state, "Illegal low temperature radiant system operating mode");
+            ShowContinueError(state, "Occurs in Radiant System=" + this->Name);
+            ShowFatalError(state, "Preceding condition causes termination.");
+        } break;
         }
         ZoneNum = this->ZonePtr;
         ZoneMult = double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
@@ -5765,23 +5767,24 @@ namespace LowTempRadiantSystem {
             PRactual = Pr(Index - 1) + InterpFrac * (Pr(Index) - Pr(Index - 1));
         }
         // arguments are glycol name, temperature, and concentration
-        {
-            auto const SELECT_CASE_var1(this->OperatingMode);
-            if (SELECT_CASE_var1 == HeatingMode) {
-                CpWater = GetSpecificHeatGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
-                                                Temperature,
-                                                state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
-                                                RoutineName);
-            } else if (SELECT_CASE_var1 == CoolingMode) {
-                CpWater = GetSpecificHeatGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                Temperature,
-                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
-                                                RoutineName);
-            } else {
-                assert(false);
-            }
+        switch (this->OperatingMode) {
+        case HeatingMode: {
+            CpWater = GetSpecificHeatGlycol(state,
+                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
+                                            Temperature,
+                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
+                                            RoutineName);
+        } break;
+        case CoolingMode: {
+            CpWater = GetSpecificHeatGlycol(state,
+                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
+                                            Temperature,
+                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+                                            RoutineName);
+        } break;
+        default: {
+            assert(false);
+        } break;
         }
 
         // Calculate NTU based on the heat transfer model

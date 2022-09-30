@@ -104,7 +104,17 @@ namespace WindowComplexManager {
     using namespace Vectors;
     using namespace DataHeatBalFanSys;
 
-    // Functions
+    // Parameters for gas definitions
+    enum class GasCoeffs
+    {
+        Invalid = -1,
+        Custom,
+        Air,
+        Argon,
+        Krypton,
+        Xenon,
+        Num
+    };
 
     void InitBSDFWindows(EnergyPlusData &state)
     {
@@ -187,7 +197,7 @@ namespace WindowComplexManager {
                 continue; // Only BSDF windows
             // Simon Check: Thermal construction removed
             // ThConst = Construct(IConst)%BSDFInput%ThermalConstruction
-            state.dataSurface->SurfWinWindowModelType(ISurf) = WindowBSDFModel;
+            state.dataSurface->SurfWinWindowModelType(ISurf) = WindowModel::BSDF;
             state.dataHeatBal->AnyBSDF = true;
             ++state.dataWindowComplexManager->NumComplexWind;
             NumStates = 1;
@@ -839,7 +849,7 @@ namespace WindowComplexManager {
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) {
             BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
             JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
-            if (state.dataSurface->SurfWinWindowModelType(JSurf) == WindowBSDFModel) continue;
+            if (state.dataSurface->SurfWinWindowModelType(JSurf) == WindowModel::BSDF) continue;
             if (!(state.dataSurface->Surface(JSurf).Class == SurfaceClass::Window ||
                   state.dataSurface->Surface(JSurf).Class == SurfaceClass::GlassDoor))
                 continue;
@@ -1528,14 +1538,22 @@ namespace WindowComplexManager {
             Geom.SolSkyWt(I) = SkyWeight(Geom.sInc(J));
         }
         WtSum = sum(Geom.SolSkyWt({1, NSky}));
-        Geom.SolSkyWt({1, NSky}) /= WtSum;
+        if (WtSum > DataGlobalConstants::rTinyValue) {
+            Geom.SolSkyWt({1, NSky}) /= WtSum;
+        } else {
+            Geom.SolSkyWt({1, NSky}) = 0.0;
+        }
         // SkyGround Weights
         Geom.SolSkyGndWt.allocate(NGnd);
         for (I = 1; I <= NGnd; ++I) {
             Geom.SolSkyGndWt(I) = SkyGndWeight(Geom.GndPt(I));
         }
         WtSum = sum(Geom.SolSkyGndWt({1, NGnd}));
-        Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
+        if (WtSum > DataGlobalConstants::rTinyValue) {
+            Geom.SolSkyGndWt({1, NGnd}) /= WtSum;
+        } else {
+            Geom.SolSkyGndWt({1, NGnd}) = 0.0;
+        }
         //  Weights for beam reflected from ground are calculated after shading
         //  interval is determined
         // Transmitted Basis:
@@ -1878,7 +1896,7 @@ namespace WindowComplexManager {
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) {  // back surface loop
             BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
             JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
-            if (state.dataSurface->SurfWinWindowModelType(JSurf) != WindowBSDFModel) continue;
+            if (state.dataSurface->SurfWinWindowModelType(JSurf) != WindowModel::BSDF) continue;
 
             //  Directional-hemispherical back reflectance
             Sum1 = 0.0;
@@ -2708,8 +2726,6 @@ namespace WindowComplexManager {
         Real64 dominantGapWidth; // store value for dominant gap width.  Used for airflow calculations
         Real64 edgeGlCorrFac;
 
-        int SrdSurfsNum;       // Surrounding surfaces list number
-        int SrdSurfNum;        // Surrounding surface number DO loop counter
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
         Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;
@@ -2774,23 +2790,13 @@ namespace WindowComplexManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
-                        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            state.dataSurface->Surface(SurfNum).ViewFactorSkyIR =
-                                state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                        }
-                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR =
-                                state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                        }
-                        for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
-                             SrdSurfNum++) {
-                            SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(
-                                    state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                DataGlobalConstants::KelvinConv;
+                    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+                        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+                        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+                            SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+                            SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                                             DataGlobalConstants::KelvinConv;
                             OutSrdIR += DataGlobalConstants::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                         }
                     }
@@ -2860,7 +2866,7 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = static_cast<int>(DataComplexFenestration::GasCoeffs::Air);
+        GasType = static_cast<int>(GasCoeffs::Air);
         wght(iprop(1, 1)) = GasWght[GasType - 1];
         gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
@@ -3307,9 +3313,9 @@ namespace WindowComplexManager {
                     state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 // Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
-                if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir ||
-                    state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                    if (state.dataSurface->SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
+                if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor ||
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
+                    if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::Indoor) {
                         InletAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
                     } else { // AirflowSource = outside air
                         InletAirHumRat = state.dataEnvrn->OutHumRat;
@@ -3318,7 +3324,7 @@ namespace WindowComplexManager {
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
                     CpAirZone = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
-                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir) {
+                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor) {
                         state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
                         state.dataSurface->SurfWinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
                     } else {

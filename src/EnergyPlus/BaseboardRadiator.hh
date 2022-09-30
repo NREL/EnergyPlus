@@ -103,22 +103,16 @@ namespace BaseboardRadiator {
         bool CheckEquipName = true;
         bool SetLoopIndexFlag = true;
         bool MyEnvrnFlag = true;
-        bool ZoneEquipmentListChecked = false;
+
+        void InitBaseboard(EnergyPlusData &state, int baseboardNum);
+
+        void SizeBaseboard(EnergyPlusData &state, int baseboardNum);
     };
 
-    void SimBaseboard(EnergyPlusData &state,
-                      std::string const &EquipName,
-                      int ActualZoneNum,
-                      int ControlledZoneNum,
-                      bool FirstHVACIteration,
-                      Real64 &PowerMet,
-                      int &CompIndex);
+    void SimBaseboard(
+        EnergyPlusData &state, std::string const &EquipName, int ControlledZoneNum, bool FirstHVACIteration, Real64 &PowerMet, int &CompIndex);
 
     void GetBaseboardInput(EnergyPlusData &state);
-
-    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNumSub);
-
-    void SizeBaseboard(EnergyPlusData &state, int BaseboardNum);
 
     void SimHWConvective(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
 

@@ -278,14 +278,17 @@ void Foundation::createMeshData() {
 
     MultiPolygon diff;
     boost::geometry::difference(intBound, intBoxes, diff);
-    if (diff.size() > 1) {
+    if (diff.size() != 1) {
       showMessage(MSG_ERR, "'Material Blocks' cannot create an enclosure.");
     }
-    if (diff[0].inners().size() > 1) {
+    if (diff[0].inners().size() > 0) {
       showMessage(MSG_ERR, "'Material Blocks' must touch an existing boundary.");
     }
 
     int numTops = 0;
+
+    // Anything less than a foot (0.3m) away from the wall is still considered part of the wall
+    double xWallMin = xyWallTopInterior - 0.3;
 
     std::size_t nVs = diff[0].outer().size();
     for (std::size_t v = 0; v < nVs; v++) {
@@ -311,15 +314,19 @@ void Foundation::createMeshData() {
       }
       if (dOut == geom::X_POS && isEqual(z1, zMax)) {
         // top boundary
-        numTops++;
+        if (dIn != geom::X_POS) {
+          numTops++;
+        }
         continue;
       }
 
       Surface surf;
       surf.boundaryConditionType = Surface::INTERIOR_FLUX;
 
-      // down
-      if (dOut == geom::Y_NEG) {
+      switch (dOut) {
+
+      case geom::Y_NEG: { // down (Most likely interior wall. Unlikely, but could be slab if the
+                          // floor is stepped.)
 
         surf.orientation = Surface::X_NEG;
 
@@ -328,12 +335,13 @@ void Foundation::createMeshData() {
         surf.xMin = x2;
         surf.xMax = x1;
 
-        if (isEqual(z1, zMax)) {
-          xyWallTopInterior = x1;
-        }
-        if (dIn == geom::X_POS) {
+        if (x1 > xWallMin || isEqual(z1, zMax)) {
           surf.type = Surface::ST_WALL_INT;
           surf.propPtr = &wall.interior;
+          if (isEqual(z1, zMax)) {
+            xyWallTopInterior = x1;
+          }
+          xWallMin = x1 - 0.3;
         } else {
           if (isLessOrEqual(x1, xyPerimeterSurface)) {
             surf.type = Surface::ST_SLAB_CORE;
@@ -342,56 +350,63 @@ void Foundation::createMeshData() {
           }
           surf.propPtr = &slab.interior;
         }
-      }
+      } break;
 
-      // left
-      if (dOut == geom::X_NEG) {
+      case geom::X_NEG: { // left (most likely interior slab, but could be top of a wall surface)
 
         surf.orientation = Surface::Z_POS;
 
-        // TODO Could be wall (bump out) Surface::ST_WALL_INT
-        if (isLessOrEqual(x1, xyPerimeterSurface)) {
-          if (isEqual(x2, xyNearMin - 1.0)) {
-            xySlabNear = x1;
-            continue;
-          }
+        if (x2 > xWallMin) {
+          // Ends close to the wall, must be top of part of the wall (bump out)
+          surf.type = Surface::ST_WALL_INT;
+          surf.propPtr = &wall.interior;
           surf.xMin = x2;
           surf.xMax = x1;
-          surf.type = Surface::ST_SLAB_CORE;
-        } else if (isGreaterThan(x2, xyPerimeterSurface)) {
-          surf.xMin = x2;
-          surf.xMax = x1;
-          surf.type = Surface::ST_SLAB_PERIM;
         } else {
-          surf.type = Surface::ST_SLAB_CORE;
-          surf.xMin = x2;
-          surf.xMax = xyPerimeterSurface;
+          if (isLessOrEqual(x1, xyPerimeterSurface)) {
+            if (isEqual(x2, xyNearMin - 1.0)) {
+              xySlabNear = x1;
+              // Slab surface will be created separately
+              continue;
+            }
+            surf.xMin = x2;
+            surf.xMax = x1;
+            surf.type = Surface::ST_SLAB_CORE;
+          } else if (isGreaterThan(x2, xyPerimeterSurface)) {
+            surf.xMin = x2;
+            surf.xMax = x1;
+            surf.type = Surface::ST_SLAB_PERIM;
+          } else {
+            surf.type = Surface::ST_SLAB_CORE;
+            surf.xMin = x2;
+            surf.xMax = xyPerimeterSurface;
 
-          Surface surf2;
-          surf2.boundaryConditionType = Surface::INTERIOR_FLUX;
-          surf2.orientation = Surface::Z_POS;
-          surf2.zMin = z2;
-          surf2.zMax = z2;
-          surf2.xMin = xyPerimeterSurface;
-          surf2.xMax = x1;
-          surf2.type = Surface::ST_SLAB_PERIM;
-          surf2.propPtr = &slab.interior;
+            Surface surf2;
+            surf2.boundaryConditionType = Surface::INTERIOR_FLUX;
+            surf2.orientation = Surface::Z_POS;
+            surf2.zMin = z2;
+            surf2.zMax = z2;
+            surf2.xMin = xyPerimeterSurface;
+            surf2.xMax = x1;
+            surf2.type = Surface::ST_SLAB_PERIM;
+            surf2.propPtr = &slab.interior;
 
-          surf2D.push_back(surf2);
+            surf2D.push_back(surf2);
 
-          if (isEqual(x2, xyNearMin - 1.0)) {
-            xySlabNear = xyPerimeterSurface;
-            continue;
+            if (isEqual(x2, xyNearMin - 1.0)) {
+              xySlabNear = xyPerimeterSurface;
+              // Slab surface will be created separately
+              continue;
+            }
           }
+          surf.propPtr = &slab.interior;
         }
 
-        surf.propPtr = &slab.interior;
         surf.zMin = z2;
         surf.zMax = z1;
-      }
+      } break;
 
-      // up
-      if (dOut == geom::Y_POS) {
+      case geom::Y_POS: { // up (very unlikely -- assume it's part of the slab)
 
         surf.orientation = Surface::X_POS;
 
@@ -406,10 +421,9 @@ void Foundation::createMeshData() {
           surf.type = Surface::ST_SLAB_PERIM;
         }
         surf.propPtr = &slab.interior;
-      }
+      } break;
 
-      // right
-      if (dOut == geom::X_POS) {
+      case geom::X_POS: { // right (unlikely to be anything but part of the wall)
 
         surf.orientation = Surface::Z_NEG;
 
@@ -420,6 +434,7 @@ void Foundation::createMeshData() {
         surf.zMin = z2;
         surf.zMax = z1;
         surf.propPtr = &wall.interior;
+      } break;
       }
 
       surf2D.push_back(surf);
@@ -454,14 +469,17 @@ void Foundation::createMeshData() {
 
     MultiPolygon diff;
     boost::geometry::difference(extBound, extBoxes, diff);
-    if (diff.size() > 1) {
+    if (diff.size() != 1) {
       showMessage(MSG_ERR, "'Material Blocks' cannot create an enclosure.");
     }
-    if (diff[0].inners().size() > 1) {
+    if (diff[0].inners().size() > 0) {
       showMessage(MSG_ERR, "'Material Blocks' must touch an existing boundary.");
     }
 
     int numTops = 0;
+
+    // Anything less than a foot (0.3m) away from the wall is still considered part of the wall
+    double xWallMin = xyWallTopExterior + 0.3;
 
     std::size_t nVs = diff[0].outer().size();
     for (std::size_t v = 0; v < nVs; v++) {
@@ -479,6 +497,7 @@ void Foundation::createMeshData() {
       double z2 = diff[0].outer()[vNext].get<1>();
 
       geom::Direction dOut = getDirectionOut(diff[0], v);
+      geom::Direction dIn = getDirectionIn(diff[0], v);
 
       if (dOut == geom::Y_NEG && isEqual(x1, xyNearMax + 1.0)) {
         // right boundary
@@ -486,7 +505,9 @@ void Foundation::createMeshData() {
       }
       if (dOut == geom::X_POS && isEqual(z1, zMax)) {
         // top boundary
-        numTops++;
+        if (dIn != geom::X_POS) {
+          numTops++;
+        }
         continue;
       }
       if (dOut == geom::X_NEG && isEqual(x1, xyNearMax + 1.0)) {
@@ -498,8 +519,9 @@ void Foundation::createMeshData() {
       Surface surf;
       surf.boundaryConditionType = Surface::EXTERIOR_FLUX;
 
-      // down
-      if (dOut == geom::Y_NEG) {
+      switch (dOut) {
+
+      case geom::Y_NEG: { // down (very unlikely -- assume it's part of the grade)
 
         surf.orientation = Surface::X_NEG;
 
@@ -509,24 +531,28 @@ void Foundation::createMeshData() {
         surf.xMax = x1;
         surf.type = Surface::ST_GRADE;
         surf.propPtr = &grade;
-      }
+      } break;
 
-      // left
-      if (dOut == geom::X_NEG) {
+      case geom::X_NEG: { // left (most likely exterior grade, but could be top of a wall surface)
 
         surf.orientation = Surface::Z_POS;
 
+        if (x1 > xWallMin) {
+          surf.type = Surface::ST_GRADE;
+          surf.propPtr = &grade;
+        } else {
+          surf.type = Surface::ST_WALL_EXT;
+          surf.propPtr = &wall.exterior;
+        }
+
         surf.xMin = x2;
         surf.xMax = x1;
-        surf.type = Surface::ST_GRADE; // TODO Could be wall (bump out)
-        surf.propPtr = &grade;
-
         surf.zMin = z2;
         surf.zMax = z1;
-      }
+      } break;
 
-      // up
-      if (dOut == geom::Y_POS) {
+      case geom::Y_POS: { // up (Most likely exterior wall. Unlikely, but could be grade if the
+                          // ground is stepped.)
 
         surf.orientation = Surface::X_POS;
 
@@ -535,20 +561,19 @@ void Foundation::createMeshData() {
         surf.xMin = x2;
         surf.xMax = x1;
 
-        if (isEqual(z2, zMax)) {
-          xyWallTopExterior = x1;
-        }
-        if (getDirectionOut(diff[0], vNext) == geom::X_POS) {
+        if (x1 < xWallMin || isEqual(z2, zMax)) {
           surf.type = Surface::ST_WALL_EXT;
           surf.propPtr = &wall.exterior;
+          if (isEqual(z2, zMax)) {
+            xyWallTopExterior = x1;
+          }
         } else {
           surf.type = Surface::ST_GRADE;
           surf.propPtr = &grade;
         }
-      }
+      } break;
 
-      // right
-      if (dOut == geom::X_POS) {
+      case geom::X_POS: { // right (unlikely to be anything but part of the wall)
 
         surf.orientation = Surface::Z_NEG;
 
@@ -559,6 +584,7 @@ void Foundation::createMeshData() {
 
         surf.zMin = z2;
         surf.zMax = z1;
+      } break;
       }
 
       surf2D.push_back(surf);

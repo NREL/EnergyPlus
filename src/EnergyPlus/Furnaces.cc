@@ -53,10 +53,11 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -311,16 +312,20 @@ namespace Furnaces {
             ZoneLoadToHeatSPSequenced = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
                                             .SequencedOutputRequiredToHeatingSP(state.dataFurnaces->Furnace(FurnaceNum).ZoneSequenceHeatingNum);
             if (ZoneLoadToHeatSPSequenced > 0.0 && ZoneLoadToCoolSPSequenced > 0.0 &&
-                state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) != SingleCoolingSetPoint) {
+                state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) !=
+                    DataHVACGlobals::ThermostatType::SingleCooling) {
                 ZoneLoad = ZoneLoadToHeatSPSequenced;
             } else if (ZoneLoadToHeatSPSequenced > 0.0 && ZoneLoadToCoolSPSequenced > 0.0 &&
-                       state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) == SingleCoolingSetPoint) {
+                       state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
+                           DataHVACGlobals::ThermostatType::SingleCooling) {
                 ZoneLoad = 0.0;
             } else if (ZoneLoadToHeatSPSequenced < 0.0 && ZoneLoadToCoolSPSequenced < 0.0 &&
-                       state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) != SingleHeatingSetPoint) {
+                       state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) !=
+                           DataHVACGlobals::ThermostatType::SingleHeating) {
                 ZoneLoad = ZoneLoadToCoolSPSequenced;
             } else if (ZoneLoadToHeatSPSequenced < 0.0 && ZoneLoadToCoolSPSequenced < 0.0 &&
-                       state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) == SingleHeatingSetPoint) {
+                       state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
+                           DataHVACGlobals::ThermostatType::SingleHeating) {
                 ZoneLoad = 0.0;
             } else if (ZoneLoadToHeatSPSequenced <= 0.0 && ZoneLoadToCoolSPSequenced >= 0.0) {
                 ZoneLoad = 0.0;
@@ -795,7 +800,6 @@ namespace Furnaces {
         using VariableSpeedCoils::GetCoilInletNodeVariableSpeed;
         using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
         using VariableSpeedCoils::GetVSCoilCondenserInletNode;
-        using VariableSpeedCoils::GetVSCoilMinOATCompressor;
         using VariableSpeedCoils::SetVarSpeedCoilData;
         auto &GetWtoAHPCoilCapacity(WaterToAirHeatPump::GetCoilCapacity);
         auto &GetWtoAHPCoilInletNode(WaterToAirHeatPump::GetCoilInletNode);
@@ -842,7 +846,6 @@ namespace Furnaces {
         using HVACControllers::CheckCoilWaterInletNode;
         using IntegratedHeatPump::GetCoilIndexIHP;
         using OutAirNodeManager::CheckOutAirNodeNumber;
-        using SteamCoils::GetTypeOfCoil;
 
         // Locals
         std::string CurrentModuleObject; // Object type for getting and error messages
@@ -884,7 +887,6 @@ namespace Furnaces {
         int NumWaterToAirHeatPump;     // Number of water-to-air heat pumps
         int NumHeatPump;               // Number of air-to-air or water-to-air heat pumps
         int HeatPumpNum;               // Index to air-to-air heat pumps
-        int ControlledZoneNum;         // Index to controlled zones
         bool AirNodeFound;             // Used to determine if control zone is valid
         bool AirLoopFound;             // Used to determine if control zone is served by furnace air loop
         int BranchNum;                 // Used to determine if control zone is served by furnace air loop
@@ -1083,49 +1085,42 @@ namespace Furnaces {
             if (state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum > 0) {
                 AirNodeFound = false;
                 AirLoopFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum !=
-                        state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                        continue;
-                    //             Find the controlled zone number for the specified thermostat location
-                    state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone =
-                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                    //             Determine if furnace is on air loop served by the thermostat location specified
-                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
-                        if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1;
-                                     CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
-                                     ++CompNum) {
-                                    if (!UtilityRoutines::SameString(
-                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
-                                            state.dataFurnaces->Furnace(FurnaceNum).Name) ||
-                                        !UtilityRoutines::SameString(
-                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                            CurrentModuleObject))
-                                        continue;
-                                    AirLoopFound = true;
-                                    state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode =
-                                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
-                                    break;
-                                }
-                                if (AirLoopFound) break;
-                            }
-                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
-                                    state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                int ControlledZoneNum = state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum;
+                //             Find the controlled zone number for the specified thermostat location
+                state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                //             Determine if furnace is on air loop served by the thermostat location specified
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                    int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    if (AirLoopNumber > 0) {
+                        for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
+                                 ++CompNum) {
+                                if (!UtilityRoutines::SameString(
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                                        state.dataFurnaces->Furnace(FurnaceNum).Name) ||
+                                    !UtilityRoutines::SameString(
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        CurrentModuleObject))
                                     continue;
-                                AirNodeFound = true;
+                                AirLoopFound = true;
+                                state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode =
+                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
-                                    state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                                    continue;
-                                AirNodeFound = true;
-                            }
+                            if (AirLoopFound) break;
                         }
-                        if (AirLoopFound) break;
+                        for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                            if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
+                                state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                                continue;
+                            AirNodeFound = true;
+                        }
+                        for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                            if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
+                                state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                                continue;
+                            AirNodeFound = true;
+                        }
                     }
                     if (AirLoopFound) break;
                 }
@@ -1589,13 +1584,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).HeatingConvergenceTolerance = 0.001;
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state,
-                                FurnaceNum,
-                                Alphas(1),
-                                cCurrentModuleObject,
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                ErrorsFound);
+            SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
 
         } // End of the HeatOnly Furnace Loop
 
@@ -1704,49 +1693,41 @@ namespace Furnaces {
             if (state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum > 0) {
                 AirNodeFound = false;
                 AirLoopFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum !=
-                        state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                        continue;
-                    //             Find the controlled zone number for the specified thermostat location
-                    state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone =
-                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                    //             Determine if system is on air loop served by the thermostat location specified
-                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
-                        if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1;
-                                     CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
-                                     ++CompNum) {
-                                    if (!UtilityRoutines::SameString(
-                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
-                                            Alphas(1)) ||
-                                        !UtilityRoutines::SameString(
-                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                            CurrentModuleObject))
-                                        continue;
-                                    AirLoopFound = true;
-                                    state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode =
-                                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
-                                    break;
-                                }
-                                if (AirLoopFound) break;
-                            }
-                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
-                                    state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                int ControlledZoneNum = state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum;
+                //             Find the controlled zone number for the specified thermostat location
+                state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                //             Determine if system is on air loop served by the thermostat location specified
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                    int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    if (AirLoopNumber > 0) {
+                        for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
+                                 ++CompNum) {
+                                if (!UtilityRoutines::SameString(
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name, Alphas(1)) ||
+                                    !UtilityRoutines::SameString(
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        CurrentModuleObject))
                                     continue;
-                                AirNodeFound = true;
+                                AirLoopFound = true;
+                                state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode =
+                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
-                                    state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                                    continue;
-                                AirNodeFound = true;
-                            }
+                            if (AirLoopFound) break;
                         }
-                        if (AirLoopFound) break;
+                        for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                            if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
+                                state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                                continue;
+                            AirNodeFound = true;
+                        }
+                        for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                            if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
+                                state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                                continue;
+                            AirNodeFound = true;
+                        }
                     }
                     if (AirLoopFound) break;
                 }
@@ -2164,7 +2145,29 @@ namespace Furnaces {
 
                     // Get outdoor condenser node from heat exchanger assisted DX coil object
                     errFlag = false;
-                    if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
+                    std::string ChildCoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, IsNotOK);
+                    std::string ChildCoolingCoilType = HVACHXAssistedCoolingCoil::GetHXDXCoilType(state, CoolingCoilType, CoolingCoilName, IsNotOK);
+                    if (IsNotOK) {
+                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, Alphas(1)));
+                        ErrorsFound = true;
+                    }
+
+                    // if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
+                    if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
+
+                        int childCCIndex = CoilCoolingDX::factory(state, ChildCoolingCoilName);
+                        if (childCCIndex < 0) {
+                            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, Alphas(1)));
+                            errFlag = true;
+                            ErrorsFound = true;
+                        }
+                        auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
+
+                        state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = newCoil.condInletNodeIndex;
+
+                    }
+                    // else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
+                    else if (UtilityRoutines::SameString(ChildCoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
                         if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
                             IHPCoilIndex = GetCoilIndexIHP(state, CoolingCoilType, CoolingCoilName, errFlag);
                             IHPCoilName = state.dataIntegratedHP->IntegratedHeatPumps(IHPCoilIndex).SCCoilName;
@@ -2962,13 +2965,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).CoolingConvergenceTolerance = 0.001;
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state,
-                                FurnaceNum,
-                                Alphas(1),
-                                cCurrentModuleObject,
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                ErrorsFound);
+            SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
 
         } // End of the HeatCool Furnace Loop
 
@@ -3057,49 +3054,41 @@ namespace Furnaces {
             if (state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum > 0) {
                 AirNodeFound = false;
                 AirLoopFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum !=
-                        state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                        continue;
-                    //             Find the controlled zone number for the specified thermostat location
-                    state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone =
-                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                    //             Determine if furnace is on air loop served by the thermostat location specified
-                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
-                        if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1;
-                                     CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
-                                     ++CompNum) {
-                                    if (!UtilityRoutines::SameString(
-                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
-                                            Alphas(1)) ||
-                                        !UtilityRoutines::SameString(
-                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                            CurrentModuleObject))
-                                        continue;
-                                    AirLoopFound = true;
-                                    state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode =
-                                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
-                                    break;
-                                }
-                                if (AirLoopFound) break;
-                            }
-                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
-                                    state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                int ControlledZoneNum = state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum;
+                //             Find the controlled zone number for the specified thermostat location
+                state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                //             Determine if furnace is on air loop served by the thermostat location specified
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                    int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    if (AirLoopNumber > 0) {
+                        for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
+                                 ++CompNum) {
+                                if (!UtilityRoutines::SameString(
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name, Alphas(1)) ||
+                                    !UtilityRoutines::SameString(
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        CurrentModuleObject))
                                     continue;
-                                AirNodeFound = true;
+                                AirLoopFound = true;
+                                state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode =
+                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
-                                    state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                                    continue;
-                                AirNodeFound = true;
-                            }
+                            if (AirLoopFound) break;
                         }
-                        if (AirLoopFound) break;
+                        for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                            if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
+                                state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                                continue;
+                            AirNodeFound = true;
+                        }
+                        for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                            if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
+                                state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                                continue;
+                            AirNodeFound = true;
+                        }
                     }
                     if (AirLoopFound) break;
                 }
@@ -3968,13 +3957,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).MaxOATSuppHeat = Numbers(5);
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state,
-                                FurnaceNum,
-                                Alphas(1),
-                                cCurrentModuleObject,
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                ErrorsFound);
+            SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
 
         } // End of the Unitary System HeatPump Loop
 
@@ -4063,49 +4046,41 @@ namespace Furnaces {
             if (state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum > 0) {
                 AirNodeFound = false;
                 AirLoopFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum !=
-                        state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                        continue;
-                    //             Find the controlled zone number for the specified thermostat location
-                    state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone =
-                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                    //             Determine if furnace is on air loop served by the thermostat location specified
-                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
-                        if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1;
-                                     CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
-                                     ++CompNum) {
-                                    if (!UtilityRoutines::SameString(
-                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
-                                            Alphas(1)) ||
-                                        !UtilityRoutines::SameString(
-                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                            CurrentModuleObject))
-                                        continue;
-                                    AirLoopFound = true;
-                                    state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode =
-                                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
-                                    break;
-                                }
-                                if (AirLoopFound) break;
-                            }
-                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
-                                    state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                int ControlledZoneNum = state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum;
+                //             Find the controlled zone number for the specified thermostat location
+                state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                //             Determine if furnace is on air loop served by the thermostat location specified
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                    int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    if (AirLoopNumber > 0) {
+                        for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
+                                 ++CompNum) {
+                                if (!UtilityRoutines::SameString(
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name, Alphas(1)) ||
+                                    !UtilityRoutines::SameString(
+                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        CurrentModuleObject))
                                     continue;
-                                AirNodeFound = true;
+                                AirLoopFound = true;
+                                state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode =
+                                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
-                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
-                                    state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                                    continue;
-                                AirNodeFound = true;
-                            }
+                            if (AirLoopFound) break;
                         }
-                        if (AirLoopFound) break;
+                        for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                            if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
+                                state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                                continue;
+                            AirNodeFound = true;
+                        }
+                        for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                            if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum !=
+                                state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
+                                continue;
+                            AirNodeFound = true;
+                        }
                     }
                     if (AirLoopFound) break;
                 }
@@ -4851,13 +4826,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).MaxOATSuppHeat = Numbers(9);
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(state,
-                                FurnaceNum,
-                                Alphas(1),
-                                cCurrentModuleObject,
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                ErrorsFound);
+            SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
 
         } // End of the Unitary System WaterToAirHeatPump Loop
 
@@ -5630,7 +5599,7 @@ namespace Furnaces {
         }
 
         if (allocated(state.dataZoneEquip->ZoneEquipConfig) && state.dataFurnaces->MyCheckFlag(FurnaceNum)) {
-            int zoneNum = state.dataHeatBal->Zone(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum).ZoneEqNum;
+            int zoneNum = state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum;
             int zoneInlet = state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode;
             int coolingPriority = 0;
             int heatingPriority = 0;
@@ -5713,7 +5682,7 @@ namespace Furnaces {
         if (!FirstHVACIteration && state.dataFurnaces->AirLoopPass == 1) {
             ZoneInNode = state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode;
             MassFlowRate = Node(ZoneInNode).MassFlowRate / state.dataFurnaces->Furnace(FurnaceNum).ControlZoneMassFlowFrac;
-            if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+            if (state.afn->distribution_simulated) {
                 DeltaMassRate = Node(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate -
                                 Node(ZoneInNode).MassFlowRate / state.dataFurnaces->Furnace(FurnaceNum).ControlZoneMassFlowFrac;
                 if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
@@ -6152,8 +6121,9 @@ namespace Furnaces {
                         state.dataFurnaces->CoolingLoad = false;
                         //         Don't set mode TRUE unless mode is allowed. Also check for floating zone.
                         if (state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
-                                SingleCoolingSetPoint ||
-                            state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) == 0) {
+                                DataHVACGlobals::ThermostatType::SingleCooling ||
+                            state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
+                                DataHVACGlobals::ThermostatType::Uncontrolled) {
                             state.dataFurnaces->HeatingLoad = false;
                         } else {
                             state.dataFurnaces->HeatingLoad = true;
@@ -6238,8 +6208,9 @@ namespace Furnaces {
                         QZnReq = QToCoolSetPt;
                         //         Don't set mode TRUE unless mode is allowed. Also check for floating zone.
                         if (state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
-                                SingleHeatingSetPoint ||
-                            state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) == 0) {
+                                DataHVACGlobals::ThermostatType::SingleHeating ||
+                            state.dataHeatBalFanSys->TempControlType(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) ==
+                                DataHVACGlobals::ThermostatType::Uncontrolled) {
                             state.dataFurnaces->CoolingLoad = false;
                         } else {
                             state.dataFurnaces->CoolingLoad = true;
@@ -6388,7 +6359,7 @@ namespace Furnaces {
         }
 
         // AirflowNetwork global variable
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
+        if (state.afn->distribution_simulated) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
         }
     }
@@ -6592,6 +6563,7 @@ namespace Furnaces {
         int Iter;                 // iteration count
         Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
         int IHPCoilIndex(0);      // refer to cooling or heating coil in IHP
+        Real64 dummy(0.0);
         bool anyRan;
         ManageEMS(state, EMSManager::EMSCallFrom::UnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
 
@@ -6620,6 +6592,16 @@ namespace Furnaces {
         if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
             SimDXCoil(state, BlankString, CompressorOperation::On, true, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, 1, 0.0);
         } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
+            int HXCC_Index = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex;
+            int childCCType_Num = state.dataHVACAssistedCC->HXAssistedCoil(HXCC_Index).CoolingCoilType_Num;
+            if (childCCType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                int childCCIndex = state.dataHVACAssistedCC->HXAssistedCoil(HXCC_Index).CoolingCoilIndex;
+                if (childCCIndex < 0) {
+                    ShowContinueError(state, "Occurs in sizing HeatExchangerAssistedCoolingCoil.");
+                }
+                auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
+                newCoil.size(state);
+            }
             SimHXAssistedCoolingCoil(state,
                                      BlankString,
                                      true,
@@ -6644,6 +6626,21 @@ namespace Furnaces {
                                   CompressorOperation::Off,
                                   0.0,
                                   FirstHVACIteration); // CoolPartLoadRatio
+            if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple) {
+                SimWatertoAirHPSimple(state,
+                                      BlankString,
+                                      state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
+                                      state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand,
+                                      dummy,
+                                      0.0,
+                                      0.0,
+                                      state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
+                                      state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
+                                      state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                      CompressorOperation::Off,
+                                      0.0,
+                                      FirstHVACIteration);
+            }
         } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit ||
                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
             if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
@@ -6872,7 +6869,14 @@ namespace Furnaces {
 
                     CheckSysSizing(
                         state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = state.dataSize->DXCoolCap;
+
+                    if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple) {
+                        state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity =
+                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex)
+                                .RatedCapHeat;
+                    } else {
+                        state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = state.dataSize->DXCoolCap;
+                    }
 
                 } else {
 
@@ -10278,8 +10282,7 @@ namespace Furnaces {
         }
 
         // Set mass flow rates during on and off cylce using an OnOff fan
-        if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
-            state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
+        if (state.afn->distribution_simulated) {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate = state.dataFurnaces->CompOnMassFlow;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate = state.dataFurnaces->CompOffMassFlow;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode;
@@ -12613,48 +12616,57 @@ namespace Furnaces {
 
     void SetMinOATCompressor(EnergyPlusData &state,
                              int const FurnaceNum,                    // index to furnace
-                             std::string const &FurnaceName,          // name of furnace
                              std::string const &cCurrentModuleObject, // type of furnace
-                             int const CoolingCoilIndex,              // index of cooling coil
-                             int const HeatingCoilIndex,              // index of heating coil
                              bool &ErrorsFound                        // GetInput logical that errors were found
     )
     {
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool errFlag;
+        bool errFlag = false;
+        auto &furnace = state.dataFurnaces->Furnace(FurnaceNum);
 
         // Set minimum OAT for heat pump compressor operation in heating mode
-        errFlag = false;
-        if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
-                DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling =
-                DXCoils::GetMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating =
-                VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, CoolingCoilIndex, errFlag);
+        if (furnace.CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
+            furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, furnace.CoolingCoilIndex, errFlag);
+        } else if (furnace.CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
+            std::string ChildCoolingCoilType = state.dataHVACAssistedCC->HXAssistedCoil(furnace.CoolingCoilIndex).CoolingCoilType;
+            std::string ChildCoolingCoilName = state.dataHVACAssistedCC->HXAssistedCoil(furnace.CoolingCoilIndex).CoolingCoilName;
+
+            if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
+                int childCCIndex_DX = CoilCoolingDX::factory(state, ChildCoolingCoilName);
+                if (childCCIndex_DX < 0) {
+                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, furnace.Name));
+                    errFlag = true;
+                    ErrorsFound = true;
+                }
+                auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_DX];
+                furnace.MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
+            } else if (UtilityRoutines::SameString(ChildCoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
+                int childCCIndex_VS = state.dataHVACAssistedCC->HXAssistedCoil(furnace.CoolingCoilIndex).CoolingCoilIndex;
+                furnace.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, childCCIndex_VS, errFlag);
+            } else { // Single speed
+                int childCCIndex_SP = state.dataHVACAssistedCC->HXAssistedCoil(furnace.CoolingCoilIndex).CoolingCoilIndex;
+                furnace.MinOATCompressorCooling = DXCoils::GetMinOATCompressor(state, childCCIndex_SP, errFlag);
+            }
+        } else if (furnace.CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
+            furnace.MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, furnace.CoolingCoilIndex, errFlag);
         } else {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling = -1000.0;
+            furnace.MinOATCompressorCooling = -1000.0;
         }
         if (errFlag) {
-            ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + FurnaceName);
+            ShowContinueError(state, format("...occurs in {} = {}", cCurrentModuleObject, furnace.Name));
             ErrorsFound = true;
         }
 
         // Set minimum OAT for heat pump compressor operation in heating mode
         errFlag = false;
-        if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating =
-                VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == CoilDX_HeatingEmpirical) {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating =
-                DXCoils::GetMinOATCompressorUsingIndex(state, HeatingCoilIndex, errFlag);
+        if (furnace.HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
+            furnace.MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, furnace.HeatingCoilIndex, errFlag);
+        } else if (furnace.HeatingCoilType_Num == CoilDX_HeatingEmpirical) {
+            furnace.MinOATCompressorHeating = DXCoils::GetMinOATCompressor(state, furnace.HeatingCoilIndex, errFlag);
         } else {
-            state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating = -1000.0;
+            furnace.MinOATCompressorHeating = -1000.0;
         }
         if (errFlag) {
-            ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + FurnaceName);
+            ShowContinueError(state, format("...occurs in {} = {}", cCurrentModuleObject, furnace.Name));
             ErrorsFound = true;
         }
     }

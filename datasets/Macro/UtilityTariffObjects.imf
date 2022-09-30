@@ -62,8 +62,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.720,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     118.69000,               !- CO2 Emission Factor {g/MJ}
@@ -697,8 +695,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -744,8 +740,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.191,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     107.35019,               !- CO2 Emission Factor {g/MJ}
@@ -1114,8 +1108,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -1163,8 +1155,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.729,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     161.02529,               !- CO2 Emission Factor {g/MJ}
@@ -2222,8 +2212,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -2267,8 +2255,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.808,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     108.10618,               !- CO2 Emission Factor {g/MJ}
@@ -2471,8 +2457,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -2515,8 +2499,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.827,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     159.26132,               !- CO2 Emission Factor {g/MJ}
@@ -2742,8 +2724,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -2788,8 +2768,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.808,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     108.10618,               !- CO2 Emission Factor {g/MJ}
@@ -3084,8 +3062,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -3503,8 +3479,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.451,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     88.95450,                !- CO2 Emission Factor {g/MJ}
@@ -3597,8 +3571,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -3873,8 +3845,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     3.281,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     261.57160,               !- CO2 Emission Factor {g/MJ}
@@ -3967,8 +3937,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -4165,8 +4133,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.736,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     226.79619,               !- CO2 Emission Factor {g/MJ}
@@ -4259,8 +4225,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -4762,8 +4726,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.680,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     206.88852,               !- CO2 Emission Factor {g/MJ}
@@ -4856,8 +4818,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -5004,8 +4964,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.616,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     199.07665,               !- CO2 Emission Factor {g/MJ}
@@ -5098,8 +5056,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -5305,8 +5261,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.857,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     192.02077,               !- CO2 Emission Factor {g/MJ}
@@ -5399,8 +5353,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -5682,8 +5634,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.195,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     176.39703,               !- CO2 Emission Factor {g/MJ}
@@ -5776,8 +5726,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -6005,8 +5953,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     3.033,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     237.12801,               !- CO2 Emission Factor {g/MJ}
@@ -6099,8 +6045,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -6274,8 +6218,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.331,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     163.04126,               !- CO2 Emission Factor {g/MJ}
@@ -6368,8 +6310,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -6416,8 +6356,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.694,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     175.64105,               !- CO2 Emission Factor {g/MJ}
@@ -6790,8 +6728,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -6888,8 +6824,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.969,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     156.48937,               !- CO2 Emission Factor {g/MJ}
@@ -6982,8 +6916,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -7340,8 +7272,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.924,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     146.66153,               !- CO2 Emission Factor {g/MJ}
@@ -7434,8 +7364,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -7863,8 +7791,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.736,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     230.57612,               !- CO2 Emission Factor {g/MJ}
@@ -7957,8 +7883,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -8171,8 +8095,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.917,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     248.97181,               !- CO2 Emission Factor {g/MJ}
@@ -8265,8 +8187,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -8505,8 +8425,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.902,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     163.29325,               !- CO2 Emission Factor {g/MJ}
@@ -8599,8 +8517,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -8844,8 +8760,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.230,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     165.30922,               !- CO2 Emission Factor {g/MJ}
@@ -8938,8 +8852,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -9174,8 +9086,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.207,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     162.03327,               !- CO2 Emission Factor {g/MJ}
@@ -9268,8 +9178,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -9450,8 +9358,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.404,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     231.83610,               !- CO2 Emission Factor {g/MJ}
@@ -9544,8 +9450,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -9592,8 +9496,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.624,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     148.42550,               !- CO2 Emission Factor {g/MJ}
@@ -10160,8 +10062,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -10396,8 +10296,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.749,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     184.46090,               !- CO2 Emission Factor {g/MJ}
@@ -10490,8 +10388,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -10680,8 +10576,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.694,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     132.29777,               !- CO2 Emission Factor {g/MJ}
@@ -10774,8 +10668,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -10949,8 +10841,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     3.101,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     242.67192,               !- CO2 Emission Factor {g/MJ}
@@ -11043,8 +10933,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -11501,8 +11389,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.615,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     191.26478,               !- CO2 Emission Factor {g/MJ}
@@ -11595,8 +11481,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -11972,8 +11856,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     0.213,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     3.52794,                 !- CO2 Emission Factor {g/MJ}
@@ -12066,8 +11948,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -12117,8 +11997,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     0.526,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     35.53140,                !- CO2 Emission Factor {g/MJ}
@@ -12950,8 +12828,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -13162,8 +13038,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.936,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     180.68096,               !- CO2 Emission Factor {g/MJ}
@@ -13256,8 +13130,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -13615,8 +13487,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.422,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     76.35472,                !- CO2 Emission Factor {g/MJ}
@@ -13709,8 +13579,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -14041,8 +13909,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.422,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     76.35472,                !- CO2 Emission Factor {g/MJ}
@@ -14135,8 +14001,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -14370,8 +14234,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.950,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     209.40848,               !- CO2 Emission Factor {g/MJ}
@@ -14464,8 +14326,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -14605,8 +14465,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     2.734,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     173.87708,               !- CO2 Emission Factor {g/MJ}
@@ -14699,8 +14557,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}
@@ -14968,8 +14824,6 @@
 
   FuelFactors,
     Electricity,             !- Existing Fuel Resource Name
-    kg,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     0.414,                   !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     30.99548,                !- CO2 Emission Factor {g/MJ}
@@ -15062,8 +14916,6 @@
 
   FuelFactors,
     NaturalGas,              !- Existing Fuel Resource Name
-    m3,                      !- Units of Measure
-    ,                        !- Energy per Unit Factor
     1.0,                     !- Source Energy Factor {J/J}
     ,                        !- Source Energy Schedule Name
     50.23439,                !- CO2 Emission Factor {g/MJ}

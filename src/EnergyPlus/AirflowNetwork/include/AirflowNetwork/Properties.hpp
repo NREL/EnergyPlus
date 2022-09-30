@@ -45,34 +45,21 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PROPERTIES_HPP
-#define PROPERTIES_HPP
-
-#ifndef AIRDENSITY
-#include "../../../Psychrometrics.hh"
-#define AIRDENSITY(state, P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(state, P, T, W)
-#define AIRDENSITY_CONSTEXPR(P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(P, T, W)
-#define AIRCP(W) Psychrometrics::PsyCpAirFnW(W)
-#else
-// Need a fallback
-#endif
-
-#ifndef AIRDYNAMICVISCOSITY
-#define AIRDYNAMICVISCOSITY(T) airDynamicVisc(T)
-#else
-// Need a fallback
-#endif
-
-#ifndef TOKELVIN
-#include "../../../DataGlobals.hh"
-#define TOKELVIN(T) (T + DataGlobalConstants::KelvinConv)
-#else
-// Need a fallback
-#endif
+#ifndef AIRFLOWNETWORK_PROPERTIES_HPP
+#define AIRFLOWNETWORK_PROPERTIES_HPP
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+
+#define AIRDENSITY_CONSTEXPR(P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(P, T, W)
+#define AIRCP(W) Psychrometrics::PsyCpAirFnW(W)
+#define AIRDYNAMICVISCOSITY_CONSTEXPR(T) air_dynamic_viscosity(T)
+#ifndef TOKELVIN
+#include "../../../DataGlobals.hh"
+#define TOKELVIN(T) (T + DataGlobalConstants::KelvinConv)
+#endif
 
 namespace EnergyPlus {
 
@@ -81,42 +68,70 @@ struct EnergyPlusData;
 
 namespace AirflowNetwork {
 
-    Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
-    );
+    constexpr Real64 air_dynamic_viscosity(Real64 T // Temperature in Celsius
+    )
+    {
+        return 1.71432e-5 + 4.828e-8 * T;
+    }
 
-    Real64 airDynamicVisc(Real64 T // Temperature in Celsius
-    );
+    struct AirProperties
+    {
+        AirProperties(EnergyPlusData &state) : lowerLimitErrIdx(0), upperLimitErrIdx(0), m_state(state)
+        {
+        }
 
-    Real64 airKinematicVisc(EnergyPlusData &state,
-                            Real64 T, // Temperature in Celsius
-                            Real64 W, // Humidity ratio
-                            Real64 P  // Barometric pressure
-    );
+        Real64 density(Real64 P, // Barometric pressure
+                       Real64 T, // Temperature in Celsius
+                       Real64 W  // Humidity ratio
+        );
 
-    Real64 airThermalDiffusivity(EnergyPlusData &state,
-                                 Real64 T, // Temperature in Celsius
-                                 Real64 W, // Humidity ratio
-                                 Real64 P  // Barometric pressure
-    );
+        Real64 thermal_conductivity(Real64 T // Temperature in Celsius
+        );
 
-    Real64 airPrandtl(EnergyPlusData &state,
-                      Real64 T, // Temperature in Celsius
-                      Real64 W, // Humidity ratio
-                      Real64 P  // Barometric pressure
-    );
+        Real64 dynamic_viscosity(Real64 T // Temperature in Celsius
+        );
+
+        Real64 kinematic_viscosity(Real64 P, // Barometric pressure
+                                   Real64 T, // Temperature in Celsius
+                                   Real64 W  // Humidity ratio
+        );
+
+        Real64 thermal_diffusivity(Real64 P, // Barometric pressure
+                                   Real64 T, // Temperature in Celsius
+                                   Real64 W  // Humidity ratio
+        );
+
+        Real64 prandtl_number(Real64 P, // Barometric pressure
+                              Real64 T, // Temperature in Celsius
+                              Real64 W  // Humidity ratio
+        );
+
+        int lowerLimitErrIdx = 0;
+        int upperLimitErrIdx = 0;
+        void clear()
+        {
+            lowerLimitErrIdx = 0;
+            upperLimitErrIdx = 0;
+        }
+
+    private:
+        EnergyPlusData &m_state;
+    };
+
+    struct AirState
+    {
+        Real64 temperature;
+        // Real64 pressure;      //{0.0}; // gage pressure
+        Real64 humidity_ratio;
+        Real64 density;
+        Real64 sqrt_density;
+        Real64 viscosity;
+
+        AirState();
+        explicit AirState(double const airDensity);
+    };
 
 } // namespace AirflowNetwork
-
-struct DataAFNProps : BaseGlobalStruct
-{
-    int lowerLimitErrIdx = 0;
-    int upperLimitErrIdx = 0;
-    void clear_state() override
-    {
-        lowerLimitErrIdx = 0;
-        upperLimitErrIdx = 0;
-    }
-};
 
 } // namespace EnergyPlus
 

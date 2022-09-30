@@ -102,10 +102,10 @@ namespace GeneratorDynamicsManager {
         //  parent objects, could have its own input object someday
 
         // get the number of generators that might use this module
-        state.dataGenerator->NumGensWDynamics = state.dataCHPElectGen->NumMicroCHPs; // TODO  + NumFuelCellCGenerators
+        int NumGensWDynamics = state.dataCHPElectGen->NumMicroCHPs; // TODO  + NumFuelCellCGenerators
 
         if (!allocated(state.dataGenerator->GeneratorDynamics)) {
-            state.dataGenerator->GeneratorDynamics.allocate(state.dataGenerator->NumGensWDynamics);
+            state.dataGenerator->GeneratorDynamics.allocate(NumGensWDynamics);
         }
 
         // first populate with Micro CHP data

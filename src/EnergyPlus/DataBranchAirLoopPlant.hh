@@ -90,40 +90,30 @@ namespace DataBranchAirLoopPlant {
     {
         // Members
         std::string Name;
-        Real64 EquivDiameter;         // - An effective diameter for calculation of Re & e/D [m]
-        Real64 MinorLossCoeff;        // - K factor                                          [-]
-        Real64 EquivLength;           // - An effective length to apply friction calculation [m]
-        Real64 EquivRoughness;        // - An effective roughness (e) to calculate e/D       [m]
-        bool ConstantFPresent;        // - Signal for if a constant value of f was entered
-        Real64 ConstantF;             // - Constant value of f (if applicable)               [-]
-        bool EMSOverrideOn;           // if TRUE, then EMS is calling to override curve value
-        Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
+        Real64 EquivDiameter = 0.0;         // - An effective diameter for calculation of Re & e/D [m]
+        Real64 MinorLossCoeff = 0.0;        // - K factor                                          [-]
+        Real64 EquivLength = 0.0;           // - An effective length to apply friction calculation [m]
+        Real64 EquivRoughness = 0.0;        // - An effective roughness (e) to calculate e/D       [m]
+        bool ConstantFPresent = false;      // - Signal for if a constant value of f was entered
+        Real64 ConstantF = 0.0;             // - Constant value of f (if applicable)               [-]
+        bool EMSOverrideOn = false;         // if TRUE, then EMS is calling to override curve value
+        Real64 EMSOverrideCurveValue = 0.0; // Value of curve result EMS is directing to use
 
         //  report variables.
-        Real64 CurveOutput;
-        Real64 CurveInput1; // - MassFlow                                         [kg/s]
-        Real64 CurveInput2; // - Density                                          [kg/m3]
-        Real64 CurveInput3; // - Velocity                                         [m/s]
-
-        // Default Constructor
-        PlantPressureCurveData()
-            : EquivDiameter(0.0), MinorLossCoeff(0.0), EquivLength(0.0), EquivRoughness(0.0), ConstantFPresent(false), ConstantF(0.0),
-              EMSOverrideOn(false), EMSOverrideCurveValue(0.0), CurveOutput(0.0), CurveInput1(0.0), CurveInput2(0.0), CurveInput3(0.0)
-        {
-        }
+        Real64 CurveOutput = 0.0;
+        Real64 CurveInput1 = 0.0; // - MassFlow                                         [kg/s]
+        Real64 CurveInput2 = 0.0; // - Density                                          [kg/m3]
+        Real64 CurveInput3 = 0.0; // - Velocity                                         [m/s]
     };
 } // namespace DataBranchAirLoopPlant
 
 struct DataBranchAirLoopPlantData : BaseGlobalStruct
 {
-
-    int NumPressureCurves = 0;
     Array1D<DataBranchAirLoopPlant::PlantPressureCurveData> PressureCurve;
 
     void clear_state() override
     {
-        this->NumPressureCurves = 0;
-        this->PressureCurve.deallocate();
+        *this = DataBranchAirLoopPlantData();
     }
 };
 

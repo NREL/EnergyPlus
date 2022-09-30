@@ -1793,45 +1793,45 @@ This field contains the number of building attached shading surfaces (e.g.~Overh
 
 \subsection{Surface Details Report}\label{surface-details-report}
 
-A good example of this is the surface details report(s) (\textbf{Output:Surfaces:List, Details;} \textbf{Output:Surfaces:List, Vertices; Output:Surfaces:List, DetailsWithVertices;}). Excerpt from the file:
+A good example of this is the surface details report(s) (\textbf{Output:Surfaces:List, Details; Output:Surfaces:List, Vertices; Output:Surfaces:List, DetailsWithVertices;}). An example excerpt of this report from the EIO file is shown below:
 
-\textbf{Line 1:}! \textless{}Zone/Shading Surfaces\textgreater{}\textbf{,}\textless{}Zone Name\textgreater{}/\#Shading Surfaces,\# Surfaces, Vertices are shown starting at Upper-Left-Corner = \textgreater{} Counter-Clockwise = \textgreater{} World Coordinates
+\textbf{Line 1:}! \textless{}Zone/Shading Surfaces\textgreater{}\textbf{,}\textless{}Zone Name\textgreater{}/\#Shading Surfaces, \# Surfaces, Vertices are shown starting at Upper-Left-Corner = \textgreater{} Counter-Clockwise = \textgreater{} World Coordinates
 
-\textbf{Line 2:}! \textless{}HeatTransfer/Shading/Frame/Divider\_Surface\textgreater{},Surface Name,Surface Class, Base Surface,Construction,Nominal U (w/o film coefs),Nominal U (with film coefs),Area (Net), Area (Gross), Area (Sunlit Calc), Aimuth, Tilt, \textasciitilde{}Width, \textasciitilde{}Height, Reveal, \textless{}ExtBoundCondition\textgreater{}, \textless{}ExtConvCoeffCalc\textgreater{}, \textless{}IntConvCoeffCalc\textgreater{},\textless{}SunExposure\textgreater{},\textless{}WindExposure\textgreater{},ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,\#Sides, \{Vertex 1\},,, \{Vertex 2\},,, \{Vertex 3\},,, \{Vertex 4\}, ,,\{etc\}
+\textbf{Line 2:}! \textless{}HeatTransfer/Shading/Frame/Divider Surface\textgreater{}, Surface Name, Surface Class, Base Surface, Construction, Nominal U (w/o film coefs), Nominal U (with film coefs), Area (Net), Area (Gross), Area (Sunlit Calc), Azimuth, Tilt, Width, Height, Reveal, \textless{}ExtBoundCondition\textgreater{}, \textless{}ExtConvCoeffCalc\textgreater{}, \textless{}IntConvCoeffCalc\textgreater{}, \textless{}SunExposure\textgreater{}, \textless{}WindExposure\textgreater{}, ViewFactorToGround, ViewFactorToSky, ViewFactorToGround-IR, ViewFactorToSky-IR,\#Sides, \{Vertex 1\}, , , \{Vertex 2\}, , , \{Vertex 3\},,, \{Vertex 4\}, ,,\{etc\}
 
-\textbf{Line 3:} ! \textless{}Units\textgreater{},,,,,\{W/m2-K\},\{W/m2-K\},\{m2\},\{m2\},\{m2\},\{deg\},\{deg\},\{m\},\{m\},\{m\},,,,,,,,,,X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\}
+\textbf{Line 3:} ! \textless{}Units\textgreater{}, , , , , \{W/m2-K\}, \{W/m2-K\}, \{m2\}, \{m2\}, \{m2\}, \{deg\}, \{deg\}, \{m\}, \{m\}, \{m\}, , , , , , , , , , X \{m\}, Y \{m\}, Z \{m\}, X \{m\}, Y \{m\}, Z \{m\}, X \{m\}, Y \{m\}, Z \{m\}, X \{m\}, Y \{m\}, Z \{m\}
 
-\textbf{Ex Line 1:} Shading\_Surfaces,Number of Shading Surfaces,~~ 10
+\textbf{Ex Line 1:} Shading Surfaces,Number of Shading Surfaces, 10
 
-\textbf{Ex Line 2:} Shading\_Surface,WEST SIDE BUSHES,Detached Shading:Building,,,,, 180.0, 180.0, 180.0, 90.0, 90.0, 60.00, 3.00,,,,,,,,,,, 4, -5.00, 0.00, 3.00, -5.00, 0.00, 0.00, -5.00, 60.00, 0.00, -5.00, 60.00, 3.00
+\textbf{Ex Line 2:} Shading Surface,WEST SIDE BUSHES,Detached Shading:Building,,,,, 180.0, 180.0, 180.0, 90.0, 90.0, 60.00, 3.00, , , , , , , , , , , 4, -5.00, 0.00, 3.00, -5.00, 0.00, 0.00, -5.00, 60.00, 0.00, -5.00, 60.00, 3.00
 
-\textbf{Ex Line 2:} Shading\_Surface,EAST SIDE TREE1,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 270.0, 90.0, 20.00, 50.99,,,,,,,,,,, 3, 70.00, 30.00, 50.00, 70.00, 40.00, 0.00, 70.00, 20.00, 0.00
+\textbf{Ex Line 2:} Shading Surface,EAST SIDE TREE1,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 270.0, 90.0, 20.00, 50.99, , , , , , , , , , , 3, 70.00, 30.00, 50.00, 70.00, 40.00, 0.00, 70.00, 20.00, 0.00
 
-\textbf{Ex Line 2:} Shading\_Surface,EAST SIDE TREE2,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 0.0, 90.0, 20.00, 50.99,,,,,,,,,,, 3, 70.00, 30.00, 50.00, 80.00, 30.00, 0.00, 60.00, 30.00, 0.00
+\textbf{Ex Line 2:} Shading Surface,EAST SIDE TREE2,Detached Shading:Building,,,,, 500.0, 500.0, 500.0, 0.0, 90.0, 20.00, 50.99, , , , , , , , , , , 3, 70.00, 30.00, 50.00, 80.00, 30.00, 0.00, 60.00, 30.00, 0.00
 
-\textbf{Ex Line 1:} Zone\_Surfaces,HEARTLAND AREA,~~ 35
+\textbf{Ex Line 1:} Zone Surfaces,HEARTLAND AREA, 35
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL001,Wall,,EXTERIOR,0.644, 0.588, 136.0, 200.0, 136.0, 180.0, 90.0, 20.0, 10.0, 0.00,ExternalEnvironment,ASHRAEDetailed,ASHRAEDetailed,SunExposed,WindExposed, 0.50, 0.50, 0.67,~ 0.33, 4, 20.00, 10.00, 10.00, 20.00, 10.00, 0.00, 40.00, 10.00, 0.00, 40.00, 10.00, 10.00
+\textbf{Ex Line 2:} HeatTransfer Surface,ZN001:WALL001,Wall,,EXTERIOR,0.644, 0.588, 136.0, 200.0, 136.0, 180.0, 90.0, 20.0, 10.0, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.67, 0.33, 4, 20.00, 10.00, 10.00, 20.00, 10.00, 0.00, 40.00, 10.00, 0.00, 40.00, 10.00, 10.00
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL001:WIN001,Window,ZN001:WALL001,SINGLE PANE HW WINDOW,N/A,6.121, 64.00000, 64.00000, 64.00000,180.0, 90.0, 8.00, 8.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,~ 0.50,~ 0.50,~ 0.71,~ 0.29, 4, 26.00, 10.00, 8.10, 26.00, 10.00, 0.10, 34.00, 10.00, 0.10, 34.00, 10.00, 8.10
+\textbf{Ex Line 2:} HeatTransfer Surface, ZN001:WALL001:WIN001, Window, ZN001:WALL001, SINGLE PANE HW WINDOW, N/A, 6.121, 64.00000, 64.00000, 64.00000,180.0, 90.0, 8.00, 8.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.71, 0.29, 4, 26.00, 10.00, 8.10, 26.00, 10.00, 0.10, 34.00, 10.00, 0.10, 34.00, 10.00, 8.10
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL002,Wall,,EXTERIOR,0.644,0.588, 155.0, 200.0, 155.0, 90.0, 90.0, 20.00, 10.00, 0.00,ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50,~ 0.50,~ 0.73,~ 0.27, 4, 50.00, 20.00, 10.00, 50.00, 20.00, 0.00, 50.00, 40.00, 0.00, 50.00, 40.00, 10.00
+\textbf{Ex Line 2:} HeatTransfer Surface, ZN001:WALL002, Wall, , EXTERIOR, 0.644, 0.588, 155.0, 200.0, 155.0, 90.0, 90.0, 20.00, 10.00, 0.00,ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.73, 0.27, 4, 50.00, 20.00, 10.00, 50.00, 20.00, 0.00, 50.00, 40.00, 0.00, 50.00, 40.00, 10.00
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL002:WIN001,Window,ZN001:WALL002,SINGLE PANE HW WINDOW,N/A,6.121, 15.0, 15.0, 15.0, 90.0, 90.0, 3.00, 5.00,~ 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed,~ 0.50,~ 0.50,~ 0.76,~ 0.24, 4, 50.00, 22.20, 7.30, 50.00, 22.20, 2.30, 50.00, 25.20, 2.30, 50.00, 25.20, 7.30
+\textbf{Ex Line 2:} HeatTransfer Surface, ZN001:WALL002:WIN001, Window, ZN001:WALL002, SINGLE PANE HW WINDOW, N/A, 6.121, 15.0, 15.0, 15.0, 90.0, 90.0, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.76, 0.24, 4, 50.00, 22.20, 7.30, 50.00, 22.20, 2.30, 50.00, 25.20, 2.30, 50.00, 25.20, 7.30
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface,ZN001:WALL002:WIN002,Window,ZN001:WALL002,SINGLE PANE HW WINDOW, N/A, 6.121, 15.00, 15.00, 15.00, 90.00, 90.00, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.71, 0.29, 4, 50.00, 28.50, 7.30, 50.00, 28.50, 2.30, 50.00, 31.50, 2.30, 50.00, 31.50, 7.30
+\textbf{Ex Line 2:} HeatTransfer Surface, ZN001:WALL002:WIN002, Window, ZN001:WALL002, SINGLE PANE HW WINDOW, N/A, 6.121, 15.00, 15.00, 15.00, 90.00, 90.00, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.71, 0.29, 4, 50.00, 28.50, 7.30, 50.00, 28.50, 2.30, 50.00, 31.50, 2.30, 50.00, 31.50, 7.30
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN001:WALL002:WIN003, Window, ZN001:WALL002, SINGLE PANE HW WINDOW, N/A, 6.121, 15.00, 15.00, 15.00, 90.00, 90.00, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.77, 0.23, 4, 50.00, 35.30, 7.30, 50.00, 35.30, 2.30, 50.00, 38.30, 2.30, 50.00, 38.30, 7.30
+\textbf{Ex Line 2:} HeatTransfer Surface, ZN001:WALL002:WIN003, Window, ZN001:WALL002, SINGLE PANE HW WINDOW, N/A, 6.121, 15.00, 15.00, 15.00, 90.00, 90.00, 3.00, 5.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.77, 0.23, 4, 50.00, 35.30, 7.30, 50.00, 35.30, 2.30, 50.00, 38.30, 2.30, 50.00, 38.30, 7.30
 
 \textless{}reduced for brevity\textgreater{}
 
-\textbf{Ex Line 1:} Zone\_Surfaces,MAINE WING,~~ 12
+\textbf{Ex Line 1:} Zone\_Surfaces,MAINE WING, 12
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN005:WALL001, Wall, , EXTERIOR, 0.644, 0.588, 100.00, 100.00, 100.00, 180.00, 90.00, 10.00, 10.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.74, 0.26, 4, 50.00, 40.00, 10.00, 50.00, 40.00, 0.00, 60.00, 40.00, 0.00, 60.00, 40.00, 10.00
+\textbf{Ex Line 2:} HeatTransfer Surface, ZN005:WALL001, Wall, , EXTERIOR, 0.644, 0.588, 100.00, 100.00, 100.00, 180.00, 90.00, 10.00, 10.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.50, 0.50, 0.74, 0.26, 4, 50.00, 40.00, 10.00, 50.00, 40.00, 0.00, 60.00, 40.00, 0.00, 60.00, 40.00, 10.00
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN005:FLR001, Floor, , SLAB FLOOR, 17.040, 3.314, 400.00, 400.00, 400.00, 90.00, 180.00, 20.00, 20.00, 0.00, Ground, N/A-Ground, ASHRAEDetailed, NoSun, NoWind, 1.00, 0.00, 1.00, 0.00, 4, 60.00, 40.00, 0.00, 40.00, 40.00, 0.00, 40.00, 60.00, 0.00, 60.00, 60.00, 0.00
+\textbf{Ex Line 2:} HeatTransfer Surface, ZN005:FLR001, Floor, , SLAB FLOOR, 17.040, 3.314, 400.00, 400.00, 400.00, 90.00, 180.00, 20.00, 20.00, 0.00, Ground, N/A-Ground, ASHRAEDetailed, NoSun, NoWind, 1.00, 0.00, 1.00, 0.00, 4, 60.00, 40.00, 0.00, 40.00, 40.00, 0.00, 40.00, 60.00, 0.00, 60.00, 60.00, 0.00
 
-\textbf{Ex Line 2:} HeatTransfer\_Surface, ZN005:ROOF001, Roof, , ROOF31, 0.790, 0.688, 400.00, 400.00, 400.00, 180.00, 0.00, 20.00, 20.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.00, 1.00, 2.41E-002, 0.98, 4, 40.00, 60.00, 10.00, 40.00, 40.00, 10.00, 60.00, 40.00, 10.00, 60.00, 60.00, 10.00
+\textbf{Ex Line 2:} HeatTransfer Surface, ZN005:ROOF001, Roof, , ROOF31, 0.790, 0.688, 400.00, 400.00, 400.00, 180.00, 0.00, 20.00, 20.00, 0.00, ExternalEnvironment, ASHRAEDetailed, ASHRAEDetailed, SunExposed, WindExposed, 0.00, 1.00, 2.41E-002, 0.98, 4, 40.00, 60.00, 10.00, 40.00, 40.00, 10.00, 60.00, 40.00, 10.00, 60.00, 60.00, 10.00
 
 \subsubsection{Description of the Detailed Surfaces Report(s)}\label{description-of-the-detailed-surfaces-reports}
 
@@ -1843,7 +1843,7 @@ When a line is shown with the comment character (!) in the first position, it si
 
 \subsubsection{Field: \textless{}Zone/Shading Surfaces\textgreater{}}\label{field-zoneshading-surfaces}
 
-This field is a dual purpose field. For beginning of the Shading Surfaces, it will show ``Shading\_Surfaces''. At each Zone, it will show ``Zone\_Surfaces''.
+This field is a dual purpose field. For beginning of the Shading Surfaces, it will show ``Shading Surfaces''. At each Zone, it will show ``Zone Surfaces''.
 
 \subsubsection{Field: \textless{}Zone Name\textgreater{}/\#Shading Surfaces}\label{field-zone-nameshading-surfaces}
 
@@ -1855,13 +1855,13 @@ This field, then, specifies the number of surfaces of the type (zone or shading)
 
 The example lines illustrate:
 
-Shading\_Surfaces,Number of Shading Surfaces,~~ 10
+Shading Surfaces,Number of Shading Surfaces,~~ 10
 
-Zone\_Surfaces,HEARTLAND AREA,~~ 35
+Zone Surfaces,HEARTLAND AREA,~~ 35
 
-Zone\_Surfaces,MAINE WING,~~ 12
+Zone Surfaces,MAINE WING,~~ 12
 
-\textbf{Line 2:}! \textless{}HeatTransfer/Shading/Frame/Divider\_Surface\textgreater{}, Surface Name, Surface Class, Base Surface, Construction, Nominal U (w/o film coefs), Nominal U (with film coefs), Area (Net), Area (Gross), Area (Sunlit Calc), Azimuth, Tilt, \textasciitilde{}Width, \textasciitilde{}Height, Reveal, \textless{}ExtBoundCondition\textgreater{}, \textless{}ExtConvCoeffCalc\textgreater{}, \textless{}IntConvCoeffCalc\textgreater{}, \textless{}SunExposure\textgreater{}, \textless{}WindExposure\textgreater{}, ViewFactorToGround, ViewFactorToSky, ViewFactorToGround-IR, ViewFactorToSky-IR, \#Sides, \{Vertex 1\},,, \{Vertex 2\},,, \{Vertex 3\},,, \{Vertex 4\}, ,,\{etc\}
+\textbf{Line 2:}! \textless{}HeatTransfer/Shading/Frame/Divider Surface\textgreater{}, Surface Name, Surface Class, Base Surface, Construction, Nominal U (w/o film coefs), Nominal U (with film coefs), Area (Net), Area (Gross), Area (Sunlit Calc), Azimuth, Tilt, \textasciitilde{}Width, \textasciitilde{}Height, Reveal, \textless{}ExtBoundCondition\textgreater{}, \textless{}ExtConvCoeffCalc\textgreater{}, \textless{}IntConvCoeffCalc\textgreater{}, \textless{}SunExposure\textgreater{}, \textless{}WindExposure\textgreater{}, ViewFactorToGround, ViewFactorToSky, ViewFactorToGround-IR, ViewFactorToSky-IR, \#Sides, \{Vertex 1\},,, \{Vertex 2\},,, \{Vertex 3\},,, \{Vertex 4\}, ,,\{etc\}
 
 \textbf{Line 3:} ! \textless{}Units\textgreater{},,,,,\{W/m2-K\},\{W/m2-K\},\{m2\},\{m2\},\{m2\},\{deg\},\{deg\},\{m\},\{m\},\{m\},,,,,,,,,,X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\},X \{m\},Y \{m\},Z \{m\}
 
@@ -1869,9 +1869,9 @@ Line 2 shows the full detail of each surface record with Line 3 used for illustr
 
 The first four fields (\textless{}HeatTransfer/ShadingSurface\textgreater{},Surface Name, Surface Class, Base Surface) are included in all the Surface reports (Details, Vertices, Details with Vertices).
 
-\subsubsection{Field: \textless{}HeatTransfer/Shading/Frame/Divider\_Surface\textgreater{}}\label{field-heattransfershadingframedividerux5fsurface}
+\subsubsection{Field: \textless{}HeatTransfer/Shading/Frame/Divider Surface\textgreater{}}\label{field-heattransfershadingframedividerux5fsurface}
 
-For shading surfaces, this will be a constant ``Shading\_Surface''. For heat transfer surfaces, this will be a constant ``HeatTransfer\_Surface''. For Frame and Divider Surfaces, it will be a constant ``Frame/Divider\_Surface'' with the proper type showing in the Surface Class.
+For shading surfaces, this will be a constant ``Shading Surface''. For heat transfer surfaces, this will be a constant ``HeatTransfer Surface''. For Frame and Divider Surfaces, it will be a constant ``Frame/Divider Surface'' with the proper type showing in the Surface Class.
 
 \subsubsection{Field: Surface Name}\label{field-surface-name}
 
@@ -1901,7 +1901,7 @@ For windows, no value is reported because the film coefficients cannot be remove
 
 A nominal thermal conductance for the surface is calculated for the surface, including film coefficients. Units for this field are W/m\(^{2}\)-K.
 
-For opaque surfaces, interior and exterior film coefficients are added to the surface construction based on the prescribed R-values for interior and exterior film coefficients as found in ASHRAE 90.1-2004, Appendix A, and shown below:~ The SI values are the exact values used inside EnergyPlus.
+For opaque surfaces, interior and exterior film coefficients are added to the surface construction based on the prescribed R-values for interior and exterior film coefficients as found in ASHRAE 90.1-2004, Appendix A, and shown below: The SI values are the exact values used inside EnergyPlus.
 
 \begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
 \toprule
@@ -1921,22 +1921,7 @@ CEILING/ROOF & 0.61 & 0.1074271 & 0.46 & 0.0810106 \tabularnewline
 \bottomrule
 \end{longtable}
 
-NOTE:~ The resulting ``Nominal U with film coefs'' is only for comparison purposes with the ASHRAE 90.1 requirements. Actual film coefficients are calculated during the simulation and are dependent on several factors that may change during the simulation time period.
-
-For windows, the ``Nominal U with film coefs'' is calculated using the following assumptions from the WINDOW 5 program (also NFRC winter conditions):
-
-\begin{itemize}
-\item
-  Indoor air temperature = 21 C (69.8 F)
-\item
-  Outdoor air temperature = -18 C (-.4 F)
-\item
-  Exterior film coefficient = ~ 26 W/m\(^{2}\) (4.58 ft\(^{2}\)-F-hr/BTU)
-\item
-  Interior film coefficient = Calculated by EnergyPlus convection algorithm
-\item
-  No incident solar beam radiation
-\end{itemize}
+NOTE: The resulting ``Nominal U with film coefs'' is only for comparison purposes with the ASHRAE 90.1 requirements. Actual film coefficients are calculated during the simulation and are dependent on several factors that may change during the simulation time period.  It should be noted that the Nominal U-values with film coefficients that are listed in this report do not account for whether or not the surface in question is considered a "semi-exterior" surface. For such "semi-exterior" surfaces, use the Nominal U-value without film coefficients listed and then factor in the film coefficients for such surfaces listed in the literature (e.g., ASHRAE Standard 90.1).  For surfaces that use Other Side Coefficients, the exterior film coefficient that is used in this calculation is based on the value entered by the user in the Other Side Coefficients input.
 
 \subsubsection{Field: Area (Net)}\label{field-area-net}
 
@@ -1958,11 +1943,11 @@ Using the specified vertices for the surface (and order of entry), EnergyPlus ca
 
 Using the specified vertices for the surface (and order of entry), EnergyPlus can determine the tilt of the surface with respect to ``horizontal''. That angle is displayed in this field. Units for this field are degrees.
 
-\subsubsection{Field: \textasciitilde{}Width}\label{field-width}
+\subsubsection{Field: Width}\label{field-width}
 
 This field (approximate width of the surface) is calculated and filled by EnergyPlus from the entered vertices. Some parts of EnergyPlus use a width and height rather than the more detailed vertex/area calculations. Units for this field are m.
 
-\subsubsection{Field: \textasciitilde{}Height}\label{field-height}
+\subsubsection{Field: Height}\label{field-height}
 
 This field (approximate height of the surface) is calculated and filled by EnergyPlus from the entered vertices. Some parts of EnergyPlus use a width and height rather than the more detailed vertex/area calculations. Units for this field are m.
 

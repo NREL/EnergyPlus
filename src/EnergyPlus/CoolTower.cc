@@ -112,7 +112,7 @@ namespace CoolTower {
             state.dataCoolTower->GetInputFlag = false;
         }
 
-        if (state.dataCoolTower->NumCoolTowers == 0) return;
+        if ((int)state.dataCoolTower->CoolTowerSys.size() == 0) return;
 
         CalcCoolTower(state);
 
@@ -175,12 +175,12 @@ namespace CoolTower {
 
         auto &Zone(state.dataHeatBal->Zone);
 
-        state.dataCoolTower->NumCoolTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumCoolTowers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        state.dataCoolTower->CoolTowerSys.allocate(state.dataCoolTower->NumCoolTowers);
+        state.dataCoolTower->CoolTowerSys.allocate(NumCoolTowers);
 
         // Obtain inputs
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -429,7 +429,7 @@ namespace CoolTower {
 
         if (ErrorsFound) ShowFatalError(state, CurrentModuleObject + " errors occurred in input.  Program terminates.");
 
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum) {
             SetupOutputVariable(state,
                                 "Zone Cooltower Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
@@ -639,7 +639,7 @@ namespace CoolTower {
 
         auto &Zone(state.dataHeatBal->Zone);
 
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
             ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;
 
             if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
@@ -773,7 +773,7 @@ namespace CoolTower {
         int CoolTowerNum;
         Real64 AvailWaterRate;
 
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
 
             // Set the demand request for supply water from water storage tank (if needed)
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
@@ -810,7 +810,7 @@ namespace CoolTower {
 
         TSMult = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
-        for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
+        for (CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirVol = state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate * TSMult;
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTAirMass = state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate * TSMult;

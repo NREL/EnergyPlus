@@ -602,10 +602,10 @@ Zone Summary
 
 \begin{itemize}
     \item
-        If the Zone \lstinline!Part of Total Floor Area! is set to 'No', then it will only be counted towards the "Not Part of Total" row
+        If the Zone \lstinline!Part of Total Floor Area! is set to `No', then it will only be counted towards the ``Not Part of Total'' row
     \item
-        Otherwise, it is added to the "Total" row. Then, if the zone is also conditioned, it is added to the "Conditioned Total" row;
-        If unconditioned, it is added to the "Unconditioned Total" row.
+        Otherwise, it is added to the ``Total'' row. Then, if the zone is also conditioned, it is added to the ``Conditioned Total'' row;
+        If unconditioned, it is added to the ``Unconditioned Total'' row.
 \end{itemize}
 
 {\tiny
@@ -1254,7 +1254,7 @@ The HVAC Sizing Summary also includes a coil summary report table. This is a lar
 
 Throughout this table the special value of -999.0 is deliberately used to signal that no data are available to report for that coil for that field or column.  This could be for a variety of reasons such as, no sizing calculations in the model, did not run design day full simulations, particular fields only applies to certain types of coils, certain calculations are only performed for particular coils, etc.  If you find a -999.0 in a situation where you think the value should be available, please report it.  Another special value of -99999.0 may be encountered which is used within EnergyPlus to signal that numeric input fields were set to Autosize, Autocalculate, or left blank and in some cases this value will carry into the coil report table.
 
-The encyclopedic documentation that follows is important because in many cases, very similiar data are available from up to three separate fields and one must be careful to understand the subtle differences and be aware that there is some repetition of the similar types of data in the fields.  This is mainly because coil performance changes with the conditions under which it operates and so an important part of this table is describing each coil under different sets of operating conditions.
+The encyclopedic documentation that follows is important because in many cases, very similar data are available from up to three separate fields and one must be careful to understand the subtle differences and be aware that there is some repetition of the similar types of data in the fields.  This is mainly because coil performance changes with the conditions under which it operates and so an important part of this table is describing each coil under different sets of operating conditions.
 
 There are three broad groupings of data fields in the table:
 
@@ -1262,7 +1262,7 @@ There are three broad groupings of data fields in the table:
 \item
   Meta data.  The meta data fields include string names to identify the coil, where it is being used, names and types of IDF objects involved, what some of the various sizing method input choices were set to, and information about the supply fan and plant found to be associated with the coil.  40 fields. 
 \item
-  Ideal loads sizing summary. The collection of fields whose names end with ``at Ideal Loads Peak'' are all related to the sizing calculations done by the ideal loads zone sizing routines and the system sizing routines based on them.  Many of the values reported here come from Sizing:Zone and/or Sizing:System input.  The operating conditions occuring during Ideal Loads sizing calculations are unlikely to match the conditions used in the definitions for coil input data.  36 fields.
+  Ideal loads sizing summary. The collection of fields whose names end with ``at Ideal Loads Peak'' are all related to the sizing calculations done by the ideal loads zone sizing routines and the system sizing routines based on them.  Many of the values reported here come from Sizing:Zone and/or Sizing:System input.  The operating conditions occurring during Ideal Loads sizing calculations are unlikely to match the conditions used in the definitions for coil input data.  36 fields.
 \item
   Rating point summary.  This is a collection of fields with names that end in ``at Rating Conditions.''  The model input data for many types of coils is based on defined set of conditions variously referred to as the rating point, reference, nominal, or design.  The coil models are calculated with conditions set to match the rating point and the inputs and outputs from that are reported here.  Many of the values here are from the input documentation that defines the conditions at the rating point. The coil capacities and leaving conditions are the results from the running complete coil model. Some coil models do not have a rating point as part of the model definition, because the models are not sensitive to operating conditions, and those coils will have -999.0 in these fields. 11 fields.
 \end{itemize}
@@ -1279,7 +1279,7 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{Zone Name(s)} This is the zone, or list of zones, found to be associated with this coil.  The zone name is defined by the user in the Zone object.  For multizone systems, the coils can have a list of zone names with the individual names separated by a semicolon. The zones listed here are those used to generate (aggregate and volume-weighted average) values for the room conditions and loads. Text string. 
 
-\emph{System Sizing Method Concurrence} This field applies to ``AirLoop'' coils.  It describes if the central air system sizing was done using ``Coincident'' or ``Non-Coincident'' method. This refers to how the ideal loads sizing routines process the time sequence of zone loads.  The concurrent sum of peaks, or coincident or "block", is often lower than the sum of the individual peaks regardless of when they occur, or non-conicident sum.  This field is not applicable to ``Zone Equipment'' coils and will show ``N/A'' here.  This corresponds to the input field called Type of Zone Sum to Use in the Sizing:System input object. Text string.
+\emph{System Sizing Method Concurrence} This field applies to ``AirLoop'' coils.  It describes if the central air system sizing was done using ``Coincident'' or ``Non-Coincident'' method. This refers to how the ideal loads sizing routines process the time sequence of zone loads.  The concurrent sum of peaks, or coincident or ``block'', is often lower than the sum of the individual peaks regardless of when they occur, or non-coincident sum.  This field is not applicable to ``Zone Equipment'' coils and will show ``N/A'' here.  This corresponds to the input field called Type of Zone Sum to Use in the Sizing:System input object. Text string.
 
 \emph{System Sizing Method Capacity} This field applies to ``AirLoop'' coils.  It describes what was chosen for the method of determining coil capacity during ideal loads sizing routines. The values here will match the input key choices available for the the Sizing:System object's input fields called \emph{Cooling Design Capacity Method}, for cooling coils, and \emph{Heating Design Capacity Method}, for heating coils. Values here of ``HeatingDesignCapacity'' or ``CoolingDesignCapacity'' mean that the coil was sized using the design loads calculated from the zone ideal loads results. When sizing was scaled using floor area the value here would be ``CapacityPerFloorArea.''  Values of \emph{FractionOfAutosizedHeatingCapacity} and \emph{FractionOfAutosizeCoolingCapacity} mean that the usual design load based results were further scaled by a separate user scaling factor. This field is not applicable to ``Zone Equipment'' coils and will show ``N/A'' here. Text string.
 
@@ -1293,7 +1293,7 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{OA Pretreated prior to coil inlet?} This field describes if the coil's sizing calculations are based on the outdoor air being preconditioned, as with a separate coil, or if the outdoor air is unconditioned. Values here will be ``Yes'' or ``No.''  A ``No'' means that the outdoor air is not preconditioned.  A ``Yes'' means that the outdoor is preconditioned.  This field only really applies to central air system coils.  The outdoor air may be mixed with return air before the coil, but that mixed air may be based on either treated or untreated outdoor air, depending on Sizing:System input.  Text string.
 
-\emph{Coil Final Gross Total Capacity [W]} This field describes the coil's gross total capacity, in units of W.  No fan impact.  This field will generally be the main value the model uses for capacity as a result of the sizing calculations.  However if a coil was not autosized, the capacity was hard sized on input, then this field will be filled with the hard sized coil capacity (if that is a parameter in the coil model).  This field is very similiar to the field called Coil Total Capacity at Rating Conditions with the difference being that this one is the model input while that other one is the result of running the full coil model at the rating point conditions.  Water heating coil models using UA and design water flow rate performance input method do not have a single design capacity in Watts and this field will show as -99999.0 (and the coil is better characterized using the field called Coil U-value Times Area Value).  Real number. 
+\emph{Coil Final Gross Total Capacity [W]} This field describes the coil's gross total capacity, in units of W.  No fan impact.  This field will generally be the main value the model uses for capacity as a result of the sizing calculations.  However if a coil was not autosized, the capacity was hard sized on input, then this field will be filled with the hard sized coil capacity (if that is a parameter in the coil model).  This field is very similar to the field called Coil Total Capacity at Rating Conditions with the difference being that this one is the model input while that other one is the result of running the full coil model at the rating point conditions.  Water heating coil models using UA and design water flow rate performance input method do not have a single design capacity in Watts and this field will show as -99999.0 (and the coil is better characterized using the field called Coil U-value Times Area Value).  Real number. 
 
 \emph{Coil Final Gross Sensible Capacity [W]} Real number. This field describes the coil's gross sensible capacity, if available, in units of W. No fan impact.  This field is generally the total capacity multiplied by the sensible heat ratio if both are defined in the model. Real number.
 
@@ -1301,7 +1301,7 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{Coil Final Reference Plant Fluid Volume Flow Rate [m3/s]}  This field describes the coil's rated/reference/nominal water flow rate, in units of m3/s.  This field will be the model input or autosize result for the source water, or other plant fluid type, flow rate through the coil at the design or rating point.  Many coils have no water source and these will have -999.0 in this field.  Real number.
 
-\emph{Coil U-value Times Area Value [W/K]} This field describes the coil's overall UA value, in units of W/K.  This is mainly for the Coil:Heating:Water coil using the Performance Input method of UFactorTimesAirAndDesignWaterFlowRate and is not avaliable for other coils.  This will be the result from the ideal loads sizing calculations or the hard sized entry.  Real number.
+\emph{Coil U-value Times Area Value [W/K]} This field describes the coil's overall UA value, in units of W/K.  This is mainly for the Coil:Heating:Water coil using the Performance Input method of UFactorTimesAirAndDesignWaterFlowRate and is not available for other coils.  This will be the result from the ideal loads sizing calculations or the hard sized entry.  Real number.
 
 \emph{Terminal Unit Reheat Coil Multiplier}  This field describes the coil sizing multiplier that might have affected the calculated size of a coil used as a reheat coil in a zone air terminal unit.  This is a non-dimensional scaling factor.  Real number.
 
@@ -1325,9 +1325,9 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{Plant Name for Coil} If the coil is a water-to-air or steam coil, then the program tries to detect the central plant system serving the coil. This field is the user-defined name for that plant system.  This will be the name in the PlantLoop and Sizing:Plant objects.  The next nine fields provides various results for that the central plant loop system.  If the coil is not a water or steam coil, then this field will have ``unknown'' as the value.  Text string.
 
-\emph{Plant Fluid Specific Heat Capacity [J/kg-K]}  This is the specific heat of the fluid circulating through the plant and serving the coil, in units of J/kg-K.  This is evaulated at the temperature used for sizing calculations. The plant need not always be water, glycol mixtures and steam are supported and this value will be adjusted accordingly.  If the coil is not served by a plant, then this field will have -999.0 as the value. Real number.
+\emph{Plant Fluid Specific Heat Capacity [J/kg-K]}  This is the specific heat of the fluid circulating through the plant and serving the coil, in units of J/kg-K.  This is evaluated at the temperature used for sizing calculations. The plant need not always be water, glycol mixtures and steam are supported and this value will be adjusted accordingly.  If the coil is not served by a plant, then this field will have -999.0 as the value. Real number.
 
-\emph{Plant Fluid Density [kg/m3]} This is the density of the fluid circulating through the plant and serving the coil, in units of kg/m3.  This is evaulated at the temperature used for sizing calculations. The plant need not always be water, glycol mixtures are supported and this value will be adjusted accordingly.  If the coil is not served by a plant, then this field will have -999.0 as the value.  Real number.
+\emph{Plant Fluid Density [kg/m3]} This is the density of the fluid circulating through the plant and serving the coil, in units of kg/m3.  This is evaluated at the temperature used for sizing calculations. The plant need not always be water, glycol mixtures are supported and this value will be adjusted accordingly.  If the coil is not served by a plant, then this field will have -999.0 as the value.  Real number.
 
 \emph{Plant Maximum Fluid Mass Flow Rate [kg/s]}  This field is the design flow rate for the (entire) central plant system serving the coil, in units of kg/s.  This value is the final outcome from plant sizing calculations, or perhaps from the hard-sized value entered in the PlantLoop object for the maximum volume flow rate.  If the coil is not served by a plant, then this field will have -999.0 as the value. Real number.
 
@@ -1357,7 +1357,7 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{Coil Total Capacity at Ideal Loads Peak [W]}  This field is the coil's gross total capacity, in Watts, resulting from the ideal loads sizing calculations.  This is the total, sensible plus latent, capacity under the conditions used for ideal loads sizing described in other ``Ideal Loads Peak'' fields.  This does not include the supply fan impacts.  Real Number.
 
-\emph{Coil Sensible Capacity at Ideal Loads Peak [W]}  This field is the coil's gross sensible capacity, in Watts, resulting from the ideal loads sizing calculations.  This is the sensible capacity under the conditiosn used for ideal loads sizing described in the other ``Ideal Loads Peak'' fields.  This does not include the supply fan impacts.  Real number.
+\emph{Coil Sensible Capacity at Ideal Loads Peak [W]}  This field is the coil's gross sensible capacity, in Watts, resulting from the ideal loads sizing calculations.  This is the sensible capacity under the conditions used for ideal loads sizing described in the other ``Ideal Loads Peak'' fields.  This does not include the supply fan impacts.  Real number.
 
 \emph{Coil Off-Rating Capacity Modifier at Ideal Loads Peak [ ]}  This field is the capacity modification factor for the conditions during ideal loads sizing.  The coil model may have performance curves that alter the capacity as a function of the conditions experienced by the coil. When the ideal loads sizing conditions are different than the conditions that the performance curves are normalized to, the rating point, the coil is being sized at ``Off-rating.''  This value can be used to convert the Coil Total Capacity at Ideal Loads Peak to what the capacity should be at the rating point.  The ideal loads sizing is often not at the rating point because of a fraction of outdoor air has been mixed into the entering air. Real number.
 
@@ -1371,7 +1371,7 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{Coil Entering Air Humidity Ratio at Ideal Loads Peak [kg-H2O/kg-DryAir]}  This field is the humidity ratio, in kg-water/kg-dryAir, of the air entering the coil during ideal loads sizing calculations. Real number.
 
-\emph{Coil Entering Air Enthalpy at Ideal Loads Peak [J/(kg-C)]}  This field is the enthalpy, in J/kg-C (base 0.0 at drybulb = 0.0C), of the air entering the coil during ideal loads sizing calculations. Real number.
+\emph{Coil Entering Air Enthalpy at Ideal Loads Peak [J/(kg-K)]}  This field is the enthalpy, in J/kg-K (base 0.0 at drybulb = 0.0$^\circ$C), of the air entering the coil during ideal loads sizing calculations. Real number.
 
 \emph{Coil Leaving Air Drybulb at Ideal Loads Peak [C]}  This field is the drybulb temperature, in degrees Celsius, of the air leaving the coil during the ideal loads sizing calculations for the coil.  Real number.
 
@@ -1379,7 +1379,7 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{Coil Leaving Air Humidity Ratio at Ideal Loads Peak [C]}  This field is the humidity ratio, in kg-water/kg-dryAir, of the air leaving the coil during ideal loads sizing calculations. Real number.
 
-\emph{Coil Leaving Air Enthalpy at Ideal Loads Peak [J/(kg-C)]}  This field is the enthalpy, in J/kg-C (base 0.0 at drybulb = 0.0C), of the air leaving the coil during ideal loads sizing calculations. Real number.
+\emph{Coil Leaving Air Enthalpy at Ideal Loads Peak [J/(kg-K)]}  This field is the enthalpy, in J/kg-K (base 0.0 at drybulb = 0.0$^\circ$C), of the air leaving the coil during ideal loads sizing calculations. Real number.
 
 \emph{Coil Plant Fluid Mass Flow Rate at Ideal Loads Peak [kg/s]}  This field is the design or maximum water flow rate, in kg/s, of the plant fluid serving the coil during ideal loads sizing calculations.  If the coil is not a water coil then this field will have a value of -999.0. Real number.
 
@@ -1427,17 +1427,17 @@ The following is a comprehensive listing of each column/field in the coil summar
 
 \emph{Coil Entering Air Wetbulb at Rating Conditions [C]}  This field is the coil air inlet wetbulb temperature, in degrees Celsius, used when calculating the full coil model under the operating conditions specified for the rating point.  The value should match the definition of the rating point as described in the coil model input documentation.  For DX cooling coils, this will be 19.444C or 67F. Real number
 
-\emph{Coil Entering Air Humidity Ratio at Rating Conditions [kg-H20/kg-DryAir]}  This field is the coil air inlet humidity ratio, in kg-water/kg-dryAir, used when calculating the full coil model under the operating conditions specified for the rating point.  Real number.
+\emph{Coil Entering Air Humidity Ratio at Rating Conditions [kg-H2O/kg-DryAir]}  This field is the coil air inlet humidity ratio, in kg-water/kg-dryAir, used when calculating the full coil model under the operating conditions specified for the rating point.  Real number.
 
-\emph{Coil Entering Air Enthalpy at Rating Conditions [J/(kg-C)]}  This field is the coil air inlet enthalpy, in J/kg-C with zero base at 0.0C, used when calculating the full coil model under the operating conditins specified for the rating point. Real number.
+\emph{Coil Entering Air Enthalpy at Rating Conditions [J/(kg-K)]}  This field is the coil air inlet enthalpy, in J/kg-K with zero base at 0.0$^\circ$C, used when calculating the full coil model under the operating conditions specified for the rating point. Real number.
 
 \emph{Coil Leaving Air Drybulb at Rating Conditions [C]}  This field is the coil air outlet drybulb, in degrees Celsius, from calculating the full coil model under the operating conditions specified for the rating point. Real number.
 
 \emph{Coil Leaving Air Wetbulb at Rating Conditions [C]}  This field is the coil air outlet wetbulb, in degrees Celsius, from calculating the full coil model under the operating conditions specified for the rating point. Real number.
 
-\emph{Coil Leaving Air Humidity Ratio at Rating Conditions [kg-H20/kg-DryAir]}  This field is the coil air outlet humidity ratio, in kg-water/kg-dryair, from calculating the full coil model under the operating conditions specified for the rating point. Real number.
+\emph{Coil Leaving Air Humidity Ratio at Rating Conditions [kg-H2O/kg-DryAir]}  This field is the coil air outlet humidity ratio, in kg-water/kg-dryair, from calculating the full coil model under the operating conditions specified for the rating point. Real number.
 
-\emph{Coil Leaving Air Enthalpy at Rating Conditions [J/(kg-C)]} This field is the coil air outlet enthalpy, in J/kg-C with zero base at 0.0C, from calculating the full coil model under the operating conditions specified for the rating point. Real number.
+\emph{Coil Leaving Air Enthalpy at Rating Conditions [J/(kg-K)]} This field is the coil air outlet enthalpy, in J/kg-K with zero base at 0.0$^\circ$C, from calculating the full coil model under the operating conditions specified for the rating point. Real number.
 Directly following is an example of the report.
 
 The key used to obtain this report is HVACSizingSummary.
@@ -2127,7 +2127,7 @@ Return Plenums & 1 \tabularnewline
 
 \subsection{Component Cost Economics Summary}\label{component-cost-economics-summary}
 
-The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. Directly following is an example of this report.
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight categories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. Directly following is an example of this report.
 
 Report: Component Cost Economics Summary
 
@@ -2374,12 +2374,12 @@ EAp2-17a. Energy Use Intensity - Electricity
 
 \begin{longtable}[c]{@{}ll@{}}
 \toprule 
- & Electricty [MJ/m2] \tabularnewline
+ & Electricity [MJ/m2] \tabularnewline
 \midrule
 \endfirsthead
 
 \toprule 
- & Electricty [MJ/m2] \tabularnewline
+ & Electricity [MJ/m2] \tabularnewline
 \midrule
 \endhead
 

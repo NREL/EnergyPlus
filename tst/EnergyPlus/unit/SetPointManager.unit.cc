@@ -646,8 +646,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum(1) = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum[0] = 1;
 
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches);
 
@@ -1723,4 +1722,118 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetHumRatTest)
     SetPointManager::UpdateSetPointManagers(*state);
     Real64 SetPt = SpAtLowRefHumRat - ((HumRat - LowRefHumRat) / (HighRefHumRat - LowRefHumRat)) * (SpAtLowRefHumRat - SpAtHighRefHumRat);
     EXPECT_EQ(SetPt, state->dataLoopNodes->Node(2).HumRatSetPoint);
+}
+
+TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetCalculateSchedValTest)
+{
+    bool ErrorsFound = false;
+    Real64 expectedAnswer;
+    static constexpr Real64 allowableTolerance = 0.001;
+
+    std::string const idf_objects = delimited_string({
+        "  SetpointManager:OutdoorAirReset,",
+        "    OA Reset Manager 1,      !- Name",
+        "    MinimumTemperature,      !- Control Variable",
+        "    50.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+        "    10.0,                    !- Outdoor Low Temperature {C}",
+        "    40.0,                    !- Setpoint at Outdoor High Temperature {C}",
+        "    20.0,                    !- Outdoor High Temperature {C}",
+        "    HW Supply Outlet Node,   !- Setpoint Node or NodeList Name",
+        "    Schedule 1,              !- Schedule",
+        "    55.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+        "    5.0,                     !- Outdoor Low Temperature {C}",
+        "    45.0,                    !- Setpoint at Outdoor High Temperature {C}",
+        "    15.0;                    !- Outdoor High Temperature {C}",
+        "  SetpointManager:OutdoorAirReset,",
+        "    OA Reset Manager 2,      !- Name",
+        "    MinimumTemperature,      !- Control Variable",
+        "    50.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+        "    10.0,                    !- Outdoor Low Temperature {C}",
+        "    40.0,                    !- Setpoint at Outdoor High Temperature {C}",
+        "    20.0,                    !- Outdoor High Temperature {C}",
+        "    HW Supply Outlet Node,   !- Setpoint Node or NodeList Name",
+        "    Schedule 2,              !- Schedule",
+        "    55.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+        "    5.0,                     !- Outdoor Low Temperature {C}",
+        "    45.0,                    !- Setpoint at Outdoor High Temperature {C}",
+        "    15.0;                    !- Outdoor High Temperature {C}",
+        "  SetpointManager:OutdoorAirReset,",
+        "    OA Reset Manager 3,      !- Name",
+        "    MinimumTemperature,      !- Control Variable",
+        "    50.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+        "    10.0,                    !- Outdoor Low Temperature {C}",
+        "    40.0,                    !- Setpoint at Outdoor High Temperature {C}",
+        "    20.0,                    !- Outdoor High Temperature {C}",
+        "    HW Supply Outlet Node,   !- Setpoint Node or NodeList Name",
+        "    Schedule 3,              !- Schedule",
+        "    55.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+        "    5.0,                     !- Outdoor Low Temperature {C}",
+        "    45.0,                    !- Setpoint at Outdoor High Temperature {C}",
+        "    15.0;                    !- Outdoor High Temperature {C}",
+        "  ScheduleTypeLimits,",
+        "    Control Type,            !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    4,                       !- Upper Limit Value",
+        "    DISCRETE;                !- Numeric Type",
+        " Schedule:Compact,",
+        "   Schedule 1,       !- Name",
+        "   Control Type,     !- Schedule Type Limits Name",
+        "   Through: 12/31,   !- Field 1",
+        "   For: Alldays,     !- Field 2",
+        "   Until: 24:00,1;   !- Field 3",
+        " Schedule:Compact,",
+        "   Schedule 2,       !- Name",
+        "   Control Type,     !- Schedule Type Limits Name",
+        "   Through: 12/31,   !- Field 1",
+        "   For: Alldays,     !- Field 2",
+        "   Until: 24:00,2;   !- Field 3",
+        " Schedule:Compact,",
+        "   Schedule 3,       !- Name",
+        "   Control Type,     !- Schedule Type Limits Name",
+        "   Through: 12/31,   !- Field 1",
+        "   For: Alldays,     !- Field 2",
+        "   Until: 24:00,1.7; !- Field 3",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(ErrorsFound); // zones are specified in the idf snippet
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->DayOfSim = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->HolidayIndex = 0;
+
+    ScheduleManager::ProcessScheduleInput(*state);
+    SetPointManager::GetSetPointManagerInputs(*state);
+
+    // Set general data for all tests
+    state->dataEnvrn->OutDryBulbTemp = 7.0;
+    ScheduleManager::UpdateScheduleValues(*state);
+
+    // Test 1: First outdoor air reset setpoint manager--should use the first set of setpoint data
+    expectedAnswer = 50.0;
+    state->dataSetPointManager->OutAirSetPtMgr(1).calculate(*state);
+    EXPECT_NEAR(state->dataSetPointManager->OutAirSetPtMgr(1).SetPt, expectedAnswer, allowableTolerance);
+
+    // Test 2: Second outdoor air reset setpoint manager--should use the second set of setpoint data
+    expectedAnswer = 53.0;
+    state->dataSetPointManager->OutAirSetPtMgr(2).calculate(*state);
+    EXPECT_NEAR(state->dataSetPointManager->OutAirSetPtMgr(2).SetPt, expectedAnswer, allowableTolerance);
+
+    // Test 3: Third outdoor air reset setpoint manager--should result in an error and use the first set of setpoint data
+    expectedAnswer = 50.0;
+    state->dataSetPointManager->OutAirSetPtMgr(3).calculate(*state);
+    EXPECT_NEAR(state->dataSetPointManager->OutAirSetPtMgr(3).SetPt, expectedAnswer, allowableTolerance);
+
+    std::string const error_string3 = delimited_string({
+        "   ** Severe  ** Schedule Values for the Outside Air Setpoint Manager = OA RESET MANAGER 3 are something other than 1 or 2.",
+        "   **   ~~~   ** ...the value for the schedule currently is 1.7",
+        "   **   ~~~   ** ...the value is being interpreted as 1 for this run but should be fixed.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string3, true));
 }

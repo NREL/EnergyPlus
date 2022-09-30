@@ -185,26 +185,19 @@ namespace DataErrorTracking {
     struct RecurringErrorData
     {
         // Members
-        std::string Message;  // Message to be written to "error file" at end of simulation
-        int Count;            // Count of total times this recurring error message has been called
-        int WarmupCount;      // Count of times this recurring error message has been called during warmup
-        int SizingCount;      // Count of times this recurring error message has been called during sizing
-        Real64 MaxValue;      // Max of the values passed for this recurring error message
-        Real64 MinValue;      // Min of the values passed for this recurring error message
-        Real64 SumValue;      // Sum of the values passed for this recurring error message
-        std::string MaxUnits; // units for Max values
-        std::string MinUnits; // units for Min values
-        std::string SumUnits; // units for Sum values
-        bool ReportMax;       // Flag to report max value
-        bool ReportMin;       // Flag to report min value
-        bool ReportSum;       // Flag to report sum value
-
-        // Default Constructor
-        RecurringErrorData()
-            : Count(0), WarmupCount(0), SizingCount(0), MaxValue(0.0), MinValue(0.0), SumValue(0.0), ReportMax(false), ReportMin(false),
-              ReportSum(false)
-        {
-        }
+        std::string Message;    // Message to be written to "error file" at end of simulation
+        int Count = 0;          // Count of total times this recurring error message has been called
+        int WarmupCount = 0;    // Count of times this recurring error message has been called during warmup
+        int SizingCount = 0;    // Count of times this recurring error message has been called during sizing
+        Real64 MaxValue = 0.0;  // Max of the values passed for this recurring error message
+        Real64 MinValue = 0.0;  // Min of the values passed for this recurring error message
+        Real64 SumValue = 0.0;  // Sum of the values passed for this recurring error message
+        std::string MaxUnits;   // units for Max values
+        std::string MinUnits;   // units for Min values
+        std::string SumUnits;   // units for Sum values
+        bool ReportMax = false; // Flag to report max value
+        bool ReportMin = false; // Flag to report min value
+        bool ReportSum = false; // Flag to report sum value
     };
 
 } // namespace DataErrorTracking
@@ -241,28 +234,7 @@ struct ErrorTrackingData : BaseGlobalStruct
 
     void clear_state() override
     {
-        RecurringErrors.clear();
-        MatchCounts = Array1D_int(DataErrorTracking::SearchCounts, 0);
-        AbortProcessing = false;             // Flag used to if currently in "abort processing"
-        NumRecurringErrors = 0;              // Number of stored recurring error messages
-        TotalSevereErrors = 0;               // Counter
-        TotalWarningErrors = 0;              // Counter
-        TotalSevereErrorsDuringWarmup = 0;   // Counter
-        TotalWarningErrorsDuringWarmup = 0;  // Counter
-        TotalSevereErrorsDuringSizing = 0;   // Counter
-        TotalWarningErrorsDuringSizing = 0;  // Counter
-        TotalMultipliedWindows = 0;          // Counter
-        TotalCoincidentVertices = 0;         // Counter
-        TotalDegenerateSurfaces = 0;         // Counter
-        TotalReceivingNonConvexSurfaces = 0; // Counter
-        TotalCastingNonConvexSurfaces = 0;   // Counter
-        TotalRoomAirPatternTooLow = 0;       // Counter
-        TotalRoomAirPatternTooHigh = 0;      // Counter
-        AskForConnectionsReport = false;     // Flag used to tell when connections should be reported
-        AskForSurfacesReport = false;        // Flag used to tell when surfaces should be reported
-        AskForPlantCheckOnAbort = false;     // flag used to tell if plant structure can be checked
-        ExitDuringSimulations = false;       // flag used to tell if program is in simulation mode when fatal occurs
-        LastSevereError = "";
+        *this = ErrorTrackingData();
     }
 };
 

@@ -337,7 +337,8 @@ CHECKED_AND_OKED = {
             "isKoppen",
             "heatingDesignlinepassed",
             "coolingDesignlinepassed",
-            "desConditionlinepassed"
+            "desConditionlinepassed",
+            "insideLiquidPrecipitation",
         ],
         "produceDualUnitsFlags": [
             "produce_Sql",
@@ -499,6 +500,9 @@ CHECKED_AND_OKED = {
         # Updated docstring
         "ManageZoneEquipment": [
             "SimZone"
+        ],
+        "ReportZoneSizingDOASInputs": [
+            "headerAlreadyPrinted"
         ]
     }
 }

@@ -57,10 +57,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataAirLoop = std::make_unique<DataAirLoopData>();
     this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
     this->dataAirSystemsData = std::make_unique<AirSystemsData>();
-    this->dataAirflowNetwork = std::make_unique<AirflowNetworkData>();
-    this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
-    this->dataAFNProps = std::make_unique<DataAFNProps>();
-    this->dataAFNSolver = std::make_unique<AirflowNetworkSolverData>();
+    this->afn = std::make_unique<AirflowNetwork::Solver>(*this);
     this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
     this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
     this->dataBaseSizerScalableInputs = std::make_unique<BaseSizerWithScalableInputsData>();
@@ -80,6 +77,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataChillerGasAbsorption = std::make_unique<ChillerGasAbsorptionData>();
     this->dataChillerIndirectAbsorption = std::make_unique<ChillerIndirectAbsoprtionData>();
     this->dataChillerReformulatedEIR = std::make_unique<ChillerReformulatedEIRData>();
+    this->dataChillerElectricASHRAE205 = std::make_unique<ChillerElectricASHRAE205Data>();
     this->dataCoilCooingDX = std::make_unique<CoilCoolingDXData>();
     this->dataCondenserLoopTowers = std::make_unique<CondenserLoopTowersData>();
     this->dataConstruction = std::make_unique<ConstructionData>();
@@ -159,7 +157,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataHeatBalHAMTMgr = std::make_unique<HeatBalHAMTMgrData>();
     this->dataHeatBalIntHeatGains = std::make_unique<HeatBalInternalHeatGainsData>();
     this->dataHeatBalIntRadExchg = std::make_unique<HeatBalanceIntRadExchgData>();
-    this->dataHeatBalKivaMgr = std::make_unique<HeatBalanceKivaMgrData>();
     this->dataHeatBalMgr = std::make_unique<HeatBalanceMgrData>();
     this->dataHeatBalSurf = std::make_unique<HeatBalSurfData>();
     this->dataHeatBalSurfMgr = std::make_unique<HeatBalSurfMgr>();
@@ -197,7 +194,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataOutputReportTabularAnnual = std::make_unique<OutputReportTabularAnnualData>();
     this->dataOutputReports = std::make_unique<OutputReportsData>();
     this->dataOutsideEnergySrcs = std::make_unique<OutsideEnergySourcesData>();
-    this->dataPTHP = std::make_unique<PackagedTerminalHeatPumpData>();
     this->dataPackagedThermalStorageCoil = std::make_unique<PackagedThermalStorageCoilData>();
     this->dataPhotovoltaic = std::make_unique<PhotovoltaicsData>();
     this->dataPhotovoltaicState = std::make_unique<PhotovoltaicStateData>();
@@ -318,10 +314,7 @@ void EnergyPlusData::clear_state()
     this->dataAirLoop->clear_state();
     this->dataAirLoopHVACDOAS->clear_state();
     this->dataAirSystemsData->clear_state();
-    this->dataAirflowNetwork->clear_state();
-    this->dataAirflowNetworkBalanceManager->clear_state();
-    this->dataAFNSolver->clear_state();
-    this->dataAFNProps->clear_state();
+    this->afn->clear_state();
     this->dataBSDFWindow->clear_state();
     this->dataBaseSizerFanHeatInputs->clear_state();
     this->dataBaseSizerScalableInputs->clear_state();
@@ -341,6 +334,7 @@ void EnergyPlusData::clear_state()
     this->dataChillerGasAbsorption->clear_state();
     this->dataChillerIndirectAbsorption->clear_state();
     this->dataChillerReformulatedEIR->clear_state();
+    this->dataChillerElectricASHRAE205->clear_state();
     this->dataCoilCooingDX->clear_state();
     this->dataCondenserLoopTowers->clear_state();
     this->dataConstruction->clear_state();
@@ -420,7 +414,6 @@ void EnergyPlusData::clear_state()
     this->dataHeatBalHAMTMgr->clear_state();
     this->dataHeatBalIntHeatGains->clear_state();
     this->dataHeatBalIntRadExchg->clear_state();
-    this->dataHeatBalKivaMgr->clear_state();
     this->dataHeatBalMgr->clear_state();
     this->dataHeatBalSurf->clear_state();
     this->dataHeatBalSurfMgr->clear_state();
@@ -458,7 +451,6 @@ void EnergyPlusData::clear_state()
     this->dataOutputReportTabularAnnual->clear_state();
     this->dataOutputReports->clear_state();
     this->dataOutsideEnergySrcs->clear_state();
-    this->dataPTHP->clear_state();
     this->dataPackagedThermalStorageCoil->clear_state();
     this->dataPhotovoltaic->clear_state();
     this->dataPhotovoltaicState->clear_state();

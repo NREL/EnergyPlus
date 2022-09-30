@@ -74,6 +74,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
     this->active_fraction_of_face_coil_area = input_data.active_fraction_of_coil_face_area;
     if (this->active_fraction_of_face_coil_area < 1.0) this->adjustForFaceArea = true;
     this->rated_evap_fan_power_per_volume_flow_rate = input_data.rated_evaporator_fan_power_per_volume_flow_rate;
+    this->rated_evap_fan_power_per_volume_flow_rate_2023 = input_data.rated_evaporator_fan_power_per_volume_flow_rate_2023;
     this->evap_condenser_pump_power_fraction = input_data.rated_evaporative_condenser_pump_power_fraction;
     this->evap_condenser_effectiveness = input_data.evaporative_condenser_effectiveness;
     this->ratedWasteHeatFractionOfPowerInput = input_data.rated_waste_heat_fraction_of_power_input;
@@ -309,14 +310,15 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
         input_specs.gross_rated_cooling_COP = state.dataIPShortCut->rNumericArgs(5);
         input_specs.active_fraction_of_coil_face_area = state.dataIPShortCut->rNumericArgs(6);
         input_specs.rated_evaporator_fan_power_per_volume_flow_rate = state.dataIPShortCut->rNumericArgs(7);
-        input_specs.rated_evaporative_condenser_pump_power_fraction = state.dataIPShortCut->rNumericArgs(8);
-        input_specs.evaporative_condenser_effectiveness = state.dataIPShortCut->rNumericArgs(9);
+        input_specs.rated_evaporator_fan_power_per_volume_flow_rate_2023 = state.dataIPShortCut->rNumericArgs(8);
+        input_specs.rated_evaporative_condenser_pump_power_fraction = state.dataIPShortCut->rNumericArgs(9);
+        input_specs.evaporative_condenser_effectiveness = state.dataIPShortCut->rNumericArgs(10);
         input_specs.total_cooling_capacity_function_of_temperature_curve_name = state.dataIPShortCut->cAlphaArgs(2);
         input_specs.total_cooling_capacity_function_of_air_flow_fraction_curve_name = state.dataIPShortCut->cAlphaArgs(3);
         input_specs.energy_input_ratio_function_of_temperature_curve_name = state.dataIPShortCut->cAlphaArgs(4);
         input_specs.energy_input_ratio_function_of_air_flow_fraction_curve_name = state.dataIPShortCut->cAlphaArgs(5);
         input_specs.part_load_fraction_correlation_curve_name = state.dataIPShortCut->cAlphaArgs(6);
-        input_specs.rated_waste_heat_fraction_of_power_input = state.dataIPShortCut->rNumericArgs(10);
+        input_specs.rated_waste_heat_fraction_of_power_input = state.dataIPShortCut->rNumericArgs(11);
         input_specs.waste_heat_function_of_temperature_curve_name = state.dataIPShortCut->cAlphaArgs(7);
         input_specs.sensible_heat_ratio_modifier_function_of_temperature_curve_name = state.dataIPShortCut->cAlphaArgs(8);
         input_specs.sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name = state.dataIPShortCut->cAlphaArgs(9);
@@ -359,12 +361,22 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     // if (maxSpeeds > 1) preFixString = "Speed " + std::to_string(speedNum + 1) + " ";
     // stringOverride = preFixString + stringOverride;
     sizingCoolingAirFlow.overrideSizingString(stringOverride);
+    if (this->original_input_specs.evaporator_air_flow_fraction < 1.0) {
+        state.dataSize->DataDXCoolsLowSpeedsAutozize = true;
+        state.dataSize->DataFractionUsedForSizing = this->original_input_specs.evaporator_air_flow_fraction;
+    }
     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->evap_air_flow_rate = sizingCoolingAirFlow.size(state, this->evap_air_flow_rate, errorsFound);
 
     std::string SizingString = preFixString + "Gross Cooling Capacity [W]";
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
+    if (this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal < 1.0) {
+        state.dataSize->DataDXCoolsLowSpeedsAutozize = true;
+        state.dataSize->DataConstantUsedForSizing = -999.0;
+        state.dataSize->DataFlowUsedForSizing = this->parentModeRatedEvapAirFlowRate;
+        state.dataSize->DataFractionUsedForSizing = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal;
+    }
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->rated_total_capacity = sizerCoolingCapacity.size(state, this->rated_total_capacity, errorsFound);
 
@@ -386,6 +398,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
     }
     state.dataSize->DataFlowUsedForSizing = 0.0;
     state.dataSize->DataCapacityUsedForSizing = 0.0;
+    state.dataSize->DataTotCapCurveIndex = 0;
     state.dataSize->DataSizingFraction = 1.0;
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
@@ -407,6 +420,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 
     // reset for next speed or coil
     state.dataSize->DataConstantUsedForSizing = 0.0;
+    state.dataSize->DataDXCoolsLowSpeedsAutozize = false;
 }
 
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &state,

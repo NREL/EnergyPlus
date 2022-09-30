@@ -185,7 +185,6 @@ using ObjexxFCL::pow_4;
 using ObjexxFCL::pow_5;
 using ObjexxFCL::pow_6;
 using ObjexxFCL::pow_7;
-using ObjexxFCL::PRECISION;
 using ObjexxFCL::RANDOM_NUMBER;
 using ObjexxFCL::RANDOM_SEED;
 using ObjexxFCL::rjustified;

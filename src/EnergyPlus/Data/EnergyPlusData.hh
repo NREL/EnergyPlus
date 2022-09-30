@@ -63,9 +63,9 @@ namespace EnergyPlus {
 // forward declare all structs
 struct AirLoopHVACDOASData;
 struct AirSystemsData;
-struct AirflowNetworkBalanceManagerData;
-struct AirflowNetworkData;
-struct AirflowNetworkSolverData;
+namespace AirflowNetwork {
+    struct Solver;
+} // namespace AirflowNetwork
 struct BSDFWindowData;
 struct BaseSizerWithFanHeatInputsData;
 struct BaseSizerWithScalableInputsData;
@@ -83,6 +83,7 @@ struct ChillerExhaustAbsorptionData;
 struct ChillerGasAbsorptionData;
 struct ChillerIndirectAbsoprtionData;
 struct ChillerReformulatedEIRData;
+struct ChillerElectricASHRAE205Data;
 struct CoilCoolingDXData;
 struct CondenserLoopTowersData;
 struct ConstructionData;
@@ -95,7 +96,6 @@ struct CrossVentMgrData;
 struct CurveManagerData;
 struct DXCoilsData;
 struct DXFEarClippingData;
-struct DataAFNProps;
 struct DataAirLoopData;
 struct DataBranchAirLoopPlantData;
 struct DataDaylightingDevicesData;
@@ -172,7 +172,6 @@ struct HeatBalSurfMgr;
 struct HeatBalanceAirMgrData;
 struct HeatBalanceData;
 struct HeatBalanceIntRadExchgData;
-struct HeatBalanceKivaMgrData;
 struct HeatBalanceMgrData;
 struct HeatPumpWaterToWaterCOOLINGData;
 struct HeatPumpWaterToWaterHEATINGData;
@@ -211,7 +210,6 @@ struct OutputReportTabularData;
 struct OutputReportsData;
 struct OutputsData;
 struct OutsideEnergySourcesData;
-struct PackagedTerminalHeatPumpData;
 struct PackagedThermalStorageCoilData;
 struct PhotovoltaicStateData;
 struct PhotovoltaicThermalCollectorsData;
@@ -325,9 +323,7 @@ struct EnergyPlusData : BaseGlobalStruct
     // module globals
     std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
     std::unique_ptr<AirSystemsData> dataAirSystemsData;
-    std::unique_ptr<AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
-    std::unique_ptr<AirflowNetworkData> dataAirflowNetwork;
-    std::unique_ptr<AirflowNetworkSolverData> dataAFNSolver;
+    std::unique_ptr<AirflowNetwork::Solver> afn;
     std::unique_ptr<BSDFWindowData> dataBSDFWindow;
     std::unique_ptr<BaseSizerWithFanHeatInputsData> dataBaseSizerFanHeatInputs;
     std::unique_ptr<BaseSizerWithScalableInputsData> dataBaseSizerScalableInputs;
@@ -345,6 +341,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ChillerGasAbsorptionData> dataChillerGasAbsorption;
     std::unique_ptr<ChillerIndirectAbsoprtionData> dataChillerIndirectAbsorption;
     std::unique_ptr<ChillerReformulatedEIRData> dataChillerReformulatedEIR;
+    std::unique_ptr<ChillerElectricASHRAE205Data> dataChillerElectricASHRAE205;
     std::unique_ptr<CoilCoolingDXData> dataCoilCooingDX;
     std::unique_ptr<CondenserLoopTowersData> dataCondenserLoopTowers;
     std::unique_ptr<ConstructionData> dataConstruction;
@@ -357,7 +354,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<CurveManagerData> dataCurveManager;
     std::unique_ptr<DXCoilsData> dataDXCoils;
     std::unique_ptr<DXFEarClippingData> dataDXFEarClipping;
-    std::unique_ptr<DataAFNProps> dataAFNProps;
     std::unique_ptr<DataAirLoopData> dataAirLoop;
     std::unique_ptr<DataBranchAirLoopPlantData> dataBranchAirLoopPlant;
     std::unique_ptr<DataDaylightingDevicesData> dataDaylightingDevicesData;
@@ -434,7 +430,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<HeatBalanceAirMgrData> dataHeatBalAirMgr;
     std::unique_ptr<HeatBalanceData> dataHeatBal;
     std::unique_ptr<HeatBalanceIntRadExchgData> dataHeatBalIntRadExchg;
-    std::unique_ptr<HeatBalanceKivaMgrData> dataHeatBalKivaMgr;
     std::unique_ptr<HeatBalanceMgrData> dataHeatBalMgr;
     std::unique_ptr<HeatPumpWaterToWaterCOOLINGData> dataHPWaterToWaterClg;
     std::unique_ptr<HeatPumpWaterToWaterHEATINGData> dataHPWaterToWaterHtg;
@@ -473,7 +468,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<OutputReportsData> dataOutputReports;
     std::unique_ptr<OutputsData> dataOutput;
     std::unique_ptr<OutsideEnergySourcesData> dataOutsideEnergySrcs;
-    std::unique_ptr<PackagedTerminalHeatPumpData> dataPTHP;
     std::unique_ptr<PackagedThermalStorageCoilData> dataPackagedThermalStorageCoil;
     std::unique_ptr<PhotovoltaicStateData> dataPhotovoltaicState;
     std::unique_ptr<PhotovoltaicThermalCollectorsData> dataPhotovoltaicThermalCollector;

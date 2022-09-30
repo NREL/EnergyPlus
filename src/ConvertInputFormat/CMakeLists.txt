@@ -26,3 +26,47 @@ set_target_properties(ConvertInputFormat PROPERTIES VERSION ${ENERGYPLUS_VERSION
 set_target_properties(ConvertInputFormat PROPERTIES FOLDER Auxiliary)
 
 install(TARGETS ConvertInputFormat DESTINATION ./)
+
+if(BUILD_TESTING)
+
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst") # build/src/ConverInputFormat/tst
+  set(IDF_FILE "${PROJECT_SOURCE_DIR}/../../testfiles/1ZoneUncontrolled.idf")
+
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  configure_file(${IDF_FILE} "${TEST_DIR}/1ZoneUncontrolled.idf" COPYONLY)
+  configure_file(${IDF_FILE} "${TEST_DIR}/1.ZoneUncontrolled.idf" COPYONLY)
+
+  add_test(NAME ConvertInputFormat2.RegularFile_AbsolutePath
+    COMMAND  "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/test_convert_input_format.py"
+             --convertinputformat-exe $<TARGET_FILE:ConvertInputFormat>
+             --out-dir "${TEST_DIR}/RegularFile_AbsolutePath"
+             --expected-filename 1ZoneUncontrolled.epJSON
+             --input-file "${TEST_DIR}/1ZoneUncontrolled.idf"
+  )
+
+  add_test(NAME ConvertInputFormat2.RegularFile_RelativePath
+    COMMAND  "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/test_convert_input_format.py"
+             --convertinputformat-exe $<TARGET_FILE:ConvertInputFormat>
+             --out-dir "RegularFile_AbsolutePath"
+             --expected-filename 1ZoneUncontrolled.epJSON
+             --input-file "1ZoneUncontrolled.idf"
+    WORKING_DIRECTORY ${TEST_DIR}
+  )
+
+  add_test(NAME ConvertInputFormat2.ExtraDotFile_AbsolutePath
+    COMMAND  "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/test_convert_input_format.py"
+             --convertinputformat-exe $<TARGET_FILE:ConvertInputFormat>
+             --out-dir "${TEST_DIR}/ExtraDotFile_AbsolutePath"
+             --expected-filename 1.ZoneUncontrolled.epJSON
+             --input-file "${TEST_DIR}/1.ZoneUncontrolled.idf"
+  )
+
+  add_test(NAME ConvertInputFormat2.ExtraDotFile__RelativePath
+    COMMAND  "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/test_convert_input_format.py"
+             --convertinputformat-exe $<TARGET_FILE:ConvertInputFormat>
+             --out-dir "ExtraDotFile__RelativePath"
+             --expected-filename 1.ZoneUncontrolled.epJSON
+             --input-file "1.ZoneUncontrolled.idf"
+    WORKING_DIRECTORY ${TEST_DIR}
+  )
+endif()

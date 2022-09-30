@@ -50,6 +50,7 @@
 // Kiva Headers
 #include <libkiva/Errors.hpp>
 #ifdef GROUND_PLOT
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <libgroundplot/GroundPlot.hpp>
 #endif
 
@@ -79,8 +80,16 @@ namespace EnergyPlus::HeatBalanceKivaManager {
 
 void kivaErrorCallback(const int messageType, const std::string message, void *contextPtr)
 {
+    if (!contextPtr) {
+        throw FatalError(format("Unhandled Kiva Error: {}", message));
+    }
+    std::string fullMessage;
     std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)contextPtr;
-    std::string fullMessage = contextPair.second + ": " + message;
+    if (contextPair.second.size() > 0) {
+        fullMessage = format("{}: {}", contextPair.second, message);
+    } else {
+        fullMessage = format("Kiva: {}", message);
+    }
     if (messageType == Kiva::MSG_INFO) {
         ShowMessage(*contextPair.first, fullMessage);
     } else if (messageType == Kiva::MSG_WARN) {
@@ -135,26 +144,35 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
     if (constructionNum == 0) {
         constructionName = "Default Footing Wall Construction";
     } else {
-        constructionName = DataHeatBalance::Construct(constructionNum).Name;
+        constructionName = state.dataConstruction->Construct(constructionNum).Name;
     }
 
     ss.dir = format("{}/{} {:.2R} {}",
-                    FileSystem::getAbsolutePath(DataStringGlobals::outDirPathName),
+                    FileSystem::getAbsolutePath(state.dataStrGlobals->outDirPath),
                     state.dataSurface->Surface(floorSurface).Name,
-                    ground.foundation.foundationDepth,
+                    instance.ground->foundation.foundationDepth,
                     constructionName);
 
     debugDir = ss.dir;
     plotNum = 0;
-    double &l = ground.foundation.reductionLength2;
-    constexpr double width = 6.0;
-    const double depth = ground.foundation.foundationDepth + width / 2.0;
+    double &l = instance.ground->foundation.reductionLength2;
+    constexpr double width = 0.0;
+    const double depth = instance.ground->foundation.foundationDepth + width / 2.0;
     const double range = max(width, depth);
     ss.xRange = {l - range / 2.0, l + range / 2.0};
     ss.yRange = {0.5, 0.5};
-    ss.zRange = {-range, ground.foundation.wall.heightAboveGrade};
+    ss.zRange = {-range, instance.ground->foundation.wall.heightAboveGrade};
+    ss.grid = true;
+    ss.contours = false;
+    ss.size = 1600;
+    // ss.plotType = Kiva::SnapshotSettings::P_FLUX;
 
-    gp = Kiva::GroundPlot(ss, ground.domain, ground.foundation);
+    if (ss.plotType == Kiva::SnapshotSettings::P_FLUX) {
+        ss.minValue = 0.0;
+        ss.maxValue = 100.0;
+    }
+
+    gp = Kiva::GroundPlot(ss, instance.ground->domain, instance.ground->foundation);
 #endif
 
     int numAccelaratedTimesteps = 3;
@@ -252,44 +270,36 @@ void KivaInstanceMap::setInitialBoundaryConditions(
         case KIVAZONE_TEMPCONTROL: {
 
             int controlTypeSchId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).CTSchedIndex;
-            int controlType = ScheduleManager::LookUpScheduleValue(state, controlTypeSchId, hour, timestep);
+            auto controlType =
+                static_cast<DataHVACGlobals::ThermostatType>(ScheduleManager::LookUpScheduleValue(state, controlTypeSchId, hour, timestep));
 
-            if (controlType == 0) { // Uncontrolled
-
+            switch (controlType) {
+            case DataHVACGlobals::ThermostatType::Uncontrolled:
                 Tin = assumedFloatingTemp + DataGlobalConstants::KelvinConv;
-
-            } else if (controlType == DataHVACGlobals::SingleHeatingSetPoint) {
-
+                break;
+            case DataHVACGlobals::ThermostatType::SingleHeating: {
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_SingleHeatSetPoint;
-                int schTypeId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                int spSchId = state.dataZoneTempPredictorCorrector->SetPointSingleHeating(schTypeId).TempSchedIndex;
-                Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, spSchId, hour, timestep);
+                Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, schNameId, hour, timestep);
                 Tin = setpoint + DataGlobalConstants::KelvinConv;
-
-            } else if (controlType == DataHVACGlobals::SingleCoolingSetPoint) {
-
+                break;
+            }
+            case DataHVACGlobals::ThermostatType::SingleCooling: {
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_SingleCoolSetPoint;
-                int schTypeId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                int spSchId = state.dataZoneTempPredictorCorrector->SetPointSingleCooling(schTypeId).TempSchedIndex;
-                Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, spSchId, hour, timestep);
+                Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, schNameId, hour, timestep);
                 Tin = setpoint + DataGlobalConstants::KelvinConv;
-
-            } else if (controlType == DataHVACGlobals::SingleHeatCoolSetPoint) {
-
+                break;
+            }
+            case DataHVACGlobals::ThermostatType::SingleHeatCool: {
                 int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_SingleHeatCoolSetPoint;
-                int schTypeId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                int spSchId = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(schTypeId).TempSchedIndex;
-                Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, spSchId, hour, timestep);
+                Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, schNameId, hour, timestep);
                 Tin = setpoint + DataGlobalConstants::KelvinConv;
-
-            } else if (controlType == DataHVACGlobals::DualSetPointWithDeadBand) {
-
-                int schNameId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBand;
-                int schTypeId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                int heatSpSchId = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(schTypeId).HeatTempSchedIndex;
-                int coolSpSchId = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(schTypeId).CoolTempSchedIndex;
-                Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(state, heatSpSchId, hour, timestep);
-                Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(state, coolSpSchId, hour, timestep);
+                break;
+            }
+            case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand: {
+                int schNameIdHeat = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBandHeat;
+                int schNameIdCool = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBandCool;
+                Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(state, schNameIdHeat, hour, timestep);
+                Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(state, schNameIdCool, hour, timestep);
                 constexpr Real64 heatBalanceTemp = 10.0; // (assumed) degC
                 constexpr Real64 coolBalanceTemp = 15.0; // (assumed) degC
 
@@ -301,8 +311,9 @@ void KivaInstanceMap::setInitialBoundaryConditions(
                     Real64 weight = (coolBalanceTemp - bcs->outdoorTemp) / (coolBalanceTemp - heatBalanceTemp);
                     Tin = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobalConstants::KelvinConv;
                 }
-
-            } else {
+                break;
+            }
+            default:
                 Tin = 0.0;
                 ShowSevereError(state,
                                 format("Illegal control type for Zone={}, Found value={}, in Schedule={}",
@@ -379,7 +390,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
                             state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(floorSurface);  // HVAC
 
     bcs->slabConvectiveTemp = state.dataHeatBal->SurfTempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
-    bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface, false) + DataGlobalConstants::KelvinConv;
+    bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, floorSurface, false) + DataGlobalConstants::KelvinConv;
     bcs->gradeForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
     bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
     bcs->slabConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].in;
@@ -396,7 +407,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
 
         Real64 &A = state.dataSurface->Surface(wl).Area;
 
-        Real64 Trad = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, wl, false);
+        Real64 Trad = ThermalComfort::CalcSurfaceWeightedMRT(state, wl, false);
         Real64 Tconv = state.dataHeatBal->SurfTempEffBulkAir(wl);
 
         QAtotal += Q * A;
@@ -492,46 +503,43 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
         }
         if (Pos != std::string::npos) LineResult.data.erase(0, Pos + 1);
 
-        {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(Header(HdLine)));
-
-            if (SELECT_CASE_var == "DATA PERIODS") {
-                bool IOStatus;
-                uppercase(LineResult.data);
-                int NumHdArgs = 2;
-                int Count = 1;
-                while (Count <= NumHdArgs) {
-                    strip(LineResult.data);
-                    Pos = index(LineResult.data, ',');
-                    if (Pos == std::string::npos) {
-                        if (len(LineResult.data) == 0) {
-                            while (Pos == std::string::npos) {
-                                LineResult.update(kivaWeatherFile.readLine());
-                                strip(LineResult.data);
-                                uppercase(LineResult.data);
-                                Pos = index(LineResult.data, ',');
-                            }
-                        } else {
-                            Pos = len(LineResult.data);
+        if (UtilityRoutines::MakeUPPERCase(Header(HdLine)) == "DATA PERIODS") {
+            bool IOStatus;
+            uppercase(LineResult.data);
+            int NumHdArgs = 2;
+            int Count = 1;
+            while (Count <= NumHdArgs) {
+                strip(LineResult.data);
+                Pos = index(LineResult.data, ',');
+                if (Pos == std::string::npos) {
+                    if (len(LineResult.data) == 0) {
+                        while (Pos == std::string::npos) {
+                            LineResult.update(kivaWeatherFile.readLine());
+                            strip(LineResult.data);
+                            uppercase(LineResult.data);
+                            Pos = index(LineResult.data, ',');
                         }
+                    } else {
+                        Pos = len(LineResult.data);
                     }
-
-                    {
-                        auto const SELECT_CASE_var1(Count);
-
-                        if (SELECT_CASE_var1 == 1) {
-                            int NumDataPeriods = UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
-                            NumHdArgs += 4 * NumDataPeriods;
-                            // TODO: Error if more than one period? Less than full year?
-                        } else if (SELECT_CASE_var1 == 2) {
-                            kivaWeather.intervalsPerHour = UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
-                        }
-                    }
-                    LineResult.data.erase(0, Pos + 1);
-                    ++Count;
                 }
+
+                switch (Count) {
+                case 1:
+                    NumHdArgs += 4 * UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
+                    // TODO: Error if more than one period? Less than full year?
+                    break;
+                case 2:
+                    kivaWeather.intervalsPerHour = UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
+                    break;
+                default:
+                    break;
+                }
+                LineResult.data.erase(0, Pos + 1);
+                ++Count;
             }
         }
+
         ++HdLine;
         if (HdLine == 9) StillLooking = false;
     }
@@ -650,7 +658,8 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
 
 bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 {
-    Kiva::setMessageCallback(kivaErrorCallback, nullptr);
+    std::pair<EnergyPlusData *, std::string> contextPair{&state, ""};
+    Kiva::setMessageCallback(kivaErrorCallback, &contextPair);
     bool ErrorsFound = false;
 
     if (state.dataZoneCtrls->GetZoneAirStatsInputFlag) {
@@ -990,6 +999,9 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                 fnd.polygon = floorPolygon;
 
+                std::pair<EnergyPlusData *, std::string> contextPair{&state, format("Foundation:Kiva=\"{}\"", foundationInputs[surface.OSCPtr].name)};
+                Kiva::setMessageCallback(kivaErrorCallback, &contextPair);
+
                 // point surface to associated ground instance(s)
                 kivaInstances.emplace_back(state,
                                            fnd,
@@ -1010,7 +1022,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                     surfaceMap[wl].add_instance(kivaInstances[inst].instance.ground.get(), 1.0);
                 }
 
-                // Increment instnace counter
+                // Increment instance counter
                 inst++;
 
                 // Increment wall combinations iterator
@@ -1136,102 +1148,31 @@ void KivaManager::calcKivaInstances(EnergyPlusData &state)
         kv.setBoundaryConditions(state);
         kv.instance.calculate(timestep);
         kv.instance.calculate_surface_averages();
+#ifdef GROUND_PLOT
         if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
-            kv.plotDomain();
+            kv.plotDomain(state);
         }
+#endif
     }
 
     calcKivaSurfaceResults(state);
 }
 
-void KivaInstanceMap::plotDomain()
-{
-
 #ifdef GROUND_PLOT
+void KivaInstanceMap::plotDomain(EnergyPlusData &state)
+{
+    gp.createFrame(*instance.ground, format("{}/{} {}:00", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay));
 
-    std::size_t nI = gp.iMax - gp.iMin + 1;
-    std::size_t nJ = gp.jMax - gp.jMin + 1;
-
-    for (size_t k = gp.kMin; k <= gp.kMax; k++) {
-        for (size_t j = gp.jMin; j <= gp.jMax; j++) {
-            for (size_t i = gp.iMin; i <= gp.iMax; i++) {
-                std::size_t index = (i - gp.iMin) + nI * (j - gp.jMin) + nI * nJ * (k - gp.kMin);
-                if (gp.snapshotSettings.plotType == Kiva::SnapshotSettings::P_TEMP) {
-                    if (gp.snapshotSettings.outputUnits == Kiva::SnapshotSettings::IP) {
-                        gp.TDat.a[index] = (ground.TNew[i][j][k] - 273.15) * 9 / 5 + 32.0;
-                    } else {
-                        gp.TDat.a[index] = ground.TNew[i][j][k] - 273.15;
-                    }
-                } else {
-                    double &du = gp.distanceUnitConversion;
-                    std::vector<double> Qflux = ground.calculateHeatFlux(i, j, k);
-                    double &Qx = Qflux[0];
-                    double &Qy = Qflux[1];
-                    double &Qz = Qflux[2];
-                    double Qmag = sqrt(Qx * Qx + Qy * Qy + Qz * Qz);
-
-                    if (gp.snapshotSettings.fluxDir == Kiva::SnapshotSettings::D_M)
-                        gp.TDat.a[index] = Qmag / (du * du);
-                    else if (gp.snapshotSettings.fluxDir == Kiva::SnapshotSettings::D_X)
-                        gp.TDat.a[index] = Qx / (du * du);
-                    else if (gp.snapshotSettings.fluxDir == Kiva::SnapshotSettings::D_Y)
-                        gp.TDat.a[index] = Qy / (du * du);
-                    else if (gp.snapshotSettings.fluxDir == Kiva::SnapshotSettings::D_Z)
-                        gp.TDat.a[index] = Qz / (du * du);
-                }
-            }
-        }
-    }
-
-    gp.createFrame(fmt::to_string(state.dataEnvrn->Month) + "/" + fmt::to_string(state.dataEnvrn->DayOfMonth) + " " +
-                   fmt::to_string(state.dataGlobal->HourOfDay) + ":00");
-
-#ifndef NDEBUG
-
-    std::ofstream output;
-    output.open(debugDir + "/" + General::RoundSigDigits(plotNum) + ".csv");
-
-    std::size_t j = 0;
-
-    output << ", ";
-
-    for (std::size_t i = 0; i < ground.nX; i++) {
-
-        output << ", " << i;
-    }
-
-    output << "\n, ";
-
-    for (std::size_t i = 0; i < ground.nX; i++) {
-
-        output << ", " << ground.domain.meshX.centers[i];
-    }
-
-    output << "\n";
-
-    for (std::size_t k = ground.nZ - 1; k < ground.nZ; k--) { // k >= 0 used to be commented out but in the loop exit conditional check here
-
-        output << k << ", " << ground.domain.meshZ.centers[k];
-
-        for (std::size_t i = 0; i < ground.nX; i++) {
-            output << ", " << ground.TNew[i][j][k] - 273.15;
-        }
-
-        output << "\n";
-    }
-    output.close();
+    instance.ground->writeCSV(format("{}/{}.csv", debugDir, plotNum));
 
     plotNum++;
-
-#endif
-#endif
 }
+#endif
 
 void KivaManager::calcKivaSurfaceResults(EnergyPlusData &state)
 {
     for (auto surfNum : state.dataSurface->AllHTKivaSurfaceList) {
-        std::string contextStr = "Surface=\"" + state.dataSurface->Surface(surfNum).Name + "\"";
-        std::pair<EnergyPlusData *, std::string> contextPair{&state, "Surface=\"" + state.dataSurface->Surface(surfNum).Name + "\""};
+        std::pair<EnergyPlusData *, std::string> contextPair{&state, format("Surface=\"{}\"", state.dataSurface->Surface(surfNum).Name)};
         Kiva::setMessageCallback(kivaErrorCallback, &contextPair);
         surfaceMap[surfNum].calc_weighted_results();
         state.dataHeatBalSurf->SurfHConvInt(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;

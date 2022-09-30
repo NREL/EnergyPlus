@@ -536,8 +536,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
     state->dataSize->UnitarySysEqSizing(1).HeatingAirFlow = false;
 
-    // Test 24 - Airloop Equipment, CurDuctType = Main
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    // Test 24 - Airloop Equipment, CurDuctType = DataHVACGlobals::AirDuctType::Main
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -563,7 +563,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 26 - Airloop Equipment, CurDuctType = Cooling
-    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
     state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -589,8 +589,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_NEAR(1109.36, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 28 - Airloop Equipment, CurDuctType = Heating
-    state->dataSize->CurDuctType = DataHVACGlobals::Heating;
+    // Test 28 - Airloop Equipment, CurDuctType = DataHVACGlobals::AirDuctType::Heating
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Heating;
     state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -603,8 +603,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_NEAR(3496.91, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 29 - Airloop Equipment, CurDuctType = Other
-    state->dataSize->CurDuctType = DataHVACGlobals::Other;
+    // Test 29 - Airloop Equipment, CurDuctType = DataHVACGlobals::AirDuctType::Other
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Other;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -616,8 +616,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_NEAR(3858.66, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 30 - Airloop Equipment, CurDuctType = RAB
-    state->dataSize->CurDuctType = DataHVACGlobals::RAB;
+    // Test 30 - Airloop Equipment, CurDuctType = DataHVACGlobals::AirDuctType::RAB
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::RAB;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -629,11 +629,11 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_NEAR(3858.66, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    // Test 31 - Airloop Equipment, CurDuctType = Main, Unitary system does not set size for HW coils
+    // Test 31 - Airloop Equipment, CurDuctType = DataHVACGlobals::AirDuctType::Main, Unitary system does not set size for HW coils
     // even when AirLoopControlInfo(1).UnitarySysSimulating = true
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
     state->dataSize->UnitaryHeatCap = 4790.0;
-    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -807,7 +807,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataAirLoopHVACDOAS->airloopDOAS[0].HeatOutTemp = 5.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].PreheatTemp = 11.0;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
-    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
+    state->dataAirLoopHVACDOAS->airloopDOAS[0].FanBeforeCoolingCoilFlag = true;
     state->dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
 
     // start with an autosized value
@@ -818,8 +818,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    EXPECT_NEAR(6448.73, sizedValue, 0.01); // capacity includes system fan heat
-    sizer.autoSizedValue = 0.0;             // reset for next test
+    EXPECT_NEAR(6632.0666, sizedValue, 0.01); // capacity includes system fan heat
+    sizer.autoSizedValue = 0.0;               // reset for next test
 
     // reset eio stream
     has_eio_output(true);
@@ -840,7 +840,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_FALSE(errorsFound);
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Heating Capacity [W], 6448.73336\n"
+    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Heating Capacity [W], 6632.06669\n"
                             " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Heating Capacity [W], 4200.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }

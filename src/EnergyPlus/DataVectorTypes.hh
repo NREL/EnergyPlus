@@ -85,15 +85,14 @@ namespace DataVectorTypes {
     //  subscript lookup and are templates so we are using them as plug replacements
     //  for consistent API and to avoid cost of copying them
     // Note: For vectorization contexts std::array is a better choice
-    typedef ObjexxFCL::Vector3<Real64> Vector;
-    typedef ObjexxFCL::Vector2<Real64> Vector_2d;
+    using Vector = ObjexxFCL::Vector3<Real64>;
+    using Vector_2d = ObjexxFCL::Vector2<Real64>;
+    using ObjexxFCL::cross;
 
     struct Vector2dCount : Vector_2d
     {
-        int count;
-        Vector2dCount() : count(0)
-        {
-        }
+        int count{};
+        Vector2dCount() = default;
     };
 
     //    struct Vector // This is used to specify a point in 3D space
@@ -547,41 +546,35 @@ namespace DataVectorTypes {
     struct PlaneEq // This is used to specify a plane based on vectors in that plane
     {
         // Members
-        Real64 x;
-        Real64 y;
-        Real64 z;
-        Real64 w;
+        Real64 x{};
+        Real64 y{};
+        Real64 z{};
+        Real64 w{};
 
         // Default Constructor
-        PlaneEq()
-        {
-        }
+        PlaneEq() = default;
     };
 
     struct Face // Used to specify the face of a polyhedron
     {
         // Members
-        int NSides;  // Number of Sides for this Face
-        int SurfNum; // ALLOCATABLE to actual surface number
+        int NSides{};  // Number of Sides for this Face
+        int SurfNum{}; // ALLOCATABLE to actual surface number
         Array1D<Vector> FacePoints;
         Vector NewellAreaVector;
 
         // Default Constructor
-        Face() : NSides(0)
-        {
-        }
+        Face() = default;
     };
 
     struct Polyhedron // This is used to specify a polyhedron based on the vectors that comprise it (a zone).
     {
         // Members
-        int NumSurfaceFaces;
+        int NumSurfaceFaces{};
         Array1D<Face> SurfaceFace;
 
         // Default Constructor
-        Polyhedron() : NumSurfaceFaces(0)
-        {
-        }
+        Polyhedron() = default;
     };
 
     //    struct Vector_2d
@@ -618,14 +611,12 @@ namespace DataVectorTypes {
     struct dTriangle
     {
         // Members
-        int vv0;
-        int vv1;
-        int vv2;
+        int vv0{};
+        int vv1{};
+        int vv2{};
 
         // Default Constructor
-        dTriangle()
-        {
-        }
+        dTriangle() = default;
     };
 
 } // namespace DataVectorTypes

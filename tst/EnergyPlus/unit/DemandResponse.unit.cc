@@ -54,7 +54,9 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DemandManager.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::MixedAir;
@@ -92,6 +94,94 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
     EXPECT_DOUBLE_EQ(0.2, DemandMgr(1).FixedRate);
     EXPECT_TRUE(compare_enums(ManagerSelection::All, DemandMgr(1).SelectionControl));
     EXPECT_EQ(1, DemandMgr(1).NumOfLoads);
+}
+
+TEST_F(EnergyPlusFixture, DemandManagerAssignmentListGetInputTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "  DemandManagerAssignmentList,",
+        "    Demand Manager,          !- Name",
+        "    Electricity:Facility,    !- Meter Name",
+        "    Limit Schedule,          !- Demand Limit Schedule Name",
+        "    1.0,                     !- Demand Limit Safety Fraction",
+        "    ,                        !- Billing Period Schedule Name",
+        "    ,                        !- Peak Period Schedule Name",
+        "    15,                      !- Demand Window Length {minutes}",
+        "    SEQUENTIAL,              !- Demand Manager Priority",
+        "    DemandManager:ExteriorLights,  !- DemandManager 1 Object Type",
+        "    Ext Lights Manager 1;    !- DemandManager 1 Name",
+
+        "  Schedule:Compact,",
+        "    Limit Schedule,          !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    FOR: AllDays,            !- Field 2",
+        "    Until: 8:00,9999999,     !- Field 3",
+        "    Until: 20:00,10000,      !- Field 5",
+        "    Until: 24:00,9999999;    !- Field 7",
+
+        "  DemandManager:ExteriorLights,",
+        "    Ext Lights Manager,      !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    FIXED,                   !- Limit Control",
+        "    60,                      !- Minimum Limit Duration {minutes}",
+        "    0.0,                     !- Maximum Limit Fraction",
+        "    ,                        !- Limit Step Change",
+        "    ALL,                     !- Selection Control",
+        "    ,                        !- Rotation Duration {minutes}",
+        "    Exterior Lights;         !- Exterior Lights 1 Name",
+
+        "  Exterior:Lights,",
+        "    Exterior Lights,         !- Name",
+        "    ON,                      !- Schedule Name",
+        "    1000,                    !- Design Level {W}",
+        "    ScheduleNameOnly;        !- Control Option",
+
+        "  Schedule:Constant,",
+        "    ON,                      !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    1;                       !- TimeStep Value",
+
+        "  ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;              !- Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    ExteriorEnergyUse::GetExteriorEnergyUseInput(*state);
+    GetDemandManagerInput(*state);
+
+    int dMgrIndex = 0;
+    auto &DemandMgr(state->dataDemandManager->DemandMgr);
+    // check lights demand manager name
+    dMgrIndex = UtilityRoutines::FindItemInList("EXT LIGHTS MANAGER", DemandMgr);
+    auto &lightsDmndMgr = state->dataDemandManager->DemandMgr(dMgrIndex);
+    EXPECT_EQ("EXT LIGHTS MANAGER", lightsDmndMgr.Name);
+    // test expected fatal error due to wrong demand manager objet name
+    // object name in the list and in the object are different
+    std::string expected_error = delimited_string({
+        "   ** Severe  ** DemandManagerAssignmentList = \"DEMAND MANAGER\" invalid DemandManager Name = \"EXT LIGHTS MANAGER 1\" not found.",
+        "   **  Fatal  ** Errors found in processing input for DemandManagerAssignmentList.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=DemandManagerAssignmentList = \"DEMAND MANAGER\" invalid DemandManager Name = \"EXT LIGHTS MANAGER 1\" not "
+        "found.",
+    });
+
+    EXPECT_ANY_THROW(GetDemandManagerListInput(*state));
+    EXPECT_TRUE(compare_err_stream(expected_error, true));
 }
 
 } // namespace EnergyPlus

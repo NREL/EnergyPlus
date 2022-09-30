@@ -245,7 +245,6 @@ void GetStandAloneERV(EnergyPlusData &state)
     int NodeNumber;            // used to find zone with humidistat
     int HStatZoneNum;          // used to find zone with humidistat
     int NumHstatZone;          // index to humidity controlled zones
-    int ControlledZoneNum(0);  // used to find zone with humidistat
     bool ZoneNodeFound(false); // used to find zone with humidistat
     bool HStatFound(false);    // used to find zone with humidistat
     bool errFlag;              // Error flag used in mining calls
@@ -531,7 +530,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         //   Check to make sure inlet and exhaust nodes are listed in a ZoneHVAC:EquipmentConnections object
         ZoneInletNodeFound = false;
         ZoneExhaustNodeFound = false;
-        for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
             if (!ZoneInletNodeFound) {
                 for (NodeNumber = 1; NodeNumber <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++NodeNumber) {
                     if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNumber) ==
@@ -993,12 +992,10 @@ void GetStandAloneERV(EnergyPlusData &state)
             if (HStatZoneNum > 0) {
                 ZoneNodeFound = false;
                 HStatFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != HStatZoneNum) continue;
+                if (state.dataZoneEquip->ZoneEquipConfig(HStatZoneNum).IsControlled) {
                     //         Find the controlled zone number for the specified humidistat location
-                    thisOAController.NodeNumofHumidistatZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                    thisOAController.NodeNumofHumidistatZone = state.dataZoneEquip->ZoneEquipConfig(HStatZoneNum).ZoneNode;
                     ZoneNodeFound = true;
-                    break; // found zone node
                 }
                 if (!ZoneNodeFound) {
                     ShowSevereError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1444,8 +1441,6 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     static constexpr std::string_view RoutineName("SizeStandAloneERV: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNum;                       // Index to zone object
-    int ActualZoneNum;                 // Actual zone number
     std::string ZoneName;              // Name of zone
     Real64 ZoneMult;                   // Zone multiplier
     int PeopleNum;                     // Index to people object
@@ -1484,22 +1479,14 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
         //      Sizing objects are not required for stand alone ERV
         //      CALL CheckZoneSizing('ZoneHVAC:EnergyRecoveryVentilator',StandAloneERV(StandAloneERVNum)%Name)
         ZoneName = state.dataZoneEquip->ZoneEquipConfig(state.dataSize->CurZoneEqNum).ZoneName;
-        ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(state.dataSize->CurZoneEqNum).ActualZoneNum;
-        ZoneMult = state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier;
+        int ZoneNum = state.dataSize->CurZoneEqNum;
+        ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
         FloorArea = 0.0;
-        if (UtilityRoutines::SameString(ZoneName, state.dataHeatBal->Zone(ActualZoneNum).Name)) {
-            FloorArea = state.dataHeatBal->Zone(ActualZoneNum).FloorArea;
-        } else {
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (!UtilityRoutines::SameString(ZoneName, state.dataHeatBal->Zone(ZoneNum).Name)) continue;
-                FloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
-                break;
-            }
-        }
+        FloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
         NumberOfPeople = 0.0;
         MaxPeopleSch = 0.0;
         for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-            if (ActualZoneNum != state.dataHeatBal->People(PeopleNum).ZonePtr) continue;
+            if (ZoneNum != state.dataHeatBal->People(PeopleNum).ZonePtr) continue;
             PeopleSchPtr = state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr;
             MaxPeopleSch = GetScheduleMaxValue(state, PeopleSchPtr);
             NumberOfPeople = NumberOfPeople + (state.dataHeatBal->People(PeopleNum).NumberOfPeople * MaxPeopleSch);

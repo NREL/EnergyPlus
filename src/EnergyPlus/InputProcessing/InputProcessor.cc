@@ -508,7 +508,7 @@ int InputProcessor::getNumSectionsFound(std::string const &SectionWord)
     return static_cast<int>(SectionWord_iter.value().size());
 }
 
-int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string_view const &ObjectWord)
+int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string_view const ObjectWord)
 {
 
     // FUNCTION INFORMATION:
@@ -689,7 +689,7 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
 
 int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
-    // Return the value of fieldName in ep_object as an integer (rounded to nearest integer if the input value is real).
+    // Return the value of fieldName in ep_object as an integer.
     // If the field value is a string, then assume autosize or autocalulate and return DataGlobalConstants::AutoCalculate(-99999).
     // If the field is not present in ep_object then return its default if there is one, or return 0
 
@@ -701,26 +701,22 @@ int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_o
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
         auto const &field_value = it.value();
-        if (field_value.is_number()) {
-            if (field_value.is_number_integer()) {
-                value = field_value.get<std::int64_t>();
-            } else {
-                value = nint(field_value.get<double>());
-            }
-        } else {
-            bool is_empty = field_value.get<std::string>().empty();
-            if (is_empty) {
-                isDefaulted = findDefault(defaultValue, schema_field_obj);
-            } else {
-                value = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
+        if (field_value.is_number_integer()) {
+            value = field_value.get<std::int64_t>();
+        } else if (field_value.is_number()) {
+            // This is a developer error, floating point numbers should not be retrieved this way. If this field
+            // really is an int then the input processor will have forced it to be an integer.
+            assert(!field_value.is_number());
+        } else if (field_value.get<std::string>().empty()) {
+            isDefaulted = findDefault(defaultValue, schema_field_obj);
+            if (isDefaulted) {
+                value = static_cast<int>(defaultValue);
             }
         }
     } else {
         isDefaulted = findDefault(defaultValue, schema_field_obj);
         if (isDefaulted) {
-            value = nint(defaultValue);
-        } else {
-            value = 0.0;
+            value = static_cast<int>(defaultValue);
         }
     }
     return value;
@@ -1456,10 +1452,10 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
 }
 
 void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
-                                         std::string_view const &ObjectWord, // Object for definition
-                                         int &NumArgs,                       // How many arguments (max) this Object can have
-                                         int &NumAlpha,                      // How many Alpha arguments (max) this Object can have
-                                         int &NumNumeric                     // How many Numeric arguments (max) this Object can have
+                                         std::string_view const ObjectWord, // Object for definition
+                                         int &NumArgs,                      // How many arguments (max) this Object can have
+                                         int &NumAlpha,                     // How many Alpha arguments (max) this Object can have
+                                         int &NumNumeric                    // How many Numeric arguments (max) this Object can have
 )
 {
     // PURPOSE OF THIS SUBROUTINE:
@@ -1935,7 +1931,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string extension_key;
-    state.dataOutput->OutputVariablesForSimulation.reserve(1024);
+    // state.dataOutput->OutputVariablesForSimulation.reserve(1024);
     state.dataOutput->MaxConsideredOutputVariables = 10000;
 
     // Output Variable
@@ -2486,12 +2482,12 @@ void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, s
 
     auto const found = state.dataOutput->OutputVariablesForSimulation.find(VarName);
     if (found == state.dataOutput->OutputVariablesForSimulation.end()) {
-        std::unordered_map<std::string,
-                           DataOutputs::OutputReportingVariables,
-                           UtilityRoutines::case_insensitive_hasher,
-                           UtilityRoutines::case_insensitive_comparator>
+        std::map<std::string,
+                 DataOutputs::OutputReportingVariables,
+                 // UtilityRoutines::case_insensitive_hasher,
+                 UtilityRoutines::case_insensitive_comparator>
             data;
-        data.reserve(32);
+        // data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));
         state.dataOutput->OutputVariablesForSimulation.emplace(VarName, std::move(data));
     } else {

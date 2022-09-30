@@ -9,7 +9,7 @@ compilers:
     version: "7.5"
     build_type: Debug
     cmake_extra_flags: -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=3.8 -DPython_ROOT_DIR:PATH=~/.pyenv/versions/3.8.12/ -DBUILD_FORTRAN:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA:STRING=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DENABLE_PCH:BOOL=OFF
-    coverage_enabled: truec
+    coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
     coverage_pass_limit: 41.0
     coverage_warn_limit: 40.0

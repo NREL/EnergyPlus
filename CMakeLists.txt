@@ -339,12 +339,6 @@ if(BUILD_TESTING)
   set_target_properties(TestAPI_Runtime_C PROPERTIES FOLDER Testing)
   set_target_properties(TestAPI_Functional_C PROPERTIES FOLDER Testing)
   set_target_properties(TestEnergyPlusCallbacks PROPERTIES FOLDER Testing)
-
-  set_target_properties(btwxt_tests PROPERTIES FOLDER ThirdParty/Btwxt)
-  set_target_properties(kiva_tests PROPERTIES FOLDER ThirdParty/Kiva)
-  if(OPENGL_FOUND AND BUILD_PENUMBRA_TESTING)
-    set_target_properties(penumbra_tests PROPERTIES FOLDER ThirdParty/Penumbra)
-  endif()
 endif()
 
 add_subdirectory(src/ConvertInputFormat)
@@ -368,9 +362,9 @@ if(BUILD_FORTRAN)
     PROJECT Transition
     CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS}
     NO_EXTERNAL_INSTALL)
-  file(COPY "idd/V9-6-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V22-1-0-Energy+.idd")
-  file(COPY "src/Transition/SupportFiles/Report Variables 9-6-0 to 22-1-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  file(COPY "idd/V22-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V22-2-0-Energy+.idd")
+  file(COPY "src/Transition/SupportFiles/Report Variables 22-1-0 to 22-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   cmake_add_fortran_subdirectory(
     src/Basement
     PROJECT Basement

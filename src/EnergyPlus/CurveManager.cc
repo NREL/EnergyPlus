@@ -2496,7 +2496,7 @@ namespace CurveManager {
                                 state.dataCurveManager->PerfCurve(CurveIndex).Name);
         }
 
-        for (CurveIndex = 1; CurveIndex <= state.dataBranchAirLoopPlant->NumPressureCurves; ++CurveIndex) {
+        for (CurveIndex = 1; CurveIndex <= (int)state.dataBranchAirLoopPlant->PressureCurve.size(); ++CurveIndex) {
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 1 Value",
                                 OutputProcessor::Unit::None,
@@ -2539,7 +2539,7 @@ namespace CurveManager {
             } // All performance curves
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
-            for (CurveIndex = 1; CurveIndex <= state.dataBranchAirLoopPlant->NumPressureCurves; ++CurveIndex) {
+            for (CurveIndex = 1; CurveIndex <= (int)state.dataBranchAirLoopPlant->PressureCurve.size(); ++CurveIndex) {
                 SetupEMSActuator(state,
                                  "Curve",
                                  state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name,
@@ -3077,8 +3077,6 @@ namespace CurveManager {
                 }
             }
         }
-
-        state.dataBranchAirLoopPlant->NumPressureCurves = NumPressure;
 
         if (ErrsFound) {
             ShowFatalError(state, "GetPressureCurveInput: Errors found in Curve Objects.  Preceding condition(s) cause termination.");

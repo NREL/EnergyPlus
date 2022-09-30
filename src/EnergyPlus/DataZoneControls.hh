@@ -60,6 +60,17 @@ namespace EnergyPlus {
 
 namespace DataZoneControls {
 
+    // Average method parameter with multiple people objects in a zone
+    enum class AverageMethod
+    {
+        Invalid = -1,
+        NO,  // No multiple people objects
+        SPE, // Specific people object
+        OBJ, // People object average
+        PEO, // People number average
+        Num
+    };
+
     struct ZoneTempControls
     {
         // Members
@@ -68,14 +79,23 @@ namespace DataZoneControls {
         int ActualZoneNum;
         std::string ControlTypeSchedName; // Name of the schedule which determines the zone temp setpoint
         int CTSchedIndex;                 // Index for this schedule
+
+        // this is the number of control types defined on this zone control object
         int NumControlTypes;
-        Array1D_string ControlType;
-        Array1D_string ControlTypeName;
-        Array1D_int ControlTypeSchIndx;
+
+        // these are all allocated to NumControlTypes, should be a struct allocated once
+        Array1D_string ControlType; // from IDF, the "types" (string-should be an enum) of control modes for this particular thermostat - delete this
+        Array1D_string ControlTypeName;                           // from IDF, the names of the control modes for this particular thermostat
+        Array1D<DataHVACGlobals::ThermostatType> ControlTypeEnum; // from IDF, the enum types of each control mode for this particular thermostat
+
+        // these now reflect that actual underlying setpoint temperature schedule indexes for each possible control type,
+        // so they can be used to call directly to ScheduleValue(...)
         int SchIndx_SingleHeatSetPoint;
         int SchIndx_SingleCoolSetPoint;
         int SchIndx_SingleHeatCoolSetPoint;
-        int SchIndx_DualSetPointWDeadBand;
+        int SchIndx_DualSetPointWDeadBandHeat;
+        int SchIndx_DualSetPointWDeadBandCool;
+
         bool ManageDemand;                      // Flag to indicate whether to use demand limiting
         Real64 HeatingResetLimit;               // Lowest heating setpoint that can be set by demand manager [C]
         Real64 CoolingResetLimit;               // Highest cooling setpoint that can be set by demand manager [C]
@@ -115,14 +135,14 @@ namespace DataZoneControls {
         // Default Constructor
         ZoneTempControls()
             : ActualZoneNum(0), CTSchedIndex(0), NumControlTypes(0), SchIndx_SingleHeatSetPoint(0), SchIndx_SingleCoolSetPoint(0),
-              SchIndx_SingleHeatCoolSetPoint(0), SchIndx_DualSetPointWDeadBand(0), ManageDemand(false), HeatingResetLimit(0.0),
-              CoolingResetLimit(0.0), EMSOverrideHeatingSetPointOn(false), EMSOverrideHeatingSetPointValue(0.0), EMSOverrideCoolingSetPointOn(false),
-              EMSOverrideCoolingSetPointValue(0.0), OperativeTempControl(false), OpTempCntrlModeScheduled(false), FixedRadiativeFraction(0.0),
-              OpTempRadiativeFractionSched(0), AdaptiveComfortTempControl(false), AdaptiveComfortModelTypeIndex(0), ZoneOvercoolRange(0.0),
-              ZoneOvercoolControl(false), OvercoolCntrlModeScheduled(false), ZoneOvercoolConstRange(0.0), ZoneOvercoolRangeSchedIndex(0),
-              ZoneOvercoolControlRatio(0.0), DehumidifyingSchedIndex(0), DeltaTCutSet(0), ZoneThermostatSetPointHi(0.0),
-              ZoneThermostatSetPointLo(0.0), CoolModeLast(false), HeatModeLast(false), CoolModeLastSave(false), HeatModeLastSave(false),
-              CoolOffFlag(false), HeatOffFlag(false)
+              SchIndx_SingleHeatCoolSetPoint(0), SchIndx_DualSetPointWDeadBandHeat(0), SchIndx_DualSetPointWDeadBandCool(0), ManageDemand(false),
+              HeatingResetLimit(0.0), CoolingResetLimit(0.0), EMSOverrideHeatingSetPointOn(false), EMSOverrideHeatingSetPointValue(0.0),
+              EMSOverrideCoolingSetPointOn(false), EMSOverrideCoolingSetPointValue(0.0), OperativeTempControl(false), OpTempCntrlModeScheduled(false),
+              FixedRadiativeFraction(0.0), OpTempRadiativeFractionSched(0), AdaptiveComfortTempControl(false), AdaptiveComfortModelTypeIndex(0),
+              ZoneOvercoolRange(0.0), ZoneOvercoolControl(false), OvercoolCntrlModeScheduled(false), ZoneOvercoolConstRange(0.0),
+              ZoneOvercoolRangeSchedIndex(0), ZoneOvercoolControlRatio(0.0), DehumidifyingSchedIndex(0), DeltaTCutSet(0),
+              ZoneThermostatSetPointHi(0.0), ZoneThermostatSetPointLo(0.0), CoolModeLast(false), HeatModeLast(false), CoolModeLastSave(false),
+              HeatModeLastSave(false), CoolOffFlag(false), HeatOffFlag(false)
 
         {
         }
@@ -155,57 +175,47 @@ namespace DataZoneControls {
     struct ZoneComfortControls
     {
         // Members
-        std::string Name;                       // Name of the thermostat
-        std::string ZoneName;                   // Name of the zone
-        int ActualZoneNum;                      // Index number of zone
-        std::string ControlTypeSchedName;       // Name of the schedule which determines the zone temp setpoint
-        int ComfortSchedIndex;                  // Index for this schedule
-        int NumControlTypes;                    // Number of control types in ZoneControl:ThermalComfort object
-        Array1D_string ControlType;             // Type of control
-        Array1D_string ControlTypeName;         // Name of control type
-        Array1D_int ControlTypeSchIndx;         // Index to control type schedule
-        int SchIndx_SglHeatSetPointFanger;      // Index to fanger single heating setpoint schedule
-        int SchIndx_SglCoolSetPointFanger;      // Index to fanger single cooling setpoint schedule
-        int SchIndx_SglHCSetPointFanger;        // Index to fanger single heating/cooling setpoint schedule
-        int SchIndx_DualSetPointFanger;         // Index to fanger dual setpoint schedule
-        int SchIndx_SglHeatSetPointPierce;      // Index to pierce single heating setpoint schedule
-        int SchIndx_SglCoolSetPointPierce;      // Index to pierce single cooling setpoint schedule
-        int SchIndx_SglHCSetPointPierce;        // Index to pierce single heating/cooling setpoint schedule
-        int SchIndx_DualSetPointPierce;         // Index to pierce dual setpoint schedule
-        int SchIndx_SglHeatSetPointKSU;         // Index to KSU single heating setpoint schedule
-        int SchIndx_SglCoolSetPointKSU;         // Index to KSU single cooling setpoint schedule
-        int SchIndx_SglHCSetPointKSU;           // Index to KSU single heating/cooling setpoint schedule
-        int SchIndx_DualSetPointKSU;            // Index to KSU dual setpoint schedule
-        bool ManageDemand;                      // Flag to indicate whether to use demand limiting
-        Real64 HeatingResetLimit;               // Lowest heating setpoint that can be set by demand manager [C]
-        Real64 CoolingResetLimit;               // Highest cooling setpoint that can be set by demand manager [C]
-        bool EMSOverrideHeatingSetPointOn;      // EMS is calling to override heating setpoint
-        Real64 EMSOverrideHeatingSetPointValue; // value EMS is directing to use for heating setpoint
-        bool EMSOverrideCoolingSetPointOn;      // EMS is calling to override cooling setpoint
-        Real64 EMSOverrideCoolingSetPointValue; // value EMS is directing to use for cooling setpoint
-        Real64 TdbMaxSetPoint;                  // Maximum dry-bulb temperature setpoint [C]
-        Real64 TdbMinSetPoint;                  // Minimum dry-bulb temperature setpoint [C]
-        std::string AverageMethodName;          // Averaging Method for Zones with Multiple People Objects
-        std::string AverageObjectName;          // Object Name for Specific Object Average
-        int AverageMethodNum;                   // Numerical value for averaging method
-        int SpecificObjectNum;                  // People Object number used for Specific people object choice
-        int PeopleAverageErrIndex;              // People average error index
-        int TdbMaxErrIndex;                     // Single cooling setpoint error index
-        int TdbMinErrIndex;                     // Single heating setpoint error index
-        int TdbHCErrIndex;                      // Single heating cooling setpoint error index
-        int TdbDualMaxErrIndex;                 // Dual cooling setpoint error index
-        int TdbDualMinErrIndex;                 // Dual heating setpoint error index
+        std::string Name;                              // Name of the thermostat
+        std::string ZoneName;                          // Name of the zone
+        int ActualZoneNum;                             // Index number of zone
+        std::string ControlTypeSchedName;              // Name of the schedule which determines the zone temp setpoint
+        int ComfortSchedIndex;                         // Index for this schedule
+        int NumControlTypes;                           // Number of control types in ZoneControl:ThermalComfort object
+        Array1D_string ControlType;                    // Type of control
+        Array1D_string ControlTypeName;                // Name of control type
+        Array1D_int ControlTypeSchIndx;                // Index to control type schedule
+        int SchIndx_SingleHeating;                     // Index to fanger single heating setpoint schedule
+        int SchIndx_SingleCooling;                     // Index to fanger single cooling setpoint schedule
+        int SchIndx_SingleHeatCool;                    // Index to fanger single heating/cooling setpoint schedule
+        int SchIndx_DualSetPointWithDeadBand;          // Index to fanger dual setpoint schedule
+        bool ManageDemand;                             // Flag to indicate whether to use demand limiting
+        Real64 HeatingResetLimit;                      // Lowest heating setpoint that can be set by demand manager [C]
+        Real64 CoolingResetLimit;                      // Highest cooling setpoint that can be set by demand manager [C]
+        bool EMSOverrideHeatingSetPointOn;             // EMS is calling to override heating setpoint
+        Real64 EMSOverrideHeatingSetPointValue;        // value EMS is directing to use for heating setpoint
+        bool EMSOverrideCoolingSetPointOn;             // EMS is calling to override cooling setpoint
+        Real64 EMSOverrideCoolingSetPointValue;        // value EMS is directing to use for cooling setpoint
+        Real64 TdbMaxSetPoint;                         // Maximum dry-bulb temperature setpoint [C]
+        Real64 TdbMinSetPoint;                         // Minimum dry-bulb temperature setpoint [C]
+        std::string AverageMethodName;                 // Averaging Method for Zones with Multiple People Objects
+        std::string AverageObjectName;                 // Object Name for Specific Object Average
+        DataZoneControls::AverageMethod AverageMethod; // Averaging method
+        int SpecificObjectNum;                         // People Object number used for Specific people object choice
+        int PeopleAverageErrIndex;                     // People average error index
+        int TdbMaxErrIndex;                            // Single cooling setpoint error index
+        int TdbMinErrIndex;                            // Single heating setpoint error index
+        int TdbHCErrIndex;                             // Single heating cooling setpoint error index
+        int TdbDualMaxErrIndex;                        // Dual cooling setpoint error index
+        int TdbDualMinErrIndex;                        // Dual heating setpoint error index
 
         // Default Constructor
         ZoneComfortControls()
-            : ActualZoneNum(0), ComfortSchedIndex(0), NumControlTypes(0), SchIndx_SglHeatSetPointFanger(0), SchIndx_SglCoolSetPointFanger(0),
-              SchIndx_SglHCSetPointFanger(0), SchIndx_DualSetPointFanger(0), SchIndx_SglHeatSetPointPierce(0), SchIndx_SglCoolSetPointPierce(0),
-              SchIndx_SglHCSetPointPierce(0), SchIndx_DualSetPointPierce(0), SchIndx_SglHeatSetPointKSU(0), SchIndx_SglCoolSetPointKSU(0),
-              SchIndx_SglHCSetPointKSU(0), SchIndx_DualSetPointKSU(0), ManageDemand(false), HeatingResetLimit(0.0), CoolingResetLimit(0.0),
+            : ActualZoneNum(0), ComfortSchedIndex(0), NumControlTypes(0), SchIndx_SingleHeating(0), SchIndx_SingleCooling(0),
+              SchIndx_SingleHeatCool(0), SchIndx_DualSetPointWithDeadBand(0), ManageDemand(false), HeatingResetLimit(0.0), CoolingResetLimit(0.0),
               EMSOverrideHeatingSetPointOn(false), EMSOverrideHeatingSetPointValue(0.0), EMSOverrideCoolingSetPointOn(false),
               EMSOverrideCoolingSetPointValue(0.0), TdbMaxSetPoint(50.0), TdbMinSetPoint(0.0), AverageMethodName("PEOPLE AVERGAE"),
-              AverageMethodNum(0), SpecificObjectNum(0), PeopleAverageErrIndex(0), TdbMaxErrIndex(0), TdbMinErrIndex(0), TdbHCErrIndex(0),
-              TdbDualMaxErrIndex(0), TdbDualMinErrIndex(0)
+              AverageMethod(DataZoneControls::AverageMethod::NO), SpecificObjectNum(0), PeopleAverageErrIndex(0), TdbMaxErrIndex(0),
+              TdbMinErrIndex(0), TdbHCErrIndex(0), TdbDualMaxErrIndex(0), TdbDualMinErrIndex(0)
         {
         }
     };

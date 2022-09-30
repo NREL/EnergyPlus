@@ -101,14 +101,23 @@ using DataStringGlobals::CharComma;
 using DataStringGlobals::CharSpace;
 using DataStringGlobals::CharTab;
 
+constexpr std::array<std::string_view, static_cast<int>(DataSizing::OAFlowCalcMethod::Num)> OAFlowCalcMethodNamesUC{
+    "FLOW/PERSON",
+    "FLOW/ZONE",
+    "FLOW/AREA",
+    "AIRCHANGES/HOUR",
+    "SUM",
+    "MAXIMUM",
+    "INDOORAIRQUALITYPROCEDURE",
+    "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE",
+    "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY"};
+
 void ManageSizing(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   December 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine manages the sizing simulations (using design day condiions)
@@ -148,8 +157,6 @@ void ManageSizing(EnergyPlusData &state)
     int TimeStepInDay(0); // time step number
     int LastMonth(0);
     int LastDayOfMonth(0);
-    int CtrlZoneNum(0);       // controlled zone index
-    int ZoneNum(0);           // index into the Zone data array for the controlled zone
     Real64 TempAtPeak(0.0);   // Outside temperature at peak cooling/heating for reporting
     Real64 HumRatAtPeak(0.0); // Outside humidity ratio at peak cooling/heating for reporting
     int TimeStepAtPeak(0);    // time step number at heat or cool peak
@@ -261,6 +268,9 @@ void ManageSizing(EnergyPlusData &state)
             // the difference seen in the loads in the epluspls and epluszsz files are not
             // simple decreasing curves but appear as amost random fluctuations.
             state.dataGlobal->isPulseZoneSizing = (state.dataGlobal->CompLoadReportIsReq && (iZoneCalcIter == 1));
+            if (state.dataGlobal->DoPureLoadCalc && !state.dataGlobal->isPulseZoneSizing) {
+                state.dataGlobal->DoOutputReporting = true;
+            }
 
             Available = true;
 
@@ -281,17 +291,16 @@ void ManageSizing(EnergyPlusData &state)
 
                 ++NumSizingPeriodsPerformed;
 
-                state.dataGlobal->BeginEnvrnFlag = true;
-                if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) &&
-                    (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                         .suppressBegEnvReset)) {
-                    // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
-                    // more easily converge fewer warmup days are allowed
-                    DisplayString(state, "Suppressing Initialization of New Environment Parameters");
-                    state.dataGlobal->beginEnvrnWarmStartFlag = true;
-                } else {
-                    state.dataGlobal->beginEnvrnWarmStartFlag = false;
+                if (state.dataGlobal->DoPureLoadCalc && !state.dataGlobal->isPulseZoneSizing) {
+                    if (state.dataSQLiteProcedures->sqlite) {
+                        state.dataSQLiteProcedures->sqlite->sqliteBegin();
+                        state.dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+                            state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
+                        state.dataSQLiteProcedures->sqlite->sqliteCommit();
+                    }
                 }
+
+                state.dataGlobal->BeginEnvrnFlag = true;
                 state.dataGlobal->EndEnvrnFlag = false;
                 state.dataEnvrn->EndMonthFlag = false;
                 state.dataGlobal->WarmupFlag = true;
@@ -388,7 +397,7 @@ void ManageSizing(EnergyPlusData &state)
 
                     } // ... End hour loop.
 
-                    if (state.dataGlobal->EndDayFlag) {
+                    if (state.dataGlobal->EndDayFlag && !state.dataGlobal->WarmupFlag) {
                         UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
                         UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
                     }
@@ -483,16 +492,6 @@ void ManageSizing(EnergyPlusData &state)
             ++NumSizingPeriodsPerformed;
 
             state.dataGlobal->BeginEnvrnFlag = true;
-            if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) &&
-                (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                     .suppressBegEnvReset)) {
-                // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
-                // easily converge fewer warmup days are allowed
-                DisplayString(state, "Suppressing Initialization of New Environment Parameters");
-                state.dataGlobal->beginEnvrnWarmStartFlag = true;
-            } else {
-                state.dataGlobal->beginEnvrnWarmStartFlag = false;
-            }
             state.dataGlobal->EndEnvrnFlag = false;
             state.dataGlobal->WarmupFlag = false;
             state.dataGlobal->DayOfSim = 0;
@@ -594,9 +593,8 @@ void ManageSizing(EnergyPlusData &state)
 
     // report sizing results to eio file
     if (state.dataSize->ZoneSizingRunDone) {
-        for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
+        for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            ZoneNum = state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
             if (state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow > 0.0) {
                 TimeStepAtPeak = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
                 DDNum = state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDDNum;
@@ -613,7 +611,7 @@ void ManageSizing(EnergyPlusData &state)
                 }
                 ReportZoneSizing(state,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
-                                 "Cooling",
+                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolSizingType,
                                  state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad,
                                  state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
@@ -622,8 +620,8 @@ void ManageSizing(EnergyPlusData &state)
                                  state.dataSize->CoolPeakDateHrMin(CtrlZoneNum),
                                  TempAtPeak,
                                  HumRatAtPeak,
-                                 state.dataHeatBal->Zone(ZoneNum).FloorArea,
-                                 state.dataHeatBal->Zone(ZoneNum).TotOccupants,
+                                 state.dataHeatBal->Zone(CtrlZoneNum).FloorArea,
+                                 state.dataHeatBal->Zone(CtrlZoneNum).TotOccupants,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA,
                                  DOASHeatGainRateAtClPk);
                 curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
@@ -631,11 +629,11 @@ void ManageSizing(EnergyPlusData &state)
                     state, state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad);
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchZnClUserDesLd, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad);
-                if (state.dataHeatBal->Zone(ZoneNum).FloorArea != 0.0) {
+                if (state.dataHeatBal->Zone(CtrlZoneNum).FloorArea != 0.0) {
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchZnClUserDesLdPerArea,
                                      curName,
-                                     state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad / state.dataHeatBal->Zone(ZoneNum).FloorArea);
+                                     state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad / state.dataHeatBal->Zone(CtrlZoneNum).FloorArea);
                 }
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchZnClCalcDesAirFlow,
@@ -697,7 +695,7 @@ void ManageSizing(EnergyPlusData &state)
                 }
                 ReportZoneSizing(state,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
-                                 "Heating",
+                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatSizingType,
                                  state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad,
                                  state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
@@ -706,8 +704,8 @@ void ManageSizing(EnergyPlusData &state)
                                  state.dataSize->HeatPeakDateHrMin(CtrlZoneNum),
                                  TempAtPeak,
                                  HumRatAtPeak,
-                                 state.dataHeatBal->Zone(ZoneNum).FloorArea,
-                                 state.dataHeatBal->Zone(ZoneNum).TotOccupants,
+                                 state.dataHeatBal->Zone(CtrlZoneNum).FloorArea,
+                                 state.dataHeatBal->Zone(CtrlZoneNum).TotOccupants,
                                  state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA,
                                  DOASHeatGainRateAtHtPk);
                 curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
@@ -715,11 +713,11 @@ void ManageSizing(EnergyPlusData &state)
                     state, state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad);
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad);
-                if (state.dataHeatBal->Zone(ZoneNum).FloorArea != 0.0) {
+                if (state.dataHeatBal->Zone(CtrlZoneNum).FloorArea != 0.0) {
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchZnHtUserDesLdPerArea,
                                      curName,
-                                     state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad / state.dataHeatBal->Zone(ZoneNum).FloorArea);
+                                     state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad / state.dataHeatBal->Zone(CtrlZoneNum).FloorArea);
                 }
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow,
@@ -798,7 +796,11 @@ void ManageSizing(EnergyPlusData &state)
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
             } else if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == TotalCoolingLoad) {
-                coolPeakLoadKind = "Total";
+                if (FinalSysSizing(AirLoopNum).LoadSizeType == DataSizing::Latent && state.dataHeatBal->DoLatentSizing) {
+                    coolPeakLoadKind = "Total Based on Latent";
+                } else {
+                    coolPeakLoadKind = "Total";
+                }
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
@@ -1044,7 +1046,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                             designOAductFlow =
                                 DataSizing::calcDesignSpecificationOutdoorAir(state,
                                                                               state.dataDualDuct->dd_airterminal(dualDuctATUNum).OARequirementsPtr,
-                                                                              state.dataDualDuct->dd_airterminal(dualDuctATUNum).ActualZoneNum,
+                                                                              state.dataDualDuct->dd_airterminal(dualDuctATUNum).CtrlZoneNum,
                                                                               UseOccSchFlag,
                                                                               UseMinOASchFlag);
                             airLoopHeatingMinimumFlowRateSum += designOAductFlow;
@@ -1197,8 +1199,8 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             }
 
             // sum up heating and max flows for any four pipe cooled beam terminal units (the only one using the airTerminalPtr at this point)
-            if (allocated(AirDistUnit) && state.dataDefineEquipment->NumAirDistUnits > 0) {
-                for (int aDUNum = 1; aDUNum <= state.dataDefineEquipment->NumAirDistUnits; ++aDUNum) {
+            if (allocated(AirDistUnit) && (int)state.dataDefineEquipment->AirDistUnit.size() > 0) {
+                for (int aDUNum = 1; aDUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++aDUNum) {
                     if (AirDistUnit(aDUNum).airTerminalPtr.get() != nullptr) {
                         if (AirLoopNum == AirDistUnit(aDUNum).airTerminalPtr->getAirLoopNum()) {
                             airLoopHeatingMaximumFlowRateSum += AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
@@ -1333,7 +1335,6 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
 {
     auto &AirDistUnit(state.dataDefineEquipment->AirDistUnit);
     auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &TermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing);
     auto &VbzByZone(state.dataSize->VbzByZone);
     auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
 
@@ -1345,37 +1346,40 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         if (FinalSysSizing(AirLoopNum).OAAutoSized &&
-            (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP || state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) &&
+            (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::VRP ||
+             state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) &&
             state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != Ventilation) {
 
             // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
             // each zone
             for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
                 int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
                 if (state.dataSize->VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                     state.dataSize->ZdzClgByZone(termUnitSizingIndex) =
-                        min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
+                        min(1.0, thisTermUnitFinalZoneSizing.VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
                 } else { // would divide by zero, so set to max ??
                     state.dataSize->ZdzClgByZone(termUnitSizingIndex) = 1.0;
                 }
                 if (state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) > 0.0) {
                     state.dataSize->ZdzHtgByZone(termUnitSizingIndex) =
-                        min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozHtgByZone / state.dataSize->VdzMinHtgByZone(termUnitSizingIndex));
+                        min(1.0, thisTermUnitFinalZoneSizing.VozHtgByZone / state.dataSize->VdzMinHtgByZone(termUnitSizingIndex));
                 } else { // would divide by zero, so set to max
                     state.dataSize->ZdzHtgByZone(termUnitSizingIndex) = 1.0;
                 }
             }
             for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
                 int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
                 if (state.dataSize->VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                     state.dataSize->ZdzClgByZone(termUnitSizingIndex) =
-                        min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
+                        min(1.0, thisTermUnitFinalZoneSizing.VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
                 } else { // would divide by zero, so set to max ??
                     state.dataSize->ZdzClgByZone(termUnitSizingIndex) = 1.0;
                 }
                 if (state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) > 0.0) {
                     state.dataSize->ZdzHtgByZone(termUnitSizingIndex) =
-                        min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozHtgByZone / state.dataSize->VdzMinHtgByZone(termUnitSizingIndex));
+                        min(1.0, thisTermUnitFinalZoneSizing.VozHtgByZone / state.dataSize->VdzMinHtgByZone(termUnitSizingIndex));
                 } else { // would divide by zero, so set to max
                     state.dataSize->ZdzHtgByZone(termUnitSizingIndex) = 1.0;
                 }
@@ -1402,7 +1406,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
 
             // Fill Vps for cooling VRP calculation, use cooling design flow rate as adjusted in ManageSystemSizingAdjustments ( to use
             // conincident sizing result if available for block air flow
-            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
+            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
 
             // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
             state.dataSize->VpsHtgBySys(AirLoopNum) = 0.0;
@@ -1444,10 +1448,10 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                     } else {
                         termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     }
-                    Real64 Er = TermUnitFinalZoneSizing(termUnitSizingIndex)
-                                    .ZoneSecondaryRecirculation; // user input in Zone Air Distribution design spec object
+                    auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
+                    Real64 Er = thisTermUnitFinalZoneSizing.ZoneSecondaryRecirculation; // user input in Zone Air Distribution design spec object
 
-                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) { // 62.1 simplified procedure
                         if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
                             state.dataSize->EvzByZoneHeat(termUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
                         } else {
@@ -1456,14 +1460,12 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                         state.dataSize->EvzByZoneCool(termUnitSizingIndex) = state.dataSize->EvzByZoneHeat(termUnitSizingIndex);
                     } else if (Er > 0.0) { // 62.1 ventilation rate procedure - multi path zone
                         // Find Evz for cooling
-                        Real64 Ep_Clg =
-                            TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction; // as adjusted in ManageSystemSizingAdjustments();
+                        Real64 Ep_Clg = thisTermUnitFinalZoneSizing.ZonePrimaryAirFraction; // as adjusted in ManageSystemSizingAdjustments();
                         Real64 Fa_Clg = Ep_Clg + (1.0 - Ep_Clg) * Er;
                         state.dataSize->FaByZoneCool(termUnitSizingIndex) = Fa_Clg;
                         Real64 Fb_Clg = Ep_Clg;
                         state.dataSize->FbByZoneCool(termUnitSizingIndex) = Fb_Clg;
-                        Real64 Ez_Clg =
-                            TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling; // user input in Zone Air Distribution design spec object
+                        Real64 Ez_Clg = thisTermUnitFinalZoneSizing.ZoneADEffCooling; // user input in Zone Air Distribution design spec object
                         Real64 Fc_Clg = 1.0 - (1.0 - Ez_Clg) * (1.0 - Er) * (1 - Ep_Clg);
                         state.dataSize->FcByZoneCool(termUnitSizingIndex) = Fc_Clg;
                         state.dataSize->EvzByZoneCool(termUnitSizingIndex) =
@@ -1472,14 +1474,12 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                         // note that SimAirServingZones::LimitZoneVentEff is intended only for single path per I/O ref
 
                         // find Evz for heating
-                        Real64 Ep_Htg =
-                            TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg; // as adjusted in ManageSystemSizingAdjustments();
+                        Real64 Ep_Htg = thisTermUnitFinalZoneSizing.ZonePrimaryAirFractionHtg; // as adjusted in ManageSystemSizingAdjustments();
                         Real64 Fa_Htg = Ep_Htg + (1.0 - Ep_Htg) * Er;
                         state.dataSize->FaByZoneHeat(termUnitSizingIndex) = Fa_Htg;
                         Real64 Fb_Htg = Ep_Htg;
                         state.dataSize->FbByZoneCool(termUnitSizingIndex) = Fb_Htg;
-                        Real64 Ez_Htg =
-                            TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating; // user input in Zone Air Distribution design spec object
+                        Real64 Ez_Htg = thisTermUnitFinalZoneSizing.ZoneADEffHeating; // user input in Zone Air Distribution design spec object
                         Real64 Fc_Htg = 1.0 - (1.0 - Ez_Htg) * (1.0 - Er) * (1 - Ep_Htg);
                         state.dataSize->FcByZoneHeat(termUnitSizingIndex) = Fc_Htg;
                         state.dataSize->EvzByZoneHeat(termUnitSizingIndex) =
@@ -1518,22 +1518,23 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                 FinalSysSizing(AirLoopNum).DesOutAirVolFlow = max(state.dataSize->VotClgBySys(AirLoopNum), state.dataSize->VotHtgBySys(AirLoopNum));
             }
         } // system OA is autosized and VRP
-        else if ((FinalSysSizing(AirLoopNum).OAAutoSized && state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
+        else if ((FinalSysSizing(AirLoopNum).OAAutoSized && state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::VRP &&
                   state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones == 1)) { // single zone VRP
             int termUnitSizingIndex = 0;
             termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(1);
             if (termUnitSizingIndex == 0) {
                 termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(1);
             }
+            auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
             // single zone cooling
-            state.dataSize->VotClgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
-            state.dataSize->EvzByZoneCool(termUnitSizingIndex) = TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
+            state.dataSize->VotClgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffCooling;
+            state.dataSize->EvzByZoneCool(termUnitSizingIndex) = thisTermUnitFinalZoneSizing.ZoneADEffCooling;
             state.dataSize->EvzMinBySysCool(AirLoopNum) = state.dataSize->EvzByZoneCool(termUnitSizingIndex);
-            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
+            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
             state.dataSize->VpzClgSumBySys(AirLoopNum) = state.dataSize->VdzClgByZone(termUnitSizingIndex);
             // single zone heating
-            state.dataSize->VotHtgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
-            state.dataSize->EvzByZoneHeat(termUnitSizingIndex) = TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
+            state.dataSize->VotHtgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffHeating;
+            state.dataSize->EvzByZoneHeat(termUnitSizingIndex) = thisTermUnitFinalZoneSizing.ZoneADEffHeating;
             state.dataSize->EvzMinBySysHeat(AirLoopNum) = state.dataSize->EvzByZoneHeat(termUnitSizingIndex);
             state.dataSize->VpsHtgBySys(AirLoopNum) = state.dataSize->VpzMinHtgByZone(termUnitSizingIndex);
             state.dataSize->VpzHtgSumBySys(AirLoopNum) = state.dataSize->VpzHtgByZone(termUnitSizingIndex);
@@ -1549,7 +1550,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             state.dataSize->VpzClgSumBySys(AirLoopNum) = 0.0;
             // Fill Vps for cooling VRP calculation, use cooling design flow rate as adjusted in ManageSystemSizingAdjustments ( to use
             // conincident sizing result if available for block air flow
-            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
+            state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
             // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
             state.dataSize->VpsHtgBySys(AirLoopNum) = 0.0;
             state.dataSize->VpzHtgSumBySys(AirLoopNum) = 0.0; // for reporting only
@@ -1625,12 +1626,12 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                  state.dataSize->EvzMinBySysCool(AirLoopNum),
                                                  4); // Ev
         // Ev Calculation Methodology
-        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP) {
+        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::VRP) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchS62svrClEvMthd,
                                                      FinalSysSizing(AirLoopNum).AirPriLoopName,
                                                      "Standard 62.1 Ventilation Rate Procedure");
-        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchS62svrClEvMthd,
                                                      FinalSysSizing(AirLoopNum).AirPriLoopName,
@@ -1707,12 +1708,12 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                  state.dataSize->EvzMinBySysHeat(AirLoopNum),
                                                  4); // Ev
         // Ev Calculation Methodology
-        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP) {
+        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::VRP) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchS62svrHtEvMthd,
                                                      FinalSysSizing(AirLoopNum).AirPriLoopName,
                                                      "Standard 62.1 Ventilation Rate Procedure");
-        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchS62svrHtEvMthd,
                                                      FinalSysSizing(AirLoopNum).AirPriLoopName,
@@ -1763,59 +1764,58 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                         termUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                 }
                 if (MatchingCooledZoneNum == 0) {
+                    auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zvpAlN,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name); // Air loop name
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zvpRp,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).DesOAFlowPPer,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.DesOAFlowPPer,
                                                              6); // Rp
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zvpPz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).TotPeopleInZone,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.TotPeopleInZone,
                                                              4); // Pz
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zvpRa,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).DesOAFlowPerArea,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.DesOAFlowPerArea,
                                                              6); // Ra
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zvpAz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).TotalZoneFloorArea); // Az
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.TotalZoneFloorArea); // Az
                     OutputReportPredefined::PreDefTableEntry(
                         state,
                         state.dataOutRptPredefined->pdchS62zvpVbz,
-                        TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                        thisTermUnitFinalZoneSizing.ZoneName,
                         VbzByZone(termUnitSizingIndex),
                         4); // Vbz, now corrected so that Vbz does not already have system population term multiplied into it
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zvpClEz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneADEffCooling,
                                                              4); // Ez-clg
-                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling > 0.0) {
+                    if (thisTermUnitFinalZoneSizing.ZoneADEffCooling > 0.0) {
                         OutputReportPredefined::PreDefTableEntry(state,
                                                                  state.dataOutRptPredefined->pdchS62zvpClVoz,
-                                                                 TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 VbzByZone(termUnitSizingIndex) /
-                                                                     TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling,
+                                                                 thisTermUnitFinalZoneSizing.ZoneName,
+                                                                 VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffCooling,
                                                                  4); // Voz-clg
                     }
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zvpHtEz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneADEffHeating,
                                                              3); // Ez-htg
-                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating != 0.0) {
+                    if (thisTermUnitFinalZoneSizing.ZoneADEffHeating != 0.0) {
                         OutputReportPredefined::PreDefTableEntry(state,
                                                                  state.dataOutRptPredefined->pdchS62zvpHtVoz,
-                                                                 TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 VbzByZone(termUnitSizingIndex) /
-                                                                     TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating,
+                                                                 thisTermUnitFinalZoneSizing.ZoneName,
+                                                                 VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffHeating,
                                                                  4); // Voz-htg
                     }
                 }
@@ -1843,30 +1843,28 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             } else {
                 numZones = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
             }
-            for (int zoneNum = 1; zoneNum <= numZones; ++zoneNum) {
+            for (int airLoopZoneNum = 1; airLoopZoneNum <= numZones; ++airLoopZoneNum) {
                 int termUnitSizingIndex = 0;
                 int MatchingCooledZoneNum = 0;
                 if (coolHeatPass == 1) {
-                    termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                    termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(airLoopZoneNum);
                 } else {
-                    termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                    termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(airLoopZoneNum);
                     MatchingCooledZoneNum = General::FindNumberInList(
                         termUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                 }
                 if (MatchingCooledZoneNum == 0) {
-
+                    auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
                     // Zone ventilation parameters, (table 3)
-                    RpPzSum +=
-                        TermUnitFinalZoneSizing(termUnitSizingIndex).DesOAFlowPPer * TermUnitFinalZoneSizing(termUnitSizingIndex).TotPeopleInZone;
-                    RaAzSum += TermUnitFinalZoneSizing(termUnitSizingIndex).DesOAFlowPerArea *
-                               TermUnitFinalZoneSizing(termUnitSizingIndex).TotalZoneFloorArea;
-                    AzSum += TermUnitFinalZoneSizing(termUnitSizingIndex).TotalZoneFloorArea;
+                    RpPzSum += thisTermUnitFinalZoneSizing.DesOAFlowPPer * thisTermUnitFinalZoneSizing.TotPeopleInZone;
+                    RaAzSum += thisTermUnitFinalZoneSizing.DesOAFlowPerArea * thisTermUnitFinalZoneSizing.TotalZoneFloorArea;
+                    AzSum += thisTermUnitFinalZoneSizing.TotalZoneFloorArea;
                     VbzSum += VbzByZone(termUnitSizingIndex);
-                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling != 0.0) {
-                        VozClgSum += VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
+                    if (thisTermUnitFinalZoneSizing.ZoneADEffCooling != 0.0) {
+                        VozClgSum += VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffCooling;
                     }
-                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating != 0.0) {
-                        VozHtgSum += VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
+                    if (thisTermUnitFinalZoneSizing.ZoneADEffHeating != 0.0) {
+                        VozHtgSum += VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffHeating;
                     }
 
                     VpzMinClgSum += state.dataSize->VpzMinClgByZone(termUnitSizingIndex);
@@ -1877,170 +1875,170 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                     // Zone Ventilation Calculations for Cooling Design, (Table 5)
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdAlN,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
-                    for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
+                    for (int iAirDistUnit = 1; iAirDistUnit <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++iAirDistUnit) {
                         if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                             OutputReportPredefined::PreDefTableEntry(state,
                                                                      state.dataOutRptPredefined->pdchS62zcdBox,
-                                                                     TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                                     thisTermUnitFinalZoneSizing.ZoneName,
                                                                      AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
                             break; // if it has been found no more searching is needed
                         }
                     }
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdVpz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->VpzClgByZone(termUnitSizingIndex),
                                                              4); // Vpz LS:
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdVdz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->VdzClgByZone(termUnitSizingIndex),
                                                              4); // Vdz
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdVpzmin,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->VpzMinClgByZone(termUnitSizingIndex),
                                                              4); // Vpz-min
                     // Vpz-min, simplified procedure?
-                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).VpzMinByZoneSPSized) {
+                    if (thisTermUnitFinalZoneSizing.VpzMinByZoneSPSized) {
                         OutputReportPredefined::PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchS62zcdVpzminSPSize, TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName, "Yes");
+                            state, state.dataOutRptPredefined->pdchS62zcdVpzminSPSize, thisTermUnitFinalZoneSizing.ZoneName, "Yes");
                     } else {
                         OutputReportPredefined::PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchS62zcdVpzminSPSize, TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName, "No");
+                            state, state.dataOutRptPredefined->pdchS62zcdVpzminSPSize, thisTermUnitFinalZoneSizing.ZoneName, "No");
                     }
                     Real64 VozClg = 0.0;
-                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling > 0.0) {
-                        VozClg = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
+                    if (thisTermUnitFinalZoneSizing.ZoneADEffCooling > 0.0) {
+                        VozClg = VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffCooling;
                         OutputReportPredefined::PreDefTableEntry(state,
                                                                  state.dataOutRptPredefined->pdchS62zcdVozclg,
-                                                                 TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                                 thisTermUnitFinalZoneSizing.ZoneName,
                                                                  VozClg,
                                                                  4); // Voz-clg
                     }
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdZpz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->ZdzClgByZone(termUnitSizingIndex),
                                                              4); // Zpz = Voz/Vpz (see eq 6-5 in 62.1-2010)
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdEp,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZonePrimaryAirFraction,
                                                              4); // Ep
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdEr,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneSecondaryRecirculation,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneSecondaryRecirculation,
                                                              4); // Er
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdFa,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->FaByZoneCool(termUnitSizingIndex),
                                                              4); // Fa
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdFb,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->FbByZoneCool(termUnitSizingIndex),
                                                              4); // Fb
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdFc,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->FcByZoneCool(termUnitSizingIndex),
                                                              4); // Fc
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zcdEvz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->EvzByZoneCool(termUnitSizingIndex),
                                                              4); // Evz
 
                     // Zone Ventilation Calculations for Heating Design (Table 7)
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdAlN,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
-                    for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
+                    for (int iAirDistUnit = 1; iAirDistUnit <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++iAirDistUnit) {
                         if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                             OutputReportPredefined::PreDefTableEntry(state,
                                                                      state.dataOutRptPredefined->pdchS62zhdBox,
-                                                                     TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                                     thisTermUnitFinalZoneSizing.ZoneName,
                                                                      AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
                             break; // if it has been found no more searching is needed
                         }
                     }
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdVpz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->VpzHtgByZone(termUnitSizingIndex),
                                                              4); // Vpz
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdVdz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->VdzHtgByZone(termUnitSizingIndex),
                                                              4); // Vdz
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdVpzmin,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->VpzMinHtgByZone(termUnitSizingIndex),
                                                              4); // Vpz-min
                     // Vpz-min, simplified procedure?
-                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).VpzMinByZoneSPSized) {
+                    if (thisTermUnitFinalZoneSizing.VpzMinByZoneSPSized) {
                         OutputReportPredefined::PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchS62zhdVpzminSPSize, TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName, "Yes");
+                            state, state.dataOutRptPredefined->pdchS62zhdVpzminSPSize, thisTermUnitFinalZoneSizing.ZoneName, "Yes");
                     } else {
                         OutputReportPredefined::PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchS62zhdVpzminSPSize, TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName, "No");
+                            state, state.dataOutRptPredefined->pdchS62zhdVpzminSPSize, thisTermUnitFinalZoneSizing.ZoneName, "No");
                     }
                     Real64 VozHtg = 0.0;
-                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating != 0.0) {
-                        VozHtg = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
+                    if (thisTermUnitFinalZoneSizing.ZoneADEffHeating != 0.0) {
+                        VozHtg = VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffHeating;
                         OutputReportPredefined::PreDefTableEntry(state,
                                                                  state.dataOutRptPredefined->pdchS62zhdVozhtg,
-                                                                 TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                                 thisTermUnitFinalZoneSizing.ZoneName,
                                                                  VozHtg,
                                                                  4); // Voz-htg
                     }
                     // Outdoor Air Details Report - Design Zone Outdoor Airflow - Voz
                     Real64 VozMax = std::max(VozHtg, VozClg); // take larger of the heating and cooling Voz values
                     OutputReportPredefined::PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchOaMvDesZnOa, TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName, VozMax, 4);
-                    state.dataOutRptPredefined->TotalVozMax +=
-                        VozMax * state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
+                        state, state.dataOutRptPredefined->pdchOaMvDesZnOa, thisTermUnitFinalZoneSizing.ZoneName, VozMax, 4);
+                    state.dataOutRptPredefined->TotalVozMax += VozMax * state.dataHeatBal->Zone(thisTermUnitFinalZoneSizing.ZoneNum).Multiplier *
+                                                               state.dataHeatBal->Zone(thisTermUnitFinalZoneSizing.ZoneNum).ListMultiplier;
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdZpz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZpzHtgByZone,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZpzHtgByZone,
                                                              4); // Zpz = Voz/Vpz (see eq 6-5 in 62.1-2010)
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdEp,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZonePrimaryAirFractionHtg,
                                                              4); // Ep
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdEr,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneSecondaryRecirculation,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneSecondaryRecirculation,
                                                              4); // Er
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdFa,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->FaByZoneHeat(termUnitSizingIndex),
                                                              4); // Fa
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdFb,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->FbByZoneHeat(termUnitSizingIndex),
                                                              4); // Fb
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdFc,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->FcByZoneHeat(termUnitSizingIndex),
                                                              4); // Fc
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zhdEvz,
-                                                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                                                             thisTermUnitFinalZoneSizing.ZoneName,
                                                              state.dataSize->EvzByZoneHeat(termUnitSizingIndex),
                                                              4); // Evz
                 }
@@ -2154,7 +2152,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
     // first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
     bool anyVRPinModel(false);
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP || FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) {
+        if (FinalSysSizing(AirLoopNum).SystemOAMethod == SysOAMethod::VRP || FinalSysSizing(AirLoopNum).SystemOAMethod == SysOAMethod::SP) {
             anyVRPinModel = true;
             break;
         }
@@ -2171,11 +2169,11 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
             for (int zoneNumOnLoop = 1; zoneNumOnLoop <= state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
                 int CtrlZoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
                 for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                    if (state.dataHeatBal->People(PeopleNum).ZonePtr == state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
+                    if (state.dataHeatBal->People(PeopleNum).ZonePtr == state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum) {
                         state.dataSize->PzSumBySys(AirLoopNum) +=
                             (state.dataHeatBal->People(PeopleNum).NumberOfPeople *
-                             state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
-                             state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
+                             state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum).Multiplier *
+                             state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum).ListMultiplier);
                     }
                 }
             }
@@ -2218,11 +2216,11 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
                             int CtrlZoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
 
                             for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                                if (state.dataHeatBal->People(PeopleNum).ZonePtr == state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
+                                if (state.dataHeatBal->People(PeopleNum).ZonePtr == state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum) {
                                     Real64 PeopleInZone =
                                         (state.dataHeatBal->People(PeopleNum).NumberOfPeople *
-                                         state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
-                                         state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
+                                         state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum).Multiplier *
+                                         state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum).ListMultiplier);
                                     Real64 schMultiplier = ScheduleManager::LookUpScheduleValue(
                                         state, state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr, hrOfDay, TS);
                                     PeopleInZone = PeopleInZone * schMultiplier;
@@ -2474,29 +2472,12 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     // DERIVED TYPE DEFINITIONS
     // na
 
+    auto &thisOARequirements(state.dataSize->OARequirements(OAIndex));
+
     if (NumAlphas > 1) {
-        if (UtilityRoutines::SameString(Alphas(2), "Flow/Person")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowPPer;
-        } else if (UtilityRoutines::SameString(Alphas(2), "Flow/Zone")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlow;
-        } else if (UtilityRoutines::SameString(Alphas(2), "Flow/Area")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowPerArea;
-        } else if (UtilityRoutines::SameString(Alphas(2), "AirChanges/Hour")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowACH;
-        } else if (UtilityRoutines::SameString(Alphas(2), "Sum")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowSum;
-        } else if (UtilityRoutines::SameString(Alphas(2), "Maximum")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowMax;
-        } else if (UtilityRoutines::SameString(Alphas(2),
-                                               "INDOORAIRQUALITYPROCEDURE")) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = ZOAM_IAQP;
-        } else if (UtilityRoutines::SameString(
-                       Alphas(2), "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE")) { // Proportional Control based on ASHRAE Standard 62.1-2004
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = ZOAM_ProportionalControlSchOcc;
-        } else if (UtilityRoutines::SameString(
-                       Alphas(2), "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY")) { // Proportional Control based on ASHRAE Standard 62.1-2004
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = ZOAM_ProportionalControlDesOcc;
-        } else {
+        thisOARequirements.OAFlowMethod =
+            static_cast<OAFlowCalcMethod>(getEnumerationValue(OAFlowCalcMethodNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(2))));
+        if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Invalid) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
             ShowContinueError(state, "...Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\",");
             ShowContinueError(state,
@@ -2506,7 +2487,7 @@ void ProcessInputOARequirements(EnergyPlusData &state,
         }
     } else {
         // default value for Outdoor Air Method
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowPPer;
+        thisOARequirements.OAFlowMethod = OAFlowCalcMethod::PerPerson;
     }
     if (NumNumbers > 0) {
         state.dataSize->OARequirements(OAIndex).OAFlowPerPerson = Numbers(1);
@@ -2516,29 +2497,26 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     }
     // if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it
     // being counted later #4378
-    if (state.dataSize->OARequirements(OAIndex).OAFlowMethod != OAFlowPPer && state.dataSize->OARequirements(OAIndex).OAFlowMethod != OAFlowSum &&
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod != OAFlowMax &&
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod != ZOAM_ProportionalControlSchOcc &&
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod != ZOAM_ProportionalControlDesOcc &&
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod != ZOAM_IAQP) {
+    if (thisOARequirements.OAFlowMethod != OAFlowCalcMethod::PerPerson && thisOARequirements.OAFlowMethod != OAFlowCalcMethod::Sum &&
+        thisOARequirements.OAFlowMethod != OAFlowCalcMethod::Max && thisOARequirements.OAFlowMethod != OAFlowCalcMethod::PCOccSch &&
+        thisOARequirements.OAFlowMethod != OAFlowCalcMethod::PCDesOcc && thisOARequirements.OAFlowMethod != OAFlowCalcMethod::IAQProcedure) {
         state.dataSize->OARequirements(OAIndex).OAFlowPerPerson = 0.0;
     }
     // remaining fields default to 0
     if (NumNumbers > 1) {
-        if (state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowPerArea ||
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowSum || state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowMax) {
+        if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::PerArea || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Sum ||
+            thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Max) {
             state.dataSize->OARequirements(OAIndex).OAFlowPerArea = Numbers(2);
-        } else if (state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_ProportionalControlSchOcc ||
-                   state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_ProportionalControlDesOcc ||
-                   state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_IAQP) {
+        } else if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::PCOccSch || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::PCDesOcc ||
+                   thisOARequirements.OAFlowMethod == OAFlowCalcMethod::IAQProcedure) {
             state.dataSize->OARequirements(OAIndex).OAFlowPerArea = Numbers(2);
         } else {
             state.dataSize->OARequirements(OAIndex).OAFlowPerArea = 0.0;
         }
     }
     if (NumNumbers > 2) {
-        if (state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlow || state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowSum ||
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowMax || state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_IAQP) {
+        if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::PerZone || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Sum ||
+            thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Max || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::IAQProcedure) {
             state.dataSize->OARequirements(OAIndex).OAFlowPerZone = Numbers(3);
         } else {
             state.dataSize->OARequirements(OAIndex).OAFlowPerZone = 0.0;
@@ -2546,8 +2524,8 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     }
 
     if (NumNumbers > 3) {
-        if (state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowACH || state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowSum ||
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowMax || state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_IAQP) {
+        if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::ACH || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Sum ||
+            thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Max || thisOARequirements.OAFlowMethod == OAFlowCalcMethod::IAQProcedure) {
             state.dataSize->OARequirements(OAIndex).OAFlowACH = Numbers(4);
         } else {
             state.dataSize->OARequirements(OAIndex).OAFlowACH = 0.0;
@@ -3001,6 +2979,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
 
             for (Item1 = 1; Item1 <= SizingZoneObjects(Item).NumOfZones; ++Item1) {
                 ++ZoneSizIndex;
+                auto &zoneSizingIndex = state.dataSize->ZoneSizingInput(ZoneSizIndex);
                 if (!SizingZoneObjects(Item).ZoneListActive) {
                     if (SizingZoneObjects(Item).ZoneOrZoneListPtr > 0) {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName = ZoneNames(SizingZoneObjects(Item).ZoneOrZoneListPtr);
@@ -3082,12 +3061,6 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod = SupplyAirTemperature;
                     } else if (heatingSATMethod == "TEMPERATUREDIFFERENCE") {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod = TemperatureDifference;
-                    } else {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                        ShowContinueError(
-                            state, "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\"");
-                        ShowContinueError(state, "... valid values are SupplyAirTemperature or TemperatureDifference.");
-                        ErrorsFound = true;
                     }
                 }
                 //  N3, \field Zone Heating Design Supply Air Temperature
@@ -3482,6 +3455,60 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
+                zoneSizingIndex.zoneSizingMethod = static_cast<DataSizing::ZoneSizing>(
+                    getEnumerationValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+                if (zoneSizingIndex.zoneSizingMethod != ZoneSizing::SensibleOnly) {
+                    zoneSizingIndex.zoneLatentSizing = true;
+                    state.dataHeatBal->DoLatentSizing = true;
+                }
+                zoneSizingIndex.ZnLatCoolDgnSAMethod =
+                    (state.dataIPShortCut->cAlphaArgs(11) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
+                zoneSizingIndex.LatentCoolDesHumRat = state.dataIPShortCut->rNumericArgs(19);
+                zoneSizingIndex.CoolDesHumRatDiff = state.dataIPShortCut->rNumericArgs(20);
+                zoneSizingIndex.ZnLatHeatDgnSAMethod =
+                    (state.dataIPShortCut->cAlphaArgs(12) == "SUPPLYAIRHUMIDITYRATIO") ? SupplyAirHumidityRatio : HumidityRatioDifference;
+                zoneSizingIndex.LatentHeatDesHumRat = state.dataIPShortCut->rNumericArgs(21);
+                zoneSizingIndex.HeatDesHumRatDiff = state.dataIPShortCut->rNumericArgs(22);
+                if (NumAlphas > 12 && !state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                    zoneSizingIndex.zoneRHDehumidifySchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
+                    if (zoneSizingIndex.zoneRHDehumidifySchIndex == 0) {
+                        ShowWarningError(state,
+                                         format("{} = \"{}\", invalid Zone Humidistat Dehumidification Set Point Schedule Name = {}. Schedule will "
+                                                "not be used and simulation continues.",
+                                                cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                state.dataIPShortCut->cAlphaArgs(13)));
+                    }
+                }
+                if (NumAlphas > 13 && !state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                    zoneSizingIndex.zoneRHHumidifySchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(14));
+                    if (zoneSizingIndex.zoneRHHumidifySchIndex == 0) {
+                        ShowWarningError(state,
+                                         format("{} = \"{}\", invalid Zone Humidistat Humidification Set Point Schedule Name = {}. Schedule will "
+                                                "not be used and simulation continues.",
+                                                cCurrentModuleObject,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                state.dataIPShortCut->cAlphaArgs(14)));
+                    } else if (zoneSizingIndex.zoneRHDehumidifySchIndex) {
+                        // check max and min of each schedule and compare RHHumidify > RHDehumidify and warn
+                        Real64 maxHumidify = ScheduleManager::GetScheduleMaxValue(state, zoneSizingIndex.zoneRHHumidifySchIndex);
+                        Real64 minDehumidify = ScheduleManager::GetScheduleMinValue(state, zoneSizingIndex.zoneRHDehumidifySchIndex);
+                        if (maxHumidify > minDehumidify) {
+                            ShowWarningError(
+                                state,
+                                format("{} = \"{}\", maximum value ({}%) of Zone Humidistat Humidification Set Point Schedule Name = {} is "
+                                       "greater than minimum value ({}%) of Zone Humidistat Dehumidifcation Set Point Schedule Name = {}. "
+                                       "Humidification set point will be limited by Dehumidification set point during zone sizing and simulation "
+                                       "continues.",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       maxHumidify,
+                                       state.dataIPShortCut->cAlphaArgs(14),
+                                       minDehumidify,
+                                       state.dataIPShortCut->cAlphaArgs(13)));
+                        }
+                    }
+                }
             }
         }
     }
@@ -3503,7 +3530,7 @@ void ReportTemperatureInputError(
                                      state.dataIPShortCut->rNumericArgs(paramNum),
                                      state.dataIPShortCut->cNumericFieldNames(paramNum - 2),
                                      state.dataIPShortCut->rNumericArgs(paramNum - 2)));
-            ShowContinueError(state, format("This is not allowed.  Please check and revise your input."));
+            ShowContinueError(state, "This is not allowed.  Please check and revise your input.");
             ErrorsFound = true;
         } else { // then input is lower than comparison tempeature--just produce a warning for user to check input
             ShowWarningError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
@@ -3512,7 +3539,7 @@ void ReportTemperatureInputError(
                                      state.dataIPShortCut->cNumericFieldNames(paramNum),
                                      state.dataIPShortCut->rNumericArgs(paramNum),
                                      comparisonTemperature));
-            ShowContinueError(state, format("Please check your input to make sure this is correct."));
+            ShowContinueError(state, "Please check your input to make sure this is correct.");
         }
     }
 }
@@ -3708,25 +3735,19 @@ void GetSystemSizingInput(EnergyPlusData &state)
             auto const loadSizeType(state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum));
             if (loadSizeType == "SENSIBLE") {
                 SysSizInput(SysSizIndex).LoadSizeType = Sensible;
-                // } else if ( loadSizeType == "LATENT" ) {
-                // SysSizInput( SysSizIndex ).LoadSizeType = Latent;
+            } else if (loadSizeType == "LATENT") {
+                SysSizInput(SysSizIndex).LoadSizeType = Latent;
             } else if (loadSizeType == "TOTAL") {
                 SysSizInput(SysSizIndex).LoadSizeType = Total;
             } else if (loadSizeType == "VENTILATIONREQUIREMENT") {
                 SysSizInput(SysSizIndex).LoadSizeType = Ventilation;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iLoadTypeSizeAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are Sensible, Total, or VentilationRequirement.");
-                ErrorsFound = true;
             }
         }
         // assign CoolingPeakLoadType based on LoadSizeType for now
         if (SysSizInput(SysSizIndex).LoadSizeType == Sensible) {
             SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
-        } else if (SysSizInput(SysSizIndex).LoadSizeType == Total) {
+        } else if (SysSizInput(SysSizIndex).LoadSizeType == Total ||
+                   (SysSizInput(SysSizIndex).LoadSizeType == Latent && state.dataHeatBal->DoLatentSizing)) {
             SysSizInput(SysSizIndex).CoolingPeakLoadType = TotalCoolingLoad;
         } else {
             SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
@@ -3998,9 +4019,9 @@ void GetSystemSizingInput(EnergyPlusData &state)
         {
             auto const systemOAMethod(state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum));
             if (systemOAMethod == "ZONESUM") {
-                SysSizInput(SysSizIndex).SystemOAMethod = SOAM_ZoneSum;
+                SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::ZoneSum;
             } else if (systemOAMethod == "STANDARD62.1VENTILATIONRATEPROCEDURE") {
-                SysSizInput(SysSizIndex).SystemOAMethod = SOAM_VRP;
+                SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::VRP;
                 if (SysSizInput(SysSizIndex).LoadSizeType == Ventilation) {
                     ShowWarningError(
                         state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid combination of inputs.");
@@ -4010,7 +4031,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                                           state.dataIPShortCut->cAlphaFieldNames(iSystemOASMethodAlphaNum) + " = " +
                                           state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum) + ".");
                     ShowContinueError(state, "Resetting System Outdoor Air Method to ZoneSum.");
-                    SysSizInput(SysSizIndex).SystemOAMethod = SOAM_ZoneSum;
+                    SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::ZoneSum;
                 } else {
                     if (SysSizInput(SysSizIndex).DesOutAirVolFlow > 0) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
@@ -4020,7 +4041,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                     }
                 }
             } else if (systemOAMethod == "STANDARD62.1SIMPLIFIEDPROCEDURE") {
-                SysSizInput(SysSizIndex).SystemOAMethod = SOAM_SP;
+                SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::SP;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
                 ShowContinueError(state,
@@ -4421,7 +4442,6 @@ void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
         state.dataGlobal->BeginDayFlag = false;
         state.dataGlobal->BeginEnvrnFlag = false;
         state.dataGlobal->BeginSimFlag = false;
-        state.dataGlobal->BeginFullSimFlag = false;
 
         //          ! do another timestep=1
         ManageWeather(state);

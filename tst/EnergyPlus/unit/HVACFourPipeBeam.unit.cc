@@ -236,7 +236,6 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
                                             DataLoopNode::ObjectIsNotParent,
                                             "Test zone node");
 
-    state->dataDefineEquipment->NumAirDistUnits = 1;
     state->dataDefineEquipment->AirDistUnit.allocate(1);
     state->dataDefineEquipment->AirDistUnit(1).EquipName(1) =
         "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP
@@ -261,7 +260,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
                           "    YES,                     !- Do System Sizing Calculation",
                           "    YES,                     !- Do Plant Sizing Calculation",
                           "    Yes,                     !- Run Simulation for Sizing Periods",
-                          "    yes;                     !- Run Simulation for Weather File Run Periods",
+                          "    No;                      !- Run Simulation for Weather File Run Periods",
 
                           "    Building,",
                           "    Simple One Zone (Wireframe DXF),  !- Name",
@@ -3334,7 +3333,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
                           "    YES,                     !- Do System Sizing Calculation",
                           "    YES,                     !- Do Plant Sizing Calculation",
                           "    Yes,                     !- Run Simulation for Sizing Periods",
-                          "    yes;                     !- Run Simulation for Weather File Run Periods",
+                          "    No;                      !- Run Simulation for Weather File Run Periods",
 
                           "    Building,",
                           "    Simple One Zone (Wireframe DXF),  !- Name",

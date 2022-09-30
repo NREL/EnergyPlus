@@ -27,46 +27,12 @@
 
 namespace ObjexxFCL {
 
-inline
-std::size_t
-SIZEOF( std::string const & x )
-{
-	return x.length();
-}
-
-std::size_t
-SIZEOF( char const * x );
-
-template< typename T >
-inline
-std::size_t
-SIZEOF( Array< T > const & x )
-{
-	return x.size() * sizeof( T );
-}
-
-template< typename T, class = typename std::enable_if< ! std::is_base_of< BArray, T >::value >::type >
-inline
-std::size_t
-SIZEOF( T const & x )
-{
-	return sizeof( x );
-}
-
 template< typename T >
 inline
 int
 RADIX( T const & )
 {
 	return std::numeric_limits< T >::radix;
-}
-
-template< typename T >
-inline
-int
-DIGITS( T const & )
-{
-	return std::numeric_limits< T >::digits;
 }
 
 template< typename T >
@@ -88,140 +54,6 @@ TINY( T const & )
 
 template< typename T >
 inline
-T
-EPSILON( T const & )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return std::numeric_limits< T >::epsilon();
-}
-
-template< typename T >
-inline
-int
-PRECISION( T const & x )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return int( ( DIGITS( x ) - 1 ) * std::log10( double( RADIX( x ) ) ) ); // + 1 if radix(x) == 10^N but we don't support non-traditional architectures
-}
-
-template< typename T >
-inline
-int
-PRECISION( std::complex< T > const & x )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return int( ( DIGITS( x.real() ) - 1 ) * std::log10( double( RADIX( x.real() ) ) ) ); // + 1 if radix(x) == 10^N but we don't support non-traditional architectures
-}
-
-inline
-int
-EXPONENT_RANGE( std::int8_t const & )
-{
-	return 2;
-}
-
-inline
-int
-EXPONENT_RANGE( std::int16_t const & )
-{
-	return 4;
-}
-
-inline
-int
-EXPONENT_RANGE( std::int32_t const & )
-{
-	return 9;
-}
-
-inline
-int
-EXPONENT_RANGE( std::int64_t const & )
-{
-	return 18;
-}
-
-inline
-int
-EXPONENT_RANGE( std::uint8_t const & )
-{
-	return 2;
-}
-
-inline
-int
-EXPONENT_RANGE( std::uint16_t const & )
-{
-	return 4;
-}
-
-inline
-int
-EXPONENT_RANGE( std::uint32_t const & )
-{
-	return 9;
-}
-
-inline
-int
-EXPONENT_RANGE( std::uint64_t const & )
-{
-	return 18;
-}
-
-inline
-int
-EXPONENT_RANGE( float const & )
-{
-	return 37;
-}
-
-inline
-int
-EXPONENT_RANGE( double const & )
-{
-	return 307;
-}
-
-inline
-int
-EXPONENT_RANGE( long double const & )
-{
-	return 4931; // Assumes long double standing in for REAL(16)
-}
-
-inline
-int
-EXPONENT_RANGE( std::complex< float > const & )
-{
-	return 37;
-}
-
-inline
-int
-EXPONENT_RANGE( std::complex< double > const & )
-{
-	return 307;
-}
-
-inline
-int
-EXPONENT_RANGE( std::complex< long double > const & )
-{
-	return 4931;
-}
-
-template< typename T >
-inline
-int
-MINEXPONENT( T const & )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return std::numeric_limits< T >::min_exponent;
-}
-
-template< typename T >
-inline
 int
 EXPONENT( T const x )
 {
@@ -232,33 +64,10 @@ EXPONENT( T const x )
 template< typename T >
 inline
 T
-SCALE( T const x, int const i )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	return ( x != T( 0 ) ? x * std::pow( T( RADIX( x ) ), T( i ) ) : T( 0 ) );
-}
-
-template< typename T >
-inline
-T
 FRACTION( T const x )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return x * std::pow( T( RADIX( x ) ), T( -EXPONENT( x ) ) );
-}
-
-template< typename T >
-inline
-T
-SPACING( T const x )
-{
-	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
-	if ( x == T( 0 ) ) return TINY( x );
-	try {
-		return std::pow( T( RADIX( x ) ), std::max( T( EXPONENT( x ) - DIGITS( x ) ), T( MINEXPONENT( x ) - 1 ) ) );
-	} catch (...) {
-		return TINY( x );
-	}
 }
 
 template< typename T, typename Y >
