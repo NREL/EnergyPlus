@@ -15206,10 +15206,9 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                     auto &outletNode = state.dataLoopNodes->Node(fanOutNode);
                     inletNode.MassFlowRate = SupplyAirMassFlowRate;
                     outletNode.MassFlowRate = SupplyAirMassFlowRate;
-                    inletNode.Temp = CoolingCoilInletAirDryBulbTempRated;
-                    inletNode.HumRat = PsyWFnTdbTwbPb(
-                        state, CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, state.dataEnvrn->OutBaroPress, RoutineName);
-                    inletNode.Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, inletNode.HumRat);
+                    inletNode.Temp = dbRated;
+                    inletNode.HumRat = PsyWFnTdbTwbPb(state, dbRated, wbRated, state.dataEnvrn->OutBaroPress, RoutineName);
+                    inletNode.Enthalpy = PsyHFnTdbW(dbRated, inletNode.HumRat);
                     if (coil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                         state.dataHVACFan->fanObjs[coil.SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                     } else {
@@ -15221,11 +15220,11 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 }
 
                 Real64 TotCapFlowModFac = CurveManager::CurveValue(state, coil.CCapFFlow(1), AirMassFlowRatio);
-                Real64 TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp(1), CoolingCoilInletAirWetBulbTempRated, par3);
+                Real64 TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp(1), wbRated, par3);
                 Real64 HighSpeedNetCoolingCap = coil.RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
                 TotCapFlowModFac = CurveManager::CurveValue(state, coil.CCapFFlow(1), AirMassFlowRatio);
-                TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp2, CoolingCoilInletAirWetBulbTempRated, par3);
+                TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp2, wbRated, par3);
                 Real64 LowSpeedNetCoolingCap = coil.RatedTotCap2 * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
                 Real64 SpeedRatio;
