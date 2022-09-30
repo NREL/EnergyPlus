@@ -83,7 +83,7 @@ namespace ResultsFramework {
     class BaseResultObject
     {
     public:
-        BaseResultObject()= default;
+        BaseResultObject() = default;
         virtual ~BaseResultObject() = default;
     };
 
@@ -338,11 +338,9 @@ namespace ResultsFramework {
         CSVWriter() = default;
         ~CSVWriter() override = default;
 
-        CSVWriter(
-            std::vector<std::string> const &key_names,
-            std::vector<std::string> const &output_variables,
-            std::map<std::string, std::vector<std::string>> const &outputVariableKeyNames
-            )
+        CSVWriter(std::vector<std::string> const &key_names,
+                  std::vector<std::string> const &output_variables,
+                  std::map<std::string, std::vector<std::string>> const &outputVariableKeyNames)
         {
             outputVariableIndices = std::vector<bool>(output_variables.size(), false);
             outputVariableIndexToKeyNameIndexMapping = std::vector<int>(output_variables.size(), -1);
@@ -351,7 +349,7 @@ namespace ResultsFramework {
             }
 
             int index = 0;
-            for (auto const & keyName : key_names) {
+            for (auto const &keyName : key_names) {
 
                 auto exact_match = outputVariables.find(keyName);
                 if (exact_match != outputVariables.end()) {
@@ -365,7 +363,7 @@ namespace ResultsFramework {
                 std::transform(keyName.begin(), keyName.end(), lowerKeyName.begin(), ::tolower);
                 auto it = outputVariableKeyNames.find(lowerKeyName);
                 if (it != outputVariableKeyNames.end()) {
-                    for (auto const & outputVariableIndex : it->second) {
+                    for (auto const &outputVariableIndex : it->second) {
                         outputVariableIndexToKeyNameIndexMapping[outputVariables.at(outputVariableIndex)] = index;
                         keyNames.emplace_back(outputVariableIndex);
                         ++index;

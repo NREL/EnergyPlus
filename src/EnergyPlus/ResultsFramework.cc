@@ -737,9 +737,7 @@ namespace ResultsFramework {
         return root;
     }
 
-    void CSVWriter::parseTSOutputs(EnergyPlusData &state,
-                                   json const &data,
-                                   OutputProcessor::ReportingFrequency reportingFrequency)
+    void CSVWriter::parseTSOutputs(EnergyPlusData &state, json const &data, OutputProcessor::ReportingFrequency reportingFrequency)
     {
         if (data.empty()) return;
         updateReportingFrequency(reportingFrequency);
@@ -849,15 +847,14 @@ namespace ResultsFramework {
         return datetime;
     }
 
-    void
-    CSVWriter::writeOutput(EnergyPlusData &state, InputOutputFile &outputFile, bool outputControl)
+    void CSVWriter::writeOutput(EnergyPlusData &state, InputOutputFile &outputFile, bool outputControl)
     {
         outputFile.ensure_open(state, "OpenOutputFiles", outputControl);
         std::vector<int> keyNameToOutputs;
 
         print<FormatSyntax::FMT>(outputFile, "{}", "Date/Time,");
         std::string sep;
-        for (auto const & keyName : keyNames) {
+        for (auto const &keyName : keyNames) {
             print<FormatSyntax::FMT>(outputFile, "{}{}", sep, keyName);
             if (sep.empty()) sep = ",";
         }
@@ -874,7 +871,7 @@ namespace ResultsFramework {
             print<FormatSyntax::FMT>(outputFile, " {},", datetime);
 
             sep = "";
-            for (auto & data : item.second) {
+            for (auto &data : item.second) {
                 print<FormatSyntax::FMT>(outputFile, "{}{}", sep, data);
                 if (sep.empty()) sep = ",";
             }
@@ -1575,8 +1572,9 @@ namespace ResultsFramework {
         }
     }
 
-    void
-    ResultsFramework::addReportMeter(std::string_view const meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval)
+    void ResultsFramework::addReportMeter(std::string_view const meter,
+                                          std::string const &units,
+                                          OutputProcessor::ReportingFrequency const reportingInterval)
     {
         auto const meterVariable = fmt::format("{0} [{1}]({2})", meter, units, reportingFrequency(reportingInterval));
         outputVariables.emplace_back(meterVariable);

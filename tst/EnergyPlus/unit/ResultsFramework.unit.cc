@@ -548,12 +548,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_RVIFilter_explicit_keys)
                                  OutputProcessor::ReportingFrequency::TimeStep,
                                  rvi_keys);
 
-    std::map<std::string, std::vector<std::string>> expected_output = {
-        {"02/25 00:45:00", {"9.0", "1.0"}},
-        {"02/25 01:00:00", {"10.0", "2.0"}},
-        {"02/25 23:45:00", {"11.0", "3.0"}},
-        {"02/25 24:00:00", {"12.0", "4.0"}}
-    };
+    std::map<std::string, std::vector<std::string>> expected_output = {{"02/25 00:45:00", {"9.0", "1.0"}},
+                                                                       {"02/25 01:00:00", {"10.0", "2.0"}},
+                                                                       {"02/25 23:45:00", {"11.0", "3.0"}},
+                                                                       {"02/25 24:00:00", {"12.0", "4.0"}}};
 
     EXPECT_EQ(expected_output, outputs);
 }
@@ -601,7 +599,9 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_RVIFilter_pattern_key)
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 12.0);
     OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
 
-    std::vector<std::string> const rvi_keys = {"System Node Temperature", };
+    std::vector<std::string> const rvi_keys = {
+        "System Node Temperature",
+    };
 
     auto outputs = getCSVOutputs(*state,
                                  state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
@@ -609,12 +609,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_RVIFilter_pattern_key)
                                  OutputProcessor::ReportingFrequency::TimeStep,
                                  rvi_keys);
 
-    std::map<std::string, std::vector<std::string>> expected_output = {
-        {"02/25 00:45:00", {"1.0", "9.0"}},
-        {"02/25 01:00:00", {"2.0", "10.0"}},
-        {"02/25 23:45:00", {"3.0", "11.0"}},
-        {"02/25 24:00:00", {"4.0", "12.0"}}
-    };
+    std::map<std::string, std::vector<std::string>> expected_output = {{"02/25 00:45:00", {"1.0", "9.0"}},
+                                                                       {"02/25 01:00:00", {"2.0", "10.0"}},
+                                                                       {"02/25 23:45:00", {"3.0", "11.0"}},
+                                                                       {"02/25 24:00:00", {"4.0", "12.0"}}};
 
     EXPECT_EQ(expected_output, outputs);
 }
@@ -625,7 +623,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_explicit_key)
     OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
-//    Electricity:Facility,NaturalGas:Plant,NaturalGas:Facility
+    //    Electricity:Facility,NaturalGas:Plant,NaturalGas:Facility
     Variable var0("Electricity:Facility", ReportingFrequency::TimeStep, indexType, reportId, Unit::J);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
     state->dataResultsFramework->resultsFramework->addReportMeter("Electricity:Facility", "J", ReportingFrequency::TimeStep);
@@ -650,7 +648,9 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_explicit_key)
 
     OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
 
-    std::vector<std::string> const mvi_keys = {"Electricity:Facility", };
+    std::vector<std::string> const mvi_keys = {
+        "Electricity:Facility",
+    };
 
     auto outputs = getCSVOutputs(*state,
                                  state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
@@ -659,15 +659,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_explicit_key)
                                  mvi_keys);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
-        {"02/25 00:45:00", {"1.0"}},
-        {"02/25 01:00:00", {"2.0"}},
-        {"02/25 23:45:00", {"3.0"}},
-        {"02/25 24:00:00", {"4.0"}}
-    };
+        {"02/25 00:45:00", {"1.0"}}, {"02/25 01:00:00", {"2.0"}}, {"02/25 23:45:00", {"3.0"}}, {"02/25 24:00:00", {"4.0"}}};
 
     EXPECT_EQ(expected_output, outputs);
 }
-
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_pattern_key)
 {
@@ -700,7 +695,9 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_pattern_key)
 
     OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
 
-    std::vector<std::string> const mvi_keys = {"Electricity:Facility [J](TimeStep)", };
+    std::vector<std::string> const mvi_keys = {
+        "Electricity:Facility [J](TimeStep)",
+    };
 
     auto outputs = getCSVOutputs(*state,
                                  state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
@@ -709,14 +706,9 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_MVIFilter_pattern_key)
                                  mvi_keys);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
-        {"02/25 00:45:00", {"1.0"}},
-        {"02/25 01:00:00", {"2.0"}},
-        {"02/25 23:45:00", {"3.0"}},
-        {"02/25 24:00:00", {"4.0"}}
-    };
+        {"02/25 00:45:00", {"1.0"}}, {"02/25 01:00:00", {"2.0"}}, {"02/25 23:45:00", {"3.0"}}, {"02/25 24:00:00", {"4.0"}}};
 
     EXPECT_EQ(expected_output, outputs);
 }
-
 
 } // namespace EnergyPlus
