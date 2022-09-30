@@ -226,7 +226,7 @@ void ManageZoneAirUpdates(EnergyPlusData &state,
         PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     } break;
     case DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep: {
-        correctZoneAirTemps(state, ZoneTempChange, UseZoneTimeStepHistory);
+        ZoneTempChange = correctZoneAirTemps(state, UseZoneTimeStepHistory);
     } break;
     case DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories: {
         RevertZoneTimestepHistories(state);
@@ -4422,31 +4422,29 @@ void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
     TotalDehumidLoad *= ZoneMultFac;
 }
 
-void correctZoneAirTemps(EnergyPlusData &state,
-                         Real64 &maxTempChange,      // Temperature change in zone air between previous and current timestep
-                         bool useZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
+Real64 correctZoneAirTemps(EnergyPlusData &state,
+                           bool useZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history
 )
 {
-    Real64 tempChange = DataPrecisionGlobals::constant_zero;
-    maxTempChange = DataPrecisionGlobals::constant_zero;
-    ;
+    Real64 maxTempChange = DataPrecisionGlobals::constant_zero; // Max absolute air temperature change between previous and current timestep
+    Real64 tempChange = DataPrecisionGlobals::constant_zero;    // Zone or space air temperature change between previous and current timestep
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).correctAirTemp(
-                    state, tempChange, useZoneTimeStepHistory, zoneNum, spaceNum);
+                tempChange =
+                    state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).correctAirTemp(state, useZoneTimeStepHistory, zoneNum, spaceNum);
                 maxTempChange = max(maxTempChange, tempChange);
             }
         } else {
-            state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).correctAirTemp(state, tempChange, useZoneTimeStepHistory, zoneNum);
+            tempChange = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).correctAirTemp(state, useZoneTimeStepHistory, zoneNum);
         }
         maxTempChange = max(maxTempChange, tempChange);
     }
+    return maxTempChange;
 }
 
-void ZoneSpaceHeatBalanceData::correctAirTemp(
+Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     EnergyPlusData &state,
-    Real64 &tempChange,                // Temperature change in zone air between previous and current timestep
     bool const useZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
     int const zoneNum,
     int const spaceNum)
@@ -4464,7 +4462,7 @@ void ZoneSpaceHeatBalanceData::correctAirTemp(
 
     static constexpr std::string_view RoutineName("correctAirTemp");
 
-    tempChange = DataPrecisionGlobals::constant_zero;
+    Real64 tempChange = DataPrecisionGlobals::constant_zero; // Zone or space air temperature change between previous and current timestep
 
     auto &thisZone = state.dataHeatBal->Zone(zoneNum);
     auto &thisAirModel = state.dataRoomAirMod->AirModel(zoneNum);
@@ -4679,9 +4677,10 @@ void ZoneSpaceHeatBalanceData::correctAirTemp(
     // Determine sensible load heating/cooling rate and energy
     state.dataHeatBal->ZoneSNLoadHeatRate(zoneNum) = max(SNLoad, 0.0);
     state.dataHeatBal->ZoneSNLoadCoolRate(zoneNum) = std::abs(min(SNLoad, 0.0));
-    state.dataHeatBal->ZoneSNLoadHeatEnergy(zoneNum) = max(SNLoad, 0.0) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state.dataHeatBal->ZoneSNLoadHeatEnergy(zoneNum) =
+        state.dataHeatBal->ZoneSNLoadHeatRate(zoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state.dataHeatBal->ZoneSNLoadCoolEnergy(zoneNum) =
-        std::abs(min(SNLoad, 0.0) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        state.dataHeatBal->ZoneSNLoadCoolRate(zoneNum) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // Final humidity calcs
     CorrectZoneHumRat(state, zoneNum);
@@ -4730,6 +4729,7 @@ void ZoneSpaceHeatBalanceData::correctAirTemp(
                               state.dataHeatBal->ZnAirRpt(zoneNum).imBalance,
                               state.dataHeatBal->ZnAirRpt(zoneNum).SumEnthalpyM,
                               state.dataHeatBal->ZnAirRpt(zoneNum).SumEnthalpyH);
+    return tempChange;
 }
 
 void PushZoneTimestepHistories(EnergyPlusData &state)
