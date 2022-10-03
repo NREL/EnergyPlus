@@ -222,13 +222,13 @@ def change_special_cased_enums(schema):
     loc['anyOf'] = newAnyOf
     loc.pop('enum')
 
-    loc = get_schema_object(schema, 'WindowMaterial:Screen')['properties']['angle_of_resolution_for_screen_transmittance_output_map']
-    loc.pop('type')
-    newAnyOf = anyOf()
-    newAnyOf[0]['enum'] = [int(i) for i in loc['enum'][:] if isInt(i)]
-    newAnyOf[1]['enum'] = ['']
-    loc['anyOf'] = newAnyOf
-    loc.pop('enum')
+    #loc = get_schema_object(schema, 'WindowMaterial:Screen')['properties']['angle_of_resolution_for_screen_transmittance_output_map']
+    #loc.pop('type')
+    #newAnyOf = anyOf()
+    #newAnyOf[0]['enum'] = [int(i) for i in loc['enum'][:] if isInt(i)]
+    #newAnyOf[1]['enum'] = ['']
+    #loc['anyOf'] = newAnyOf
+    #loc.pop('enum')
 
     loc = get_schema_object(schema, 'Refrigeration:System')['properties']['number_of_compressor_stages']
     loc.pop('type')
