@@ -508,6 +508,7 @@ namespace DataHeatBalance {
         Real64 Volume = DataGlobalConstants::AutoCalculate;        // Volume entered by user [m3] or calculated
         Real64 ExtGrossWallArea = 0.0;                             // Exterior Wall Area for Zone (Gross)
         Real64 ExteriorTotalSurfArea = 0.0;                        // Total surface area of all exterior surfaces for Zone
+        int SystemZoneNodeNumber = 0;                              // This is the zone or space node number for the system for a controlled zone
     };
 
     struct SpaceData : ZoneSpaceData
@@ -650,7 +651,6 @@ namespace DataHeatBalance {
         Real64 ExteriorTotalGroundSurfArea = 0.0;       // Total surface area of all surfaces for Zone with ground contact
         Real64 ExtGrossGroundWallArea = 0.0;            // Ground contact Wall Area for Zone (Gross)
         Real64 ExtGrossGroundWallArea_Multiplied = 0.0; // Ground contact Wall Area for Zone (Gross) with multipliers
-        int SystemZoneNodeNumber = 0;                   // This is the zone node number for the system for a controlled zone
         bool IsControlled = false;                      // True when this is a controlled zone.
         bool IsSupplyPlenum = false;                    // True when this zone is a supply plenum
         bool IsReturnPlenum = false;                    // True when this zone is a return plenum

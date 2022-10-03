@@ -506,7 +506,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(DualZoneNum).TotalOutputRequired =
         0.0; // no load and no thermostat since control type is set to 0 above
     CalcZoneAirTempSetPoints(*state);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).calcPredictedSystemLoad(*state, DualZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).calcPredictedSystemLoad(*state, 1.0, DualZoneNum);
 
     EXPECT_EQ(0.0,
               state->dataHeatBalFanSys->TempZoneThermostatSetPoint(
@@ -527,7 +527,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
         state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue;
 
     CalcZoneAirTempSetPoints(*state);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(HeatZoneNum).calcPredictedSystemLoad(*state, HeatZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(HeatZoneNum).calcPredictedSystemLoad(*state, 1.0, HeatZoneNum);
 
     EXPECT_EQ(20.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(HeatZoneNum));
     EXPECT_EQ(-1000.0,
@@ -566,7 +566,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
         state->dataScheduleMgr->Schedule(SetPointTempSchedIndex).CurrentValue;
 
     CalcZoneAirTempSetPoints(*state);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(HeatZoneNum).calcPredictedSystemLoad(*state, HeatZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(HeatZoneNum).calcPredictedSystemLoad(*state, 1.0, HeatZoneNum);
 
     EXPECT_EQ(21.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(HeatZoneNum));
     EXPECT_FALSE(state->dataZoneEnergyDemand->CurDeadBandOrSetback(HeatZoneNum)); // Tstat should show there is load on a single heating SP
@@ -574,7 +574,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
               state->dataZoneEnergyDemand->ZoneSysEnergyDemand(HeatZoneNum)
                   .TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(CoolZoneNum).calcPredictedSystemLoad(*state, CoolZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(CoolZoneNum).calcPredictedSystemLoad(*state, 1.0, CoolZoneNum);
 
     EXPECT_EQ(23.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(CoolZoneNum));
     EXPECT_FALSE(state->dataZoneEnergyDemand->CurDeadBandOrSetback(CoolZoneNum)); // Tstat should show there is load on a single cooling SP
@@ -582,7 +582,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
               state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CoolZoneNum)
                   .TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(CoolHeatZoneNum).calcPredictedSystemLoad(*state, CoolHeatZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(CoolHeatZoneNum).calcPredictedSystemLoad(*state, 1.0, CoolHeatZoneNum);
 
     ASSERT_EQ(22.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(CoolHeatZoneNum));
     EXPECT_FALSE(
@@ -591,7 +591,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
               state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CoolHeatZoneNum)
                   .TotalOutputRequired); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).calcPredictedSystemLoad(*state, DualZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).calcPredictedSystemLoad(*state, 1.0, DualZoneNum);
 
     EXPECT_EQ(20.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(DualZoneNum));
     EXPECT_FALSE(state->dataZoneEnergyDemand->CurDeadBandOrSetback(DualZoneNum)); // Tstat should show there is load on a dual SP
@@ -609,7 +609,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).TempIndZnLd = 3500.0; // results in a cooling load
 
     CalcZoneAirTempSetPoints(*state);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).calcPredictedSystemLoad(*state, DualZoneNum, 1.0);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(DualZoneNum).calcPredictedSystemLoad(*state, 1.0, DualZoneNum);
 
     EXPECT_EQ(25.0, state->dataHeatBalFanSys->TempZoneThermostatSetPoint(DualZoneNum));
     EXPECT_FALSE(state->dataZoneEnergyDemand->CurDeadBandOrSetback(DualZoneNum)); // Tstat should show there is load on a dual SP
@@ -1051,7 +1051,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     EXPECT_NEAR(302.00968500, thisZoneHB.SumSysMCp, 0.0001);
     EXPECT_NEAR(6040.1937, thisZoneHB.SumSysMCpT, 0.0001);
 
-    thisZoneHB.calcZoneSums(*state, ZoneNum);
+    thisZoneHB.calcZoneSums(*state, ZoneNum, false);
     EXPECT_EQ(0.0, thisZoneHB.SumSysMCp);
     EXPECT_EQ(0.0, thisZoneHB.SumSysMCpT);
 }
