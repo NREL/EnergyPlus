@@ -11385,7 +11385,6 @@ namespace UnitarySystems {
         SpeedRatio = 1.0;
         int SolFla = 0.0;
 
-        std::vector<Real64> Par(8); // Parameter array passed to solver
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIte(500);    // Maximum number of iterations for solver
         Real64 constexpr Acc(1.0e-3); // Accuracy of solver result
@@ -11413,16 +11412,16 @@ namespace UnitarySystems {
             return;
         } else {
 
-            Par[1] = double(this->m_SuppHeatCoilIndex);
-            Par[2] = SuppHeatLoad;
-            Par[3] = double(this->m_UnitarySysNum);
-            // Par(4) = CycRatio or SpeedRatio
-            Par[5] = this->m_SuppHeatingSpeedNum;
-            Par[6] = double(FanOpMode);
-            Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // UnitarySystem(UnitarySysNum)%CompressorOp
             if (this->m_SuppHeatingSpeedNum > 1.0) {
-                Par[4] = CycRatio;
-                General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, this->calcMultiStageSuppCoilLoadResidual, 0.0, 1.0, Par);
+                auto f = [&state, this, CycRatio, FanOpMode, SuppHeatLoad](Real64 const SpeedRatio) {
+                    Real64 QActual;
+                    int CoilIndex = this->m_SuppHeatCoilIndex;
+                    int SpeedNum = this->m_SuppHeatingSpeedNum;
+                    HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
+                    return SuppHeatLoad - QActual;
+                };
+
+                General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
                 this->m_SuppHeatingCycRatio = CycRatio;
                 this->m_SuppHeatingSpeedRatio = SpeedRatio;
                 this->m_SuppHeatPartLoadFrac = SpeedRatio;
@@ -11430,8 +11429,15 @@ namespace UnitarySystems {
             } else {
                 SpeedRatio = 0.0;
                 this->m_SuppHeatingSpeedRatio = SpeedRatio;
-                Par[4] = SpeedRatio;
-                General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, this->calcMultiStageSuppCoilLoadCycResidual, 0.0, 1.0, Par);
+                auto f = [&state, this, SpeedRatio, FanOpMode, SuppHeatLoad](Real64 const CycRatio) {
+                    Real64 QActual;
+                    int CoilIndex = this->m_SuppHeatCoilIndex;
+                    int SpeedNum = this->m_SuppHeatingSpeedNum;
+                    HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
+                    return SuppHeatLoad - QActual;
+                };
+
+                General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, f, 0.0, 1.0);
                 this->m_SuppHeatingCycRatio = CycRatio;
                 this->m_SuppHeatPartLoadFrac = CycRatio;
                 PartLoadFrac = CycRatio;
@@ -16170,34 +16176,6 @@ namespace UnitarySystems {
         }
 
         return Residuum;
-    }
-
-    Real64 UnitarySys::calcMultiStageSuppCoilLoadResidual(EnergyPlusData &state,
-                                                          Real64 const SpeedRatio,
-                                                          std::vector<Real64> const &Par // Function parameters
-    )
-    {
-        Real64 QActual;
-        int CoilIndex = int(Par[1]);
-        Real64 CycRatio = Par[4];
-        int SpeedNum = int(Par[5]);
-        int FanOpMode = int(Par[6]);
-        HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
-        return Par[2] - QActual;
-    }
-
-    Real64 UnitarySys::calcMultiStageSuppCoilLoadCycResidual(EnergyPlusData &state,
-                                                             Real64 const CycRatio,
-                                                             std::vector<Real64> const &Par // Function parameters
-    )
-    {
-        Real64 QActual;
-        int CoilIndex = int(Par[1]);
-        Real64 SpeedRatio = Par[4];
-        int SpeedNum = int(Par[5]);
-        int FanOpMode = int(Par[6]);
-        HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
-        return Par[2] - QActual;
     }
 
     Real64 UnitarySys::HXAssistedCoolCoilTempResidual(EnergyPlusData &state,
