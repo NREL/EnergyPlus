@@ -606,11 +606,6 @@ namespace UnitarySystems {
 
         void setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
 
-        static Real64 DOE2DXCoilResidual(EnergyPlusData &state,
-                                         Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                         std::vector<Real64> const &Par // par(1) = DX coil number
-        );
-
         static Real64 genericDXCoilResidual(EnergyPlusData &state,
                                             Real64 const PartLoadRatio, // iteration routine for Coil:Cooling:DX
                                             std::array<Real64, 8> const &Par);

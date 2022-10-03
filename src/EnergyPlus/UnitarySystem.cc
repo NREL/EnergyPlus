@@ -12905,10 +12905,14 @@ namespace UnitarySystems {
 
                         if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
 
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutTemp;
-                            Par[5] = double(FanOpMode);
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->DOE2DXCoilResidual, 0.0, 1.0, Par);
+                            auto f = [&state, this, DesOutTemp, FanOpMode](Real64 const PartLoadRatio){
+                                int CoilIndex = this->m_CoolingCoilIndex;
+                                DXCoils::CalcDoe2DXCoil(state, CoilIndex, DataHVACGlobals::CompressorOperation::On, true, PartLoadRatio, FanOpMode);
+                                Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
+
+                                return DesOutTemp - OutletAirTemp;
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             this->m_CompPartLoadRatio = PartLoadFrac;
 
                         } else if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
@@ -15975,40 +15979,6 @@ namespace UnitarySystems {
         } else {
             Residuum = Par[3] - OutletAirTemp;
         }
-
-        return Residuum;
-    }
-
-    Real64 UnitarySys::DOE2DXCoilResidual(EnergyPlusData &state,
-                                          Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   November 2003
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcDOe2DXCoil to get outlet temperature at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet temperature [C]
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        int CoilIndex = int(Par[1]);
-        int FanOpMode = int(Par[5]);
-        DXCoils::CalcDoe2DXCoil(state, CoilIndex, DataHVACGlobals::CompressorOperation::On, true, PartLoadRatio, FanOpMode);
-        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
-        Residuum = Par[2] - OutletAirTemp;
 
         return Residuum;
     }
