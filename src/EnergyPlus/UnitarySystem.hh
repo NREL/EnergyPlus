@@ -836,7 +836,7 @@ namespace UnitarySystems {
         void calcUnitarySuppSystemToSP(EnergyPlusData &state, bool const FirstHVACIteration // True when first HVAC iteration
         );
 
-        void controlCoolingSystemToSP(EnergyPlusData &state,
+        void controlCoolingSystemToSP(EnergyPlusData &PartLoadFrac,
                                       int const AirLoopNum,                              // index to air loop
                                       bool const FirstHVACIteration,                     // First HVAC iteration flag
                                       bool &HXUnitOn,                                    // flag to enable heat exchanger heat recovery
