@@ -2421,12 +2421,10 @@ namespace FanCoilUnits {
                 if (QUnitOutMaxC < QZnReq) {
                     // more cooling than required, find reduced water flow rate to meet the load
                     // solve for the cold water flow rate with no limit set by flow rate lockdown
-                    Par(1) = double(FanCoilNum);
-                    Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                    if (FirstHVACIteration) Par(2) = 1.0;
-                    Par(3) = ControlledZoneNum;
-                    Par(4) = QZnReq;
-                    General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, CWFlow, CalcFanCoilCWLoadResidual, 0.0, MaxWaterFlow, Par);
+                    auto f = [&state, FanCoilNum, FirstHVACIteration, ControlledZoneNum, QZnReq](Real64 const CWFlow) {
+                        return CalcFanCoilCWLoadResidual(state, CWFlow, FanCoilNum, FirstHVACIteration, ControlledZoneNum, QZnReq);
+                    };
+                    General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, CWFlow, f, 0.0, MaxWaterFlow);
                     if (SolFlag == -1) {
                         // tighten limits on water flow rate to see if this allows convergence
                         state.dataFanCoilUnits->CoolingLoad = true;
@@ -2441,7 +2439,7 @@ namespace FanCoilUnits {
                                                QZnReq,
                                                MinWaterFlow,
                                                MaxWaterFlow);
-                        General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, CWFlow, CalcFanCoilCWLoadResidual, MinWaterFlow, MaxWaterFlow, Par);
+                        General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, CWFlow, f, MinWaterFlow, MaxWaterFlow);
                         if (SolFlag == -1) {
                             ++FanCoil(FanCoilNum).ConvgErrCountC;
                             if (FanCoil(FanCoilNum).ConvgErrCountC < 2) {
@@ -5071,9 +5069,11 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilCWLoadResidual(EnergyPlusData &state,
-                                     Real64 const CWFlow,       // water mass flow rate [kg/s]
-                                     Array1D<Real64> const &Par // Function parameters
-    )
+                                     Real64 const CWFlow, // water mass flow rate [kg/s]
+                                     int const FanCoilNum,
+                                     bool const FirstHVACIteration,
+                                     int const ControlledZoneNum,
+                                     Real64 const QZnReq)
     {
 
         // FUNCTION INFORMATION:
@@ -5085,32 +5085,7 @@ namespace FanCoilUnits {
         // PURPOSE OF THIS SUBROUTINE:
         // To calculate the part-load ratio for the FCU with electric heating coil
 
-        // METHODOLOGY EMPLOYED:
-        // Use SolveRoot to CALL this Function to converge on a solution
-
-        //   Parameter description example:
-        //       Par(1)  = REAL(FanCoilNum,r64) ! Index to fan coil unit
-        //       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
-        //       Par(3)  = REAL(ControlledZoneNum,r64)     ! zone index
-        //       Par(4)  = QZnReq               ! zone load [W]
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FanCoilNum;          // Index to this fan coil unit
-        bool FirstHVACIteration; // FirstHVACIteration flag
-        int ControlledZoneNum;   // zone index
-        Real64 QZnReq;           // Sensible load to be met [W]
-        Real64 QUnitOut;         // delivered capacity [W]
-
-        // Convert parameters to usable variables
-        FanCoilNum = int(Par(1));
-        if (Par(2) == 1.0) {
-            FirstHVACIteration = true;
-        } else {
-            FirstHVACIteration = false;
-        }
-        ControlledZoneNum = int(Par(3));
-        QZnReq = Par(4);
-
+        Real64 QUnitOut; // delivered capacity [W]
         state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate = CWFlow;
         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
 

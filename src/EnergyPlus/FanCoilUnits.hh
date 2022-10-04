@@ -378,9 +378,11 @@ namespace FanCoilUnits {
     );
 
     Real64 CalcFanCoilCWLoadResidual(EnergyPlusData &state,
-                                     Real64 CWFlow,             // water mass flow rate [kg/s]
-                                     Array1D<Real64> const &Par // Function parameters
-    );
+                                     Real64 CWFlow, // water mass flow rate [kg/s]
+                                     int FanCoilNum,
+                                     bool FirstHVACIteration,
+                                     int ControlledZoneNum,
+                                     Real64 QZnReq);
 
     Real64 CalcFanCoilWaterFlowResidual(EnergyPlusData &state,
                                         Real64 WaterFlow,          // water mass flow rate [kg/s]
