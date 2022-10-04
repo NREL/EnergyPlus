@@ -843,7 +843,7 @@ namespace UnitarySystems {
                                       DataHVACGlobals::CompressorOperation &CompressorOp // compressor on/off control
         );
 
-        void controlHeatingSystemToSP(EnergyPlusData &state,
+        void controlHeatingSystemToSP(EnergyPlusData &maxPartLoadFrac,
                                       int const AirLoopNum,                               // index to air loop
                                       bool const FirstHVACIteration,                      // First HVAC iteration flag
                                       DataHVACGlobals::CompressorOperation &CompressorOp, // compressor on/off control
