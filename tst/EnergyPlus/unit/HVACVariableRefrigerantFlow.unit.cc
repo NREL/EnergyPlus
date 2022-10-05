@@ -2888,26 +2888,13 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualCool)
 {
     // PURPOSE OF THIS TEST:
     //   Test the method FanSpdResidualCool.
-
-    using namespace DXCoils;
-
-    double FanSpdRto;
-    double ZnSenLoad;
-    double Th2;
-    double TairInlet;
-    double Garate;
-    double BF;
-
-    // Inputs:
-    FanSpdRto = 0.5;
-    ZnSenLoad = 2716.62;
-    Th2 = 17.41212;
-    TairInlet = 25.55534;
-    Garate = 0.20664;
-    BF = 0.0592;
-    std::array<Real64, 5> Par = {ZnSenLoad, Th2, TairInlet, Garate, BF};
-    // Run and Check
-    double FanSpdResidual = FanSpdResidualCool(*state, FanSpdRto, Par);
+    Real64 FanSpdRto = 0.5;
+    Real64 ZnSenLoad = 2716.62;
+    Real64 Th2 = 17.41212;
+    Real64 TairInlet = 25.55534;
+    Real64 Garate = 0.20664;
+    Real64 BF = 0.0592;
+    Real64 FanSpdResidual = DXCoils::FanSpdResidualCool(FanSpdRto, ZnSenLoad, Th2, TairInlet, Garate, BF);
     EXPECT_NEAR(-0.707, FanSpdResidual, 0.0005);
 }
 
@@ -2915,27 +2902,13 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
 {
     // PURPOSE OF THIS TEST:
     //   Test the method FanSpdResidualHeat.
-
-    using namespace DXCoils;
-
-    double FanSpdRto;
-    double ZnSenLoad;
-    double Th2;
-    double TairInlet;
-    double Garate;
-    double BF;
-
-    // Inputs:
-    FanSpdRto = 0.5;
-    ZnSenLoad = 4241.66;
-    Th2 = 41.221;
-    TairInlet = 20.236;
-    Garate = 0.21136;
-    BF = 0.1360;
-    std::array<Real64, 5> Par = {ZnSenLoad, Th2, TairInlet, Garate, BF};
-
-    // Run and Check
-    double FanSpdResidual = FanSpdResidualHeat(*state, FanSpdRto, Par);
+    Real64 FanSpdRto = 0.5;
+    Real64 ZnSenLoad = 4241.66;
+    Real64 Th2 = 41.221;
+    Real64 TairInlet = 20.236;
+    Real64 Garate = 0.21136;
+    Real64 BF = 0.1360;
+    Real64 FanSpdResidual = DXCoils::FanSpdResidualHeat(FanSpdRto, ZnSenLoad, Th2, TairInlet, Garate, BF);
     EXPECT_NEAR(-0.5459, FanSpdResidual, 0.0005);
 }
 
