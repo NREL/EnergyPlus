@@ -234,6 +234,8 @@ namespace ZoneTempPredictorCorrector {
                               bool useZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                               int const zoneNum,
                               int const spaceNum = 0);
+
+        void calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const ZoneNum, int const spaceNum = 0);
     };
 
     // Functions
@@ -274,8 +276,6 @@ namespace ZoneTempPredictorCorrector {
                                            Real64 LoadCorrFactor,
                                            Real64 ZoneMultiplier,
                                            Real64 ZoneMultiplierList);
-
-    void CalcPredictedHumidityRatio(EnergyPlusData &state, int ZoneNum, Real64 RAFNFrac);
 
     void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
                                         Real64 &TotalHumidLoad,

@@ -3784,7 +3784,7 @@ void PredictSystemLoads(EnergyPlusData &state,
         }
 
         // Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
-        CalcPredictedHumidityRatio(state, ZoneNum, RAFNFrac);
+        thisZoneHB.calcPredictedHumidityRatio(state, RAFNFrac, ZoneNum);
     }
 
     if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
@@ -4042,14 +4042,12 @@ void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
     TotalCoolLoad = SensLoadCoolSingleZone * ZoneMultFac;
 }
 
-void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac)
+void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const ZoneNum, int const spaceNum)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   May 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine does the prediction step for humidity control
@@ -4062,38 +4060,23 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
     // Routine FinalZnCalcs - FINAL ZONE CALCULATIONS, authored by Dale Herron
     // for BLAST.
 
-    static constexpr std::string_view RoutineName("CalcPredictedHumidityRatio");
+    static constexpr std::string_view RoutineName("calcPredictedHumidityRatio");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 LatentGain; // Zone latent load
-    Real64 RhoAir;
-    Real64 A;
-    Real64 B;
-    Real64 C;
-    Real64 SysTimeStepInSeconds;
-    Real64 H2OHtOfVap;
     Real64 RHSetPoint; // Relative Humidity in percent
     Real64 WZoneSetPoint;
     int HumidControlledZoneNum;
     bool ControlledHumidZoneFlag;       // This determines whether this is a humidity controlled zone or not
     Real64 ZoneRHHumidifyingSetPoint;   // Zone humidifying set point (%)
     Real64 ZoneRHDehumidifyingSetPoint; // Zone dehumidifying set point (%)
-    Real64 LoadToHumidifySetPoint;      // Moisture load at humidifying set point
-    Real64 LoadToDehumidifySetPoint;    // Moisture load at dehumidifying set point
     Real64 ZoneAirRH;                   // Zone air relative humidity
-    bool SingleSetPoint;                // This determines whether both setpoint are equal or not
-    int RoomAirNode;
 
-    auto &zone = state.dataHeatBal->Zone(ZoneNum);
-    auto &zoneAirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRat;
+    auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
     auto &zoneSysMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum);
 
-    Real64 const thisMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
-    Real64 const thisZT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZT;
-
-    LoadToHumidifySetPoint = 0.0;
-    LoadToDehumidifySetPoint = 0.0;
-    SingleSetPoint = false;
+    Real64 LoadToHumidifySetPoint = 0.0;   // Moisture load at humidifying set point
+    Real64 LoadToDehumidifySetPoint = 0.0; // Moisture load at dehumidifying set point
+    bool SingleSetPoint = false;           // This determines whether both setpoint are equal or not
     zoneSysMoistureDemand.TotalOutputRequired = 0.0;
     zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 0.0;
     zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 0.0;
@@ -4104,7 +4087,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
     for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HumidControlledZoneNum) {
         auto &humidityControlZone = state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum);
         if (humidityControlZone.ActualZoneNum != ZoneNum) continue;
-        ZoneAirRH = Psychrometrics::PsyRhFnTdbWPb(state, thisMAT, zoneAirHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
+        ZoneAirRH = Psychrometrics::PsyRhFnTdbWPb(state, this->MAT, this->ZoneAirHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
         ZoneRHHumidifyingSetPoint = ScheduleManager::GetCurrentScheduleValue(state, humidityControlZone.HumidifyingSchedIndex);
         ZoneRHDehumidifyingSetPoint = ScheduleManager::GetCurrentScheduleValue(state, humidityControlZone.DehumidifyingSchedIndex);
 
@@ -4178,15 +4161,16 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
                         if (offsetThermostat != 0.0) {
                             // Calculate the humidistat offset value from the thermostat offset value
                             faultZoneWHumidifyingSetPoint = Psychrometrics::PsyWFnTdbRhPb(
-                                state, (thisMAT + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                state, (this->MAT + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                             faultZoneWDehumidifyingSetPoint = Psychrometrics::PsyWFnTdbRhPb(
-                                state, (thisMAT + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                state, (this->MAT + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                             offsetZoneRHHumidifyingSetPoint =
                                 ZoneRHHumidifyingSetPoint -
-                                Psychrometrics::PsyRhFnTdbWPb(state, thisMAT, faultZoneWHumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
+                                Psychrometrics::PsyRhFnTdbWPb(state, this->MAT, faultZoneWHumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
                             offsetZoneRHDehumidifyingSetPoint =
                                 ZoneRHDehumidifyingSetPoint -
-                                Psychrometrics::PsyRhFnTdbWPb(state, thisMAT, faultZoneWDehumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
+                                Psychrometrics::PsyRhFnTdbWPb(state, this->MAT, faultZoneWDehumidifyingSetPoint, state.dataEnvrn->OutBaroPress) *
+                                    100.0;
 
                             // Apply the calculated humidistat offset value
                             // Positive offset means the sensor reading is higher than the actual value
@@ -4276,13 +4260,11 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
     }
 
     if (ControlledHumidZoneFlag) {
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         // Calculate hourly humidity ratio from infiltration + humidity added from latent load
         // to determine system added/subtracted moisture.
-        LatentGain =
-            thisZoneHB.ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
+        LatentGain = this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
 
-        SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
+        Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
         // Calculate the coefficients for the 3rd Order derivative for final
         // zone humidity ratio.  The A, B, C coefficients are analogous to the heat balance.
@@ -4290,33 +4272,34 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // are currently set to zero when the CTF only version is used.
 
         // The density of air and latent heat of vaporization are calculated as functions.
-        RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZT, zoneAirHumRat, RoutineName);
-        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(zoneAirHumRat, thisZT);
+        Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->ZT, this->ZoneAirHumRat, RoutineName);
+        Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(this->ZoneAirHumRat, this->ZT);
 
         // Assume that the system will have flow
+        Real64 A = 0.0;
+        Real64 B = 0.0;
+        Real64 C = 0.0;
         if (state.afn->multizone_always_simulated ||
             (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
              state.afn->AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
-            B = (LatentGain / H2OHtOfVap) + state.afn->exchangeData(ZoneNum).SumMHrW + state.afn->exchangeData(ZoneNum).SumMMHrW +
-                thisZoneHB.SumHmARaW;
-            A = state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr + thisZoneHB.SumHmARa;
+            B = (LatentGain / H2OHtOfVap) + state.afn->exchangeData(ZoneNum).SumMHrW + state.afn->exchangeData(ZoneNum).SumMMHrW + this->SumHmARaW;
+            A = state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr + this->SumHmARa;
         } else {
-            B = (LatentGain / H2OHtOfVap) + ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.CTMFL) * state.dataEnvrn->OutHumRat) +
-                thisZoneHB.EAMFLxHumRat + thisZoneHB.SumHmARaW + thisZoneHB.MixingMassFlowXHumRat + thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
-            A = thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.SumHmARa + thisZoneHB.MixingMassFlowZone +
-                thisZoneHB.MDotOA;
+            B = (LatentGain / H2OHtOfVap) + ((this->OAMFL + this->VAMFL + this->CTMFL) * state.dataEnvrn->OutHumRat) + this->EAMFLxHumRat +
+                this->SumHmARaW + this->MixingMassFlowXHumRat + this->MDotOA * state.dataEnvrn->OutHumRat;
+            A = this->OAMFL + this->VAMFL + this->EAMFL + this->CTMFL + this->SumHmARa + this->MixingMassFlowZone + this->MDotOA;
         }
-        C = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+        C = RhoAir * thisZone.Volume * thisZone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             auto &roomAFNInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum);
-            RoomAirNode = roomAFNInfo.ControlAirNodeID;
+            int RoomAirNode = roomAFNInfo.ControlAirNodeID;
             H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(roomAFNInfo.Node(RoomAirNode).HumRat, roomAFNInfo.Node(RoomAirNode).AirTemp);
             A = roomAFNInfo.Node(RoomAirNode).SumLinkM + roomAFNInfo.Node(RoomAirNode).SumHmARa;
             B = (roomAFNInfo.Node(RoomAirNode).SumIntLatentGain / H2OHtOfVap) + roomAFNInfo.Node(RoomAirNode).SumLinkMW +
                 roomAFNInfo.Node(RoomAirNode).SumHmARaW;
-            C = roomAFNInfo.Node(RoomAirNode).RhoAir * roomAFNInfo.Node(RoomAirNode).AirVolume * zone.ZoneVolCapMultpMoist /
+            C = roomAFNInfo.Node(RoomAirNode).RhoAir * roomAFNInfo.Node(RoomAirNode).AirVolume * thisZone.ZoneVolCapMultpMoist /
                 (DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys);
         }
 
@@ -4325,40 +4308,41 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         // this amount of moisture must be added to the zone to reach the setpoint.  Negative values represent
         // the amount of moisture that must be removed by the system.
         // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
-        WZoneSetPoint = Psychrometrics::PsyWFnTdbRhPb(state, thisZT, (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
+        WZoneSetPoint =
+            Psychrometrics::PsyWFnTdbRhPb(state, this->ZT, (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
         Real64 exp_700_A_C(0.0);
         if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
-            LoadToHumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
-                                     (B + C * (3.0 * thisZoneHB.WZoneTimeMinus1Temp - (3.0 / 2.0) * thisZoneHB.WZoneTimeMinus2Temp +
-                                               (1.0 / 3.0) * thisZoneHB.WZoneTimeMinus3Temp));
+            LoadToHumidifySetPoint =
+                ((11.0 / 6.0) * C + A) * WZoneSetPoint -
+                (B + C * (3.0 * this->WZoneTimeMinus1Temp - (3.0 / 2.0) * this->WZoneTimeMinus2Temp + (1.0 / 3.0) * this->WZoneTimeMinus3Temp));
             // Exact solution
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             if (A == 0.0) { // B=0
-                LoadToHumidifySetPoint = C * (WZoneSetPoint - thisZoneHB.ZoneW1) - B;
+                LoadToHumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) - B;
             } else {
                 exp_700_A_C = std::exp(min(700.0, -A / C)); // Tuned Save expensive value
-                LoadToHumidifySetPoint = A * (WZoneSetPoint - thisZoneHB.ZoneW1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
+                LoadToHumidifySetPoint = A * (WZoneSetPoint - this->ZoneW1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
             }
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
-            LoadToHumidifySetPoint = C * (WZoneSetPoint - thisZoneHB.ZoneW1) + A * WZoneSetPoint - B;
+            LoadToHumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
         zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
         WZoneSetPoint =
-            Psychrometrics::PsyWFnTdbRhPb(state, thisZT, (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
+            Psychrometrics::PsyWFnTdbRhPb(state, this->ZT, (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
         if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
-            LoadToDehumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
-                                       (B + C * (3.0 * thisZoneHB.WZoneTimeMinus1Temp - (3.0 / 2.0) * thisZoneHB.WZoneTimeMinus2Temp +
-                                                 (1.0 / 3.0) * thisZoneHB.WZoneTimeMinus3Temp));
+            LoadToDehumidifySetPoint =
+                ((11.0 / 6.0) * C + A) * WZoneSetPoint -
+                (B + C * (3.0 * this->WZoneTimeMinus1Temp - (3.0 / 2.0) * this->WZoneTimeMinus2Temp + (1.0 / 3.0) * this->WZoneTimeMinus3Temp));
             // Exact solution
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             if (A == 0.0) { // B=0
-                LoadToDehumidifySetPoint = C * (WZoneSetPoint - thisZoneHB.ZoneW1) - B;
+                LoadToDehumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) - B;
             } else {
-                LoadToDehumidifySetPoint = A * (WZoneSetPoint - thisZoneHB.ZoneW1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
+                LoadToDehumidifySetPoint = A * (WZoneSetPoint - this->ZoneW1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
             }
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
-            LoadToDehumidifySetPoint = C * (WZoneSetPoint - thisZoneHB.ZoneW1) + A * WZoneSetPoint - B;
+            LoadToDehumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToDehumidifySetPoint = LoadToDehumidifySetPoint / RAFNFrac;
         zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = LoadToDehumidifySetPoint;
@@ -4380,7 +4364,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
             } else { // this should never occur!
                 ShowSevereError(
                     state, "Humidistat: Unanticipated combination of humidifying and dehumidifying loads - report to EnergyPlus Development Team");
-                ShowContinueErrorTimeStamp(state, format("occurs in Zone = {}", zone.Name));
+                ShowContinueErrorTimeStamp(state, format("occurs in Zone = {}", thisZone.Name));
                 ShowContinueError(
                     state,
                     format("LoadToHumidifySetPoint={:.5R}, LoadToDehumidifySetPoint={:.5R}", LoadToHumidifySetPoint, LoadToDehumidifySetPoint));
@@ -4398,16 +4382,17 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
                                    state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedRate,
                                    state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedHumSPRate,
                                    state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedDehumSPRate,
-                                   zone.Multiplier,
-                                   zone.ListMultiplier);
+                                   thisZone.Multiplier,
+                                   thisZone.ListMultiplier);
 
     // init each sequenced demand to the full output
-    if (allocated(zoneSysMoistureDemand.SequencedOutputRequired))
-        zoneSysMoistureDemand.SequencedOutputRequired = zoneSysMoistureDemand.TotalOutputRequired;
-    if (allocated(zoneSysMoistureDemand.SequencedOutputRequiredToHumidSP))
-        zoneSysMoistureDemand.SequencedOutputRequiredToHumidSP = zoneSysMoistureDemand.OutputRequiredToHumidifyingSP;
-    if (allocated(zoneSysMoistureDemand.SequencedOutputRequiredToDehumidSP))
-        zoneSysMoistureDemand.SequencedOutputRequiredToDehumidSP = zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP;
+    if (thisZone.IsControlled && zoneSysMoistureDemand.NumZoneEquipment > 0) {
+        for (int equipNum = 1; equipNum <= zoneSysMoistureDemand.NumZoneEquipment; ++equipNum) {
+            zoneSysMoistureDemand.SequencedOutputRequired(equipNum) = zoneSysMoistureDemand.TotalOutputRequired;
+            zoneSysMoistureDemand.SequencedOutputRequiredToHumidSP(equipNum) = zoneSysMoistureDemand.OutputRequiredToHumidifyingSP;
+            zoneSysMoistureDemand.SequencedOutputRequiredToDehumidSP(equipNum) = zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP;
+        }
+    }
 }
 
 void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
