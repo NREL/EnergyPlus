@@ -15339,6 +15339,35 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                                           state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1),
                                           CoolingCoilInletAirWetBulbTempRated,
                                           OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint));
+            //    Warn user if curve output goes negative
+            if (TotCapTempModFac < 0.0) {
+                if (state.dataDXCoils->DXCoil(DXCoilNum).CCapFTempErrorIndex == 0) {
+                    ShowWarningMessage(
+                        state,
+                        format(
+                            "{}{} \"{}\":", RoutineName, state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+                    ShowContinueError(
+                        state,
+                        format(" Total Cooling Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotCapTempModFac));
+                    ShowContinueError(state,
+                                      format(" Negative value occurs using a coil inlet wet-bulb temperature of {:.1T} and an outdoor unit inlet air "
+                                             "dry-bulb temperature of {:.1T}.",
+                                             CoolingCoilInletAirWetBulbTempRated,
+                                             OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint)));
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+                }
+                ShowRecurringWarningErrorAtEnd(
+                    state,
+                    format("{}{} \"{}\": Total Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
+                           RoutineName,
+                           state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
+                           state.dataDXCoils->DXCoil(DXCoilNum).Name),
+                    state.dataDXCoils->DXCoil(DXCoilNum).CCapFTempErrorIndex,
+                    TotCapTempModFac,
+                    TotCapTempModFac);
+                TotCapTempModFac = 0.0;
+            }
+
             HighSpeedTotCoolingCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac;
             HighSpeedNetCoolingCap = HighSpeedTotCoolingCap - FanHeatCorrection;
 
