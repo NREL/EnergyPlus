@@ -15329,7 +15329,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 EIR = 0.0;
             }
 
-            TotCapFlowModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp2, AirMassFlowRatio);
+            // TotCapFlowModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
             TotCapTempModFac = CurveValue(state,
                                           state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp2,
                                           CoolingCoilInletAirWetBulbTempRated,
