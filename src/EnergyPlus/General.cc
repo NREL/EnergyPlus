@@ -188,31 +188,14 @@ void SolveRoot(EnergyPlusData &state,
     // >  0: number of iterations performed
 
     Real64 constexpr SMALL(1.e-10);
+    Real64 X0 = X_0;   // present 1st bound
+    Real64 X1 = X_1;   // present 2nd bound
+    Real64 XTemp = X0; // new estimate
+    int NIte = 0;      // number of interations
+    int AltIte = 0;    // an accounter used for Alternation choice
 
-    Real64 X0;       // present 1st bound
-    Real64 X1;       // present 2nd bound
-    Real64 XTemp;    // new estimate
-    Real64 Y0;       // f at X0
-    Real64 Y1;       // f at X1
-    Real64 YTemp;    // f at XTemp
-    Real64 DY;       // DY = Y0 - Y1
-    bool Conv;       // flag, true if convergence is achieved
-    bool StopMaxIte; // stop due to exceeding of maximum # of iterations
-    bool Cont;       // flag, if true, continue searching
-    int NIte;        // number of interations
-    int AltIte;      // an accounter used for Alternation choice
-
-    X0 = X_0;
-    X1 = X_1;
-    XTemp = X0;
-    Conv = false;
-    StopMaxIte = false;
-    Cont = true;
-    NIte = 0;
-    AltIte = 0;
-
-    Y0 = f(X0);
-    Y1 = f(X1);
+    Real64 Y0 = f(X0); // f at X0
+    Real64 Y1 = f(X1); // f at X1
     // check initial values
     if (Y0 * Y1 > 0) {
         Flag = -2;
@@ -221,9 +204,9 @@ void SolveRoot(EnergyPlusData &state,
     }
     XRes = XTemp;
 
-    while (Cont) {
+    while (true) {
 
-        DY = Y0 - Y1;
+        Real64 DY = Y0 - Y1;
         if (std::abs(DY) < SMALL) DY = SMALL;
         if (std::abs(X1 - X0) < SMALL) {
             break;
@@ -268,52 +251,44 @@ void SolveRoot(EnergyPlusData &state,
         }
         }
 
-        YTemp = f(XTemp);
+        Real64 const YTemp = f(XTemp);
 
         ++NIte;
         ++AltIte;
 
         // check convergence
-        if (std::abs(YTemp) < Eps) Conv = true;
+        if (std::abs(YTemp) < Eps) {
+            Flag = NIte;
+            XRes = XTemp;
+            return;
+        };
 
-        if (NIte > MaxIte) StopMaxIte = true;
+        // OK, so we didn't converge, lets check max iterations to see if we should break early
+        if (NIte > MaxIte) break;
 
-        if ((!Conv) && (!StopMaxIte)) {
-            Cont = true;
-        } else {
-            Cont = false;
-        }
-
-        if (Cont) {
-
-            // reassign values (only if further iteration required)
-            if (Y0 < 0.0) {
-                if (YTemp < 0.0) {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                } else {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                }
+        // Finally, if we make it here, we have not converged, and we still have iterations left, so continue
+        // and reassign values (only if further iteration required)
+        if (Y0 < 0.0) {
+            if (YTemp < 0.0) {
+                X0 = XTemp;
+                Y0 = YTemp;
             } else {
-                if (YTemp < 0.0) {
-                    X1 = XTemp;
-                    Y1 = YTemp;
-                } else {
-                    X0 = XTemp;
-                    Y0 = YTemp;
-                }
-            } // ( Y0 < 0 )
+                X1 = XTemp;
+                Y1 = YTemp;
+            }
+        } else {
+            if (YTemp < 0.0) {
+                X1 = XTemp;
+                Y1 = YTemp;
+            } else {
+                X0 = XTemp;
+                Y0 = YTemp;
+            }
+        } // ( Y0 < 0 )
+    }     // Cont
 
-        } // (Cont)
-
-    } // Cont
-
-    if (Conv) {
-        Flag = NIte;
-    } else {
-        Flag = -1;
-    }
+    // if we make it here we haven't converged, so just set the flag and leave
+    Flag = -1;
     XRes = XTemp;
 }
 

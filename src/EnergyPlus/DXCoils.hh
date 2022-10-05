@@ -985,7 +985,7 @@ struct DXCoilsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        *this = DXCoilsData();
+        new (this) DXCoilsData();
     }
 };
 
