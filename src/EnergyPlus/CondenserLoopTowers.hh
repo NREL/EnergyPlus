@@ -303,28 +303,28 @@ namespace CondenserLoopTowers {
         Real64 StarvedMakeUpVol = 0.0;
 
         // From VSTower struct - for Variable speed towers only
-        Array1D<Real64> Coeff;            // - model coefficients
-        bool FoundModelCoeff = false;     // - TRUE if model is calibratable
-        Real64 MinInletAirWBTemp = 0.0;   // - model limit for min inlet air WB temp
-        Real64 MaxInletAirWBTemp = 0.0;   // - model limit for max inlet air WB temp
-        Real64 MinRangeTemp = 0.0;        // - model limit for min range temp
-        Real64 MaxRangeTemp = 0.0;        // - model limit for max range temp
-        Real64 MinApproachTemp = 0.0;     // - model limit for min approach temp
-        Real64 MaxApproachTemp = 0.0;     // - model limit for max approach temp
-        Real64 MinWaterFlowRatio = 0.0;   // - model limit for min water flow rate ratio
-        Real64 MaxWaterFlowRatio = 0.0;   // - model limit for max water flow rate ratio
-        Real64 MaxLiquidToGasRatio = 0.0; // - model limit for max liquid to gas ratio
-        int VSErrorCountFlowFrac = 0;     // - counter if water flow rate ratio limits are exceeded
-        int VSErrorCountWFRR = 0;         // - counter if water flow rate ratio limits are exceeded
-        int VSErrorCountIAWB = 0;         // - counter if inlet air wet-bulb temperature limits are exceeded
-        int VSErrorCountTR = 0;           // - counter if tower range temperature limits are exceeded
-        int VSErrorCountTA = 0;           // - counter if tower approach temperature limits are exceeded
-        int ErrIndexFlowFrac = 0;         // - index to recurring error structure for liquid to gas ratio
-        int ErrIndexWFRR = 0;             // - index to recurring error structure for water flow rate ratio
-        int ErrIndexIAWB = 0;             // - index to recurring error structure for inlet air WB
-        int ErrIndexTR = 0;               // - index to recurring error structure for tower range
-        int ErrIndexTA = 0;               // - index to recurring error structure for tower approach
-        int ErrIndexLG = 0;               // - index to recurring error structure for tower liquid/gas ratio
+        std::array<Real64, 35> Coeff = {0.0}; // - model coefficients
+        bool FoundModelCoeff = false;         // - TRUE if model is calibratable
+        Real64 MinInletAirWBTemp = 0.0;       // - model limit for min inlet air WB temp
+        Real64 MaxInletAirWBTemp = 0.0;       // - model limit for max inlet air WB temp
+        Real64 MinRangeTemp = 0.0;            // - model limit for min range temp
+        Real64 MaxRangeTemp = 0.0;            // - model limit for max range temp
+        Real64 MinApproachTemp = 0.0;         // - model limit for min approach temp
+        Real64 MaxApproachTemp = 0.0;         // - model limit for max approach temp
+        Real64 MinWaterFlowRatio = 0.0;       // - model limit for min water flow rate ratio
+        Real64 MaxWaterFlowRatio = 0.0;       // - model limit for max water flow rate ratio
+        Real64 MaxLiquidToGasRatio = 0.0;     // - model limit for max liquid to gas ratio
+        int VSErrorCountFlowFrac = 0;         // - counter if water flow rate ratio limits are exceeded
+        int VSErrorCountWFRR = 0;             // - counter if water flow rate ratio limits are exceeded
+        int VSErrorCountIAWB = 0;             // - counter if inlet air wet-bulb temperature limits are exceeded
+        int VSErrorCountTR = 0;               // - counter if tower range temperature limits are exceeded
+        int VSErrorCountTA = 0;               // - counter if tower approach temperature limits are exceeded
+        int ErrIndexFlowFrac = 0;             // - index to recurring error structure for liquid to gas ratio
+        int ErrIndexWFRR = 0;                 // - index to recurring error structure for water flow rate ratio
+        int ErrIndexIAWB = 0;                 // - index to recurring error structure for inlet air WB
+        int ErrIndexTR = 0;                   // - index to recurring error structure for tower range
+        int ErrIndexTA = 0;                   // - index to recurring error structure for tower approach
+        int ErrIndexLG = 0;                   // - index to recurring error structure for tower liquid/gas ratio
         //- Tr = Range temperature
         std::string TrBuffer1; // - buffer to print Tr warning messages on following time step
         std::string TrBuffer2; // - buffer to print Tr warning messages on following time step
@@ -354,9 +354,6 @@ namespace CondenserLoopTowers {
         Real64 TaLast = 0.0;                 // value of Ta when warning occurred (passed to Recurring Warning)
         Real64 WaterFlowRateRatioLast = 0.0; // value of WFRR when warning occurred (passed to Recurring Warn)
         Real64 LGLast = 0.0;                 // value of LG when warning occurred (passed to Recurring Warn)
-
-        // Hopefully temporary members
-        int thisTowerNum = 0; // regula falsi residual functions are static and so they need to get an index passed from a member function
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
@@ -425,26 +422,6 @@ namespace CondenserLoopTowers {
         void update(EnergyPlusData &state);
 
         void report(EnergyPlusData &state, bool RunFlag);
-
-        Real64 residualUA(EnergyPlusData &state,
-                          Real64 UA,                       // UA of cooling tower
-                          std::array<Real64, 6> const &Par // par(1) = design tower load [W]
-        );
-
-        Real64 residualTa(EnergyPlusData &state,
-                          Real64 FlowRatio,                // water or air flow ratio of cooling tower
-                          std::array<Real64, 6> const &Par // par(1) = tower number
-        );
-
-        Real64 residualTr(EnergyPlusData &state,
-                          Real64 Trange,                   // cooling tower range temperature [C]
-                          std::array<Real64, 6> const &Par // par(1) = tower number
-        );
-
-        Real64 residualMerkelLoad(EnergyPlusData &state,
-                                  Real64 airFlowRateRatioLocal,    // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                  std::array<Real64, 8> const &Par // par(1) = Tower number
-        );
 
         static PlantComponent *factory(EnergyPlusData &state, std::string_view objectName);
     };

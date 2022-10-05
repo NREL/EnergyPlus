@@ -285,11 +285,6 @@ namespace DesiccantDehumidifiers {
                                Optional<Real64> RegenCoilLoadmet = _ // heating load met
     );
 
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 HWFlow,                   // hot water flow rate in kg/s
-                                std::array<Real64, 3> const &Par // Par(5) is the requested coil load
-    );
-
     int GetProcAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
 
     int GetProcAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
@@ -297,28 +292,6 @@ namespace DesiccantDehumidifiers {
     int GetRegAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
 
     int GetRegAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
-
-    //        End of Reporting subroutines for the SimAir Module
-    // *****************************************************************************
-
-    //                                 COPYRIGHT NOTICE
-
-    //     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
-
-    //     GRI LEGAL NOTICE
-    //     Neither GRI, members of GRI nor any person or organization acting on behalf
-    //     of either:
-
-    //     A. Makes any warranty of representation, express or implied with respect to
-    //        the accuracy, completness, or usefulness of the information contained in
-    //        in this program, including any warranty of merchantability or fitness of
-    //        any purpose with respoect to the program, or that the use of any
-    //        information disclosed in this program may not infringe privately-owned
-    //        rights, or
-
-    //     B.  Assumes any liability with respoct to the use of, or for any and all
-    //         damages resulting from the use of the program or any portion thereof or
-    //         any information disclosed therein.
 
 } // namespace DesiccantDehumidifiers
 
@@ -349,26 +322,7 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->NumDesicDehums = 0;
-        this->NumSolidDesicDehums = 0;
-        this->NumGenericDesicDehums = 0;
-        this->TempSteamIn = 100.0;
-        this->GetInputDesiccantDehumidifier = true;
-        this->InitDesiccantDehumidifierOneTimeFlag = true;
-        this->DesicDehum.deallocate();
-        this->UniqueDesicDehumNames.clear();
-        this->MySetPointCheckFlag = true;
-        this->CalcSolidDesiccantDehumidifierMyOneTimeFlag = true;
-        this->CalcGenericDesiccantDehumidifierMyOneTimeFlag = true;
-        this->MaxNums = 0;
-        this->MaxAlphas = 0;
-        this->TotalArgs = 0;
-        this->SteamDensity = 0.0;
-        this->MyEnvrnFlag.deallocate();
-        this->MyPlantScanFlag.deallocate();
-        this->RhoAirStdInit = 0.0;
-        this->QRegen = 0.0;
-        this->RhoAirStdInitCGDD = 0.0;
+        new (this) DesiccantDehumidifiersData();
     }
 };
 
