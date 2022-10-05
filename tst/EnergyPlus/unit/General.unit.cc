@@ -407,25 +407,35 @@ TEST_F(EnergyPlusFixture, General_MovingAvg)
 {
     int numItem = 12;
     Array1D<Real64> inputData;
-    Array1D<Real64> outputData;
+    Array1D<Real64> saveData;
     inputData.allocate(numItem);
-    outputData.allocate(numItem);
+    saveData.allocate(numItem);
     for (int i = 1; i <= numItem; i++) {
         inputData(i) = (Real64)i * i;
     }
-    outputData = 0.0;
+    saveData = inputData;
 
     int avgWindowWidth = 1;
-    MovingAvg(inputData, numItem, avgWindowWidth, outputData);
+    MovingAvg(inputData, avgWindowWidth);
     for (int i = 1; i <= numItem; i++) {
-        ASSERT_EQ(outputData(i), inputData(i));
+        ASSERT_EQ(saveData(i), inputData(i)); // averaged data has not changed since window = 1
     }
 
     avgWindowWidth = 2;
-    MovingAvg(inputData, numItem, avgWindowWidth, outputData);
-    ASSERT_EQ(outputData(1), (inputData(1) + inputData(numItem)) / 2);
+    MovingAvg(inputData, avgWindowWidth);
+    ASSERT_EQ(inputData(1), (saveData(1) + saveData(numItem)) / avgWindowWidth);
     for (int j = 2; j <= numItem; j++) {
-        ASSERT_EQ(outputData(j), (inputData(j) + inputData(j - 1)) / 2);
+        ASSERT_EQ(inputData(j), (saveData(j) + saveData(j - 1)) / avgWindowWidth);
+    }
+    inputData = saveData; // reset for next test
+
+    avgWindowWidth = 4;
+    MovingAvg(inputData, avgWindowWidth);
+    EXPECT_NEAR(inputData(1), (saveData(1) + saveData(12) + saveData(11) + saveData(10)) / avgWindowWidth, 1E-9);
+    EXPECT_NEAR(inputData(2), (saveData(2) + saveData(1) + saveData(12) + saveData(11)) / avgWindowWidth, 1E-9);
+    EXPECT_NEAR(inputData(3), (saveData(3) + saveData(2) + saveData(1) + saveData(12)) / avgWindowWidth, 1E-9);
+    for (int j = 4; j <= numItem; j++) {
+        EXPECT_NEAR(inputData(j), (saveData(j) + saveData(j - 1) + saveData(j - 2) + saveData(j - 3)) / avgWindowWidth, 1E-9);
     }
 }
 

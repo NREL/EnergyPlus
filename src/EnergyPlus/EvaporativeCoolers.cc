@@ -2432,7 +2432,6 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     Real64 EvapCoolerTotalElectricPowerDry; // evaporative cooler current total electric power drawn
     Real64 EvapCoolerTotalElectricPowerWet; // evaporative cooler current total electric power drawn
     int SolFla;                             // Flag of solver
-    std::array<Real64, 6> Par = {0.0};      // Parameter array passed to solver
     Real64 QHXLatent;                       // evaporative cooler latent heat transfer rate
     Real64 hfg;                             // latent heat of vaporization of water at the secondary air inlet condition
 
@@ -2470,14 +2469,15 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     PartLoad = thisEvapCond.PartLoadFract;
     {
         if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::DryModulated) {
-            Par[0] = double(EvapCoolNum);
-            Par[1] = double(OperatingMode::DryModulated);
-            Par[2] = SysTempSetPoint;
-            Par[3] = InletDryBulbTempSec;
-            Par[4] = InletWetBulbTempSec;
-            Par[5] = InletHumRatioSec;
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::DryModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -2534,15 +2534,15 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             thisEvapCond.EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryFull, FlowRatioSec);
             thisEvapCond.IECOperatingStatus = 1;
         } else if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::DryWetModulated) {
-            Par[0] = double(EvapCoolNum);
-            Par[2] = SysTempSetPoint;
-            Par[3] = InletDryBulbTempSec;
-            Par[4] = InletWetBulbTempSec;
-            Par[5] = InletHumRatioSec;
-            // get dry operation performance first
-            Par[1] = double(OperatingMode::DryModulated);
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::DryModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -2592,9 +2592,15 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             AirMassFlowSecDry = AirMassFlowSec;
             EvapCoolerTotalElectricPowerDry = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryModulated, FlowRatioSecDry);
             // get wet operation performance
-            Par[1] = double(OperatingMode::WetModulated);
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f2 = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::WetModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f2, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -2662,14 +2668,15 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 thisEvapCond.IECOperatingStatus = 2;
             }
         } else if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::WetModulated) {
-            Par[0] = double(EvapCoolNum);
-            Par[1] = double(OperatingMode::WetModulated);
-            Par[2] = SysTempSetPoint;
-            Par[3] = InletDryBulbTempSec;
-            Par[4] = InletWetBulbTempSec;
-            Par[5] = InletHumRatioSec;
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::WetModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -2865,52 +2872,6 @@ OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(EnergyPlusData &sta
         OperatingMode = OperatingMode::None; // this condition should not happen unless the bounds do not cover all combinations possible
     }
     return OperatingMode;
-}
-
-Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state,
-                                      Real64 const AirMassFlowSec,     // secondary air mass flow rate in kg/s
-                                      std::array<Real64, 6> const &Par // Par(2) is desired outlet temperature of Evap Cooler
-)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         B. Nigusse
-    //       DATE WRITTEN   Sep 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Indirect research special evaporative cooler part load operation:
-    // determines the secondary air flow rate
-
-    // METHODOLOGY EMPLOYED:
-    // Uses regula falsi to minimize setpoint temperature residual to by varying the
-    // secondary air flow rate.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int EvapCoolIndex;                   // evaporative cooler index
-    OperatingMode DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
-    Real64 EDBTSecAirSide;               // current entering dry bulb temperature of the secondary side
-    Real64 EWBTSecAirSide;               // current entering wet bulb temperature of the secondary side
-    Real64 EHumRatSecAirSide;            // current entering humidity ratio of the secondary side
-    Real64 OutletAirTemp;                // evap Coler outlet air temperature
-    Real64 SysTempSetPoint;              // evaporative cooler outlet setpoint temperature, drybulb
-    Real64 Residuum;                     // Residual to be minimized to zero
-
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
-
-    EvapCoolIndex = int(Par[0]);
-    DryOrWetOperatingMode = OperatingMode(int(Par[1]));
-    SysTempSetPoint = Par[2];
-    EDBTSecAirSide = Par[3];
-    EWBTSecAirSide = Par[4];
-    EHumRatSecAirSide = Par[5];
-    state.dataEvapCoolers->EvapCond(EvapCoolIndex).SecInletMassFlowRate = AirMassFlowSec;
-    CalcIndirectRDDEvapCoolerOutletTemp(
-        state, EvapCoolIndex, DryOrWetOperatingMode, AirMassFlowSec, EDBTSecAirSide, EWBTSecAirSide, EHumRatSecAirSide);
-    OutletAirTemp = EvapCond(EvapCoolIndex).OutletTemp;
-    Residuum = SysTempSetPoint - OutletAirTemp;
-
-    return Residuum;
 }
 
 void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
@@ -4230,7 +4191,7 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
             if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
 
                 // determine fan speed to meet load
-                ControlVSEvapUnitToMeetLoad(state, UnitNum, ZoneNum, ZoneCoolingLoad);
+                ControlVSEvapUnitToMeetLoad(state, UnitNum, ZoneCoolingLoad);
                 // variable speed fan used fan speed ratio instead of partload ratio
                 CalcZoneEvapUnitOutput(state, UnitNum, ZoneEvapUnit(UnitNum).FanSpeedRatio, SensibleOutputProvided, LatentOutputProvided);
 
@@ -4370,9 +4331,14 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
 
     // calculate part load ratio
     if (FullFlowSensibleOutput < ZoneCoolingLoad) {
-        std::array<Real64, 2> Par = {Real64(UnitNum), ZoneCoolingLoad}; // Parameters passed to root solver
-
-        General::SolveRoot(state, Tol, MaxIte, SolFla, PartLoadRatio, ZoneEvapUnitLoadResidual, 0.0, 1.0, Par);
+        auto f = [&state, UnitNum, ZoneCoolingLoad](Real64 PartLoadRatio) {
+            // calculates cooling load residual by varying part load ratio
+            Real64 QSensOutputProvided; // sensible output at a given PLR
+            Real64 QLatOutputProvided;  // latent output at a given PLR
+            CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, QSensOutputProvided, QLatOutputProvided);
+            return QSensOutputProvided - ZoneCoolingLoad;
+        };
+        General::SolveRoot(state, Tol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
             if (ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex == 0) {
                 ShowWarningError(state, "Iteration limit exceeded calculating evap unit part load ratio, for unit=" + ZoneEvapUnit(UnitNum).Name);
@@ -4409,21 +4375,8 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
 }
 
-Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio, std::array<Real64, 2> const &Par // parameters
-)
-{
-    // calculates cooling load residual by varying part load ratio
-    int UnitNum = int(Par[0]);
-    Real64 LoadToBeMet = Par[1];
-    Real64 QSensOutputProvided; // sensible output at a given PLR
-    Real64 QLatOutputProvided;  // latent output at a given PLR
-    CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, QSensOutputProvided, QLatOutputProvided);
-    return QSensOutputProvided - LoadToBeMet;
-}
-
 void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                                  int const UnitNum,           // unit number
-                                 int const ZoneNum,           // number of zone being served
                                  Real64 const ZoneCoolingLoad // target cooling load
 )
 {
@@ -4498,14 +4451,55 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                                       Psychrometrics::PsyHFnTdbW(Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp, MinHumRat));
 
     if (FullFlowSensibleOutputProvided < ZoneCoolingLoad) { // find speed ratio by regula falsi numerical method
-        std::array<Real64, 5> Par = {0.0};                  // Parameters passed to RegulaFalsi
-        Par[0] = UnitNum;
-        Par[1] = ZoneNum;
-        Par[2] = ZoneEvapUnit(UnitNum).ZoneNodeNum;
-        Par[4] = ZoneCoolingLoad;
         FanSpeedRatio = 1.0;
+        auto f = [&state, UnitNum, ZoneCoolingLoad](Real64 FanSpeedRatio) {
+            auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+            auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
+            auto &Node(state.dataLoopNodes->Node);
+            auto &unit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
-        General::SolveRoot(state, ErrorToler, MaxIte, SolFla, FanSpeedRatio, VSEvapUnitLoadResidual, 0.0, 1.0, Par);
+            Node(unit.OAInletNodeNum).MassFlowRate = unit.DesignAirMassFlowRate * FanSpeedRatio;
+            Node(unit.OAInletNodeNum).MassFlowRateMaxAvail = Node(unit.OAInletNodeNum).MassFlowRate;
+            Node(unit.UnitOutletNodeNum).MassFlowRate = Node(unit.OAInletNodeNum).MassFlowRate;
+            Node(unit.UnitOutletNodeNum).MassFlowRateMaxAvail = Node(unit.UnitOutletNodeNum).MassFlowRate;
+
+            if (unit.UnitReliefNodeNum > 0) {
+                Node(unit.UnitReliefNodeNum).MassFlowRate = Node(unit.OAInletNodeNum).MassFlowRate;
+                Node(unit.UnitReliefNodeNum).MassFlowRateMaxAvail = Node(unit.OAInletNodeNum).MassFlowRate;
+            }
+            if (unit.FanLocation == FanPlacement::BlowThruFan) {
+                Node(unit.FanOutletNodeNum).MassFlowRate = Node(unit.OAInletNodeNum).MassFlowRate;
+                Node(unit.FanOutletNodeNum).MassFlowRateMaxAvail = Node(unit.OAInletNodeNum).MassFlowRate;
+                if (unit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                } else {
+                    state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                }
+            }
+
+            if (unit.EvapCooler_1_AvailStatus) {
+                SimEvapCooler(state, unit.EvapCooler_1_Name, unit.EvapCooler_1_Index, FanSpeedRatio);
+            }
+
+            if ((unit.EvapCooler_2_Index > 0) && unit.EvapCooler_2_AvailStatus) {
+                SimEvapCooler(state, unit.EvapCooler_2_Name, unit.EvapCooler_2_Index, FanSpeedRatio);
+            }
+            if (unit.FanLocation == FanPlacement::DrawThruFan) {
+                if (unit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                } else {
+                    state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                }
+            }
+
+            Real64 const MinHumRat = min(Node(unit.ZoneNodeNum).HumRat, Node(unit.UnitOutletNodeNum).HumRat);
+            Real64 const SensibleOutputProvided =
+                Node(unit.UnitOutletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(unit.UnitOutletNodeNum).Temp, MinHumRat) -
+                                                             Psychrometrics::PsyHFnTdbW(Node(unit.ZoneNodeNum).Temp, MinHumRat));
+
+            return SensibleOutputProvided - ZoneCoolingLoad;
+        };
+        General::SolveRoot(state, ErrorToler, MaxIte, SolFla, FanSpeedRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
             if (ZoneEvapUnit(UnitNum).UnitVSControlMaxIterErrorIndex == 0) {
                 ShowWarningError(
@@ -4537,85 +4531,6 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
         }
         ZoneEvapUnit(UnitNum).FanSpeedRatio = FanSpeedRatio;
     }
-}
-
-Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 const FanSpeedRatio, std::array<Real64, 5> const &Par // parameters
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         <author>
-    //       DATE WRITTEN   <date_written>
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // Using/Aliasing
-    auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-    auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-
-    // Return value
-    Real64 Residual;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int UnitNum;
-    int ZoneNum;
-    int ZoneNodeNum;
-    Real64 LoadToBeMet; // sensible load to be met
-    Real64 MinHumRat;
-    Real64 SensibleOutputProvided;
-
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
-    auto &Node(state.dataLoopNodes->Node);
-
-    UnitNum = int(Par[0]);
-    ZoneNum = int(Par[1]);
-    ZoneNodeNum = int(Par[2]);
-    LoadToBeMet = Par[4];
-
-    Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate * FanSpeedRatio;
-    Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate;
-
-    if (ZoneEvapUnit(UnitNum).UnitReliefNodeNum > 0) {
-        Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::BlowThruFan) {
-        Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
-        } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
-        }
-    }
-
-    if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, FanSpeedRatio);
-    }
-
-    if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, FanSpeedRatio);
-    }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
-        } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
-        }
-    }
-
-    MinHumRat = min(Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).HumRat, Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).HumRat);
-    SensibleOutputProvided = Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate *
-                             (Psychrometrics::PsyHFnTdbW(Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).Temp, MinHumRat) -
-                              Psychrometrics::PsyHFnTdbW(Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp, MinHumRat));
-
-    Residual = SensibleOutputProvided - LoadToBeMet;
-
-    return Residual;
 }
 
 void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // unit number

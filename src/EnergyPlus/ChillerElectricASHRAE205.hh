@@ -72,14 +72,6 @@ namespace ChillerElectricASHRAE205 {
         Num,
     };
 
-    enum class PerformanceInterpolationType
-    {
-        Invalid = -1,
-        Linear,
-        Cubic,
-        Num
-    };
-
     void tk205ErrCallback(tk205::MsgSeverity message_type, const std::string &message, void *context_ptr);
 
     void getChillerASHRAE205Input(EnergyPlusData &state);
@@ -88,7 +80,7 @@ namespace ChillerElectricASHRAE205 {
     {
         static constexpr std::string_view ObjectType{"Chiller:Electric:ASHRAE205"};
         std::shared_ptr<tk205::rs0001_ns::RS0001> Representation; // ASHRAE205 representation instance
-        PerformanceInterpolationType InterpolationType{PerformanceInterpolationType::Linear};
+        Btwxt::Method InterpolationType{Btwxt::Method::LINEAR};
         int MinSequenceNumber{1};
         int MaxSequenceNumber{1};
 
@@ -137,8 +129,6 @@ namespace ChillerElectricASHRAE205 {
         void size(EnergyPlusData &state) override;
 
         void findEvaporatorMassFlowRate(EnergyPlusData &state, Real64 &load, Real64 Cp);
-
-        Real64 findCapacityResidual(EnergyPlusData &, Real64 partLoadSequenceNumber, std::array<Real64, 4> const &par);
 
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad, // operating load

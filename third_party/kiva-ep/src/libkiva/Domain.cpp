@@ -406,6 +406,10 @@ std::vector<std::size_t> Domain::getDestIndex(std::size_t i, std::size_t j, std:
   return dest_index;
 }
 
+std::size_t Domain::getIndex(std::size_t i, std::size_t j, std::size_t k) {
+  return i + dim_lengths[0] * j + dim_lengths[0] * dim_lengths[1] * k;
+}
+
 } // namespace Kiva
 
 #endif

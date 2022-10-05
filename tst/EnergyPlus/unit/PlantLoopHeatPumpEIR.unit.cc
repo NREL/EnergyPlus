@@ -58,6 +58,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -2994,6 +2995,182 @@ TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
     EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_TRUE(thisCoolingPLHP->running);
+}
+
+TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
+{
+
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  hp heating side,",
+                                                      "  0.005,",
+                                                      "  0.002,",
+                                                      "  20000,",
+                                                      "  3.0,",
+                                                      "  1,",
+                                                      "  CapCurveFuncTemp,",
+                                                      "  EIRCurveFuncTemp,",
+                                                      "  badEIRCurveFuncPLR;",
+                                                      "HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 5,",
+                                                      "  node 6,",
+                                                      "  WaterSource,",
+                                                      "  node 7,",
+                                                      "  node 8,",
+                                                      "  hp cooling side,",
+                                                      "  0.005,",
+                                                      "  0.002,",
+                                                      "  20000,",
+                                                      "  3.0,",
+                                                      "  1,",
+                                                      "  CapCurveFuncTemp,",
+                                                      "  EIRCurveFuncTemp,",
+                                                      "  EIRCurveFuncPLR;",
+                                                      "Curve:Biquadratic,",
+                                                      "  CapCurveFuncTemp,",
+                                                      "  1.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  5.0,",
+                                                      "  10.0,",
+                                                      "  24.0,",
+                                                      "  35.0,",
+                                                      "  ,",
+                                                      "  ,",
+                                                      "  Temperature,",
+                                                      "  Temperature,",
+                                                      "  Dimensionless;",
+                                                      "Curve:Biquadratic,",
+                                                      "  EIRCurveFuncTemp,",
+                                                      "  1.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  1.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  5.0,",
+                                                      "  10.0,",
+                                                      "  24.0,",
+                                                      "  35.0,",
+                                                      "  ,",
+                                                      "  ,",
+                                                      "  Temperature,",
+                                                      "  Temperature,",
+                                                      "  Dimensionless;",
+                                                      "Curve:Quadratic,",
+                                                      "  EIRCurveFuncPLR,",
+                                                      "  1.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  1.0;"
+                                                      "Curve:Quadratic,",
+                                                      "  badEIRCurveFuncPLR,",
+                                                      "  -1.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  0.0,",
+                                                      "  1.0;"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up the plant loops
+    // first the load side
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideLoop = state->dataPlnt->PlantLoop(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    // then the source side
+
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+
+    auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1);
+    PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &state->dataEIRPlantLoopHeatPump->heatPumps[0];
+
+    // do a little setup here
+    thisCoolingPLHP->loadSidePlantLoc.loopNum = 1;
+    thisCoolingPLHP->loadSidePlantLoc.loopSideNum = DataPlant::LoopSideLocation::Supply;
+    thisCoolingPLHP->loadSidePlantLoc.branchNum = 1;
+    thisCoolingPLHP->loadSidePlantLoc.compNum = 1;
+    thisCoolingPLHP->loadSideNodes.outlet = 1;
+
+    // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
+    // outlet setpoint node
+    state->dataLoopNodes->Node.allocate(5);
+    PLHPPlantLoadSideLoop.TempSetPointNodeNum = 5;
+
+    // set up the plant setpoint conditions and test for single setpoint operation
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
+    state->dataLoopNodes->Node(5).TempSetPoint = 2.718;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
+
+    // test for dual setpoint operation
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
+    state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
+    state->dataLoopNodes->Node(5).TempSetPointHi = 5.436;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CoolingRB;
+
+    state->dataHVACGlobal->TimeStepSys = 60;
+
+    Real64 curLoad = -10000;
+
+    thisCoolingPLHP->loadSideMassFlowRate = 0.3;
+    thisCoolingPLHP->sourceSideMassFlowRate = 0.8;
+    thisCoolingPLHP->loadSideInletTemp = 20;
+    thisCoolingPLHP->sourceSideInletTemp = 20;
+    thisCoolingPLHP->doPhysics(*state, curLoad);
+
+    // Power and energy are now zero since the curve is reset with zero values
+    EXPECT_NEAR(thisCoolingPLHP->powerUsage, 0.000, 1e-3);
+    EXPECT_NEAR(thisCoolingPLHP->powerEnergy, 0.000, 1e-3);
+
+    EXPECT_NEAR(thisCoolingPLHP->sourceSideHeatTransfer, 10000.000, 1e-3);
+    EXPECT_NEAR(thisCoolingPLHP->sourceSideEnergy, 2160000000.000, 1e-3);
+
+    EXPECT_NEAR(thisCoolingPLHP->loadSideOutletTemp, 12.095, 1e-3);
+
+    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 22.964, 1e-3);
+
+    EXPECT_EQ(thisCoolingPLHP->eirModFPLRErrorIndex, 1);
+
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "HeatPump:PlantLoop:EIR:Cooling \"HP COOLING SIDE\":");
+
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors(1).Count, 1);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors(1).Message,
+              " ** Warning ** HeatPump:PlantLoop:EIR:Cooling \"HP COOLING SIDE\": EIR Modifier curve (function of PLR) output is negative warning "
+              "continues...");
 }
 
 TEST_F(EnergyPlusFixture, GAHP_HeatingConstructionFullObjectsNoCompanion)

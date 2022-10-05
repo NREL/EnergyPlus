@@ -57,8 +57,10 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -237,7 +239,7 @@ namespace UnitarySystems {
             Num,
         };
 
-        UnitarySysInputSpec original_input_specs;
+        UnitarySysInputSpec input_specs;
         int m_UnitarySysNum = -1;
         SysType m_sysType = SysType::Invalid;
         bool m_ThisSysInputShouldBeGotten = true;
@@ -279,7 +281,7 @@ namespace UnitarySystems {
         int m_NumOfSpeedSuppHeating = 0;
         bool m_MultiSpeedHeatingCoil = false;
         bool m_VarSpeedHeatingCoil = false;
-        int m_SystemHeatControlNodeNum = 0;
+        int HeatCtrlNode = 0;
         bool m_CoolCoilExists = false;
         int m_CoolingCoilType_Num = 0;
         int m_NumOfSpeedCooling = 0;
@@ -293,7 +295,7 @@ namespace UnitarySystems {
         int m_ActualDXCoilIndexForHXAssisted = 0;
         bool m_DiscreteSpeedCoolingCoil = false;
         bool m_ContSpeedCoolingCoil = false;
-        int m_SystemCoolControlNodeNum = 0;
+        int CoolCtrlNode = 0;
         int m_WaterCyclingMode = 0;
         bool m_ISHundredPercentDOASDXCoil = false;
         bool m_RunOnSensibleLoad = false;
@@ -304,11 +306,11 @@ namespace UnitarySystems {
         bool m_SuppCoilExists = false;
         Real64 m_DesignSuppHeatingCapacity = 0.0;
         int m_SuppCoilAirInletNode = 0;
-        int m_SuppCoilAirOutletNode = 0;
+        int SuppCoilOutletNodeNum = 0;
         int m_SuppCoilFluidInletNode = 0;
         Real64 m_MaxSuppCoilFluidFlow = 0.0;
         int m_SuppHeatCoilIndex = 0;
-        int m_SuppHeatControlNodeNum = 0;
+        int SuppCtrlNode = 0;
         Real64 m_SupHeaterLoad = 0.0;
         int m_CoolingSAFMethod = 0;
         int m_HeatingSAFMethod = 0;
@@ -487,7 +489,8 @@ namespace UnitarySystems {
 
     public:
         // SZVAV variables
-        int UnitarySystemType_Num = 0;
+        DataZoneEquipment::ZoneEquip ZoneEqType = DataZoneEquipment::ZoneEquip::Invalid;
+        SimAirServingZones::CompType AirloopEqType = SimAirServingZones::CompType::Invalid;
         int MaxIterIndex = 0;
         int RegulaFalsiFailedIndex = 0;
         int NodeNumOfControlledZone = 0;
@@ -733,7 +736,7 @@ namespace UnitarySystems {
 
         void initUnitarySystems(EnergyPlusData &state, int AirLoopNum, bool FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
 
-        void checkNodeSetPoint(EnergyPlusData &state,
+        bool checkNodeSetPoint(EnergyPlusData &state,
                                int const AirLoopNum,       // number of the current air loop being simulated
                                int const ControlNode,      // Node to test for set point
                                int const CoilType,         // True if cooling coil, then test for HumRatMax set point
@@ -914,20 +917,6 @@ namespace UnitarySystems {
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        void simulateSys(EnergyPlusData &state,
-                         std::string_view Name,
-                         bool const firstHVACIteration,
-                         int AirLoopNum,
-                         int &CompIndex,
-                         bool &HeatActive,
-                         bool &CoolActive,
-                         int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-                         Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-                         bool const ZoneEquipment,    // TRUE if called as zone equipment
-                         Real64 &sysOutputProvided,   // sensible output at supply air node
-                         Real64 &latOutputProvided    // latent output at supply air node
-        );
-
         void calcUnitarySystemToLoad(EnergyPlusData &state,
                                      int const AirLoopNum,          // index to air loop
                                      bool const FirstHVACIteration, // True when first HVAC iteration
@@ -990,7 +979,12 @@ namespace UnitarySystems {
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
     bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
-    bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
+    bool searchTotalComponents(EnergyPlusData &state,
+                               SimAirServingZones::CompType compTypeToFind,
+                               std::string_view objectNameToFind,
+                               int &compIndex,
+                               int &branchIndex,
+                               int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound);
 
@@ -1035,7 +1029,6 @@ struct UnitarySystemsData : BaseGlobalStruct
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
 
-    bool myOneTimeFlag = true;
     bool getInputFlag = true;
 
     void clear_state() override
@@ -1071,7 +1064,6 @@ struct UnitarySystemsData : BaseGlobalStruct
         reportVariablesAreSetup = false;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
-        myOneTimeFlag = true;
         getInputFlag = true;
     }
 

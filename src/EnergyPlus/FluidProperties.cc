@@ -7164,82 +7164,25 @@ namespace FluidProperties {
 
         // Perform iterations to obtain the temperature level
         {
-            std::array<Real64, 3> Par;        // Parameters passed to RegulaFalsi
             Real64 constexpr ErrorTol(0.001); // tolerance for RegulaFalsi iterations
             int constexpr MaxIte(500);        // maximum number of iterations
             int SolFla;                       // Flag of RegulaFalsi solver
 
-            Par[0] = RefrigNum;
-            Par[1] = Enthalpy;
-            Par[2] = Pressure;
+            auto f = [&state, RefrigNum, Enthalpy, Pressure](Real64 Temp) {
+                static constexpr std::string_view RoutineNameNoSpace("GetSupHeatTempRefrigResidual");
+                Real64 Enthalpy_Req = Enthalpy;
+                std::string const &Refrigerant = state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name;
+                if (std::abs(Enthalpy_Req) < 100.0) Enthalpy_Req = sign(100.0, Enthalpy_Req);
+                int nonConstRefrigNum = RefrigNum;
+                Real64 Enthalpy_Act = GetSupHeatEnthalpyRefrig(state, Refrigerant, Temp, Pressure, nonConstRefrigNum, RoutineNameNoSpace);
+                return (Enthalpy_Act - Enthalpy_Req) / Enthalpy_Req;
+            };
 
-            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
+            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Temp, f, TempLow, TempUp);
             ReturnValue = Temp;
         }
 
         return ReturnValue;
-    }
-
-    Real64 GetSupHeatTempRefrigResidual(EnergyPlusData &state,
-                                        Real64 const Temp, // temperature of the refrigerant
-                                        std::array<Real64, 3> const &Par)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Rongpeng Zhang, LBNL
-        //       DATE WRITTEN   July 2016
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        //  Calculates residual function (( Enthalpy_Actual - Enthalpy_Req ) / Enthalpy_Req )
-        //  This method is designed to support , which calculates the refrigerant temperature corresponding to the given
-        //  enthalpy and pressure in superheated region.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 TempResidual;
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // Par( 1 ) = RefrigNum;
-        // Par( 2 ) = Enthalpy;
-        // Par( 3 ) = Pressure;
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static constexpr std::string_view RoutineNameNoSpace("GetSupHeatTempRefrigResidual");
-        std::string Refrigerant; // carries in substance name
-        int RefrigNum;           // index for refrigerant under consideration
-        Real64 Pressure;         // pressure of the refrigerant
-        Real64 Enthalpy_Req;     // enthalpy of the refrigerant to meet
-        Real64 Enthalpy_Act;     // enthalpy of the refrigerant calculated
-
-        RefrigNum = int(Par[0]);
-        Enthalpy_Req = Par[1];
-        Pressure = Par[2];
-        Refrigerant = state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name;
-        if (std::abs(Enthalpy_Req) < 100.0) Enthalpy_Req = sign(100.0, Enthalpy_Req);
-
-        Enthalpy_Act = GetSupHeatEnthalpyRefrig(state, Refrigerant, Temp, Pressure, RefrigNum, RoutineNameNoSpace);
-
-        TempResidual = (Enthalpy_Act - Enthalpy_Req) / Enthalpy_Req;
-
-        return TempResidual;
     }
 
     //*****************************************************************************
