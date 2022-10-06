@@ -13144,18 +13144,24 @@ namespace UnitarySystems {
                             this->m_CompPartLoadRatio = PartLoadFrac;
 
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
-                            std::array<Real64, 8> Par2 = {
-                                double(this->m_CoolingCoilIndex),
-                                DesOutTemp,
-                                double(DehumidMode), // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                                double(FanOpMode),
-                                double(this->m_CoolingSpeedNum),
-                                this->m_CoolingSpeedRatio,
-                                0.0,
-                                0.0,
+                            auto f = [&state, this, DesOutTemp, DehumidMode, FanOpMode](Real64 const PartLoadRatio) {
+                                int CoilIndex = this->m_CoolingCoilIndex;
+                                int CoolingSpeedNum = this->m_CoolingSpeedNum;
+                                Real64 CoolingSpeedRatio = this->m_CoolingSpeedRatio;
+                                bool const singleMode = this->m_SingleMode;
+                                if (CoolingSpeedNum == 1) {
+                                    state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                        state, DehumidMode, PartLoadRatio, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode, singleMode);
+                                } else {
+                                    state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                        state, DehumidMode, CoolingSpeedRatio, CoolingSpeedNum, PartLoadRatio, FanOpMode, singleMode);
+                                }
+                                Real64 outletCondition =
+                                    state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).Temp;
+                                return DesOutTemp - outletCondition;
                             };
-                            if (this->m_SingleMode == 1) Par[7] = 1.0;
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             if (this->m_CoolingSpeedNum == 1) {
                                 this->m_CompPartLoadRatio = PartLoadFrac;
                                 SpeedRatio = 0.0;
