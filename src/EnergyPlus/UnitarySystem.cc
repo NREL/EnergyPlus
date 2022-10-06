@@ -14548,17 +14548,63 @@ namespace UnitarySystems {
                         } break;
                         case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple:
                         case DataHVACGlobals::Coil_HeatingWaterToAirHP: {
-                            Par[1] = double(this->m_UnitarySysNum);
-                            if (FirstHVACIteration) {
-                                Par[2] = 1.0;
-                            } else {
-                                Par[2] = 0.0;
-                            }
-                            Par[3] = DesOutTemp;
-                            Par[4] = ReqOutput;
                             this->m_HeatingCoilSensDemand = ReqOutput;
 
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->heatWatertoAirHPTempResidual, 0.0, 1.0, Par);
+                            auto f = [&state, this, FirstHVACIteration, DesOutTemp, ReqOutput](Real64 const PartLoadRatio) {
+                                Real64 OutletAirTemp; // outlet air humidity ratio [kg/kg]
+                                bool errFlag;
+                                Real64 RuntimeFrac;
+                                Real64 dummy;
+
+                                this->heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
+
+                                if (RuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
+                                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
+                                } else {
+                                    state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
+                                }
+
+                                this->m_CompPartLoadRatio = PartLoadRatio;
+                                this->m_WSHPRuntimeFrac = RuntimeFrac;
+
+                                dummy = 0.0;
+                                if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
+                                    WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
+                                                                                    blankString,
+                                                                                    this->m_HeatingCoilIndex,
+                                                                                    ReqOutput,
+                                                                                    dummy,
+                                                                                    this->m_FanOpMode,
+                                                                                    RuntimeFrac,
+                                                                                    this->m_MaxONOFFCyclesperHour,
+                                                                                    this->m_HPTimeConstant,
+                                                                                    this->m_FanDelayTime,
+                                                                                    DataHVACGlobals::CompressorOperation::On,
+                                                                                    PartLoadRatio,
+                                                                                    FirstHVACIteration);
+                                } else {
+                                    WaterToAirHeatPump::SimWatertoAirHP(state,
+                                                                        blankString,
+                                                                        this->m_HeatingCoilIndex,
+                                                                        this->MaxHeatAirMassFlow,
+                                                                        this->m_FanOpMode,
+                                                                        FirstHVACIteration,
+                                                                        RuntimeFrac,
+                                                                        this->m_MaxONOFFCyclesperHour,
+                                                                        this->m_HPTimeConstant,
+                                                                        this->m_FanDelayTime,
+                                                                        this->m_InitHeatPump,
+                                                                        ReqOutput,
+                                                                        dummy,
+                                                                        DataHVACGlobals::CompressorOperation::Off,
+                                                                        PartLoadRatio);
+                                }
+
+                                OutletAirTemp = state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp;
+                                return DesOutTemp - OutletAirTemp;
+                            };
+
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         } break;
                         case DataHVACGlobals::Coil_UserDefined: {
                             // should never get here, user defined coil cannot be controlled and has already been simulated
