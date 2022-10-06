@@ -4044,7 +4044,7 @@ void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
     TotalCoolLoad = SensLoadCoolSingleZone * ZoneMultFac;
 }
 
-void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const ZoneNum, int const spaceNum)
+void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -4064,15 +4064,11 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
 
     static constexpr std::string_view RoutineName("calcPredictedHumidityRatio");
 
-    Real64 LatentGain; // Zone latent load
-    Real64 RHSetPoint; // Relative Humidity in percent
-    Real64 WZoneSetPoint;
-    Real64 ZoneRHHumidifyingSetPoint;   // Zone humidifying set point (%)
-    Real64 ZoneRHDehumidifyingSetPoint; // Zone dehumidifying set point (%)
-    Real64 ZoneAirRH;                   // Zone air relative humidity
+    Real64 ZoneRHHumidifyingSetPoint = 0.0;   // Zone humidifying set point (%)
+    Real64 ZoneRHDehumidifyingSetPoint = 0.0; // Zone dehumidifying set point (%)
 
-    auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
-    auto &zoneSysMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum);
+    auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+    auto &zoneSysMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum);
 
     Real64 LoadToHumidifySetPoint = 0.0;   // Moisture load at humidifying set point
     Real64 LoadToDehumidifySetPoint = 0.0; // Moisture load at dehumidifying set point
@@ -4086,8 +4082,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
     // Check all the controlled zones to see if it matches the zone simulated
     if (thisZone.humidityControlZoneIndex > 0) {
         auto &humidityControlZone = state.dataZoneCtrls->HumidityControlZone(thisZone.humidityControlZoneIndex);
-        assert(humidityControlZone.ActualZoneNum == ZoneNum);
-        ZoneAirRH = Psychrometrics::PsyRhFnTdbWPb(state, this->MAT, this->ZoneAirHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
+        assert(humidityControlZone.ActualZoneNum == zoneNum);
         ZoneRHHumidifyingSetPoint = ScheduleManager::GetCurrentScheduleValue(state, humidityControlZone.HumidifyingSchedIndex);
         ZoneRHDehumidifyingSetPoint = ScheduleManager::GetCurrentScheduleValue(state, humidityControlZone.DehumidifyingSchedIndex);
 
@@ -4261,7 +4256,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
     if (ControlledHumidZoneFlag) {
         // Calculate hourly humidity ratio from infiltration + humidity added from latent load
         // to determine system added/subtracted moisture.
-        LatentGain = this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
+        Real64 LatentGain =
+            this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
 
         Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
@@ -4282,8 +4278,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
              state.afn->AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
-            B = (LatentGain / H2OHtOfVap) + state.afn->exchangeData(ZoneNum).SumMHrW + state.afn->exchangeData(ZoneNum).SumMMHrW + this->SumHmARaW;
-            A = state.afn->exchangeData(ZoneNum).SumMHr + state.afn->exchangeData(ZoneNum).SumMMHr + this->SumHmARa;
+            B = (LatentGain / H2OHtOfVap) + state.afn->exchangeData(zoneNum).SumMHrW + state.afn->exchangeData(zoneNum).SumMMHrW + this->SumHmARaW;
+            A = state.afn->exchangeData(zoneNum).SumMHr + state.afn->exchangeData(zoneNum).SumMMHr + this->SumHmARa;
         } else {
             B = (LatentGain / H2OHtOfVap) + ((this->OAMFL + this->VAMFL + this->CTMFL) * state.dataEnvrn->OutHumRat) + this->EAMFLxHumRat +
                 this->SumHmARaW + this->MixingMassFlowXHumRat + this->MDotOA * state.dataEnvrn->OutHumRat;
@@ -4291,8 +4287,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         }
         C = RhoAir * thisZone.Volume * thisZone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
-        if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
-            auto &roomAFNInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum);
+        if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+            auto &roomAFNInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum);
             int RoomAirNode = roomAFNInfo.ControlAirNodeID;
             H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(roomAFNInfo.Node(RoomAirNode).HumRat, roomAFNInfo.Node(RoomAirNode).AirTemp);
             A = roomAFNInfo.Node(RoomAirNode).SumLinkM + roomAFNInfo.Node(RoomAirNode).SumHmARa;
@@ -4307,7 +4303,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         // this amount of moisture must be added to the zone to reach the setpoint.  Negative values represent
         // the amount of moisture that must be removed by the system.
         // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
-        WZoneSetPoint =
+        Real64 WZoneSetPoint =
             Psychrometrics::PsyWFnTdbRhPb(state, this->ZT, (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
         Real64 exp_700_A_C(0.0);
         if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
@@ -4354,10 +4350,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         } else {
             if (LoadToHumidifySetPoint > 0.0 && LoadToDehumidifySetPoint > 0.0) {
                 zoneSysMoistureDemand.TotalOutputRequired = LoadToHumidifySetPoint;
-                RHSetPoint = ZoneRHHumidifyingSetPoint;
             } else if (LoadToHumidifySetPoint < 0.0 && LoadToDehumidifySetPoint < 0.0) {
                 zoneSysMoistureDemand.TotalOutputRequired = LoadToDehumidifySetPoint;
-                RHSetPoint = ZoneRHDehumidifyingSetPoint;
             } else if (LoadToHumidifySetPoint <= 0.0 && LoadToDehumidifySetPoint >= 0.0) { // deadband includes zero loads
                 zoneSysMoistureDemand.TotalOutputRequired = 0.0;
             } else { // this should never occur!
@@ -4376,9 +4370,9 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         ReportMoistLoadsZoneMultiplier(zoneSysMoistureDemand.TotalOutputRequired,
                                        zoneSysMoistureDemand.OutputRequiredToHumidifyingSP,
                                        zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP,
-                                       state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedRate,
-                                       state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedHumSPRate,
-                                       state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedDehumSPRate,
+                                       state.dataHeatBal->latentReports(zoneNum).ZoneMoisturePredictedRate,
+                                       state.dataHeatBal->latentReports(zoneNum).ZoneMoisturePredictedHumSPRate,
+                                       state.dataHeatBal->latentReports(zoneNum).ZoneMoisturePredictedDehumSPRate,
                                        thisZone.Multiplier,
                                        thisZone.ListMultiplier);
 

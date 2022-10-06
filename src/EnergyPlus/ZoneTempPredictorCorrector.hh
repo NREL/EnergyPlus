@@ -235,7 +235,7 @@ namespace ZoneTempPredictorCorrector {
                               int const zoneNum,
                               int const spaceNum = 0);
 
-        void calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const ZoneNum, int const spaceNum = 0);
+        void calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum = 0);
     };
 
     // Functions
