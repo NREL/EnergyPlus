@@ -7638,12 +7638,12 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
                                       thisZone.ListMultiplier);
 
     // init each sequenced demand to the full output
-    if (allocated(thisZoneSysEnergyDemand.SequencedOutputRequired))
-        thisZoneSysEnergyDemand.SequencedOutputRequired = thisZoneSysEnergyDemand.TotalOutputRequired; // array assignment
-    if (allocated(thisZoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP))
-        thisZoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP = thisZoneSysEnergyDemand.OutputRequiredToHeatingSP; // array assignment
-    if (allocated(thisZoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP))
-        thisZoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP = thisZoneSysEnergyDemand.OutputRequiredToCoolingSP; // array assignment
+    if (thisZone.IsControlled && thisZoneSysEnergyDemand.NumZoneEquipment > 0) {
+        for (int equipNum = 1; equipNum <= thisZoneSysEnergyDemand.NumZoneEquipment; ++equipNum) {
+            thisZoneSysEnergyDemand.SequencedOutputRequired(equipNum) = thisZoneSysEnergyDemand.TotalOutputRequired;
+            thisZoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP(equipNum) = thisZoneSysEnergyDemand.OutputRequiredToHeatingSP;
+            thisZoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP(equipNum) = thisZoneSysEnergyDemand.OutputRequiredToCoolingSP;
+        }
+    }
 }
-
 } // namespace EnergyPlus::ZoneTempPredictorCorrector
