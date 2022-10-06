@@ -265,26 +265,10 @@ namespace ZoneTempPredictorCorrector {
     void
     CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
 
-    void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
-                                           Real64 &TotalHeatLoad,
-                                           Real64 &TotalCoolLoad,
-                                           Real64 &SensLoadSingleZone,
-                                           Real64 &SensLoadHeatSingleZone,
-                                           Real64 &SensLoadCoolSingleZone,
-                                           Real64 OutputHeatSP,
-                                           Real64 OutputCoolSP,
-                                           Real64 LoadCorrFactor,
-                                           Real64 ZoneMultiplier,
-                                           Real64 ZoneMultiplierList);
+    void reportSensibleLoadsZoneMultiplier(
+        EnergyPlusData &state, Real64 const loadToHeatingSetPoint, Real64 const loadToCoolingSetPoint, int const zoneNum, int const spaceNum = 0);
 
-    void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
-                                        Real64 &TotalHumidLoad,
-                                        Real64 &TotalDehumidLoad,
-                                        Real64 &MoistLoadSingleZone,
-                                        Real64 &MoistLoadHumidSingleZone,
-                                        Real64 &MoistLoadDehumidSingleZone,
-                                        Real64 ZoneMultiplier,
-                                        Real64 ZoneMultiplierList);
+    void reportMoistLoadsZoneMultiplier(EnergyPlusData &state, int const zoneNum, int const spaceNum = 0);
 
     Real64 correctZoneAirTemps(EnergyPlusData &state,
                                bool useZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history

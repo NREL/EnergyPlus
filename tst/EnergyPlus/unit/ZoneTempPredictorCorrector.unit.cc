@@ -1459,153 +1459,132 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
 
 TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
 {
-    Real64 TotOutReq;
-    Real64 OutReqToHumSP;
-    Real64 OutReqToDehumSP;
-    Real64 SingleZoneTotRate;
-    Real64 SingleZoneHumRate;
-    Real64 SingleZoneDehRate;
-    Real64 ZoneMultiplier;
-    Real64 ZoneMultiplierList;
+    int zoneNum = 1;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(zoneNum);
+    auto &thisZoneSysMoistureDemand = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum);
+    state->dataHeatBal->latentReports.allocate(zoneNum);
+    auto &thisLatentReport = state->dataHeatBal->latentReports(zoneNum);
+    state->dataHeatBal->Zone.allocate(zoneNum);
+    auto &thisZone = state->dataHeatBal->Zone(zoneNum);
     Real64 ExpectedResult;
     Real64 AcceptableTolerance = 0.00001;
 
     // Test 1: Zone Multipliers are all unity (1.0).  So, single zone loads should be the same as total loads
-    TotOutReq = 1000.0;
-    OutReqToHumSP = 2000.0;
-    OutReqToDehumSP = 3000.0;
-    ZoneMultiplier = 1.0;
-    ZoneMultiplierList = 1.0;
-    ReportMoistLoadsZoneMultiplier(
-        TotOutReq, OutReqToHumSP, OutReqToDehumSP, SingleZoneTotRate, SingleZoneHumRate, SingleZoneDehRate, ZoneMultiplier, ZoneMultiplierList);
-    EXPECT_NEAR(TotOutReq, SingleZoneTotRate, AcceptableTolerance);
-    EXPECT_NEAR(OutReqToHumSP, SingleZoneHumRate, AcceptableTolerance);
-    EXPECT_NEAR(OutReqToDehumSP, SingleZoneDehRate, AcceptableTolerance);
+    thisZoneSysMoistureDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 2000.0;
+    thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 3000.0;
+    thisZone.Multiplier = 1.0;
+    thisZone.ListMultiplier = 1.0;
+    reportMoistLoadsZoneMultiplier(*state, zoneNum);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, thisLatentReport.ZoneMoisturePredictedRate, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP, thisLatentReport.ZoneMoisturePredictedHumSPRate, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP, thisLatentReport.ZoneMoisturePredictedDehumSPRate, AcceptableTolerance);
 
     // Test 2a: Zone Multiplier (non-list) is greater than 1, list Zone Multiplier is still one
-    TotOutReq = 1000.0;
-    OutReqToHumSP = 2000.0;
-    OutReqToDehumSP = 3000.0;
-    ZoneMultiplier = 7.0;
-    ZoneMultiplierList = 1.0;
-    ReportMoistLoadsZoneMultiplier(
-        TotOutReq, OutReqToHumSP, OutReqToDehumSP, SingleZoneTotRate, SingleZoneHumRate, SingleZoneDehRate, ZoneMultiplier, ZoneMultiplierList);
+    thisZoneSysMoistureDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 2000.0;
+    thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 3000.0;
+    thisZone.Multiplier = 7.0;
+    thisZone.ListMultiplier = 1.0;
+    reportMoistLoadsZoneMultiplier(*state, zoneNum);
     ExpectedResult = 1000.0;
-    EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisLatentReport.ZoneMoisturePredictedRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
-    EXPECT_NEAR(ExpectedResult, SingleZoneHumRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisLatentReport.ZoneMoisturePredictedHumSPRate, AcceptableTolerance);
     ExpectedResult = 3000.0;
-    EXPECT_NEAR(ExpectedResult, SingleZoneDehRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisLatentReport.ZoneMoisturePredictedDehumSPRate, AcceptableTolerance);
     ExpectedResult = 7000.0;
-    EXPECT_NEAR(TotOutReq, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 14000.0;
-    EXPECT_NEAR(OutReqToHumSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 21000.0;
-    EXPECT_NEAR(OutReqToDehumSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 2b: list Zone Multiplier is greater than 1, non-list Zone Multiplier is one
-    TotOutReq = 1000.0;
-    OutReqToHumSP = 2000.0;
-    OutReqToDehumSP = 3000.0;
-    ZoneMultiplier = 1.0;
-    ZoneMultiplierList = 7.0;
-    ReportMoistLoadsZoneMultiplier(
-        TotOutReq, OutReqToHumSP, OutReqToDehumSP, SingleZoneTotRate, SingleZoneHumRate, SingleZoneDehRate, ZoneMultiplier, ZoneMultiplierList);
+    thisZoneSysMoistureDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 2000.0;
+    thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 3000.0;
+    thisZone.Multiplier = 1.0;
+    thisZone.ListMultiplier = 7.0;
+    reportMoistLoadsZoneMultiplier(*state, zoneNum);
     ExpectedResult = 1000.0;
-    EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisLatentReport.ZoneMoisturePredictedRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
-    EXPECT_NEAR(ExpectedResult, SingleZoneHumRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisLatentReport.ZoneMoisturePredictedHumSPRate, AcceptableTolerance);
     ExpectedResult = 3000.0;
-    EXPECT_NEAR(ExpectedResult, SingleZoneDehRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisLatentReport.ZoneMoisturePredictedDehumSPRate, AcceptableTolerance);
     ExpectedResult = 7000.0;
-    EXPECT_NEAR(TotOutReq, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 14000.0;
-    EXPECT_NEAR(OutReqToHumSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 21000.0;
-    EXPECT_NEAR(OutReqToDehumSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 3: both zone multipliers are greater than 1.0
-    TotOutReq = 300.0;
-    OutReqToHumSP = 150.0;
-    OutReqToDehumSP = 100.0;
-    ZoneMultiplier = 2.0;
-    ZoneMultiplierList = 3.0;
-    ReportMoistLoadsZoneMultiplier(
-        TotOutReq, OutReqToHumSP, OutReqToDehumSP, SingleZoneTotRate, SingleZoneHumRate, SingleZoneDehRate, ZoneMultiplier, ZoneMultiplierList);
+    thisZoneSysMoistureDemand.TotalOutputRequired = 300.0;
+    thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 150.0;
+    thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 100.0;
+    thisZone.Multiplier = 2.0;
+    thisZone.ListMultiplier = 3.0;
+    reportMoistLoadsZoneMultiplier(*state, zoneNum);
     ExpectedResult = 300.0;
-    EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisLatentReport.ZoneMoisturePredictedRate, AcceptableTolerance);
     ExpectedResult = 150.0;
-    EXPECT_NEAR(ExpectedResult, SingleZoneHumRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisLatentReport.ZoneMoisturePredictedHumSPRate, AcceptableTolerance);
     ExpectedResult = 100.0;
-    EXPECT_NEAR(ExpectedResult, SingleZoneDehRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisLatentReport.ZoneMoisturePredictedDehumSPRate, AcceptableTolerance);
     ExpectedResult = 1800.0;
-    EXPECT_NEAR(TotOutReq, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 900.0;
-    EXPECT_NEAR(OutReqToHumSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 600.0;
-    EXPECT_NEAR(OutReqToDehumSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP, ExpectedResult, AcceptableTolerance);
 }
 
 TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
 {
-    Real64 TotOutReq;
-    Real64 OutReqToHeatSP;
-    Real64 OutReqToCoolSP;
-    Real64 SingleZoneTotRate;
-    Real64 SingleZoneHeatRate;
-    Real64 SingleZoneCoolRate;
+    int zoneNum = 1;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(zoneNum);
+    auto &thisZoneSysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
+    state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(zoneNum);
+    state->dataHeatBal->ZoneSNLoadPredictedHSPRate.allocate(zoneNum);
+    state->dataHeatBal->ZoneSNLoadPredictedCSPRate.allocate(zoneNum);
+    Real64 &SingleZoneTotRate = state->dataHeatBal->ZoneSNLoadPredictedRate(zoneNum);
+    Real64 &SingleZoneHeatRate = state->dataHeatBal->ZoneSNLoadPredictedHSPRate(zoneNum);
+    Real64 &SingleZoneCoolRate = state->dataHeatBal->ZoneSNLoadPredictedCSPRate(zoneNum);
     Real64 HeatToSP;
     Real64 CoolToSP;
-    Real64 CorrectionFactor;
-    Real64 ZoneMultiplier;
-    Real64 ZoneMultiplierList;
+    state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(zoneNum);
+    Real64 &CorrectionFactor = state->dataHeatBalFanSys->LoadCorrectionFactor(zoneNum);
+    state->dataHeatBal->Zone.allocate(zoneNum);
+    auto &thisZone = state->dataHeatBal->Zone(zoneNum);
     Real64 ExpectedResult;
     Real64 AcceptableTolerance = 0.00001;
 
     // Test 1: Zone Multipliers and Load Correction Factor are all unity (1.0).  So, single zone loads should be the same as total loads
-    TotOutReq = 1000.0;
-    OutReqToHeatSP = 0.0;
-    OutReqToCoolSP = 0.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
+    thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
     HeatToSP = 2000.0;
     CoolToSP = 3000.0;
     CorrectionFactor = 1.0;
-    ZoneMultiplier = 1.0;
-    ZoneMultiplierList = 1.0;
-    ReportSensibleLoadsZoneMultiplier(TotOutReq,
-                                      OutReqToHeatSP,
-                                      OutReqToCoolSP,
-                                      SingleZoneTotRate,
-                                      SingleZoneHeatRate,
-                                      SingleZoneCoolRate,
-                                      HeatToSP,
-                                      CoolToSP,
-                                      CorrectionFactor,
-                                      ZoneMultiplier,
-                                      ZoneMultiplierList);
-    EXPECT_NEAR(TotOutReq, SingleZoneTotRate, AcceptableTolerance);
-    EXPECT_NEAR(OutReqToHeatSP, SingleZoneHeatRate, AcceptableTolerance);
-    EXPECT_NEAR(OutReqToCoolSP, SingleZoneCoolRate, AcceptableTolerance);
+    thisZone.Multiplier = 1.0;
+    thisZone.ListMultiplier = 1.0;
+    reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.TotalOutputRequired, SingleZoneTotRate, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToHeatingSP, SingleZoneHeatRate, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToCoolingSP, SingleZoneCoolRate, AcceptableTolerance);
 
     // Test 2a: Zone Multiplier (non-list) is greater than 1, list Zone Multiplier and Load Correction are still one
-    TotOutReq = 1000.0;
-    OutReqToHeatSP = 0.0;
-    OutReqToCoolSP = 0.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
+    thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
     HeatToSP = 2000.0;
     CoolToSP = 3000.0;
     CorrectionFactor = 1.0;
-    ZoneMultiplier = 4.0;
-    ZoneMultiplierList = 1.0;
-    ReportSensibleLoadsZoneMultiplier(TotOutReq,
-                                      OutReqToHeatSP,
-                                      OutReqToCoolSP,
-                                      SingleZoneTotRate,
-                                      SingleZoneHeatRate,
-                                      SingleZoneCoolRate,
-                                      HeatToSP,
-                                      CoolToSP,
-                                      CorrectionFactor,
-                                      ZoneMultiplier,
-                                      ZoneMultiplierList);
+    thisZone.Multiplier = 4.0;
+    thisZone.ListMultiplier = 1.0;
+    reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
     ExpectedResult = 1000.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
@@ -1613,32 +1592,22 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     ExpectedResult = 3000.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneCoolRate, AcceptableTolerance);
     ExpectedResult = 4000.0;
-    EXPECT_NEAR(TotOutReq, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 8000.0;
-    EXPECT_NEAR(OutReqToHeatSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToHeatingSP, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 12000.0;
-    EXPECT_NEAR(OutReqToCoolSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToCoolingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 2b: list Zone Multiplier is greater than 1, non-list Zone Multiplier and Load Correction are still one
-    TotOutReq = 1000.0;
-    OutReqToHeatSP = 0.0;
-    OutReqToCoolSP = 0.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
+    thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
     HeatToSP = 2000.0;
     CoolToSP = 3000.0;
     CorrectionFactor = 1.0;
-    ZoneMultiplier = 1.0;
-    ZoneMultiplierList = 5.0;
-    ReportSensibleLoadsZoneMultiplier(TotOutReq,
-                                      OutReqToHeatSP,
-                                      OutReqToCoolSP,
-                                      SingleZoneTotRate,
-                                      SingleZoneHeatRate,
-                                      SingleZoneCoolRate,
-                                      HeatToSP,
-                                      CoolToSP,
-                                      CorrectionFactor,
-                                      ZoneMultiplier,
-                                      ZoneMultiplierList);
+    thisZone.Multiplier = 1.0;
+    thisZone.ListMultiplier = 5.0;
+    reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
     ExpectedResult = 1000.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
@@ -1646,32 +1615,22 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     ExpectedResult = 3000.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneCoolRate, AcceptableTolerance);
     ExpectedResult = 5000.0;
-    EXPECT_NEAR(TotOutReq, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 10000.0;
-    EXPECT_NEAR(OutReqToHeatSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToHeatingSP, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 15000.0;
-    EXPECT_NEAR(OutReqToCoolSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToCoolingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 2c: list Zone Multiplier and Zone Multiplier are unity, Load Correction is not equal to 1.0
-    TotOutReq = 1000.0;
-    OutReqToHeatSP = 0.0;
-    OutReqToCoolSP = 0.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
+    thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
     HeatToSP = 2000.0;
     CoolToSP = 3000.0;
     CorrectionFactor = 1.1;
-    ZoneMultiplier = 1.0;
-    ZoneMultiplierList = 1.0;
-    ReportSensibleLoadsZoneMultiplier(TotOutReq,
-                                      OutReqToHeatSP,
-                                      OutReqToCoolSP,
-                                      SingleZoneTotRate,
-                                      SingleZoneHeatRate,
-                                      SingleZoneCoolRate,
-                                      HeatToSP,
-                                      CoolToSP,
-                                      CorrectionFactor,
-                                      ZoneMultiplier,
-                                      ZoneMultiplierList);
+    thisZone.Multiplier = 1.0;
+    thisZone.ListMultiplier = 1.0;
+    reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
     ExpectedResult = 1100.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
     ExpectedResult = 2200.0;
@@ -1679,32 +1638,22 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     ExpectedResult = 3300.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneCoolRate, AcceptableTolerance);
     ExpectedResult = 1100.0;
-    EXPECT_NEAR(TotOutReq, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 2200.0;
-    EXPECT_NEAR(OutReqToHeatSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToHeatingSP, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 3300.0;
-    EXPECT_NEAR(OutReqToCoolSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToCoolingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 3: none of the multipliers are unity
-    TotOutReq = 1000.0;
-    OutReqToHeatSP = 0.0;
-    OutReqToCoolSP = 0.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
+    thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
     HeatToSP = 2000.0;
     CoolToSP = 3000.0;
     CorrectionFactor = 1.2;
-    ZoneMultiplier = 2.0;
-    ZoneMultiplierList = 1.5;
-    ReportSensibleLoadsZoneMultiplier(TotOutReq,
-                                      OutReqToHeatSP,
-                                      OutReqToCoolSP,
-                                      SingleZoneTotRate,
-                                      SingleZoneHeatRate,
-                                      SingleZoneCoolRate,
-                                      HeatToSP,
-                                      CoolToSP,
-                                      CorrectionFactor,
-                                      ZoneMultiplier,
-                                      ZoneMultiplierList);
+    thisZone.Multiplier = 1.0;
+    thisZone.ListMultiplier = 3.0;
+    reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
     ExpectedResult = 1200.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
     ExpectedResult = 2400.0;
@@ -1712,11 +1661,11 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     ExpectedResult = 3600.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneCoolRate, AcceptableTolerance);
     ExpectedResult = 3600.0;
-    EXPECT_NEAR(TotOutReq, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 7200.0;
-    EXPECT_NEAR(OutReqToHeatSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToHeatingSP, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 10800.0;
-    EXPECT_NEAR(OutReqToCoolSP, ExpectedResult, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToCoolingSP, ExpectedResult, AcceptableTolerance);
 }
 
 TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)

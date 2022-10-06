@@ -4021,27 +4021,20 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
     OverrideAirSetPointsforEMSCntrl(state);
 }
 
-void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
-                                       Real64 &TotalHeatLoad,
-                                       Real64 &TotalCoolLoad,
-                                       Real64 &SensLoadSingleZone,
-                                       Real64 &SensLoadHeatSingleZone,
-                                       Real64 &SensLoadCoolSingleZone,
-                                       Real64 const OutputHeatSP,
-                                       Real64 const OutputCoolSP,
-                                       Real64 const LoadCorrFactor,
-                                       Real64 const ZoneMultiplier,
-                                       Real64 const ZoneMultiplierList)
+void reportSensibleLoadsZoneMultiplier(
+    EnergyPlusData &state, Real64 const loadToHeatingSetPoint, Real64 const loadToCoolingSetPoint, int const zoneNum, int const spaceNum)
 {
-    SensLoadSingleZone = TotalLoad * LoadCorrFactor;
-    SensLoadHeatSingleZone = OutputHeatSP * LoadCorrFactor;
-    SensLoadCoolSingleZone = OutputCoolSP * LoadCorrFactor;
+    auto &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
+    Real64 loadCorrFactor = state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum);
 
-    Real64 ZoneMultFac = ZoneMultiplier * ZoneMultiplierList;
+    state.dataHeatBal->ZoneSNLoadPredictedRate(zoneNum) = thisZoneSysEnergyDemand.TotalOutputRequired * loadCorrFactor;
+    state.dataHeatBal->ZoneSNLoadPredictedHSPRate(zoneNum) = loadToHeatingSetPoint * loadCorrFactor;
+    state.dataHeatBal->ZoneSNLoadPredictedCSPRate(zoneNum) = loadToCoolingSetPoint * loadCorrFactor;
 
-    TotalLoad = SensLoadSingleZone * ZoneMultFac;
-    TotalHeatLoad = SensLoadHeatSingleZone * ZoneMultFac;
-    TotalCoolLoad = SensLoadCoolSingleZone * ZoneMultFac;
+    Real64 ZoneMultFac = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
+    thisZoneSysEnergyDemand.TotalOutputRequired = state.dataHeatBal->ZoneSNLoadPredictedRate(zoneNum) * ZoneMultFac;
+    thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = state.dataHeatBal->ZoneSNLoadPredictedHSPRate(zoneNum) * ZoneMultFac;
+    thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = state.dataHeatBal->ZoneSNLoadPredictedCSPRate(zoneNum) * ZoneMultFac;
 }
 
 void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum)
@@ -4367,14 +4360,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             }
         }
         // Apply zone multipliers as needed
-        ReportMoistLoadsZoneMultiplier(zoneSysMoistureDemand.TotalOutputRequired,
-                                       zoneSysMoistureDemand.OutputRequiredToHumidifyingSP,
-                                       zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP,
-                                       state.dataHeatBal->latentReports(zoneNum).ZoneMoisturePredictedRate,
-                                       state.dataHeatBal->latentReports(zoneNum).ZoneMoisturePredictedHumSPRate,
-                                       state.dataHeatBal->latentReports(zoneNum).ZoneMoisturePredictedDehumSPRate,
-                                       thisZone.Multiplier,
-                                       thisZone.ListMultiplier);
+        reportMoistLoadsZoneMultiplier(state, zoneNum, spaceNum);
 
         // init each sequenced demand to the full output
         if (thisZone.IsControlled && zoneSysMoistureDemand.NumZoneEquipment > 0) {
@@ -4387,24 +4373,19 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
     }
 }
 
-void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
-                                    Real64 &TotalHumidLoad,
-                                    Real64 &TotalDehumidLoad,
-                                    Real64 &MoistLoadSingleZone,
-                                    Real64 &MoistLoadHumidSingleZone,
-                                    Real64 &MoistLoadDehumidSingleZone,
-                                    Real64 const ZoneMultiplier,
-                                    Real64 const ZoneMultiplierList)
+void reportMoistLoadsZoneMultiplier(EnergyPlusData &state, int const zoneNum, int const spaceNum)
 {
-    MoistLoadSingleZone = TotalLoad;
-    MoistLoadHumidSingleZone = TotalHumidLoad;
-    MoistLoadDehumidSingleZone = TotalDehumidLoad;
+    auto &thisZoneSysMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum);
+    auto &thisLatentReport = state.dataHeatBal->latentReports(zoneNum);
+    thisLatentReport.ZoneMoisturePredictedRate = thisZoneSysMoistureDemand.TotalOutputRequired;
+    thisLatentReport.ZoneMoisturePredictedHumSPRate = thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP;
+    thisLatentReport.ZoneMoisturePredictedDehumSPRate = thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP;
 
-    Real64 ZoneMultFac = ZoneMultiplier * ZoneMultiplierList;
+    Real64 zoneMultFac = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
 
-    TotalLoad *= ZoneMultFac;
-    TotalHumidLoad *= ZoneMultFac;
-    TotalDehumidLoad *= ZoneMultFac;
+    thisZoneSysMoistureDemand.TotalOutputRequired *= zoneMultFac;
+    thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP *= zoneMultFac;
+    thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP *= zoneMultFac;
 }
 
 Real64 correctZoneAirTemps(EnergyPlusData &state,
@@ -7619,17 +7600,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     state.dataZoneEnergyDemand->CurDeadBandOrSetback(zoneNum) = thisDeadBandOrSetBack;
 
     // Apply the Zone Multiplier and Load Correction factor as needed
-    ReportSensibleLoadsZoneMultiplier(thisZoneSysEnergyDemand.TotalOutputRequired,
-                                      thisZoneSysEnergyDemand.OutputRequiredToHeatingSP,
-                                      thisZoneSysEnergyDemand.OutputRequiredToCoolingSP,
-                                      state.dataHeatBal->ZoneSNLoadPredictedRate(zoneNum),
-                                      state.dataHeatBal->ZoneSNLoadPredictedHSPRate(zoneNum),
-                                      state.dataHeatBal->ZoneSNLoadPredictedCSPRate(zoneNum),
-                                      LoadToHeatingSetPoint,
-                                      LoadToCoolingSetPoint,
-                                      state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum),
-                                      thisZone.Multiplier,
-                                      thisZone.ListMultiplier);
+    reportSensibleLoadsZoneMultiplier(state, LoadToHeatingSetPoint, LoadToCoolingSetPoint, zoneNum, spaceNum);
 
     // init each sequenced demand to the full output
     if (thisZone.IsControlled && thisZoneSysEnergyDemand.NumZoneEquipment > 0) {
