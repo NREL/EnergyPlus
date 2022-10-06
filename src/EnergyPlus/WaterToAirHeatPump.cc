@@ -1473,7 +1473,7 @@ namespace WaterToAirHeatPump {
                         CompSuctionTemp2 = CompSuctionSatTemp + DegreeofSuperheat;
                     }
 
-                    auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp){
+                    auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp) {
                         static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
                         std::string Refrigerant{}; // Name of refrigerant
                         int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
@@ -1481,14 +1481,8 @@ namespace WaterToAirHeatPump {
                         return (compSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
                     };
 
-                    General::SolveRoot(state,
-                                       ERR,
-                                       STOP1,
-                                       SolFlag,
-                                       state.dataWaterToAirHeatPump->CompSuctionTemp,
-                                       f,
-                                       CompSuctionTemp1,
-                                       CompSuctionTemp2);
+                    General::SolveRoot(
+                        state, ERR, STOP1, SolFlag, state.dataWaterToAirHeatPump->CompSuctionTemp, f, CompSuctionTemp1, CompSuctionTemp2);
                     if (SolFlag == -1) {
                         heatPump.SimFlag = false;
                         return;
@@ -1954,7 +1948,7 @@ namespace WaterToAirHeatPump {
 
                 //       Do not need the name of the refrigerant if we already have the index (from above CALLs)
 
-                auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp){
+                auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp) {
                     static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
                     std::string Refrigerant{}; // Name of refrigerant
                     int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
