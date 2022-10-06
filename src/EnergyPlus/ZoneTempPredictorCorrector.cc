@@ -921,6 +921,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             ShowSevereError(
                 state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" not found.");
             ErrorsFound = true;
+        } else {
+            state.dataHeatBal->Zone(HumidityControlZone(HumidControlledZoneNum).ActualZoneNum).humidityControlZoneIndex = HumidControlledZoneNum;
         }
         HumidityControlZone(HumidControlledZoneNum).HumidifyingSched = cAlphaArgs(3);
         HumidityControlZone(HumidControlledZoneNum).HumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
@@ -4065,8 +4067,6 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
     Real64 LatentGain; // Zone latent load
     Real64 RHSetPoint; // Relative Humidity in percent
     Real64 WZoneSetPoint;
-    int HumidControlledZoneNum;
-    bool ControlledHumidZoneFlag;       // This determines whether this is a humidity controlled zone or not
     Real64 ZoneRHHumidifyingSetPoint;   // Zone humidifying set point (%)
     Real64 ZoneRHDehumidifyingSetPoint; // Zone dehumidifying set point (%)
     Real64 ZoneAirRH;                   // Zone air relative humidity
@@ -4082,11 +4082,11 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
     zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 0.0;
 
     // Check to see if this is a "humidity controlled zone"
-    ControlledHumidZoneFlag = false;
+    bool ControlledHumidZoneFlag = false;
     // Check all the controlled zones to see if it matches the zone simulated
-    for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HumidControlledZoneNum) {
-        auto &humidityControlZone = state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum);
-        if (humidityControlZone.ActualZoneNum != ZoneNum) continue;
+    if (thisZone.humidityControlZoneIndex > 0) {
+        auto &humidityControlZone = state.dataZoneCtrls->HumidityControlZone(thisZone.humidityControlZoneIndex);
+        assert(humidityControlZone.ActualZoneNum == ZoneNum);
         ZoneAirRH = Psychrometrics::PsyRhFnTdbWPb(state, this->MAT, this->ZoneAirHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
         ZoneRHHumidifyingSetPoint = ScheduleManager::GetCurrentScheduleValue(state, humidityControlZone.HumidifyingSchedIndex);
         ZoneRHDehumidifyingSetPoint = ScheduleManager::GetCurrentScheduleValue(state, humidityControlZone.DehumidifyingSchedIndex);
@@ -4229,7 +4229,6 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         if (ZoneRHHumidifyingSetPoint == ZoneRHDehumidifyingSetPoint) SingleSetPoint = true;
         ControlledHumidZoneFlag = true;
 
-        break;
     } // HumidControlledZoneNum
 
     // if zone latent sizing is requested but no humidistat exists
@@ -4373,24 +4372,23 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
                 ShowFatalError(state, "Program terminates due to above conditions.");
             }
         }
-    }
+        // Apply zone multipliers as needed
+        ReportMoistLoadsZoneMultiplier(zoneSysMoistureDemand.TotalOutputRequired,
+                                       zoneSysMoistureDemand.OutputRequiredToHumidifyingSP,
+                                       zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP,
+                                       state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedRate,
+                                       state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedHumSPRate,
+                                       state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedDehumSPRate,
+                                       thisZone.Multiplier,
+                                       thisZone.ListMultiplier);
 
-    // Apply zone multipliers as needed
-    ReportMoistLoadsZoneMultiplier(zoneSysMoistureDemand.TotalOutputRequired,
-                                   zoneSysMoistureDemand.OutputRequiredToHumidifyingSP,
-                                   zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP,
-                                   state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedRate,
-                                   state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedHumSPRate,
-                                   state.dataHeatBal->latentReports(ZoneNum).ZoneMoisturePredictedDehumSPRate,
-                                   thisZone.Multiplier,
-                                   thisZone.ListMultiplier);
-
-    // init each sequenced demand to the full output
-    if (thisZone.IsControlled && zoneSysMoistureDemand.NumZoneEquipment > 0) {
-        for (int equipNum = 1; equipNum <= zoneSysMoistureDemand.NumZoneEquipment; ++equipNum) {
-            zoneSysMoistureDemand.SequencedOutputRequired(equipNum) = zoneSysMoistureDemand.TotalOutputRequired;
-            zoneSysMoistureDemand.SequencedOutputRequiredToHumidSP(equipNum) = zoneSysMoistureDemand.OutputRequiredToHumidifyingSP;
-            zoneSysMoistureDemand.SequencedOutputRequiredToDehumidSP(equipNum) = zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP;
+        // init each sequenced demand to the full output
+        if (thisZone.IsControlled && zoneSysMoistureDemand.NumZoneEquipment > 0) {
+            for (int equipNum = 1; equipNum <= zoneSysMoistureDemand.NumZoneEquipment; ++equipNum) {
+                zoneSysMoistureDemand.SequencedOutputRequired(equipNum) = zoneSysMoistureDemand.TotalOutputRequired;
+                zoneSysMoistureDemand.SequencedOutputRequiredToHumidSP(equipNum) = zoneSysMoistureDemand.OutputRequiredToHumidifyingSP;
+                zoneSysMoistureDemand.SequencedOutputRequiredToDehumidSP(equipNum) = zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP;
+            }
         }
     }
 }

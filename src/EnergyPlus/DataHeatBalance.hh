@@ -656,6 +656,7 @@ namespace DataHeatBalance {
         bool IsReturnPlenum = false;                    // True when this zone is a return plenum
         int PlenumCondNum = 0;                          // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex = 0;                // this is the index number for TempControlledZone structure for lookup
+        int humidityControlZoneIndex = 0;               // this is the index number for HumidityControlZone structure for lookup
         int AllSurfaceFirst = 0;                        // First surface in zone including air boundaries
         int AllSurfaceLast = -1;                        // Last  surface in zone including air boundaries
         int InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple; // Ref: appropriate values for Inside Convection solution
