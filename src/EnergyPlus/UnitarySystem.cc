@@ -13380,18 +13380,27 @@ namespace UnitarySystems {
                     // make sure outlet temp is below set point before calling SolveRoot
                     // Cooling: iterate only when outlet temp is below DesOutTemp by at least Acc
                     if ((DesOutTemp - state.dataLoopNodes->Node(OutletNode).Temp) > Acc) {
-                        std::array<Real64, 8> Par2 = {double(this->m_CoolingCoilIndex),
-                                                      DesOutTemp,
-                                                      // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                                                      // need to test what happens when Alt mode doesn't exist, or somehow test for it,
-                                                      // or fatal out in GetInput
-                                                      1.0, // DehumidMode
-                                                      double(FanOpMode),
-                                                      double(this->m_CoolingSpeedNum),
-                                                      1.0, //  this->m_CoolingSpeedRatio;
-                                                      0.0,
-                                                      0.0};
-                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+
+                        auto f = [&state, this, DesOutTemp, FanOpMode] (Real64 const PartLoadFrac) {
+                            int CoilIndex = this->m_CoolingCoilIndex;
+                            bool useDehumMode = true;
+                            int CoolingSpeedNum = this->m_CoolingSpeedNum;
+                            Real64 CoolingSpeedRatio = 1.0;
+                            bool const singleMode = false;
+                            if (CoolingSpeedNum == 1) {
+                                state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                    state, useDehumMode, PartLoadFrac, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode, singleMode);
+                            } else {
+                                state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                    state, useDehumMode, CoolingSpeedRatio, CoolingSpeedNum, PartLoadFrac, FanOpMode, singleMode);
+                            }
+                            Real64 outletCondition = state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).Temp;
+
+                            return DesOutTemp - outletCondition;
+
+                        };
+
+                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     }
                     if (this->m_CoolingSpeedNum == 1) {
                         this->m_CompPartLoadRatio = PartLoadFrac;
@@ -15952,43 +15961,6 @@ namespace UnitarySystems {
         if (RuntimeFrac > 1.0) {
             RuntimeFrac = 1.0;
         }
-    }
-
-    Real64 UnitarySys::genericDXCoilResidual(EnergyPlusData &state,
-                                             Real64 const PartLoadRatio,      // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                             std::array<Real64, 8> const &Par // par(1) = DX coil number
-    )
-    {
-
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   February 2020
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        int CoilIndex = int(Par[0]);
-        bool useDehumMode = int(Par[2]) > 0;
-        int FanOpMode = int(Par[3]);
-        int CoolingSpeedNum = int(Par[4]);
-        Real64 CoolingSpeedRatio = Par[5];
-        bool RunOnSensible = (Par[6] == 0.0);
-        bool const singleMode = (Par[7] == 1.0);
-        if (CoolingSpeedNum == 1) {
-            state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
-                state, useDehumMode, PartLoadRatio, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode, singleMode);
-        } else {
-            state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
-                state, useDehumMode, CoolingSpeedRatio, CoolingSpeedNum, PartLoadRatio, FanOpMode, singleMode);
-        }
-        Real64 outletCondition = 0.0;
-        if (RunOnSensible) {
-            outletCondition = state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).Temp;
-        } else {
-            outletCondition = state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).HumRat;
-        }
-        Residuum = Par[1] - outletCondition;
-
-        return Residuum;
     }
 
     Real64 UnitarySys::DOE2DXCoilHumRatResidual(EnergyPlusData &state,
