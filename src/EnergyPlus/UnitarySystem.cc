@@ -16981,54 +16981,6 @@ namespace UnitarySystems {
         return Par[3] - OutletAirTemp;
     }
 
-    Real64 UnitarySys::steamHeatingCoilResidual(EnergyPlusData &state,
-                                                Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Chandan Sharma, FSEC
-        //       DATE WRITTEN   February 2013
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // hot Steam Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls SimulateSteamCoilComponents to get outlet temperature at the given part load ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // Par(2) = desired air outlet temperature [C]
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 OutletAirTemp; // Outlet air temperature [C]
-        Real64 mdot;
-
-        int UnitarySysNum = int(Par[1]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        bool FirstHVACIteration = (Par[2] > 0.0);
-        bool SuppHeatingCoilFlag = (Par[4] > 0.0);
-
-        if (!SuppHeatingCoilFlag) {
-            mdot =
-                min(state.dataLoopNodes->Node(thisSys.HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxHeatCoilFluidFlow * PartLoadFrac);
-            state.dataLoopNodes->Node(thisSys.HeatCoilFluidInletNode).MassFlowRate = mdot;
-            SteamCoils::SimulateSteamCoilComponents(
-                state, thisSys.m_HeatingCoilName, FirstHVACIteration, thisSys.m_HeatingCoilIndex, 1.0, _, thisSys.m_FanOpMode, PartLoadFrac);
-        } else {
-            mdot = min(state.dataLoopNodes->Node(thisSys.m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
-                       thisSys.m_MaxSuppCoilFluidFlow * PartLoadFrac);
-            state.dataLoopNodes->Node(thisSys.m_SuppCoilFluidInletNode).MassFlowRate = mdot;
-            SteamCoils::SimulateSteamCoilComponents(
-                state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, thisSys.m_SuppHeatCoilIndex, 1.0, _, thisSys.m_FanOpMode, PartLoadFrac);
-        }
-        OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp; // RR this should be supp coil
-        return Par[3] - OutletAirTemp;
-    }
-
     Real64 UnitarySys::coolWatertoAirHPHumRatResidual(EnergyPlusData &state,
                                                       Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                       std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
