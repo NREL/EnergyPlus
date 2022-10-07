@@ -20,6 +20,8 @@ jobs:
   create-card:
     runs-on: ubuntu-latest
     steps:
+      # check out the repo to get the script downloaded
+      - uses: actions/checkout@v1
       # interact with the GitHub API and manipulate the Project
       # we should also probably pass the project id as an env variable / argument
       - run: bash scripts/dev/add_to_project.sh ${{ github.event.issue.number }}
