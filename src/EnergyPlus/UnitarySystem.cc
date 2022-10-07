@@ -14526,25 +14526,33 @@ namespace UnitarySystems {
                             General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, maxPartLoadFrac);
                         } break;
                         case DataHVACGlobals::Coil_HeatingSteam: {
-                            Par[1] = double(this->m_UnitarySysNum);
-                            if (FirstHVACIteration) {
-                                Par[2] = 1.0;
-                            } else {
-                                Par[2] = 0.0;
-                            }
-                            Par[3] = DesOutTemp;
-                            if (SuppHeatingCoilFlag) {
-                                Par[4] = 1.0;
-                            } else {
-                                Par[4] = 0.0;
-                            }
 
                             // calculate max waterside PLR from mdot request above in case plant chokes water flow
                             maxPartLoadFrac =
                                 min(1.0,
                                     ((mdot / this->MaxHeatCoilFluidFlow) +
                                      0.001)); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->steamHeatingCoilResidual, 0.0, maxPartLoadFrac, Par);
+
+                            auto f = [&state, this, FirstHVACIteration, DesOutTemp](Real64 const PartLoadFrac) {
+                                Real64 OutletAirTemp; // Outlet air temperature [C]
+                                Real64 mdot;
+
+                                mdot = min(state.dataLoopNodes->Node(this->HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
+                                           this->MaxHeatCoilFluidFlow * PartLoadFrac);
+                                state.dataLoopNodes->Node(this->HeatCoilFluidInletNode).MassFlowRate = mdot;
+                                SteamCoils::SimulateSteamCoilComponents(state,
+                                                                        this->m_HeatingCoilName,
+                                                                        FirstHVACIteration,
+                                                                        this->m_HeatingCoilIndex,
+                                                                        1.0,
+                                                                        _,
+                                                                        this->m_FanOpMode,
+                                                                        PartLoadFrac);
+                                OutletAirTemp = state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp; // RR this should be supp coil
+                                return DesOutTemp - OutletAirTemp;
+                            };
+
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, maxPartLoadFrac);
                         } break;
                         case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple:
                         case DataHVACGlobals::Coil_HeatingWaterToAirHP: {
