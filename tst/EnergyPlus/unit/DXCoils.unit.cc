@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
@@ -4491,7 +4492,7 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
 
 TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
 {
-    // Test the PR that fixes Issue 9301; will report severe error if tested in original develop branch
+    // Test the PR 9694 that fixes Issue 9301; will report severe error if tested in original develop branch
     std::string const idf_objects = delimited_string({
 
         "ScheduleTypeLimits,",
@@ -4706,7 +4707,9 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
     OutletNode.MassFlowRateMaxAvail = 1.0;
     OutletNode.MassFlowRateMinAvail = 0.0;
     OutputReportPredefined::SetPredefinedTables(*state);
+
     // test 1: using internal static and fan pressure rise
+
     CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
     EXPECT_EQ(coolcoilTwoSpeed.Name, "CCOOLING DX TWO SPEED");
     EXPECT_EQ(coolcoilTwoSpeed.DXCoilType, "Coil:Cooling:DX:TwoSpeed");
@@ -4715,12 +4718,18 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
     EXPECT_TRUE(coolcoilTwoSpeed.RateWithInternalStaticAndFanObject);
     EXPECT_EQ("8.77", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
     EXPECT_EQ("11.25", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+
     // test 2: using default fan power per evap air flow rate, 365 W/1000 scfm or 773.3 W/(m3/s)
+
     coolcoilTwoSpeed.RateWithInternalStaticAndFanObject = false;
     OutputReportPredefined::SetPredefinedTables(*state);
     CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
     EXPECT_EQ("8.72", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
     EXPECT_EQ("10.16", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
 }
 
 } // namespace EnergyPlus
