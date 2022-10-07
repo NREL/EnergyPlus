@@ -490,12 +490,6 @@ namespace FluidProperties {
                                 std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
-    Real64 GetSupHeatTempRefrigResidual(EnergyPlusData &state,
-                                        Real64 Temperature, // temperature of the refrigerant
-                                        std::array<Real64, 3> const &Par);
-
-    //*****************************************************************************
-
     Real64 GetSupHeatDensityRefrig(EnergyPlusData &state,
                                    std::string_view const Refrigerant, // carries in substance name
                                    Real64 Temperature,                 // actual temperature given as input

@@ -3879,9 +3879,21 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
 
     SolarShading::GetShadowingInput(*state);
 
-    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
-    // Now expect one severe error from GetShadowInput()
-    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
-    // There should be a severe warning reported about the PixelCounting and the scheduled shading surface tm values > 0.0 combination.
-    EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
+#ifdef EP_NO_OPENGL
+    EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+    EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
+#else
+    if (!Pumbra::Penumbra::isValidContext()) {
+        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
+        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+        EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
+    } else {
+        EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 0);
+        // Now expect one severe error from GetShadowInput()
+        EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 1);
+        // There should be a severe warning reported about the PixelCounting and the scheduled shading surface tm values > 0.0 combination.
+        EXPECT_EQ(state->dataErrTracking->LastSevereError, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
+    }
+#endif
 }
