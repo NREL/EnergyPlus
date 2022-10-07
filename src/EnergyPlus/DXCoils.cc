@@ -15223,7 +15223,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 Real64 TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp(1), wbRated, par3);
                 Real64 HighSpeedNetCoolingCap = coil.RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
-                TotCapFlowModFac = CurveManager::CurveValue(state, coil.CCapFFlow(1), AirMassFlowRatio);
+                // TotCapFlowModFac = CurveManager::CurveValue(state, coil.CCapFFlow(1), AirMassFlowRatio);
                 TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp2, wbRated, par3);
                 Real64 LowSpeedNetCoolingCap = coil.RatedTotCap2 * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
