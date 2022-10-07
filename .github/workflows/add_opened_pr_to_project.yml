@@ -22,6 +22,11 @@ jobs:
     steps:
       # check out the repo to get the script downloaded
       - uses: actions/checkout@v1
+        # gets the current PR and stores it in a variable
+      - uses: jwalton/gh-find-current-pr@v1
+        id: findPr
+      # adds the variable to the environment so that we can use it in the next step
+      - run: echo "PR=${{ steps.findPr.outputs.pr }}" >> $GITHUB_ENV
       # interact with the GitHub API and manipulate the Project
       # we should also probably pass the project id as an env variable / argument
-      - run: bash scripts/dev/add_to_project.sh ${{ github.event.issue.number }}
+      - run: bash scripts/dev/add_to_project.sh ${{ env.PR }}
