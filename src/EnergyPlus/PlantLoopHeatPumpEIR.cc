@@ -1402,7 +1402,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 oaTemp2 = max(-8.8888, min(3.3333, oaTempforCurve));
     Real64 eirDefrost = 1.0;
 
-    if (state.dataEnvrn->OutDryBulbTemp <= this->defrostMaxOADBT) {
+    if ((state.dataEnvrn->OutDryBulbTemp <= this->defrostMaxOADBT) && this->defrostType == DefrostType::OnDemand) {
         if (this->defrostEIRCurveIndex > 0) {
             eirDefrost = CurveManager::CurveValue(state, this->defrostEIRCurveIndex, oaTemp2);
         }
@@ -1493,7 +1493,11 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         this->powerUsage = 0.0;
     } else {
         this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
+
         this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR;
+        if (this->defrostType == DefrostType::Timed) {
+            this->powerUsage += this->defrostResistiveHeaterCap * this->defrostOpTimeFrac * reportingInterval;
+        }
     }
     this->powerUsage += this->standbyElecPower;
 
@@ -2008,7 +2012,30 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     }
                 }
 
-                // N9 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
+                // N9 Resistive Defrost Heater Capacity
+                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
+                    thisPLHP.defrostResistiveHeaterCap = 0.0;
+                } else {
+                    if (fields.find("resistive_defrost_heater_capacity") != fields.end()) {
+                        thisPLHP.defrostResistiveHeaterCap = fields.at("resistive_defrost_heater_capacity").get<Real64>();
+                    } else {
+                        Real64 defaultVal = 0.0;
+                        if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                                state, cCurrentModuleObject, "resistive_defrost_heater_capacity", defaultVal)) {
+                            // this error condition would mean that someone broke the input dictionary, not their
+                            // input file.  I can't really unit test it so I'll leave it here as a severe error
+                            // but excluding it from coverage
+                            ShowSevereError(
+                                state,                                                                                         // LCOV_EXCL_LINE
+                                "EIR PLFFHP: Resistive Defrost Heater Capacity not entered and could not get default value."); // LCOV_EXCL_LINE
+                            errorsFound = true;                                                                                // LCOV_EXCL_LINE
+                        } else {
+                            thisPLHP.defrostResistiveHeaterCap = defaultVal;
+                        }
+                    }
+                }
+
+                // N10 maximum_outdoor_dry_bulb_temperature_for_defrost_operation
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
                     thisPLHP.defrostMaxOADBT = -99.0;
                 } else {
@@ -2047,7 +2074,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.cycRatioCurveIndex = 0;
                 }
 
-                // N10 nominal_auxiliary_electric_power
+                // N11 nominal_auxiliary_electric_power
                 if (fields.find("nominal_auxiliary_electric_power") != fields.end()) {
                     thisPLHP.nominalAuxElecPower = fields.at("nominal_auxiliary_electric_power").get<Real64>();
                 } else {
@@ -2098,7 +2125,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.auxElecEIRFoPLRCurveIndex = 0;
                 }
 
-                // N11 standby_electric_power
+                // N12 standby_electric_power
                 if (fields.find("standby_electric_power") != fields.end()) {
                     thisPLHP.standbyElecPower = fields.at("standby_electric_power").get<Real64>();
                 } else {

@@ -254,6 +254,7 @@ namespace EIRPlantLoopHeatPumps {
         int defrostEIRCurveIndex = 0;
         DefrostType defrostType = DefrostType::OnDemand;
         Real64 defrostOpTimeFrac = 0.0;
+        Real64 defrostResistiveHeaterCap = 0.0;
         Real64 defrostMaxOADBT = 5.0;
 
         int cycRatioCurveIndex = 0;
