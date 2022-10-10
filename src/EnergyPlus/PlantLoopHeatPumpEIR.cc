@@ -1401,25 +1401,29 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     Real64 oaTemp2 = max(-8.8888, min(3.3333, oaTempforCurve));
     Real64 eirDefrost = 1.0;
-    if (this->defrostEIRCurveIndex > 0) {
-        eirDefrost = CurveManager::CurveValue(state, this->defrostEIRCurveIndex, oaTemp2);
-    }
 
-    if (eirDefrost < 0.0) {
-        if (this->eirDefrostFTErrorIndex == 0) {
-            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
-            ShowContinueError(state, format(" EIR defrost Modifier curve (function of Temperature) output is negative ({:.3T}).", eirDefrost));
-            ShowContinueError(state, format(" Negative value occurs using an outdoor air temperature of {:.2T}", oaTemp2));
-            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+    if (state.dataEnvrn->OutDryBulbTemp <= this->defrostMaxOADBT) {
+        if (this->defrostEIRCurveIndex > 0) {
+            eirDefrost = CurveManager::CurveValue(state, this->defrostEIRCurveIndex, oaTemp2);
         }
-        ShowRecurringWarningErrorAtEnd(state,
-                                       format("{} \"{}\": EIR Modifier curve (function of PLR) output is negative warning continues...",
-                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
-                                              this->name),
-                                       this->eirDefrostFTErrorIndex,
-                                       eirDefrost,
-                                       eirDefrost);
-        eirDefrost = 0.0;
+
+        if (eirDefrost < 1.0) {
+            if (this->eirDefrostFTErrorIndex == 0) {
+                ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+                ShowContinueError(state,
+                                  format(" EIR defrost Modifier curve (function of Temperature) output is less than 1.0 ({:.3T}).", eirDefrost));
+                ShowContinueError(state, format(" Negative value occurs using an outdoor air temperature of {:.2T}", oaTemp2));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to 1.0 and continuing simulation.");
+            }
+            ShowRecurringWarningErrorAtEnd(state,
+                                           format("{} \"{}\": EIR Modifier curve (function of PLR) output out of range warning continues...",
+                                                  DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                                  this->name),
+                                           this->eirDefrostFTErrorIndex,
+                                           eirDefrost,
+                                           eirDefrost);
+            eirDefrost = 1.0;
+        }
     }
 
     // Cycling Ratio
@@ -1491,7 +1495,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         this->fuelUsage = this->loadSideHeatTransfer * eirModifierFuncPLR * eirModifierFuncTemp * eirDefrost / CRF;
         this->powerUsage = this->nominalAuxElecPower * eirAuxElecFuncTemp * eirAuxElecFuncPLR;
     }
-    this->powerUsage += +this->standbyElecPower;
+    this->powerUsage += this->standbyElecPower;
 
     this->fuelEnergy = this->fuelUsage * reportingInterval;
     this->powerEnergy = this->powerEnergy * reportingInterval;
