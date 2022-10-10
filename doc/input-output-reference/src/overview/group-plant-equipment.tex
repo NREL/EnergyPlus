@@ -5629,7 +5629,7 @@ This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
 \paragraph{Field: Defrost Control Type}
 
-The defrost control type. There are two options for this input: \emph{timed}, or \emph{OnDemand}. The \emph{timed} option will use a fraction of time per hour to account for the defrost action. The \emph{OnDemand} option will work when the outdoor air temperature drops to a certain point. The default choice is \emph{timed}.
+The defrost control type. There are two options for this input: \emph{Timed}, or \emph{OnDemand}. The \emph{Timed} option will use a fraction of time per hour to account for the defrost action. The \emph{OnDemand} option will work when the outdoor air temperature drops to a certain point. The default choice is \emph{Timed}.
 
 This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
@@ -5637,7 +5637,11 @@ This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
 The fraction of the defrost time to the total operation time. The value should be in between 0.0 and 1.0 (inclusive). The default value is 0.0.
 
-This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+This field only applies to the HeatPump:AirToWater:FuelFired:Heating object.
+
+\paragraph{Field: Resistive Defrost Heater Capacity}
+
+This numeric field defines the capacity of the resistive defrost heating element in Watts. This input field is used only when the selected defrost control is ``OnDemand''. The value for this input field must be greater than or equal to 0.0. If the input field is left blank, the default value is 0.0.
 
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Defrost Operation}
 
@@ -5647,11 +5651,11 @@ This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
 \paragraph{Field: Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name}
 
-Auxiliary Electric EIRFT - Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name, which is a biquadratic curve or a lookup table which accounts for system internal fans, pumps, and electronics.
+Auxiliary Electric EIRFT---Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name, which is a biquadratic curve or a lookup table which accounts for system internal fans, pumps, and electronics.
 
 \paragraph{Field: Auxiliary Electric Energy Input Ratio Function of PLR Curve Name}
 
-Auxiliary Electric EIRFPLR - Auxiliary Electric Energy Input Ratio Function of PLR (Part Load Ratio) Curve Name.
+Auxiliary Electric EIRFPLR---Auxiliary Electric Energy Input Ratio Function of PLR (Part Load Ratio) Curve Name.
 
 \paragraph{Field: Standby Electric Power}
 
@@ -5684,6 +5688,7 @@ Fuel_EIRFPLR_CurveName, !-Fuel Energy Input Ratio Function of PLR Curve Name
 Fuel_EIRDefrost_CurveName, !-Fuel Energy Input Ratio Defrost Adjustment Curve name
 OnDemand, !-Defrost Control Type
 , !-Defrost operation time fraction
+, !-Resistive Defrost Heater Capacity
 5, !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation
 CRF_CurveName, !-Cycling Ratio Factor Curve Name
 900, !-Nominal Auxiliary Electric Power
