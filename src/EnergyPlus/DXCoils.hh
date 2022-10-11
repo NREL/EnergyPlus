@@ -131,6 +131,7 @@ namespace DXCoils {
         Array1D<Real64> RatedAirVolFlowRateEMSOverrideValue; // value to use for EMS override Air volume flow rate
         Array1D<Real64> FanPowerPerEvapAirFlowRate;          // Fan Power Per Air volume flow rate through the
         // Evaporator coil at rated conditions [W/(m3/s)]
+        Array1D<Real64> FanPowerPerEvapAirFlowRate_2023;
         Array1D<Real64> RatedAirMassFlowRate; // Air mass flow rate through coil at rated conditions [kg/s]
         // This is adjusted for bypassed air if any (see BypassedFlowFrac)
         Array1D<Real64> BypassedFlowFrac; // Fraction of air flow bypassed around coil
@@ -375,6 +376,7 @@ namespace DXCoils {
         Array1D<Real64> MSMaxONOFFCyclesperHour;      // Maximum ON/OFF cycles per hour for the compressor (cycles/hour)
         Array1D<Real64> MSLatentCapacityTimeConstant; // Time constant for latent capacity to reach steady state
         Array1D<Real64> MSFanPowerPerEvapAirFlowRate;
+        Array1D<Real64> MSFanPowerPerEvapAirFlowRate_2023;
         Real64 FuelUsed;         // Energy used, in addition to electricity [W]
         Real64 FuelConsumed;     // Energy consumed, in addition to electricity [J]
         Real64 MSFuelWasteHeat;  // Total waste heat [J]
@@ -452,19 +454,19 @@ namespace DXCoils {
               RatedTotCapEMSOverrideValue(MaxModes, 0.0), RatedSHR(MaxModes, 0.0), RatedSHREMSOverrideOn(MaxModes, false),
               RatedSHREMSOverrideValue(MaxModes, 0.0), RatedCOP(MaxModes, 0.0), RatedAirVolFlowRate(MaxModes, 0.0),
               RatedAirVolFlowRateEMSOverrideON(MaxModes, false), RatedAirVolFlowRateEMSOverrideValue(MaxModes, 0.0),
-              FanPowerPerEvapAirFlowRate(MaxModes, 0.0), RatedAirMassFlowRate(MaxModes, 0.0), BypassedFlowFrac(MaxModes, 0.0),
-              RatedCBF(MaxModes, 0.0), AirInNode(0), AirOutNode(0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0), CCapFFlow(MaxModes, 0),
-              CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0), EIRFFlow(MaxModes, 0), EIRFFlowErrorIndex(0),
-              PLFFPLR(MaxModes, 0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0),
-              MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0),
-              CompanionUpstreamDXCoil(0), FindCompanionUpStreamCoil(true), CondenserInletNodeNum(MaxModes, 0), LowOutletTempIndex(0),
-              FullLoadOutAirTempLast(0.0), FullLoadInletAirTempLast(0.0), PrintLowOutTempMessage(false), HeatingCoilPLFCurvePTR(0),
-              BasinHeaterSchedulePtr(0), RatedTotCap2(0.0), RatedSHR2(0.0), RatedCOP2(0.0), RatedAirVolFlowRate2(0.0), RatedAirMassFlowRate2(0.0),
-              RatedCBF2(0.0), CCapFTemp2(0), EIRFTemp2(0), RatedEIR2(0.0), InternalStaticPressureDrop(0.0), RateWithInternalStaticAndFanObject(false),
-              SupplyFanIndex(-1), SupplyFan_TypeNum(0), RatedEIR(MaxModes, 0.0), InletAirMassFlowRate(0.0), InletAirMassFlowRateMax(0.0),
-              InletAirTemp(0.0), InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirTemp(0.0), OutletAirHumRat(0.0), OutletAirEnthalpy(0.0),
-              PartLoadRatio(0.0), TotalCoolingEnergy(0.0), SensCoolingEnergy(0.0), LatCoolingEnergy(0.0), TotalCoolingEnergyRate(0.0),
-              SensCoolingEnergyRate(0.0), LatCoolingEnergyRate(0.0), ElecCoolingConsumption(0.0), ElecCoolingPower(0.0),
+              FanPowerPerEvapAirFlowRate(MaxModes, 0.0), FanPowerPerEvapAirFlowRate_2023(MaxModes, 0.0), RatedAirMassFlowRate(MaxModes, 0.0),
+              BypassedFlowFrac(MaxModes, 0.0), RatedCBF(MaxModes, 0.0), AirInNode(0), AirOutNode(0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0),
+              CCapFFlow(MaxModes, 0), CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0), EIRFFlow(MaxModes, 0),
+              EIRFFlowErrorIndex(0), PLFFPLR(MaxModes, 0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0),
+              CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0),
+              BasinHeaterSetPointTemp(0.0), CompanionUpstreamDXCoil(0), FindCompanionUpStreamCoil(true), CondenserInletNodeNum(MaxModes, 0),
+              LowOutletTempIndex(0), FullLoadOutAirTempLast(0.0), FullLoadInletAirTempLast(0.0), PrintLowOutTempMessage(false),
+              HeatingCoilPLFCurvePTR(0), BasinHeaterSchedulePtr(0), RatedTotCap2(0.0), RatedSHR2(0.0), RatedCOP2(0.0), RatedAirVolFlowRate2(0.0),
+              RatedAirMassFlowRate2(0.0), RatedCBF2(0.0), CCapFTemp2(0), EIRFTemp2(0), RatedEIR2(0.0), InternalStaticPressureDrop(0.0),
+              RateWithInternalStaticAndFanObject(false), SupplyFanIndex(-1), SupplyFan_TypeNum(0), RatedEIR(MaxModes, 0.0), InletAirMassFlowRate(0.0),
+              InletAirMassFlowRateMax(0.0), InletAirTemp(0.0), InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirTemp(0.0), OutletAirHumRat(0.0),
+              OutletAirEnthalpy(0.0), PartLoadRatio(0.0), TotalCoolingEnergy(0.0), SensCoolingEnergy(0.0), LatCoolingEnergy(0.0),
+              TotalCoolingEnergyRate(0.0), SensCoolingEnergyRate(0.0), LatCoolingEnergyRate(0.0), ElecCoolingConsumption(0.0), ElecCoolingPower(0.0),
               CoolingCoilRuntimeFraction(0.0), TotalHeatingEnergy(0.0), TotalHeatingEnergyRate(0.0), ElecHeatingConsumption(0.0),
               ElecHeatingPower(0.0), HeatingCoilRuntimeFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Invalid),
               DefrostControl(StandardRatings::HPdefrostControl::Invalid), EIRFPLR(0), DefrostEIRFT(0), RegionNum(0), MinOATCompressor(0.0),
@@ -559,6 +561,7 @@ namespace DXCoils {
                             int const FanOpMode // allows parent object to control fan mode
     );
 
+    // TODO: Add New Property for AHRI 2023 Standard & Modify Numeric Fields (increment)
     void GetDXCoils(EnergyPlusData &state);
 
     void InitDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current DX coil unit being simulated
@@ -696,13 +699,6 @@ namespace DXCoils {
 
     void GetFanIndexForTwoSpeedCoil(
         EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
-
-    Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
-                                          Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          std::array<Real64, 12> const &Par   // par(1) = DX coil number
-    );
-
-    // ======================  Utility routines ======================================
 
     void GetDXCoilIndex(EnergyPlusData &state,
                         std::string const &DXCoilName,
@@ -924,17 +920,9 @@ namespace DXCoils {
                               Real64 &CapModFac               // Coil capacity modification factor
     );
 
-    Real64 FanSpdResidualCool(EnergyPlusData &state,
-                              Real64 FanSpdRto,                // indoor unit fan speed ratio
-                              std::array<Real64, 5> const &Par // array of parameters
-    );
+    Real64 FanSpdResidualCool(Real64 FanSpdRto, Real64 QCoilSenCoolingLoad, Real64 Ts_1, Real64 Tin, Real64 Garate, Real64 BF);
 
-    Real64 FanSpdResidualHeat(EnergyPlusData &state,
-                              Real64 FanSpdRto,                // indoor unit fan speed ratio
-                              std::array<Real64, 5> const &Par // array of parameters
-    );
-    // End of Methods for New VRF Model: Fluid Temperature Control
-    // *****************************************************************************
+    Real64 FanSpdResidualHeat(Real64 FanSpdRto, Real64 QCoilSenHeatingLoad, Real64 Ts_1, Real64 Tin, Real64 Garate, Real64 BF);
 
     void SetMSHPDXCoilHeatRecoveryFlag(EnergyPlusData &state, int const DXCoilNum); // must match coil names for the coil type
 
@@ -997,52 +985,7 @@ struct DXCoilsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->GetCoilsInputFlag = true;
-        this->MyOneTimeFlag = true;
-        this->CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
-        this->CrankcaseHeaterReportVarFlag = true;
-        this->NumVRFHeatingCoils = 0;
-        this->NumVRFCoolingCoils = 0;
-        this->NumDXCoils = 0;
-        this->NumVRFHeatingFluidTCtrlCoils = 0;
-        this->NumVRFCoolingFluidTCtrlCoils = 0;
-        this->NumDXHeatingCoils = 0;
-        this->NumDoe2DXCoils = 0;
-        this->NumDXHeatPumpWaterHeaterPumpedCoils = 0;
-        this->NumDXHeatPumpWaterHeaterWrappedCoils = 0;
-        this->NumDXMulSpeedCoils = 0;
-        this->NumDXMulModeCoils = 0;
-        this->NumDXMulSpeedCoolCoils = 0;
-        this->NumDXMulSpeedHeatCoils = 0;
-        this->HPWHHeatingCapacity = 0.0;
-        this->HPWHHeatingCOP = 0.0;
-        this->CheckEquipName.deallocate();
-        this->DXCoilOutletTemp.deallocate();
-        this->DXCoilOutletHumRat.deallocate();
-        this->DXCoilPartLoadRatio.deallocate();
-        this->DXCoilFanOpMode.deallocate();
-        this->DXCoilFullLoadOutAirTemp.deallocate();
-        this->DXCoilFullLoadOutAirHumRat.deallocate();
-        this->DXCoilTotalCooling.deallocate();
-        this->DXCoilTotalHeating.deallocate();
-        this->DXCoilCoolInletAirWBTemp.deallocate();
-        this->DXCoilHeatInletAirDBTemp.deallocate();
-        this->DXCoilHeatInletAirWBTemp.deallocate();
-        this->DXCoil.deallocate();
-        this->DXCoilNumericFields.deallocate();
-        this->MyEnvrnFlag.clear();
-        this->MySizeFlag.clear();
-        this->CurrentEndTime = 0.0;
-        this->CalcVRFCoolingCoilCurrentEndTime = 0.0;
-        this->CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime = 0.0;
-        this->NetCoolingCapRated = 0.0;
-        this->EER = 0.0;
-        this->IEER = 0.0;
-        this->TotCapTempModFac = 0.0;
-        this->TotCapFlowModFac = 0.0;
-        this->EIRTempModFac = 0.0;
-        this->EIRFlowModFac = 0.0;
-        this->TempDryBulb_Leaving_Apoint = 0.0;
+        new (this) DXCoilsData();
     }
 };
 

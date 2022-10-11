@@ -283,7 +283,7 @@ Polygon symmetricUnit(Polygon poly) {
 
   if (isXsymm) {
     // Find centroid
-    Point centroid;
+    Point centroid{};
     boost::geometry::centroid(poly, centroid);
     double centroidX = centroid.get<0>();
 
@@ -300,7 +300,7 @@ Polygon symmetricUnit(Polygon poly) {
 
   if (isYsymm) {
     // Find centroid
-    Point centroid;
+    Point centroid{};
     boost::geometry::centroid(poly, centroid);
     double centroidY = centroid.get<1>();
 

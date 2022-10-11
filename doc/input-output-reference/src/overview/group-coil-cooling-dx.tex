@@ -218,9 +218,13 @@ The coefficient of performance is the ratio of the gross total cooling capacity 
 
 Defines the fraction of the cooling coil face which is actively cooled at a specific speed. Value varies between 0.0 and 1.0. For non-split-face coils, this should be 1.0.
 
-\paragraph{Field: Rated Evaporator Fan Power Per Volume Flow Rate}
+\paragraph{Field: 2017 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER.  ‘SEER User’ is calculated using user-input PLF curve and cooling coefficient of degradation. ‘SEER Standard’ is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+
+\paragraph{Field: 2023 Rated Evaporator Fan Power Per Volume Flow Rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m\(^{3}\)/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER2), Integrated Energy Efficiency Ratio (IEER2) and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER2, IEER2 and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER2.  ‘SEER2 User’ is calculated using user-input PLF curve and cooling coefficient of degradation. ‘SEER2 Standard’ is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
 
 \paragraph{Field: Evaporative Condenser Pump Power Fraction}\label{field-evaporative-condenser-pump-power-fraction}
 
@@ -351,24 +355,25 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
 
 Coil:Cooling:DX:CurveFit:Speed,
   Single Speed Cooling Coil Speed 1,  !- Name
-  1.0,       !- Gross Total Cooling Capacity Fraction
-  1.0,       !- Evaporator Air Flow Rate Fraction
-  1.0,       !- Condenser Air Flow Rate Fraction
-  Autosize,  !- Gross Sensible Heat Ratio
-  3.0,       !- Gross Cooling COP
-  1.0,       !- Active Fraction of Coil Face Area
-  773.3,     !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  1.0,       !- Evaporative Condenser Pump Power Fraction
-  0.9,       !- Evaporative Condenser Effectiveness
-  Single Speed Cool Cap fTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-  Single Speed Cool Cap fFlow,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-  Single Speed Cool EIR fTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-  Single Speed Cool EIR fFlow,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-  Single Speed Cool fPLR,       !- Part Load Fraction Correlation Curve Name
-  0.2,                            !- Rated Waste Heat Fraction of Power Input
-  Single Speed Waste Heat fTemp;  !- Waste Heat Function of Temperature Curve Name
-  , !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-  ; !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+  1.0,                                !- Gross Total Cooling Capacity Fraction
+  1.0,                                !- Evaporator Air Flow Rate Fraction
+  1.0,                                !- Condenser Air Flow Rate Fraction
+  Autosize,                           !- Gross Sensible Heat Ratio
+  3.0,                                !- Gross Cooling COP
+  1.0,                                !- Active Fraction of Coil Face Area
+  773.3,                              !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  934.4,                              !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  1.0,                                !- Evaporative Condenser Pump Power Fraction
+  0.9,                                !- Evaporative Condenser Effectiveness
+  Single Speed Cool Cap fTemp,        !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+  Single Speed Cool Cap fFlow,        !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+  Single Speed Cool EIR fTemp,        !- Energy Input Ratio Modifier Function of Temperature Curve Name
+  Single Speed Cool EIR fFlow,        !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+  Single Speed Cool fPLR,             !- Part Load Fraction Correlation Curve Name
+  0.2,                                !- Rated Waste Heat Fraction of Power Input
+  Single Speed Waste Heat fTemp;      !- Waste Heat Function of Temperature Curve Name
+  ,                                   !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+  ;                                   !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 \end{lstlisting}
 

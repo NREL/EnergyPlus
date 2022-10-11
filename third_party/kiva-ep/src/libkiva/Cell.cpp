@@ -308,14 +308,9 @@ void Cell::gatherCCoeffs(const double theta, bool cylindrical, double (&C)[3][2]
   }
 }
 
-std::vector<double> Cell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
-                                            std::size_t nZ,
-                                            const std::vector<std::shared_ptr<Cell>> & /*cell_v*/) {
-  std::vector<double> Qflux;
-  double Qx = 0;
-  double Qy = 0;
-  double Qz = 0;
-
+std::array<double, 3>
+Cell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY, std::size_t nZ,
+                        const std::vector<std::shared_ptr<Cell>> & /*cell_v*/) {
   double CXP = 0;
   double CXM = 0;
   double CYP = 0;
@@ -358,15 +353,11 @@ std::vector<double> Cell::calculateHeatFlux(int ndims, double &TNew, std::size_t
   if (coords[2] != 0)
     DTZM = TNew - *(&TNew - stepsize[2]);
 
-  Qx = CXP * DTXP + CXM * DTXM;
-  Qy = CYP * DTYP + CYM * DTYM;
-  Qz = CZP * DTZP + CZM * DTZM;
+  double Qx = CXP * DTXP + CXM * DTXM;
+  double Qy = CYP * DTYP + CYM * DTYM;
+  double Qz = CZP * DTZP + CZM * DTZM;
 
-  Qflux.push_back(Qx);
-  Qflux.push_back(Qy);
-  Qflux.push_back(Qz);
-
-  return Qflux;
+  return {Qx, Qy, Qz};
 }
 
 void Cell::doOutdoorTemp(const BoundaryConditions &bcs, double &A, double &bVal) {
@@ -412,15 +403,11 @@ void ExteriorAirCell::calcCellMatrix(Foundation::NumericalScheme, const double /
   doOutdoorTemp(bcs, A, bVal);
 }
 
-std::vector<double>
+std::array<double, 3>
 ExteriorAirCell::calculateHeatFlux(int /*ndims*/, double & /*TNew*/, std::size_t /*nX*/,
                                    std::size_t /*nY*/, std::size_t /*nZ*/,
                                    const std::vector<std::shared_ptr<Cell>> & /*cell_v*/) {
-  std::vector<double> Qflux;
-  Qflux.push_back(0);
-  Qflux.push_back(0);
-  Qflux.push_back(0);
-  return Qflux;
+  return {0.0, 0.0, 0.0};
 }
 
 InteriorAirCell::InteriorAirCell(const std::size_t &index, const CellType cellType,
@@ -456,15 +443,11 @@ void InteriorAirCell::calcCellADI(std::size_t /*dim*/, const double /*timestep*/
   doIndoorTemp(bcs, A, bVal);
 }
 
-std::vector<double>
+std::array<double, 3>
 InteriorAirCell::calculateHeatFlux(int /*ndims*/, double & /*TNew*/, std::size_t /*nX*/,
                                    std::size_t /*nY*/, std::size_t /*nZ*/,
                                    const std::vector<std::shared_ptr<Cell>> & /*cell_v*/) {
-  std::vector<double> Qflux;
-  Qflux.push_back(0);
-  Qflux.push_back(0);
-  Qflux.push_back(0);
-  return Qflux;
+  return {0.0, 0.0, 0.0};
 }
 
 BoundaryCell::BoundaryCell(const std::size_t &index, const CellType cellType, const std::size_t &i,
@@ -655,14 +638,10 @@ void BoundaryCell::calcCellMatrix(Foundation::NumericalScheme, const double /*ti
   }
 }
 
-std::vector<double>
+std::array<double, 3>
 BoundaryCell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
                                 std::size_t nZ,
                                 const std::vector<std::shared_ptr<Cell>> & /*cell_v*/) {
-  std::vector<double> Qflux;
-  double Qx = 0;
-  double Qy = 0;
-  double Qz = 0;
 
   double CXP = 0;
   double CXM = 0;
@@ -732,15 +711,11 @@ BoundaryCell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::si
     CZM = -kcoeff[2][0] / dist[2][0];
   } break;
   }
-  Qx = CXP * DTXP + CXM * DTXM;
-  Qy = CYP * DTYP + CYM * DTYM;
-  Qz = CZP * DTZP + CZM * DTZM;
+  double Qx = CXP * DTXP + CXM * DTXM;
+  double Qy = CYP * DTYP + CYM * DTYM;
+  double Qz = CZP * DTZP + CZM * DTZM;
 
-  Qflux.push_back(Qx);
-  Qflux.push_back(Qy);
-  Qflux.push_back(Qz);
-
-  return Qflux;
+  return {Qx, Qy, Qz};
 }
 
 #define INTFLUX_PREFACE                                                                            \
@@ -783,8 +758,8 @@ void BoundaryCell::ifCellADI(const std::size_t dim, const std::size_t sdim, cons
     bVal = hc * Tair + hr * Trad + heatGain;
   } else {
     Alt = 0.0;
-    bVal = *(told_ptr + sign * stepsize[sdim]) * kcoeff[sdim][dir] / dist[sdim][dir] +
-           hc * Tair + hr * Trad + heatGain;
+    bVal = *(told_ptr + sign * stepsize[sdim]) * kcoeff[sdim][dir] / dist[sdim][dir] + hc * Tair +
+           hr * Trad + heatGain;
   }
 }
 
@@ -907,8 +882,8 @@ double BoundaryCell::ifCellExplicit(const std::size_t dim, const std::size_t &di
 
   int sign = (dir == 0) ? -1 : 1;
 
-  return (kcoeff[dim][dir] * *(told_ptr + sign * stepsize[dim]) / dist[dim][dir] +
-          hc * Tair + hr * Trad + heatGain) /
+  return (kcoeff[dim][dir] * *(told_ptr + sign * stepsize[dim]) / dist[dim][dir] + hc * Tair +
+          hr * Trad + heatGain) /
          (kcoeff[dim][dir] / dist[dim][dir] + (hc + hr));
 }
 
@@ -927,17 +902,12 @@ ZeroThicknessCell::ZeroThicknessCell(const std::size_t &index, const CellType ce
                                      Block *blockPtr, Mesher *meshPtr)
     : Cell(index, cellType, i, j, k, stepsize, foundation, surfacePtr, blockPtr, meshPtr) {}
 
-std::vector<double>
+std::array<double, 3>
 ZeroThicknessCell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
                                      std::size_t nZ,
                                      const std::vector<std::shared_ptr<Cell>> &cell_v) {
-  std::vector<double> Qflux;
-  double Qx = 0;
-  double Qy = 0;
-  double Qz = 0;
-
-  std::vector<double> Qm;
-  std::vector<double> Qp;
+  std::array<double, 3> Qm;
+  std::array<double, 3> Qp;
 
   if (isEqual(meshPtr[0].deltas[coords[0]], 0.0)) {
     Qm = cell_v[index - stepsize[0]]->calculateHeatFlux(ndims, *(&TNew - stepsize[0]), nX, nY, nZ,
@@ -958,15 +928,11 @@ ZeroThicknessCell::calculateHeatFlux(int ndims, double &TNew, std::size_t nX, st
                                                         cell_v);
   }
 
-  Qx = (Qm[0] + Qp[0]) * 0.5;
-  Qy = (Qm[1] + Qp[1]) * 0.5;
-  Qz = (Qm[2] + Qp[2]) * 0.5;
+  double Qx = (Qm[0] + Qp[0]) * 0.5;
+  double Qy = (Qm[1] + Qp[1]) * 0.5;
+  double Qz = (Qm[2] + Qp[2]) * 0.5;
 
-  Qflux.push_back(Qx);
-  Qflux.push_back(Qy);
-  Qflux.push_back(Qz);
-
-  return Qflux;
+  return {Qx, Qy, Qz};
 }
 
 } // namespace Kiva

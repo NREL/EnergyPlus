@@ -2268,6 +2268,9 @@
     40125.6,                 !- Gross Rated Total Cooling Capacity {W}
     28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -2284,6 +2287,9 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     33156.73,                !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
 
@@ -2527,6 +2533,9 @@
     41562.8,                 !- Gross Rated Total Cooling Capacity {W}
     29533.53,                !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -2543,6 +2552,9 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     35078.365,               !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
 
@@ -2786,6 +2798,9 @@
     43125.6,                 !- Gross Rated Total Cooling Capacity {W}
     30267.06,                !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -2802,6 +2817,9 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     39156.73,                !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
 
@@ -3045,6 +3063,9 @@
     42000.0,                 !- Gross Rated Total Cooling Capacity {W}
     30000.0,                 !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -3061,6 +3082,9 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     35000.0,                 !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
 
@@ -3304,6 +3328,9 @@
     100000.0,                !- Gross Rated Total Cooling Capacity {W}
     75000.0,                 !- Gross Rated Sensible Cooling Capacity {W}
     7.007757577,             !- Gross Rated Cooling COP {W/W}
+    30.0,                   !- Rated Entering Water Temperature {C}
+    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
+    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
@@ -3320,6 +3347,9 @@
     0.0033,                  !- Rated Water Flow Rate {m3/s}
     81000.0,                 !- Gross Rated Heating Capacity {W}
     3.167053691,             !- Gross Rated Heating COP {W/W}
+    20.0,                    !- Rated Entering Water Temperature {C}
+    20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
+    1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
     HeatPowCurve;            !- Heating Power Consumption Curve Name
 
@@ -3672,11 +3702,11 @@
 
   Curve:QuadLinear,
     TotCoolCapCurve,         !- Name
-    -0.68126221,             !- Coefficient1 Constant
-    1.99529297,              !- Coefficient2 w
-    -0.93611888,             !- Coefficient3 x
-    0.02081177,              !- Coefficient4 y
-    0.008438868,             !- Coefficient5 z
+    -1.68436772950691,       !- Coefficient1 Constant
+    4.9332063928513,         !- Coefficient2 w
+    -2.31448098736337,       !- Coefficient3 x
+    0.0514554796484602,      !- Coefficient4 y
+    0.0208644435639084,      !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -3690,12 +3720,12 @@
 
   Curve:QuintLinear,
     CoolSensCapCurve,        !- Name
-    2.24209455,              !- Coefficient1 Constant
-    7.28913391,              !- Coefficient2 v
-    -9.06079896,             !- Coefficient3 w
-    -0.36729404,             !- Coefficient4 x
-    0.218826161,             !- Coefficient5 y
-    0.00901534,              !- Coefficient6 z
+    4.93131349655017,        !- Coefficient1 Constant
+    16.0318860899709,        !- Coefficient2 v
+    -19.9285262974194,       !- Coefficient3 w
+    -0.807834824206872,      !- Coefficient4 x
+    0.481291210996235,       !- Coefficient5 y
+    0.0198285428319642,      !- Coefficient6 z
     -100,                    !- Minimum Value of v
     100,                     !- Maximum Value of v
     -100,                    !- Minimum Value of w
@@ -3711,11 +3741,11 @@
 
   Curve:QuadLinear,
     CoolPowCurve,            !- Name
-    -3.20456384,             !- Coefficient1 Constant
-    0.47656454,              !- Coefficient2 w
-    3.16734236,              !- Coefficient3 x
-    0.10244637,              !- Coefficient4 y
-    -0.038132556,            !- Coefficient5 z
+    -4.3157569995297,        !- Coefficient1 Constant
+    0.641814877756547,       !- Coefficient2 w
+    4.2656288476615,         !- Coefficient3 x
+    0.137969989202621,       !- Coefficient4 y
+    -0.0513551464984883,     !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -3729,11 +3759,11 @@
 
   Curve:QuadLinear,
     HeatCapCurve,            !- Name
-    -5.50102734,             !- Coefficient1 Constant
-    -0.96688754,             !- Coefficient2 w
-    7.70755007,              !- Coefficient3 x
-    0.031928881,             !- Coefficient4 y
-    0.028112522,             !- Coefficient5 z
+    -3.57735399536928,       !- Coefficient1 Constant
+    -0.62877328006368,       !- Coefficient2 w
+    5.01227013305906,        !- Coefficient3 x
+    0.0207635597777306,      !- Coefficient4 y
+    0.0182817566030506,      !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -3747,11 +3777,11 @@
 
   Curve:QuadLinear,
     HeatPowCurve,            !- Name
-    -7.47517858,             !- Coefficient1 Constant
-    6.40876653,              !- Coefficient2 w
-    1.99711665,              !- Coefficient3 x
-    -0.050682973,            !- Coefficient4 y
-    0.011385145,             !- Coefficient5 z
+    -6.29077057443245,       !- Coefficient1 Constant
+    5.39332665753272,        !- Coefficient2 w
+    1.68068261126801,        !- Coefficient3 x
+    -0.0426524867280368,     !- Coefficient4 y
+    0.00958122062037036,     !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x

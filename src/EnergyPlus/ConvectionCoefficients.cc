@@ -3157,8 +3157,7 @@ Real64 CalcASHRAETARPNatural(Real64 const Tsurf, Real64 const Tamb, Real64 const
 
         return CalcWaltonUnstableHorizontalOrTilt(DeltaTemp, cosTilt);
 
-    } else // if (((DeltaTemp > 0.0) && (cosTilt < 0.0)) || ((DeltaTemp < 0.0) && (cosTilt > 0.0)))
-    {      // Reduced Convection
+    } else { // (((DeltaTemp > 0.0) && (cosTilt < 0.0)) || ((DeltaTemp < 0.0) && (cosTilt > 0.0))) // Reduced Convection
 
         return CalcWaltonStableHorizontalOrTilt(DeltaTemp, cosTilt);
 

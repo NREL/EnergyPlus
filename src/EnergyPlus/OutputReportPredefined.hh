@@ -273,6 +273,17 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXCoolCoilEERIP = 0;          // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
     int pdchDXCoolCoilIEERIP = 0;         // IEER value in IP unit at AHRI std. 340/360 conditions
 
+    // DX Cooling Coil SEER2 subtable | AHRI std. 210/240 2023 conditions
+    int pdstDXCoolCoil_2023 = 0;
+    int pdchDXCoolCoilType_2023 = 0;        // DX cooling coil type
+    int pdchDXCoolCoilNetCapSI_2023 = 0;    // Standard Rated (Net) Cooling Capacity [W]
+    int pdchDXCoolCoilCOP_2023 = 0;         // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
+    int pdchDXCoolCoilSEER2UserIP_2023 = 0; // SEER2 value in IP unit at AHRI std. 210/240 2023 conditions and user PLF curve [Btu/W-hr]
+    int pdchDXCoolCoilSEER2StandardIP_2023 =
+        0;                             // SEER2 value in IP unit at AHRI std. 210/240 2023 conditions and default PLF curve and C_D value [Btu/W-hr]
+    int pdchDXCoolCoilEERIP_2023 = 0;  // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
+    int pdchDXCoolCoilIEERIP_2023 = 0; // IEER value in IP unit at AHRI std. 340/360 conditions
+
     // DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
     int pdstDXCoolCoil2 = 0;
     int pdchDXCoolCoilNetCapSIA = 0;  // Standard Rated (Net) Cooling Capacity [W], Test A
@@ -283,6 +294,18 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXCoolCoilElecPowerC = 0; // Standard Rated Electric Power [W], Test C
     int pdchDXCoolCoilNetCapSID = 0;  // Standard Rated (Net) Cooling Capacity [W], Test D
     int pdchDXCoolCoilElecPowerD = 0; // Standard Rated Electric Power [W], Test D
+
+    // Water-to-Air HP report
+    int pdstWAHP = 0;
+    int pdchWAHPType = 0;
+    int pdchWAHPRatedCapAtRatedCdts = 0;
+    int pdchWAHPRatedSensCapAtRatedCdts = 0;
+    int pdchWAHPRatedPowerAtRatedCdts = 0;
+    int pdchWAHPRatedCOPAtRatedCdts = 0;
+    int pdchWAHPRatedAirDBT = 0;
+    int pdchWAHPRatedAirWBT = 0;
+    int pdchWAHPRatedWtrT = 0;
+    int pdchWAHPDD = 0;
 
     // VAV DX Cooling Ratings Details
     int pdstVAVDXCoolCoil = 0; // details for Packaged VAV rating under AHRI 340/360
@@ -303,6 +326,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchVAVDXCoolCoilEER_D_IP = 0;
     int pdchVAVDXCoolCoilMdotD = 0;
 
+    // TODO: As not inlcuded in clearState() , Confirm and update
     // DX Heating Coil subtable
     int pdstDXHeatCoil;
     int pdchDXHeatCoilType; // DX Heating coil type
@@ -311,6 +335,16 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXHeatCoilHSPFSI;    // HSPF value in SI unit at AHRI std. 340/360 conditions [W/W]
     int pdchDXHeatCoilHSPFIP;    // HSPF value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
     int pdchDXHeatCoilRegionNum; // Region number for which HSPF is calculated
+
+    // TODO: As not inlcuded in clearState() , Confirm and update
+    // DX Heating Coil subtable| AHRI std. 210/240 2023 conditions
+    int pdstDXHeatCoil_2023;
+    int pdchDXHeatCoilType_2023; // DX Heating coil type
+    int pdchDXHeatCoilHighCap_2023;
+    int pdchDXHeatCoilLowCap_2023;
+    int pdchDXHeatCoilHSPF2SI_2023;   // HSPF2 value in SI unit at AHRI std. 340/360 conditions [W/W]
+    int pdchDXHeatCoilHSPF2IP_2023;   // HSPF2 value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
+    int pdchDXHeatCoilRegionNum_2023; // Region number for which HSPF is calculated
 
     // Heating Coil subtable
     int pdstHeatCoil = 0;
@@ -1129,6 +1163,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHIOccuHourExtremeCaution = 0;
     int pdchHIOccuHourDanger = 0;
     int pdchHIOccuHourExtremeDanger = 0;
+    int pdstHIOccupiedHours = 0;
+    int pdchHIOccupiedHourSafe = 0;
+    int pdchHIOccupiedHourCaution = 0;
+    int pdchHIOccupiedHourExtremeCaution = 0;
+    int pdchHIOccupiedHourDanger = 0;
+    int pdchHIOccupiedHourExtremeDanger = 0;
     int pdstHumidexHours = 0;
     int pdchHumidexHourLittle = 0;
     int pdchHumidexHourSome = 0;
@@ -1141,17 +1181,57 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHumidexOccuHourGreat = 0;
     int pdchHumidexOccuHourDanger = 0;
     int pdchHumidexOccuHourStroke = 0;
+    int pdstHumidexOccupiedHours = 0;
+    int pdchHumidexOccupiedHourLittle = 0;
+    int pdchHumidexOccupiedHourSome = 0;
+    int pdchHumidexOccupiedHourGreat = 0;
+    int pdchHumidexOccupiedHourDanger = 0;
+    int pdchHumidexOccupiedHourStroke = 0;
 
     int pdstHeatingSETHours = 0;
     int pdchHeatingSETHours = 0;
     int pdchHeatingSETOccuHours = 0;
+    int pdchHeatingSETOccupiedHours = 0;
     int pdchHeatingSETUnmetDuration = 0;
     int pdchHeatingSETUnmetTime = 0;
     int pdstCoolingSETHours = 0;
     int pdchCoolingSETHours = 0;
     int pdchCoolingSETOccuHours = 0;
+    int pdchCoolingSETOccupiedHours = 0;
     int pdchCoolingSETUnmetDuration = 0;
     int pdchCoolingSETUnmetTime = 0;
+
+    int pdstHourOfSafetyColdEvent = 0;
+    int pdchColdHourOfSafety = 0;
+    int pdchColdSafetyEndTime = 0;
+    int pdchColdSafeTempExceedHour = 0;
+    int pdchColdSafeTempExceedOccHour = 0;
+    int pdchColdSafeTempExceedOccupiedHour = 0;
+    int pdstHourOfSafetyHeatEvent = 0;
+    int pdchHeatHourOfSafety = 0;
+    int pdchHeatSafetyEndTime = 0;
+    int pdchHeatSafeTempExceedHour = 0;
+    int pdchHeatSafeTempExceedOccHour = 0;
+    int pdchHeatSafeTempExceedOccupiedHour = 0;
+
+    int pdstUnmetDegreeHour = 0;
+    int pdchCoolingUnmetDegreeHour = 0;
+    int pdchCoolingUnmetDegreeOccHour = 0;
+    int pdchCoolingUnmetDegreeOccupiedHour = 0;
+    int pdchHeatingUnmetDegreeHour = 0;
+    int pdchHeatingUnmetDegreeOccHour = 0;
+    int pdchHeatingUnmetDegreeOccupiedHour = 0;
+
+    int pdstDiscomfortWtExceedOccuHour = 0;
+    int pdstDiscomfortWtExceedOccupiedHour = 0;
+    int pdchVeryColdExceedOccuHour = 0;
+    int pdchCoolExceedOccuHour = 0;
+    int pdchWarmExceedOccuHour = 0;
+    int pdchVeryHotExceedOccuHour = 0;
+    int pdchVeryColdExceedOccupiedHour = 0;
+    int pdchCoolExceedOccupiedHour = 0;
+    int pdchWarmExceedOccupiedHour = 0;
+    int pdchVeryHotExceedOccupiedHour = 0;
 
     int pdrCO2Resilience = 0;
     int pdstCO2Hours = 0;
@@ -1162,6 +1242,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchCO2OccuHourSafe = 0;
     int pdchCO2OccuHourCaution = 0;
     int pdchCO2OccuHourHazard = 0;
+    int pdstCO2OccupiedHours = 0;
+    int pdchCO2OccupiedHourSafe = 0;
+    int pdchCO2OccupiedHourCaution = 0;
+    int pdchCO2OccupiedHourHazard = 0;
 
     int pdrVisualResilience = 0;
     int pdstIllumHours = 0;
@@ -1174,6 +1258,11 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchIllumOccuHourDim = 0;
     int pdchIllumOccuHourAdequate = 0;
     int pdchIllumOccuHourBright = 0;
+    int pdstIllumOccupiedHours = 0;
+    int pdchIllumOccupiedHourDark = 0;
+    int pdchIllumOccupiedHourDim = 0;
+    int pdchIllumOccupiedHourAdequate = 0;
+    int pdchIllumOccupiedHourBright = 0;
 
     int sizeReportName = 0;
     int numReportName = 0;
@@ -1287,6 +1376,16 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchDXCoolCoilSEERStandardIP = 0;
         this->pdchDXCoolCoilEERIP = 0;
         this->pdchDXCoolCoilIEERIP = 0;
+        // Start : SEER2 ANSI/AHRI 210/240 Standard 2023
+        this->pdstDXCoolCoil_2023 = 0;
+        this->pdchDXCoolCoilType_2023 = 0;
+        this->pdchDXCoolCoilNetCapSI_2023 = 0;
+        this->pdchDXCoolCoilCOP_2023 = 0;
+        this->pdchDXCoolCoilSEER2UserIP_2023 = 0;
+        this->pdchDXCoolCoilSEER2StandardIP_2023 = 0;
+        this->pdchDXCoolCoilEERIP_2023 = 0;
+        this->pdchDXCoolCoilIEERIP_2023 = 0;
+        // End
         this->pdstDXCoolCoil2 = 0;
         this->pdchDXCoolCoilNetCapSIA = 0;
         this->pdchDXCoolCoilElecPowerA = 0;

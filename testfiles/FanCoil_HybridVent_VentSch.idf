@@ -2213,20 +2213,20 @@
 
   ZoneMixing,
     NORTH ZONE Mixng,        !- Name
-    NORTH ZONE,              !- Zone Name
+    NORTH ZONE,              !- Zone or Space Name
     MixingAvailSched,        !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
     0.1059,                  !- Design Flow Rate {m3/s}
-    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
     ,                        !- Flow Rate per Person {m3/s-person}
     ,                        !- Air Changes per Hour {1/hr}
-    West Zone,               !- Source Zone Name
+    West Zone,               !- Source Zone or Space Name
     ,                        !- Delta Temperature {deltaC}
     DeltaTemp,               !- Delta Temperature Schedule Name
-    MinIndoorTemp,           !- Minimum Zone Temperature Schedule Name
-    MaxIndoorTemp,           !- Maximum Zone Temperature Schedule Name
-    MinIndoorTemp,           !- Minimum Source Zone Temperature Schedule Name
-    MaxIndoorTemp,           !- Maximum Source Zone Temperature Schedule Name
+    MinIndoorTemp,           !- Minimum Receiving Temperature Schedule Name
+    MaxIndoorTemp,           !- Maximum Receiving Temperature Schedule Name
+    MinIndoorTemp,           !- Minimum Source Temperature Schedule Name
+    MaxIndoorTemp,           !- Maximum Source Temperature Schedule Name
     MinOutdoorTemp,          !- Minimum Outdoor Temperature Schedule Name
     MaxOutdoorTemp;          !- Maximum Outdoor Temperature Schedule Name
 

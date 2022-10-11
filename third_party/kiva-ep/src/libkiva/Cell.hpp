@@ -93,9 +93,9 @@ public:
                            double &bVal);
   void gatherCCoeffs(const double theta, bool cylindrical, double (&C)[3][2]);
 
-  virtual std::vector<double> calculateHeatFlux(int ndims, double &TNew, std::size_t nX,
-                                                std::size_t nY, std::size_t nZ,
-                                                const std::vector<std::shared_ptr<Cell>> &cell_v);
+  virtual std::array<double, 3> calculateHeatFlux(int ndims, double &TNew, std::size_t nX,
+                                                  std::size_t nY, std::size_t nZ,
+                                                  const std::vector<std::shared_ptr<Cell>> &cell_v);
 
   void Assemble(const Foundation &foundation);
 
@@ -125,9 +125,9 @@ public:
   void calcCellADI(std::size_t dim, const double timestep, const Foundation &foundation,
                    const BoundaryConditions &bcs, double &A, double (&Alt)[2],
                    double &bVal) override;
-  std::vector<double> calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
-                                        std::size_t nZ,
-                                        const std::vector<std::shared_ptr<Cell>> &cell_v) override;
+  std::array<double, 3>
+  calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY, std::size_t nZ,
+                    const std::vector<std::shared_ptr<Cell>> &cell_v) override;
 };
 
 class InteriorAirCell : public Cell {
@@ -149,9 +149,9 @@ public:
   void calcCellADI(std::size_t dim, const double timestep, const Foundation &foundation,
                    const BoundaryConditions &bcs, double &A, double (&Alt)[2],
                    double &bVal) override;
-  std::vector<double> calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
-                                        std::size_t nZ,
-                                        const std::vector<std::shared_ptr<Cell>> &cell_v) override;
+  std::array<double, 3>
+  calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY, std::size_t nZ,
+                    const std::vector<std::shared_ptr<Cell>> &cell_v) override;
 };
 
 class BoundaryCell : public Cell {
@@ -172,9 +172,9 @@ public:
   void calcCellADI(std::size_t dim, const double timestep, const Foundation &foundation,
                    const BoundaryConditions &bcs, double &A, double (&Alt)[2],
                    double &bVal) override;
-  std::vector<double> calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
-                                        std::size_t nZ,
-                                        const std::vector<std::shared_ptr<Cell>> &cell_v) override;
+  std::array<double, 3>
+  calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY, std::size_t nZ,
+                    const std::vector<std::shared_ptr<Cell>> &cell_v) override;
 
 private:
   inline void zfCellADI(const std::size_t dim, const std::size_t sdim, const std::size_t sign,
@@ -206,9 +206,9 @@ public:
                     const Foundation &foundation, Surface *surfacePtr, Block *blockPtr,
                     Mesher *meshptr);
 
-  std::vector<double> calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY,
-                                        std::size_t nZ,
-                                        const std::vector<std::shared_ptr<Cell>> &cell_v) override;
+  std::array<double, 3>
+  calculateHeatFlux(int ndims, double &TNew, std::size_t nX, std::size_t nY, std::size_t nZ,
+                    const std::vector<std::shared_ptr<Cell>> &cell_v) override;
 };
 
 } // namespace Kiva

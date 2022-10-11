@@ -68,7 +68,9 @@ function Component()
 
       // man page:
       linktarget = "/usr/local/share/man/man1";
-      component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/energyplus.1", linktarget,
+      component.addElevatedOperation("Execute", "mkdir", "-p", linktarget);
+
+      component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/energyplus.1", linktarget + "/energyplus.1",
                                      "UNDOEXECUTE", "rm", linktarget + "/energyplus.1");
 
     }

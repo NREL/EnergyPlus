@@ -76,7 +76,8 @@ namespace OutputProcessor {
 
 namespace WeatherManager {
     enum class DateType;
-}
+    struct ReportPeriodData;
+} // namespace WeatherManager
 
 namespace General {
 
@@ -251,6 +252,16 @@ namespace General {
         XRes = XTemp;
     }
 
+    // A second version that does not require a payload -- use lambdas
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 Eps,   // required absolute accuracy
+                   int MaxIte,   // maximum number of allowed iterations
+                   int &Flag,    // integer storing exit status
+                   Real64 &XRes, // value of x that solves f(x,Par) = 0
+                   const std::function<Real64(Real64)> &f,
+                   Real64 X_0,  // 1st bound of interval that contains the solution
+                   Real64 X_1); // 2nd bound of interval that contains the solution
+
     constexpr Real64 InterpGeneral(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
     {
         return Lower + InterpFac * (Upper - Lower);
@@ -329,11 +340,7 @@ namespace General {
 
     std::string &strip_trailing_zeros(std::string &InputString);
 
-    void MovingAvg(Array1A<Real64> DataIn,      // input data that needs smoothing
-                   int NumDataItems,            // number of values in DataIn
-                   int NumItemsInAvg,           // number of items in the averaging window
-                   Array1A<Real64> SmoothedData // output data after smoothing
-    );
+    void MovingAvg(Array1D<Real64> &DataIn, int NumItemsInAvg);
 
     void ProcessDateString(EnergyPlusData &state,
                            std::string const &String,
@@ -367,6 +374,8 @@ namespace General {
     );
 
     void InvOrdinalDay(int Number, int &PMonth, int &PDay, int LeapYr);
+
+    bool BetweenDateHoursLeftInclusive(int TestDate, int TestHour, int StartDate, int StartHour, int EndDate, int EndHour);
 
     bool BetweenDates(int TestDate,  // Date to test
                       int StartDate, // Start date in sequence
@@ -500,6 +509,13 @@ namespace General {
     }
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
+
+    bool isReportPeriodBeginning(EnergyPlusData &state, int periodIdx);
+
+    void findReportPeriodIdx(EnergyPlusData &state,
+                             const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                             int nReportPeriods,
+                             Array1D_bool &inReportPeriodFlags);
 
     inline Real64 epexp(const Real64 numerator, const Real64 denominator)
     {
