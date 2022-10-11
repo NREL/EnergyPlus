@@ -845,15 +845,7 @@ target_link_libraries(energyplusapi PRIVATE energypluslib)
 target_link_libraries(energyplusapi PRIVATE project_options project_fp_options project_warnings)
 
 set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR "@executable_path")
-install(
-  TARGETS energyplusapi
-  EXPORT energyplusapi
-  RUNTIME DESTINATION ./
-  LIBRARY DESTINATION ./
-  ARCHIVE DESTINATION ./
-  INCLUDES DESTINATION include
-                       include/EnergyPlus/api
-  )
+
 
 # now the actual E+ executable
 if(APPLE OR UNIX)
@@ -882,7 +874,15 @@ add_custom_command(
     -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}" -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}" -P
     "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake")
 
-install(TARGETS energyplus energyplusapi DESTINATION ./)
+install(
+  TARGETS energyplusapi energyplus
+  EXPORT energyplus
+  RUNTIME DESTINATION ./
+  LIBRARY DESTINATION ./
+  ARCHIVE DESTINATION ./
+  INCLUDES DESTINATION include
+                       include/EnergyPlus/api
+)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
@@ -893,13 +893,13 @@ write_basic_package_version_file(
 
 export(
   EXPORT
-  energyplusapi
+  energyplus
        NAMESPACE "energyplus::"
        FILE "${PROJECT_BINARY_DIR}/energyplusConfig.cmake"
 )
 
 install(
-  EXPORT energyplusapi
+  EXPORT energyplus
         DESTINATION lib/cmake/energyplus
         NAMESPACE "energyplus::"
         COMPONENT "CPPAPI"
