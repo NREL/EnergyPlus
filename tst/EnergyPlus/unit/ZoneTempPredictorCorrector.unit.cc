@@ -1032,7 +1032,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
-    thisZoneHB.calcZoneSums(*state, ZoneNum);
+    thisZoneHB.calcZoneSums(*state, true, ZoneNum);
 
     EXPECT_EQ(5.0, thisZoneHB.SumHA);
     EXPECT_EQ(300.0, thisZoneHB.SumHATsurf);
@@ -1040,18 +1040,18 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
-    thisZoneHB.calcZoneSums(*state, ZoneNum);
+    thisZoneHB.calcZoneSums(*state, true, ZoneNum);
     EXPECT_EQ(10.0, thisZoneHB.SumHA);
     EXPECT_EQ(300.0, thisZoneHB.SumHATsurf);
     EXPECT_EQ(50.0, thisZoneHB.SumHATref);
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(2).MassFlowRate = 0.2;
-    thisZoneHB.calcZoneSums(*state, ZoneNum);
+    thisZoneHB.calcZoneSums(*state, true, ZoneNum);
     EXPECT_NEAR(302.00968500, thisZoneHB.SumSysMCp, 0.0001);
     EXPECT_NEAR(6040.1937, thisZoneHB.SumSysMCpT, 0.0001);
 
-    thisZoneHB.calcZoneSums(*state, ZoneNum, false);
+    thisZoneHB.calcZoneSums(*state, false, ZoneNum);
     EXPECT_EQ(0.0, thisZoneHB.SumSysMCp);
     EXPECT_EQ(0.0, thisZoneHB.SumSysMCpT);
 }

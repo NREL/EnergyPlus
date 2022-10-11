@@ -3672,10 +3672,10 @@ void PredictSystemLoads(EnergyPlusData &state,
         // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).calcZoneSums(state, ZoneNum, false, spaceNum);
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).calcZoneSums(state, false, ZoneNum, spaceNum);
             }
         } else {
-            thisZoneHB.calcZoneSums(state, ZoneNum, false);
+            thisZoneHB.calcZoneSums(state, false, ZoneNum);
         }
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
@@ -4430,6 +4430,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
 
     Real64 tempChange = DataPrecisionGlobals::constant_zero; // Zone or space air temperature change between previous and current timestep
 
+    assert(zoneNum > 0);
     auto &thisZone = state.dataHeatBal->Zone(zoneNum);
     auto &thisAirModel = state.dataRoomAirMod->AirModel(zoneNum);
 
@@ -4463,11 +4464,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     RoomAirModelManager::ManageAirModel(state, zoneNum);
 
     // Calculate the various heat balance sums
-    if (spaceNum == 0) {
-        this->calcZoneSums(state, zoneNum);
-    } else {
-        this->calcZoneSums(state, zoneNum, spaceNum);
-    }
+    this->calcZoneSums(state, true, zoneNum, spaceNum);
 
     // Sum all convective internal gains except for people: SumIntGainExceptPeople
     if (state.dataHybridModel->FlagHybridModel_PC) {
@@ -5565,8 +5562,8 @@ void InverseModelHumidity(EnergyPlusData &state,
 }
 
 void ZoneSpaceHeatBalanceData::calcZoneSums(EnergyPlusData &state,
-                                            int const zoneNum,
                                             bool const CorrectorFlag, // Corrector call flag
+                                            int const zoneNum,
                                             int const spaceNum)
 {
 
@@ -5600,6 +5597,7 @@ void ZoneSpaceHeatBalanceData::calcZoneSums(EnergyPlusData &state,
     this->SumIntGain += state.dataHeatBalFanSys->SumConvHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumConvPool(zoneNum);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
+    assert(zoneNum > 0);
     auto &thisZone = state.dataHeatBal->Zone(zoneNum);
     if (thisZone.NoHeatToReturnAir) {
         this->SumIntGain += InternalHeatGains::SumAllReturnAirConvectionGains(state, zoneNum, 0);
@@ -7115,6 +7113,7 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
                                                   int const zoneNum,
                                                   int const spaceNum)
 {
+    assert(zoneNum > 0);
     if (ShortenTimeStepSys) {
         // timestep has just shifted from full zone timestep to a new shorter system timestep
         // throw away last updates in corrector and rewind for resimulating smaller timestep
@@ -7125,6 +7124,14 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
                 state.dataHeatBalFanSys->TempTstatAir(zoneNum) = this->XMAT;
                 zoneNode.HumRat = this->WZoneTimeMinus1;
                 zoneNode.Enthalpy = Psychrometrics::PsyHFnTdbW(this->XMAT, this->WZoneTimeMinus1);
+            }
+        } else {
+            if (state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber > 0) { // roll back result for space air node,
+                auto &spaceNode = state.dataLoopNodes->Node(state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber);
+                spaceNode.Temp = this->XMAT;
+                state.dataHeatBalFanSys->TempTstatAir(zoneNum) = this->XMAT;
+                spaceNode.HumRat = this->WZoneTimeMinus1;
+                spaceNode.Enthalpy = Psychrometrics::PsyHFnTdbW(this->XMAT, this->WZoneTimeMinus1);
             }
         }
 
@@ -7239,6 +7246,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
 {
     // Calculate the predicted system load for a time step.
 
+    assert(zoneNum > 0);
     auto &thisZone = state.dataHeatBal->Zone(zoneNum);
     auto &thisTempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
     auto &thisZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum);

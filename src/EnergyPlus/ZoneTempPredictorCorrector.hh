@@ -219,8 +219,8 @@ namespace ZoneTempPredictorCorrector {
         void calcPredictedSystemLoad(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum = 0);
 
         void calcZoneSums(EnergyPlusData &state,
+                          bool const CorrectorFlag, // Corrector call flag
                           int const zoneNum,
-                          bool const CorrectorFlag = true, // Corrector call flag
                           int const spaceNum = 0);
 
         void updateTemperatures(EnergyPlusData &state,
