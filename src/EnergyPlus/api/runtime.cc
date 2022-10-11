@@ -114,10 +114,16 @@ void issueText(EnergyPlusState state, const char *message)
     EnergyPlus::ShowContinueError(*thisState, message);
 }
 
-void registerProgressCallback(EnergyPlusState state, void (*f)(int const))
+void registerProgressCallback([[maybe_unused]] EnergyPlusState state, std::function<void(int const)> f)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    thisState->dataGlobal->progressCallback = f;
+    thisState->dataGlobal->progressCallback = f; // NOLINT(performance-unnecessary-value-param)
+}
+
+void registerProgressCallback(EnergyPlusState state, void (*f)(int const))
+{
+    const auto stdf = [f](int const progress) { f(progress); };
+    registerProgressCallback(state, std::function<void(int const)>(stdf));
 }
 
 void registerStdOutCallback([[maybe_unused]] EnergyPlusState state, std::function<void(const std::string &)> f)
