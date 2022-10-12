@@ -4857,30 +4857,19 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         if (HCType == HeatingCoilType::SimpleHeating) {
             if (QTotLoad < QHeatFanOffMax - SmallLoad) {
                 // vary HW flow, leave air flow at minimum
-                MassFlow = MinMassFlow;
-                FanOp = 0;
-                Par(1) = double(this->SysNum);
-                if (FirstHVACIteration) {
-                    Par(2) = 1.0;
-                } else {
-                    Par(2) = 0.0;
-                }
-                Par(3) = double(ZoneNodeNum);
-                Par(4) = double(static_cast<int>(HCType));
-                Par(5) = MassFlow;
-                Par(6) = double(FanType);
-                Par(7) = double(FanOp);
-                Par(8) = QTotLoad;
                 ErrTolerance = this->ControllerOffset;
-                SolveRoot(state,
-                          ErrTolerance,
-                          500,
-                          SolFlag,
-                          HWFlow,
-                          EnergyPlus::SingleDuct::SingleDuctAirTerminal::VAVVSHWNoFanResidual,
-                          MinFlowWater,
-                          MaxFlowWater,
-                          Par);
+
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, HCType, MinMassFlow, FanType, FanOp, QTotLoad](Real64 const HWMassFlow) {
+                    Real64 UnitOutput = 0.0; // heating output [W]
+                    Real64 QSteamLoad = 0.0; // proportional load to calculate steam flow [W]
+
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, FanType, MinMassFlow, FanOp, UnitOutput);
+
+                    return (QTotLoad - UnitOutput) / QTotLoad;
+                };
+
+                SolveRoot(state, ErrTolerance, 500, SolFlag, HWFlow, f, MinFlowWater, MaxFlowWater);
                 if (SolFlag == -1) {
                     ShowRecurringWarningErrorAtEnd(state, "Hot Water flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
                     ShowRecurringContinueErrorAtEnd(
