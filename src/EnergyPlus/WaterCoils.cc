@@ -6569,10 +6569,13 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
 
     T0 = 1.0;
     T1 = 50.0;
-    Par(1) = H;
-    Par(2) = RH;
-    Par(3) = PB;
-    General::SolveRoot(state, Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par);
+
+    auto f = [&state, H, RH, PB](Real64 const Tprov) {
+        using Psychrometrics::PsyHFnTdbRhPb;
+        return H - PsyHFnTdbRhPb(state, Tprov, RH, PB);
+    };
+
+    General::SolveRoot(state, Acc, MaxIte, SolFla, Tprov, f, T0, T1);
     // if the numerical inversion failed, issue error messages.
     if (SolFla == -1) {
         ShowSevereError(state, "Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)");
@@ -6590,55 +6593,6 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
     }
 
     return T;
-}
-
-Real64 EnthalpyResidual(EnergyPlusData &state,
-                        Real64 const Tprov,        // test value of Tdb [C]
-                        Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   April 2009
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function Hdesired - H(Tdb,Rh,Pb)
-
-    // METHODOLOGY EMPLOYED:
-    // Calls PsyHFnTdbRhPb
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using Psychrometrics::PsyHFnTdbRhPb;
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // Par(2) = desired relative humidity (0.0 - 1.0)
-    // Par(3) = barometric pressure [N/m2 (Pascals)]
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-    Residuum = Par(1) - PsyHFnTdbRhPb(state, Tprov, Par(2), Par(3));
-
-    return Residuum;
 }
 
 Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum) // coil number, [-]

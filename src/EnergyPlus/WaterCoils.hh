@@ -487,11 +487,6 @@ namespace WaterCoils {
                       Real64 const PB  // barometric pressure {Pascals}
     );
 
-    Real64 EnthalpyResidual(EnergyPlusData &state,
-                            Real64 const Tprov,        // test value of Tdb [C]
-                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
-    );
-
     Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum); // coil number, [-]
 
     int GetWaterCoilIndex(EnergyPlusData &state,
