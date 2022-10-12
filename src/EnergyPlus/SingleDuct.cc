@@ -4858,13 +4858,15 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
             if (QTotLoad < QHeatFanOffMax - SmallLoad) {
                 // vary HW flow, leave air flow at minimum
                 ErrTolerance = this->ControllerOffset;
+                MassFlow = MinMassFlow;
+                FanOp = 0;
 
-                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, HCType, MinMassFlow, FanType, FanOp, QTotLoad](Real64 const HWMassFlow) {
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, HCType, MassFlow, FanType, FanOp, QTotLoad](Real64 const HWMassFlow) {
                     Real64 UnitOutput = 0.0; // heating output [W]
                     Real64 QSteamLoad = 0.0; // proportional load to calculate steam flow [W]
 
                     state.dataSingleDuct->sd_airterminal(this->SysNum)
-                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, FanType, MinMassFlow, FanOp, UnitOutput);
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, FanType, MassFlow, FanOp, UnitOutput);
 
                     return (QTotLoad - UnitOutput) / QTotLoad;
                 };
