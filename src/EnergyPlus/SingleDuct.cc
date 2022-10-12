@@ -4932,34 +4932,37 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         } else if (HCType == HeatingCoilType::SteamAirHeating) {
             //      IF (QTotLoad > QNoHeatFanOff + SmallLoad .AND. QTotLoad < QHeatFanOffMax - SmallLoad) THEN
             if (QTotLoad < QHeatFanOffMax - SmallLoad) {
-                // vary steam flow, leave air flow at minimum
+                ErrTolerance = this->ControllerOffset;
                 MassFlow = MinMassFlow;
                 FanOp = 0;
-                Par(1) = double(this->SysNum);
-                if (FirstHVACIteration) {
-                    Par(2) = 1.0;
-                } else {
-                    Par(2) = 0.0;
-                }
-                Par(3) = double(ZoneNodeNum);
-                Par(4) = double(static_cast<int>(HCType));
-                Par(5) = MassFlow;
-                Par(6) = double(FanType);
-                Par(7) = double(FanOp);
-                Par(8) = QTotLoad;
-                Par(9) = MinFlowSteam;
-                Par(10) = MaxFlowSteam;
-                Par(11) = MaxSteamCap;
-                ErrTolerance = this->ControllerOffset;
-                SolveRoot(state,
-                          ErrTolerance,
-                          500,
-                          SolFlag,
-                          HWFlow,
-                          EnergyPlus::SingleDuct::SingleDuctAirTerminal::VAVVSHWNoFanResidual,
+                auto f = [&state,
+                          this,
+                          FirstHVACIteration,
+                          ZoneNodeNum,
+                          HCType,
+                          MassFlow,
+                          FanType,
+                          FanOp,
+                          QTotLoad,
                           MinFlowSteam,
                           MaxFlowSteam,
-                          Par);
+                          MaxSteamCap](Real64 const HWMassFlow) {
+                    Real64 UnitOutput{}; // heating output [W]
+                    Real64 QSteamLoad{}; // proportional load to calculate steam flow [W]
+
+                    // vary the load to be met by the steam coil to converge on a steam flow rate to meet the load
+                    //   backwards way of varying steam flow rate. Steam coil calculates a flow rate to meet a load.
+                    if ((MaxFlowSteam - MinFlowSteam) == 0.0) {
+                        QSteamLoad = QTotLoad; // Use QTotLoad, bad starting value error for RegulaFalsi will occur
+                    } else {
+                        QSteamLoad = MaxSteamCap * HWMassFlow / (MaxFlowSteam - MinFlowSteam);
+                    }
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, FanType, MassFlow, FanOp, UnitOutput);
+
+                    return (QTotLoad - UnitOutput) / QTotLoad;
+                };
+                SolveRoot(state, ErrTolerance, 500, SolFlag, HWFlow, f, MinFlowSteam, MaxFlowSteam);
                 if (SolFlag == -1) {
                     ShowRecurringWarningErrorAtEnd(state, "Steam flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
                     ShowRecurringContinueErrorAtEnd(
@@ -5401,99 +5404,6 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     }
 
     LoadMet = AirMassFlow * CpAirZn * (state.dataLoopNodes->Node(HCOutNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
-}
-
-Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(EnergyPlusData &state,
-                                                   Real64 const HWMassFlow,   // hot water mass flow rate [kg/s]
-                                                   Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   July 2004
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Requested Zone Load - Unit Output) / Requested Zone Load
-    // Unit Output depends on the hot water flow rate which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls CalcVAVVS, and calculates
-    // the residual as defined above.
-
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // Par(2) = FirstHVACIteration (1. or 0.)
-    // Par(3) = REAL(ZoneNodeNum)
-    // Par(4) = REAL(HCType)
-    // Par(5) = air mass flow flow rate [kg/s]
-    // Par(6) = REAL(FanType)
-    // Par(7) = REAL(FanOp)
-    // Par(8) = heating demand [W]
-    // Par(9) = min steam flow rate [m3/s] - steam only
-    // Par(10 = max steam flow rate [m3/s] - steam only
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int UnitIndex;
-    bool FirstHVACSoln;
-    int ZoneNodeIndex;
-    Real64 AirMassFlow;     // supply air mass flow rate [kg/s]
-    HeatingCoilType HCType; // heating coil type (integer)
-    int FanType;            // fan type (as an integer)
-    int FanOp;              // fan operation; 0=off, 1=on.
-    Real64 UnitOutput;      // heating output [W]
-    Real64 QSteamLoad;      // proportional load to calculate steam flow [W]
-    Real64 MinSteamFlow;
-    Real64 MaxSteamFlow;
-    Real64 MaxSteamCoilCapacity;
-
-    UnitIndex = int(Par(1));
-    FirstHVACSoln = (Par(2) > 0.0);
-    ZoneNodeIndex = int(Par(3));
-    HCType = static_cast<HeatingCoilType>(int(Par(4)));
-    AirMassFlow = Par(5);
-    FanType = int(Par(6));
-    FanOp = int(Par(7));
-    QSteamLoad = 0.0;
-    // vary the load to be met by the steam coil to converge on a steam flow rate to meet the load
-    if (HCType == HeatingCoilType::SteamAirHeating) {
-        //   backwards way of varying steam flow rate. Steam coil calculates a flow rate to meet a load.
-        MinSteamFlow = Par(9);
-        MaxSteamFlow = Par(10);
-        MaxSteamCoilCapacity = Par(11);
-        if ((MaxSteamFlow - MinSteamFlow) == 0.0) {
-            QSteamLoad = Par(8); // Use QTotLoad, bad starting value error for RegulaFalsi will occur
-        } else {
-            QSteamLoad = MaxSteamCoilCapacity * HWMassFlow / (MaxSteamFlow - MinSteamFlow);
-        }
-    }
-    state.dataSingleDuct->sd_airterminal(UnitIndex).CalcVAVVS(
-        state, FirstHVACSoln, ZoneNodeIndex, HWMassFlow, QSteamLoad, FanType, AirMassFlow, FanOp, UnitOutput);
-
-    Residuum = (Par(8) - UnitOutput) / Par(8);
-
-    return Residuum;
 }
 
 Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(EnergyPlusData &state,
