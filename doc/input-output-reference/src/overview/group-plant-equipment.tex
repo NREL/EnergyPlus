@@ -5623,31 +5623,34 @@ A positive fraction that represents the minimum heating output possible when ope
 A positive fraction that represents the maximum heating output possible when operated continually at rated temperature conditions divided by the available heating capacity at those same conditions. If greater than 1.0, the equipment is typically thought of as capable of being overloaded. The default is 1.0.
 
 \paragraph{Field: Fuel Energy Input Ratio Defrost Adjustment Curve name}
-This is a normalized curve that would adjust the fuel energy input ratio taken into consideration of the defrost operation.
 
-This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+This is a normalized curve that would adjust the fuel energy input ratio taken into consideration of the defrost operation. The EIR (Energy Input Ratio) adjustment is a function of the outdoor air temperature---the temperature that the condenser is exposed to.
+
+This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
 \paragraph{Field: Defrost Control Type}
 
 The defrost control type. There are two options for this input: \emph{Timed}, or \emph{OnDemand}. The \emph{Timed} option will use a fraction of time per hour to account for the defrost action. The \emph{OnDemand} option will work when the outdoor air temperature drops to a certain point. The default choice is \emph{Timed}.
 
-This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
 \paragraph{Field: Defrost Operation Time Fraction}
 
 The fraction of the defrost time to the total operation time. The value should be in between 0.0 and 1.0 (inclusive). The default value is 0.0.
 
-This field only applies to the HeatPump:AirToWater:FuelFired:Heating object.
+This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
 \paragraph{Field: Resistive Defrost Heater Capacity}
 
 This numeric field defines the capacity of the resistive defrost heating element in Watts. This input field is used only when the selected defrost control is ``OnDemand''. The value for this input field must be greater than or equal to 0.0. If the input field is left blank, the default value is 0.0.
 
+This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Defrost Operation}
 
 The maximum outdoor air dry-bulb temperature in degree [C] that the defrost operation will be turned on. When the outdoor air dry-bulb temperature rises above this temperature, the will be no defrost operation. The maximum value for this value is 10$^\circ$C. The default value is 5$^\circ$C.
 
-This field does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
+This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
 \paragraph{Field: Auxiliary Electric Energy Input Ratio Function of Temperature Curve Name}
 
