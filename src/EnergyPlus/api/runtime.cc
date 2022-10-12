@@ -77,63 +77,60 @@ int energyplus(EnergyPlusState state, int argc, const char *argv[])
 
 void stopSimulation(EnergyPlusState state)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataGlobal->stopSimulation = true;
 }
 
 void setConsoleOutputState(EnergyPlusState state, int outputStatus)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (outputStatus == 0) {
-        thisState->dataGlobal->printConsoleOutput = false;
-    } else {
-        thisState->dataGlobal->printConsoleOutput = true;
-    }
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->printConsoleOutput = (outputStatus != 0);
 }
 
 void setEnergyPlusRootDirectory(EnergyPlusState state, const char *path)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataGlobal->installRootOverride = true;
     thisState->dataStrGlobals->exeDirectoryPath = fs::path(path);
 }
 
 void issueWarning(EnergyPlusState state, const char *message)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::ShowWarningError(*thisState, message);
 }
 void issueSevere(EnergyPlusState state, const char *message)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::ShowSevereError(*thisState, message);
 }
 void issueText(EnergyPlusState state, const char *message)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::ShowContinueError(*thisState, message);
 }
 
 void registerProgressCallback([[maybe_unused]] EnergyPlusState state, std::function<void(int const)> f)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    thisState->dataGlobal->progressCallback = f; // NOLINT(performance-unnecessary-value-param)
+    thisState->dataGlobal->progressCallback = std::move(f);
 }
 
 void registerProgressCallback(EnergyPlusState state, void (*f)(int const))
 {
-    const auto stdf = [f](int const progress) { f(progress); };
-    registerProgressCallback(state, std::function<void(int const)>(stdf));
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->progressCallback = f;
 }
 
 void registerStdOutCallback([[maybe_unused]] EnergyPlusState state, std::function<void(const std::string &)> f)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    thisState->dataGlobal->messageCallback = f; // NOLINT(performance-unnecessary-value-param)
+    thisState->dataGlobal->messageCallback = std::move(f);
 }
 
 void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *))
 {
+    // Extra lamba needed to go from `const std::string&` to `const char *`
     const auto stdf = [f](const std::string &message) { f(message.c_str()); };
     registerStdOutCallback(state, std::function<void(const std::string &)>(stdf));
 }
@@ -141,12 +138,13 @@ void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *))
 void registerExternalHVACManager(EnergyPlusState state, std::function<void(EnergyPlusState)> f)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    thisState->dataGlobal->externalHVACManager = f; // NOLINT(performance-unnecessary-value-param)
+    thisState->dataGlobal->externalHVACManager = std::move(f);
 }
 
 void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState))
 {
-    registerExternalHVACManager(state, std::function<void(EnergyPlusState)>(f));
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->externalHVACManager = f;
 }
 
 void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void(EnergyPlusState)> const &f)
