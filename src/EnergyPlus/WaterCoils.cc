@@ -1622,7 +1622,30 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
             UA0 = 0.1 * state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal;
             UA1 = 10.0 * state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal;
             // Invert the simple cooling coil model: given the design inlet conditions and the design load, find the design UA
-            General::SolveRoot(state, 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, state.dataWaterCoils->Par);
+            auto f = [&state, CoilNum](Real64 const UA) {
+                int FanOpMode;
+                Real64 PartLoadRatio;
+
+                FanOpMode = ContFanCycCoil;
+                PartLoadRatio = 1.0;
+                state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal = UA;
+                state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal * 3.3;
+                state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal =
+                    1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
+                state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea = EstimateHEXSurfaceArea(state, CoilNum);
+                state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea =
+                    state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
+                state.dataWaterCoils->WaterCoil(CoilNum).UAWetExtPerUnitArea =
+                    state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
+                state.dataWaterCoils->WaterCoil(CoilNum).UADryExtPerUnitArea = state.dataWaterCoils->WaterCoil(CoilNum).UAWetExtPerUnitArea;
+
+                CoolingCoil(state, CoilNum, true, state.dataWaterCoils->DesignCalc, FanOpMode, PartLoadRatio);
+
+                return (state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad -
+                        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate) /
+                       state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad;
+            };
+            General::SolveRoot(state, 0.001, MaxIte, SolFla, UA, f, UA0, UA1);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 ShowSevereError(state, "Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
@@ -5688,74 +5711,6 @@ Real64 SimpleHeatingCoilUAResidual(EnergyPlusData &state,
     CalcSimpleHeatingCoil(state, CoilIndex, FanOpMode, PartLoadRatio, state.dataWaterCoils->SimCalc);
     Residuum = (Par(1) - state.dataWaterCoils->WaterCoil(CoilIndex).TotWaterHeatingCoilRate) / Par(1);
     state.dataSize->DataDesignCoilCapacity = state.dataWaterCoils->WaterCoil(CoilIndex).TotWaterHeatingCoilRate;
-
-    return Residuum;
-}
-
-Real64 SimpleCoolingCoilUAResidual(EnergyPlusData &state,
-                                   Real64 const UA,           // UA of coil
-                                   Array1D<Real64> const &Par // par(1) = design coil load [W]
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   September 2011
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Design Coil Load - Coil Cooling Output) / Design Coil Load.
-    // Coil Cooling Output depends on the UA which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Puts UA into the water coil data structure, calls CoolingCoil, and calculates
-    // the residual as defined above.
-
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int CoilIndex;
-    int FanOpMode;
-    Real64 PartLoadRatio;
-
-    CoilIndex = int(Par(2));
-    FanOpMode = (Par(3) == 1.0 ? CycFanCycCoil : ContFanCycCoil);
-    PartLoadRatio = Par(4);
-    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal = UA;
-    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal * 3.3;
-    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilTotal =
-        1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternal);
-    state.dataWaterCoils->WaterCoil(CoilIndex).TotCoilOutsideSurfArea = EstimateHEXSurfaceArea(state, CoilIndex);
-    state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternalPerUnitArea =
-        state.dataWaterCoils->WaterCoil(CoilIndex).UACoilInternal / state.dataWaterCoils->WaterCoil(CoilIndex).TotCoilOutsideSurfArea;
-    state.dataWaterCoils->WaterCoil(CoilIndex).UAWetExtPerUnitArea =
-        state.dataWaterCoils->WaterCoil(CoilIndex).UACoilExternal / state.dataWaterCoils->WaterCoil(CoilIndex).TotCoilOutsideSurfArea;
-    state.dataWaterCoils->WaterCoil(CoilIndex).UADryExtPerUnitArea = state.dataWaterCoils->WaterCoil(CoilIndex).UAWetExtPerUnitArea;
-
-    CoolingCoil(state, CoilIndex, true, state.dataWaterCoils->DesignCalc, FanOpMode, PartLoadRatio);
-
-    Residuum = (Par(1) - state.dataWaterCoils->WaterCoil(CoilIndex).TotWaterCoolingCoilRate) / Par(1);
 
     return Residuum;
 }

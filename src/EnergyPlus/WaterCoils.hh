@@ -406,11 +406,6 @@ namespace WaterCoils {
                                        Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
-    Real64 SimpleCoolingCoilUAResidual(EnergyPlusData &state,
-                                       Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
     // Iterate Routine for Cooling Coil
 
     void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
