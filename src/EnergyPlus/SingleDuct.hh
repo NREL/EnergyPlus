@@ -266,8 +266,6 @@ namespace SingleDuct {
                        int FanOn,
                        Real64 &LoadMet);
 
-        static Real64 VAVVSHWFanOnResidual(EnergyPlusData &state, Real64 SupplyAirMassFlow, Array1D<Real64> const &Par);
-
         void SimConstVolNoReheat(EnergyPlusData &state);
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
