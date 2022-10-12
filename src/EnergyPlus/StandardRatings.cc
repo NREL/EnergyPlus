@@ -527,29 +527,65 @@ namespace StandardRatings {
                                        state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex,
                                        RoutineName);
 
-                Par(1) = EnteringWaterTempReduced;
-                Par(2) = EvapOutletTemp;
-                Par(3) = Cp;
-                Par(4) = ReducedPLR[RedCapNum];
-                Par(5) = CondVolFlowRate * Rho;
-                Par(6) = CapFTempCurveIndex;
-                Par(7) = EIRFTempCurveIndex;
-                Par(8) = EIRFPLRCurveIndex;
-                Par(9) = RefCap;
-                Par(10) = RefCOP;
-                Par(11) = OpenMotorEff;
-                Par(12) = ChillerCapFT_rated;
+                Real64 reducedPLR = ReducedPLR[RedCapNum];
                 CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
                 CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
-                General::SolveRoot(state,
-                                   Acc,
-                                   IterMax,
-                                   SolFla,
-                                   CondenserOutletTemp,
-                                   ReformEIRChillerCondInletTempResidual,
-                                   CondenserOutletTemp0,
-                                   CondenserOutletTemp1,
-                                   Par);
+
+                auto f = [&state,
+                          EnteringWaterTempReduced,
+                          EvapOutletTemp,
+                          Cp,
+                          reducedPLR,
+                          CondVolFlowRate,
+                          Rho,
+                          CapFTempCurveIndex,
+                          EIRFTempCurveIndex,
+                          EIRFPLRCurveIndex,
+                          RefCap,
+                          RefCOP,
+                          OpenMotorEff,
+                          ChillerCapFT_rated](Real64 const CondenserOutletTemp) {
+                    using CurveManager::CurveValue;
+
+                    Real64 AvailChillerCap(0.0);         // Chiller available capacity at current operating conditions [W]
+                    Real64 CondenserInletTemp(0.0);      // Calculated condenser inlet temperature [C]
+                    Real64 QEvap(0.0);                   // Rate of heat transfer to the evaporator coil [W]
+                    Real64 QCond(0.0);                   // Rate of heat transfer to the condenser coil [W]
+                    Real64 Power(0.0);                   // Power at reduced capacity test conditions (100%, 75%, 50%, and 25%)
+                    Real64 ReformEIRChillerCapFT(0.0);   // Chiller capacity fraction (evaluated as a function of temperature)
+                    Real64 ReformEIRChillerEIRFT(0.0);   // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
+                    Real64 ReformEIRChillerEIRFPLR(0.0); // Chiller EIR as a function of part-load ratio (PLR)
+                    Real64 PartLoadRatio(0.0);           // Chiller part load ratio
+
+                    ReformEIRChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+
+                    ReformEIRChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+
+                    // Available chiller capacity as a function of temperature
+                    AvailChillerCap = RefCap * ReformEIRChillerCapFT;
+
+                    ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR);
+
+                    Power = (AvailChillerCap / RefCOP) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
+
+                    if (reducedPLR >= 1.0) {
+                        PartLoadRatio = reducedPLR;
+                    } else {
+                        PartLoadRatio = reducedPLR * ChillerCapFT_rated / ReformEIRChillerCapFT;
+                    }
+
+                    QEvap = AvailChillerCap * PartLoadRatio;
+
+                    QCond = Power * OpenMotorEff + QEvap;
+
+                    if (CapFTempCurveIndex > DataBranchAirLoopPlant::MassFlowTolerance) {
+                        CondenserInletTemp = CondenserOutletTemp - QCond / (CondVolFlowRate * Rho)/ Cp;
+                    }
+                    return (EnteringWaterTempReduced - CondenserInletTemp) / EnteringWaterTempReduced;
+
+                };
+
+                General::SolveRoot(state, Acc, IterMax, SolFla, CondenserOutletTemp, f, CondenserOutletTemp0, CondenserOutletTemp1);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating Reform Chiller IPLV");
                     ShowContinueError(state, "Reformulated Chiller IPLV calculation failed for " + ChillerName);
