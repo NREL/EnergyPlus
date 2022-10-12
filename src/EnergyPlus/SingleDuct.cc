@@ -4978,27 +4978,24 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
             } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                 FanOp = 1;
-                Par(1) = double(this->SysNum);
-                if (FirstHVACIteration) {
-                    Par(2) = 1.0;
-                } else {
-                    Par(2) = 0.0;
-                }
-                Par(3) = double(ZoneNodeNum);
-                Par(4) = double(HCType);
-                Par(5) = MaxFlowSteam;
-                Par(6) = double(FanType);
-                Par(7) = double(FanOp);
-                Par(8) = QTotLoad;
+
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
+                    Real64 UnitOutput {}; // heating output [W]
+
+                    state.dataSingleDuct->sd_airterminal(this->SysNum).CalcVAVVS(
+                        state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+
+                    return (QTotLoad - UnitOutput) / QTotLoad;
+                };
+
                 SolveRoot(state,
                           UnitFlowToler,
                           50,
                           SolFlag,
                           MassFlow,
-                          EnergyPlus::SingleDuct::SingleDuctAirTerminal::VAVVSHWFanOnResidual,
+                          f,
                           MinMassFlow,
-                          MaxHeatMassFlow,
-                          Par);
+                          MaxHeatMassFlow);
                 if (SolFlag == -1) {
                     if (this->IterationLimit == 0) {
                         ShowWarningError(state, "Steam heating coil control failed in VS VAV terminal unit " + this->SysName);
