@@ -2698,12 +2698,16 @@ namespace UnitVentilator {
                             CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
                             if ((FullOutput - state.dataUnitVentilators->QZnReq) > DataHVACGlobals::SmallLoad) {
                                 // Unit ventilator full load capacity is able to meet the load, Find PLR
-                                Par(1) = double(UnitVentNum);
-                                Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                                if (FirstHVACIteration) Par(2) = 1.0;
-                                Par(3) = double(OpMode);
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
+                                auto f = [&state, UnitVentNum, FirstHVACIteration, OpMode](Real64 const PartLoadRatio) {
+                                    Real64 QUnitOut = 0.0; // heating/Cooling provided by unit ventilator [watts]
+                                    CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadRatio);
+                                    if (state.dataUnitVentilators->QZnReq) {
+                                        return (QUnitOut - state.dataUnitVentilators->QZnReq) / state.dataUnitVentilators->QZnReq;
+                                    } else
+                                        return 0.0;
+                                };
+                                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, f, 0.0, 1.0);
                             }
                         }
 
