@@ -197,6 +197,7 @@ namespace SingleDuct {
         bool NoOAFlowInputFromUser;           // avoids OA calculation if no input specified by user
         int OARequirementsPtr;                // - Index to DesignSpecification:OutdoorAir object
         int AirLoopNum;
+        Real64 ADEff = 1.0;           // DesignSpecification:AirDistributionEffectiveness
         PlantLocation HWplantLoc;     // plant topology, Component location
         std::string ZoneHVACUnitType; // type of Zone HVAC unit for air terminal mixer units
         std::string ZoneHVACUnitName; // name of Zone HVAC unit for air terminal mixer units

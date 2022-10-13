@@ -2858,6 +2858,11 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     }
 
     if (state.dataSize->CurTermUnitSizingNum > 0) {
+
+        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADEff =
+            std::min(state.dataSize->ZoneSizingInput(state.dataSize->CurTermUnitSizingNum).ZoneADEffCooling,
+                     state.dataSize->ZoneSizingInput(state.dataSize->CurTermUnitSizingNum).ZoneADEffHeating);
+
         if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
             if (this->MaxAirVolFlowRate > 0.0) {
                 BaseSizer::reportSizerOutput(
