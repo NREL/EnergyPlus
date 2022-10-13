@@ -973,11 +973,6 @@ namespace HVACVariableRefrigerantFlow {
                                       Array1D<Real64> const &Par // par(1) = VRFTUNum
     );
 
-    Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
-                                   Real64 T_suc,              // Compressor suction temperature Te' [C]
-                                   Array1D<Real64> const &Par // parameters
-    );
-
 } // namespace HVACVariableRefrigerantFlow
 
 struct HVACVarRefFlowData : BaseGlobalStruct

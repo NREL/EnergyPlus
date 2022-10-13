@@ -13323,38 +13323,6 @@ Real64 VRFOUTeResidual_FluidTCtrl(EnergyPlusData &state,
     return TeResidual;
 }
 
-Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
-                               Real64 const T_suc,        // Compressor suction temperature Te' [C]
-                               Array1D<Real64> const &Par // parameters
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Xiufeng Pang (XP)
-    //       DATE WRITTEN   Mar 2013
-    //       MODIFIED       Jul 2015, RP Zhang, LBNL
-    //       RE-ENGINEERED
-    //
-    // PURPOSE OF THIS FUNCTION:
-    //       Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
-    //
-    using CurveManager::CurveValue;
-
-    Real64 T_dis;    // Compressor discharge temperature Tc' [C]
-    Real64 CondHeat; // Evaporative capacity to be met [W]
-    Real64 CAPSpd;   // Evaporative capacity of the compressor at a given spd[W]
-    Real64 CompResidual;
-    int CAPFT;
-
-    T_dis = Par(1);
-    CondHeat = Par(2);
-    CAPFT = Par(3);
-
-    CAPSpd = CurveValue(state, CAPFT, T_dis, T_suc);
-    CompResidual = (CondHeat - CAPSpd) / CAPSpd;
-
-    return CompResidual;
-}
-
 void VRFCondenserEquipment::VRFOU_TeTc(EnergyPlusData &state,
                                        HXOpMode const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
                                        Real64 const Q_coil,          // // OU coil heat release at cooling mode or heat extract at heating mode [W]
@@ -14334,9 +14302,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 Q_evap_req = TU_load + Pipe_Q0; // Pipe_Q0 is updated during the iteration
                 Pipe_h_IU_in = GetSatEnthalpyRefrig(state, this->RefrigerantName, T_discharge_new - this->SC, 0.0, RefrigerantIndex, RoutineName);
                 CompSpdActual = this->CompressorSpeed(1);
-                Par(1) = T_discharge_new;
-                Par(2) = Q_evap_req * C_cap_operation0 / this->RatedEvapCapacity; // 150130 To be confirmed
-                Par(3) = this->OUCoolingCAPFT(CounterCompSpdTemp);
+                Real64 CondHeat = Q_evap_req * C_cap_operation0 / this->RatedEvapCapacity; // 150130 To be confirmed
+                int CAPFT = this->OUCoolingCAPFT(CounterCompSpdTemp);
 
                 // Update Te' (SmallLoadTe) to meet the required evaporator capacity
                 MinOutdoorUnitTe = 6;
@@ -14347,15 +14314,13 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 MinOutdoorUnitTe = GetSatTemperatureRefrig(
                     state, this->RefrigerantName, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
-                General::SolveRoot(state,
-                                   1.0e-3,
-                                   MaxIter,
-                                   SolFla,
-                                   SmallLoadTe,
-                                   CompResidual_FluidTCtrl,
-                                   MinOutdoorUnitTe,
-                                   T_suction,
-                                   Par);         // SmallLoadTe is the updated Te'
+                auto f = [&state, T_discharge_new, CondHeat, CAPFT](Real64 const T_suc) {
+                    Real64 CAPSpd = CurveManager::CurveValue(state, CAPFT, T_discharge_new, T_suc);
+                    return (CondHeat - CAPSpd) / CAPSpd;
+                };
+
+                General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe,
+                                   T_suction);   // SmallLoadTe is the updated Te'
                 if (SolFla < 0) SmallLoadTe = 6; // MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
 
                 // Get an updated Te corresponding to the updated Te'
