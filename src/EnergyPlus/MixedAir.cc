@@ -4805,15 +4805,35 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
                     OASignal = OutAirSignal;
                 } else {
                     // 4 - find result
-                    Par(1) = this->MixNode;
-                    Par(2) = this->RelNode;
-                    Par(3) = this->OANode;
-                    Par(4) = this->MixMassFlow;
-                    Par(5) = 0.0;
-                    if (FirstHVACIteration) Par(5) = 1.0;
-                    Par(6) = double(AirLoopNum);
 
-                    SolveRoot(state, (Acc / 10.0), MaxIte, SolFla, OASignal, MultiCompControlTempResidual, minOAFrac, 1.0, Par);
+                    auto f = [&state, this, FirstHVACIteration, AirLoopNum](Real64 const OASignal) {
+                        using Psychrometrics::PsyTdbFnHW;
+                        int MixNode;            // mixed air node number
+                        int RelNode;            // return air node number
+                        int OANode;             // outside air node number
+                        Real64 MixMassFlowRate; // mixed air mass flow rare [kg/s]
+                        Real64 OAMassFlowRate;  // outside air mass flow rate [kg/s]
+                        Real64 ExhMassFlow;
+                        int OASysNum;
+
+                        MixNode = this->MixNode;
+                        RelNode = this->RelNode;
+                        OANode = this->OANode;
+                        MixMassFlowRate = this->MixMassFlow;
+                        OASysNum = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum;
+                        ExhMassFlow = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ZoneExhMassFlow;
+
+                        OAMassFlowRate = max(ExhMassFlow, OASignal * MixMassFlowRate);
+                        state.dataLoopNodes->Node(OANode).MassFlowRate = OAMassFlowRate; // set OA node mass flow rate
+                        state.dataLoopNodes->Node(RelNode).MassFlowRate =
+                            max(OAMassFlowRate - ExhMassFlow, 0.0); // set relief node mass flow rate to maintain mixer continuity calcs
+
+                        SimOASysComponents(state, OASysNum, FirstHVACIteration, AirLoopNum);
+
+                        return state.dataLoopNodes->Node(MixNode).TempSetPoint - state.dataLoopNodes->Node(MixNode).Temp;
+                    };
+
+                    SolveRoot(state, (Acc / 10.0), MaxIte, SolFla, OASignal, f, minOAFrac, 1.0);
                     if (SolFla < 0) { // if RegulaFalsi fails to find a solution, returns -1 or -2, set to existing OutAirSignal
                         OASignal = OutAirSignal;
                     }
@@ -5402,86 +5422,6 @@ Real64 MixedAirControlTempResidual(EnergyPlusData &state,
     MixHumRat = (RecircMassFlowRate * RecircHumRat + OAMassFlowRate * state.dataLoopNodes->Node(OANode).HumRat) / MixMassFlowRate;
     MixTemp = PsyTdbFnHW(MixEnth, MixHumRat);
     Residuum = state.dataLoopNodes->Node(MixNode).TempSetPoint - MixTemp;
-
-    return Residuum;
-}
-
-Real64 MultiCompControlTempResidual(EnergyPlusData &state,
-                                    Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
-                                    Array1D<Real64> const &Par // par(1) = mixed node number
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         R. Raustad
-    //       DATE WRITTEN   Nov, 2016
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function TMixSetPoint - TMix.
-    // Economizer damper position (OASignal) is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Simulate the OA System to determine actual mixed air condition, calculates the
-    // mixed air temperature given the outside air damper position.
-
-    // REFERENCES:
-
-    // Using/Aliasing
-    using Psychrometrics::PsyTdbFnHW;
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // pao(1) = mixed air node number
-    // par(2) = relief air node number
-    // par(3) = outside air node number
-    // par(4) = mixed air flow rate
-    // par(5) = FirstHVACIteration
-    // par(6) = AirLoopNum index
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int MixNode;            // mixed air node number
-    int RelNode;            // return air node number
-    int OANode;             // outside air node number
-    Real64 MixMassFlowRate; // mixed air mass flow rare [kg/s]
-    Real64 OAMassFlowRate;  // outside air mass flow rate [kg/s]
-    Real64 ExhMassFlow;
-    bool FirstHVACIteration;
-    int AirloopNum;
-    int OASysNum;
-
-    MixNode = int(Par(1));
-    RelNode = int(Par(2));
-    OANode = int(Par(3));
-    MixMassFlowRate = Par(4);
-    FirstHVACIteration = (Par(5) == 1.0);
-    AirloopNum = int(Par(6));
-    OASysNum = state.dataAirLoop->AirLoopControlInfo(AirloopNum).OASysNum;
-    ExhMassFlow = state.dataAirLoop->AirLoopControlInfo(AirloopNum).ZoneExhMassFlow;
-
-    OAMassFlowRate = max(ExhMassFlow, OASignal * MixMassFlowRate);
-    state.dataLoopNodes->Node(OANode).MassFlowRate = OAMassFlowRate; // set OA node mass flow rate
-    state.dataLoopNodes->Node(RelNode).MassFlowRate =
-        max(OAMassFlowRate - ExhMassFlow, 0.0); // set relief node mass flow rate to maintain mixer continuity calcs
-
-    SimOASysComponents(state, OASysNum, FirstHVACIteration, AirloopNum);
-
-    Residuum = state.dataLoopNodes->Node(MixNode).TempSetPoint - state.dataLoopNodes->Node(MixNode).Temp;
 
     return Residuum;
 }
