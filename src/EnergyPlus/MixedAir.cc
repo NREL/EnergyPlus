@@ -4739,11 +4739,32 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
             if (state.dataAirLoop->OutsideAirSys(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum).NumComponents == 1) {
                 // no need to simulate OA System if only a mixer is used in the OutsideAirSystem
 
-                Par(1) = this->MixNode;
-                Par(2) = this->RetNode;
-                Par(3) = this->InletNode;
-                Par(4) = this->MixMassFlow;
-                SolveRoot(state, Acc, MaxIte, SolFla, OASignal, MixedAirControlTempResidual, OutAirMinFrac, 1.0, Par);
+                auto f = [&state, this](Real64 const OASignal) {
+                    using Psychrometrics::PsyTdbFnHW;
+                    Real64 OAMassFlowRate{};     // outside air mass flow rate [kg/s]
+                    Real64 RecircMassFlowRate{}; // recirculated air mass flow rate [kg/s]
+                    Real64 RecircEnth{};         // recirculated air specific enthalpy [J/kg]
+                    Real64 RecircHumRat{};       // recirculated air humidity ratio [kg water/kg dry air]
+                    Real64 MixEnth{};            // mixed air specific enthalpy [J/kg]
+                    Real64 MixHumRat{};          // mixed air humidity ratio [kg water/kg dry air]
+                    Real64 MixTemp{};            // mixed air temperature [C]
+                    int MixNode = this->MixNode;
+                    int RetNode = this->RetNode;
+                    int OANode = this->InletNode;
+                    Real64 MixMassFlowRate = this->MixMassFlow;
+
+                    OAMassFlowRate = OASignal * MixMassFlowRate;
+                    RecircMassFlowRate = max(MixMassFlowRate - OAMassFlowRate, 0.0);
+                    RecircEnth = state.dataLoopNodes->Node(RetNode).Enthalpy;
+                    RecircHumRat = state.dataLoopNodes->Node(RetNode).HumRat;
+                    MixEnth = (RecircMassFlowRate * RecircEnth + OAMassFlowRate * state.dataLoopNodes->Node(OANode).Enthalpy) / MixMassFlowRate;
+                    MixHumRat = (RecircMassFlowRate * RecircHumRat + OAMassFlowRate * state.dataLoopNodes->Node(OANode).HumRat) / MixMassFlowRate;
+                    MixTemp = PsyTdbFnHW(MixEnth, MixHumRat);
+
+                    return state.dataLoopNodes->Node(MixNode).TempSetPoint - MixTemp;
+                };
+
+                General::SolveRoot(state, Acc, MaxIte, SolFla, OASignal, f, OutAirMinFrac, 1.0);
                 if (SolFla < 0) {
                     OASignal = OutAirSignal;
                 }
