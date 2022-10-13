@@ -3360,16 +3360,29 @@ namespace DesiccantDehumidifiers {
                     // control water flow to obtain output matching RegenCoilLoad
                     SolFlag = 0;
                     MinWaterFlow = 0.0;
-                    std::array<Real64, 3> Par;
-                    Par[0] = double(DesicDehumNum);
-                    if (FirstHVACIteration) {
-                        Par[1] = 1.0;
-                    } else {
-                        Par[1] = 0.0;
-                    }
-                    Par[2] = RegenCoilLoad;
-                    General::SolveRoot(
-                        state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                    auto f = [&state, DesicDehumNum, FirstHVACIteration, RegenCoilLoad](Real64 HWFlow) {
+                        Real64 RegenCoilHeatLoad = RegenCoilLoad;
+                        Real64 RegenCoilActual = RegenCoilHeatLoad;
+                        Real64 mdot = HWFlow;
+                        PlantUtilities::SetComponentFlowRate(state,
+                                                             mdot,
+                                                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilControlNode,
+                                                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilOutletNode,
+                                                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).plantLoc);
+
+                        // simulate the hot water regenerator heating coil
+                        WaterCoils::SimulateWaterCoilComponents(state,
+                                                                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName,
+                                                                FirstHVACIteration,
+                                                                state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilIndex,
+                                                                RegenCoilActual);
+                        if (RegenCoilHeatLoad != 0.0) {
+                            return (RegenCoilActual - RegenCoilHeatLoad) / RegenCoilHeatLoad;
+                        } else { // Autodesk:Return ELSE added to assure return value is set
+                            return 0.0;
+                        }
+                    };
+                    General::SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, f, MinWaterFlow, MaxHotWaterFlow);
                     if (SolFlag == -1) {
                         if (DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex == 0) {
                             ShowWarningMessage(state,
@@ -3477,66 +3490,6 @@ namespace DesiccantDehumidifiers {
             }
         }
         if (present(RegenCoilLoadmet)) RegenCoilLoadmet = RegenCoilActual;
-    }
-
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,             // hot water flow rate in kg/s
-                                std::array<Real64, 3> const &Par // Par(5) is the requested coil load
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Bereket Nigusse, FSEC/UCF
-        //       DATE WRITTEN   January 2012
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (RegenCoilActual - RegenCoilHeatLoad) / RegenCoilHeatLoad
-        // coil actual output depends on the hot water flow rate which is varied to minimize the residual
-
-        // METHODOLOGY EMPLOYED:
-        // Calls HotWaterCoilResidual, and calculates the residual as defined above.
-
-        // REFERENCES:
-
-        // Using/Aliasing
-        using PlantUtilities::SetComponentFlowRate;
-        using WaterCoils::SimulateWaterCoilComponents;
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int DesicDehumNum;
-        bool FirstHVACSoln;
-        Real64 RegenCoilActual;   // delivered coild load, W
-        Real64 RegenCoilHeatLoad; // requested coild load, W
-        Real64 mdot;
-
-        DesicDehumNum = int(Par[0]);
-        FirstHVACSoln = (Par[1] > 0.0);
-        RegenCoilHeatLoad = Par[2];
-        RegenCoilActual = RegenCoilHeatLoad;
-        mdot = HWFlow;
-        SetComponentFlowRate(state,
-                             mdot,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilControlNode,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilOutletNode,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).plantLoc);
-
-        // simulate the hot water regenerator heating coil
-        SimulateWaterCoilComponents(state,
-                                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilName,
-                                    FirstHVACSoln,
-                                    state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).RegenCoilIndex,
-                                    RegenCoilActual);
-        if (RegenCoilHeatLoad != 0.0) {
-            Residuum = (RegenCoilActual - RegenCoilHeatLoad) / RegenCoilHeatLoad;
-        } else { // Autodesk:Return ELSE added to assure return value is set
-            Residuum = 0.0;
-        }
-        return Residuum;
     }
 
     int GetProcAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
