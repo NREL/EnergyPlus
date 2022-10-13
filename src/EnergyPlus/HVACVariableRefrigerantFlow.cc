@@ -13172,147 +13172,97 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
     } else {
         Par(1) = 0.0;
     }
-    Par(2) = VRFTUNum;
-    Par(3) = DXCoilNum;
-    Par(4) = QCoilReq;
-    Par(5) = TeTc;
-    Par(6) = PartLoadRatio;
-    Par(7) = state.dataHVACVarRefFlow->OACompOnMassFlow;
 
     FanSpdRatioMax = 1.0;
-    SolveRoot(state, ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par);
+
+    auto f = [&state, FirstHVACIteration, VRFTUNum, DXCoilNum, QCoilReq, TeTc, PartLoadRatio](Real64 const FanSpdRatio) {
+        using DXCoils::ControlVRFIUCoil;
+        using Fans::SimulateFanComponents;
+        using MixedAir::SimOAMixer;
+        using Psychrometrics::PsyHFnTdbW;
+        using SingleDuct::SimATMixer;
+
+        Real64 AirFlowRateResidual;
+        int constexpr Mode(1);   // Performance mode for MultiMode DX coil. Always 1 for other coil types
+        int OAMixNode;           // index to the mix node of OA mixer
+        int VRFCond;             // index to VRF condenser
+        int VRFInletNode;        // VRF inlet node number
+        Real64 FanSpdRatioBase;  // baseline FanSpdRatio for VRFTUAirFlowResidual
+        Real64 FanSpdRatioAct;   // calculated FanSpdRatio for VRFTUAirFlowResidual
+        Real64 QCoilAct;         // actual coil load [W]
+        Real64 temp;             // for temporary use
+        Real64 Tin;              // coil inlet air temperature [C]
+        Real64 Win;              // coil inlet air humidity ratio [kg/kg]
+        Real64 Hin;              // coil inlet air enthalpy
+        Real64 Wout;             // coil outlet air humidity ratio
+        Real64 Tout;             // coil outlet air temperature
+        Real64 Hout;             // coil outlet air enthalpy
+        Real64 SHact;            // coil actual SH
+        Real64 SCact;            // coil actual SC
+
+        VRFCond = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
+        VRFInletNode = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum;
+
+        if (std::abs(FanSpdRatio) < 0.01)
+            FanSpdRatioBase = sign(0.01, FanSpdRatio);
+        else
+            FanSpdRatioBase = FanSpdRatio;
+
+        // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
+        state.dataHVACVarRefFlow->CompOnMassFlow = FanSpdRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
+        SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, temp);
+        Tin = state.dataLoopNodes->Node(VRFInletNode).Temp;
+        Win = state.dataLoopNodes->Node(VRFInletNode).HumRat;
+
+        // Simulation the OAMixer if there is any
+        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
+            SimOAMixer(
+                state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+            OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
+            Tin = state.dataLoopNodes->Node(OAMixNode).Temp;
+            Win = state.dataLoopNodes->Node(OAMixNode).HumRat;
+        }
+        // Simulate the blow-through fan if there is any
+        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
+            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                if (temp > 0) {
+                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
+                        state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                } else {
+                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
+                        state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                }
+            } else {
+                Fans::SimulateFanComponents(state,
+                                            "",
+                                            false,
+                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex,
+                                            state.dataHVACVarRefFlow->FanSpeedRatio,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOff);
+            }
+            Tin = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).Temp;
+            Win = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).HumRat;
+        }
+
+        // Call the coil control logic to determine the air flow rate to match the given coil load
+        ControlVRFIUCoil(
+            state, DXCoilNum, QCoilReq, Tin, Win, TeTc, state.dataHVACVarRefFlow->OACompOnMassFlow, FanSpdRatioAct, Wout, Tout, Hout, SHact, SCact);
+
+        Hin = PsyHFnTdbW(Tin, Win);
+        QCoilAct =
+            FanSpdRatioAct * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) * (Hout - Hin); // positive for heating, negative for cooling
+
+        return (FanSpdRatioAct - FanSpdRatio);
+
+    };
+
+    SolveRoot(state, ErrorTol, MaxIte, SolFla, FanSpdRatio, f, FanSpdRatioMin, FanSpdRatioMax);
     if (SolFla < 0) FanSpdRatio = FanSpdRatioMax; // over capacity
 
     AirMassFlowRate = FanSpdRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
 
     return AirMassFlowRate;
-}
-
-Real64 VRFTUAirFlowResidual_FluidTCtrl(EnergyPlusData &state,
-                                       Real64 const FanSpdRatio,  // fan speed ratio of VRF VAV TU
-                                       Array1D<Real64> const &Par // par(1) = VRFTUNum
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Rongpeng Zhang, LBNL
-    //       DATE WRITTEN   Nov 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //         Calculates residual function ( FanSpdRatioAct - FanSpdRatio ) / FanSpdRatio
-    //         This is used to address the coupling between OA mixer simulation and VRF-FluidTCtrl coil simulation.
-
-    // METHODOLOGY EMPLOYED:
-    //         VRF-FluidTCtrl TU airflow rate is determined by the control logic of VRF-FluidTCtrl coil to match the
-    //         coil load. This is affected by the coil inlet conditions. However, the airflow rate will affect the
-    //         OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
-
-    using DXCoils::ControlVRFIUCoil;
-    using Fans::SimulateFanComponents;
-    using MixedAir::SimOAMixer;
-    using Psychrometrics::PsyHFnTdbW;
-    using SingleDuct::SimATMixer;
-
-    Real64 AirFlowRateResidual;
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    //     Par( 1 ) = FirstHVACIteration;
-    //     Par( 2 ) = VRFTUNum;
-    //     Par( 3 ) = DXCoilNum;
-    //     Par( 4 ) = QCoilReq;
-    //     Par( 5 ) = TeTc;
-    //     Par( 6 ) = PartLoadRatio;
-    //     Par( 7 ) = OACompOnMassFlow;
-
-    int constexpr Mode(1);   // Performance mode for MultiMode DX coil. Always 1 for other coil types
-    int CoilIndex;           // index to coil
-    int OAMixNode;           // index to the mix node of OA mixer
-    int VRFCond;             // index to VRF condenser
-    int VRFTUNum;            // Unit index in VRF terminal unit array
-    int VRFInletNode;        // VRF inlet node number
-    bool FirstHVACIteration; // flag for 1st HVAC iteration in the time step
-    Real64 FanSpdRatioBase;  // baseline FanSpdRatio for VRFTUAirFlowResidual
-    Real64 FanSpdRatioAct;   // calculated FanSpdRatio for VRFTUAirFlowResidual
-    Real64 PartLoadRatio;    // Part load ratio
-    Real64 QCoilReq;         // required coil load [W]
-    Real64 QCoilAct;         // actual coil load [W]
-    Real64 temp;             // for temporary use
-    Real64 TeTc;             // evaporating/condensing temperature [C]
-    Real64 Tin;              // coil inlet air temperature [C]
-    Real64 Win;              // coil inlet air humidity ratio [kg/kg]
-    Real64 Hin;              // coil inlet air enthalpy
-    Real64 Wout;             // coil outlet air humidity ratio
-    Real64 Tout;             // coil outlet air temperature
-    Real64 Hout;             // coil outlet air enthalpy
-    Real64 SHact;            // coil actual SH
-    Real64 SCact;            // coil actual SC
-
-    // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
-    FirstHVACIteration = (Par(1) == 1.0);
-    VRFTUNum = int(Par(2));
-    CoilIndex = int(Par(3));
-    QCoilReq = Par(4);
-    TeTc = Par(5);
-    PartLoadRatio = Par(6);
-    state.dataHVACVarRefFlow->OACompOnMassFlow = Par(7);
-
-    VRFCond = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
-    VRFInletNode = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum;
-
-    if (std::abs(FanSpdRatio) < 0.01)
-        FanSpdRatioBase = sign(0.01, FanSpdRatio);
-    else
-        FanSpdRatioBase = FanSpdRatio;
-
-    // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-    state.dataHVACVarRefFlow->CompOnMassFlow = FanSpdRatio * state.dataDXCoils->DXCoil(CoilIndex).RatedAirMassFlowRate(Mode);
-    SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, temp);
-    Tin = state.dataLoopNodes->Node(VRFInletNode).Temp;
-    Win = state.dataLoopNodes->Node(VRFInletNode).HumRat;
-
-    // Simulation the OAMixer if there is any
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-        SimOAMixer(
-            state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
-        OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
-        Tin = state.dataLoopNodes->Node(OAMixNode).Temp;
-        Win = state.dataLoopNodes->Node(OAMixNode).HumRat;
-    }
-    // Simulate the blow-through fan if there is any
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            if (temp > 0) {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
-            } else {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
-            }
-        } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        false,
-                                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOff);
-        }
-        Tin = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).Temp;
-        Win = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).HumRat;
-    }
-
-    // Call the coil control logic to determine the air flow rate to match the given coil load
-    ControlVRFIUCoil(
-        state, CoilIndex, QCoilReq, Tin, Win, TeTc, state.dataHVACVarRefFlow->OACompOnMassFlow, FanSpdRatioAct, Wout, Tout, Hout, SHact, SCact);
-
-    Hin = PsyHFnTdbW(Tin, Win);
-    QCoilAct =
-        FanSpdRatioAct * state.dataDXCoils->DXCoil(CoilIndex).RatedAirMassFlowRate(Mode) * (Hout - Hin); // positive for heating, negative for cooling
-
-    AirFlowRateResidual = (FanSpdRatioAct - FanSpdRatio);
-
-    return AirFlowRateResidual;
 }
 
 Real64 VRFOUTeResidual_FluidTCtrl(EnergyPlusData &state,
