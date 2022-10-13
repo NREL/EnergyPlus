@@ -15574,7 +15574,31 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                 }
                 Par[3] = SuppHeatCoilLoad;
 
-                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HotWaterHeatingCoilResidual, 0.0, 1.0, Par);
+                auto f = [&state, VRFTUNum, FirstHVACIteration, SuppHeatCoilLoad](Real64 const PartLoadFrac) {
+                    Real64 QActual = 0.0;             // actual heating load deleivered [W]
+
+                    // Real64 mdot = min(state.dataLoopNodes->Node(VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode).MassFlowRateMaxAvail,
+                    //                  VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac);
+
+                    Real64 mdot = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
+                    state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+                    WaterCoils::SimulateWaterCoilComponents(state,
+                                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
+                                                            FirstHVACIteration,
+                                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilIndex,
+                                                            QActual,
+                                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode,
+                                                            PartLoadFrac);
+
+                    if (std::abs(SuppHeatCoilLoad) == 0.0) {
+                        return (QActual - SuppHeatCoilLoad) / 100.0;
+                    } else {
+                        return (QActual - SuppHeatCoilLoad) / SuppHeatCoilLoad;
+                    }
+
+                };
+
+                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                 this->SuppHeatPartLoadRatio = PartLoadFrac;
             } else {
                 this->SuppHeatPartLoadRatio = 1.0;
