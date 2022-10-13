@@ -14665,11 +14665,15 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
 
                 // Update Te'( SmallLoadTe ) to meet the required evaporator capacity
                 CompSpdActual = this->CompressorSpeed(1);
-                Par(1) = T_discharge;
-                Par(2) = Q_evap_req * C_cap_operation / this->RatedEvapCapacity;
-                Par(3) = this->OUCoolingCAPFT(CounterCompSpdTemp);
+                Real64 CondHeat = Q_evap_req * C_cap_operation / this->RatedEvapCapacity;
+                int CAPFT = this->OUCoolingCAPFT(CounterCompSpdTemp);
 
-                General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par);
+                auto f = [&state, T_discharge, CondHeat, CAPFT](Real64 const T_suc) {
+                    Real64 CAPSpd = CurveManager::CurveValue(state, CAPFT, T_discharge, T_suc);
+                    return (CondHeat - CAPSpd) / CAPSpd;
+                };
+
+                General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe, T_suction);
                 if (SolFla < 0) SmallLoadTe = MinOutdoorUnitTe;
 
                 T_suction = SmallLoadTe;
