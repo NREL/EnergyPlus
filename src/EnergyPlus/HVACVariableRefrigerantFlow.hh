@@ -933,11 +933,6 @@ namespace HVACVariableRefrigerantFlow {
 
     void isVRFCoilPresent(EnergyPlusData &state, std::string_view VRFTUName, bool &CoolCoilPresent, bool &HeatCoilPresent);
 
-    Real64 PLRResidual(EnergyPlusData &state,
-                       Real64 PartLoadRatio,      // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                       Array1D<Real64> const &Par // par(1) = VRFTUNum
-    );
-
     void SetAverageAirFlow(EnergyPlusData &state,
                            int VRFTUNum,             // Unit index
                            Real64 PartLoadRatio,     // unit part load ratio
