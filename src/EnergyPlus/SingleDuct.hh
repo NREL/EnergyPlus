@@ -198,6 +198,8 @@ namespace SingleDuct {
         int OARequirementsPtr;                // - Index to DesignSpecification:OutdoorAir object
         int AirLoopNum;
         Real64 ADEff = 1.0;           // DesignSpecification:AirDistributionEffectiveness
+        Real64 ADEffHeating = 1.0;    // DesignSpecification:AirDistributionEffectiveness
+        Real64 ADEffCooling = 1.0;    // DesignSpecification:AirDistributionEffectiveness
         PlantLocation HWplantLoc;     // plant topology, Component location
         std::string ZoneHVACUnitType; // type of Zone HVAC unit for air terminal mixer units
         std::string ZoneHVACUnitName; // name of Zone HVAC unit for air terminal mixer units

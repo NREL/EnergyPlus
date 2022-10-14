@@ -2853,15 +2853,16 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
 
     auto &TermUnitSizing(state.dataSize->TermUnitSizing);
 
+    if (state.dataSize->ZoneSizingRunDone && state.dataSize->CurTermUnitSizingNum > 0) {
+        this->ADEffHeating = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneADEffHeating;
+        this->ADEffCooling = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneADEffCooling;
+    }
+
     if (this->MaxAirVolFlowRate == AutoSize) {
         IsAutoSize = true;
     }
 
     if (state.dataSize->CurTermUnitSizingNum > 0) {
-
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADEff =
-            std::min(state.dataSize->ZoneSizingInput(state.dataSize->CurTermUnitSizingNum).ZoneADEffCooling,
-                     state.dataSize->ZoneSizingInput(state.dataSize->CurTermUnitSizingNum).ZoneADEffHeating);
 
         if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
             if (this->MaxAirVolFlowRate > 0.0) {
@@ -3848,7 +3849,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
 
         // calculate supply air flow rate based on user specified OA requirement
         this->CalcOAMassFlow(state, MassFlowBasedOnOA, AirLoopOAFrac);
-        MassFlow = max(MassFlow, MassFlowBasedOnOA);
+        MassFlow = max(MassFlow, MassFlowBasedOnOA/this->ADEffCooling);
 
         // used for normal acting damper
         state.dataSingleDuct->MinMassAirFlowSDAT = max(state.dataSingleDuct->MinMassAirFlowSDAT, MassFlowBasedOnOA);
@@ -3886,7 +3887,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
 
         // calculate supply air flow rate based on user specified OA requirement
         this->CalcOAMassFlow(state, MassFlowBasedOnOA, AirLoopOAFrac);
-        MassFlow = max(MassFlow, MassFlowBasedOnOA);
+        MassFlow = max(MassFlow, MassFlowBasedOnOA/this->ADEffHeating);
 
         // Check to see if the flow is < the Min or > the Max air Fraction to the zone; then set to min or max
         if (MassFlow <= this->sd_airterminalInlet.AirMassFlowRateMinAvail) {
