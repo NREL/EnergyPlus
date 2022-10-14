@@ -13182,7 +13182,6 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
 
-        Real64 AirFlowRateResidual;
         int constexpr Mode(1);   // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int OAMixNode;           // index to the mix node of OA mixer
         int VRFCond;             // index to VRF condenser
@@ -13263,64 +13262,6 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
     AirMassFlowRate = FanSpdRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
 
     return AirMassFlowRate;
-}
-
-Real64 VRFOUTeResidual_FluidTCtrl(EnergyPlusData &state,
-                                  Real64 const Te,           // outdoor unit evaporating temperature
-                                  Array1D<Real64> const &Par // par(1) = VRFTUNum
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Rongpeng Zhang, LBNL
-    //       DATE WRITTEN   Mar 2016
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //         Calculates residual function ( Tsuction - Tsuction_new )
-    //         This is used to calculate the VRF OU evaporating temperature at the given compressor speed and operational conditions.
-
-    // METHODOLOGY EMPLOYED:
-    //         Call VRFOU_CompCap to calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational
-    //         conditions, and then call VRFOU_TeTc to obtain Tsuction_new based on OU evaporator air-side calculations
-
-    // Return value
-    Real64 TeResidual;
-
-    int VRFCond = int(Par(1));        // Index to VRF outdoor unit
-    Real64 CompSpdActual = Par(2);    // Actual compressor running speed [rps]
-    Real64 Tdischarge = Par(3);       // VRF Compressor discharge refrigerant temperature [C]
-    Real64 h_IU_evap_in = Par(4);     // enthalpy of refrigerant at IU evaporator inlet [kJ/kg]
-    Real64 h_comp_in = Par(5);        // enthalpy of refrigerant at compressor inlet [kJ/kg]
-    Real64 Q_c_TU_PL = Par(6);        // IU evaporator load, including piping loss [W]
-    Real64 m_air_evap_rated = Par(7); // Rated OU evaporator air mass flow rate [kg/s]
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 Ncomp_temp;   // compressor power [W]
-    Real64 Q_c_tot_temp; // total evaporator load, including piping loss [W]
-    Real64 Q_c_OU_temp;  // OU evaporator load, including piping loss [W]
-    Real64 Te_new;       // newly calculated OU evaporating temperature
-    Real64 Tfs;          // OU evaporator coil surface temperature [C]
-
-    // calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational conditions
-    state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(state, CompSpdActual, Te, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_temp);
-    Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
-
-    // Tsuction_new calculated based on OU evaporator air-side calculations (Tsuction_new < To)
-    state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(state,
-                                                      HXOpMode::EvapMode,
-                                                      Q_c_OU_temp,
-                                                      state.dataHVACVarRefFlow->VRF(VRFCond).SH,
-                                                      m_air_evap_rated,
-                                                      state.dataEnvrn->OutDryBulbTemp,
-                                                      state.dataEnvrn->OutHumRat,
-                                                      state.dataEnvrn->OutBaroPress,
-                                                      Tfs,
-                                                      Te_new);
-
-    TeResidual = Te_new - Te;
-
-    return TeResidual;
 }
 
 void VRFCondenserEquipment::VRFOU_TeTc(EnergyPlusData &state,
@@ -14985,16 +14926,35 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
 
         // perform iterations to calculate Te at the given compressor speed and operational conditions
         {
-            Par(1) =
-                state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->TerminalUnitList(this->ZoneTUListPtr).ZoneTUPtr(1)).VRFSysNum; // VRFCond;
-            Par(2) = CompSpdActual;
-            Par(3) = Tdischarge;
-            Par(4) = h_IU_evap_in;
-            Par(5) = h_comp_in;
-            Par(6) = Q_c_TU_PL;
-            Par(7) = m_air_evap_rated;
 
-            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Tsuction_new, VRFOUTeResidual_FluidTCtrl, Tsuction_LB, Tsuction_HB, Par);
+            auto f = [&state, this, CompSpdActual, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_TU_PL, m_air_evap_rated](Real64 const Te) {
+                int VRFCond = state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->TerminalUnitList(this->ZoneTUListPtr).ZoneTUPtr(1)).VRFSysNum; // VRFCond;
+
+                Real64 Ncomp_temp;   // compressor power [W]
+                Real64 Q_c_tot_temp; // total evaporator load, including piping loss [W]
+                Real64 Q_c_OU_temp;  // OU evaporator load, including piping loss [W]
+                Real64 Te_new;       // newly calculated OU evaporating temperature
+                Real64 Tfs;          // OU evaporator coil surface temperature [C]
+
+                state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(state, CompSpdActual, Te, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_temp);
+                Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
+
+                // Tsuction_new calculated based on OU evaporator air-side calculations (Tsuction_new < To)
+                state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(state,
+                                                                  HXOpMode::EvapMode,
+                                                                  Q_c_OU_temp,
+                                                                  state.dataHVACVarRefFlow->VRF(VRFCond).SH,
+                                                                  m_air_evap_rated,
+                                                                  state.dataEnvrn->OutDryBulbTemp,
+                                                                  state.dataEnvrn->OutHumRat,
+                                                                  state.dataEnvrn->OutBaroPress,
+                                                                  Tfs,
+                                                                  Te_new);
+
+                return Te_new - Te;
+            };
+
+            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Tsuction_new, f, Tsuction_LB, Tsuction_HB);
             if (SolFla < 0) Tsuction_new = Tsuction_LB;
 
             // Update Q_c_tot_temp using updated Tsuction_new
