@@ -5604,7 +5604,7 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
     assert(zoneNum > 0);
     auto &thisZone = state.dataHeatBal->Zone(zoneNum);
     if (thisZone.NoHeatToReturnAir) {
-        this->SumIntGain += InternalHeatGains::SumAllReturnAirConvectionGains(state, zoneNum, 0);
+        this->SumIntGain += InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, zoneNum, 0);
     }
 
     // Sum all non-system air flow, i.e. infiltration, simple ventilation, mixing, earth tube: this->SumMCp, this->SumMCpT
@@ -5834,7 +5834,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (thisZone.NoHeatToReturnAir) {
-        SumIntGains += InternalHeatGains::SumAllReturnAirConvectionGains(state, ZoneNum, 0);
+        SumIntGains += InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, ZoneNum, 0);
     }
 
     // sum non-system air flow transfers between zones

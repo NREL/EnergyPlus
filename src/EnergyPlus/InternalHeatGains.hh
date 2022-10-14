@@ -154,9 +154,14 @@ namespace InternalHeatGains {
         const Array1D<Real64> &FractionARR // array of fractional multipliers to apply to devices
     );
 
-    Real64 SumAllReturnAirConvectionGains(EnergyPlusData &state,
-                                          int const ZoneNum,      // zone index pointer for which zone to sum gains for
-                                          int const ReturnNodeNum // return air node number
+    Real64 zoneSumAllReturnAirConvectionGains(EnergyPlusData &state,
+                                              int const zoneNum,      // zone index pointer to sum gains for
+                                              int const returnNodeNum // return air node number
+    );
+
+    Real64 spaceSumAllReturnAirConvectionGains(EnergyPlusData &state,
+                                               int const spaceNum,     // space index pointer to sum gains for
+                                               int const returnNodeNum // return air node number
     );
 
     Real64 SumReturnAirConvectionGainsByTypes(

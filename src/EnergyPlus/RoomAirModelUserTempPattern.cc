@@ -768,7 +768,6 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // Using/Aliasing
     using DataHVACGlobals::RetTempMax;
     using DataHVACGlobals::RetTempMin;
-    using InternalHeatGains::SumAllReturnAirConvectionGains;
     using InternalHeatGains::SumAllReturnAirLatentGains;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
@@ -811,7 +810,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
         // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
         // Add sensible heat gain from refrigerated cases with under case returns
-        QRetAir = SumAllReturnAirConvectionGains(state, ZoneNum, ReturnNode);
+        QRetAir = InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, ZoneNum, ReturnNode);
 
         CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
 

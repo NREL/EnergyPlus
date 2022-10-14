@@ -333,7 +333,6 @@ namespace MundtSimMgr {
         // PURPOSE OF THIS SUBROUTINE:
         //     map data from surface domain to air domain for each particular zone
 
-        using InternalHeatGains::SumAllReturnAirConvectionGains;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
@@ -410,7 +409,7 @@ namespace MundtSimMgr {
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
         if (Zone(ZoneNum).NoHeatToReturnAir) {
-            RetAirConvGain = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
+            RetAirConvGain = InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, ZoneNum, 0);
             state.dataMundtSimMgr->ConvIntGain += RetAirConvGain;
         }
 
