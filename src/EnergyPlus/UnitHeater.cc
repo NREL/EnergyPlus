@@ -1702,9 +1702,8 @@ namespace UnitHeater {
                         auto opMode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode;
 
                         auto f = [&state, UnitHeatNum, FirstHVACIteration, opMode](Real64 const PartLoadRatio) {
-
                             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-                            Real64 QUnitOut;         // heating provided by unit heater [watts]
+                            Real64 QUnitOut; // heating provided by unit heater [watts]
 
                             CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, QUnitOut, opMode, PartLoadRatio);
 

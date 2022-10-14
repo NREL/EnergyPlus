@@ -9459,10 +9459,10 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
     if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
 
         auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
-
-            Real64 QZnReqTemp= QZnReq;        // denominator representing zone load (W)
-            Real64 ActualOutput;      // delivered capacity of VRF terminal unit
-            Real64 SuppHeatCoilLoad = 0.0;;  // supplemetal heating coil load (W)
+            Real64 QZnReqTemp = QZnReq; // denominator representing zone load (W)
+            Real64 ActualOutput;        // delivered capacity of VRF terminal unit
+            Real64 SuppHeatCoilLoad = 0.0;
+            ; // supplemetal heating coil load (W)
             bool setPointControlled = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled;
             Real64 nonConstOnOffAirFlowRatio = OnOffAirFlowRatio;
 
@@ -9483,7 +9483,6 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 if (std::abs(QZnReq) < 100.0) QZnReqTemp = sign(100.0, QZnReq);
                 return (ActualOutput - QZnReq) / QZnReqTemp;
             }
-
         };
         General::SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
@@ -12733,10 +12732,9 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
 
     if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
         auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
-
-            Real64 QZnReqTemp= QZnReq;        // denominator representing zone load (W)
-            Real64 ActualOutput;      // delivered capacity of VRF terminal unit
-            Real64 SuppHeatCoilLoad = 0.0;  // supplemetal heating coil load (W)
+            Real64 QZnReqTemp = QZnReq;    // denominator representing zone load (W)
+            Real64 ActualOutput;           // delivered capacity of VRF terminal unit
+            Real64 SuppHeatCoilLoad = 0.0; // supplemetal heating coil load (W)
             bool setPointControlled = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled;
             Real64 nonConstOnOffAirFlowRatio = OnOffAirFlowRatio;
 
@@ -12757,7 +12755,6 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
                 if (std::abs(QZnReq) < 100.0) QZnReqTemp = sign(100.0, QZnReq);
                 return (ActualOutput - QZnReq) / QZnReqTemp;
             }
-
         };
         SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
@@ -13143,22 +13140,22 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
 
-        int constexpr Mode(1);   // Performance mode for MultiMode DX coil. Always 1 for other coil types
-        int OAMixNode;           // index to the mix node of OA mixer
-        int VRFCond;             // index to VRF condenser
-        int VRFInletNode;        // VRF inlet node number
-        Real64 FanSpdRatioBase;  // baseline FanSpdRatio for VRFTUAirFlowResidual
-        Real64 FanSpdRatioAct;   // calculated FanSpdRatio for VRFTUAirFlowResidual
-        Real64 QCoilAct;         // actual coil load [W]
-        Real64 temp;             // for temporary use
-        Real64 Tin;              // coil inlet air temperature [C]
-        Real64 Win;              // coil inlet air humidity ratio [kg/kg]
-        Real64 Hin;              // coil inlet air enthalpy
-        Real64 Wout;             // coil outlet air humidity ratio
-        Real64 Tout;             // coil outlet air temperature
-        Real64 Hout;             // coil outlet air enthalpy
-        Real64 SHact;            // coil actual SH
-        Real64 SCact;            // coil actual SC
+        int constexpr Mode(1);  // Performance mode for MultiMode DX coil. Always 1 for other coil types
+        int OAMixNode;          // index to the mix node of OA mixer
+        int VRFCond;            // index to VRF condenser
+        int VRFInletNode;       // VRF inlet node number
+        Real64 FanSpdRatioBase; // baseline FanSpdRatio for VRFTUAirFlowResidual
+        Real64 FanSpdRatioAct;  // calculated FanSpdRatio for VRFTUAirFlowResidual
+        Real64 QCoilAct;        // actual coil load [W]
+        Real64 temp;            // for temporary use
+        Real64 Tin;             // coil inlet air temperature [C]
+        Real64 Win;             // coil inlet air humidity ratio [kg/kg]
+        Real64 Hin;             // coil inlet air enthalpy
+        Real64 Wout;            // coil outlet air humidity ratio
+        Real64 Tout;            // coil outlet air temperature
+        Real64 Hout;            // coil outlet air enthalpy
+        Real64 SHact;           // coil actual SH
+        Real64 SCact;           // coil actual SC
 
         VRFCond = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
         VRFInletNode = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum;
@@ -13176,8 +13173,10 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
 
         // Simulation the OAMixer if there is any
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-            SimOAMixer(
-                state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+            SimOAMixer(state,
+                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
+                       FirstHVACIteration,
+                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
             OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
             Tin = state.dataLoopNodes->Node(OAMixNode).Temp;
             Win = state.dataLoopNodes->Node(OAMixNode).HumRat;
@@ -13210,11 +13209,10 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
             state, DXCoilNum, QCoilReq, Tin, Win, TeTc, state.dataHVACVarRefFlow->OACompOnMassFlow, FanSpdRatioAct, Wout, Tout, Hout, SHact, SCact);
 
         Hin = PsyHFnTdbW(Tin, Win);
-        QCoilAct =
-            FanSpdRatioAct * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) * (Hout - Hin); // positive for heating, negative for cooling
+        QCoilAct = FanSpdRatioAct * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) *
+                   (Hout - Hin); // positive for heating, negative for cooling
 
         return (FanSpdRatioAct - FanSpdRatio);
-
     };
 
     SolveRoot(state, ErrorTol, MaxIte, SolFla, FanSpdRatio, f, FanSpdRatioMin, FanSpdRatioMax);
@@ -14889,7 +14887,8 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
         {
 
             auto f = [&state, this, CompSpdActual, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_TU_PL, m_air_evap_rated](Real64 const Te) {
-                int VRFCond = state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->TerminalUnitList(this->ZoneTUListPtr).ZoneTUPtr(1)).VRFSysNum; // VRFCond;
+                int VRFCond = state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->TerminalUnitList(this->ZoneTUListPtr).ZoneTUPtr(1))
+                                  .VRFSysNum; // VRFCond;
 
                 Real64 Ncomp_temp;   // compressor power [W]
                 Real64 Q_c_tot_temp; // total evaporator load, including piping loss [W]
@@ -14897,7 +14896,8 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
                 Real64 Te_new;       // newly calculated OU evaporating temperature
                 Real64 Tfs;          // OU evaporator coil surface temperature [C]
 
-                state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(state, CompSpdActual, Te, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_temp);
+                state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(
+                    state, CompSpdActual, Te, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_temp);
                 Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
 
                 // Tsuction_new calculated based on OU evaporator air-side calculations (Tsuction_new < To)
@@ -15415,7 +15415,7 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                 Par[3] = SuppHeatCoilLoad;
 
                 auto f = [&state, VRFTUNum, FirstHVACIteration, SuppHeatCoilLoad](Real64 const PartLoadFrac) {
-                    Real64 QActual = 0.0;             // actual heating load deleivered [W]
+                    Real64 QActual = 0.0; // actual heating load deleivered [W]
 
                     // Real64 mdot = min(state.dataLoopNodes->Node(VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode).MassFlowRateMaxAvail,
                     //                  VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac);
@@ -15435,7 +15435,6 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                     } else {
                         return (QActual - SuppHeatCoilLoad) / SuppHeatCoilLoad;
                     }
-
                 };
 
                 General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);

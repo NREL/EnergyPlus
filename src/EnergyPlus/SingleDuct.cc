@@ -4890,20 +4890,12 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 FanOp = 1;
                 auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
                     Real64 UnitOutput{}; // heating output [W]
-                    state.dataSingleDuct->sd_airterminal(this->SysNum).CalcVAVVS(
-                        state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
 
                     return (QTotLoad - UnitOutput) / QTotLoad;
                 };
-                SolveRoot(state,
-                          UnitFlowToler,
-                          50,
-                          SolFlag,
-                          MassFlow,
-                          f,
-                          MinMassFlow,
-                          MaxHeatMassFlow
-                          );
+                SolveRoot(state, UnitFlowToler, 50, SolFlag, MassFlow, f, MinMassFlow, MaxHeatMassFlow);
                 if (SolFlag == -1) {
                     if (this->IterationLimit == 0) {
                         ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
@@ -4975,22 +4967,15 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 FanOp = 1;
 
                 auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
-                    Real64 UnitOutput {}; // heating output [W]
+                    Real64 UnitOutput{}; // heating output [W]
 
-                    state.dataSingleDuct->sd_airterminal(this->SysNum).CalcVAVVS(
-                        state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
 
                     return (QTotLoad - UnitOutput) / QTotLoad;
                 };
 
-                SolveRoot(state,
-                          UnitFlowToler,
-                          50,
-                          SolFlag,
-                          MassFlow,
-                          f,
-                          MinMassFlow,
-                          MaxHeatMassFlow);
+                SolveRoot(state, UnitFlowToler, 50, SolFlag, MassFlow, f, MinMassFlow, MaxHeatMassFlow);
                 if (SolFlag == -1) {
                     if (this->IterationLimit == 0) {
                         ShowWarningError(state, "Steam heating coil control failed in VS VAV terminal unit " + this->SysName);
@@ -5021,31 +5006,23 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 FanOp = 1;
 
                 auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, FanType, FanOp, QTotLoad](Real64 const HeatingFrac) {
-                    Real64 MaxHeatOut {this->ReheatCoilMaxCapacity};      // maximum heating output [W]
-                    Real64 UnitOutput;      // heating output [W]
-                    Real64 AirMassFlowRate; // [kg/s]
-                    Real64 HeatOut;         // heating coil output [W]
+                    Real64 MaxHeatOut{this->ReheatCoilMaxCapacity}; // maximum heating output [W]
+                    Real64 UnitOutput;                              // heating output [W]
+                    Real64 AirMassFlowRate;                         // [kg/s]
+                    Real64 HeatOut;                                 // heating coil output [W]
 
                     HeatOut = HeatingFrac * MaxHeatOut;
                     AirMassFlowRate = max(HeatingFrac * state.dataSingleDuct->sd_airterminal(this->SysNum).HeatAirMassFlowRateMax,
                                           state.dataSingleDuct->sd_airterminal(this->SysNum).sd_airterminalInlet.AirMassFlowRateMaxAvail *
                                               state.dataSingleDuct->sd_airterminal(this->SysNum).ZoneMinAirFrac);
 
-                    state.dataSingleDuct->sd_airterminal(this->SysNum).CalcVAVVS(
-                        state, FirstHVACIteration, ZoneNodeNum, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
 
                     return (QTotLoad - UnitOutput) / QTotLoad;
                 };
 
-                SolveRoot(state,
-                          UnitFlowToler,
-                          50,
-                          SolFlag,
-                          FracDelivered,
-                          f,
-                          0.0,
-                          1.0
-                          );
+                SolveRoot(state, UnitFlowToler, 50, SolFlag, FracDelivered, f, 0.0, 1.0);
                 MassFlow = state.dataLoopNodes->Node(SysInletNode).MassFlowRate;
                 if (SolFlag == -1) {
                     if (this->IterationLimit == 0) {

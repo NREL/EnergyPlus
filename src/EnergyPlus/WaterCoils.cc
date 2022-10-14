@@ -1630,8 +1630,8 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                 PartLoadRatio = 1.0;
                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal = UA;
                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal * 3.3;
-                state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal =
-                    1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
+                state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal = 1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal +
+                                                                              1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
                 state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea = EstimateHEXSurfaceArea(state, CoilNum);
                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea =
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;

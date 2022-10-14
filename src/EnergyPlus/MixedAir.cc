@@ -4836,7 +4836,6 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
 
         } else {
 
-
             auto f = [&state, this](Real64 const OASignal) {
                 using Psychrometrics::PsyTdbFnHW;
 
