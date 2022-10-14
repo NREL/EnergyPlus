@@ -12786,20 +12786,34 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     // The coil will not operate at PLR=0 or PLR=1, calculate the operating part-load ratio
 
     if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
+        auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
 
-        Par(1) = VRFTUNum;
-        Par(2) = 0.0;
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled) Par(2) = 1.0;
-        Par(4) = 0.0;
-        if (FirstHVACIteration) {
-            Par(3) = 1.0;
-        } else {
-            Par(3) = 0.0;
-        }
-        //    Par(4) = OpMode
-        Par(5) = QZnReq;
-        Par(6) = OnOffAirFlowRatio;
-        SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par);
+            Real64 QZnReqTemp= QZnReq;        // denominator representing zone load (W)
+            Real64 ActualOutput;      // delivered capacity of VRF terminal unit
+            Real64 SuppHeatCoilLoad = 0.0;;  // supplemetal heating coil load (W)
+            bool setPointControlled = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled;
+            Real64 nonConstOnOffAirFlowRatio = OnOffAirFlowRatio;
+
+            if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
+                    state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, nonConstOnOffAirFlowRatio, SuppHeatCoilLoad);
+            } else {
+                // Algorithm Type: VRF model based on system curve
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF(
+                    state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, nonConstOnOffAirFlowRatio, SuppHeatCoilLoad);
+            }
+
+            if (setPointControlled) {
+                Real64 outletNodeT = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
+                return (outletNodeT - state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilTempSetPoint);
+            } else {
+                if (std::abs(QZnReq) < 100.0) QZnReqTemp = sign(100.0, QZnReq);
+                return (ActualOutput - QZnReq) / QZnReqTemp;
+            }
+
+        };
+        SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
             //     Very low loads may not converge quickly. Tighten PLR boundary and try again.
             TempMaxPLR = -0.1;
