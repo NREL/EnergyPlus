@@ -802,7 +802,6 @@ namespace CrossVentMgr {
 
         using namespace DataEnvironment;
         using namespace DataHeatBalance;
-        using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -834,7 +833,7 @@ namespace CrossVentMgr {
             }
         }
 
-        ConvGains = SumAllInternalConvectionGains(state, ZoneNum);
+        ConvGains = InternalHeatGains::zoneSumAllInternalConvectionGains(state, ZoneNum);
         ConvGains += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                      thisZoneHB.SysDepZoneLoadsLagged + thisZoneHB.NonAirSystemResponse / ZoneMult;
 

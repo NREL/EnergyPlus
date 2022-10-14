@@ -106,6 +106,8 @@ namespace ZoneTempPredictorCorrector {
 
     struct ZoneSpaceHeatBalanceData
     {
+        // This entire struct is re-initialized during the simulation, so no static informat may be stored here (e.g. zone or space characteristics)
+
         // Zone air drybulb conditions variables
         Real64 MAT = DataHeatBalFanSys::ZoneInitialTemp;      // MEAN AIR TEMPERATURE (C)
         Real64 ZTAV = DataHeatBalFanSys::ZoneInitialTemp;     // Air Temperature Averaged over the Zone Time step
@@ -218,7 +220,7 @@ namespace ZoneTempPredictorCorrector {
 
         void calcPredictedSystemLoad(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum = 0);
 
-        void calcZoneSums(EnergyPlusData &state,
+        void calcZoneOrSpaceSums(EnergyPlusData &state,
                           bool const CorrectorFlag, // Corrector call flag
                           int const zoneNum,
                           int const spaceNum = 0);

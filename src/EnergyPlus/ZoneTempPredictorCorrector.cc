@@ -3672,10 +3672,10 @@ void PredictSystemLoads(EnergyPlusData &state,
         // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).calcZoneSums(state, false, ZoneNum, spaceNum);
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).calcZoneOrSpaceSums(state, false, ZoneNum, spaceNum);
             }
         } else {
-            thisZoneHB.calcZoneSums(state, false, ZoneNum);
+            thisZoneHB.calcZoneOrSpaceSums(state, false, ZoneNum);
         }
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
@@ -4464,7 +4464,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     RoomAirModelManager::ManageAirModel(state, zoneNum);
 
     // Calculate the various heat balance sums
-    this->calcZoneSums(state, true, zoneNum, spaceNum);
+    this->calcZoneOrSpaceSums(state, true, zoneNum, spaceNum);
 
     // Sum all convective internal gains except for people: SumIntGainExceptPeople
     if (state.dataHybridModel->FlagHybridModel_PC) {
@@ -5561,10 +5561,10 @@ void InverseModelHumidity(EnergyPlusData &state,
     state.dataHeatBalFanSys->PreviousMeasuredHumRat1(ZoneNum) = zone.ZoneMeasuredHumidityRatio;
 }
 
-void ZoneSpaceHeatBalanceData::calcZoneSums(EnergyPlusData &state,
-                                            bool const CorrectorFlag, // Corrector call flag
-                                            int const zoneNum,
-                                            int const spaceNum)
+void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
+                                                   bool const CorrectorFlag, // Corrector call flag
+                                                   int const zoneNum,
+                                                   int const spaceNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -5593,7 +5593,11 @@ void ZoneSpaceHeatBalanceData::calcZoneSums(EnergyPlusData &state,
     this->SumSysMCp = 0.0;
     this->SumSysMCpT = 0.0;
     // Sum all convective internal gains: this->SumIntGain
-    this->SumIntGain = InternalHeatGains::SumAllInternalConvectionGains(state, zoneNum);
+    if (spaceNum == 0) {
+        this->SumIntGain = InternalHeatGains::zoneSumAllInternalConvectionGains(state, zoneNum);
+    } else {
+        this->SumIntGain = InternalHeatGains::spaceSumAllInternalConvectionGains(state, spaceNum);
+    }
     this->SumIntGain += state.dataHeatBalFanSys->SumConvHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumConvPool(zoneNum);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
@@ -5825,7 +5829,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     // Sum all convective internal gains: SumIntGain
-    SumIntGains = InternalHeatGains::SumAllInternalConvectionGains(state, ZoneNum);
+    SumIntGains = InternalHeatGains::zoneSumAllInternalConvectionGains(state, ZoneNum);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)

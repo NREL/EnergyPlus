@@ -677,7 +677,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     InternalHeatGains::UpdateInternalGainValues(*state);
 
     // Check total of all convective gains
-    totConvGains = InternalHeatGains::SumAllInternalConvectionGains(*state, zoneNum);
+    totConvGains = InternalHeatGains::zoneSumAllInternalConvectionGains(*state, zoneNum);
     EXPECT_EQ(totConvGains, expectedTotConvGains);
 
     // Check subtotals used in zone component loads

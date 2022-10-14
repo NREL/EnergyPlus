@@ -8447,11 +8447,25 @@ namespace InternalHeatGains {
         }
     }
 
-    Real64 SumAllInternalConvectionGains(EnergyPlusData &state,
-                                         int const ZoneNum // zone index pointer for which zone to sum gains for
+    Real64 zoneSumAllInternalConvectionGains(EnergyPlusData &state,
+                                             int const zoneNum // zone index pointer to sum gains for
     )
     {
+        Real64 zoneSumConvGainRate(0.0);
+        // worker routine for summing all the internal gain types
 
+        for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) continue;
+            zoneSumConvGainRate += InternalHeatGains::spaceSumAllInternalConvectionGains(state, spaceNum);
+        }
+
+        return zoneSumConvGainRate;
+    }
+
+    Real64 spaceSumAllInternalConvectionGains(EnergyPlusData &state,
+                                              int const spaceNum // space index pointer to sum gains for
+    )
+    {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Nov. 2011
@@ -8459,20 +8473,12 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        // Return value
-        Real64 SumConvGainRate(0.0);
+        Real64 spaceSumConvGainRate(0.0);
 
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
-                continue;
-            }
-
-            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                SumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
-            }
+        for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
+            spaceSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
         }
-
-        return SumConvGainRate;
+        return spaceSumConvGainRate;
     }
 
     // For HybridModel
