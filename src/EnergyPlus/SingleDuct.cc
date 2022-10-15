@@ -6355,7 +6355,7 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
             airLoopOAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
             if (airLoopOAFrac > 0.0) {
                 vDotOAReq = DataSizing::calcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
-                mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / (airLoopOAFrac * this->ADEff);
+                mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / airLoopOAFrac;
             } else {
                 mDotFromOARequirement = state.dataLoopNodes->Node(this->PriInNode).MassFlowRate;
             }
