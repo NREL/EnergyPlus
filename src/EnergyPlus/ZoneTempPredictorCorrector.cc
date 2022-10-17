@@ -5822,8 +5822,6 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     imBalance = 0.0;
     SumEnthalpyM = 0.0;
     SumEnthalpyH = 0.0;
-    Real64 ADUHeatAddRate = 0.0;
-    Real64 QSensRate = 0.0;
 
     auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
     auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
@@ -5859,22 +5857,22 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
     // Sum all system air flow: reusing how SumSysMCp, SumSysMCpT are calculated in CalcZoneSums
     // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
+    Real64 QSensRate = 0.0;
     if (thisZone.IsControlled) {
         auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
         for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumInletNodes; ++NodeNum) {
             // Get node conditions
             Real64 const NodeTemp = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(NodeNum)).Temp;
             Real64 const MassFlowRate = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(NodeNum)).MassFlowRate;
-            CalcZoneSensibleOutput(MassFlowRate, NodeTemp, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, QSensRate);
+            QSensRate = calcZoneSensibleOutput(MassFlowRate, NodeTemp, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
             SumMCpDTsystem += QSensRate;
 
             if (zoneEquipConfig.InletNodeADUNum(NodeNum) > 0) {
                 auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(zoneEquipConfig.InletNodeADUNum(NodeNum));
-                CalcZoneSensibleOutput(state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).MassFlowRate,
-                                       state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).Temp,
-                                       thisZoneHB.MAT,
-                                       thisZoneHB.ZoneAirHumRat,
-                                       ADUHeatAddRate);
+                Real64 ADUHeatAddRate = calcZoneSensibleOutput(state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).MassFlowRate,
+                                                               state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).Temp,
+                                                               thisZoneHB.MAT,
+                                                               thisZoneHB.ZoneAirHumRat);
                 airDistUnit.HeatRate = max(0.0, ADUHeatAddRate);
                 airDistUnit.CoolRate = std::abs(min(0.0, ADUHeatAddRate));
                 airDistUnit.HeatGain = airDistUnit.HeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
@@ -5885,41 +5883,37 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     } else if (thisZone.IsReturnPlenum) {
         auto &zoneRetPlenCond = state.dataZonePlenum->ZoneRetPlenCond(thisZone.PlenumCondNum);
         for (int NodeNum = 1; NodeNum <= zoneRetPlenCond.NumInletNodes; ++NodeNum) {
-            CalcZoneSensibleOutput(state.dataLoopNodes->Node(zoneRetPlenCond.InletNode(NodeNum)).MassFlowRate,
-                                   state.dataLoopNodes->Node(zoneRetPlenCond.InletNode(NodeNum)).Temp,
-                                   thisZoneHB.MAT,
-                                   thisZoneHB.ZoneAirHumRat,
-                                   QSensRate);
+            QSensRate = calcZoneSensibleOutput(state.dataLoopNodes->Node(zoneRetPlenCond.InletNode(NodeNum)).MassFlowRate,
+                                               state.dataLoopNodes->Node(zoneRetPlenCond.InletNode(NodeNum)).Temp,
+                                               thisZoneHB.MAT,
+                                               thisZoneHB.ZoneAirHumRat);
             SumMCpDTsystem += QSensRate;
         }
         // add in the leaks
         for (int ADUListIndex = 1; ADUListIndex <= zoneRetPlenCond.NumADUs; ++ADUListIndex) {
             auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(zoneRetPlenCond.ADUIndex(ADUListIndex));
             if (airDistUnit.UpStreamLeak) {
-                CalcZoneSensibleOutput(airDistUnit.MassFlowRateUpStrLk,
-                                       state.dataLoopNodes->Node(airDistUnit.InletNodeNum).Temp,
-                                       thisZoneHB.MAT,
-                                       thisZoneHB.ZoneAirHumRat,
-                                       QSensRate);
+                QSensRate = calcZoneSensibleOutput(airDistUnit.MassFlowRateUpStrLk,
+                                                   state.dataLoopNodes->Node(airDistUnit.InletNodeNum).Temp,
+                                                   thisZoneHB.MAT,
+                                                   thisZoneHB.ZoneAirHumRat);
                 SumMCpDTsystem += QSensRate;
             }
             if (airDistUnit.DownStreamLeak) {
-                CalcZoneSensibleOutput(airDistUnit.MassFlowRateDnStrLk,
-                                       state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).Temp,
-                                       thisZoneHB.MAT,
-                                       thisZoneHB.ZoneAirHumRat,
-                                       QSensRate);
+                QSensRate = calcZoneSensibleOutput(airDistUnit.MassFlowRateDnStrLk,
+                                                   state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).Temp,
+                                                   thisZoneHB.MAT,
+                                                   thisZoneHB.ZoneAirHumRat);
                 SumMCpDTsystem += QSensRate;
             }
         }
 
     } else if (thisZone.IsSupplyPlenum) {
         auto &zoneSupPlenCond = state.dataZonePlenum->ZoneSupPlenCond(thisZone.PlenumCondNum);
-        CalcZoneSensibleOutput(state.dataLoopNodes->Node(zoneSupPlenCond.InletNode).MassFlowRate,
-                               state.dataLoopNodes->Node(zoneSupPlenCond.InletNode).Temp,
-                               thisZoneHB.MAT,
-                               thisZoneHB.ZoneAirHumRat,
-                               QSensRate);
+        QSensRate = calcZoneSensibleOutput(state.dataLoopNodes->Node(zoneSupPlenCond.InletNode).MassFlowRate,
+                                           state.dataLoopNodes->Node(zoneSupPlenCond.InletNode).Temp,
+                                           thisZoneHB.MAT,
+                                           thisZoneHB.ZoneAirHumRat);
         SumMCpDTsystem += QSensRate;
     }
 

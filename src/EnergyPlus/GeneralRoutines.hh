@@ -242,12 +242,10 @@ void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate,
                                   Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
 );
 
-void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
-                            Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
-                            Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
-                            Real64 const WZone,    // humidity ratio at zone air node
-                            Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
-);
+Real64 calcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
+                              Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
+                              Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
+                              Real64 const WZone);
 
 struct GeneralRoutinesData : BaseGlobalStruct
 {
