@@ -240,8 +240,6 @@ namespace EvaporativeFluidCoolers {
 
         void CalcTwoSpeedEvapFluidCooler(EnergyPlusData &state);
 
-        Real64 SimpleEvapFluidCoolerUAResidual(EnergyPlusData &state, Real64 UA, std::array<Real64, 4> const &Par);
-
         void SimSimpleEvapFluidCooler(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;

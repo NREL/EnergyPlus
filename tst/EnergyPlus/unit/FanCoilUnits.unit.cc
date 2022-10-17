@@ -4452,18 +4452,14 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
 
     int MaxIter = 10;
     int SolFlag = 0;
-    Array1D<Real64> Par(5);
     Real64 CyclingRatio = 1.0;
     // test 1: fan runs continuously at low speed and
     // only heating coil cycles On/Off to meet load
     QZnReq = 2000.0;
-    Par(1) = double(FanCoilNum);
-    Par(2) = 0.0;
-    if (FirstHVACIteration) Par(2) = 1.0;
-    Par(3) = ZoneNum;
-    Par(4) = QZnReq;
-    Par(5) = double(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode);
-    General::SolveRoot(*state, 0.001, MaxIter, SolFlag, CyclingRatio, CalcFanCoilHeatCoilPLRResidual, 0.0, 1.0, Par);
+    auto f = [this, FanCoilNum, FirstHVACIteration, ZoneNum, QZnReq](Real64 const CyclingR) {
+        return CalcFanCoilHeatCoilPLRResidual(*this->state, CyclingR, FanCoilNum, FirstHVACIteration, ZoneNum, QZnReq);
+    };
+    General::SolveRoot(*state, 0.001, MaxIter, SolFlag, CyclingRatio, f, 0.0, 1.0);
     Real64 expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, expectedAirFlowRate);
@@ -4474,13 +4470,10 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     zSysEDemand.RemainingOutputReqToHeatSP = 1000.0;
     zSysEDemand.RemainingOutputRequired = 1000.0;
     QZnReq = 1000.0;
-    Par(1) = double(FanCoilNum);
-    Par(2) = 0.0;
-    if (FirstHVACIteration) Par(2) = 1.0;
-    Par(3) = ZoneNum;
-    Par(4) = QZnReq;
-    Par(5) = double(state->dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode);
-    General::SolveRoot(*state, 0.001, MaxIter, SolFlag, CyclingRatio, CalcFanCoilHeatCoilPLRResidual, 0.0, 1.0, Par);
+    auto f2 = [this, FanCoilNum, FirstHVACIteration, ZoneNum, QZnReq](Real64 const CyclingR) {
+        return CalcFanCoilHeatCoilPLRResidual(*this->state, CyclingR, FanCoilNum, FirstHVACIteration, ZoneNum, QZnReq);
+    };
+    General::SolveRoot(*state, 0.001, MaxIter, SolFlag, CyclingRatio, f2, 0.0, 1.0);
     expectedAirFlowRate = thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio;
     EXPECT_EQ(thisFanCoil.SpeedFanSel, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, expectedAirFlowRate);
