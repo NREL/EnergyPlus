@@ -130,8 +130,6 @@ namespace ChillerElectricASHRAE205 {
 
         void findEvaporatorMassFlowRate(EnergyPlusData &state, Real64 &load, Real64 Cp);
 
-        Real64 findCapacityResidual(EnergyPlusData &, Real64 partLoadSequenceNumber, std::array<Real64, 4> const &par);
-
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad, // operating load
                        bool RunFlag    // TRUE when chiller operating

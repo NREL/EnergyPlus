@@ -14919,7 +14919,6 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
 
     // Using/Aliasing
     using CurveManager::CurveValue;
-    using General::SolveRoot;
     using namespace OutputReportPredefined;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -15157,40 +15156,99 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
         }
 
         TargetNetCapacity = NetCapacityFactorPLTestPoint(PartLoadTestPoint) * NetCoolingCapRated;
-        std::array<Real64, 12> Par; // Parameter array passed to solver
 
-        Par[0] = double(DXCoilNum);
-        Par[1] = TempDryBulb_Leaving_Apoint;
-        Par[2] = TargetNetCapacity;
-        Par[3] = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
-        Par[4] = CoolingCoilInletAirWetBulbTempRated;
-        Par[5] = CoolingCoilInletAirDryBulbTempRated;
-        Par[6] = NetCoolingCapRated;
+        // set up parameters for the solver here
+        Real64 const par3 = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
+        Real64 par7 = FanPowerPerEvapAirFlowRate;
+        int fanInNode = 0;
+        int fanOutNode = 0;
+        Real64 externalStatic = 0.0;
+        int fanIndex = 0;
         if (state.dataDXCoils->DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
-            Par[7] = 0.0;
-            Par[8] = double(FanInletNode);
-            Par[9] = double(FanOutletNode);
-            Par[10] = ExternalStatic;
-            Par[11] = double(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
-        } else {
-            Par[7] = FanPowerPerEvapAirFlowRate;
-            Par[8] = 0.0;
-            Par[9] = 0.0;
-            Par[10] = 0.0;
-            Par[11] = 0.0;
+            par7 = 0.0;
+            fanInNode = FanInletNode;
+            fanOutNode = FanOutletNode;
+            externalStatic = ExternalStatic;
+            fanIndex = state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex;
         }
 
         LowerBoundMassFlowRate = 0.01 * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
+        // OK, so there are two variables here which are const at compile time.  The question is whether compile time data needs to be
+        // explicitly captured in the lambda capture block.
+        // For GCC it currently doesn't mind whether they are captured or not, no warnings.
+        // On Clang, if you list them, there is a compiler warning.
+        // On our version of MSVC, if you take them out, the compiler will fail.  On newer versions, I think it's OK.  Should be soon anyway.
+        // To avoid this, you could pragma away the Clang warning in this section, or tell Clang to hush via compiler flags.  However, to keep things
+        // really simple, I'm just going to use two local variables and capture them instead of the original data.
+        // I'm not sure if there are any more of these instances in the codebase.  If so I am going to tag all of them with CONST_LAMBDA_CAPTURE.
+        Real64 dbRated = CoolingCoilInletAirDryBulbTempRated;
+        Real64 wbRated = CoolingCoilInletAirWetBulbTempRated;
+        auto f =
+            [&state, DXCoilNum, TempDryBulb_Leaving_Apoint, TargetNetCapacity, par3, par7, fanInNode, fanOutNode, externalStatic, dbRated, wbRated](
+                Real64 SupplyAirMassFlowRate) {
+                static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");
+                auto &coil = state.dataDXCoils->DXCoil(DXCoilNum);
+                Real64 AirMassFlowRatio = 0.0;
+                if (coil.RatedAirMassFlowRate(1) > 0.0) {
+                    AirMassFlowRatio = SupplyAirMassFlowRate / coil.RatedAirMassFlowRate(1);
+                }
+                Real64 SupplyAirHumRat = PsyWFnTdbTwbPb(state, dbRated, wbRated, state.dataEnvrn->OutBaroPress, RoutineName);
+                Real64 SupplyAirRho = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, dbRated, SupplyAirHumRat, RoutineName);
+                Real64 SupplyAirVolFlowRate = SupplyAirMassFlowRate / SupplyAirRho;
+
+                Real64 FanHeatCorrection;
+                if (coil.RateWithInternalStaticAndFanObject) {
+                    // modify external static per AHRI 340/360, Table 6, note 1.
+                    Real64 FanStaticPressureRise = coil.InternalStaticPressureDrop + (externalStatic * pow_2(AirMassFlowRatio));
+                    auto &inletNode = state.dataLoopNodes->Node(fanInNode);
+                    auto &outletNode = state.dataLoopNodes->Node(fanOutNode);
+                    inletNode.MassFlowRate = SupplyAirMassFlowRate;
+                    outletNode.MassFlowRate = SupplyAirMassFlowRate;
+                    inletNode.Temp = dbRated;
+                    inletNode.HumRat = PsyWFnTdbTwbPb(state, dbRated, wbRated, state.dataEnvrn->OutBaroPress, RoutineName);
+                    inletNode.Enthalpy = PsyHFnTdbW(dbRated, inletNode.HumRat);
+                    if (coil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
+                        state.dataHVACFan->fanObjs[coil.SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
+                    } else {
+                        Fans::SimulateFanComponents(state, coil.SupplyFanName, true, coil.SupplyFanIndex, _, true, false, FanStaticPressureRise);
+                    }
+                    FanHeatCorrection = SupplyAirMassFlowRate * (outletNode.Enthalpy - inletNode.Enthalpy);
+                } else {
+                    FanHeatCorrection = par7 * SupplyAirVolFlowRate;
+                }
+
+                Real64 TotCapFlowModFac = CurveManager::CurveValue(state, coil.CCapFFlow(1), AirMassFlowRatio);
+                Real64 TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp(1), wbRated, par3);
+                Real64 HighSpeedNetCoolingCap = coil.RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
+
+                TotCapFlowModFac = CurveManager::CurveValue(state, coil.CCapFFlow(1), AirMassFlowRatio);
+                TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp2, wbRated, par3);
+                Real64 LowSpeedNetCoolingCap = coil.RatedTotCap2 * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
+
+                Real64 SpeedRatio;
+                Real64 CycRatio;
+                if (LowSpeedNetCoolingCap <= TargetNetCapacity) {
+                    CycRatio = 1.0;
+                    SpeedRatio = (TargetNetCapacity - LowSpeedNetCoolingCap) / (HighSpeedNetCoolingCap - LowSpeedNetCoolingCap);
+                } else { // minimum unloading limit exceeded for no cycling
+                    SpeedRatio = 0.0;
+                    CycRatio = TargetNetCapacity / LowSpeedNetCoolingCap;
+                }
+
+                coil.InletAirMassFlowRate = SupplyAirMassFlowRate;
+                CalcMultiSpeedDXCoil(state, DXCoilNum, SpeedRatio, CycRatio, true);
+                Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(DXCoilNum);
+                return TempDryBulb_Leaving_Apoint - OutletAirTemp;
+            };
         General::SolveRoot(state,
                            AccuracyTolerance,
                            MaximumIterations,
                            SolverFlag,
                            PartLoadAirMassFlowRate,
-                           CalcTwoSpeedDXCoilIEERResidual,
+                           f,
                            LowerBoundMassFlowRate,
-                           state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1),
-                           Par);
+                           state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1));
 
         if (SolverFlag == -1) {
 
@@ -15538,145 +15596,6 @@ void GetFanIndexForTwoSpeedCoil(
         }
     }
 }
-
-Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
-                                      Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                      std::array<Real64, 12> const &Par   // par(1) = DX coil number
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   July 2012
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (desired outlet temp - actual outlet temp)
-    // Two Speed DX Coil rating for VAV, output depends on the supply air flow rate which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls CalcMultiSpeedDXCoil to get outlet temperature at the given supply flow rate and SpeedRatio
-    // and calculates the residual as defined above
-
-    // Using/Aliasing
-    using CurveManager::CurveValue;
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // par(2) = desired air outlet temperature [C]
-    // par(3) = speed ratio
-    // par(4) = cycling Ratio
-    // par(5) = supply air fan operating mode (ContFanCycCoil)
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");
-    int DXCoilNum;        // index of this coil
-    Real64 OutletAirTemp; // outlet air temperature [C]
-    Real64 TargetCoilLeavingDryBulb;
-    Real64 OutdoorUnitInletDryBulb;
-    Real64 IndoorUnitInletDryBulb;
-    Real64 IndoorUnitInletWetBulb;
-    Real64 AirMassFlowRatio;
-    Real64 SpeedRatio;
-    Real64 CycRatio;
-    Real64 SupplyAirRho;
-    Real64 SupplyAirHumRat;
-    Real64 NetCoolingCapRated;
-    Real64 TargetNetCapacity;
-    Real64 FanPowerPerEvapAirFlowRate;
-    int FanInletNodeNum;
-    int FanOutletNodeNum;
-    int FanIndex;
-    Real64 FanExternalStaticFull;
-    Real64 SupplyAirVolFlowRate;
-    Real64 FanStaticPressureRise;
-    Real64 FanHeatCorrection;
-    Real64 TotCapFlowModFac;
-    Real64 TotCapTempModFac;
-    Real64 HighSpeedNetCoolingCap;
-    Real64 LowSpeedNetCoolingCap;
-
-    DXCoilNum = int(Par[0]);
-    TargetCoilLeavingDryBulb = Par[1];
-    TargetNetCapacity = Par[2];
-    OutdoorUnitInletDryBulb = Par[3];
-    IndoorUnitInletWetBulb = Par[4];
-    IndoorUnitInletDryBulb = Par[5];
-    NetCoolingCapRated = Par[6];
-    FanPowerPerEvapAirFlowRate = Par[7];
-    FanInletNodeNum = int(Par[8]);
-    FanOutletNodeNum = int(Par[9]);
-    FanExternalStaticFull = Par[10];
-    FanIndex = int(Par[11]);
-
-    if (state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1) > 0.0) {
-        AirMassFlowRatio = SupplyAirMassFlowRate / state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
-    } else {
-        AirMassFlowRatio = 0.0;
-    }
-    SupplyAirHumRat = PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, state.dataEnvrn->OutBaroPress, RoutineName);
-    SupplyAirRho = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, IndoorUnitInletDryBulb, SupplyAirHumRat, RoutineName);
-
-    SupplyAirVolFlowRate = SupplyAirMassFlowRate / SupplyAirRho;
-
-    if (state.dataDXCoils->DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
-        // modify external static per AHRI 340/360, Table 6, note 1.
-        FanStaticPressureRise = state.dataDXCoils->DXCoil(DXCoilNum).InternalStaticPressureDrop + (FanExternalStaticFull * pow_2(AirMassFlowRatio));
-        state.dataLoopNodes->Node(FanInletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
-        state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
-        state.dataLoopNodes->Node(FanInletNodeNum).Temp = IndoorUnitInletDryBulb;
-        state.dataLoopNodes->Node(FanInletNodeNum).HumRat =
-            PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, state.dataEnvrn->OutBaroPress, RoutineName);
-        state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy = PsyHFnTdbW(IndoorUnitInletDryBulb, state.dataLoopNodes->Node(FanInletNodeNum).HumRat);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
-        } else {
-            Fans::SimulateFanComponents(state,
-                                        state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
-                                        true,
-                                        state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex,
-                                        _,
-                                        true,
-                                        false,
-                                        FanStaticPressureRise);
-        }
-
-        FanHeatCorrection =
-            SupplyAirMassFlowRate * (state.dataLoopNodes->Node(FanOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(FanInletNodeNum).Enthalpy);
-
-    } else {
-
-        FanHeatCorrection = FanPowerPerEvapAirFlowRate * SupplyAirVolFlowRate;
-    }
-
-    TotCapFlowModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
-    TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1), IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
-    HighSpeedNetCoolingCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
-
-    TotCapFlowModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
-    TotCapTempModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp2, IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
-    LowSpeedNetCoolingCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap2 * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
-
-    if (LowSpeedNetCoolingCap <= TargetNetCapacity) {
-        CycRatio = 1.0;
-        SpeedRatio = (TargetNetCapacity - LowSpeedNetCoolingCap) / (HighSpeedNetCoolingCap - LowSpeedNetCoolingCap);
-    } else { // minimum unloading limit exceeded for no cycling
-        SpeedRatio = 0.0;
-        CycRatio = TargetNetCapacity / LowSpeedNetCoolingCap;
-    }
-
-    state.dataDXCoils->DXCoil(DXCoilNum).InletAirMassFlowRate = SupplyAirMassFlowRate;
-
-    CalcMultiSpeedDXCoil(state, DXCoilNum, SpeedRatio, CycRatio, true);
-    OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(DXCoilNum);
-    Residuum = TargetCoilLeavingDryBulb - OutletAirTemp;
-
-    return Residuum;
-}
-
-// ======================  Utility routines ======================================
 
 void GetDXCoilIndex(EnergyPlusData &state,
                     std::string const &DXCoilName,
@@ -17982,11 +17901,9 @@ void ControlVRFIUCoil(EnergyPlusData &state,
     //       A new physics based VRF model applicable for Fluid Temperature Control.
     //
     // USE STATEMENTS:
-    using General::SolveRoot;
     using Psychrometrics::PsyHFnTdbW;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::array<Real64, 5> Par;     // Parameter array for SolveRoot
     int MaxIter(500);              // Max iteration numbers (-)
     int SolFla;                    // Solving flag for SolveRoot (-)
     int constexpr FlagCoolMode(0); // Flag for cooling mode
@@ -18063,11 +17980,11 @@ void ControlVRFIUCoil(EnergyPlusData &state,
 
         if (QCoilSenCoolingLoad > QinSenMin1) {
             // Increase fan speed to meet room sensible load; SH is not updated
-
-            Par = {QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF};
-
             FanSpdRatioMax = 1.0;
-            SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
+            auto f = [QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF](Real64 FanSpdRto) {
+                return FanSpdResidualCool(FanSpdRto, QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF);
+            };
+            General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, f, FanSpdRatioMin, FanSpdRatioMax);
             if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
             FanSpdRatio = Ratio1;
             CoilOnOffRatio = 1.0;
@@ -18160,12 +18077,11 @@ void ControlVRFIUCoil(EnergyPlusData &state,
 
         if (QCoilSenHeatingLoad > QinSenMin1) {
             // Modulate fan speed to meet room sensible load; SC is not updated
-
-            Par = {QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF};
-
             FanSpdRatioMax = 1.0;
-
-            SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
+            auto f = [QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF](Real64 FanSpdRto) {
+                return FanSpdResidualHeat(FanSpdRto, QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF);
+            };
+            General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, f, FanSpdRatioMin, FanSpdRatioMax);
             // this will likely cause problems eventually, -1 and -2 mean different things
             if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
             FanSpdRatio = Ratio1;
@@ -18406,10 +18322,8 @@ void CalcVRFCoilCapModFac(EnergyPlusData &state,
     }
 }
 
-Real64 FanSpdResidualCool([[maybe_unused]] EnergyPlusData &state,
-                          Real64 const FanSpdRto,          // indoor unit fan speed ratio
-                          std::array<Real64, 5> const &Par // parameters
-)
+Real64 FanSpdResidualCool(
+    Real64 const FanSpdRto, Real64 const QCoilSenCoolingLoad, Real64 const Ts_1, Real64 const Tin, Real64 const Garate, Real64 const BF)
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         Xiufeng Pang (XP)
@@ -18421,37 +18335,17 @@ Real64 FanSpdResidualCool([[maybe_unused]] EnergyPlusData &state,
     //       This is used to modify the fan speed to adjust the coil cooling capacity to match
     //       the zone cooling load.
     //
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 BF;                 // Bypass factor (-)
-    Real64 FanSpdResidualCool; // Modified fan speed ratio to meet actual zone load (-)
-    Real64 Garate;             // Nominal air mass flow rate (m3/s)
-    Real64 TcoilIn;            // Air temperature at indoor coil inlet (C)
-    Real64 Th2;                // Air temperature at the coil surface (C)
-    Real64 TotCap;             // Cooling capacity of the coil (W)
-    Real64 Tout;               // Air temperature at the indoor unit outlet (C)
-    Real64 ZnSenLoad;          // Zone sensible cooling load (W)
-
-    ZnSenLoad = Par[0];
-    Th2 = Par[1];
-    TcoilIn = Par[2];
-    Garate = Par[3];
-    BF = Par[4];
+    Real64 ZnSenLoad = QCoilSenCoolingLoad;
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
-
-    Tout = TcoilIn - (TcoilIn - Th2) * (1 - BF);
-    TotCap = FanSpdRto * Garate * 1005.0 * (TcoilIn - Tout);
-    FanSpdResidualCool = (TotCap - ZnSenLoad) / ZnSenLoad;
-
-    return FanSpdResidualCool;
+    Real64 Tout = Tin - (Tin - Ts_1) * (1 - BF);
+    Real64 TotCap = FanSpdRto * Garate * 1005.0 * (Tin - Tout);
+    return (TotCap - ZnSenLoad) / ZnSenLoad;
 }
 
-Real64 FanSpdResidualHeat([[maybe_unused]] EnergyPlusData &state,
-                          Real64 const FanSpdRto,          // indoor unit fan speed ratio
-                          std::array<Real64, 5> const &Par // parameters
-)
+Real64 FanSpdResidualHeat(Real64 FanSpdRto, Real64 QCoilSenHeatingLoad, Real64 Ts_1, Real64 Tin, Real64 Garate, Real64 BF)
 {
+
     // FUNCTION INFORMATION:
     //       AUTHOR         Xiufeng Pang (XP)
     //       DATE WRITTEN   Mar 2013
@@ -18463,28 +18357,12 @@ Real64 FanSpdResidualHeat([[maybe_unused]] EnergyPlusData &state,
     //       the zone heating load.
     //
 
-    Real64 BF;                 // Bypass factor (-)
-    Real64 FanSpdResidualHeat; // Modified fan speed ratio to meet actual zone load (-)
-    Real64 Garate;             // Nominal air mass flow rate (m3/s)
-    Real64 TcoilIn;            // Air temperature at indoor coil inlet (C)
-    Real64 Th2;                // Air temperature at the coil surface (C)
-    Real64 TotCap;             // Heating capacity of the coil (W)
-    Real64 Tout;               // Air temperature at the indoor unit outlet (C)
-    Real64 ZnSenLoad;          // Zone sensible heating load (W)
-
-    ZnSenLoad = Par[0];
-    Th2 = Par[1];
-    TcoilIn = Par[2];
-    Garate = Par[3];
-    BF = Par[4];
+    Real64 ZnSenLoad = QCoilSenHeatingLoad;
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
-
-    Tout = TcoilIn + (Th2 - TcoilIn) * (1 - BF);
-    TotCap = FanSpdRto * Garate * 1005.0 * (Tout - TcoilIn);
-    FanSpdResidualHeat = (TotCap - ZnSenLoad) / ZnSenLoad;
-
-    return FanSpdResidualHeat;
+    Real64 Tout = Tin + (Ts_1 - Tin) * (1 - BF);
+    Real64 TotCap = FanSpdRto * Garate * 1005.0 * (Tout - Tin);
+    return (TotCap - ZnSenLoad) / ZnSenLoad;
 }
 
 void SetMSHPDXCoilHeatRecoveryFlag(EnergyPlusData &state, int const DXCoilNum)

@@ -702,13 +702,6 @@ namespace DXCoils {
     void GetFanIndexForTwoSpeedCoil(
         EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
 
-    Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
-                                          Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          std::array<Real64, 12> const &Par   // par(1) = DX coil number
-    );
-
-    // ======================  Utility routines ======================================
-
     void GetDXCoilIndex(EnergyPlusData &state,
                         std::string const &DXCoilName,
                         int &DXCoilIndex,
@@ -929,17 +922,9 @@ namespace DXCoils {
                               Real64 &CapModFac               // Coil capacity modification factor
     );
 
-    Real64 FanSpdResidualCool(EnergyPlusData &state,
-                              Real64 FanSpdRto,                // indoor unit fan speed ratio
-                              std::array<Real64, 5> const &Par // array of parameters
-    );
+    Real64 FanSpdResidualCool(Real64 FanSpdRto, Real64 QCoilSenCoolingLoad, Real64 Ts_1, Real64 Tin, Real64 Garate, Real64 BF);
 
-    Real64 FanSpdResidualHeat(EnergyPlusData &state,
-                              Real64 FanSpdRto,                // indoor unit fan speed ratio
-                              std::array<Real64, 5> const &Par // array of parameters
-    );
-    // End of Methods for New VRF Model: Fluid Temperature Control
-    // *****************************************************************************
+    Real64 FanSpdResidualHeat(Real64 FanSpdRto, Real64 QCoilSenHeatingLoad, Real64 Ts_1, Real64 Tin, Real64 Garate, Real64 BF);
 
     void SetMSHPDXCoilHeatRecoveryFlag(EnergyPlusData &state, int const DXCoilNum); // must match coil names for the coil type
 
@@ -1002,52 +987,7 @@ struct DXCoilsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->GetCoilsInputFlag = true;
-        this->MyOneTimeFlag = true;
-        this->CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
-        this->CrankcaseHeaterReportVarFlag = true;
-        this->NumVRFHeatingCoils = 0;
-        this->NumVRFCoolingCoils = 0;
-        this->NumDXCoils = 0;
-        this->NumVRFHeatingFluidTCtrlCoils = 0;
-        this->NumVRFCoolingFluidTCtrlCoils = 0;
-        this->NumDXHeatingCoils = 0;
-        this->NumDoe2DXCoils = 0;
-        this->NumDXHeatPumpWaterHeaterPumpedCoils = 0;
-        this->NumDXHeatPumpWaterHeaterWrappedCoils = 0;
-        this->NumDXMulSpeedCoils = 0;
-        this->NumDXMulModeCoils = 0;
-        this->NumDXMulSpeedCoolCoils = 0;
-        this->NumDXMulSpeedHeatCoils = 0;
-        this->HPWHHeatingCapacity = 0.0;
-        this->HPWHHeatingCOP = 0.0;
-        this->CheckEquipName.deallocate();
-        this->DXCoilOutletTemp.deallocate();
-        this->DXCoilOutletHumRat.deallocate();
-        this->DXCoilPartLoadRatio.deallocate();
-        this->DXCoilFanOpMode.deallocate();
-        this->DXCoilFullLoadOutAirTemp.deallocate();
-        this->DXCoilFullLoadOutAirHumRat.deallocate();
-        this->DXCoilTotalCooling.deallocate();
-        this->DXCoilTotalHeating.deallocate();
-        this->DXCoilCoolInletAirWBTemp.deallocate();
-        this->DXCoilHeatInletAirDBTemp.deallocate();
-        this->DXCoilHeatInletAirWBTemp.deallocate();
-        this->DXCoil.deallocate();
-        this->DXCoilNumericFields.deallocate();
-        this->MyEnvrnFlag.clear();
-        this->MySizeFlag.clear();
-        this->CurrentEndTime = 0.0;
-        this->CalcVRFCoolingCoilCurrentEndTime = 0.0;
-        this->CalcVRFCoolingCoil_FluidTCtrlCurrentEndTime = 0.0;
-        this->NetCoolingCapRated = 0.0;
-        this->EER = 0.0;
-        this->IEER = 0.0;
-        this->TotCapTempModFac = 0.0;
-        this->TotCapFlowModFac = 0.0;
-        this->EIRTempModFac = 0.0;
-        this->EIRFlowModFac = 0.0;
-        this->TempDryBulb_Leaving_Apoint = 0.0;
+        new (this) DXCoilsData();
     }
 };
 
