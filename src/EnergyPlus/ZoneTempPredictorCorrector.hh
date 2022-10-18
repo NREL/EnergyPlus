@@ -225,6 +225,8 @@ namespace ZoneTempPredictorCorrector {
                                  int const zoneNum,
                                  int const spaceNum = 0);
 
+        void calcSpaceSumHat(EnergyPlusData &state, int const zoneNum, int const spaceNum);
+
         void updateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,
                                 bool const UseZoneTimeStepHistory,

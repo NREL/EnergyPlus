@@ -5604,7 +5604,11 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
     assert(zoneNum > 0);
     auto &thisZone = state.dataHeatBal->Zone(zoneNum);
     if (thisZone.NoHeatToReturnAir) {
-        this->SumIntGain += InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, zoneNum, 0);
+        if (spaceNum == 0) {
+            this->SumIntGain += InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, zoneNum, 0);
+        } else {
+            this->SumIntGain = InternalHeatGains::spaceSumAllReturnAirConvectionGains(state, spaceNum, 0);
+        }
     }
 
     // Sum all non-system air flow, i.e. infiltration, simple ventilation, mixing, earth tube: this->SumMCp, this->SumMCpT
@@ -5672,109 +5676,127 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
         this->SumSysMCp /= ZoneMult;
         this->SumSysMCpT /= ZoneMult;
     }
+
+    if (spaceNum > 0) {
+        Real64 spaceFrac = state.dataHeatBal->space(spaceNum).fracZoneVolume;
+        this->SumSysMCp *= spaceFrac;
+        this->SumSysMCpT *= spaceFrac;
+    }
+
     // Sum all surface convection: this->SumHA, this->SumHATsurf, this->SumHATref (and additional contributions to this->SumIntGain)
-    for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-        auto &thisSpace = state.dataHeatBal->space(spaceNum);
-        for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-            Real64 HA = 0.0;
-            Real64 Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
-
-            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-                auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
-
-                // Add to the convective internal gains
-                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
-                    // The shade area covers the area of the glazing plus the area of the dividers.
-                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-                    // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
-                    // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
-                    // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
-                    // at the same time that the interaction between glass and shade is calculated.
-                    this->SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
-                }
-
-                // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL)
-                    this->SumIntGain += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
-
-                // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) this->SumIntGain += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
-
-                // Convective heat gain from airflow window
-                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                    this->SumIntGain += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
-                    if (thisZone.NoHeatToReturnAir) {
-                        this->SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
-                        state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
-                        if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
-                            state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
-                            state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) =
-                                state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-                        } else {
-                            state.dataSurface->SurfWinHeatLossRep(SurfNum) = -state.dataSurface->SurfWinHeatGain(SurfNum);
-                            state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) =
-                                state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-                        }
-                        state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) =
-                            state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-                    }
-                }
-
-                // Add to the surface convection sums
-                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                    // Window frame contribution
-                    Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                         (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)));
-                    this->SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempIn(SurfNum);
-                    HA += HA_surf;
-                }
-
-                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
-                    // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                         (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)));
-                    this->SumHATsurf += HA_surf * state.dataSurface->SurfWinDividerTempIn(SurfNum);
-                    HA += HA_surf;
-                }
-
-            } // End of check if window
-
-            HA += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area;
-            this->SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
-
-            // determine reference air temperature for this surface
-            switch (state.dataSurface->SurfTAirRef(SurfNum)) {
-            case DataSurfaces::RefAirTemp::ZoneMeanAirTemp:
-                // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
-                this->SumHA += HA;
-                break;
-            case DataSurfaces::RefAirTemp::AdjacentAirTemp:
-                this->SumHATref += HA * state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
-                break;
-            case DataSurfaces::RefAirTemp::ZoneSupplyAirTemp:
-                // check whether this zone is a controlled zone or not
-                if (!thisZone.IsControlled) {
-                    ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + thisZone.Name);
-                    return;
-                }
-                // determine supply air temperature as a weighted average of the inlet temperatures.
-                if (this->SumSysMCp > 0.0) {
-                    this->SumHATref += HA * this->SumSysMCpT / this->SumSysMCp;
-                } else {
-                    // no system flow (yet) so just use zone air temperature #5906
-                    this->SumHA += HA;
-                }
-                break;
-            default:
-                // currently set to mean air temp but should add error warning here
-                this->SumHA += HA;
-                break;
-            }
-
-        } // SurfNum
+    if (spaceNum > 0) {
+        this->calcSpaceSumHat(state, zoneNum, spaceNum);
+    } else {
+        for (int zoneSpaceNum : thisZone.spaceIndexes) {
+            this->calcSpaceSumHat(state, zoneNum, zoneSpaceNum);
+        }
     }
 }
 
+void ZoneSpaceHeatBalanceData::calcSpaceSumHat(EnergyPlusData &state, int const zoneNum, int const spaceNum)
+{
+    assert(zoneNum > 0);
+    assert(spaceNum > 0);
+    auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+    for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+        Real64 HA = 0.0;
+        Real64 Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
+
+        if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
+            auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
+
+            // Add to the convective internal gains
+            if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
+                // The shade area covers the area of the glazing plus the area of the dividers.
+                Area += state.dataSurface->SurfWinDividerArea(SurfNum);
+                // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
+                // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
+                // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
+                // at the same time that the interaction between glass and shade is calculated.
+                this->SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
+            }
+
+            // Other convection term is applicable to equivalent layer window (ASHWAT) model
+            if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL)
+                this->SumIntGain += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
+
+            // Convective heat gain from natural convection in gap between glass and interior shade or blind
+            if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) this->SumIntGain += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
+
+            // Convective heat gain from airflow window
+            if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                this->SumIntGain += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
+                if (thisZone.NoHeatToReturnAir) {
+                    this->SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                    state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                    if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
+                        state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
+                        state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) =
+                            state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                    } else {
+                        state.dataSurface->SurfWinHeatLossRep(SurfNum) = -state.dataSurface->SurfWinHeatGain(SurfNum);
+                        state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) =
+                            state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                    }
+                    state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) =
+                        state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                }
+            }
+
+            // Add to the surface convection sums
+            if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
+                // Window frame contribution
+                Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                     (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)));
+                this->SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempIn(SurfNum);
+                HA += HA_surf;
+            }
+
+            if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
+                // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
+                Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                     (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)));
+                this->SumHATsurf += HA_surf * state.dataSurface->SurfWinDividerTempIn(SurfNum);
+                HA += HA_surf;
+            }
+
+        } // End of check if window
+
+        HA += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area;
+        this->SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
+
+        // determine reference air temperature for this surface
+        switch (state.dataSurface->SurfTAirRef(SurfNum)) {
+        case DataSurfaces::RefAirTemp::ZoneMeanAirTemp:
+            // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
+            this->SumHA += HA;
+            break;
+        case DataSurfaces::RefAirTemp::AdjacentAirTemp:
+            this->SumHATref += HA * state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
+            break;
+        case DataSurfaces::RefAirTemp::ZoneSupplyAirTemp:
+            // check whether this zone is a controlled zone or not
+            if (!thisZone.IsControlled) {
+                ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + thisZone.Name);
+                return;
+            }
+            // determine supply air temperature as a weighted average of the inlet temperatures.
+            if (this->SumSysMCp > 0.0) {
+                this->SumHATref += HA * this->SumSysMCpT / this->SumSysMCp;
+            } else {
+                // no system flow (yet) so just use zone air temperature #5906
+                this->SumHA += HA;
+            }
+            break;
+        default:
+            // currently set to mean air temp but should add error warning here
+            this->SumHA += HA;
+            break;
+        }
+
+    } // SurfNum
+}
 void CalcZoneComponentLoadSums(EnergyPlusData &state,
                                int const ZoneNum,        // Zone number
                                Real64 const TempDepCoef, // Dependent coefficient
