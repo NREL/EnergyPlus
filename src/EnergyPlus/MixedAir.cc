@@ -4735,13 +4735,13 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
 
                 auto f = [&state, this](Real64 const OASignal) {
                     using Psychrometrics::PsyTdbFnHW;
-                    Real64 OAMassFlowRate{};     // outside air mass flow rate [kg/s]
-                    Real64 RecircMassFlowRate{}; // recirculated air mass flow rate [kg/s]
-                    Real64 RecircEnth{};         // recirculated air specific enthalpy [J/kg]
-                    Real64 RecircHumRat{};       // recirculated air humidity ratio [kg water/kg dry air]
-                    Real64 MixEnth{};            // mixed air specific enthalpy [J/kg]
-                    Real64 MixHumRat{};          // mixed air humidity ratio [kg water/kg dry air]
-                    Real64 MixTemp{};            // mixed air temperature [C]
+                    Real64 OAMassFlowRate = 0.0;     // outside air mass flow rate [kg/s]
+                    Real64 RecircMassFlowRate = 0.0; // recirculated air mass flow rate [kg/s]
+                    Real64 RecircEnth = 0.0;         // recirculated air specific enthalpy [J/kg]
+                    Real64 RecircHumRat = 0.0;       // recirculated air humidity ratio [kg water/kg dry air]
+                    Real64 MixEnth = 0.0;            // mixed air specific enthalpy [J/kg]
+                    Real64 MixHumRat = 0.0;          // mixed air humidity ratio [kg water/kg dry air]
+                    Real64 MixTemp = 0.0;            // mixed air temperature [C]
                     int MixNode = this->MixNode;
                     int RetNode = this->RetNode;
                     int OANode = this->InletNode;

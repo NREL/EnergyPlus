@@ -1475,7 +1475,7 @@ namespace WaterToAirHeatPump {
 
                     auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp) {
                         static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
-                        std::string Refrigerant{}; // Name of refrigerant
+                        std::string Refrigerant; // Name of refrigerant
                         int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
                         Real64 compSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
                         return (compSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
@@ -1950,7 +1950,7 @@ namespace WaterToAirHeatPump {
 
                 auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp) {
                     static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
-                    std::string Refrigerant{}; // Name of refrigerant
+                    std::string Refrigerant; // Name of refrigerant
                     int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
                     Real64 compSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
                     return (compSuctionEnth - SuperHeatEnth) / SuperHeatEnth;

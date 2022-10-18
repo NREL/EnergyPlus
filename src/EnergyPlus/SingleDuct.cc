@@ -4803,7 +4803,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
             Real64 MinHWFlow = (HCType == HeatingCoilType::SteamAirHeating) ? MinFlowSteam : MinFlowWater;
 
             auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MinHWFlow, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
-                Real64 UnitOutput{}; // cooling output [W] (cooling is negative)
+                Real64 UnitOutput = 0.0; // cooling output [W] (cooling is negative)
 
                 state.dataSingleDuct->sd_airterminal(this->SysNum)
                     .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
@@ -4889,7 +4889,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 // set hot water flow to max and vary the supply air flow rate
                 FanOp = 1;
                 auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
-                    Real64 UnitOutput{}; // heating output [W]
+                    Real64 UnitOutput = 0.0; // heating output [W]
                     state.dataSingleDuct->sd_airterminal(this->SysNum)
                         .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
 
@@ -4934,8 +4934,8 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                           MinFlowSteam,
                           MaxFlowSteam,
                           MaxSteamCap](Real64 const HWMassFlow) {
-                    Real64 UnitOutput{}; // heating output [W]
-                    Real64 QSteamLoad{}; // proportional load to calculate steam flow [W]
+                    Real64 UnitOutput = 0.0; // heating output [W]
+                    Real64 QSteamLoad = 0.0; // proportional load to calculate steam flow [W]
 
                     // vary the load to be met by the steam coil to converge on a steam flow rate to meet the load
                     //   backwards way of varying steam flow rate. Steam coil calculates a flow rate to meet a load.
@@ -4967,7 +4967,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 FanOp = 1;
 
                 auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
-                    Real64 UnitOutput{}; // heating output [W]
+                    Real64 UnitOutput = 0.0; // heating output [W]
 
                     state.dataSingleDuct->sd_airterminal(this->SysNum)
                         .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
