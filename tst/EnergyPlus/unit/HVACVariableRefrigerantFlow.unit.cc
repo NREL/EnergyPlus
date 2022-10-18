@@ -2832,7 +2832,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).SH, 3);
 }
 //
-//TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
+// TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
 //{
 //    // PURPOSE OF THIS SUBROUTINE:
 //    //  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
