@@ -5691,12 +5691,12 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
     }
 
     // Sum all surface convection: this->SumHA, this->SumHATsurf, this->SumHATref (and additional contributions to this->SumIntGain)
-    SumHATOutput outputVal;
-    outputVal = this->calcSumHAT(state, zoneNum, spaceNum);
-    this->SumIntGain += outputVal.sumIntGain;
-    this->SumHA += outputVal.sumHA;
-    this->SumHATsurf += outputVal.sumHATsurf;
-    this->SumHATref += outputVal.sumHATref;
+    SumHATOutput sumHATResults; // space or zone return values
+    sumHATResults = this->calcSumHAT(state, zoneNum, spaceNum);
+    this->SumIntGain += sumHATResults.sumIntGain;
+    this->SumHA += sumHATResults.sumHA;
+    this->SumHATsurf += sumHATResults.sumHATsurf;
+    this->SumHATref += sumHATResults.sumHATref;
 }
 
 SumHATOutput ZoneSpaceHeatBalanceData::calcSumHAT(EnergyPlusData &state, [[maybe_unused]] int const zoneNum, [[maybe_unused]] int const spaceNum)
@@ -5710,9 +5710,9 @@ SumHATOutput ZoneHeatBalanceData::calcSumHAT(EnergyPlusData &state, int const zo
 {
     assert(zoneNum > 0);
     assert(spaceNum == 0);
-    SumHATOutput zoneResults;
+    SumHATOutput zoneResults; // zone-level return values
     for (int zoneSpaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-        SumHATOutput spaceResults;
+        SumHATOutput spaceResults; // temporary return value from space-level calcSumHAT
         spaceResults = state.dataZoneTempPredictorCorrector->spaceHeatBalance(zoneSpaceNum).calcSumHAT(state, zoneNum, zoneSpaceNum);
         zoneResults.sumIntGain += spaceResults.sumIntGain;
         zoneResults.sumHA += spaceResults.sumHA;
@@ -5728,14 +5728,14 @@ SumHATOutput SpaceHeatBalanceData::calcSumHAT(EnergyPlusData &state, int const z
     assert(spaceNum > 0);
     auto &thisZone = state.dataHeatBal->Zone(zoneNum);
     auto &thisSpace = state.dataHeatBal->space(spaceNum);
-    SumHATOutput results;
+    SumHATOutput results; // space-level return values
 
     for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
         Real64 HA = 0.0;
         Real64 Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
 
         if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-            auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
+            DataSurfaces::WinShadingType const shading_flag = state.dataSurface->SurfWinShadingFlag(SurfNum);
 
             // Add to the convective internal gains
             if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
