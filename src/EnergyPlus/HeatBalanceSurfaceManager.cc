@@ -2127,7 +2127,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         state.dataHeatBal->ZoneMRT(zoneNum) = DataHeatBalFanSys::ZoneInitialTemp; // module level array
         // TODO: Reinitializing this entire stuct may cause diffs
-        new (&state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum)) ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData();
+        new (&state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum)) ZoneTempPredictorCorrector::ZoneHeatBalanceData();
         // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
         thisZoneHB.ZoneAirHumRatAvg = state.dataEnvrn->OutHumRat;
@@ -2137,7 +2137,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     }
     // Reset spaceHeatBalance even if doSpaceHeatBalance is false, beause spaceHB is used to gether zoneHB
     for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
-        new (&thisSpaceHB) ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData();
+        new (&thisSpaceHB) ZoneTempPredictorCorrector::SpaceHeatBalanceData();
     }
 
     // "Bulk" initializations of arrays sized to TotSurfaces

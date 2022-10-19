@@ -134,8 +134,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataHeatBalFanSys->SumLatentPool.allocate(1);
     state->dataHeatBalFanSys->SumLatentPool(1) = 0.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1); // Zone temperature C
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
     thisZoneHB.ZT = 24.0;
 
@@ -477,6 +477,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(state->dataZoneCtrls->NumTempControlledZones);
@@ -948,7 +949,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_calcZoneOrSpaceSums_SurfCon
     state->dataHeatBal->ZoneIntGain.allocate(ZoneNum);
     state->dataHeatBalFanSys->SumConvHTRadSys.allocate(ZoneNum);
     state->dataHeatBalFanSys->SumConvPool.allocate(ZoneNum);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(ZoneNum);
 
     state->dataHeatBalFanSys->SumConvHTRadSys(1) = 0.0;
     state->dataHeatBalFanSys->SumConvPool(1) = 0.0;
@@ -982,7 +982,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_calcZoneOrSpaceSums_SurfCon
     state->dataHeatBalFanSys->SumLatentPool.allocate(1);
     state->dataHeatBalFanSys->SumLatentPool(1) = 0.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1); // Zone temperature C
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
     thisZoneHB.MAT = 24.0;
     thisZoneHB.ZoneAirHumRat = 0.001;
@@ -1211,10 +1212,8 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     // SingleHeatingSetPoint
     state->dataZoneCtrls->TempControlledZone.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
@@ -1239,11 +1238,13 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating.allocate(1);
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).AirPowerCap = 2000;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempDepZnLd = 1.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempIndZnLd = 1.0;
-
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    thisZoneHB.AirPowerCap = 2000;
+    thisZoneHB.TempDepZnLd = 1.0;
+    thisZoneHB.TempIndZnLd = 1.0;
+
     thisZoneHB.MAT = 20.0;
     thisZoneHB.ZoneT1 = thisZoneHB.MAT;
     state->dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
@@ -1341,10 +1342,8 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     // SingleHeatingSetPoint
     state->dataZoneCtrls->TempControlledZone.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
@@ -1369,11 +1368,13 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating.allocate(1);
     state->dataZoneTempPredictorCorrector->SetPointSingleHeating(1).TempSchedIndex = 3;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).AirPowerCap = 2000;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempDepZnLd = 1.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).TempIndZnLd = 1.0;
-
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    thisZoneHB.AirPowerCap = 2000;
+    thisZoneHB.TempDepZnLd = 1.0;
+    thisZoneHB.TempIndZnLd = 1.0;
+
     thisZoneHB.MAT = 20.0;
     thisZoneHB.XMPT = 23.0;
     state->dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;

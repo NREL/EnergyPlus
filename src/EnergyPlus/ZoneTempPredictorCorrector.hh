@@ -104,6 +104,15 @@ namespace ZoneTempPredictorCorrector {
         Array1D<Real64> ThermalComfortAdaptiveCEN15251_Central;
     };
 
+    struct SumHATOutput
+    {
+        // Output results from calSumHAT
+        Real64 sumIntGain = 0.0;
+        Real64 sumHA = 0.0;
+        Real64 sumHATsurf = 0.0;
+        Real64 sumHATref = 0.0;
+    };
+
     struct ZoneSpaceHeatBalanceData
     {
         // This entire struct is re-initialized during the simulation, so no static informat may be stored here (e.g. zone or space characteristics)
@@ -225,7 +234,7 @@ namespace ZoneTempPredictorCorrector {
                                  int const zoneNum,
                                  int const spaceNum = 0);
 
-        void calcSpaceSumHat(EnergyPlusData &state, int const zoneNum, int const spaceNum);
+        virtual SumHATOutput calcSumHAT(EnergyPlusData &state, [[maybe_unused]] int const zoneNum, [[maybe_unused]] int const spaceNum) = 0;
 
         void updateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,
@@ -240,6 +249,16 @@ namespace ZoneTempPredictorCorrector {
                               int const spaceNum = 0);
 
         void calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum = 0);
+    };
+
+    struct ZoneHeatBalanceData : ZoneSpaceHeatBalanceData
+    {
+        SumHATOutput calcSumHAT(EnergyPlusData &state, int const zoneNum, [[maybe_unused]] int const spaceNum) override;
+    };
+
+    struct SpaceHeatBalanceData : ZoneSpaceHeatBalanceData
+    {
+        SumHATOutput calcSumHAT(EnergyPlusData &state, int const zoneNum, int const spaceNum) override;
     };
 
     // Functions
@@ -435,8 +454,8 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
     int IterLimitExceededNum2 = 0;
     int IterLimitErrIndex2 = 0;
 
-    EPVector<ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData> zoneHeatBalance;
-    EPVector<ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData> spaceHeatBalance;
+    EPVector<ZoneTempPredictorCorrector::ZoneHeatBalanceData> zoneHeatBalance;
+    EPVector<ZoneTempPredictorCorrector::SpaceHeatBalanceData> spaceHeatBalance;
 
     void clear_state() override
     {

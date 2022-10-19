@@ -104,7 +104,6 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHybridModel->HybridModelZone.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataRoomAirMod->ZTOC.allocate(1);
     state->dataRoomAirMod->ZTMX.allocate(1);
     state->dataRoomAirMod->ZTM1MX.allocate(1);
@@ -112,8 +111,6 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->PreviousMeasuredZT1.allocate(1);
     state->dataHeatBalFanSys->PreviousMeasuredZT2.allocate(1);
     state->dataHeatBalFanSys->PreviousMeasuredZT3.allocate(1);
@@ -147,6 +144,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBalFanSys->SumConvPool.allocate(1);
     state->dataHeatBalFanSys->SumConvPool(1) = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
     thisZoneHB.MixingMassFlowXHumRat = 0.0;
     thisZoneHB.MixingMassFlowZone = 0.0;
@@ -486,8 +484,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataHeatBalFanSys->PreviousMeasuredZT1.allocate(1);
     state->dataHeatBalFanSys->PreviousMeasuredZT2.allocate(1);
     state->dataHeatBalFanSys->PreviousMeasuredZT3.allocate(1);
@@ -513,6 +509,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // CorrectZoneContaminants variable initialization
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
     thisZoneHB.MixingMassFlowZone = 0.0;
     thisZoneHB.ZT = 0.0;
