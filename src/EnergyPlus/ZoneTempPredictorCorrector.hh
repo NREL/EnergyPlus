@@ -123,7 +123,9 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZT = DataHeatBalFanSys::ZoneInitialTemp;       // Air Temperature Averaged over the System Time Increment
         Real64 ZTAVComf = DataHeatBalFanSys::ZoneInitialTemp; // Air Temperature Averaged over the Zone Time step used
         // in thermal comfort models (currently Fang model only)
-        Real64 XMAT = DataHeatBalFanSys::ZoneInitialTemp; // Temporary zone/space temperature to test convergence
+        Real64 MixingMAT = DataHeatBalFanSys::ZoneInitialTemp; // Air temperature for mixing
+        Real64 MixingHumRat = 0.01;                            // Air humidity ratio for mixing
+        Real64 XMAT = DataHeatBalFanSys::ZoneInitialTemp;      // Temporary zone/space temperature to test convergence
         Real64 XM2T = DataHeatBalFanSys::ZoneInitialTemp;
         Real64 XM3T = DataHeatBalFanSys::ZoneInitialTemp;
         Real64 XM4T = DataHeatBalFanSys::ZoneInitialTemp;
