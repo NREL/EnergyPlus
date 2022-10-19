@@ -155,6 +155,143 @@ enum class RptKey
 constexpr std::array<std::string_view, static_cast<int>(RptKey::Num)> RptKeyNamesUC{
     "COSTINFO", "DXF", "DXF:WIREFRAME", "VRML", "VERTICES", "DETAILS", "DETAILSWITHVERTICES", "LINES"};
 
+// A second version that does not require a payload -- use lambdas
+void SolveRoot(EnergyPlusData &state,
+               Real64 Eps,   // required absolute accuracy
+               int MaxIte,   // maximum number of allowed iterations
+               int &Flag,    // integer storing exit status
+               Real64 &XRes, // value of x that solves f(x,Par) = 0
+               const std::function<Real64(Real64)> &f,
+               Real64 X_0, // 1st bound of interval that contains the solution
+               Real64 X_1) // 2nd bound of interval that contains the solution
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Michael Wetter
+    //       DATE WRITTEN   March 1999
+    //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+    //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Find the value of x between x0 and x1 such that f(x,Par)
+    // is equal to zero.
+
+    // METHODOLOGY EMPLOYED:
+    // Uses the Regula Falsi (false position) method (similar to secant method)
+
+    // REFERENCES:
+    // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+    // 2nd edition, 1992. Page 347 ff.
+
+    // SUBROUTINE ARGUMENT DEFINITIONS:
+    // = -2: f(x0) and f(x1) have the same sign
+    // = -1: no convergence
+    // >  0: number of iterations performed
+
+    Real64 constexpr SMALL(1.e-10);
+    Real64 X0 = X_0;   // present 1st bound
+    Real64 X1 = X_1;   // present 2nd bound
+    Real64 XTemp = X0; // new estimate
+    int NIte = 0;      // number of interations
+    int AltIte = 0;    // an accounter used for Alternation choice
+
+    Real64 Y0 = f(X0); // f at X0
+    Real64 Y1 = f(X1); // f at X1
+    // check initial values
+    if (Y0 * Y1 > 0) {
+        Flag = -2;
+        XRes = X0;
+        return;
+    }
+    XRes = XTemp;
+
+    while (true) {
+
+        Real64 DY = Y0 - Y1;
+        if (std::abs(DY) < SMALL) DY = SMALL;
+        if (std::abs(X1 - X0) < SMALL) {
+            break;
+        }
+        // new estimation
+        switch (state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver) {
+        case HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+            XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::Bisection: {
+            XTemp = (X1 + X0) / 2.0;
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+            if (NIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+            if (NIte <= state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        case HVACSystemRootSolverAlgorithm::Alternation: {
+            if (AltIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
+                XTemp = (X1 + X0) / 2.0;
+                if (AltIte >= 2 * state.dataRootFinder->HVACSystemRootFinding.NumOfIter) AltIte = 0;
+            } else {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            break;
+        }
+        default: {
+            XTemp = (Y0 * X1 - Y1 * X0) / DY;
+        }
+        }
+
+        Real64 const YTemp = f(XTemp);
+
+        ++NIte;
+        ++AltIte;
+
+        // check convergence
+        if (std::abs(YTemp) < Eps) {
+            Flag = NIte;
+            XRes = XTemp;
+            return;
+        };
+
+        // OK, so we didn't converge, lets check max iterations to see if we should break early
+        if (NIte > MaxIte) break;
+
+        // Finally, if we make it here, we have not converged, and we still have iterations left, so continue
+        // and reassign values (only if further iteration required)
+        if (Y0 < 0.0) {
+            if (YTemp < 0.0) {
+                X0 = XTemp;
+                Y0 = YTemp;
+            } else {
+                X1 = XTemp;
+                Y1 = YTemp;
+            }
+        } else {
+            if (YTemp < 0.0) {
+                X1 = XTemp;
+                Y1 = YTemp;
+            } else {
+                X0 = XTemp;
+                Y0 = YTemp;
+            }
+        } // ( Y0 < 0 )
+    }     // Cont
+
+    // if we make it here we haven't converged, so just set the flag and leave
+    Flag = -1;
+    XRes = XTemp;
+}
+
 Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
                      Array1S<Real64> const PropArray // Array of blind properties
 )
@@ -421,44 +558,22 @@ std::string &strip_trailing_zeros(std::string &InputString)
     return InputString; // Allows chaining
 }
 
-void MovingAvg(Array1A<Real64> const DataIn, // input data that needs smoothing
-               int const NumDataItems,       // number of values in DataIn
-               int const NumItemsInAvg,      // number of items in the averaging window
-               Array1A<Real64> SmoothedData  // output data after smoothing
-)
+void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
+    if (NumItemsInAvg <= 1) return; // no need to average/smooth
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   January 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+    Array1D<Real64> TempData(2 * DataIn.size()); // a scratch array twice the size, bottom end duplicate of top end
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // Smooth the data in the 1-d array DataIn by averaging over a window NumItemsInAvg
-    // wide. Return the results in the 1-d array SmoothedData
-
-    // METHODOLOGY EMPLOYED:
-    // Note that DataIn and SmoothedData should have the same size. This is the reponsibility
-    // of the calling routine. NumItemsInAvg should be no bigger than the size of DataIn.
-
-    // Argument array dimensioning
-    DataIn.dim(NumDataItems);
-    SmoothedData.dim(NumDataItems);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array1D<Real64> TempData(3 * NumDataItems); // a scratch array
-
-    for (int i = 1; i <= NumDataItems; ++i) {
-        TempData(i) = TempData(NumDataItems + i) = TempData(2 * NumDataItems + i) = DataIn(i);
-        SmoothedData(i) = 0.0;
+    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
+        TempData(i) = TempData(DataIn.size() + i) = DataIn(i); // initialize both bottom and top end
+        DataIn(i) = 0.0;
     }
 
-    for (int i = 1; i <= NumDataItems; ++i) {
+    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
         for (int j = 1; j <= NumItemsInAvg; ++j) {
-            SmoothedData(i) += TempData(NumDataItems + i - NumItemsInAvg + j);
+            DataIn(i) += TempData(DataIn.size() - NumItemsInAvg + i + j); // sum top end including NumItemsInAvg history terms
         }
-        SmoothedData(i) /= double(NumItemsInAvg);
+        DataIn(i) /= NumItemsInAvg; // average to smooth over NumItemsInAvg window
     }
 }
 

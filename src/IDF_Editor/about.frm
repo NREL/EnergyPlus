@@ -81,7 +81,7 @@ Begin VB.Form About
       Begin VB.Label lblVersion 
          Alignment       =   1  'Right Justify
          AutoSize        =   -1  'True
-         Caption         =   "Version 1.52"
+         Caption         =   "Version 1.53"
          BeginProperty Font 
             Name            =   "Arial"
             Size            =   12
@@ -259,6 +259,3 @@ End Sub
 '
 '     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 '
-Private Sub lblVersion_Click()
-
-End Sub

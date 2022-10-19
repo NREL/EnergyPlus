@@ -1230,6 +1230,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         ihp.SCCoilType = "COIL:COOLING:DX:VARIABLESPEED";
         ihp.SCCoilName = AlphArray(3);
+        ihp.SCCoilTypeNum = DataLoopNode::ConnectionObjectType::CoilCoolingDXVariableSpeed;
 
         ValidateComponent(state, ihp.SCCoilType, ihp.SCCoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1246,6 +1247,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         ihp.SHCoilType = "COIL:HEATING:DX:VARIABLESPEED";
         ihp.SHCoilName = AlphArray(4);
+        ihp.SHCoilTypeNum = DataLoopNode::ConnectionObjectType::CoilHeatingDXVariableSpeed;
 
         ValidateComponent(state, ihp.SHCoilType, ihp.SHCoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1262,6 +1264,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         ihp.DWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
         ihp.DWHCoilName = AlphArray(5);
+        ihp.DWHCoilTypeNum = DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpVariableSpeed;
 
         ValidateComponent(state, ihp.DWHCoilType, ihp.DWHCoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1278,6 +1281,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         ihp.SCWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
         ihp.SCWHCoilName = AlphArray(6);
+        ihp.SCWHCoilTypeNum = DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpVariableSpeed;
 
         ValidateComponent(state, ihp.SCWHCoilType, ihp.SCWHCoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1294,6 +1298,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         ihp.SCDWHCoolCoilType = "COIL:COOLING:DX:VARIABLESPEED";
         ihp.SCDWHCoolCoilName = AlphArray(7);
+        ihp.SCDWHCoolCoilTypeNum = DataLoopNode::ConnectionObjectType::CoilCoolingDXVariableSpeed;
 
         ValidateComponent(state, ihp.SCDWHCoolCoilType, ihp.SCDWHCoolCoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1310,6 +1315,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         ihp.SCDWHWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
         ihp.SCDWHWHCoilName = AlphArray(8);
+        ihp.SCDWHWHCoilTypeNum = DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpVariableSpeed;
 
         ValidateComponent(state, ihp.SCDWHWHCoilType, ihp.SCDWHWHCoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1328,6 +1334,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         ihp.SHDWHHeatCoilType = "COIL:HEATING:DX:VARIABLESPEED";
         ihp.SHDWHHeatCoilName = AlphArray(9);
+        ihp.SHDWHHeatCoilTypeNum = DataLoopNode::ConnectionObjectType::CoilHeatingDXVariableSpeed;
 
         ValidateComponent(state, ihp.SHDWHHeatCoilType, ihp.SHDWHHeatCoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1344,6 +1351,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         ihp.SHDWHWHCoilType = "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
         ihp.SHDWHWHCoilName = AlphArray(10);
+        ihp.SHDWHWHCoilTypeNum = DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpVariableSpeed;
 
         ValidateComponent(state, ihp.SHDWHWHCoilType, ihp.SHDWHWHCoilName, IsNotOK, CurrentModuleObject);
         if (IsNotOK) {
@@ -1417,7 +1425,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SCCoilType,
+                                   ihp.SCCoilTypeNum,
                                    ihp.SCCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1426,7 +1434,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SCCoilType,
+                                   ihp.SCCoilTypeNum,
                                    ihp.SCCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1442,7 +1450,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SCWHCoilType,
+                                   ihp.SCWHCoilTypeNum,
                                    ihp.SCWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1451,7 +1459,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SCWHCoilType,
+                                   ihp.SCWHCoilTypeNum,
                                    ihp.SCWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1467,7 +1475,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SCDWHCoolCoilType,
+                                   ihp.SCDWHCoolCoilTypeNum,
                                    ihp.SCDWHCoolCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1476,7 +1484,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SCDWHCoolCoilType,
+                                   ihp.SCDWHCoolCoilTypeNum,
                                    ihp.SCDWHCoolCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1520,7 +1528,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SHCoilType,
+                                   ihp.SHCoilTypeNum,
                                    ihp.SHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1529,7 +1537,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SHCoilType,
+                                   ihp.SHCoilTypeNum,
                                    ihp.SHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1546,7 +1554,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SHDWHHeatCoilType,
+                                   ihp.SHDWHHeatCoilTypeNum,
                                    ihp.SHDWHHeatCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1555,7 +1563,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SHDWHHeatCoilType,
+                                   ihp.SHDWHHeatCoilTypeNum,
                                    ihp.SHDWHHeatCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1601,7 +1609,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SCWHCoilType,
+                                   ihp.SCWHCoilTypeNum,
                                    ihp.SCWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
@@ -1610,7 +1618,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SCWHCoilType,
+                                   ihp.SCWHCoilTypeNum,
                                    ihp.SCWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
@@ -1621,7 +1629,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SCDWHWHCoilType,
+                                   ihp.SCDWHWHCoilTypeNum,
                                    ihp.SCDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
@@ -1630,7 +1638,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SCDWHWHCoilType,
+                                   ihp.SCDWHWHCoilTypeNum,
                                    ihp.SCDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
@@ -1646,7 +1654,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SHDWHWHCoilType,
+                                   ihp.SHDWHWHCoilTypeNum,
                                    ihp.SHDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
@@ -1655,7 +1663,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SHDWHWHCoilType,
+                                   ihp.SHDWHWHCoilTypeNum,
                                    ihp.SHDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
@@ -1671,7 +1679,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.DWHCoilType,
+                                   ihp.DWHCoilTypeNum,
                                    ihp.DWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
@@ -1680,7 +1688,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.DWHCoilType,
+                                   ihp.DWHCoilTypeNum,
                                    ihp.DWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
@@ -1736,7 +1744,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.DWHCoilType,
+                                   ihp.DWHCoilTypeNum,
                                    ihp.DWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1745,7 +1753,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.DWHCoilType,
+                                   ihp.DWHCoilTypeNum,
                                    ihp.DWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1756,7 +1764,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SCDWHWHCoilType,
+                                   ihp.SCDWHWHCoilTypeNum,
                                    ihp.SCDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1765,7 +1773,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SCDWHWHCoilType,
+                                   ihp.SCDWHWHCoilTypeNum,
                                    ihp.SCDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1785,7 +1793,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    InNode,
                                    InNodeName,
-                                   ihp.SHDWHWHCoilType,
+                                   ihp.SHDWHWHCoilTypeNum,
                                    ihp.SHDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
@@ -1794,7 +1802,7 @@ void GetIHPInput(EnergyPlusData &state)
         OverrideNodeConnectionType(state,
                                    OutNode,
                                    OutNodeName,
-                                   ihp.SHDWHWHCoilType,
+                                   ihp.SHDWHWHCoilTypeNum,
                                    ihp.SHDWHWHCoilName,
                                    DataLoopNode::ConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,

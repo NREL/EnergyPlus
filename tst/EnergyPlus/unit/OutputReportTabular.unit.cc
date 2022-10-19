@@ -6285,6 +6285,9 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->TotElecEquip = 3;
     state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
+    state->dataHeatBal->TotITEquip = 3;
+    state->dataHeatBal->ZoneITEq.allocate(state->dataHeatBal->TotITEquip);
+
     state->dataHeatBal->Lights(1).ZonePtr = 1;
     state->dataHeatBal->Lights(1).spaceIndex = 1;
     state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
@@ -6314,6 +6317,16 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
     state->dataHeatBal->ZoneElectric(3).spaceIndex = 3;
     state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
+
+    state->dataHeatBal->ZoneITEq(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneITEq(1).spaceIndex = 1;
+    state->dataHeatBal->ZoneITEq(1).DesignTotalPower = 750.0;
+    state->dataHeatBal->ZoneITEq(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneITEq(2).spaceIndex = 2;
+    state->dataHeatBal->ZoneITEq(2).DesignTotalPower = 300.0;
+    state->dataHeatBal->ZoneITEq(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneITEq(3).spaceIndex = 3;
+    state->dataHeatBal->ZoneITEq(3).DesignTotalPower = 150.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
@@ -6460,20 +6473,33 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 
         {state->dataHeatBal->Zone(1).Name,
          "Plug and Process",
-         state->dataHeatBal->ZoneElectric(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
+         (state->dataHeatBal->ZoneElectric(1).DesignLevel + state->dataHeatBal->ZoneITEq(1).DesignTotalPower) /
+             state->dataHeatBal->Zone(1).FloorArea},
         {state->dataHeatBal->Zone(2).Name,
          "Plug and Process",
-         state->dataHeatBal->ZoneElectric(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
+         (state->dataHeatBal->ZoneElectric(2).DesignLevel + state->dataHeatBal->ZoneITEq(2).DesignTotalPower) /
+             state->dataHeatBal->Zone(2).FloorArea},
         {state->dataHeatBal->Zone(3).Name,
          "Plug and Process",
-         state->dataHeatBal->ZoneElectric(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
+         (state->dataHeatBal->ZoneElectric(3).DesignLevel + state->dataHeatBal->ZoneITEq(3).DesignTotalPower) /
+             state->dataHeatBal->Zone(3).FloorArea},
         {"Total",
          "Plug and Process",
-         (state->dataHeatBal->ZoneElectric(1).DesignLevel + state->dataHeatBal->ZoneElectric(2).DesignLevel) /
+         (state->dataHeatBal->ZoneElectric(1).DesignLevel + state->dataHeatBal->ZoneElectric(2).DesignLevel +
+          +state->dataHeatBal->ZoneITEq(1).DesignTotalPower + state->dataHeatBal->ZoneITEq(2).DesignTotalPower) /
              (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea)},
-        {"Conditioned Total", "Plug and Process", state->dataHeatBal->ZoneElectric(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
-        {"Unconditioned Total", "Plug and Process", state->dataHeatBal->ZoneElectric(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
-        {"Not Part of Total", "Plug and Process", state->dataHeatBal->ZoneElectric(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
+        {"Conditioned Total",
+         "Plug and Process",
+         (state->dataHeatBal->ZoneElectric(1).DesignLevel + state->dataHeatBal->ZoneITEq(1).DesignTotalPower) /
+             state->dataHeatBal->Zone(1).FloorArea},
+        {"Unconditioned Total",
+         "Plug and Process",
+         (state->dataHeatBal->ZoneElectric(2).DesignLevel + state->dataHeatBal->ZoneITEq(2).DesignTotalPower) /
+             state->dataHeatBal->Zone(2).FloorArea},
+        {"Not Part of Total",
+         "Plug and Process",
+         (state->dataHeatBal->ZoneElectric(3).DesignLevel + state->dataHeatBal->ZoneITEq(3).DesignTotalPower) /
+             state->dataHeatBal->Zone(3).FloorArea},
     });
 
     // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
@@ -10131,6 +10157,20 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
     for (auto &col : missingBracesHeaders) {
         std::string colHeader = col[0];
         EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
+    }
+
+    // Test for #9436
+    auto extraSpaceAfterBracesHeaders = queryResult(
+        R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
+             WHERE ReportName LIKE "MONTHLY EXAMPLE%"
+             AND ColumnName LIKE "%} %")",
+        "TabularDataWithStrings");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // Should be none!
+    for (auto &col : extraSpaceAfterBracesHeaders) {
+        std::string colHeader = col[0];
+        ADD_FAILURE() << "Extra space after brace in monthly table for : '" << colHeader << "'";
     }
 }
 

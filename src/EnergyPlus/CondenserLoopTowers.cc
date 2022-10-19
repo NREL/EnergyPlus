@@ -288,7 +288,6 @@ namespace CondenserLoopTowers {
                 state, UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
-            tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_SingleSpd;
             tower.TowerMassFlowRateMultiplier = 2.5;
             tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -475,7 +474,7 @@ namespace CondenserLoopTowers {
                     ShowWarningError(state,
                                      cCurrentModuleObject + ", \"" + tower.Name +
                                          "\" The Capacity Control is not specified correctly. The default Fan Cycling is used.");
-                };
+                }
             }
 
             // added for multi-cell
@@ -615,7 +614,6 @@ namespace CondenserLoopTowers {
 
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
-            tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_TwoSpd;
             tower.TowerMassFlowRateMultiplier = 2.5;
             tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -980,7 +978,6 @@ namespace CondenserLoopTowers {
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.VSTower = VariableSpeedTowerNumber;
             tower.Name = AlphArray(1);
-            tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_VarSpd;
             tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                           AlphArray(2),
@@ -1033,50 +1030,47 @@ namespace CondenserLoopTowers {
                 }
             }
 
-            state.dataCondenserLoopTowers->towers(VariableSpeedTowerNumber).Coeff.allocate(35);
-            state.dataCondenserLoopTowers->towers(VariableSpeedTowerNumber).Coeff = 0.0;
-
             auto &vstower = state.dataCondenserLoopTowers->towers(tower.VSTower);
 
             if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
                 tower.TowerModelType = ModelType::CoolToolsXFModel;
                 //     set cross-flow model coefficients
                 //       Outputs approach in C
-                vstower.Coeff(1) = 0.52049709836241;
-                vstower.Coeff(2) = -10.617046395344;
-                vstower.Coeff(3) = 10.7292974722538;
-                vstower.Coeff(4) = -2.74988377158227;
-                vstower.Coeff(5) = 4.73629943913743;
-                vstower.Coeff(6) = -8.25759700874711;
-                vstower.Coeff(7) = 1.57640938114136;
-                vstower.Coeff(8) = 6.51119643791324;
-                vstower.Coeff(9) = 1.50433525206692;
-                vstower.Coeff(10) = -3.2888529287801;
-                vstower.Coeff(11) = 0.0257786145353773;
-                vstower.Coeff(12) = 0.182464289315254;
-                vstower.Coeff(13) = -0.0818947291400898;
-                vstower.Coeff(14) = -0.215010003996285;
-                vstower.Coeff(15) = 0.0186741309635284;
-                vstower.Coeff(16) = 0.0536824177590012;
-                vstower.Coeff(17) = -0.00270968955115031;
-                vstower.Coeff(18) = 0.00112277498589279;
-                vstower.Coeff(19) = -0.00127758497497718;
-                vstower.Coeff(20) = 0.0000760420796601607;
-                vstower.Coeff(21) = 1.43600088336017;
-                vstower.Coeff(22) = -0.5198695909109;
-                vstower.Coeff(23) = 0.117339576910507;
-                vstower.Coeff(24) = 1.50492810819924;
-                vstower.Coeff(25) = -0.135898905926974;
-                vstower.Coeff(26) = -0.152577581866506;
-                vstower.Coeff(27) = -0.0533843828114562;
-                vstower.Coeff(28) = 0.00493294869565511;
-                vstower.Coeff(29) = -0.00796260394174197;
-                vstower.Coeff(30) = 0.000222619828621544;
-                vstower.Coeff(31) = -0.0543952001568055;
-                vstower.Coeff(32) = 0.00474266879161693;
-                vstower.Coeff(33) = -0.0185854671815598;
-                vstower.Coeff(34) = 0.00115667701293848;
-                vstower.Coeff(35) = 0.000807370664460284;
+                vstower.Coeff[0] = 0.52049709836241;
+                vstower.Coeff[1] = -10.617046395344;
+                vstower.Coeff[2] = 10.7292974722538;
+                vstower.Coeff[3] = -2.74988377158227;
+                vstower.Coeff[4] = 4.73629943913743;
+                vstower.Coeff[5] = -8.25759700874711;
+                vstower.Coeff[6] = 1.57640938114136;
+                vstower.Coeff[7] = 6.51119643791324;
+                vstower.Coeff[8] = 1.50433525206692;
+                vstower.Coeff[9] = -3.2888529287801;
+                vstower.Coeff[10] = 0.0257786145353773;
+                vstower.Coeff[11] = 0.182464289315254;
+                vstower.Coeff[12] = -0.0818947291400898;
+                vstower.Coeff[13] = -0.215010003996285;
+                vstower.Coeff[14] = 0.0186741309635284;
+                vstower.Coeff[15] = 0.0536824177590012;
+                vstower.Coeff[16] = -0.00270968955115031;
+                vstower.Coeff[17] = 0.00112277498589279;
+                vstower.Coeff[18] = -0.00127758497497718;
+                vstower.Coeff[19] = 0.0000760420796601607;
+                vstower.Coeff[20] = 1.43600088336017;
+                vstower.Coeff[21] = -0.5198695909109;
+                vstower.Coeff[22] = 0.117339576910507;
+                vstower.Coeff[23] = 1.50492810819924;
+                vstower.Coeff[24] = -0.135898905926974;
+                vstower.Coeff[25] = -0.152577581866506;
+                vstower.Coeff[26] = -0.0533843828114562;
+                vstower.Coeff[27] = 0.00493294869565511;
+                vstower.Coeff[28] = -0.00796260394174197;
+                vstower.Coeff[29] = 0.000222619828621544;
+                vstower.Coeff[30] = -0.0543952001568055;
+                vstower.Coeff[31] = 0.00474266879161693;
+                vstower.Coeff[32] = -0.0185854671815598;
+                vstower.Coeff[33] = 0.00115667701293848;
+                vstower.Coeff[34] = 0.000807370664460284;
 
                 //       set minimum and maximum boundaries for CoolTools crossflow model input variables
                 vstower.MinInletAirWBTemp = -1.0;
@@ -1092,33 +1086,33 @@ namespace CondenserLoopTowers {
                 tower.TowerModelType = ModelType::YorkCalcModel;
                 //     set counter-flow model coefficients
                 //       Outputs approach in C
-                vstower.Coeff(1) = -0.359741205;
-                vstower.Coeff(2) = -0.055053608;
-                vstower.Coeff(3) = 0.0023850432;
-                vstower.Coeff(4) = 0.173926877;
-                vstower.Coeff(5) = -0.0248473764;
-                vstower.Coeff(6) = 0.00048430224;
-                vstower.Coeff(7) = -0.005589849456;
-                vstower.Coeff(8) = 0.0005770079712;
-                vstower.Coeff(9) = -0.00001342427256;
-                vstower.Coeff(10) = 2.84765801111111;
-                vstower.Coeff(11) = -0.121765149;
-                vstower.Coeff(12) = 0.0014599242;
-                vstower.Coeff(13) = 1.680428651;
-                vstower.Coeff(14) = -0.0166920786;
-                vstower.Coeff(15) = -0.0007190532;
-                vstower.Coeff(16) = -0.025485194448;
-                vstower.Coeff(17) = 0.0000487491696;
-                vstower.Coeff(18) = 0.00002719234152;
-                vstower.Coeff(19) = -0.0653766255555556;
-                vstower.Coeff(20) = -0.002278167;
-                vstower.Coeff(21) = 0.0002500254;
-                vstower.Coeff(22) = -0.0910565458;
-                vstower.Coeff(23) = 0.00318176316;
-                vstower.Coeff(24) = 0.000038621772;
-                vstower.Coeff(25) = -0.0034285382352;
-                vstower.Coeff(26) = 0.00000856589904;
-                vstower.Coeff(27) = -0.000001516821552;
+                vstower.Coeff[0] = -0.359741205;
+                vstower.Coeff[1] = -0.055053608;
+                vstower.Coeff[2] = 0.0023850432;
+                vstower.Coeff[3] = 0.173926877;
+                vstower.Coeff[4] = -0.0248473764;
+                vstower.Coeff[5] = 0.00048430224;
+                vstower.Coeff[6] = -0.005589849456;
+                vstower.Coeff[7] = 0.0005770079712;
+                vstower.Coeff[8] = -0.00001342427256;
+                vstower.Coeff[9] = 2.84765801111111;
+                vstower.Coeff[10] = -0.121765149;
+                vstower.Coeff[11] = 0.0014599242;
+                vstower.Coeff[12] = 1.680428651;
+                vstower.Coeff[13] = -0.0166920786;
+                vstower.Coeff[14] = -0.0007190532;
+                vstower.Coeff[15] = -0.025485194448;
+                vstower.Coeff[16] = 0.0000487491696;
+                vstower.Coeff[17] = 0.00002719234152;
+                vstower.Coeff[18] = -0.0653766255555556;
+                vstower.Coeff[19] = -0.002278167;
+                vstower.Coeff[20] = 0.0002500254;
+                vstower.Coeff[21] = -0.0910565458;
+                vstower.Coeff[22] = 0.00318176316;
+                vstower.Coeff[23] = 0.000038621772;
+                vstower.Coeff[24] = -0.0034285382352;
+                vstower.Coeff[25] = 0.00000856589904;
+                vstower.Coeff[26] = -0.000001516821552;
 
                 //       set minimum and maximum boundaries for YorkCalc model input variables
                 vstower.MinInletAirWBTemp = -34.4;
@@ -1158,7 +1152,7 @@ namespace CondenserLoopTowers {
                         vstower.MaxWaterFlowRatio = NumArray2(8);
 
                         for (CoeffNum = 9; CoeffNum <= NumNums2; ++CoeffNum) {
-                            vstower.Coeff(CoeffNum - 8) = NumArray2(CoeffNum);
+                            vstower.Coeff[CoeffNum - 9] = NumArray2(CoeffNum);
                         }
                     }
                     break;
@@ -1198,7 +1192,7 @@ namespace CondenserLoopTowers {
                         vstower.MaxLiquidToGasRatio = NumArray2(9);
 
                         for (CoeffNum = 10; CoeffNum <= NumNums2; ++CoeffNum) {
-                            vstower.Coeff(CoeffNum - 9) = NumArray2(CoeffNum);
+                            vstower.Coeff[CoeffNum - 10] = NumArray2(CoeffNum);
                         }
                     }
                     break;
@@ -1471,7 +1465,6 @@ namespace CondenserLoopTowers {
                 state, UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), ErrorsFound);
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
-            tower.thisTowerNum = TowerNum;
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_VarSpdMerkel;
             tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                           AlphArray(2),
@@ -2336,7 +2329,6 @@ namespace CondenserLoopTowers {
         Real64 UA0;                       // Lower bound for UA [W/C]
         Real64 UA1;                       // Upper bound for UA [W/C]
         Real64 UA;                        // Calculated UA value
-        std::array<Real64, 6> Par;        // Parameter array need for RegulaFalsi routine
         std::string OutputChar;           // report variable for warning messages
         std::string OutputChar2;          // report variable for warning messages
         std::string OutputCharLo;         // report variable for warning messages
@@ -2670,21 +2662,21 @@ namespace CondenserLoopTowers {
                         ShowFatalError(state, "Autosizing of cooling tower fails for tower = " + this->Name + '.');
                     }
 
-                    Par[0] = DesTowerLoad;
-                    Par[1] = double(this->thisTowerNum);
-                    Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
-                    Par[3] = tmpHighSpeedAirFlowRate;      // design air volume flow rate
-                    Par[4] = Cp;
-                    UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
-                    UA1 = DesTowerLoad;          // Assume deltaT = 1K
+                    Real64 const solveDesignWaterMassFlow = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                    UA0 = 0.0001 * DesTowerLoad;                                          // Assume deltaT = 10000K (limit)
+                    UA1 = DesTowerLoad;                                                   // Assume deltaT = 1K
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                    // auto f1 = [this](EnergyPlusData &state, Real64 x, std::array<Real64, 6> p) -> Real64 { return this->residualUA(state, x, p); };
-                    auto f1 = [this](auto &state, auto x, const auto &p) { return this->residualUA(state, x, p); };
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f1, UA0, UA1, Par);
+                    auto f1 = [&state, this, DesTowerLoad, solveDesignWaterMassFlow, tmpHighSpeedAirFlowRate, Cp](Real64 UA) {
+                        Real64 const OutWaterTemp =
+                            this->calculateSimpleTowerOutletTemp(state, solveDesignWaterMassFlow, tmpHighSpeedAirFlowRate, UA);
+                        Real64 const CoolingOutput = Cp * solveDesignWaterMassFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                        return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
+                    };
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f1, UA0, UA1);
                     if (SolFla == -1) {
                         ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                         ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -2787,20 +2779,20 @@ namespace CondenserLoopTowers {
                         ShowFatalError(state, "Autosizing of cooling tower fails for tower = " + this->Name + '.');
                     }
 
-                    Par[0] = DesTowerLoad;
-                    Par[1] = double(this->thisTowerNum);
-                    Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
-                    Par[3] = tmpHighSpeedAirFlowRate;      // design air volume flow rate
-                    Par[4] = Cp;
-                    UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
-                    UA1 = DesTowerLoad;          // Assume deltaT = 1K
+                    Real64 const solveWaterMassFlow = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                    UA0 = 0.0001 * DesTowerLoad;                                    // Assume deltaT = 10000K (limit)
+                    UA1 = DesTowerLoad;                                             // Assume deltaT = 1K
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                    auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                    auto f = [&state, this, DesTowerLoad, solveWaterMassFlow, tmpHighSpeedAirFlowRate, Cp](Real64 UA) {
+                        Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterMassFlow, tmpHighSpeedAirFlowRate, UA);
+                        Real64 const CoolingOutput = Cp * solveWaterMassFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                        return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
+                    };
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                     if (SolFla == -1) {
                         ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                         ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -2868,20 +2860,20 @@ namespace CondenserLoopTowers {
                                                                          RoutineName); // 85F design exiting water temp
 
                 DesTowerLoad = this->TowerNominalCapacity * this->HeatRejectCapNomCapSizingRatio;
-                Par[0] = DesTowerLoad;
-                Par[1] = double(this->thisTowerNum);
-                Par[2] = rho * tmpDesignWaterFlowRate;      // design water mass flow rate
-                Par[3] = tmpHighSpeedAirFlowRate;           // design air volume flow rate
-                Par[4] = Cp;                                // 85F design exiting water temp
-                UA0 = 0.0001 * DesTowerLoad;                // Assume deltaT = 10000K (limit)
-                UA1 = DesTowerLoad;                         // Assume deltaT = 1K
-                this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
-                this->AirTemp = this->DesInletAirDBTemp;    // 95F design inlet air dry-bulb temp
-                this->AirWetBulb = this->DesInletAirWBTemp; // 78F design inlet air wet-bulb temp
+                Real64 const solveWaterFlowRate = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                UA0 = 0.0001 * DesTowerLoad;                                    // Assume deltaT = 10000K (limit)
+                UA1 = DesTowerLoad;                                             // Assume deltaT = 1K
+                this->WaterTemp = this->DesInletWaterTemp;                      // 35.0; // 95F design inlet water temperature
+                this->AirTemp = this->DesInletAirDBTemp;                        // 95F design inlet air dry-bulb temp
+                this->AirWetBulb = this->DesInletAirWBTemp;                     // 78F design inlet air wet-bulb temp
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                auto f = [&state, this, DesTowerLoad, solveWaterFlowRate, tmpHighSpeedAirFlowRate, Cp](Real64 UA) {
+                    Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlowRate, tmpHighSpeedAirFlowRate, UA);
+                    Real64 const CoolingOutput = Cp * solveWaterFlowRate * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                    return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
+                };
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -3050,20 +3042,20 @@ namespace CondenserLoopTowers {
                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                          RoutineName); // 85F design exiting water temp
                 DesTowerLoad = this->TowerLowSpeedNomCap * this->HeatRejectCapNomCapSizingRatio;
-                Par[0] = DesTowerLoad;
-                Par[1] = double(this->thisTowerNum);
-                Par[2] = rho * tmpDesignWaterFlowRate;      // design water mass flow rate
-                Par[3] = tmpLowSpeedAirFlowRate;            // Air volume flow rate at low fan speed
-                Par[4] = Cp;                                // 85F design exiting water temp
-                UA0 = 0.0001 * DesTowerLoad;                // Assume deltaT = 10000K (limit)
-                UA1 = DesTowerLoad;                         // Assume deltaT = 1K
-                this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
-                this->AirTemp = this->DesInletAirDBTemp;    // 35.0; // 95F design inlet air dry-bulb temp
-                this->AirWetBulb = this->DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
+                Real64 const solveWaterFlow = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                UA0 = 0.0001 * DesTowerLoad;                                // Assume deltaT = 10000K (limit)
+                UA1 = DesTowerLoad;                                         // Assume deltaT = 1K
+                this->WaterTemp = this->DesInletWaterTemp;                  // 35.0; // 95F design inlet water temperature
+                this->AirTemp = this->DesInletAirDBTemp;                    // 35.0; // 95F design inlet air dry-bulb temp
+                this->AirWetBulb = this->DesInletAirWBTemp;                 // 25.6; // 78F design inlet air wet-bulb temp
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                auto f = [&state, this, DesTowerLoad, solveWaterFlow, tmpLowSpeedAirFlowRate, Cp](Real64 UA) {
+                    Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, tmpLowSpeedAirFlowRate, UA);
+                    Real64 const CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                    return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
+                };
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -3149,20 +3141,20 @@ namespace CondenserLoopTowers {
                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                          RoutineName); // 85F design exiting water temp
                 DesTowerLoad = this->TowerFreeConvNomCap * this->HeatRejectCapNomCapSizingRatio;
-                Par[0] = DesTowerLoad;
-                Par[1] = double(this->thisTowerNum);
-                Par[2] = rho * this->DesignWaterFlowRate;   // design water mass flow rate
-                Par[3] = this->FreeConvAirFlowRate;         // free convection air volume flow rate
-                Par[4] = Cp;                                // 85F design exiting water temp
-                UA0 = 0.0001 * DesTowerLoad;                // Assume deltaT = 10000K (limit)
-                UA1 = DesTowerLoad;                         // Assume deltaT = 1K
-                this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
-                this->AirTemp = this->DesInletAirDBTemp;    // 35.0; // 95F design inlet air dry-bulb temp
-                this->AirWetBulb = this->DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
+                Real64 const solveWaterFlow = rho * this->DesignWaterFlowRate; // design water mass flow rate
+                UA0 = 0.0001 * DesTowerLoad;                                   // Assume deltaT = 10000K (limit)
+                UA1 = DesTowerLoad;                                            // Assume deltaT = 1K
+                this->WaterTemp = this->DesInletWaterTemp;                     // 35.0; // 95F design inlet water temperature
+                this->AirTemp = this->DesInletAirDBTemp;                       // 35.0; // 95F design inlet air dry-bulb temp
+                this->AirWetBulb = this->DesInletAirWBTemp;                    // 25.6; // 78F design inlet air wet-bulb temp
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                auto f = [&state, this, DesTowerLoad, solveWaterFlow, Cp](Real64 UA) {
+                    Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, this->FreeConvAirFlowRate, UA);
+                    Real64 const CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                    return (DesTowerLoad - CoolingOutput) / DesTowerLoad;
+                };
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -3177,12 +3169,13 @@ namespace CondenserLoopTowers {
                                              this->TowerFreeConvNomCap));
 
                     Real64 OutWaterTemp; // outlet water temperature during sizing [C]
-                    OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, Par[2], Par[3], UA0);
-                    Real64 CoolingOutput = Par[4] * Par[2] * (this->WaterTemp - OutWaterTemp); // tower capacity during sizing [W]
+
+                    OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, this->FreeConvAirFlowRate, UA0);
+                    Real64 CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower capacity during sizing [W]
                     ShowContinueError(state, format("Tower capacity at lower UA guess ({:.4T}) = {:.0T} W.", UA0, CoolingOutput));
 
-                    OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, Par[2], Par[3], UA1);
-                    CoolingOutput = Par[4] * Par[2] * (this->WaterTemp - OutWaterTemp);
+                    OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, this->FreeConvAirFlowRate, UA1);
+                    CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp);
                     ShowContinueError(state, format("Tower capacity at upper UA guess ({:.4T}) = {:.0T} W.", UA1, CoolingOutput));
 
                     if (CoolingOutput < DesTowerLoad) {
@@ -3216,13 +3209,6 @@ namespace CondenserLoopTowers {
         // yields an approach temperature that matches user input
         if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:VariableSpeed")) {
 
-            Par[0] = this->thisTowerNum;   // Index to cooling tower
-            Par[1] = 1.0;                  // air flow rate ratio
-            Par[2] = this->DesignInletWB;  // inlet air wet-bulb temperature [C]
-            Par[3] = this->DesignRange;    // tower range temperature [C]
-            Par[4] = this->DesignApproach; // design approach temperature [C]
-            Par[5] = 0.0;                  // Calculation FLAG, 0.0 = calc water flow ratio, 1.0 calc air flow ratio
-
             //   check range for water flow rate ratio (make sure RegulaFalsi converges)
             Real64 MaxWaterFlowRateRatio = 0.5; // maximum water flow rate ratio which yields desired approach temp
             Real64 Tapproach = 0.0;             // temporary tower approach temp variable [C]
@@ -3251,9 +3237,12 @@ namespace CondenserLoopTowers {
             Real64 WaterFlowRatio(0.0); // tower water flow rate ratio found during model calibration
 
             if (ModelCalibrated) {
-                auto f = std::bind(&CoolingTower::residualTa, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(
-                    state, Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio, Par);
+                auto f = [&state, this](Real64 FlowRatio) {
+                    Real64 Tact = this->calculateVariableSpeedApproach(state, FlowRatio, 1.0, this->DesignInletWB, this->DesignRange);
+                    return this->DesignApproach - Tact;
+                };
+                General::SolveRoot(state, Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio);
+
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower water flow ratio during calibration");
                     ShowContinueError(state,
@@ -3427,7 +3416,6 @@ namespace CondenserLoopTowers {
         int SolFla; // Flag of solver
         Real64 tmpHighSpeedFanPower;
 
-        std::array<Real64, 6> Par;        // Parameter array need for RegulaFalsi routine
         Real64 UA0;                       // Lower bound for UA [W/C]
         Real64 UA1;                       // Upper bound for UA [W/C]
         Real64 DesTowerLoad;              // Design tower load [W]
@@ -3809,20 +3797,21 @@ namespace CondenserLoopTowers {
                                                         RoutineName);
 
                 // full speed fan tower UA
-                Par[0] = tmpNomTowerCap * this->HeatRejectCapNomCapSizingRatio;
-                Par[1] = double(this->thisTowerNum);
-                Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
-                Par[3] = tmpDesignAirFlowRate;         // design air volume flow rate
-                Par[4] = Cp;
-                UA0 = 0.0001 * Par[0]; // Assume deltaT = 10000K (limit)
-                UA1 = Par[0];          // Assume deltaT = 1K
+                Real64 const solveLoad = tmpNomTowerCap * this->HeatRejectCapNomCapSizingRatio;
+                Real64 const solveWaterFlow = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                UA0 = 0.0001 * solveLoad;                                   // Assume deltaT = 10000K (limit)
+                UA1 = solveLoad;                                            // Assume deltaT = 1K
 
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                auto f = [&state, this, solveLoad, solveWaterFlow, tmpDesignAirFlowRate, Cp](Real64 UA) {
+                    Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, tmpDesignAirFlowRate, UA);
+                    Real64 const CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                    return (solveLoad - CoolingOutput) / solveLoad;
+                };
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "calculating cooling tower UA failed for tower " + this->Name);
@@ -3846,21 +3835,21 @@ namespace CondenserLoopTowers {
                                                  this->HighSpeedTowerUA);
                 }
                 // free convection tower UA
-                Par[0] = tmpTowerFreeConvNomCap * this->HeatRejectCapNomCapSizingRatio;
-                Par[1] = double(this->thisTowerNum);
-                Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
-                Par[3] = tmpFreeConvAirFlowRate;       // design air volume flow rate
-                Par[4] = Cp;
-                UA0 = 0.0001 * Par[0]; // Assume deltaT = 10000K (limit)
-                UA0 = max(UA0, 1.0);   // limit to 1.0
-                UA1 = Par[0];          // Assume deltaT = 1K
-
-                this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
-                this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
+                Real64 const solveLoad1 = tmpTowerFreeConvNomCap * this->HeatRejectCapNomCapSizingRatio;
+                Real64 solveWaterFlow1 = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                UA0 = 0.0001 * solveLoad1;                             // Assume deltaT = 10000K (limit)
+                UA0 = max(UA0, 1.0);                                   // limit to 1.0
+                UA1 = solveLoad1;                                      // Assume deltaT = 1K
+                this->AirTemp = this->DesInletAirDBTemp;               // 35.0;
+                this->AirWetBulb = this->DesInletAirWBTemp;            // 25.6;
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                auto f2 = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f2, UA0, UA1, Par);
+                auto f2 = [&state, this, solveLoad1, solveWaterFlow1, tmpFreeConvAirFlowRate, Cp](Real64 UA) {
+                    Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow1, tmpFreeConvAirFlowRate, UA);
+                    Real64 const CoolingOutput = Cp * solveWaterFlow1 * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                    return (solveLoad1 - CoolingOutput) / solveLoad1;
+                };
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f2, UA0, UA1);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower free convection UA");
                     ShowFatalError(state, "calculating cooling tower UA failed for tower " + this->Name);
@@ -4135,20 +4124,21 @@ namespace CondenserLoopTowers {
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                 RoutineName);
                     // full speed fan tower UA
-                    Par[0] = tmpNomTowerCap * this->HeatRejectCapNomCapSizingRatio;
-                    Par[1] = double(this->thisTowerNum);
-                    Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
-                    Par[3] = tmpDesignAirFlowRate;         // design air volume flow rate
-                    Par[4] = Cp;
-                    UA0 = 0.0001 * Par[0]; // Assume deltaT = 10000K (limit)
-                    UA1 = Par[0];          // Assume deltaT = 1K
+                    Real64 const solveLoad = tmpNomTowerCap * this->HeatRejectCapNomCapSizingRatio;
+                    Real64 const solveWaterFlow = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                    UA0 = 0.0001 * solveLoad;                                   // Assume deltaT = 10000K (limit)
+                    UA1 = solveLoad;                                            // Assume deltaT = 1K
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                    auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                    auto f = [&state, this, solveLoad, solveWaterFlow, tmpDesignAirFlowRate, Cp](Real64 UA) {
+                        Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow, tmpDesignAirFlowRate, UA);
+                        Real64 const CoolingOutput = Cp * solveWaterFlow * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                        return (solveLoad - CoolingOutput) / solveLoad;
+                    };
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                     if (SolFla == -1) {
                         ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                         ShowFatalError(state, "calculating cooling tower UA failed for tower " + this->Name);
@@ -4172,20 +4162,21 @@ namespace CondenserLoopTowers {
                                                      this->HighSpeedTowerUA);
                     }
                     // free convection tower UA
-                    Par[0] = tmpTowerFreeConvNomCap * this->HeatRejectCapNomCapSizingRatio;
-                    Par[1] = double(this->thisTowerNum);
-                    Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
-                    Par[3] = tmpFreeConvAirFlowRate;       // design air volume flow rate
-                    Par[4] = Cp;
-                    UA0 = 0.0001 * Par[0]; // Assume deltaT = 10000K (limit)
-                    UA1 = Par[0];          // Assume deltaT = 1K
+                    Real64 const solveLoad2 = tmpTowerFreeConvNomCap * this->HeatRejectCapNomCapSizingRatio;
+                    Real64 const solveWaterFlow2 = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                    UA0 = 0.0001 * solveLoad2;                                   // Assume deltaT = 10000K (limit)
+                    UA1 = solveLoad2;                                            // Assume deltaT = 1K
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = DesTowerInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                    auto f3 = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f3, UA0, UA1, Par);
+                    auto f3 = [&state, this, solveLoad2, solveWaterFlow2, tmpFreeConvAirFlowRate, Cp](Real64 UA) {
+                        Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, solveWaterFlow2, tmpFreeConvAirFlowRate, UA);
+                        Real64 const CoolingOutput = Cp * solveWaterFlow2 * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
+                        return (solveLoad2 - CoolingOutput) / solveLoad2;
+                    };
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f3, UA0, UA1);
                     if (SolFla == -1) {
                         ShowSevereError(state, "Iteration limit exceeded in calculating tower free convection UA");
                         ShowFatalError(state, "calculating cooling tower UA failed for tower " + this->Name);
@@ -5061,13 +5052,12 @@ namespace CondenserLoopTowers {
         static constexpr std::string_view RoutineName("calculateVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla(0);             // Flag of solver
-        std::array<Real64, 6> Par; // Parameter array for regula falsi solver
-        std::string OutputChar;    // character string used for warning messages
-        std::string OutputChar2;   // character string used for warning messages
-        std::string OutputChar3;   // character string used for warning messages
-        std::string OutputChar4;   // character string used for warning messages
-        std::string OutputChar5;   // character string used for warning messages
+        int SolFla(0);           // Flag of solver
+        std::string OutputChar;  // character string used for warning messages
+        std::string OutputChar2; // character string used for warning messages
+        std::string OutputChar3; // character string used for warning messages
+        std::string OutputChar4; // character string used for warning messages
+        std::string OutputChar5; // character string used for warning messages
 
         // Added for multi-cell. Determine the number of cells operating
         Real64 WaterMassFlowRatePerCellMin = 0.0;
@@ -5236,17 +5226,11 @@ namespace CondenserLoopTowers {
 
                     // Setpoint was met with pump ON and fan ON at full flow
                     // Calculate the fraction of full air flow to exactly meet the setpoint temperature
-
-                    Par[0] = this->thisTowerNum; // Index to cooling tower
-                    //         cap the water flow rate ratio and inlet air wet-bulb temperature to provide a stable output
-                    Par[1] = WaterFlowRateRatioCapped; // water flow rate ratio
-                    Par[2] = TwbCapped;                // Inlet air wet-bulb temperature [C]
-                    //         do not cap desired range and approach temperature to provide a valid (balanced) output for this simulation time step
-                    Par[3] = Tr;  // Tower range temperature [C]
-                    Par[4] = Ta;  // desired approach temperature [C]
-                    Par[5] = 1.0; // calculate the air flow rate ratio required for a balance
-                    auto f = std::bind(&CoolingTower::residualTa, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
+                    auto f = [&state, this, WaterFlowRateRatioCapped, TwbCapped, Tr, Ta](Real64 FlowRatio) {
+                        Real64 TapproachActual = this->calculateVariableSpeedApproach(state, WaterFlowRateRatioCapped, FlowRatio, TwbCapped, Tr);
+                        return Ta - TapproachActual;
+                    };
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag)
                             ShowWarningError(state,
@@ -5384,8 +5368,7 @@ namespace CondenserLoopTowers {
         static constexpr std::string_view RoutineName("calculateMerkelVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::array<Real64, 8> Par; // Parameter array passed to solver
-        int SolFla(0);             // Flag of solver
+        int SolFla(0); // Flag of solver
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -5555,18 +5538,18 @@ namespace CondenserLoopTowers {
 
         if ((MinSpeedFanQdot < std::abs(MyLoad)) && (std::abs(MyLoad) < FullSpeedFanQdot)) {
             // load can be refined by modulating fan speed, call regula-falsi
-
-            Par[0] = double(this->thisTowerNum);
-            Par[1] = MyLoad;
-            Par[2] = WaterMassFlowRatePerCell;
-            Par[3] = UAdesignPerCell;
-            Par[4] = UAwetbulbAdjFac;
-            Par[5] = UAwaterflowAdjFac;
-            Par[6] = CpWater;
-            Par[7] = this->WaterMassFlowRate;
-
-            auto f = std::bind(&CoolingTower::residualMerkelLoad, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
+            auto f = [&state, this, MyLoad, WaterMassFlowRatePerCell, UAdesignPerCell, UAwetbulbAdjFac, UAwaterflowAdjFac, CpWater](
+                         Real64 airFlowRateRatioLocal) {
+                Real64 const AirFlowRatePerCell = airFlowRateRatioLocal * this->HighSpeedAirFlowRate / this->NumCell;
+                Real64 const UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
+                Real64 const UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
+                Real64 OutletWaterTempTrial =
+                    this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
+                Real64 const Qdot =
+                    this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempTrial);
+                return std::abs(MyLoad) - Qdot;
+            };
+            General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0);
 
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -5626,54 +5609,6 @@ namespace CondenserLoopTowers {
             FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
         }
-    }
-
-    Real64 CoolingTower::residualMerkelLoad(EnergyPlusData &state,
-                                            Real64 airFlowRateRatioLocal,    // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                            std::array<Real64, 8> const &Par // par(1) = Tower number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // par(2) =MyLoad [W] , negative is cooling
-        // par(3) = water mass flow per cell
-        // par(4) = Design UA per cell
-        // par(5) = UA adjust factor for wetbulb
-        // par(6) = UA adjust factor for water flow rate
-        // par(7) = specific heat of water at inlet temp
-        // par(8) = water mass flow rate, total [kg/s]
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        int TowerNum = int(Par[0]);
-        auto const &TargetLoad = Par[1];
-        auto const &WaterMassFlowRatePerCell = Par[2];
-        auto const &UAdesignPerCell = Par[3];
-        auto const &UAwetbulbAdjFac = Par[4];
-        auto const &UAwaterflowAdjFac = Par[5];
-        auto const &CpWater = Par[6];
-        auto const &TotalWaterMassFlowRate = Par[7];
-
-        Real64 const AirFlowRatePerCell = airFlowRateRatioLocal * state.dataCondenserLoopTowers->towers(TowerNum).HighSpeedAirFlowRate /
-                                          state.dataCondenserLoopTowers->towers(TowerNum).NumCell;
-        Real64 const UAairflowAdjFac =
-            CurveManager::CurveValue(state, state.dataCondenserLoopTowers->towers(TowerNum).UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
-        Real64 const UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
-
-        Real64 OutletWaterTempTrial;
-        OutletWaterTempTrial = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
-
-        Real64 const Qdot =
-            TotalWaterMassFlowRate * CpWater *
-            (state.dataLoopNodes->Node(state.dataCondenserLoopTowers->towers(TowerNum).WaterInletNodeNum).Temp - OutletWaterTempTrial);
-        return std::abs(TargetLoad) - Qdot;
     }
 
     Real64 CoolingTower::calculateSimpleTowerOutletTemp(EnergyPlusData &state,
@@ -5826,17 +5761,17 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;                                    // Flag of solver
-        std::array<Real64, 6> Par;                     // Parameter array for regula falsi solver
         Real64 constexpr VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
 
         //   determine tower outlet water temperature
-        Par[0] = this->thisTowerNum;    // Index to cooling tower
-        Par[1] = WaterFlowRateRatio;    // water flow rate ratio
-        Par[2] = airFlowRateRatioLocal; // air flow rate ratio
-        Par[3] = Twb;                   // inlet air wet-bulb temperature [C]
-        Real64 Tr;                      // range temperature which results in an energy balance
-        auto f = std::bind(&CoolingTower::residualTr, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp, Par);
+        Real64 Tr; // range temperature which results in an energy balance
+        auto f = [&state, this, WaterFlowRateRatio, airFlowRateRatioLocal, Twb](Real64 Trange) {
+            // call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
+            Real64 Tapproach = this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, airFlowRateRatioLocal, Twb, Trange);
+            // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
+            return (Twb + Tapproach + Trange) - state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+        };
+        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp);
 
         Real64 OutletWaterTempLocal = this->WaterTemp - Tr;
 
@@ -5895,78 +5830,40 @@ namespace CondenserLoopTowers {
         // York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
         // Form 160.00-SG2 (0502). 2002.
 
-        Real64 approach;
+        auto &tower = state.dataCondenserLoopTowers->towers(this->VSTower);
         if (this->TowerModelType == ModelType::YorkCalcModel || this->TowerModelType == ModelType::YorkCalcUserDefined) {
             Real64 PctAirFlow = airFlowRatioLocal;
             Real64 FlowFactor = PctWaterFlow / PctAirFlow;
-            approach = state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(1) +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(2) * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(3) * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(4) * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(5) * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(6) * Twb * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(7) * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(8) * Twb * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(9) * Twb * Twb * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(10) * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(11) * Twb * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(12) * Twb * Twb * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(13) * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(14) * Twb * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(15) * Twb * Twb * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(16) * Tr * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(17) * Twb * Tr * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(18) * Twb * Twb * Tr * Tr * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(19) * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(20) * Twb * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(21) * Twb * Twb * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(22) * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(23) * Twb * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(24) * Twb * Twb * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(25) * Tr * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(26) * Twb * Tr * Tr * FlowFactor * FlowFactor +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(27) * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
+            return tower.Coeff[0] + tower.Coeff[1] * Twb + tower.Coeff[2] * Twb * Twb + tower.Coeff[3] * Tr + tower.Coeff[4] * Twb * Tr +
+                   tower.Coeff[5] * Twb * Twb * Tr + tower.Coeff[6] * Tr * Tr + tower.Coeff[7] * Twb * Tr * Tr +
+                   tower.Coeff[8] * Twb * Twb * Tr * Tr + tower.Coeff[9] * FlowFactor + tower.Coeff[10] * Twb * FlowFactor +
+                   tower.Coeff[11] * Twb * Twb * FlowFactor + tower.Coeff[12] * Tr * FlowFactor + tower.Coeff[13] * Twb * Tr * FlowFactor +
+                   tower.Coeff[14] * Twb * Twb * Tr * FlowFactor + tower.Coeff[15] * Tr * Tr * FlowFactor +
+                   tower.Coeff[16] * Twb * Tr * Tr * FlowFactor + tower.Coeff[17] * Twb * Twb * Tr * Tr * FlowFactor +
+                   tower.Coeff[18] * FlowFactor * FlowFactor + tower.Coeff[19] * Twb * FlowFactor * FlowFactor +
+                   tower.Coeff[20] * Twb * Twb * FlowFactor * FlowFactor + tower.Coeff[21] * Tr * FlowFactor * FlowFactor +
+                   tower.Coeff[22] * Twb * Tr * FlowFactor * FlowFactor + tower.Coeff[23] * Twb * Twb * Tr * FlowFactor * FlowFactor +
+                   tower.Coeff[24] * Tr * Tr * FlowFactor * FlowFactor + tower.Coeff[25] * Twb * Tr * Tr * FlowFactor * FlowFactor +
+                   tower.Coeff[26] * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
 
         } else { // empirical model is CoolTools format
             //     the CoolTools model actually uses PctFanPower = AirFlowRatio^3 as an input to the model
             Real64 PctAirFlow = pow_3(airFlowRatioLocal);
-            approach = state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(1) +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(2) * PctAirFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(3) * PctAirFlow * PctAirFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(4) * PctAirFlow * PctAirFlow * PctAirFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(5) * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(6) * PctAirFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(7) * PctAirFlow * PctAirFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(8) * PctWaterFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(9) * PctAirFlow * PctWaterFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(10) * PctWaterFlow * PctWaterFlow * PctWaterFlow +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(11) * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(12) * PctAirFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(13) * PctAirFlow * PctAirFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(14) * PctWaterFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(15) * PctAirFlow * PctWaterFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(16) * PctWaterFlow * PctWaterFlow * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(17) * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(18) * PctAirFlow * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(19) * PctWaterFlow * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(20) * Twb * Twb * Twb +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(21) * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(22) * PctAirFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(23) * PctAirFlow * PctAirFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(24) * PctWaterFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(25) * PctAirFlow * PctWaterFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(26) * PctWaterFlow * PctWaterFlow * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(27) * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(28) * PctAirFlow * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(29) * PctWaterFlow * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(30) * Twb * Twb * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(31) * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(32) * PctAirFlow * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(33) * PctWaterFlow * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(34) * Twb * Tr * Tr +
-                       state.dataCondenserLoopTowers->towers(this->VSTower).Coeff(35) * Tr * Tr * Tr;
+            return tower.Coeff[0] + tower.Coeff[1] * PctAirFlow + tower.Coeff[2] * PctAirFlow * PctAirFlow +
+                   tower.Coeff[3] * PctAirFlow * PctAirFlow * PctAirFlow + tower.Coeff[4] * PctWaterFlow +
+                   tower.Coeff[5] * PctAirFlow * PctWaterFlow + tower.Coeff[6] * PctAirFlow * PctAirFlow * PctWaterFlow +
+                   tower.Coeff[7] * PctWaterFlow * PctWaterFlow + tower.Coeff[8] * PctAirFlow * PctWaterFlow * PctWaterFlow +
+                   tower.Coeff[9] * PctWaterFlow * PctWaterFlow * PctWaterFlow + tower.Coeff[10] * Twb + tower.Coeff[11] * PctAirFlow * Twb +
+                   tower.Coeff[12] * PctAirFlow * PctAirFlow * Twb + tower.Coeff[13] * PctWaterFlow * Twb +
+                   tower.Coeff[14] * PctAirFlow * PctWaterFlow * Twb + tower.Coeff[15] * PctWaterFlow * PctWaterFlow * Twb +
+                   tower.Coeff[16] * Twb * Twb + tower.Coeff[17] * PctAirFlow * Twb * Twb + tower.Coeff[18] * PctWaterFlow * Twb * Twb +
+                   tower.Coeff[19] * Twb * Twb * Twb + tower.Coeff[20] * Tr + tower.Coeff[21] * PctAirFlow * Tr +
+                   tower.Coeff[22] * PctAirFlow * PctAirFlow * Tr + tower.Coeff[23] * PctWaterFlow * Tr +
+                   tower.Coeff[24] * PctAirFlow * PctWaterFlow * Tr + tower.Coeff[25] * PctWaterFlow * PctWaterFlow * Tr +
+                   tower.Coeff[26] * Twb * Tr + tower.Coeff[27] * PctAirFlow * Twb * Tr + tower.Coeff[28] * PctWaterFlow * Twb * Tr +
+                   tower.Coeff[29] * Twb * Twb * Tr + tower.Coeff[30] * Tr * Tr + tower.Coeff[31] * PctAirFlow * Tr * Tr +
+                   tower.Coeff[32] * PctWaterFlow * Tr * Tr + tower.Coeff[33] * Twb * Tr * Tr + tower.Coeff[34] * Tr * Tr * Tr;
         }
-        return approach;
     }
 
     void CoolingTower::checkModelBounds(EnergyPlusData &state,
@@ -6229,113 +6126,6 @@ namespace CondenserLoopTowers {
                 state.dataCondenserLoopTowers->towers(this->VSTower).PrintWFRRMessage = false;
             }
         }
-    }
-
-    Real64 CoolingTower::residualUA(EnergyPlusData &state,
-                                    Real64 UA,                       // UA of cooling tower
-                                    std::array<Real64, 6> const &Par // par(1) = design tower load [W]
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   May 2002
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (Design Tower Load - Tower Cooling Output) / Design Tower Load.
-        // Tower Cooling Output depends on the UA which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Puts UA into the cooling tower data structure, calls calculateSimpleTowerOutletTemp, and calculates
-        // the residual as defined above.
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = tower number
-        // par(3) = design water mass flow rate [kg/s]
-        // par(4) = design air volume flow rate [m3/s]
-        // par(5) = water specific heat [J/(kg*C)]
-
-        Real64 const OutWaterTemp = this->calculateSimpleTowerOutletTemp(state, Par[2], Par[3], UA);
-        Real64 const CoolingOutput = Par[4] * Par[2] * (this->WaterTemp - OutWaterTemp); // tower cooling output [W]
-        return (Par[0] - CoolingOutput) / Par[0];
-    }
-
-    Real64 CoolingTower::residualTr(EnergyPlusData &state,
-                                    Real64 Trange,                   // cooling tower range temperature [C]
-                                    std::array<Real64, 6> const &Par // par(1) = tower number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   Feb 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (where residual shows a balance point of model and desired performance)
-        // Tower Approach depends on the range temperature which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Varies tower range temperature until a balance point exists where the model output corresponds
-        // to the desired independent variables
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = water flow ratio
-        // par(3) = air flow ratio
-        // par(4) = inlet air wet-bulb temperature [C]
-
-        Real64 WaterFlowRateRatio = Par[1];    // ratio of water flow rate to design water flow rate
-        Real64 AirFlowRateRatioLocal = Par[2]; // ratio of water flow rate to design water flow rate
-        Real64 InletAirWB = Par[3];            // inlet air wet-bulb temperature [C]
-
-        // call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
-        Real64 Tapproach = this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, AirFlowRateRatioLocal, InletAirWB, Trange);
-        // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
-        return (InletAirWB + Tapproach + Trange) - state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
-    }
-
-    Real64 CoolingTower::residualTa(EnergyPlusData &state,
-                                    Real64 FlowRatio,                // water or air flow ratio of cooling tower
-                                    std::array<Real64, 6> const &Par // par(1) = tower number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   Feb 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (Desired Approach - Model Approach Output)
-        // Tower Approach depends on the water (or air) flow rate ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // In SizeTower, calibrates tower water flow rate ratio at an air flow rate ratio of 1.
-        // In VariableSpeedTower, calculates air flow rate ratio at the inlet water flow rate ratio.
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = water or air flow ratio (opposite of input variable)
-        // par(3) = inlet air wet-bulb temp [C]
-        // par(4) = tower range [C]
-        // par(5) = desired approach [C]
-        // par(6) = 0.0 to calculate water flow rate ratio, 1.0 for air
-
-        Real64 AirFlowRateRatioLocal; // ratio of water flow rate to design water flow rate
-        Real64 WaterFlowRateRatio;    // ratio of water flow rate to design water flow rate
-        if (Par[5] == 0.0) {
-            AirFlowRateRatioLocal = Par[1];
-            WaterFlowRateRatio = FlowRatio;
-        } else {
-            AirFlowRateRatioLocal = FlowRatio;
-            WaterFlowRateRatio = Par[1];
-        }
-        Real64 InletAirWB = Par[2];       // inlet air wet-bulb temperature [C]
-        Real64 Trange = Par[3];           // tower range temperature [C]
-        Real64 TapproachDesired = Par[4]; // desired tower approach temperature [C]
-        // call model to determine tower approach temperature given other independent variables
-        Real64 TapproachActual = this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, AirFlowRateRatioLocal, InletAirWB, Trange);
-        return TapproachDesired - TapproachActual;
     }
 
     void CoolingTower::calculateWaterUsage(EnergyPlusData &state)

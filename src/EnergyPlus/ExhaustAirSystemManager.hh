@@ -62,68 +62,61 @@ namespace ExhaustAirSystemManager {
     struct ExhaustAir
     {
         // Members
-        std::string Name;
+        std::string Name = "";
 
-        int AvailScheduleNum;
-        std::string ZoneMixerName;
-        int ZoneMixerIndex;
-        int CentralFanTypeNum;
-        std::string CentralFanName;
-        int CentralFanIndex;
+        int AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
+        std::string ZoneMixerName = "";
+        int ZoneMixerIndex = 0;
+        int CentralFanTypeNum = 0;
+        std::string CentralFanName = "";
+        int CentralFanIndex = 0;
 
-        bool SizingFlag;
+        bool SizingFlag = true;
 
         // output variables
-        Real64 centralFan_MassFlowRate;
-        Real64 centralFan_VolumeFlowRate_Std;
-        Real64 centralFan_VolumeFlowRate_Cur;
-        Real64 centralFan_Power;
-        Real64 centralFan_Energy;
+        Real64 centralFan_MassFlowRate = 0.0;
+        Real64 centralFan_VolumeFlowRate_Std = 0.0;
+        Real64 centralFan_VolumeFlowRate_Cur = 0.0;
+        Real64 centralFan_Power = 0.0;
+        Real64 centralFan_Energy = 0.0;
 
         // Output acc variable for heat rejection outputs
-        Real64 exhTotalHVACReliefHeatLoss; // feed to state.dataHeatBal->SysTotalHVACReliefHeatLoss
-
-        // Default Constructor
-        ExhaustAir()
-            : AvailScheduleNum(0), ZoneMixerName(""), ZoneMixerIndex(0), CentralFanTypeNum(0), CentralFanName(""), CentralFanIndex(0),
-              SizingFlag(true), centralFan_MassFlowRate(0.0), centralFan_VolumeFlowRate_Std(0.0), centralFan_VolumeFlowRate_Cur(0.0),
-              centralFan_Power(0.0), centralFan_Energy(0.0), exhTotalHVACReliefHeatLoss(0.0)
-        {
-        }
+        Real64 exhTotalHVACReliefHeatLoss = 0.0; // feed to state.dataHeatBal->SysTotalHVACReliefHeatLoss
     };
 
     struct ZoneExhaustControl
     {
-        std::string Name;
+        enum class FlowControlType
+        {
+            Invalid = -1,
+            Scheduled,
+            FollowSupply,
+            Num
+        };
 
-        int AvailScheduleNum;
+        std::string Name = "";
 
-        std::string ZoneName;
-        int ZoneNum;
-        int ControlledZoneNum;
+        int AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
 
-        int InletNodeNum;
-        int OutletNodeNum;
+        std::string ZoneName = "";
+        int ZoneNum = 0;
+        int ControlledZoneNum = 0;
 
-        Real64 DesignExhaustFlowRate;
-        int FlowControlTypeNum;
-        int ExhaustFlowFractionScheduleNum;
-        int SupplyNodeOrNodelistNum;
-        int MinZoneTempLimitScheduleNum;
-        int MinExhFlowFracScheduleNum;
-        int BalancedExhFracScheduleNum;
-        Real64 BalancedFlow;
-        Real64 UnbalancedFlow;
+        int InletNodeNum = 0;
+        int OutletNodeNum = 0;
+
+        Real64 DesignExhaustFlowRate = 0.0;
+        FlowControlType FlowControlOption = FlowControlType::Scheduled;
+        int ExhaustFlowFractionScheduleNum = 0;
+        std::string SupplyNodeOrNodelistName = "";
+        int SupplyNodeOrNodelistNum = 0; // may not need this one
+        int MinZoneTempLimitScheduleNum = 0;
+        int MinExhFlowFracScheduleNum = 0;
+        int BalancedExhFracScheduleNum = 0;
+        Real64 BalancedFlow = 0.0;
+        Real64 UnbalancedFlow = 0.0;
 
         Array1D_int SuppNodeNums;
-
-        // default constructor
-        ZoneExhaustControl()
-            : AvailScheduleNum(0), ZoneName(""), ZoneNum(0), ControlledZoneNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0),
-              FlowControlTypeNum(0), ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0),
-              MinExhFlowFracScheduleNum(0), BalancedExhFracScheduleNum(0), BalancedFlow(0.0), UnbalancedFlow(0.0)
-        {
-        }
     };
 
     void SimExhaustAirSystem(EnergyPlusData &state, bool FirstHVACIteration);
@@ -148,7 +141,7 @@ namespace ExhaustAirSystemManager {
 
     void UpdateZoneExhaustControl(EnergyPlusData &state);
 
-    void CheckForSupplyNode(); // (EnergyPlusData &state, int const SupplyNodeNum, bool &NodeNotFound);
+    void CheckForSupplyNode(EnergyPlusData &state, int const ExhCtrlNum, bool &NodeNotFound);
 
     bool ExhaustSystemHasMixer(EnergyPlusData &state, std::string_view CompName); // component (mixer) name
 } // namespace ExhaustAirSystemManager

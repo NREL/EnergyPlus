@@ -338,4 +338,104 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalFiniteDiffManager_skipNotUsedConstruct
     ConstructFD.deallocate();
 }
 
+TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstructionAndCondFDTest)
+{
+    bool ErrorsFound(false);
+    std::string const idf_objects = delimited_string({
+        "Material:AirGap,",
+        "   F05 Ceiling air space resistance, !- Name",
+        "   0.18;                    !- Thermal Resistance{ m2 - K / W }",
+        "Material,",
+        "   Reg Mat F05 Ceiling air space resistance, !- Name",
+        "   VerySmooth, !- Roughness",
+        "   0.36, !- Thickness{ m }",
+        "   2.00, !- Conductivity{ W / m - K }",
+        "   1.23, !- Density{ kg / m3 }",
+        "   1000.0, !- Specific Heat{ J / kg - K }",
+        "   0.9, !- Thermal Absorptance",
+        "   0.7, !- Solar Absorptance",
+        "   0.7; !- Visible Absorptance",
+        "Material,",
+        "   F16 Acoustic tile, !- Name",
+        "   MediumSmooth, !- Roughness",
+        "   0.0191, !- Thickness{ m }",
+        "   0.06, !- Conductivity{ W / m - K }",
+        "   368, !- Density{ kg / m3 }",
+        "   590.000000000002, !- Specific Heat{ J / kg - K }",
+        "   0.9, !- Thermal Absorptance",
+        "   0.3, !- Solar Absorptance",
+        "   0.3;                     !- Visible Absorptance",
+        "Material,",
+        "   M11 100mm lightweight concrete, !- Name",
+        "   MediumRough, !- Roughness",
+        "   0.1016, !- Thickness{ m }",
+        "   0.53, !- Conductivity{ W / m - K }",
+        "   1280, !- Density{ kg / m3 }",
+        "   840.000000000002, !- Specific Heat{ J / kg - K }",
+        "   0.9, !- Thermal Absorptance",
+        "   0.5, !- Solar Absorptance",
+        "   0.5;                     !- Visible Absorptance",
+        "Construction,",
+        "   Interior Floor, !- Name",
+        "   F16 Acoustic tile, !- Outside Layer",
+        "   F05 Ceiling air space resistance, !- Layer 2",
+        "   M11 100mm lightweight concrete;  !- Layer 3",
+        "Construction,",
+        "   Interior Floor All Reg Mats,  !- Name",
+        "   F16 Acoustic tile, !- Outside Layer",
+        "   Reg Mat F05 Ceiling air space resistance, !- Layer 2",
+        "   M11 100mm lightweight concrete;  !- Layer 3",
+        "Output:Constructions,",
+        "Constructions;",
+        "Output:Constructions,",
+        "Materials;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ErrorsFound = false;
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+
+    ErrorsFound = false;
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);                                 // expect no errors
+
+    // allocate properties for construction objects when it is used or not for building surfaces in the model
+    state->dataConstruction->Construct(1).IsUsed = true;
+    state->dataConstruction->Construct(2).IsUsed = true;
+
+    auto &thisData = state->dataSurface;
+    thisData->TotSurfaces = 2;
+    thisData->Surface.allocate(thisData->TotSurfaces);
+    thisData->Surface(1).Construction = 1;
+    thisData->Surface(2).Construction = 2;
+    thisData->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CondFD;
+    thisData->Surface(2).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CondFD;
+    state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux.allocate(thisData->TotSurfaces);
+    state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux.allocate(thisData->TotSurfaces);
+    state->dataGlobal->TimeStepZoneSec = 600.0;
+
+    // call the function for initialization of finite difference calculation
+    std::string const error_string = delimited_string({"   ** Severe  ** InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too "
+                                                       "highly conductive, material name = REG MAT F05 CEILING AIR SPACE RESISTANCE",
+                                                       "   **   ~~~   ** High conductivity Material layers are not well supported by Conduction "
+                                                       "Finite Difference, material conductivity = 2.000 [W/m-K]",
+                                                       "   **   ~~~   ** Material thermal diffusivity = 1.626E-003 [m2/s]",
+                                                       "   **   ~~~   ** Material with this thermal diffusivity should have thickness > 1.71080 [m]",
+                                                       "   **  Fatal  ** Preceding conditions cause termination.",
+                                                       "   ...Summary of Errors that led to program termination:",
+                                                       "   ..... Reference severe error count=1",
+                                                       "   ..... Last severe error=InitialInitHeatBalFiniteDiff: Found Material that is too thin "
+                                                       "and/or too highly conductive, material name = REG MAT F05 CEILING AIR SPACE RESISTANCE"});
+    EXPECT_ANY_THROW(InitialInitHeatBalFiniteDiff(*state));
+
+    compare_err_stream(error_string, true);
+
+    // test new function directly
+    thisData->Surface(2).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
+    EXPECT_TRUE(EnergyPlus::HeatBalFiniteDiffManager::findAnySurfacesUsingConstructionAndCondFD(*state, 1));
+    EXPECT_FALSE(EnergyPlus::HeatBalFiniteDiffManager::findAnySurfacesUsingConstructionAndCondFD(*state, 2));
+}
+
 } // namespace EnergyPlus
