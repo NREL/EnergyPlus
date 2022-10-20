@@ -155,7 +155,7 @@ namespace WaterToAirHeatPumpSimple {
         Real64 MaxONOFFCyclesperHour = 0.0; // Maximum cycling rate of heat pump [cycles/hr]
         Real64 HPTimeConstant = 0.0;        // Heat pump time constant [s]
         Real64 FanDelayTime = 0.0;          // Fan delay time, time delay for the HP's fan to
-        bool reportCoilFinalSizes = false;  // one time report of sizes to coil report
+        bool reportCoilFinalSizes = true;   // one time report of sizes to coil report
     };
 
     void SimWatertoAirHPSimple(EnergyPlusData &state,
