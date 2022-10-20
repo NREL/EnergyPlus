@@ -518,9 +518,6 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     bool ZoneEquipSimulatedOnce = false;
     int NumOfZoneEquipLists = 0;
     Array1D_int ZoneEquipAvail;
-    Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-    Array1D_bool MixingReportFlag;      // TRUE when Mixing is active based on controls
-    Array1D<Real64> VentMCP;            // Product of mass rate and Cp for each Ventilation object
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
@@ -541,9 +538,6 @@ struct DataZoneEquipmentData : BaseGlobalStruct
         this->ZoneEquipSimulatedOnce = false;
         this->NumOfZoneEquipLists = 0;
         this->ZoneEquipAvail.deallocate();
-        this->CrossMixingReportFlag.deallocate();
-        this->MixingReportFlag.deallocate();
-        this->VentMCP.deallocate();
         this->ZoneEquipConfig.deallocate();
         this->UniqueZoneEquipListNames.clear();
         this->ZoneEquipList.deallocate();

@@ -90,12 +90,10 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->CrossMixing.allocate(NumOfCrossMixing);
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
-    state->dataZoneEquip->CrossMixingReportFlag.allocate(NumOfCrossMixing);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     state->dataHeatBal->TotCrossMixing = NumOfCrossMixing;
-    state->dataZoneEquip->CrossMixingReportFlag(1) = true;
     state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPI = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MCPI = 0.0;
@@ -113,6 +111,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     state->dataHeatBal->CrossMixing(1).ZonePtr = 1;
     state->dataHeatBal->CrossMixing(1).FromZone = 2;
     state->dataHeatBal->CrossMixing(1).DesiredAirFlowRate = 0.1;
+    state->dataHeatBal->CrossMixing(1).ReportFlag = true;
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
@@ -376,7 +375,6 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->TotVentilation = 1;
     state->dataHeatBal->Ventilation.allocate(state->dataHeatBal->TotVentilation);
-    state->dataZoneEquip->VentMCP.allocate(1);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     state->dataHVACGlobal->TimeStepSys = 1.0;
@@ -404,7 +402,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
     state->dataHeatBal->Ventilation(1).ZonePtr = 1;
     state->dataHeatBal->Ventilation(1).AirTemp = state->dataHeatBal->Zone(1).OutDryBulbTemp;
-    state->dataZoneEquip->VentMCP(1) = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV;
+    state->dataHeatBal->Ventilation(1).MCP = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV;
     // Call HVACManager
     ReportAirHeatBalance(*state);
 

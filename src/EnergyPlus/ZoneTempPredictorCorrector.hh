@@ -123,8 +123,6 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZT = DataHeatBalFanSys::ZoneInitialTemp;       // Air Temperature Averaged over the System Time Increment
         Real64 ZTAVComf = DataHeatBalFanSys::ZoneInitialTemp; // Air Temperature Averaged over the Zone Time step used
         // in thermal comfort models (currently Fang model only)
-        Real64 MixingMAT = DataHeatBalFanSys::ZoneInitialTemp; // Air temperature for mixing
-        Real64 MixingHumRat = 0.01;                            // Air humidity ratio for mixing
         Real64 XMAT = DataHeatBalFanSys::ZoneInitialTemp;      // Temporary zone/space temperature to test convergence
         Real64 XM2T = DataHeatBalFanSys::ZoneInitialTemp;
         Real64 XM3T = DataHeatBalFanSys::ZoneInitialTemp;
@@ -220,7 +218,9 @@ namespace ZoneTempPredictorCorrector {
         // HVAC time step
         Real64 MDotCPOA = 0.0; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
         Real64 MDotOA = 0.0;   // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
-        Real64 MixingMassFlowZone = 0.0;    // Mixing MASS FLOW (kg/s)
+        Real64 MixingMAT = DataHeatBalFanSys::ZoneInitialTemp; // Air temperature for mixing
+        Real64 MixingHumRat = 0.01;                            // Air humidity ratio for mixing
+        Real64 MixingMassFlowZone = 0.0;                       // Mixing MASS FLOW (kg/s)
         Real64 MixingMassFlowXHumRat = 0.0; // Mixing MASS FLOW * Humidity Ratio
 
         Real64 ZoneSetPointLast = 0.0;

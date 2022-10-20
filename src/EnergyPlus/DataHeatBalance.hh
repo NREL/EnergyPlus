@@ -1189,6 +1189,7 @@ namespace DataHeatBalance {
         Real64 EffAngle = 0.0;    // Effective angle [degree]
         Real64 DH = 0.0;          // Height difference [m]
         Real64 DiscCoef = 0.0;    // Discharge coefficient
+        Real64 MCP = 0.0;               // Product of mass flow rate and Cp
     };
 
     struct ZoneAirBalanceData
@@ -1244,6 +1245,7 @@ namespace DataHeatBalance {
         int NumRefDoorConnections = 0;
         bool EMSSimpleMixingOn = false;      // EMS actuating ventilation flow rate if .TRUE.
         bool RefDoorMixFlag = false;         // Refrigeration door mixing within zone
+        bool ReportFlag = false;             // TRUE when Mixing or Cross Mixing is active based on controls
         Real64 EMSimpleMixingFlowRate = 0.0; // Value EMS is directing to use for override
         Array1D_bool EMSRefDoorMixingOn;
         Array1D<Real64> EMSRefDoorFlowRate;

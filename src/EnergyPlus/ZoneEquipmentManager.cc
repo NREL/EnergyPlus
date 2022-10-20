@@ -5146,11 +5146,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     static constexpr std::string_view RoutineNameZoneAirBalance("CalcAirFlowSimple:ZoneAirBalance");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 MCP;
-    Real64 MCPxM;
-    Real64 MCPxN;
-    int m;                    // Index to From Zone
-    int n;                    // Index of this zone
     int I;                    // Ventilation master object index
     Real64 AirDensity;        // Density of air (kg/m^3)
     Real64 CpAir;             // Heat capacity of air (J/kg-C)
@@ -5162,7 +5157,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     Real64 MixingTmax;
 
     Real64 MCpI_temp;
-    Real64 VAMFL_temp;
 
     Real64 Cw;    // Opening effectivenss
     Real64 Cd;    // Discharge coefficent
@@ -5174,16 +5168,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     Real64 FDens;
     Real64 Fb;
 
-    // Allocate the MixingMAT and MixingHumRat arrays
-
-    if (!allocated(state.dataZoneEquip->VentMCP)) state.dataZoneEquip->VentMCP.allocate(state.dataHeatBal->TotVentilation);
-
-    // Allocate module level logical arrays for MIXING and CROSS MIXING reporting
-    if (!allocated(state.dataZoneEquip->CrossMixingReportFlag))
-        state.dataZoneEquip->CrossMixingReportFlag.allocate(state.dataHeatBal->TotCrossMixing);
-    if (!allocated(state.dataZoneEquip->MixingReportFlag)) state.dataZoneEquip->MixingReportFlag.allocate(state.dataHeatBal->TotMixing);
-
-    //                                      COMPUTE ZONE AIR MIXINGS
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MCPM = 0.0;
         thisZoneHB.MCPTM = 0.0;
@@ -5201,8 +5185,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         thisZoneHB.MixingMassFlowZone = 0.0;
         thisZoneHB.MixingMassFlowXHumRat = 0.0;
     }
-    state.dataZoneEquip->CrossMixingReportFlag = false;
-    state.dataZoneEquip->MixingReportFlag = false;
     if (state.dataContaminantBalance->Contaminant.CO2Simulation &&
         state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing + state.dataHeatBal->TotRefDoorMixing > 0)
         state.dataContaminantBalance->MixingMassFlowCO2 = 0.0;
@@ -5212,7 +5194,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
     Real64 IVF = 0.0; // DESIGN INFILTRATION FLOW RATE (M**3/SEC)
     Real64 VVF = 0.0; // DESIGN VENTILATION FLOW RATE (M**3/SEC)
-    state.dataZoneEquip->VentMCP = 0.0;
 
     if (!state.dataHeatBal->AirFlowFlag) return;
     // AirflowNetwork Multizone field /= SIMPLE
@@ -5248,13 +5229,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         }
     }
 
-    // Process the scheduled Ventilation for air heat balance
-    if (state.dataHeatBal->TotVentilation > 0) {
-        for (auto &e : state.dataHeatBal->ZnAirRpt) {
-            e.VentilFanElec = 0.0;
-        }
-    }
-
     // Initialization of ZoneAirBalance
     if (state.dataHeatBal->TotZoneAirBalance > 0) {
         for (auto &e : state.dataHeatBal->ZoneAirBalance) {
@@ -5267,16 +5241,37 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         }
     }
 
+    if (state.dataHeatBal->TotVentilation > 0) {
+        for (auto &e : state.dataHeatBal->ZnAirRpt) {
+            e.VentilFanElec = 0.0;
+        }
+    }
+
+    // Process the scheduled Ventilation for air heat balance
     for (int j = 1; j <= state.dataHeatBal->TotVentilation; ++j) {
         // Use air node information linked to the zone if defined
-        int NZ = state.dataHeatBal->Ventilation(j).ZonePtr;
-        state.dataHeatBal->Ventilation(j).FanPower = 0.0;
-        Real64 TempExt = state.dataHeatBal->Zone(NZ).OutDryBulbTemp;
-        Real64 WindSpeedExt = state.dataHeatBal->Zone(NZ).WindSpeed;
-        Real64 WindDirExt = state.dataHeatBal->Zone(NZ).WindDir;
-        if (state.dataHeatBal->Zone(NZ).HasLinkedOutAirNode) {
-            HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
-            EnthalpyExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).Enthalpy;
+        auto &thisVentilation = state.dataHeatBal->Ventilation(j);
+        int zoneNum = thisVentilation.ZonePtr;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
+        Real64 thisMixingMAT = 0.0;
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            thisMixingMAT = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisVentilation.spaceIndex).MixingMAT;
+        } else {
+            thisMixingMAT = thisZoneHB.MixingMAT;
+        }
+        thisVentilation.FanPower = 0.0;
+        thisVentilation.MCP = 0.0;
+
+        Real64 TempExt = state.dataHeatBal->Zone(zoneNum).OutDryBulbTemp;
+        Real64 WindSpeedExt = state.dataHeatBal->Zone(zoneNum).WindSpeed;
+        Real64 WindDirExt = state.dataHeatBal->Zone(zoneNum).WindDir;
+        Real64 thisMCPV = 0.0;
+        Real64 thisVAMFL = 0.0;
+        Real64 thisMCPTV = 0.0;
+
+        if (state.dataHeatBal->Zone(zoneNum).HasLinkedOutAirNode) {
+            HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(zoneNum).LinkedOutAirNode).HumRat;
+            EnthalpyExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(zoneNum).LinkedOutAirNode).Enthalpy;
         } else {
             HumRatExt = state.dataEnvrn->OutHumRat;
             EnthalpyExt = state.dataEnvrn->OutEnthalpy;
@@ -5286,16 +5281,15 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         // Hybrid ventilation global control
         Real64 hybridControlZoneMAT = 0.0; // Hybrid controlled zone MAT
 
-        if (state.dataHeatBal->Ventilation(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global &&
-            state.dataHeatBal->Ventilation(j).HybridControlMasterNum > 0) {
-            I = state.dataHeatBal->Ventilation(j).HybridControlMasterNum;
+        if (thisVentilation.HybridControlType == DataHeatBalance::HybridCtrlType::Global && thisVentilation.HybridControlMasterNum > 0) {
+            I = thisVentilation.HybridControlMasterNum;
             hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataHeatBal->Ventilation(I).ZonePtr).MixingMAT;
             if (j == I) {
-                state.dataHeatBal->Ventilation(j).HybridControlMasterStatus = false;
+                thisVentilation.HybridControlMasterStatus = false;
             }
         } else {
             I = j;
-            hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataHeatBal->Ventilation(j).ZonePtr).MixingMAT;
+            hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisVentilation.ZonePtr).MixingMAT;
         }
         // Check scheduled temperatures
         if (state.dataHeatBal->Ventilation(I).MinIndoorTempSchedPtr > 0) {
@@ -5360,278 +5354,265 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             state.dataHeatBal->Ventilation(I).DelTemperature = GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).DeltaTempSchedPtr);
         }
         // Skip this if the zone is below the minimum indoor temperature limit
-        if ((hybridControlZoneMAT < state.dataHeatBal->Ventilation(I).MinIndoorTemperature) && (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn))
-            continue;
+        if ((hybridControlZoneMAT < state.dataHeatBal->Ventilation(I).MinIndoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip this if the zone is above the maximum indoor temperature limit
-        if ((hybridControlZoneMAT > state.dataHeatBal->Ventilation(I).MaxIndoorTemperature) && (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn))
-            continue;
+        if ((hybridControlZoneMAT > state.dataHeatBal->Ventilation(I).MaxIndoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip if below the temperature difference limit (3/12/03 Negative DelTemperature allowed now)
-        if (((hybridControlZoneMAT - TempExt) < state.dataHeatBal->Ventilation(I).DelTemperature) &&
-            (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn))
-            continue;
+        if (((hybridControlZoneMAT - TempExt) < state.dataHeatBal->Ventilation(I).DelTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip this if the outdoor temperature is below the minimum outdoor temperature limit
-        if ((TempExt < state.dataHeatBal->Ventilation(I).MinOutdoorTemperature) && (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn)) continue;
+        if ((TempExt < state.dataHeatBal->Ventilation(I).MinOutdoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip this if the outdoor temperature is above the maximum outdoor temperature limit
-        if ((TempExt > state.dataHeatBal->Ventilation(I).MaxOutdoorTemperature) && (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn)) continue;
+        if ((TempExt > state.dataHeatBal->Ventilation(I).MaxOutdoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip this if the outdoor wind speed is above the maximum windspeed limit
-        if ((WindSpeedExt > state.dataHeatBal->Ventilation(I).MaxWindSpeed) && (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn)) continue;
+        if ((WindSpeedExt > state.dataHeatBal->Ventilation(I).MaxWindSpeed) && (!thisVentilation.EMSSimpleVentOn)) continue;
 
         // Hybrid ventilation controls
-        if ((state.dataHeatBal->Ventilation(j).HybridControlType == DataHeatBalance::HybridCtrlType::Close) &&
-            (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn))
-            continue;
-        if (state.dataHeatBal->Ventilation(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global &&
-            state.dataHeatBal->Ventilation(j).HybridControlMasterNum > 0) {
-            if (j == I) state.dataHeatBal->Ventilation(j).HybridControlMasterStatus = true;
+        if ((thisVentilation.HybridControlType == DataHeatBalance::HybridCtrlType::Close) && (!thisVentilation.EMSSimpleVentOn)) continue;
+        if (thisVentilation.HybridControlType == DataHeatBalance::HybridCtrlType::Global && thisVentilation.HybridControlMasterNum > 0) {
+            if (j == I) thisVentilation.HybridControlMasterStatus = true;
         }
 
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
-        if (state.dataHeatBal->Ventilation(j).ModelType == DataHeatBalance::VentilationModelType::DesignFlowRate) {
+        if (thisVentilation.ModelType == DataHeatBalance::VentilationModelType::DesignFlowRate) {
             // CR6845 if calculated < 0, don't propagate.
-            VVF = state.dataHeatBal->Ventilation(j).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(j).SchedPtr);
+            VVF = thisVentilation.DesignLevel * GetCurrentScheduleValue(state, thisVentilation.SchedPtr);
 
-            if (state.dataHeatBal->Ventilation(j).EMSSimpleVentOn) VVF = state.dataHeatBal->Ventilation(j).EMSimpleVentFlowRate;
+            if (thisVentilation.EMSSimpleVentOn) VVF = thisVentilation.EMSimpleVentFlowRate;
 
             if (VVF < 0.0) VVF = 0.0;
-            state.dataZoneEquip->VentMCP(j) = VVF * AirDensity * CpAir *
-                                              (state.dataHeatBal->Ventilation(j).ConstantTermCoef +
-                                               std::abs(TempExt - thisZoneHB.MixingMAT) * state.dataHeatBal->Ventilation(j).TemperatureTermCoef +
-                                               WindSpeedExt * (state.dataHeatBal->Ventilation(j).VelocityTermCoef +
-                                                               WindSpeedExt * state.dataHeatBal->Ventilation(j).VelocitySQTermCoef));
-            if (state.dataZoneEquip->VentMCP(j) < 0.0) state.dataZoneEquip->VentMCP(j) = 0.0;
-            VAMFL_temp = state.dataZoneEquip->VentMCP(j) / CpAir;
-            if (state.dataHeatBal->Zone(NZ).zoneOAQuadratureSum) {
-                auto &thisZoneAirBalance = state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Zone(NZ).zoneOABalanceIndex);
-                switch (state.dataHeatBal->Ventilation(j).FanType) {
+            thisVentilation.MCP = VVF * AirDensity * CpAir *
+                                  (thisVentilation.ConstantTermCoef + std::abs(TempExt - thisMixingMAT) * thisVentilation.TemperatureTermCoef +
+                                   WindSpeedExt * (thisVentilation.VelocityTermCoef + WindSpeedExt * thisVentilation.VelocitySQTermCoef));
+            if (thisVentilation.MCP < 0.0) thisVentilation.MCP = 0.0;
+            Real64 VAMFL_temp = thisVentilation.MCP / CpAir;
+            if (state.dataHeatBal->Zone(zoneNum).zoneOAQuadratureSum) {
+                auto &thisZoneAirBalance = state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Zone(zoneNum).zoneOABalanceIndex);
+                switch (thisVentilation.FanType) {
                     // ventilation type based calculation
                 case DataHeatBalance::VentilationType::Exhaust: {
-                    thisZoneAirBalance.ExhMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
+                    thisZoneAirBalance.ExhMassFlowRate += VAMFL_temp;
                 } break;
                 case DataHeatBalance::VentilationType::Intake: {
-                    thisZoneAirBalance.IntMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
+                    thisZoneAirBalance.IntMassFlowRate += VAMFL_temp;
                 } break;
                 case DataHeatBalance::VentilationType::Natural: {
-                    thisZoneAirBalance.NatMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
+                    thisZoneAirBalance.NatMassFlowRate += VAMFL_temp;
                 } break;
                 case DataHeatBalance::VentilationType::Balanced: {
-                    thisZoneAirBalance.BalMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
+                    thisZoneAirBalance.BalMassFlowRate += VAMFL_temp;
                 } break;
                 default:
                     break;
                 }
             } else {
-                thisZoneHB.MCPV += state.dataZoneEquip->VentMCP(j);
-                thisZoneHB.VAMFL += VAMFL_temp;
+                thisMCPV = thisVentilation.MCP;
+                thisVAMFL = VAMFL_temp;
             }
-            if (state.dataHeatBal->Ventilation(j).FanEfficiency > 0.0) {
-                state.dataHeatBal->Ventilation(j).FanPower =
-                    VAMFL_temp * state.dataHeatBal->Ventilation(j).FanPressure / (state.dataHeatBal->Ventilation(j).FanEfficiency * AirDensity);
-                if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced)
-                    state.dataHeatBal->Ventilation(j).FanPower *= 2.0;
+            if (thisVentilation.FanEfficiency > 0.0) {
+                thisVentilation.FanPower = VAMFL_temp * thisVentilation.FanPressure / (thisVentilation.FanEfficiency * AirDensity);
+                if (thisVentilation.FanType == DataHeatBalance::VentilationType::Balanced) thisVentilation.FanPower *= 2.0;
                 // calc electric
                 if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
-                    // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(NZ)) &
+                    // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(zoneNum)) &
                     if (!state.dataGlobal->KickOffSimulation) {
-                        if (!(state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
-                            !state.afn->AirflowNetworkZoneFlag(NZ))
-                            state.dataHeatBal->ZnAirRpt(NZ).VentilFanElec +=
-                                state.dataHeatBal->Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
-                    } else if (!state.afn->AirflowNetworkZoneFlag(NZ)) {
-                        state.dataHeatBal->ZnAirRpt(NZ).VentilFanElec +=
-                            state.dataHeatBal->Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
+                        if (!(state.dataZoneEquip->ZoneEquipAvail(zoneNum) == CycleOn ||
+                              state.dataZoneEquip->ZoneEquipAvail(zoneNum) == CycleOnZoneFansOnly) ||
+                            !state.afn->AirflowNetworkZoneFlag(zoneNum))
+                            state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
+                                thisVentilation.FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
+                    } else if (!state.afn->AirflowNetworkZoneFlag(zoneNum)) {
+                        state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
                     }
                 } else {
-                    state.dataHeatBal->ZnAirRpt(NZ).VentilFanElec +=
-                        state.dataHeatBal->Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
+                    state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
                 }
             }
             // Intake fans will add some heat to the air, raising the temperature for an intake fan...
-            if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Intake ||
-                state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced) {
+            if (thisVentilation.FanType == DataHeatBalance::VentilationType::Intake ||
+                thisVentilation.FanType == DataHeatBalance::VentilationType::Balanced) {
                 if (VAMFL_temp == 0.0) {
                     OutletAirEnthalpy = EnthalpyExt;
                 } else {
-                    if (state.dataHeatBal->Ventilation(j).FanPower > 0.0) {
-                        if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced) {
-                            OutletAirEnthalpy =
-                                EnthalpyExt + state.dataHeatBal->Ventilation(j).FanPower / VAMFL_temp / 2.0; // Half fan power to calculate inlet T
+                    if (thisVentilation.FanPower > 0.0) {
+                        if (thisVentilation.FanType == DataHeatBalance::VentilationType::Balanced) {
+                            OutletAirEnthalpy = EnthalpyExt + thisVentilation.FanPower / VAMFL_temp / 2.0; // Half fan power to calculate inlet T
                         } else {
-                            OutletAirEnthalpy = EnthalpyExt + state.dataHeatBal->Ventilation(j).FanPower / VAMFL_temp;
+                            OutletAirEnthalpy = EnthalpyExt + thisVentilation.FanPower / VAMFL_temp;
                         }
                     } else {
                         OutletAirEnthalpy = EnthalpyExt;
                     }
                 }
-                state.dataHeatBal->Ventilation(j).AirTemp = PsyTdbFnHW(OutletAirEnthalpy, HumRatExt);
+                thisVentilation.AirTemp = PsyTdbFnHW(OutletAirEnthalpy, HumRatExt);
             } else {
-                state.dataHeatBal->Ventilation(j).AirTemp = TempExt;
+                thisVentilation.AirTemp = TempExt;
             }
-            if (!state.dataHeatBal->Zone(NZ).zoneOAQuadratureSum)
-                thisZoneHB.MCPTV += state.dataZoneEquip->VentMCP(j) * state.dataHeatBal->Ventilation(j).AirTemp;
-        }
-
-        if (state.dataHeatBal->Ventilation(j).ModelType == DataHeatBalance::VentilationModelType::WindAndStack) {
-            if (state.dataHeatBal->Ventilation(j).OpenEff != DataGlobalConstants::AutoCalculate) {
-                Cw = state.dataHeatBal->Ventilation(j).OpenEff;
+            if (!state.dataHeatBal->Zone(zoneNum).zoneOAQuadratureSum) thisMCPTV = thisVentilation.MCP * thisVentilation.AirTemp;
+        } else if (thisVentilation.ModelType == DataHeatBalance::VentilationModelType::WindAndStack) {
+            if (thisVentilation.OpenEff != DataGlobalConstants::AutoCalculate) {
+                Cw = thisVentilation.OpenEff;
             } else {
                 // linear interpolation between effective angle and wind direction
-                angle = std::abs(WindDirExt - state.dataHeatBal->Ventilation(j).EffAngle);
+                angle = std::abs(WindDirExt - thisVentilation.EffAngle);
                 if (angle > 180.0) angle -= 180.0;
                 Cw = 0.55 + angle / 180.0 * (0.3 - 0.55);
             }
-            if (state.dataHeatBal->Ventilation(j).DiscCoef != DataGlobalConstants::AutoCalculate) {
-                Cd = state.dataHeatBal->Ventilation(j).DiscCoef;
+            if (thisVentilation.DiscCoef != DataGlobalConstants::AutoCalculate) {
+                Cd = thisVentilation.DiscCoef;
             } else {
-                Cd = 0.40 + 0.0045 * std::abs(TempExt - thisZoneHB.MixingMAT);
+                Cd = 0.40 + 0.0045 * std::abs(TempExt - thisMixingMAT);
             }
-            Qw = Cw * state.dataHeatBal->Ventilation(j).OpenArea *
-                 GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(j).OpenAreaSchedPtr) * WindSpeedExt;
-            Qst = Cd * state.dataHeatBal->Ventilation(j).OpenArea *
-                  GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(j).OpenAreaSchedPtr) *
-                  std::sqrt(2.0 * 9.81 * state.dataHeatBal->Ventilation(j).DH * std::abs(TempExt - thisZoneHB.MixingMAT) /
-                            (thisZoneHB.MixingMAT + 273.15));
+            Qw = Cw * thisVentilation.OpenArea * GetCurrentScheduleValue(state, thisVentilation.OpenAreaSchedPtr) * WindSpeedExt;
+            Qst = Cd * thisVentilation.OpenArea * GetCurrentScheduleValue(state, thisVentilation.OpenAreaSchedPtr) *
+                  std::sqrt(2.0 * 9.81 * thisVentilation.DH * std::abs(TempExt - thisMixingMAT) / (thisMixingMAT + 273.15));
             VVF = std::sqrt(Qw * Qw + Qst * Qst);
-            if (state.dataHeatBal->Ventilation(j).EMSSimpleVentOn) VVF = state.dataHeatBal->Ventilation(j).EMSimpleVentFlowRate;
+            if (thisVentilation.EMSSimpleVentOn) VVF = thisVentilation.EMSimpleVentFlowRate;
             if (VVF < 0.0) VVF = 0.0;
-            state.dataZoneEquip->VentMCP(j) = VVF * AirDensity * CpAir;
-            if (state.dataZoneEquip->VentMCP(j) < 0.0) state.dataZoneEquip->VentMCP(j) = 0.0;
-            if (state.dataHeatBal->Zone(NZ).zoneOAQuadratureSum) {
-                state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Zone(NZ).zoneOABalanceIndex).NatMassFlowRate +=
-                    state.dataZoneEquip->VentMCP(j) / CpAir;
+            thisVentilation.MCP = VVF * AirDensity * CpAir;
+            if (thisVentilation.MCP < 0.0) thisVentilation.MCP = 0.0;
+            if (state.dataHeatBal->Zone(zoneNum).zoneOAQuadratureSum) {
+                state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Zone(zoneNum).zoneOABalanceIndex).NatMassFlowRate += thisVentilation.MCP / CpAir;
             } else {
-                thisZoneHB.MCPV += state.dataZoneEquip->VentMCP(j);
-                VAMFL_temp = state.dataZoneEquip->VentMCP(j) / CpAir;
-                thisZoneHB.VAMFL += VAMFL_temp;
-                state.dataHeatBal->Ventilation(j).AirTemp = TempExt;
-                thisZoneHB.MCPTV += state.dataZoneEquip->VentMCP(j) * state.dataHeatBal->Ventilation(j).AirTemp;
+                thisMCPV = thisVentilation.MCP;
+                thisVAMFL = thisVentilation.MCP / CpAir;
+                thisVentilation.AirTemp = TempExt;
+                thisMCPTV = thisVentilation.MCP * thisVentilation.AirTemp;
             }
+        }
+        // Accumulate for zone and space
+        thisZoneHB.MCPV += thisMCPV;
+        thisZoneHB.VAMFL += thisVAMFL;
+        thisZoneHB.MCPTV += thisMCPTV;
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisVentilation.spaceIndex);
+            thisSpaceHB.MCPV += thisMCPV;
+            thisSpaceHB.VAMFL += thisVAMFL;
+            thisSpaceHB.MCPTV += thisMCPTV;
         }
     }
 
     // Process Mixing
     for (int j = 1; j <= state.dataHeatBal->TotMixing; ++j) {
-        n = state.dataHeatBal->Mixing(j).ZonePtr;
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(n);
-        m = state.dataHeatBal->Mixing(j).FromZone;
-        Real64 TD = state.dataHeatBal->Mixing(j).DeltaTemperature; // Delta Temp limit
+        auto &thisMixing = state.dataHeatBal->Mixing(j);
+        int thisZoneNum = thisMixing.ZonePtr;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisZoneNum);
+        int fromZoneNum = thisMixing.FromZone;
+        Real64 TD = thisMixing.DeltaTemperature; // Delta Temp limit
+        thisMixing.ReportFlag = false;
 
         // Get scheduled delta temperature
-        if (state.dataHeatBal->Mixing(j).DeltaTempSchedPtr > 0) {
-            TD = GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(j).DeltaTempSchedPtr);
+        if (thisMixing.DeltaTempSchedPtr > 0) {
+            TD = GetCurrentScheduleValue(state, thisMixing.DeltaTempSchedPtr);
         }
-        Real64 TZN = thisZoneHB.MixingMAT;                                                       // Temperature of this zone
-        Real64 TZM = state.dataZoneTempPredictorCorrector->zoneHeatBalance(m).MixingMAT;         // Temperature of From Zone
-        Real64 HumRatZN = thisZoneHB.MixingHumRat;                                               // HumRat of this zone
-        Real64 HumRatZM = state.dataZoneTempPredictorCorrector->zoneHeatBalance(m).MixingHumRat; // HumRat of From Zone
+        Real64 TZN = thisZoneHB.MixingMAT;                                                                 // Temperature of this zone
+        Real64 TZM = state.dataZoneTempPredictorCorrector->zoneHeatBalance(fromZoneNum).MixingMAT;         // Temperature of From Zone
+        Real64 HumRatZN = thisZoneHB.MixingHumRat;                                                         // HumRat of this zone
+        Real64 HumRatZM = state.dataZoneTempPredictorCorrector->zoneHeatBalance(fromZoneNum).MixingHumRat; // HumRat of From Zone
+        Real64 thisMCPM = 0.0;
+        Real64 thisMCPTM = 0.0;
+        Real64 thisMixingMassFlow = 0.0;
+        Real64 thisMixingMassFlowXHumRat = 0.0;
 
         // Hybrid ventilation controls
-        if (state.dataHeatBal->Mixing(j).HybridControlType == DataHeatBalance::HybridCtrlType::Close) continue;
+        if (thisMixing.HybridControlType == DataHeatBalance::HybridCtrlType::Close) continue;
         // Check temperature limit
         MixingLimitFlag = false;
 
         // Hybrid ventilation global control
-        if (state.dataHeatBal->Mixing(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global &&
-            state.dataHeatBal->Mixing(j).HybridControlMasterNum > 0) {
-            I = state.dataHeatBal->Mixing(j).HybridControlMasterNum;
+        if (thisMixing.HybridControlType == DataHeatBalance::HybridCtrlType::Global && thisMixing.HybridControlMasterNum > 0) {
+            I = thisMixing.HybridControlMasterNum;
             if (!state.dataHeatBal->Ventilation(I).HybridControlMasterStatus) continue;
         } else {
             // Ensure the minimum indoor temperature <= the maximum indoor temperature
-            if (state.dataHeatBal->Mixing(j).MinIndoorTempSchedPtr > 0)
-                MixingTmin = GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(j).MinIndoorTempSchedPtr);
-            if (state.dataHeatBal->Mixing(j).MaxIndoorTempSchedPtr > 0)
-                MixingTmax = GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(j).MaxIndoorTempSchedPtr);
-            if (state.dataHeatBal->Mixing(j).MinIndoorTempSchedPtr > 0 && state.dataHeatBal->Mixing(j).MaxIndoorTempSchedPtr > 0) {
+            if (thisMixing.MinIndoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisMixing.MinIndoorTempSchedPtr);
+            if (thisMixing.MaxIndoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisMixing.MaxIndoorTempSchedPtr);
+            if (thisMixing.MinIndoorTempSchedPtr > 0 && thisMixing.MaxIndoorTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
-                    ++state.dataHeatBal->Mixing(j).IndoorTempErrCount;
-                    if (state.dataHeatBal->Mixing(j).IndoorTempErrCount < 2) {
+                    ++thisMixing.IndoorTempErrCount;
+                    if (thisMixing.IndoorTempErrCount < 2) {
                         ShowWarningError(state,
                                          "Mixing zone temperature control: The minimum zone temperature is above the maximum zone temperature in " +
-                                             state.dataHeatBal->Mixing(j).Name);
+                                             thisMixing.Name);
                         ShowContinueError(state, "The minimum zone temperature is set to the maximum zone temperature. Simulation continues.");
                         ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state,
                                                        "The minimum zone temperature is still above the maximum zone temperature",
-                                                       state.dataHeatBal->Mixing(j).IndoorTempErrIndex,
+                                                       thisMixing.IndoorTempErrIndex,
                                                        MixingTmin,
                                                        MixingTmin);
                     }
                     MixingTmin = MixingTmax;
                 }
             }
-            if (state.dataHeatBal->Mixing(j).MinIndoorTempSchedPtr > 0) {
+            if (thisMixing.MinIndoorTempSchedPtr > 0) {
                 if (TZN < MixingTmin) MixingLimitFlag = true;
             }
-            if (state.dataHeatBal->Mixing(j).MaxIndoorTempSchedPtr > 0) {
+            if (thisMixing.MaxIndoorTempSchedPtr > 0) {
                 if (TZN > MixingTmax) MixingLimitFlag = true;
             }
             // Ensure the minimum source temperature <= the maximum source temperature
-            if (state.dataHeatBal->Mixing(j).MinSourceTempSchedPtr > 0)
-                MixingTmin = GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(j).MinSourceTempSchedPtr);
-            if (state.dataHeatBal->Mixing(j).MaxSourceTempSchedPtr > 0)
-                MixingTmax = GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(j).MaxSourceTempSchedPtr);
-            if (state.dataHeatBal->Mixing(j).MinSourceTempSchedPtr > 0 && state.dataHeatBal->Mixing(j).MaxSourceTempSchedPtr > 0) {
+            if (thisMixing.MinSourceTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisMixing.MinSourceTempSchedPtr);
+            if (thisMixing.MaxSourceTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisMixing.MaxSourceTempSchedPtr);
+            if (thisMixing.MinSourceTempSchedPtr > 0 && thisMixing.MaxSourceTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
-                    ++state.dataHeatBal->Mixing(j).SourceTempErrCount;
-                    if (state.dataHeatBal->Mixing(j).SourceTempErrCount < 2) {
+                    ++thisMixing.SourceTempErrCount;
+                    if (thisMixing.SourceTempErrCount < 2) {
                         ShowWarningError(
                             state,
                             "Mixing source temperature control: The minimum source temperature is above the maximum source temperature in " +
-                                state.dataHeatBal->Mixing(j).Name);
+                                thisMixing.Name);
                         ShowContinueError(state, "The minimum source temperature is set to the maximum source temperature. Simulation continues.");
                         ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state,
                                                        "The minimum source temperature is still above the maximum source temperature",
-                                                       state.dataHeatBal->Mixing(j).SourceTempErrIndex,
+                                                       thisMixing.SourceTempErrIndex,
                                                        MixingTmin,
                                                        MixingTmin);
                     }
                     MixingTmin = MixingTmax;
                 }
             }
-            if (state.dataHeatBal->Mixing(j).MinSourceTempSchedPtr > 0) {
+            if (thisMixing.MinSourceTempSchedPtr > 0) {
                 if (TZM < MixingTmin) MixingLimitFlag = true;
             }
-            if (state.dataHeatBal->Mixing(j).MaxSourceTempSchedPtr > 0) {
+            if (thisMixing.MaxSourceTempSchedPtr > 0) {
                 if (TZM > MixingTmax) MixingLimitFlag = true;
             }
             // Ensure the minimum outdoor temperature <= the maximum outdoor temperature
-            Real64 TempExt = state.dataHeatBal->Zone(n).OutDryBulbTemp;
-            if (state.dataHeatBal->Mixing(j).MinOutdoorTempSchedPtr > 0)
-                MixingTmin = GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(j).MinOutdoorTempSchedPtr);
-            if (state.dataHeatBal->Mixing(j).MaxOutdoorTempSchedPtr > 0)
-                MixingTmax = GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(j).MaxOutdoorTempSchedPtr);
-            if (state.dataHeatBal->Mixing(j).MinOutdoorTempSchedPtr > 0 && state.dataHeatBal->Mixing(j).MaxOutdoorTempSchedPtr > 0) {
+            Real64 TempExt = state.dataHeatBal->Zone(thisZoneNum).OutDryBulbTemp;
+            if (thisMixing.MinOutdoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisMixing.MinOutdoorTempSchedPtr);
+            if (thisMixing.MaxOutdoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisMixing.MaxOutdoorTempSchedPtr);
+            if (thisMixing.MinOutdoorTempSchedPtr > 0 && thisMixing.MaxOutdoorTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
-                    ++state.dataHeatBal->Mixing(j).OutdoorTempErrCount;
-                    if (state.dataHeatBal->Mixing(j).OutdoorTempErrCount < 2) {
+                    ++thisMixing.OutdoorTempErrCount;
+                    if (thisMixing.OutdoorTempErrCount < 2) {
                         ShowWarningError(state,
                                          "Mixing outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor "
                                          "temperature in " +
-                                             state.dataHeatBal->Mixing(j).Name);
+                                             thisMixing.Name);
                         ShowContinueError(state, "The minimum outdoor temperature is set to the maximum source temperature. Simulation continues.");
                         ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state,
                                                        "The minimum outdoor temperature is still above the maximum outdoor temperature",
-                                                       state.dataHeatBal->Mixing(j).OutdoorTempErrIndex,
+                                                       thisMixing.OutdoorTempErrIndex,
                                                        MixingTmin,
                                                        MixingTmin);
                     }
                     MixingTmin = MixingTmax;
                 }
             }
-            if (state.dataHeatBal->Mixing(j).MinOutdoorTempSchedPtr > 0) {
+            if (thisMixing.MinOutdoorTempSchedPtr > 0) {
                 if (TempExt < MixingTmin) MixingLimitFlag = true;
             }
-            if (state.dataHeatBal->Mixing(j).MaxOutdoorTempSchedPtr > 0) {
+            if (thisMixing.MaxOutdoorTempSchedPtr > 0) {
                 if (TempExt > MixingTmax) MixingLimitFlag = true;
             }
         }
 
-        if (state.dataHeatBal->Mixing(j).HybridControlType != DataHeatBalance::HybridCtrlType::Global && MixingLimitFlag) continue;
-        if (state.dataHeatBal->Mixing(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global) TD = 0.0;
+        if (thisMixing.HybridControlType != DataHeatBalance::HybridCtrlType::Global && MixingLimitFlag) continue;
+        if (thisMixing.HybridControlType == DataHeatBalance::HybridCtrlType::Global) TD = 0.0;
 
         //  If TD equals zero (default) set coefficients for full mixing otherwise test
         //    for mixing conditions if user input delta temp > 0, then from zone temp (TZM)
@@ -5640,75 +5621,71 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         if (TD < 0.0) {
             if (TZM < TZN + TD) {
                 //            Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
-                //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,MixingHumRat(m))
-                //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(MixingHumRat(m),tzm) * RhoAirM
+                //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,MixingHumRat(fromZoneNum))
+                //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(MixingHumRat(fromZoneNum),tzm) * RhoAirM
                 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (HumRatZN + HumRatZM) / 2.0);
                 CpAir = PsyCpAirFnW((HumRatZN + HumRatZM) / 2.0); // Use average conditions
 
-                state.dataHeatBal->Mixing(j).DesiredAirFlowRate = state.dataHeatBal->Mixing(j).DesiredAirFlowRateSaved;
-                if (state.dataHeatBalFanSys->ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag) {
-                    if (state.dataHeatBal->Mixing(j).MixingMassFlowRate > 0.0) {
-                        state.dataHeatBal->Mixing(j).DesiredAirFlowRate = state.dataHeatBal->Mixing(j).MixingMassFlowRate / AirDensity;
+                thisMixing.DesiredAirFlowRate = thisMixing.DesiredAirFlowRateSaved;
+                if (state.dataHeatBalFanSys->ZoneMassBalanceFlag(thisZoneNum) && AdjustZoneMixingFlowFlag) {
+                    if (thisMixing.MixingMassFlowRate > 0.0) {
+                        thisMixing.DesiredAirFlowRate = thisMixing.MixingMassFlowRate / AirDensity;
                     }
                 }
-                state.dataHeatBal->Mixing(j).MixingMassFlowRate = state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
+                thisMixing.MixingMassFlowRate = thisMixing.DesiredAirFlowRate * AirDensity;
 
-                MCP = state.dataHeatBal->Mixing(j).DesiredAirFlowRate * CpAir * AirDensity;
-                thisZoneHB.MCPM += MCP;
-                thisZoneHB.MCPTM += MCP * TZM;
+                thisMCPM = thisMixing.MixingMassFlowRate * CpAir;
+                thisMCPTM = thisMCPM * TZN;
 
                 // Now to determine the moisture conditions
-                thisZoneHB.MixingMassFlowZone += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
-                thisZoneHB.MixingMassFlowXHumRat += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * HumRatZM;
+                thisMixingMassFlow = thisMixing.DesiredAirFlowRate * AirDensity;
+                thisMixingMassFlowXHumRat = thisMixing.DesiredAirFlowRate * AirDensity * HumRatZM;
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    state.dataContaminantBalance->MixingMassFlowCO2(n) +=
-                        state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
+                    state.dataContaminantBalance->MixingMassFlowCO2(thisZoneNum) +=
+                        thisMixing.DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(fromZoneNum);
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    state.dataContaminantBalance->MixingMassFlowGC(n) +=
-                        state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
+                    state.dataContaminantBalance->MixingMassFlowGC(thisZoneNum) +=
+                        thisMixing.DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(fromZoneNum);
                 }
-                state.dataZoneEquip->MixingReportFlag(j) = true;
+                thisMixing.ReportFlag = true;
             }
-        }
-        if (TD > 0.0) {
+        } else if (TD > 0.0) {
             if (TZM > TZN + TD) {
-                //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,MixingHumRat(m))
-                //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(MixingHumRat(m),tzm) * RhoAirM
+                //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,MixingHumRat(fromZoneNum))
+                //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(MixingHumRat(fromZoneNum),tzm) * RhoAirM
                 AirDensity = PsyRhoAirFnPbTdbW(state,
                                                state.dataEnvrn->OutBaroPress,
                                                (TZN + TZM) / 2.0,
                                                (HumRatZN + HumRatZM) / 2.0); // Use avg conditions
                 CpAir = PsyCpAirFnW((HumRatZN + HumRatZM) / 2.0);            // Use average conditions
 
-                state.dataHeatBal->Mixing(j).DesiredAirFlowRate = state.dataHeatBal->Mixing(j).DesiredAirFlowRateSaved;
-                if (state.dataHeatBalFanSys->ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag) {
-                    if (state.dataHeatBal->Mixing(j).MixingMassFlowRate > 0.0) {
-                        state.dataHeatBal->Mixing(j).DesiredAirFlowRate = state.dataHeatBal->Mixing(j).MixingMassFlowRate / AirDensity;
+                thisMixing.DesiredAirFlowRate = thisMixing.DesiredAirFlowRateSaved;
+                if (state.dataHeatBalFanSys->ZoneMassBalanceFlag(thisZoneNum) && AdjustZoneMixingFlowFlag) {
+                    if (thisMixing.MixingMassFlowRate > 0.0) {
+                        thisMixing.DesiredAirFlowRate = thisMixing.MixingMassFlowRate / AirDensity;
                     }
                 }
-                state.dataHeatBal->Mixing(j).MixingMassFlowRate = state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
+                thisMixing.MixingMassFlowRate = thisMixing.DesiredAirFlowRate * AirDensity;
 
-                MCP = state.dataHeatBal->Mixing(j).DesiredAirFlowRate * CpAir * AirDensity;
-                thisZoneHB.MCPM += MCP;
-                thisZoneHB.MCPTM += MCP * TZM;
+                thisMCPM = thisMixing.MixingMassFlowRate * CpAir;
+                thisMCPTM = thisMCPM * TZM;
                 // Now to determine the moisture conditions
-                thisZoneHB.MixingMassFlowZone += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
-                thisZoneHB.MixingMassFlowXHumRat += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * HumRatZM;
+                thisMixingMassFlow = thisMixing.MixingMassFlowRate;
+                thisMixingMassFlowXHumRat = thisMixing.MixingMassFlowRate * HumRatZM;
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    state.dataContaminantBalance->MixingMassFlowCO2(n) +=
-                        state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
+                    state.dataContaminantBalance->MixingMassFlowCO2(thisZoneNum) +=
+                        thisMixing.MixingMassFlowRate * state.dataContaminantBalance->ZoneAirCO2(fromZoneNum);
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    state.dataContaminantBalance->MixingMassFlowGC(n) +=
-                        state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
+                    state.dataContaminantBalance->MixingMassFlowGC(thisZoneNum) +=
+                        thisMixing.MixingMassFlowRate * state.dataContaminantBalance->ZoneAirGC(fromZoneNum);
                 }
-                state.dataZoneEquip->MixingReportFlag(j) = true;
+                thisMixing.ReportFlag = true;
             }
-        }
-        if (TD == 0.0) {
-            //          RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,MixingHumRat(m))
-            //          MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(MixingHumRat(m),tzm) * RhoAirM
+        } else if (TD == 0.0) {
+            //          RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,MixingHumRat(fromZoneNum))
+            //          MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(MixingHumRat(fromZoneNum),tzm) * RhoAirM
             AirDensity = PsyRhoAirFnPbTdbW(state,
                                            state.dataEnvrn->OutBaroPress,
                                            (TZN + TZM) / 2.0,
@@ -5716,124 +5693,138 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                                            RoutineNameMixing); // Use avg conditions
             CpAir = PsyCpAirFnW((HumRatZN + HumRatZM) / 2.0);  // Use average conditions
 
-            state.dataHeatBal->Mixing(j).DesiredAirFlowRate = state.dataHeatBal->Mixing(j).DesiredAirFlowRateSaved;
-            if (state.dataHeatBalFanSys->ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag) {
-                if (state.dataHeatBal->Mixing(j).MixingMassFlowRate > 0.0) {
-                    state.dataHeatBal->Mixing(j).DesiredAirFlowRate = state.dataHeatBal->Mixing(j).MixingMassFlowRate / AirDensity;
+            thisMixing.DesiredAirFlowRate = thisMixing.DesiredAirFlowRateSaved;
+            if (state.dataHeatBalFanSys->ZoneMassBalanceFlag(thisZoneNum) && AdjustZoneMixingFlowFlag) {
+                if (thisMixing.MixingMassFlowRate > 0.0) {
+                    thisMixing.DesiredAirFlowRate = thisMixing.MixingMassFlowRate / AirDensity;
                 }
             }
-            state.dataHeatBal->Mixing(j).MixingMassFlowRate = state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
+            thisMixing.MixingMassFlowRate = thisMixing.DesiredAirFlowRate * AirDensity;
 
-            MCP = state.dataHeatBal->Mixing(j).DesiredAirFlowRate * CpAir * AirDensity;
-            thisZoneHB.MCPM += MCP;
-            thisZoneHB.MCPTM += MCP * TZM;
+            thisMCPM = thisMixing.MixingMassFlowRate * CpAir;
+            thisMCPTM = thisMCPM * TZM;
             // Now to determine the moisture conditions
-            thisZoneHB.MixingMassFlowZone += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity;
-            thisZoneHB.MixingMassFlowXHumRat += state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * HumRatZM;
+            thisMixingMassFlow = thisMixing.MixingMassFlowRate;
+            thisMixingMassFlowXHumRat = thisMixing.MixingMassFlowRate * HumRatZM;
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                state.dataContaminantBalance->MixingMassFlowCO2(n) +=
-                    state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
+                state.dataContaminantBalance->MixingMassFlowCO2(thisZoneNum) +=
+                    thisMixing.MixingMassFlowRate * state.dataContaminantBalance->ZoneAirCO2(fromZoneNum);
             }
             if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                state.dataContaminantBalance->MixingMassFlowGC(n) +=
-                    state.dataHeatBal->Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
+                state.dataContaminantBalance->MixingMassFlowGC(thisZoneNum) +=
+                    thisMixing.MixingMassFlowRate * state.dataContaminantBalance->ZoneAirGC(fromZoneNum);
             }
-            state.dataZoneEquip->MixingReportFlag(j) = true;
+            thisMixing.ReportFlag = true;
+        }
+        // Accumulate for zone and space
+        thisZoneHB.MCPM += thisMCPM;
+        thisZoneHB.MCPTM += thisMCPTM;
+        thisZoneHB.MixingMassFlowZone += thisMixingMassFlow;
+        thisZoneHB.MixingMassFlowXHumRat += thisMixingMassFlowXHumRat;
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisMixing.spaceIndex);
+            thisSpaceHB.MCPM += thisMCPM;
+            thisSpaceHB.MCPTM += thisMCPTM;
+            thisSpaceHB.MixingMassFlowZone += thisMixingMassFlow;
+            thisSpaceHB.MixingMassFlowXHumRat += thisMixingMassFlowXHumRat;
         }
     }
 
     //                              COMPUTE CROSS ZONE
     //                              AIR MIXING
     for (int j = 1; j <= state.dataHeatBal->TotCrossMixing; ++j) {
-        n = state.dataHeatBal->CrossMixing(j).ZonePtr;
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(n);
-        m = state.dataHeatBal->CrossMixing(j).FromZone;
-        auto &otherZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(m);
-        Real64 TD = state.dataHeatBal->CrossMixing(j).DeltaTemperature; // Delta Temp limit
+        auto &thisCrossMixing = state.dataHeatBal->CrossMixing(j);
+        int thisZoneNum = thisCrossMixing.ZonePtr;
+        thisCrossMixing.ReportFlag = false;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisZoneNum);
+        int fromZoneNum = thisCrossMixing.FromZone;
+        auto &fromZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(fromZoneNum);
+        Real64 TD = thisCrossMixing.DeltaTemperature; // Delta Temp limit
         // Get scheduled delta temperature
-        if (state.dataHeatBal->CrossMixing(j).DeltaTempSchedPtr > 0) {
-            TD = GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(j).DeltaTempSchedPtr);
+        if (thisCrossMixing.DeltaTempSchedPtr > 0) {
+            TD = GetCurrentScheduleValue(state, thisCrossMixing.DeltaTempSchedPtr);
         }
+        Real64 thisMCPxM = 0.0;
+        Real64 thisMCPTxM = 0.0;
+        Real64 thisXMixingMassFlow = 0.0;
+        Real64 thisXMixingMassFlowXHumRat = 0.0;
+        Real64 fromMCPxM = 0.0;
+        Real64 fromMCPTxM = 0.0;
+        Real64 fromXMixingMassFlowXHumRat = 0.0;
 
         if (TD >= 0.0) {
-            Real64 TZN = thisZoneHB.MixingMAT;          // Temperature of this zone
-            Real64 TZM = otherZoneHB.MixingMAT;         // Temperature of From Zone
-            Real64 HumRatZN = thisZoneHB.MixingHumRat;  // HumRat of this zone
-            Real64 HumRatZM = otherZoneHB.MixingHumRat; // HumRat of From Zone
+            Real64 TZN = thisZoneHB.MixingMAT;         // Temperature of this zone
+            Real64 TZM = fromZoneHB.MixingMAT;         // Temperature of From Zone
+            Real64 HumRatZN = thisZoneHB.MixingHumRat; // HumRat of this zone
+            Real64 HumRatZM = fromZoneHB.MixingHumRat; // HumRat of From Zone
             // Check temperature limit
             MixingLimitFlag = false;
             // Ensure the minimum indoor temperature <= the maximum indoor temperature
-            if (state.dataHeatBal->CrossMixing(j).MinIndoorTempSchedPtr > 0)
-                MixingTmin = GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(j).MinIndoorTempSchedPtr);
-            if (state.dataHeatBal->CrossMixing(j).MaxIndoorTempSchedPtr > 0)
-                MixingTmax = GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(j).MaxIndoorTempSchedPtr);
-            if (state.dataHeatBal->CrossMixing(j).MinIndoorTempSchedPtr > 0 && state.dataHeatBal->CrossMixing(j).MaxIndoorTempSchedPtr > 0) {
+            if (thisCrossMixing.MinIndoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisCrossMixing.MinIndoorTempSchedPtr);
+            if (thisCrossMixing.MaxIndoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisCrossMixing.MaxIndoorTempSchedPtr);
+            if (thisCrossMixing.MinIndoorTempSchedPtr > 0 && thisCrossMixing.MaxIndoorTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
-                    ++state.dataHeatBal->CrossMixing(j).IndoorTempErrCount;
-                    if (state.dataHeatBal->CrossMixing(j).IndoorTempErrCount < 2) {
+                    ++thisCrossMixing.IndoorTempErrCount;
+                    if (thisCrossMixing.IndoorTempErrCount < 2) {
                         ShowWarningError(
                             state,
                             "CrossMixing zone temperature control: The minimum zone temperature is above the maximum zone temperature in " +
-                                state.dataHeatBal->CrossMixing(j).Name);
+                                thisCrossMixing.Name);
                         ShowContinueError(state, "The minimum zone temperature is set to the maximum zone temperature. Simulation continues.");
                         ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state,
                                                        "The minimum zone temperature is still above the maximum zone temperature",
-                                                       state.dataHeatBal->CrossMixing(j).IndoorTempErrIndex,
+                                                       thisCrossMixing.IndoorTempErrIndex,
                                                        MixingTmin,
                                                        MixingTmin);
                     }
                     MixingTmin = MixingTmax;
                 }
             }
-            if (state.dataHeatBal->CrossMixing(j).MinIndoorTempSchedPtr > 0) {
+            if (thisCrossMixing.MinIndoorTempSchedPtr > 0) {
                 if (TZN < MixingTmin) MixingLimitFlag = true;
             }
-            if (state.dataHeatBal->CrossMixing(j).MaxIndoorTempSchedPtr > 0) {
+            if (thisCrossMixing.MaxIndoorTempSchedPtr > 0) {
                 if (TZN > MixingTmax) MixingLimitFlag = true;
             }
             // Ensure the minimum source temperature <= the maximum source temperature
-            if (state.dataHeatBal->CrossMixing(j).MinSourceTempSchedPtr > 0)
-                MixingTmin = GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(j).MinSourceTempSchedPtr);
-            if (state.dataHeatBal->CrossMixing(j).MaxSourceTempSchedPtr > 0)
-                MixingTmax = GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(j).MaxSourceTempSchedPtr);
-            if (state.dataHeatBal->CrossMixing(j).MinSourceTempSchedPtr > 0 && state.dataHeatBal->CrossMixing(j).MaxSourceTempSchedPtr > 0) {
+            if (thisCrossMixing.MinSourceTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisCrossMixing.MinSourceTempSchedPtr);
+            if (thisCrossMixing.MaxSourceTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisCrossMixing.MaxSourceTempSchedPtr);
+            if (thisCrossMixing.MinSourceTempSchedPtr > 0 && thisCrossMixing.MaxSourceTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
-                    ++state.dataHeatBal->CrossMixing(j).SourceTempErrCount;
-                    if (state.dataHeatBal->CrossMixing(j).SourceTempErrCount < 2) {
+                    ++thisCrossMixing.SourceTempErrCount;
+                    if (thisCrossMixing.SourceTempErrCount < 2) {
                         ShowWarningError(state,
                                          "CrossMixing source temperature control: The minimum source temperature is above the maximum source "
                                          "temperature in " +
-                                             state.dataHeatBal->CrossMixing(j).Name);
+                                             thisCrossMixing.Name);
                         ShowContinueError(state, "The minimum source temperature is set to the maximum source temperature. Simulation continues.");
                         ShowContinueErrorTimeStamp(state, " Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state,
                                                        "The minimum source temperature is still above the maximum source temperature",
-                                                       state.dataHeatBal->CrossMixing(j).SourceTempErrIndex,
+                                                       thisCrossMixing.SourceTempErrIndex,
                                                        MixingTmin,
                                                        MixingTmin);
                     }
                     MixingTmin = MixingTmax;
                 }
             }
-            if (state.dataHeatBal->CrossMixing(j).MinSourceTempSchedPtr > 0) {
+            if (thisCrossMixing.MinSourceTempSchedPtr > 0) {
                 if (TZM < MixingTmin) MixingLimitFlag = true;
             }
-            if (state.dataHeatBal->CrossMixing(j).MaxSourceTempSchedPtr > 0) {
+            if (thisCrossMixing.MaxSourceTempSchedPtr > 0) {
                 if (TZM > MixingTmax) MixingLimitFlag = true;
             }
             // Ensure the minimum outdoor temperature <= the maximum outdoor temperature
-            Real64 TempExt = state.dataHeatBal->Zone(n).OutDryBulbTemp;
-            if (state.dataHeatBal->CrossMixing(j).MinOutdoorTempSchedPtr > 0)
-                MixingTmin = GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(j).MinOutdoorTempSchedPtr);
-            if (state.dataHeatBal->CrossMixing(j).MaxOutdoorTempSchedPtr > 0)
-                MixingTmax = GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(j).MaxOutdoorTempSchedPtr);
-            if (state.dataHeatBal->CrossMixing(j).MinOutdoorTempSchedPtr > 0 && state.dataHeatBal->CrossMixing(j).MaxOutdoorTempSchedPtr > 0) {
+            Real64 TempExt = state.dataHeatBal->Zone(thisZoneNum).OutDryBulbTemp;
+            if (thisCrossMixing.MinOutdoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisCrossMixing.MinOutdoorTempSchedPtr);
+            if (thisCrossMixing.MaxOutdoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisCrossMixing.MaxOutdoorTempSchedPtr);
+            if (thisCrossMixing.MinOutdoorTempSchedPtr > 0 && thisCrossMixing.MaxOutdoorTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
-                    ++state.dataHeatBal->CrossMixing(j).OutdoorTempErrCount;
-                    if (state.dataHeatBal->CrossMixing(j).OutdoorTempErrCount < 2) {
+                    ++thisCrossMixing.OutdoorTempErrCount;
+                    if (thisCrossMixing.OutdoorTempErrCount < 2) {
                         ShowWarningError(state,
                                          "CrossMixing outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor "
                                          "temperature in " +
@@ -5843,23 +5834,23 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                     } else {
                         ShowRecurringWarningErrorAtEnd(state,
                                                        "The minimum outdoor temperature is still above the maximum outdoor temperature",
-                                                       state.dataHeatBal->CrossMixing(j).OutdoorTempErrIndex,
+                                                       thisCrossMixing.OutdoorTempErrIndex,
                                                        MixingTmin,
                                                        MixingTmin);
                     }
                     MixingTmin = MixingTmax;
                 }
             }
-            if (state.dataHeatBal->CrossMixing(j).MinOutdoorTempSchedPtr > 0) {
+            if (thisCrossMixing.MinOutdoorTempSchedPtr > 0) {
                 if (TempExt < MixingTmin) MixingLimitFlag = true;
             }
-            if (state.dataHeatBal->CrossMixing(j).MaxOutdoorTempSchedPtr > 0) {
+            if (thisCrossMixing.MaxOutdoorTempSchedPtr > 0) {
                 if (TempExt > MixingTmax) MixingLimitFlag = true;
             }
             if (MixingLimitFlag) continue;
 
             if ((TD == 0.0 || (TD > 0.0 && (TZM - TZN) >= TD))) {
-                state.dataZoneEquip->CrossMixingReportFlag(j) = true; // set reporting flag
+                thisCrossMixing.ReportFlag = true;
             }
 
             if ((TD <= 0.0) || ((TD > 0.0) && (TZM - TZN >= TD))) {
@@ -5868,33 +5859,51 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 Real64 Wavg = (HumRatZN + HumRatZM) / 2.0;
                 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing);
                 CpAir = PsyCpAirFnW(Wavg);
-                MCPxN = state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * CpAir * AirDensity;
-                thisZoneHB.MCPM += MCPxN;
+                thisXMixingMassFlow = thisCrossMixing.DesiredAirFlowRate * AirDensity;
+                thisMCPxM = thisXMixingMassFlow * CpAir;
 
-                MCPxM = state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * CpAir * AirDensity;
-                otherZoneHB.MCPM += MCPxM;
-                thisZoneHB.MCPTM += MCPxM * TZM;
-                otherZoneHB.MCPTM += MCPxN * TZN;
+                fromMCPxM = thisMCPxM;
+                thisMCPTxM = thisMCPxM * TZM;
+                fromMCPTxM = fromMCPxM * TZN;
 
                 // Now to determine the moisture conditions
-                otherZoneHB.MixingMassFlowZone += state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity;
-                otherZoneHB.MixingMassFlowXHumRat += state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity * HumRatZN;
+                fromXMixingMassFlowXHumRat = thisXMixingMassFlow * HumRatZN;
+                thisXMixingMassFlowXHumRat = thisXMixingMassFlow * HumRatZM;
 
-                thisZoneHB.MixingMassFlowZone += state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity;
-                thisZoneHB.MixingMassFlowXHumRat += state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity * HumRatZM;
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    state.dataContaminantBalance->MixingMassFlowCO2(m) +=
-                        state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(n);
-                    state.dataContaminantBalance->MixingMassFlowCO2(n) +=
-                        state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
+                    state.dataContaminantBalance->MixingMassFlowCO2(fromZoneNum) +=
+                        thisXMixingMassFlow * state.dataContaminantBalance->ZoneAirCO2(thisZoneNum);
+                    state.dataContaminantBalance->MixingMassFlowCO2(thisZoneNum) +=
+                        thisXMixingMassFlow * state.dataContaminantBalance->ZoneAirCO2(fromZoneNum);
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    state.dataContaminantBalance->MixingMassFlowGC(m) +=
-                        state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(n);
-                    state.dataContaminantBalance->MixingMassFlowGC(n) +=
-                        state.dataHeatBal->CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
+                    state.dataContaminantBalance->MixingMassFlowGC(fromZoneNum) +=
+                        thisXMixingMassFlow * state.dataContaminantBalance->ZoneAirGC(thisZoneNum);
+                    state.dataContaminantBalance->MixingMassFlowGC(thisZoneNum) +=
+                        thisXMixingMassFlow * state.dataContaminantBalance->ZoneAirGC(fromZoneNum);
                 }
             }
+        }
+        // Accumulate for zone and space
+        thisZoneHB.MCPM += thisMCPxM;
+        thisZoneHB.MCPTM += thisMCPTxM;
+        thisZoneHB.MixingMassFlowZone += thisXMixingMassFlow;
+        thisZoneHB.MixingMassFlowXHumRat += thisXMixingMassFlowXHumRat;
+        fromZoneHB.MCPM += fromMCPxM;
+        fromZoneHB.MCPTM += fromMCPTxM;
+        fromZoneHB.MixingMassFlowZone += thisXMixingMassFlow;
+        fromZoneHB.MixingMassFlowXHumRat += fromXMixingMassFlowXHumRat;
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.spaceIndex);
+            auto &fromSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisCrossMixing.fromSpaceIndex);
+            thisSpaceHB.MCPM += thisMCPxM;
+            thisSpaceHB.MCPTM += thisMCPTxM;
+            thisSpaceHB.MixingMassFlowZone += thisXMixingMassFlow;
+            thisSpaceHB.MixingMassFlowXHumRat += thisXMixingMassFlowXHumRat;
+            fromSpaceHB.MCPM += fromMCPxM;
+            fromSpaceHB.MCPTM += fromMCPTxM;
+            fromSpaceHB.MixingMassFlowZone += thisXMixingMassFlow;
+            fromSpaceHB.MixingMassFlowXHumRat += fromXMixingMassFlowXHumRat;
         }
     }
 
