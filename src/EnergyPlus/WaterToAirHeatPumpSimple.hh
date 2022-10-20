@@ -65,11 +65,19 @@ struct EnergyPlusData;
 
 namespace WaterToAirHeatPumpSimple {
 
+    enum class WatertoAirHP
+    {
+        Invalid = -1,
+        Heating,
+        Cooling,
+        Num
+    };
+
     struct SimpleWatertoAirHPConditions
     {
         // Members
         std::string Name;                                                                     // Name of the Water to Air Heat pump
-        std::string WatertoAirHPType;                                                         // Type of WatertoAirHP ie. Heating or Cooling
+        WatertoAirHP WAHPType = WatertoAirHP::Invalid;                                        // Type of WatertoAirHP ie. Heating or Cooling
         DataPlant::PlantEquipmentType WAHPPlantType = DataPlant::PlantEquipmentType::Invalid; // type of component in plant
         bool SimFlag = false;                                                                 // Heat Pump Simulation Flag
         Real64 AirVolFlowRate = 0.0;                                                          // Air Volumetric Flow Rate[m3/s]
