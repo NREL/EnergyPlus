@@ -5107,7 +5107,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                        bool const AdjustZoneInfiltrationFlowFlag // holds zone mixing air flow calc status
 )
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Legacy Code
     //       MODIFIED       Shirey, Jan 2008 (MIXING objects, use avg. conditions for Cp, Air Density and Hfg)
@@ -5122,51 +5121,12 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine calculates the air component of the heat balance.
 
-    // Using/Aliasing
-    using namespace DataHeatBalance;
-    using CoolTower::ManageCoolTower;
-    using DataHVACGlobals::CycleOn;
-    using DataHVACGlobals::CycleOnZoneFansOnly;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    using EarthTube::ManageEarthTube;
-    using Psychrometrics::PsyCpAirFnW;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using Psychrometrics::PsyTdbFnHW;
-    using Psychrometrics::PsyWFnTdbTwbPb;
-    using ScheduleManager::GetCurrentScheduleValue;
-    using ThermalChimney::ManageThermalChimney;
-    using namespace DataLoopNode;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr Real64 StdGravity(9.80665); // The acceleration of gravity at the sea level (m/s2)
     static constexpr std::string_view RoutineNameMixing("CalcAirFlowSimple:Mixing");
     static constexpr std::string_view RoutineNameCrossMixing("CalcAirFlowSimple:CrossMixing");
     static constexpr std::string_view RoutineNameRefrigerationDoorMixing("CalcAirFlowSimple:RefrigerationDoorMixing");
     static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
     static constexpr std::string_view RoutineNameZoneAirBalance("CalcAirFlowSimple:ZoneAirBalance");
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int I;                    // Ventilation master object index
-    Real64 AirDensity;        // Density of air (kg/m^3)
-    Real64 CpAir;             // Heat capacity of air (J/kg-C)
-    Real64 OutletAirEnthalpy; // Enthlapy of outlet air (VENTILATION objects)
-    Real64 HumRatExt;
-    Real64 EnthalpyExt;
-    bool MixingLimitFlag;
-    Real64 MixingTmin;
-    Real64 MixingTmax;
-
-    Real64 MCpI_temp;
-
-    Real64 Cw;    // Opening effectivenss
-    Real64 Cd;    // Discharge coefficent
-    Real64 angle; // Angle between wind direction and effective angle
-    Real64 Qw;    // Volumetric flow driven by wind
-    Real64 Qst;   // Volumetric flow driven by stack effect
-    // following variables used for refrigeration door mixing and all defined in EngRef
-    Real64 MassFlowDryAir;
-    Real64 FDens;
-    Real64 Fb;
 
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MCPM = 0.0;
@@ -5221,9 +5181,9 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         return;
     }
 
-    ManageEarthTube(state);
-    ManageCoolTower(state);
-    ManageThermalChimney(state);
+    EarthTube::ManageEarthTube(state);
+    CoolTower::ManageCoolTower(state);
+    ThermalChimney::ManageThermalChimney(state);
 
     // Assign zone air temperature
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
@@ -5267,7 +5227,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
     // Process the scheduled Ventilation for air heat balance
     for (int j = 1; j <= state.dataHeatBal->TotVentilation; ++j) {
-        // Use air node information linked to the zone if defined
         auto &thisVentilation = state.dataHeatBal->Ventilation(j);
         int zoneNum = thisVentilation.ZonePtr;
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
@@ -5287,6 +5246,9 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         Real64 thisVAMFL = 0.0;
         Real64 thisMCPTV = 0.0;
 
+        // Use air node information linked to the zone if defined
+        Real64 HumRatExt = 0.0;
+        Real64 EnthalpyExt = 0.0;
         if (state.dataHeatBal->Zone(zoneNum).HasLinkedOutAirNode) {
             HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(zoneNum).LinkedOutAirNode).HumRat;
             EnthalpyExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(zoneNum).LinkedOutAirNode).Enthalpy;
@@ -5294,11 +5256,12 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             HumRatExt = state.dataEnvrn->OutHumRat;
             EnthalpyExt = state.dataEnvrn->OutEnthalpy;
         }
-        AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt);
-        CpAir = PsyCpAirFnW(HumRatExt);
+        Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt); // Density of air (kg/m^3)
+        Real64 CpAir = PsyCpAirFnW(HumRatExt);
         // Hybrid ventilation global control
         Real64 hybridControlZoneMAT = 0.0; // Hybrid controlled zone MAT
 
+        int I = 0;
         if (thisVentilation.HybridControlType == DataHeatBalance::HybridCtrlType::Global && thisVentilation.HybridControlMasterNum > 0) {
             I = thisVentilation.HybridControlMasterNum;
             hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataHeatBal->Ventilation(I).ZonePtr).MixingMAT;
@@ -5312,11 +5275,11 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         // Check scheduled temperatures
         if (state.dataHeatBal->Ventilation(I).MinIndoorTempSchedPtr > 0) {
             state.dataHeatBal->Ventilation(I).MinIndoorTemperature =
-                GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MinIndoorTempSchedPtr);
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MinIndoorTempSchedPtr);
         }
         if (state.dataHeatBal->Ventilation(I).MaxIndoorTempSchedPtr > 0) {
             state.dataHeatBal->Ventilation(I).MaxIndoorTemperature =
-                GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MaxIndoorTempSchedPtr);
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MaxIndoorTempSchedPtr);
         }
         // Ensure the minimum indoor temperature <= the maximum indoor temperature
         if (state.dataHeatBal->Ventilation(I).MinIndoorTempSchedPtr > 0 || state.dataHeatBal->Ventilation(I).MaxIndoorTempSchedPtr > 0) {
@@ -5341,11 +5304,11 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         }
         if (state.dataHeatBal->Ventilation(I).MinOutdoorTempSchedPtr > 0) {
             state.dataHeatBal->Ventilation(I).MinOutdoorTemperature =
-                GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MinOutdoorTempSchedPtr);
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MinOutdoorTempSchedPtr);
         }
         if (state.dataHeatBal->Ventilation(I).MaxOutdoorTempSchedPtr > 0) {
             state.dataHeatBal->Ventilation(I).MaxOutdoorTemperature =
-                GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MaxOutdoorTempSchedPtr);
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MaxOutdoorTempSchedPtr);
         }
         // Ensure the minimum outdoor temperature <= the maximum outdoor temperature
         if (state.dataHeatBal->Ventilation(I).MinOutdoorTempSchedPtr > 0 || state.dataHeatBal->Ventilation(I).MaxOutdoorTempSchedPtr > 0) {
@@ -5369,7 +5332,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             }
         }
         if (state.dataHeatBal->Ventilation(I).DeltaTempSchedPtr > 0) {
-            state.dataHeatBal->Ventilation(I).DelTemperature = GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).DeltaTempSchedPtr);
+            state.dataHeatBal->Ventilation(I).DelTemperature =
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).DeltaTempSchedPtr);
         }
         // Skip this if the zone is below the minimum indoor temperature limit
         if ((hybridControlZoneMAT < state.dataHeatBal->Ventilation(I).MinIndoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
@@ -5392,7 +5356,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
         if (thisVentilation.ModelType == DataHeatBalance::VentilationModelType::DesignFlowRate) {
             // CR6845 if calculated < 0, don't propagate.
-            VVF = thisVentilation.DesignLevel * GetCurrentScheduleValue(state, thisVentilation.SchedPtr);
+            VVF = thisVentilation.DesignLevel * ScheduleManager::GetCurrentScheduleValue(state, thisVentilation.SchedPtr);
 
             if (thisVentilation.EMSSimpleVentOn) VVF = thisVentilation.EMSimpleVentFlowRate;
 
@@ -5432,21 +5396,24 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
                     // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(zoneNum)) &
                     if (!state.dataGlobal->KickOffSimulation) {
-                        if (!(state.dataZoneEquip->ZoneEquipAvail(zoneNum) == CycleOn ||
-                              state.dataZoneEquip->ZoneEquipAvail(zoneNum) == CycleOnZoneFansOnly) ||
+                        if (!(state.dataZoneEquip->ZoneEquipAvail(zoneNum) == DataHVACGlobals::CycleOn ||
+                              state.dataZoneEquip->ZoneEquipAvail(zoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) ||
                             !state.afn->AirflowNetworkZoneFlag(zoneNum))
                             state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                                thisVentilation.FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
+                                thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                     } else if (!state.afn->AirflowNetworkZoneFlag(zoneNum)) {
-                        state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
+                        state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
+                            thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                     }
                 } else {
-                    state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
+                    state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
+                        thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
                 }
             }
             // Intake fans will add some heat to the air, raising the temperature for an intake fan...
             if (thisVentilation.FanType == DataHeatBalance::VentilationType::Intake ||
                 thisVentilation.FanType == DataHeatBalance::VentilationType::Balanced) {
+                Real64 OutletAirEnthalpy = 0.0;
                 if (VAMFL_temp == 0.0) {
                     OutletAirEnthalpy = EnthalpyExt;
                 } else {
@@ -5460,12 +5427,17 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                         OutletAirEnthalpy = EnthalpyExt;
                     }
                 }
-                thisVentilation.AirTemp = PsyTdbFnHW(OutletAirEnthalpy, HumRatExt);
+                thisVentilation.AirTemp = Psychrometrics::PsyTdbFnHW(OutletAirEnthalpy, HumRatExt);
             } else {
                 thisVentilation.AirTemp = TempExt;
             }
             if (!state.dataHeatBal->Zone(zoneNum).zoneOAQuadratureSum) thisMCPTV = thisVentilation.MCP * thisVentilation.AirTemp;
         } else if (thisVentilation.ModelType == DataHeatBalance::VentilationModelType::WindAndStack) {
+            Real64 Cw = 0.0;    // Opening effectivenss
+            Real64 Cd = 0.0;    // Discharge coefficent
+            Real64 angle = 0.0; // Angle between wind direction and effective angle
+            Real64 Qw = 0.0;    // Volumetric flow driven by wind
+            Real64 Qst = 0.0;   // Volumetric flow driven by stack effect
             if (thisVentilation.OpenEff != DataGlobalConstants::AutoCalculate) {
                 Cw = thisVentilation.OpenEff;
             } else {
@@ -5479,8 +5451,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             } else {
                 Cd = 0.40 + 0.0045 * std::abs(TempExt - thisMixingMAT);
             }
-            Qw = Cw * thisVentilation.OpenArea * GetCurrentScheduleValue(state, thisVentilation.OpenAreaSchedPtr) * WindSpeedExt;
-            Qst = Cd * thisVentilation.OpenArea * GetCurrentScheduleValue(state, thisVentilation.OpenAreaSchedPtr) *
+            Qw = Cw * thisVentilation.OpenArea * ScheduleManager::GetCurrentScheduleValue(state, thisVentilation.OpenAreaSchedPtr) * WindSpeedExt;
+            Qst = Cd * thisVentilation.OpenArea * ScheduleManager::GetCurrentScheduleValue(state, thisVentilation.OpenAreaSchedPtr) *
                   std::sqrt(2.0 * 9.81 * thisVentilation.DH * std::abs(TempExt - thisMixingMAT) / (thisMixingMAT + 273.15));
             VVF = std::sqrt(Qw * Qw + Qst * Qst);
             if (thisVentilation.EMSSimpleVentOn) VVF = thisVentilation.EMSimpleVentFlowRate;
@@ -5519,7 +5491,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
         // Get scheduled delta temperature
         if (thisMixing.DeltaTempSchedPtr > 0) {
-            TD = GetCurrentScheduleValue(state, thisMixing.DeltaTempSchedPtr);
+            TD = ScheduleManager::GetCurrentScheduleValue(state, thisMixing.DeltaTempSchedPtr);
         }
         Real64 TZN = 0.0;      // Temperature of this Zone/Space
         Real64 TZM = 0.0;      // Temperature of From Zone/Space
@@ -5547,16 +5519,19 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         // Hybrid ventilation controls
         if (thisMixing.HybridControlType == DataHeatBalance::HybridCtrlType::Close) continue;
         // Check temperature limit
-        MixingLimitFlag = false;
+        bool MixingLimitFlag = false;
 
         // Hybrid ventilation global control
+        int I = 0;
         if (thisMixing.HybridControlType == DataHeatBalance::HybridCtrlType::Global && thisMixing.HybridControlMasterNum > 0) {
             I = thisMixing.HybridControlMasterNum;
             if (!state.dataHeatBal->Ventilation(I).HybridControlMasterStatus) continue;
         } else {
             // Ensure the minimum indoor temperature <= the maximum indoor temperature
-            if (thisMixing.MinIndoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisMixing.MinIndoorTempSchedPtr);
-            if (thisMixing.MaxIndoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisMixing.MaxIndoorTempSchedPtr);
+            Real64 MixingTmin = 0.0;
+            Real64 MixingTmax = 0.0;
+            if (thisMixing.MinIndoorTempSchedPtr > 0) MixingTmin = ScheduleManager::GetCurrentScheduleValue(state, thisMixing.MinIndoorTempSchedPtr);
+            if (thisMixing.MaxIndoorTempSchedPtr > 0) MixingTmax = ScheduleManager::GetCurrentScheduleValue(state, thisMixing.MaxIndoorTempSchedPtr);
             if (thisMixing.MinIndoorTempSchedPtr > 0 && thisMixing.MaxIndoorTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
                     ++thisMixing.IndoorTempErrCount;
@@ -5583,8 +5558,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (TZN > MixingTmax) MixingLimitFlag = true;
             }
             // Ensure the minimum source temperature <= the maximum source temperature
-            if (thisMixing.MinSourceTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisMixing.MinSourceTempSchedPtr);
-            if (thisMixing.MaxSourceTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisMixing.MaxSourceTempSchedPtr);
+            if (thisMixing.MinSourceTempSchedPtr > 0) MixingTmin = ScheduleManager::GetCurrentScheduleValue(state, thisMixing.MinSourceTempSchedPtr);
+            if (thisMixing.MaxSourceTempSchedPtr > 0) MixingTmax = ScheduleManager::GetCurrentScheduleValue(state, thisMixing.MaxSourceTempSchedPtr);
             if (thisMixing.MinSourceTempSchedPtr > 0 && thisMixing.MaxSourceTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
                     ++thisMixing.SourceTempErrCount;
@@ -5613,8 +5588,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             }
             // Ensure the minimum outdoor temperature <= the maximum outdoor temperature
             Real64 TempExt = state.dataHeatBal->Zone(thisZoneNum).OutDryBulbTemp;
-            if (thisMixing.MinOutdoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisMixing.MinOutdoorTempSchedPtr);
-            if (thisMixing.MaxOutdoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisMixing.MaxOutdoorTempSchedPtr);
+            if (thisMixing.MinOutdoorTempSchedPtr > 0)
+                MixingTmin = ScheduleManager::GetCurrentScheduleValue(state, thisMixing.MinOutdoorTempSchedPtr);
+            if (thisMixing.MaxOutdoorTempSchedPtr > 0)
+                MixingTmax = ScheduleManager::GetCurrentScheduleValue(state, thisMixing.MaxOutdoorTempSchedPtr);
             if (thisMixing.MinOutdoorTempSchedPtr > 0 && thisMixing.MaxOutdoorTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
                     ++thisMixing.OutdoorTempErrCount;
@@ -5646,17 +5623,17 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         if (thisMixing.HybridControlType != DataHeatBalance::HybridCtrlType::Global && MixingLimitFlag) continue;
         if (thisMixing.HybridControlType == DataHeatBalance::HybridCtrlType::Global) TD = 0.0;
 
+        //            Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
+        Real64 AirDensity =
+            PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (HumRatZN + HumRatZM) / 2.0); // Density of air (kg/m^3)
+        Real64 CpAir = PsyCpAirFnW((HumRatZN + HumRatZM) / 2.0);                                                     // Use average conditions
+
         //  If TD equals zero (default) set coefficients for full mixing otherwise test
         //    for mixing conditions if user input delta temp > 0, then from zone temp (TZM)
         //    must be td degrees warmer than zone temp (TZN).  If user input delta temp < 0,
         //    then from zone temp (TZM) must be TD degrees cooler than zone temp (TZN).
         if (TD < 0.0) {
             if (TZM < TZN + TD) {
-                //            Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
-                //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,MixingHumRat(fromZoneNum))
-                //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(MixingHumRat(fromZoneNum),tzm) * RhoAirM
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (HumRatZN + HumRatZM) / 2.0);
-                CpAir = PsyCpAirFnW((HumRatZN + HumRatZM) / 2.0); // Use average conditions
 
                 thisMixing.DesiredAirFlowRate = thisMixing.DesiredAirFlowRateSaved;
                 if (state.dataHeatBalFanSys->ZoneMassBalanceFlag(thisZoneNum) && AdjustZoneMixingFlowFlag) {
@@ -5684,14 +5661,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             }
         } else if (TD > 0.0) {
             if (TZM > TZN + TD) {
-                //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,MixingHumRat(fromZoneNum))
-                //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(MixingHumRat(fromZoneNum),tzm) * RhoAirM
-                AirDensity = PsyRhoAirFnPbTdbW(state,
-                                               state.dataEnvrn->OutBaroPress,
-                                               (TZN + TZM) / 2.0,
-                                               (HumRatZN + HumRatZM) / 2.0); // Use avg conditions
-                CpAir = PsyCpAirFnW((HumRatZN + HumRatZM) / 2.0);            // Use average conditions
-
                 thisMixing.DesiredAirFlowRate = thisMixing.DesiredAirFlowRateSaved;
                 if (state.dataHeatBalFanSys->ZoneMassBalanceFlag(thisZoneNum) && AdjustZoneMixingFlowFlag) {
                     if (thisMixing.MixingMassFlowRate > 0.0) {
@@ -5716,15 +5685,6 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 thisMixing.ReportFlag = true;
             }
         } else if (TD == 0.0) {
-            //          RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,MixingHumRat(fromZoneNum))
-            //          MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(MixingHumRat(fromZoneNum),tzm) * RhoAirM
-            AirDensity = PsyRhoAirFnPbTdbW(state,
-                                           state.dataEnvrn->OutBaroPress,
-                                           (TZN + TZM) / 2.0,
-                                           (HumRatZN + HumRatZM) / 2.0,
-                                           RoutineNameMixing); // Use avg conditions
-            CpAir = PsyCpAirFnW((HumRatZN + HumRatZM) / 2.0);  // Use average conditions
-
             thisMixing.DesiredAirFlowRate = thisMixing.DesiredAirFlowRateSaved;
             if (state.dataHeatBalFanSys->ZoneMassBalanceFlag(thisZoneNum) && AdjustZoneMixingFlowFlag) {
                 if (thisMixing.MixingMassFlowRate > 0.0) {
@@ -5774,7 +5734,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         Real64 TD = thisCrossMixing.DeltaTemperature; // Delta Temp limit
         // Get scheduled delta temperature
         if (thisCrossMixing.DeltaTempSchedPtr > 0) {
-            TD = GetCurrentScheduleValue(state, thisCrossMixing.DeltaTempSchedPtr);
+            TD = ScheduleManager::GetCurrentScheduleValue(state, thisCrossMixing.DeltaTempSchedPtr);
         }
         Real64 thisMCPxM = 0.0;
         Real64 thisMCPTxM = 0.0;
@@ -5803,10 +5763,14 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 HumRatZM = fromZoneHB.MixingHumRat; // HumRat of From Zone
             }
             // Check temperature limit
-            MixingLimitFlag = false;
+            bool MixingLimitFlag = false;
             // Ensure the minimum indoor temperature <= the maximum indoor temperature
-            if (thisCrossMixing.MinIndoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisCrossMixing.MinIndoorTempSchedPtr);
-            if (thisCrossMixing.MaxIndoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisCrossMixing.MaxIndoorTempSchedPtr);
+            Real64 MixingTmin = 0.0;
+            Real64 MixingTmax = 0.0;
+            if (thisCrossMixing.MinIndoorTempSchedPtr > 0)
+                MixingTmin = ScheduleManager::GetCurrentScheduleValue(state, thisCrossMixing.MinIndoorTempSchedPtr);
+            if (thisCrossMixing.MaxIndoorTempSchedPtr > 0)
+                MixingTmax = ScheduleManager::GetCurrentScheduleValue(state, thisCrossMixing.MaxIndoorTempSchedPtr);
             if (thisCrossMixing.MinIndoorTempSchedPtr > 0 && thisCrossMixing.MaxIndoorTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
                     ++thisCrossMixing.IndoorTempErrCount;
@@ -5834,8 +5798,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (TZN > MixingTmax) MixingLimitFlag = true;
             }
             // Ensure the minimum source temperature <= the maximum source temperature
-            if (thisCrossMixing.MinSourceTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisCrossMixing.MinSourceTempSchedPtr);
-            if (thisCrossMixing.MaxSourceTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisCrossMixing.MaxSourceTempSchedPtr);
+            if (thisCrossMixing.MinSourceTempSchedPtr > 0)
+                MixingTmin = ScheduleManager::GetCurrentScheduleValue(state, thisCrossMixing.MinSourceTempSchedPtr);
+            if (thisCrossMixing.MaxSourceTempSchedPtr > 0)
+                MixingTmax = ScheduleManager::GetCurrentScheduleValue(state, thisCrossMixing.MaxSourceTempSchedPtr);
             if (thisCrossMixing.MinSourceTempSchedPtr > 0 && thisCrossMixing.MaxSourceTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
                     ++thisCrossMixing.SourceTempErrCount;
@@ -5864,8 +5830,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             }
             // Ensure the minimum outdoor temperature <= the maximum outdoor temperature
             Real64 TempExt = state.dataHeatBal->Zone(thisZoneNum).OutDryBulbTemp;
-            if (thisCrossMixing.MinOutdoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, thisCrossMixing.MinOutdoorTempSchedPtr);
-            if (thisCrossMixing.MaxOutdoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, thisCrossMixing.MaxOutdoorTempSchedPtr);
+            if (thisCrossMixing.MinOutdoorTempSchedPtr > 0)
+                MixingTmin = ScheduleManager::GetCurrentScheduleValue(state, thisCrossMixing.MinOutdoorTempSchedPtr);
+            if (thisCrossMixing.MaxOutdoorTempSchedPtr > 0)
+                MixingTmax = ScheduleManager::GetCurrentScheduleValue(state, thisCrossMixing.MaxOutdoorTempSchedPtr);
             if (thisCrossMixing.MinOutdoorTempSchedPtr > 0 && thisCrossMixing.MaxOutdoorTempSchedPtr > 0) {
                 if (MixingTmin > MixingTmax) {
                     ++thisCrossMixing.OutdoorTempErrCount;
@@ -5902,8 +5870,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 //                                      SET COEFFICIENTS .
                 Real64 Tavg = (TZN + TZM) / 2.0;
                 Real64 Wavg = (HumRatZN + HumRatZM) / 2.0;
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing);
-                CpAir = PsyCpAirFnW(Wavg);
+                Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing);
+                Real64 CpAir = PsyCpAirFnW(Wavg);
                 thisXMixingMassFlow = thisCrossMixing.DesiredAirFlowRate * AirDensity;
                 thisMCPxM = thisXMixingMassFlow * CpAir;
 
@@ -5959,27 +5927,30 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         for (int ZoneA = 1; ZoneA <= (state.dataGlobal->NumOfZones - 1); ++ZoneA) {
             if (!state.dataHeatBal->RefDoorMixing(ZoneA).RefDoorMixFlag) continue;
             auto &zoneAHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA);
+            Real64 TZoneA = zoneAHB.MixingMAT;
+            Real64 HumRatZoneA = zoneAHB.MixingHumRat;
+            Real64 AirDensityZoneA = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TZoneA, HumRatZoneA, RoutineNameRefrigerationDoorMixing);
+            Real64 CpAirZoneA = PsyCpAirFnW(HumRatZoneA);
             for (int j = 1; j <= state.dataHeatBal->RefDoorMixing(ZoneA).NumRefDoorConnections; ++j) {
                 int ZoneB = state.dataHeatBal->RefDoorMixing(ZoneA).MateZonePtr(j);
                 auto &zoneBHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneB);
-                Real64 TZoneA = zoneAHB.MixingMAT;
                 Real64 TZoneB = zoneBHB.MixingMAT;
-                Real64 HumRatZoneA = zoneAHB.MixingHumRat;
                 Real64 HumRatZoneB = zoneBHB.MixingHumRat;
-                Real64 AirDensityZoneA =
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TZoneA, HumRatZoneA, RoutineNameRefrigerationDoorMixing);
-                Real64 CpAirZoneA = PsyCpAirFnW(HumRatZoneA);
-                Real64 AirDensityZoneB =
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TZoneB, HumRatZoneB, RoutineNameRefrigerationDoorMixing);
                 Real64 CpAirZoneB = PsyCpAirFnW(HumRatZoneB);
                 Real64 Tavg = (TZoneA + TZoneB) / 2.0;
                 Real64 Wavg = (HumRatZoneA + HumRatZoneB) / 2.0;
                 Real64 AirDensityAvg = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tavg, Wavg, RoutineNameRefrigerationDoorMixing);
+                // following variables used for refrigeration door mixing and all defined in EngRef
+                Real64 MassFlowDryAir = 0.0;
+                Real64 FDens = 0.0;
+                Real64 Fb = 0.0;
 
                 if (state.dataHeatBal->RefDoorMixing(ZoneA).EMSRefDoorMixingOn(j)) {
                     MassFlowDryAir = state.dataHeatBal->RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * AirDensityAvg;
                 } else {
-                    Real64 SchedDoorOpen = GetCurrentScheduleValue(state, state.dataHeatBal->RefDoorMixing(ZoneA).OpenSchedPtr(j));
+                    Real64 AirDensityZoneB =
+                        PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TZoneB, HumRatZoneB, RoutineNameRefrigerationDoorMixing);
+                    Real64 SchedDoorOpen = ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->RefDoorMixing(ZoneA).OpenSchedPtr(j));
                     if (SchedDoorOpen == 0.0) continue;
                     Real64 DoorHeight = state.dataHeatBal->RefDoorMixing(ZoneA).DoorHeight(j);
                     Real64 DoorArea = state.dataHeatBal->RefDoorMixing(ZoneA).DoorArea(j);
@@ -6060,113 +6031,96 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     // Process the scheduled Infiltration for air heat balance depending on model type
     for (int j = 1; j <= state.dataHeatBal->TotInfiltration; ++j) {
 
+        auto &thisInfiltration = state.dataHeatBal->Infiltration(j);
         int NZ = state.dataHeatBal->Infiltration(j).ZonePtr;
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
+        Real64 tempInt = 0.0;
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            tempInt = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisInfiltration.spaceIndex).MixingMAT;
+        } else {
+            tempInt = thisZoneHB.MixingMAT;
+        }
 
         Real64 TempExt = state.dataHeatBal->Zone(NZ).OutDryBulbTemp;
         Real64 WindSpeedExt = state.dataHeatBal->Zone(NZ).WindSpeed;
 
         // Use air node information linked to the zone if defined
-
+        Real64 HumRatExt = 0.0;
         if (state.dataHeatBal->Zone(NZ).HasLinkedOutAirNode) {
             HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
         } else {
             HumRatExt = state.dataEnvrn->OutHumRat;
         }
 
-        AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt, RoutineNameInfiltration);
-        CpAir = PsyCpAirFnW(HumRatExt);
+        Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt, RoutineNameInfiltration);
+        Real64 CpAir = PsyCpAirFnW(HumRatExt);
+        Real64 MCpI_temp = 0.0;
+        Real64 scheduleFrac = ScheduleManager::GetCurrentScheduleValue(state, thisInfiltration.SchedPtr);
+        if (scheduleFrac > 0.0) {
+            // CR7751  should maybe use code below, indoor conditions instead of outdoor conditions
+            //   AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MixingMAT(NZ), MixingHumRat(NZ))
+            //   CpAir = PsyCpAirFnW(MixingHumRat(NZ),MixingMAT(NZ))
+            switch (thisInfiltration.ModelType) {
+            case DataHeatBalance::InfiltrationModelType::DesignFlowRate: {
+                IVF = thisInfiltration.DesignLevel * scheduleFrac;
+                // CR6845 if calculated < 0.0, don't propagate
+                if (IVF < 0.0) IVF = 0.0;
+                MCpI_temp = IVF * AirDensity * CpAir *
+                            (thisInfiltration.ConstantTermCoef + std::abs(TempExt - tempInt) * thisInfiltration.TemperatureTermCoef +
+                             WindSpeedExt * (thisInfiltration.VelocityTermCoef + WindSpeedExt * thisInfiltration.VelocitySQTermCoef));
 
-        // CR7751  should maybe use code below, indoor conditions instead of outdoor conditions
-        //   AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MixingMAT(NZ), MixingHumRat(NZ))
-        //   CpAir = PsyCpAirFnW(MixingHumRat(NZ),MixingMAT(NZ))
-        switch (state.dataHeatBal->Infiltration(j).ModelType) {
-        case DataHeatBalance::InfiltrationModelType::DesignFlowRate: {
-            IVF = state.dataHeatBal->Infiltration(j).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Infiltration(j).SchedPtr);
-            // CR6845 if calculated < 0.0, don't propagate
-            if (IVF < 0.0) IVF = 0.0;
-            MCpI_temp = IVF * AirDensity * CpAir *
-                        (state.dataHeatBal->Infiltration(j).ConstantTermCoef +
-                         std::abs(TempExt - thisZoneHB.MixingMAT) * state.dataHeatBal->Infiltration(j).TemperatureTermCoef +
-                         WindSpeedExt * (state.dataHeatBal->Infiltration(j).VelocityTermCoef +
-                                         WindSpeedExt * state.dataHeatBal->Infiltration(j).VelocitySQTermCoef));
-
-            if (MCpI_temp < 0.0) MCpI_temp = 0.0;
-            state.dataHeatBal->Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-            if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
-                    // if ( Infiltration(j).MassFlowRate > 0.0 ) {
-                    state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).MassFlowRate / AirDensity;
-                    MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
-                    //}
-                }
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
-                    state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate +
-                                                                        state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
-                    MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
-                }
+                if (MCpI_temp < 0.0) MCpI_temp = 0.0;
+                thisInfiltration.VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
+            } break;
+            case DataHeatBalance::InfiltrationModelType::ShermanGrimsrud: {
+                // Sherman Grimsrud model as formulated in ASHRAE HoF
+                WindSpeedExt = state.dataEnvrn->WindSpeed; // formulated to use wind at Meterological Station rather than local
+                IVF = scheduleFrac * thisInfiltration.LeakageArea / 1000.0 *
+                      std::sqrt(thisInfiltration.BasicStackCoefficient * std::abs(TempExt - tempInt) +
+                                thisInfiltration.BasicWindCoefficient * pow_2(WindSpeedExt));
+                if (IVF < 0.0) IVF = 0.0;
+                MCpI_temp = IVF * AirDensity * CpAir;
+                if (MCpI_temp < 0.0) MCpI_temp = 0.0;
+                thisInfiltration.VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
+            } break;
+            case DataHeatBalance::InfiltrationModelType::AIM2: {
+                // Walker Wilson model as formulated in ASHRAE HoF
+                IVF =
+                    scheduleFrac * std::sqrt(pow_2(thisInfiltration.FlowCoefficient * thisInfiltration.AIM2StackCoefficient *
+                                                   std::pow(std::abs(TempExt - tempInt), thisInfiltration.PressureExponent)) +
+                                             pow_2(thisInfiltration.FlowCoefficient * thisInfiltration.AIM2WindCoefficient *
+                                                   std::pow(thisInfiltration.ShelterFactor * WindSpeedExt, 2.0 * thisInfiltration.PressureExponent)));
+                if (IVF < 0.0) IVF = 0.0;
+                MCpI_temp = IVF * AirDensity * CpAir;
+                if (MCpI_temp < 0.0) MCpI_temp = 0.0;
+                thisInfiltration.VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
+            } break;
+            default:
+                break;
             }
-            state.dataHeatBal->Infiltration(j).MassFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity;
-        } break;
-        case DataHeatBalance::InfiltrationModelType::ShermanGrimsrud: {
-            // Sherman Grimsrud model as formulated in ASHRAE HoF
-            WindSpeedExt = state.dataEnvrn->WindSpeed; // formulated to use wind at Meterological Station rather than local
-            IVF = GetCurrentScheduleValue(state, state.dataHeatBal->Infiltration(j).SchedPtr) * state.dataHeatBal->Infiltration(j).LeakageArea /
-                  1000.0 *
-                  std::sqrt(state.dataHeatBal->Infiltration(j).BasicStackCoefficient * std::abs(TempExt - thisZoneHB.MixingMAT) +
-                            state.dataHeatBal->Infiltration(j).BasicWindCoefficient * pow_2(WindSpeedExt));
-            if (IVF < 0.0) IVF = 0.0;
-            MCpI_temp = IVF * AirDensity * CpAir;
-            if (MCpI_temp < 0.0) MCpI_temp = 0.0;
-            state.dataHeatBal->Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-            if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
-                    if (state.dataHeatBal->Infiltration(j).MassFlowRate > 0.0) {
-                        state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).MassFlowRate / AirDensity;
-                        MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
-                    }
-                }
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
-                    state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate +
-                                                                        state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
-                    MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
-                }
-            }
-            state.dataHeatBal->Infiltration(j).MassFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity;
-        } break;
-        case DataHeatBalance::InfiltrationModelType::AIM2: {
-            // Walker Wilson model as formulated in ASHRAE HoF
-            IVF = GetCurrentScheduleValue(state, state.dataHeatBal->Infiltration(j).SchedPtr) *
-                  std::sqrt(pow_2(state.dataHeatBal->Infiltration(j).FlowCoefficient * state.dataHeatBal->Infiltration(j).AIM2StackCoefficient *
-                                  std::pow(std::abs(TempExt - thisZoneHB.MixingMAT), state.dataHeatBal->Infiltration(j).PressureExponent)) +
-                            pow_2(state.dataHeatBal->Infiltration(j).FlowCoefficient * state.dataHeatBal->Infiltration(j).AIM2WindCoefficient *
-                                  std::pow(state.dataHeatBal->Infiltration(j).ShelterFactor * WindSpeedExt,
-                                           2.0 * state.dataHeatBal->Infiltration(j).PressureExponent)));
-            if (IVF < 0.0) IVF = 0.0;
-            MCpI_temp = IVF * AirDensity * CpAir;
-            if (MCpI_temp < 0.0) MCpI_temp = 0.0;
-            state.dataHeatBal->Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-            if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
-                    if (state.dataHeatBal->Infiltration(j).MassFlowRate > 0.0) {
-                        state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).MassFlowRate / AirDensity;
-                        MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
-                    }
-                }
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
-                    state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate +
-                                                                        state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
-                    MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
-                }
-            }
-            state.dataHeatBal->Infiltration(j).MassFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity;
-        } break;
-        default:
-            break;
+        } else {
+            thisInfiltration.VolumeFlowRate = 0.0;
+            MCpI_temp = 0.0;
         }
 
-        if (state.dataHeatBal->Infiltration(j).EMSOverrideOn) {
-            IVF = state.dataHeatBal->Infiltration(j).EMSAirFlowRateValue;
+        if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
+            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
+                if (thisInfiltration.MassFlowRate > 0.0 || thisInfiltration.ModelType == DataHeatBalance::InfiltrationModelType::DesignFlowRate) {
+                    // For DesignFlowRate, allow exfiltraion
+                    thisInfiltration.VolumeFlowRate = thisInfiltration.MassFlowRate / AirDensity;
+                    MCpI_temp = thisInfiltration.VolumeFlowRate * AirDensity * CpAir;
+                }
+            }
+            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
+                thisInfiltration.VolumeFlowRate =
+                    thisInfiltration.VolumeFlowRate + state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
+                MCpI_temp = thisInfiltration.VolumeFlowRate * AirDensity * CpAir;
+            }
+        }
+        thisInfiltration.MassFlowRate = thisInfiltration.VolumeFlowRate * AirDensity;
+
+        if (thisInfiltration.EMSOverrideOn) {
+            IVF = thisInfiltration.EMSAirFlowRateValue;
             if (IVF < 0.0) IVF = 0.0;
             MCpI_temp = IVF * AirDensity * CpAir;
             if (MCpI_temp < 0.0) MCpI_temp = 0.0;
@@ -6175,27 +6129,39 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         if (state.dataHeatBal->Zone(NZ).zoneOAQuadratureSum) {
             state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Zone(NZ).zoneOABalanceIndex).InfMassFlowRate += MCpI_temp / CpAir;
         } else {
-            state.dataHeatBal->Infiltration(j).MCpI_temp = MCpI_temp;
+            thisInfiltration.MCpI_temp = MCpI_temp;
             thisZoneHB.MCPI += MCpI_temp;
             thisZoneHB.OAMFL += MCpI_temp / CpAir;
             thisZoneHB.MCPTI += MCpI_temp * TempExt;
+            if (state.dataHeatBal->doSpaceHeatBalance) {
+                auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(thisInfiltration.spaceIndex);
+                thisSpaceHB.MCPI += MCpI_temp;
+                thisSpaceHB.OAMFL += MCpI_temp / CpAir;
+                thisSpaceHB.MCPTI += MCpI_temp * TempExt;
+            }
         }
     }
 
     // Add infiltration rate enhanced by the existence of thermal chimney
-    for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
+    for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MCPI += thisZoneHB.MCPThermChim;
         thisZoneHB.OAMFL += thisZoneHB.ThermChimAMFL;
         thisZoneHB.MCPTI += thisZoneHB.MCPTThermChim;
     }
+    if (state.dataHeatBal->doSpaceHeatBalance) {
+        for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+            thisSpaceHB.MCPI += thisSpaceHB.MCPThermChim;
+            thisSpaceHB.OAMFL += thisSpaceHB.ThermChimAMFL;
+            thisSpaceHB.MCPTI += thisSpaceHB.MCPTThermChim;
+        }
+    }
 
     // Calculate combined outdoor air flows
     for (auto thisZoneAirBalance : state.dataHeatBal->ZoneAirBalance) {
-        if (thisZoneAirBalance.BalanceMethod == AirBalance::Quadrature) {
+        if (thisZoneAirBalance.BalanceMethod == DataHeatBalance::AirBalance::Quadrature) {
             if (!thisZoneAirBalance.OneTimeFlag) GetStandAloneERVNodes(state, thisZoneAirBalance);
             if (thisZoneAirBalance.NumOfERVs > 0) {
-                for (I = 1; I <= thisZoneAirBalance.NumOfERVs; ++I) {
+                for (int I = 1; I <= thisZoneAirBalance.NumOfERVs; ++I) {
                     Real64 MassFlowDiff = state.dataLoopNodes->Node(thisZoneAirBalance.ERVExhaustNode(I)).MassFlowRate -
                                           state.dataLoopNodes->Node(thisZoneAirBalance.ERVInletNode(I)).MassFlowRate;
                     if (MassFlowDiff > 0.0) {
@@ -6205,15 +6171,22 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             }
             int NZ = thisZoneAirBalance.ZonePtr;
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
-            AirDensity = PsyRhoAirFnPbTdbW(
+            // Use air node information linked to the zone if defined
+            Real64 HumRatExt = 0.0;
+            if (state.dataHeatBal->Zone(NZ).HasLinkedOutAirNode) {
+                HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
+            } else {
+                HumRatExt = state.dataEnvrn->OutHumRat;
+            }
+            Real64 AirDensity = PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->OutBaroPress, state.dataHeatBal->Zone(NZ).OutDryBulbTemp, HumRatExt, RoutineNameZoneAirBalance);
-            CpAir = PsyCpAirFnW(HumRatExt);
+            Real64 CpAir = PsyCpAirFnW(HumRatExt);
             thisZoneAirBalance.ERVMassFlowRate *= AirDensity;
             thisZoneHB.MDotOA = std::sqrt(pow_2(thisZoneAirBalance.NatMassFlowRate) + pow_2(thisZoneAirBalance.IntMassFlowRate) +
                                           pow_2(thisZoneAirBalance.ExhMassFlowRate) + pow_2(thisZoneAirBalance.ERVMassFlowRate) +
                                           pow_2(thisZoneAirBalance.InfMassFlowRate) +
                                           pow_2(AirDensity * thisZoneAirBalance.InducedAirRate *
-                                                GetCurrentScheduleValue(state, thisZoneAirBalance.InducedAirSchedPtr))) +
+                                                ScheduleManager::GetCurrentScheduleValue(state, thisZoneAirBalance.InducedAirSchedPtr))) +
                                 thisZoneAirBalance.BalMassFlowRate;
             thisZoneHB.MDotCPOA = thisZoneHB.MDotOA * CpAir;
         }
