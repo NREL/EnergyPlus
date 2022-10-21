@@ -691,8 +691,7 @@ namespace DataHeatBalance {
         bool WindDirEMSOverrideOn = false;           // if true, EMS is calling to override the surface's outside wind direction
         Real64 WindDirEMSOverrideValue = 0.0;        // value to use for EMS override of the surface's outside wind speed
 
-        bool HasLinkedOutAirNode = false; // true if an OutdoorAir::Node is linked to the surface
-        int LinkedOutAirNode = 0;         // Index of the an OutdoorAir:Node
+        int LinkedOutAirNode = 0;         // Index of the an OutdoorAir:Node,, zero if none
 
         bool isPartOfTotalArea = true;           // Count the zone area when determining the building total floor area
         bool isNominalOccupied = false;          // has occupancy nominally specified
@@ -1189,7 +1188,7 @@ namespace DataHeatBalance {
         Real64 EffAngle = 0.0;    // Effective angle [degree]
         Real64 DH = 0.0;          // Height difference [m]
         Real64 DiscCoef = 0.0;    // Discharge coefficient
-        Real64 MCP = 0.0;               // Product of mass flow rate and Cp
+        Real64 MCP = 0.0;         // Product of mass flow rate and Cp
     };
 
     struct ZoneAirBalanceData

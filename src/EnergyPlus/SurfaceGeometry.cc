@@ -8114,7 +8114,6 @@ namespace SurfaceGeometry {
                 if (SurfLocalEnv.SurfPtr == SurfLoop) {
                     auto &surface = state.dataSurface->Surface(SurfLoop);
                     if (SurfLocalEnv.OutdoorAirNodePtr != 0) {
-                        surface.SurfHasLinkedOutAirNode = true;
                         surface.SurfLinkedOutAirNode = SurfLocalEnv.OutdoorAirNodePtr;
                     }
                     if (SurfLocalEnv.ExtShadingSchedPtr != 0) {

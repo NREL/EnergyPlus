@@ -5249,7 +5249,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         // Use air node information linked to the zone if defined
         Real64 HumRatExt = 0.0;
         Real64 EnthalpyExt = 0.0;
-        if (state.dataHeatBal->Zone(zoneNum).HasLinkedOutAirNode) {
+        if (state.dataHeatBal->Zone(zoneNum).LinkedOutAirNode > 0) {
             HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(zoneNum).LinkedOutAirNode).HumRat;
             EnthalpyExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(zoneNum).LinkedOutAirNode).Enthalpy;
         } else {
@@ -5258,95 +5258,95 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         }
         Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt); // Density of air (kg/m^3)
         Real64 CpAir = PsyCpAirFnW(HumRatExt);
-        // Hybrid ventilation global control
-        Real64 hybridControlZoneMAT = 0.0; // Hybrid controlled zone MAT
 
+        // Hybrid ventilation global control
         int I = 0;
         if (thisVentilation.HybridControlType == DataHeatBalance::HybridCtrlType::Global && thisVentilation.HybridControlMasterNum > 0) {
             I = thisVentilation.HybridControlMasterNum;
-            hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataHeatBal->Ventilation(I).ZonePtr).MixingMAT;
             if (j == I) {
                 thisVentilation.HybridControlMasterStatus = false;
             }
         } else {
             I = j;
-            hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisVentilation.ZonePtr).MixingMAT;
         }
+        auto &hybridControlVentilation = state.dataHeatBal->Ventilation(I);
+        // Hybrid controlled zone MAT
+        Real64 hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(hybridControlVentilation.ZonePtr).MixingMAT;
+
         // Check scheduled temperatures
-        if (state.dataHeatBal->Ventilation(I).MinIndoorTempSchedPtr > 0) {
-            state.dataHeatBal->Ventilation(I).MinIndoorTemperature =
-                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MinIndoorTempSchedPtr);
+        if (hybridControlVentilation.MinIndoorTempSchedPtr > 0) {
+            hybridControlVentilation.MinIndoorTemperature =
+                ScheduleManager::GetCurrentScheduleValue(state, hybridControlVentilation.MinIndoorTempSchedPtr);
         }
-        if (state.dataHeatBal->Ventilation(I).MaxIndoorTempSchedPtr > 0) {
-            state.dataHeatBal->Ventilation(I).MaxIndoorTemperature =
-                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MaxIndoorTempSchedPtr);
+        if (hybridControlVentilation.MaxIndoorTempSchedPtr > 0) {
+            hybridControlVentilation.MaxIndoorTemperature =
+                ScheduleManager::GetCurrentScheduleValue(state, hybridControlVentilation.MaxIndoorTempSchedPtr);
         }
         // Ensure the minimum indoor temperature <= the maximum indoor temperature
-        if (state.dataHeatBal->Ventilation(I).MinIndoorTempSchedPtr > 0 || state.dataHeatBal->Ventilation(I).MaxIndoorTempSchedPtr > 0) {
-            if (state.dataHeatBal->Ventilation(I).MinIndoorTemperature > state.dataHeatBal->Ventilation(I).MaxIndoorTemperature) {
-                ++state.dataHeatBal->Ventilation(I).IndoorTempErrCount;
-                if (state.dataHeatBal->Ventilation(I).IndoorTempErrCount < 2) {
+        if (hybridControlVentilation.MinIndoorTempSchedPtr > 0 || hybridControlVentilation.MaxIndoorTempSchedPtr > 0) {
+            if (hybridControlVentilation.MinIndoorTemperature > hybridControlVentilation.MaxIndoorTemperature) {
+                ++hybridControlVentilation.IndoorTempErrCount;
+                if (hybridControlVentilation.IndoorTempErrCount < 2) {
                     ShowWarningError(
                         state,
                         "Ventilation indoor temperature control: The minimum indoor temperature is above the maximum indoor temperature in " +
-                            state.dataHeatBal->Ventilation(I).Name);
+                            hybridControlVentilation.Name);
                     ShowContinueError(state, "The minimum indoor temperature is set to the maximum indoor temperature. Simulation continues.");
                     ShowContinueErrorTimeStamp(state, " Occurrence info:");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
                                                    "The minimum indoor temperature is still above the maximum indoor temperature",
-                                                   state.dataHeatBal->Ventilation(I).IndoorTempErrIndex,
-                                                   state.dataHeatBal->Ventilation(I).MinIndoorTemperature,
-                                                   state.dataHeatBal->Ventilation(I).MinIndoorTemperature);
+                                                   hybridControlVentilation.IndoorTempErrIndex,
+                                                   hybridControlVentilation.MinIndoorTemperature,
+                                                   hybridControlVentilation.MinIndoorTemperature);
                 }
-                state.dataHeatBal->Ventilation(I).MinIndoorTemperature = state.dataHeatBal->Ventilation(I).MaxIndoorTemperature;
+                hybridControlVentilation.MinIndoorTemperature = hybridControlVentilation.MaxIndoorTemperature;
             }
         }
-        if (state.dataHeatBal->Ventilation(I).MinOutdoorTempSchedPtr > 0) {
-            state.dataHeatBal->Ventilation(I).MinOutdoorTemperature =
-                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MinOutdoorTempSchedPtr);
+        if (hybridControlVentilation.MinOutdoorTempSchedPtr > 0) {
+            hybridControlVentilation.MinOutdoorTemperature =
+                ScheduleManager::GetCurrentScheduleValue(state, hybridControlVentilation.MinOutdoorTempSchedPtr);
         }
-        if (state.dataHeatBal->Ventilation(I).MaxOutdoorTempSchedPtr > 0) {
-            state.dataHeatBal->Ventilation(I).MaxOutdoorTemperature =
-                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).MaxOutdoorTempSchedPtr);
+        if (hybridControlVentilation.MaxOutdoorTempSchedPtr > 0) {
+            hybridControlVentilation.MaxOutdoorTemperature =
+                ScheduleManager::GetCurrentScheduleValue(state, hybridControlVentilation.MaxOutdoorTempSchedPtr);
         }
         // Ensure the minimum outdoor temperature <= the maximum outdoor temperature
-        if (state.dataHeatBal->Ventilation(I).MinOutdoorTempSchedPtr > 0 || state.dataHeatBal->Ventilation(I).MaxOutdoorTempSchedPtr > 0) {
-            if (state.dataHeatBal->Ventilation(I).MinOutdoorTemperature > state.dataHeatBal->Ventilation(I).MaxOutdoorTemperature) {
-                ++state.dataHeatBal->Ventilation(I).OutdoorTempErrCount;
-                if (state.dataHeatBal->Ventilation(I).OutdoorTempErrCount < 2) {
+        if (hybridControlVentilation.MinOutdoorTempSchedPtr > 0 || hybridControlVentilation.MaxOutdoorTempSchedPtr > 0) {
+            if (hybridControlVentilation.MinOutdoorTemperature > hybridControlVentilation.MaxOutdoorTemperature) {
+                ++hybridControlVentilation.OutdoorTempErrCount;
+                if (hybridControlVentilation.OutdoorTempErrCount < 2) {
                     ShowWarningError(state,
                                      "Ventilation outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor "
                                      "temperature in " +
-                                         state.dataHeatBal->Ventilation(I).Name);
+                                         hybridControlVentilation.Name);
                     ShowContinueError(state, "The minimum outdoor temperature is set to the maximum outdoor temperature. Simulation continues.");
                     ShowContinueErrorTimeStamp(state, " Occurrence info:");
                 } else {
                     ShowRecurringWarningErrorAtEnd(state,
                                                    "The minimum outdoor temperature is still above the maximum outdoor temperature",
-                                                   state.dataHeatBal->Ventilation(I).OutdoorTempErrIndex,
-                                                   state.dataHeatBal->Ventilation(I).MinOutdoorTemperature,
-                                                   state.dataHeatBal->Ventilation(I).MinOutdoorTemperature);
+                                                   hybridControlVentilation.OutdoorTempErrIndex,
+                                                   hybridControlVentilation.MinOutdoorTemperature,
+                                                   hybridControlVentilation.MinOutdoorTemperature);
                 }
-                state.dataHeatBal->Ventilation(I).MinIndoorTemperature = state.dataHeatBal->Ventilation(I).MaxIndoorTemperature;
+                hybridControlVentilation.MinIndoorTemperature = hybridControlVentilation.MaxIndoorTemperature;
             }
         }
-        if (state.dataHeatBal->Ventilation(I).DeltaTempSchedPtr > 0) {
-            state.dataHeatBal->Ventilation(I).DelTemperature =
-                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(I).DeltaTempSchedPtr);
+        if (hybridControlVentilation.DeltaTempSchedPtr > 0) {
+            hybridControlVentilation.DelTemperature = ScheduleManager::GetCurrentScheduleValue(state, hybridControlVentilation.DeltaTempSchedPtr);
         }
         // Skip this if the zone is below the minimum indoor temperature limit
-        if ((hybridControlZoneMAT < state.dataHeatBal->Ventilation(I).MinIndoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
+        if ((hybridControlZoneMAT < hybridControlVentilation.MinIndoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip this if the zone is above the maximum indoor temperature limit
-        if ((hybridControlZoneMAT > state.dataHeatBal->Ventilation(I).MaxIndoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
+        if ((hybridControlZoneMAT > hybridControlVentilation.MaxIndoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip if below the temperature difference limit (3/12/03 Negative DelTemperature allowed now)
-        if (((hybridControlZoneMAT - TempExt) < state.dataHeatBal->Ventilation(I).DelTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
+        if (((hybridControlZoneMAT - TempExt) < hybridControlVentilation.DelTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip this if the outdoor temperature is below the minimum outdoor temperature limit
-        if ((TempExt < state.dataHeatBal->Ventilation(I).MinOutdoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
+        if ((TempExt < hybridControlVentilation.MinOutdoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip this if the outdoor temperature is above the maximum outdoor temperature limit
-        if ((TempExt > state.dataHeatBal->Ventilation(I).MaxOutdoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
+        if ((TempExt > hybridControlVentilation.MaxOutdoorTemperature) && (!thisVentilation.EMSSimpleVentOn)) continue;
         // Skip this if the outdoor wind speed is above the maximum windspeed limit
-        if ((WindSpeedExt > state.dataHeatBal->Ventilation(I).MaxWindSpeed) && (!thisVentilation.EMSSimpleVentOn)) continue;
+        if ((WindSpeedExt > hybridControlVentilation.MaxWindSpeed) && (!thisVentilation.EMSSimpleVentOn)) continue;
 
         // Hybrid ventilation controls
         if ((thisVentilation.HybridControlType == DataHeatBalance::HybridCtrlType::Close) && (!thisVentilation.EMSSimpleVentOn)) continue;
@@ -6046,7 +6046,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
         // Use air node information linked to the zone if defined
         Real64 HumRatExt = 0.0;
-        if (state.dataHeatBal->Zone(NZ).HasLinkedOutAirNode) {
+        if (state.dataHeatBal->Zone(NZ).LinkedOutAirNode > 0) {
             HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
         } else {
             HumRatExt = state.dataEnvrn->OutHumRat;
@@ -6157,7 +6157,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     }
 
     // Calculate combined outdoor air flows
-    for (auto thisZoneAirBalance : state.dataHeatBal->ZoneAirBalance) {
+    for (auto &thisZoneAirBalance : state.dataHeatBal->ZoneAirBalance) {
         if (thisZoneAirBalance.BalanceMethod == DataHeatBalance::AirBalance::Quadrature) {
             if (!thisZoneAirBalance.OneTimeFlag) GetStandAloneERVNodes(state, thisZoneAirBalance);
             if (thisZoneAirBalance.NumOfERVs > 0) {
@@ -6173,14 +6173,14 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
             // Use air node information linked to the zone if defined
             Real64 HumRatExt = 0.0;
-            if (state.dataHeatBal->Zone(NZ).HasLinkedOutAirNode) {
+            if (state.dataHeatBal->Zone(NZ).LinkedOutAirNode > 0) {
                 HumRatExt = state.dataLoopNodes->Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
             } else {
                 HumRatExt = state.dataEnvrn->OutHumRat;
             }
-            Real64 AirDensity = PsyRhoAirFnPbTdbW(
+            Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->OutBaroPress, state.dataHeatBal->Zone(NZ).OutDryBulbTemp, HumRatExt, RoutineNameZoneAirBalance);
-            Real64 CpAir = PsyCpAirFnW(HumRatExt);
+            Real64 CpAir = Psychrometrics::PsyCpAirFnW(HumRatExt);
             thisZoneAirBalance.ERVMassFlowRate *= AirDensity;
             thisZoneHB.MDotOA = std::sqrt(pow_2(thisZoneAirBalance.NatMassFlowRate) + pow_2(thisZoneAirBalance.IntMassFlowRate) +
                                           pow_2(thisZoneAirBalance.ExhMassFlowRate) + pow_2(thisZoneAirBalance.ERVMassFlowRate) +

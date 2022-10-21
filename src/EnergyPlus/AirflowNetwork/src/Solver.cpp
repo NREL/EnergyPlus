@@ -12905,7 +12905,7 @@ namespace AirflowNetwork {
 
         if (MinTimeControlOnly) return;
 
-        if (Zone(ZoneNum).HasLinkedOutAirNode) {
+        if (Zone(ZoneNum).LinkedOutAirNode > 0) {
             OutDryBulb = Zone(ZoneNum).OutDryBulbTemp;
         } else {
             OutDryBulb = OutDryBulbTempAt(state, Zone(ZoneNum).Centroid.z);

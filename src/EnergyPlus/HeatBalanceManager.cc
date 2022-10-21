@@ -5383,7 +5383,6 @@ namespace HeatBalanceManager {
             for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 if (state.dataHeatBal->ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
                     if (state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
-                        state.dataHeatBal->Zone(ZoneLoop).HasLinkedOutAirNode = true;
                         state.dataHeatBal->Zone(ZoneLoop).LinkedOutAirNode = state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
                     }
                 }
@@ -5873,7 +5872,7 @@ namespace HeatBalanceManager {
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             SetOutAirNodes(state);
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (state.dataHeatBal->Zone(ZoneNum).HasLinkedOutAirNode) {
+                if (state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode > 0) {
                     if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
                         state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(
                             state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
