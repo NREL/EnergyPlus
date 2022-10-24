@@ -236,7 +236,8 @@ namespace ZoneTempPredictorCorrector {
                                  int const zoneNum,
                                  int const spaceNum = 0);
 
-        virtual SumHATOutput calcSumHAT(EnergyPlusData &state, [[maybe_unused]] int const zoneNum, [[maybe_unused]] int const spaceNum) = 0;
+        virtual SumHATOutput
+        calcSumHAT([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int const zoneNum, [[maybe_unused]] int const spaceNum) = 0;
 
         void updateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,
@@ -251,6 +252,8 @@ namespace ZoneTempPredictorCorrector {
                               int const spaceNum = 0);
 
         void calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum = 0);
+
+        void beginEnvironmentInit(EnergyPlusData &state);
     };
 
     struct ZoneHeatBalanceData : ZoneSpaceHeatBalanceData

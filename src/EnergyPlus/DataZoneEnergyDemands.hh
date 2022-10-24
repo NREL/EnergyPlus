@@ -53,90 +53,78 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DataZoneEnergyDemands {
 
-    struct ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
+    struct ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts) or Humidification/dehumidification loads to be met (kg water per
+                                // second)
     {
-        // Members
-        Real64 RemainingOutputRequired;      // The load each equipment sees as what is remaining with load fractions applied
-        Real64 UnadjRemainingOutputRequired; // The total unadjusted load remaining to be met
-        Real64 TotalOutputRequired;
-        Real64 OutputRequiredToHeatingSP;       // Load required to meet heating setpoint (>0 is a heating load)
-        Real64 OutputRequiredToCoolingSP;       // Load required to meet cooling setpoint (<0 is a cooling load)
-        Real64 RemainingOutputReqToHeatSP;      // Remaining load required to meet heating setpoint with load fractions applied (>0 is a heating load)
-        Real64 RemainingOutputReqToCoolSP;      // Remaining load required to meet cooling setpoint with load fractions applied (<0 is a cooling load)
-        Real64 UnadjRemainingOutputReqToHeatSP; // Remaining unadjusted load required to meet heating setpoint (>0 is a heating load)
-        Real64 UnadjRemainingOutputReqToCoolSP; // Remaining unadjusted load required to meet cooling setpoint (<0 is a cooling load)
-        int NumZoneEquipment;                   // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-        Array1D<Real64> SequencedOutputRequired;
-        Array1D<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
-        Array1D<Real64> SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence
-        Real64 SupplyAirAdjustFactor;                       // supply air adjustment factor due to the cap of
+        Real64 RemainingOutputRequired = 0.0;      // The load each equipment sees as what is remaining with load fractions applied
+        Real64 UnadjRemainingOutputRequired = 0.0; // The total unadjusted load remaining to be met
+        Real64 TotalOutputRequired = 0.0;
+        int NumZoneEquipment = 0;           // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
+        Real64 SupplyAirAdjustFactor = 1.0; // supply air adjustment factor due to the cap of
         // zone maximum outdoor air fraction
-        int StageNum; // The stage number when staged thermostate is used:
+        int StageNum = 0; // The stage number when staged thermostate is used:
         // 0 no load, >0 Heating stage, <0 Cooling stage
 
-        // Default Constructor
-        ZoneSystemDemandData()
-            : RemainingOutputRequired(0.0), UnadjRemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHeatingSP(0.0),
-              OutputRequiredToCoolingSP(0.0), RemainingOutputReqToHeatSP(0.0), RemainingOutputReqToCoolSP(0.0), UnadjRemainingOutputReqToHeatSP(0.0),
-              UnadjRemainingOutputReqToCoolSP(0.0), NumZoneEquipment(0), SupplyAirAdjustFactor(1.0), StageNum(0)
-        {
-        }
+        void virtual beginEnvironmentInit(EnergyPlusData &state);
     };
 
-    struct ZoneSystemMoistureDemand // Humidification/dehumidification loads to be met (kg water per second)
+    struct ZoneSystemSensibleDemand : ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
     {
-        // Members
-        Real64 RemainingOutputRequired;
-        Real64 UnadjRemainingOutputRequired; // The total unadjusted load remaining to be met
-        Real64 TotalOutputRequired;
-        Real64 OutputRequiredToHumidifyingSP;   // Load required to meet humidifying setpoint (>0 = a humidify load)
-        Real64 OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)
-        Real64 RemainingOutputReqToHumidSP;     // Remaining load required to meet humidifying setpoint with load fractions applied
-        // (>0 is a humidify load)
-        Real64 RemainingOutputReqToDehumidSP; // Remaining load required to meet dehumidifying setpoint with load fractions applied
-        // (<0 is a dehumidify load)
-        Real64 UnadjRemainingOutputReqToHumidSP; // Remaining unadjusted load required to meet humidifying setpoint
-        // (>0 is a humidify load)
-        Real64 UnadjRemainingOutputReqToDehumidSP; // Remaining unadjusted load required to meet dehumidifying setpoint
-        // (<0 is a dehumidify load)
-        int NumZoneEquipment; // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-        Array1D<Real64> SequencedOutputRequired;
-        Array1D<Real64> SequencedOutputRequiredToHumidSP;   // load required to meet humidify setpoint by sequence
-        Array1D<Real64> SequencedOutputRequiredToDehumidSP; // load required to meet dehumidify setpoint by sequenc
+        Real64 OutputRequiredToHeatingSP = 0.0; // Load required to meet heating setpoint (>0 is a heating load)
+        Real64 OutputRequiredToCoolingSP = 0.0; // Load required to meet cooling setpoint (<0 is a cooling load)
+        Real64 RemainingOutputReqToHeatSP =
+            0.0; // Remaining load required to meet heating setpoint with load fractions applied (>0 is a heating load)
+        Real64 RemainingOutputReqToCoolSP =
+            0.0; // Remaining load required to meet cooling setpoint with load fractions applied (<0 is a cooling load)
+        Real64 UnadjRemainingOutputReqToHeatSP = 0.0; // Remaining unadjusted load required to meet heating setpoint (>0 is a heating load)
+        Real64 UnadjRemainingOutputReqToCoolSP = 0.0; // Remaining unadjusted load required to meet cooling setpoint (<0 is a cooling load)
+        EPVector<Real64> SequencedOutputRequired;
+        EPVector<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
+        EPVector<Real64> SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence
 
-        // Default Constructor
-        ZoneSystemMoistureDemand()
-            : RemainingOutputRequired(0.0), UnadjRemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHumidifyingSP(0.0),
-              OutputRequiredToDehumidifyingSP(0.0), RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0),
-              UnadjRemainingOutputReqToHumidSP(0.0), UnadjRemainingOutputReqToDehumidSP(0.0), NumZoneEquipment(0)
-        {
-        }
+        void beginEnvironmentInit(EnergyPlusData &state) override;
+    };
+    struct ZoneSystemMoistureDemand : ZoneSystemDemandData // Humidification/dehumidification loads to be met (kg water per second)
+    {
+        Real64 OutputRequiredToHumidifyingSP = 0.0;   // Load required to meet humidifying setpoint (>0 = a humidify load)
+        Real64 OutputRequiredToDehumidifyingSP = 0.0; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)
+        Real64 RemainingOutputReqToHumidSP = 0.0;     // Remaining load required to meet humidifying setpoint with load fractions applied
+        // (>0 is a humidify load)
+        Real64 RemainingOutputReqToDehumidSP = 0.0; // Remaining load required to meet dehumidifying setpoint with load fractions applied
+        // (<0 is a dehumidify load)
+        Real64 UnadjRemainingOutputReqToHumidSP = 0.0; // Remaining unadjusted load required to meet humidifying setpoint
+        // (>0 is a humidify load)
+        Real64 UnadjRemainingOutputReqToDehumidSP = 0.0; // Remaining unadjusted load required to meet dehumidifying setpoint
+        // (<0 is a dehumidify load)
+        EPVector<Real64> SequencedOutputRequired;
+        EPVector<Real64> SequencedOutputRequiredToHumidSP;   // load required to meet humidify setpoint by sequence
+        EPVector<Real64> SequencedOutputRequiredToDehumidSP; // load required to meet dehumidify setpoint by sequenc
+
+        void beginEnvironmentInit(EnergyPlusData &state) override;
     };
 
 } // namespace DataZoneEnergyDemands
 
 struct DataZoneEnergyDemandsData : BaseGlobalStruct
 {
-
     Array1D_bool DeadBandOrSetback;    // true if zone temperature is in the thermostat deadband before any heating / cooling done
     Array1D_bool Setback;              // true if zone temperature has increased from previous setting
     Array1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment in a zone is simulated
-    Array1D<DataZoneEnergyDemands::ZoneSystemDemandData> ZoneSysEnergyDemand;
-    Array1D<DataZoneEnergyDemands::ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
+    EPVector<DataZoneEnergyDemands::ZoneSystemSensibleDemand> ZoneSysEnergyDemand;
+    EPVector<DataZoneEnergyDemands::ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
+    EPVector<DataZoneEnergyDemands::ZoneSystemSensibleDemand> spaceSysEnergyDemand;
+    EPVector<DataZoneEnergyDemands::ZoneSystemMoistureDemand> spaceSysMoistureDemand;
 
     void clear_state() override
     {
-        this->DeadBandOrSetback.deallocate();
-        this->Setback.deallocate();
-        this->CurDeadBandOrSetback.deallocate();
-        this->ZoneSysEnergyDemand.deallocate();
-        this->ZoneSysMoistureDemand.deallocate();
+        new (this) DataZoneEnergyDemandsData();
     }
 };
 
