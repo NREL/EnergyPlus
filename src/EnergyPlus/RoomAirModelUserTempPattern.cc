@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -481,7 +482,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
         }
     } break;
     case DataRoomAirModel::UserDefinedPatternMode::SensibleCooling: {
-        CoolLoad = state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
+        CoolLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadCoolRate;
         if (CoolLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
             Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
@@ -504,7 +505,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
         }
     } break;
     case DataRoomAirModel::UserDefinedPatternMode::SensibleHeating: {
-        HeatLoad = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum);
+        HeatLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadHeatRate;
         if (HeatLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
             Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 

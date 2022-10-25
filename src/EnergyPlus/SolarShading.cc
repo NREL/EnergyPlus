@@ -73,6 +73,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -9743,7 +9744,7 @@ void WindowShadingManager(EnergyPlusData &state)
                     // In the following, the check on BeginSimFlag is needed since SNLoadCoolRate (and SNLoadHeatRate,
                     // used in other CASEs) are not allocated at this point for the first time step of the simulation.
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataHeatBal->ZoneSNLoadCoolRate(IZone) > SetPoint && SchedAllowsControl) {
+                        if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > SetPoint && SchedAllowsControl) {
                             shadingOn = true;
                         } else if (GlareControlIsActive) {
                             shadingOffButGlareControlOn = true;
@@ -9849,7 +9850,8 @@ void WindowShadingManager(EnergyPlusData &state)
 
                 case WindowShadingControlType::OnNightIfHeating_OffDay: // 'OnNightIfHeatingAndOffDay'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (!state.dataEnvrn->SunIsUp && state.dataHeatBal->ZoneSNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
+                        if (!state.dataEnvrn->SunIsUp && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadHeatRate > SetPoint &&
+                            SchedAllowsControl) {
                             shadingOn = true;
                         } else if (GlareControlIsActive) {
                             shadingOffButGlareControlOn = true;
@@ -9862,7 +9864,7 @@ void WindowShadingManager(EnergyPlusData &state)
                         if (!state.dataEnvrn->SunIsUp) { // Night
                             if (state.dataSurface->SurfOutDryBulbTemp(ISurf) < SetPoint && SchedAllowsControl) shadingOn = true;
                         } else { // Day
-                            if (state.dataHeatBal->ZoneSNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > 0.0 && SchedAllowsControl) {
                                 shadingOn = true;
                             } else if (GlareControlIsActive) {
                                 shadingOffButGlareControlOn = true;
@@ -9874,9 +9876,10 @@ void WindowShadingManager(EnergyPlusData &state)
                 case WindowShadingControlType::OnNightIfHeating_OnDayCooling: // 'OnNightIfHeatingAndOnDayIfCooling'
                     if (!state.dataGlobal->BeginSimFlag) {
                         if (!state.dataEnvrn->SunIsUp) { // Night
-                            if (state.dataHeatBal->ZoneSNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) shadingOn = true;
+                            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadHeatRate > SetPoint && SchedAllowsControl)
+                                shadingOn = true;
                         } else { // Day
-                            if (state.dataHeatBal->ZoneSNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > 0.0 && SchedAllowsControl) {
                                 shadingOn = true;
                             } else if (GlareControlIsActive) {
                                 shadingOffButGlareControlOn = true;
@@ -9887,7 +9890,8 @@ void WindowShadingManager(EnergyPlusData &state)
 
                 case WindowShadingControlType::OffNight_OnDay_HiSolarWindow: // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataEnvrn->SunIsUp && state.dataHeatBal->ZoneSNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                        if (state.dataEnvrn->SunIsUp && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > 0.0 &&
+                            SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) shadingOn = true;
                         } else if (GlareControlIsActive) {
                             shadingOffButGlareControlOn = true;
@@ -9897,7 +9901,8 @@ void WindowShadingManager(EnergyPlusData &state)
 
                 case WindowShadingControlType::OnNight_OnDay_HiSolarWindow: // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataEnvrn->SunIsUp && state.dataHeatBal->ZoneSNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                        if (state.dataEnvrn->SunIsUp && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > 0.0 &&
+                            SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) shadingOn = true;
                         } else if (!state.dataEnvrn->SunIsUp && SchedAllowsControl) {
                             shadingOn = true;

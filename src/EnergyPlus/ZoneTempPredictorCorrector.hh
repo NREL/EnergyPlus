@@ -229,6 +229,8 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZoneAirRelHum = 0.0; // Zone relative humidity in percent
         Real64 AirPowerCap = 0.0;   // "air power capacity"  Vol*VolMult*rho*Cp/timestep [W/degK]
 
+        void beginEnvironmentInit(EnergyPlusData &state);
+
         void calcPredictedSystemLoad(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum = 0);
 
         void calcZoneOrSpaceSums(EnergyPlusData &state,
@@ -252,8 +254,6 @@ namespace ZoneTempPredictorCorrector {
                               int const spaceNum = 0);
 
         void calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum = 0);
-
-        void beginEnvironmentInit(EnergyPlusData &state);
     };
 
     struct ZoneHeatBalanceData : ZoneSpaceHeatBalanceData
@@ -292,11 +292,6 @@ namespace ZoneTempPredictorCorrector {
 
     void
     CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
-
-    void reportSensibleLoadsZoneMultiplier(
-        EnergyPlusData &state, Real64 const loadToHeatingSetPoint, Real64 const loadToCoolingSetPoint, int const zoneNum, int const spaceNum = 0);
-
-    void reportMoistLoadsZoneMultiplier(EnergyPlusData &state, int const zoneNum, int const spaceNum = 0);
 
     Real64 correctZoneAirTemps(EnergyPlusData &state,
                                bool useZoneTimeStepHistory // if true then use zone timestep history, if false use system time step history

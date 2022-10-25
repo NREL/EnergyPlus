@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -2261,10 +2262,14 @@ void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
     for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
         for (ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
             Mult = state.dataHeatBal->Zone(ZoneNum).Multiplier;
-            ZoneListSNLoadHeatEnergy(ListNum) += state.dataHeatBal->ZoneSNLoadHeatEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ZoneListSNLoadCoolEnergy(ListNum) += state.dataHeatBal->ZoneSNLoadCoolEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ZoneListSNLoadHeatRate(ListNum) += state.dataHeatBal->ZoneSNLoadHeatRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ZoneListSNLoadCoolRate(ListNum) += state.dataHeatBal->ZoneSNLoadCoolRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+            ZoneListSNLoadHeatEnergy(ListNum) +=
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneList(ListNum).Zone(ZoneNum)).ZoneSNLoadHeatEnergy * Mult;
+            ZoneListSNLoadCoolEnergy(ListNum) +=
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneList(ListNum).Zone(ZoneNum)).ZoneSNLoadCoolEnergy * Mult;
+            ZoneListSNLoadHeatRate(ListNum) +=
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneList(ListNum).Zone(ZoneNum)).ZoneSNLoadHeatRate * Mult;
+            ZoneListSNLoadCoolRate(ListNum) +=
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneList(ListNum).Zone(ZoneNum)).ZoneSNLoadCoolRate * Mult;
         } // ZoneNum
     }     // ListNum
 

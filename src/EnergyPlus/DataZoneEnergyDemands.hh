@@ -63,11 +63,11 @@ namespace DataZoneEnergyDemands {
     struct ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts) or Humidification/dehumidification loads to be met (kg water per
                                 // second)
     {
-        Real64 RemainingOutputRequired = 0.0;      // The load each equipment sees as what is remaining with load fractions applied
-        Real64 UnadjRemainingOutputRequired = 0.0; // The total unadjusted load remaining to be met
-        Real64 TotalOutputRequired = 0.0;
-        int NumZoneEquipment = 0;           // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-        Real64 SupplyAirAdjustFactor = 1.0; // supply air adjustment factor due to the cap of
+        Real64 RemainingOutputRequired = 0.0;      // The load each equipment sees as what is remaining with load fractions applied [W] (multiplied)
+        Real64 UnadjRemainingOutputRequired = 0.0; // The total unadjusted load remaining to be met [W] (multiplied)
+        Real64 TotalOutputRequired = 0.0;          // The total output required from all equipment [W] (multiplied)
+        int NumZoneEquipment = 0;                  // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
+        Real64 SupplyAirAdjustFactor = 1.0;        // supply air adjustment factor due to the cap of
         // zone maximum outdoor air fraction
         int StageNum = 0; // The stage number when staged thermostate is used:
         // 0 no load, >0 Heating stage, <0 Cooling stage
@@ -77,37 +77,63 @@ namespace DataZoneEnergyDemands {
 
     struct ZoneSystemSensibleDemand : ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
     {
-        Real64 OutputRequiredToHeatingSP = 0.0; // Load required to meet heating setpoint (>0 is a heating load)
-        Real64 OutputRequiredToCoolingSP = 0.0; // Load required to meet cooling setpoint (<0 is a cooling load)
+        Real64 OutputRequiredToHeatingSP = 0.0; // Load required to meet heating setpoint (>0 is a heating load) [W] (multiplied)
+        Real64 OutputRequiredToCoolingSP = 0.0; // Load required to meet cooling setpoint (<0 is a cooling load) [W] (multiplied)
         Real64 RemainingOutputReqToHeatSP =
-            0.0; // Remaining load required to meet heating setpoint with load fractions applied (>0 is a heating load)
+            0.0; // Remaining load required to meet heating setpoint with load fractions applied (>0 is a heating load) [W] (multiplied)
         Real64 RemainingOutputReqToCoolSP =
-            0.0; // Remaining load required to meet cooling setpoint with load fractions applied (<0 is a cooling load)
-        Real64 UnadjRemainingOutputReqToHeatSP = 0.0; // Remaining unadjusted load required to meet heating setpoint (>0 is a heating load)
-        Real64 UnadjRemainingOutputReqToCoolSP = 0.0; // Remaining unadjusted load required to meet cooling setpoint (<0 is a cooling load)
-        EPVector<Real64> SequencedOutputRequired;
-        EPVector<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
-        EPVector<Real64> SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence
+            0.0; // Remaining load required to meet cooling setpoint with load fractions applied (<0 is a cooling load) [W] (multiplied)
+        Real64 UnadjRemainingOutputReqToHeatSP =
+            0.0; // Remaining unadjusted load required to meet heating setpoint (>0 is a heating load) [W] (multiplied)
+        Real64 UnadjRemainingOutputReqToCoolSP =
+            0.0; // Remaining unadjusted load required to meet cooling setpoint (<0 is a cooling load) [W] (multiplied)
+        EPVector<Real64> SequencedOutputRequired;            // load required to meet setpoint by sequence [W] (multiplied)
+        EPVector<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence [W] (multiplied)
+        EPVector<Real64> SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence [W] (multiplied)
+        Real64 ZoneSNLoadPredictedRate = 0.0;                // Predicted sensible load [W] (unmultiplied)
+        Real64 ZoneSNLoadPredictedHSPRate = 0.0;             // Predicted sensible load to heating setpoint [W] (unmultiplied)
+        Real64 ZoneSNLoadPredictedCSPRate = 0.0;             // Predicted sensible load to cooling setpoint [W] (unmultiplied)
+        Real64 ZoneSNLoadHeatRate = 0.0;                     // sensible heating rate [W] (unmultiplied)
+        Real64 ZoneSNLoadCoolRate = 0.0;                     // sensible cooling rate [W] (unmultiplied)
+        Real64 ZoneSNLoadHeatEnergy = 0.0;                   // sensible heating energy [J] (unmultiplied)
+        Real64 ZoneSNLoadCoolEnergy = 0.0;                   // sensible cooling energy [J] (unmultiplied)
 
         void beginEnvironmentInit(EnergyPlusData &state) override;
+
+        void reportSensibleLoadsZoneMultiplier(EnergyPlusData &state,
+                                               Real64 const loadToHeatingSetPoint,
+                                               Real64 const loadToCoolingSetPoint,
+                                               int const zoneNum);
     };
     struct ZoneSystemMoistureDemand : ZoneSystemDemandData // Humidification/dehumidification loads to be met (kg water per second)
     {
-        Real64 OutputRequiredToHumidifyingSP = 0.0;   // Load required to meet humidifying setpoint (>0 = a humidify load)
-        Real64 OutputRequiredToDehumidifyingSP = 0.0; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)
-        Real64 RemainingOutputReqToHumidSP = 0.0;     // Remaining load required to meet humidifying setpoint with load fractions applied
-        // (>0 is a humidify load)
+        Real64 OutputRequiredToHumidifyingSP = 0.0; // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s] (multiplied)
+        Real64 OutputRequiredToDehumidifyingSP =
+            0.0;                                  // Load required to meet dehumidifying setpoint (<0 = a dehumidify load) [kgWater/s] (multiplied)
+        Real64 RemainingOutputReqToHumidSP = 0.0; // Remaining load required to meet humidifying setpoint with load fractions applied
+        // (>0 is a humidify load) [kgWater/s] (multiplied)
         Real64 RemainingOutputReqToDehumidSP = 0.0; // Remaining load required to meet dehumidifying setpoint with load fractions applied
-        // (<0 is a dehumidify load)
+        // (<0 is a dehumidify load) [kgWater/s] (multiplied)
         Real64 UnadjRemainingOutputReqToHumidSP = 0.0; // Remaining unadjusted load required to meet humidifying setpoint
-        // (>0 is a humidify load)
+        // (>0 is a humidify load) [kgWater/s] (multiplied)
         Real64 UnadjRemainingOutputReqToDehumidSP = 0.0; // Remaining unadjusted load required to meet dehumidifying setpoint
-        // (<0 is a dehumidify load)
-        EPVector<Real64> SequencedOutputRequired;
-        EPVector<Real64> SequencedOutputRequiredToHumidSP;   // load required to meet humidify setpoint by sequence
-        EPVector<Real64> SequencedOutputRequiredToDehumidSP; // load required to meet dehumidify setpoint by sequenc
+        // (<0 is a dehumidify load) [kgWater/s] (multiplied)
+        EPVector<Real64> SequencedOutputRequired;            // load required to meet setpoint by sequence [kgWater/s] (multiplied)
+        EPVector<Real64> SequencedOutputRequiredToHumidSP;   // load required to meet humidify setpoint by sequence [kgWater/s] (multiplied)
+        EPVector<Real64> SequencedOutputRequiredToDehumidSP; // load required to meet dehumidify setpoint by sequenc [kgWater/s] (multiplied)
+        Real64 ZoneMoisturePredictedRate = 0.0;              // Predicted moisture load to setpoint [kgWater/s] (unmultiplied)
+        Real64 ZoneMoisturePredictedHumSPRate = 0.0;         // Predicted latent load to humidification setpoint [kgWater/s] (unmultiplied)
+        Real64 ZoneMoisturePredictedDehumSPRate = 0.0;       // Predicted latent load to dehumidification setpoint [kgWater/s] (unmultiplied)
+        Real64 ZoneLTLoadHeatRate = 0.0;                     // latent heating rate [W] (unmultiplied)
+        Real64 ZoneLTLoadCoolRate = 0.0;                     // latent cooling rate [W] (unmultiplied)
+        Real64 ZoneLTLoadHeatEnergy = 0.0;                   // latent heating energy [J] (unmultiplied)
+        Real64 ZoneLTLoadCoolEnergy = 0.0;                   // latent cooling energy [J] (unmultiplied)
+        Real64 ZoneSensibleHeatRatio = 0.0;                  // zone load SHR []
+        Real64 ZoneVaporPressureDifference = 0.0;            // vapor pressure depression [Pa]
 
         void beginEnvironmentInit(EnergyPlusData &state) override;
+
+        void reportMoistLoadsZoneMultiplier(EnergyPlusData &state, int const zoneNum);
     };
 
 } // namespace DataZoneEnergyDemands
