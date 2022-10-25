@@ -3975,7 +3975,7 @@ namespace UnitarySystems {
                 }
             }
 
-            if (ZoneEquipmentFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
+            if (ZoneEquipment && !ZoneExhaustNodeFound && !InducedNodeFound) {
                 // Exhaust Node was not found
                 ShowSevereError(state, format("Input errors for {}:{}", cCurrentModuleObject, thisObjectName));
                 ShowContinueError(state,
@@ -3988,7 +3988,7 @@ namespace UnitarySystems {
                            input_data.air_inlet_node_name));
                 ShowContinueError(state, "or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.");
                 errorsFound = true;
-            } else if (ZoneEquipmentFound && !ZoneInletNodeFound) {
+            } else if (ZoneEquipment && !ZoneInletNodeFound) {
                 bool ZoneInletNodeExists = false;
                 int InletControlledZoneNum = 0;
                 int ZoneInletNum = 0;
