@@ -2831,56 +2831,45 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).C3Te, 0);
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).SH, 3);
 }
-//
-// TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
-//{
-//    // PURPOSE OF THIS SUBROUTINE:
-//    //  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
-//
-//    using namespace CurveManager;
-//
-//    int CurveNum = 1;
-//    int NumPar;
-//    double Te = -2.796; // Outdoor unit evaporating temperature
-//    double Tdis = 40.093;
-//    double CondHeat = 1864.44;
-//    Array1D<Real64> Par;
-//
-//    // Allocate
-//    state->dataCurveManager->NumCurves = 1; // CurveManager::NumCurves
-//    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
-//
-//    NumPar = 3;
-//    Par.allocate(NumPar);
-//
-//    // Inputs: curve parameters
-//    Par(1) = Tdis;
-//    Par(2) = CondHeat;
-//    Par(3) = CurveNum;
-//
-//    // Inputs: parameters
-//    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-//    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-//    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-//    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
-//    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
-//    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
-//    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
-//    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
-//    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
-//    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
-//    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
-//    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
-//    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
-//
-//    // Run and Check
-//    double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(*state, Te, Par);
-//    EXPECT_NEAR(1.652, CompResidual, 0.005);
-//
-//    // Clean up
-//    state->dataCurveManager->PerfCurve.deallocate();
-//    Par.deallocate();
-//}
+
+TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
+{
+    // PURPOSE OF THIS SUBROUTINE:
+    //  Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
+
+    using namespace CurveManager;
+
+    int CurveNum = 1;
+    double Te = -2.796; // Outdoor unit evaporating temperature
+    double Tdis = 40.093;
+    double CondHeat = 1864.44;
+
+    // Allocate
+    state->dataCurveManager->NumCurves = 1; // CurveManager::NumCurves
+    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+
+    // Inputs: parameters
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
+
+    // Run and Check
+    double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(*state, Tdis, CondHeat, CurveNum, Te);
+    EXPECT_NEAR(1.652, CompResidual, 0.005);
+
+    // Clean up
+    state->dataCurveManager->PerfCurve.deallocate();
+}
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualCool)
 {

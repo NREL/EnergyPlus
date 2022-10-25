@@ -963,6 +963,14 @@ namespace HVACVariableRefrigerantFlow {
                            Real64 &MaxLimit                 // Maximum terminal unit capacity for coils in same operating mode [W]
     );
 
+
+    Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
+                                   Real64 T_dis,
+                                   Real64 CondHeat,
+                                   int CAPFT,
+                                   Real64 const T_suc        // Compressor suction temperature Te' [C]
+    );
+
 } // namespace HVACVariableRefrigerantFlow
 
 struct HVACVarRefFlowData : BaseGlobalStruct

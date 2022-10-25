@@ -13223,6 +13223,33 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
     return AirMassFlowRate;
 }
 
+Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
+                               Real64 T_dis,
+                               Real64 CondHeat,
+                               int CAPFT,
+                               Real64 const T_suc        // Compressor suction temperature Te' [C]
+)
+{
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Xiufeng Pang (XP)
+    //       DATE WRITTEN   Mar 2013
+    //       MODIFIED       Jul 2015, RP Zhang, LBNL
+    //       RE-ENGINEERED
+    //
+    // PURPOSE OF THIS FUNCTION:
+    //       Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
+    //
+    using CurveManager::CurveValue;
+
+    Real64 CAPSpd;   // Evaporative capacity of the compressor at a given spd[W]
+    Real64 CompResidual;
+
+    CAPSpd = CurveValue(state, CAPFT, T_dis, T_suc);
+    CompResidual = (CondHeat - CAPSpd) / CAPSpd;
+
+    return CompResidual;
+}
+
 void VRFCondenserEquipment::VRFOU_TeTc(EnergyPlusData &state,
                                        HXOpMode const OperationMode, // Mode 0 for running as condenser, 1 for evaporator
                                        Real64 const Q_coil,          // // OU coil heat release at cooling mode or heat extract at heating mode [W]
@@ -14215,8 +14242,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                     state, this->RefrigerantName, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
                 auto f = [&state, T_discharge_new, CondHeat, CAPFT](Real64 const T_suc) {
-                    Real64 CAPSpd = CurveManager::CurveValue(state, CAPFT, T_discharge_new, T_suc);
-                    return (CondHeat - CAPSpd) / CAPSpd;
+                    return CompResidual_FluidTCtrl(state, T_discharge_new, CondHeat, CAPFT, T_suc);
                 };
 
                 General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe,
@@ -14534,8 +14560,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 int CAPFT = this->OUCoolingCAPFT(CounterCompSpdTemp);
 
                 auto f = [&state, T_discharge, CondHeat, CAPFT](Real64 const T_suc) {
-                    Real64 CAPSpd = CurveManager::CurveValue(state, CAPFT, T_discharge, T_suc);
-                    return (CondHeat - CAPSpd) / CAPSpd;
+                    return CompResidual_FluidTCtrl(state, T_discharge, CondHeat, CAPFT, T_suc);
                 };
 
                 General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe, T_suction);
