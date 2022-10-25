@@ -52,13 +52,13 @@
 
 namespace EnergyPlus::DataZoneEnergyDemands {
 
-void ZoneSystemDemandData::beginEnvironmentInit([[maybe_unused]] EnergyPlusData &state)
+void ZoneSystemDemandData::beginEnvironmentInit()
 {
     // Dummy function for overrides - should never execute
     assert(false);
 }
 
-void ZoneSystemSensibleDemand::beginEnvironmentInit(EnergyPlusData &state)
+void ZoneSystemSensibleDemand::beginEnvironmentInit()
 {
     this->RemainingOutputRequired = 0.0;
     this->TotalOutputRequired = 0.0;
@@ -92,7 +92,7 @@ void ZoneSystemSensibleDemand::reportSensibleLoadsZoneMultiplier(EnergyPlusData 
     this->OutputRequiredToCoolingSP = this->ZoneSNLoadPredictedCSPRate * ZoneMultFac;
 }
 
-void ZoneSystemMoistureDemand::beginEnvironmentInit(EnergyPlusData &state)
+void ZoneSystemMoistureDemand::beginEnvironmentInit()
 {
     this->RemainingOutputRequired = 0.0;
     this->TotalOutputRequired = 0.0;

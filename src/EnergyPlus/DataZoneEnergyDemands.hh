@@ -72,7 +72,7 @@ namespace DataZoneEnergyDemands {
         int StageNum = 0; // The stage number when staged thermostate is used:
         // 0 no load, >0 Heating stage, <0 Cooling stage
 
-        void virtual beginEnvironmentInit(EnergyPlusData &state);
+        void virtual beginEnvironmentInit();
     };
 
     struct ZoneSystemSensibleDemand : ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
@@ -98,7 +98,7 @@ namespace DataZoneEnergyDemands {
         Real64 ZoneSNLoadHeatEnergy = 0.0;                   // sensible heating energy [J] (unmultiplied)
         Real64 ZoneSNLoadCoolEnergy = 0.0;                   // sensible cooling energy [J] (unmultiplied)
 
-        void beginEnvironmentInit(EnergyPlusData &state) override;
+        void beginEnvironmentInit() override;
 
         void reportSensibleLoadsZoneMultiplier(EnergyPlusData &state,
                                                Real64 const loadToHeatingSetPoint,
@@ -131,7 +131,7 @@ namespace DataZoneEnergyDemands {
         Real64 ZoneSensibleHeatRatio = 0.0;                  // zone load SHR []
         Real64 ZoneVaporPressureDifference = 0.0;            // vapor pressure depression [Pa]
 
-        void beginEnvironmentInit(EnergyPlusData &state) override;
+        void beginEnvironmentInit() override;
 
         void reportMoistLoadsZoneMultiplier(EnergyPlusData &state, int const zoneNum);
     };

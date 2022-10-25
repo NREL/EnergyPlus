@@ -5122,6 +5122,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     // This subroutine calculates the air component of the heat balance.
 
     constexpr Real64 StdGravity(9.80665); // The acceleration of gravity at the sea level (m/s2)
+    static constexpr std::string_view RoutineNameVentilation("CalcAirFlowSimple:Ventilation");
     static constexpr std::string_view RoutineNameMixing("CalcAirFlowSimple:Mixing");
     static constexpr std::string_view RoutineNameCrossMixing("CalcAirFlowSimple:CrossMixing");
     static constexpr std::string_view RoutineNameRefrigerationDoorMixing("CalcAirFlowSimple:RefrigerationDoorMixing");
@@ -5256,7 +5257,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             HumRatExt = state.dataEnvrn->OutHumRat;
             EnthalpyExt = state.dataEnvrn->OutEnthalpy;
         }
-        Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt); // Density of air (kg/m^3)
+        Real64 AirDensity =
+            PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt, RoutineNameVentilation); // Density of air (kg/m^3)
         Real64 CpAir = PsyCpAirFnW(HumRatExt);
 
         // Hybrid ventilation global control
@@ -5624,9 +5626,9 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         if (thisMixing.HybridControlType == DataHeatBalance::HybridCtrlType::Global) TD = 0.0;
 
         //            Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
-        Real64 AirDensity =
-            PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (HumRatZN + HumRatZM) / 2.0); // Density of air (kg/m^3)
-        Real64 CpAir = PsyCpAirFnW((HumRatZN + HumRatZM) / 2.0);                                                     // Use average conditions
+        Real64 AirDensity = PsyRhoAirFnPbTdbW(
+            state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (HumRatZN + HumRatZM) / 2.0, RoutineNameMixing); // Density of air (kg/m^3)
+        Real64 CpAir = PsyCpAirFnW((HumRatZN + HumRatZM) / 2.0);                                                      // Use average conditions
 
         //  If TD equals zero (default) set coefficients for full mixing otherwise test
         //    for mixing conditions if user input delta temp > 0, then from zone temp (TZM)

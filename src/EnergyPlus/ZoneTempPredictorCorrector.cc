@@ -3184,17 +3184,17 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataHeatBalFanSys->LoadCorrectionFactor = 1.0;
         TempControlType = DataHVACGlobals::ThermostatType::Uncontrolled;
         for (auto &e : state.dataZoneEnergyDemand->ZoneSysEnergyDemand) {
-            e.beginEnvironmentInit(state);
+            e.beginEnvironmentInit();
         }
         for (auto &e : state.dataZoneEnergyDemand->ZoneSysMoistureDemand) {
-            e.beginEnvironmentInit(state);
+            e.beginEnvironmentInit();
         }
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (auto &e : state.dataZoneEnergyDemand->spaceSysEnergyDemand) {
-                e.beginEnvironmentInit(state);
+                e.beginEnvironmentInit();
             }
             for (auto &e : state.dataZoneEnergyDemand->spaceSysMoistureDemand) {
-                e.beginEnvironmentInit(state);
+                e.beginEnvironmentInit();
             }
         }
 
