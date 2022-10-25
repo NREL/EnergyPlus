@@ -13227,7 +13227,7 @@ Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
                                Real64 T_dis,
                                Real64 CondHeat,
                                int CAPFT,
-                               Real64 const T_suc        // Compressor suction temperature Te' [C]
+                               Real64 const T_suc // Compressor suction temperature Te' [C]
 )
 {
     // FUNCTION INFORMATION:
@@ -13241,7 +13241,7 @@ Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
     //
     using CurveManager::CurveValue;
 
-    Real64 CAPSpd;   // Evaporative capacity of the compressor at a given spd[W]
+    Real64 CAPSpd; // Evaporative capacity of the compressor at a given spd[W]
     Real64 CompResidual;
 
     CAPSpd = CurveValue(state, CAPFT, T_dis, T_suc);
