@@ -12280,7 +12280,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
         state.dataOutRptTab->zstArea(iTotal) = 0.0;
         state.dataOutRptTab->zstLight(iTotal) = 0.0;
         state.dataOutRptTab->zstPlug(iTotal) = 0.0;
-        state.dataOutRptTab->zstArea(iTotal) = 0.0;
+        state.dataOutRptTab->zstPeople(iTotal) = 0.0;
     }
 
     int spaceTableRowNum = 0;
