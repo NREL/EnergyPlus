@@ -4017,10 +4017,13 @@ namespace UnitarySystems {
 
         if (AirLoopNumber == 0 && !ZoneEquipmentFound &&
             (this->m_ControlType == UnitarySysCtrlType::Load || this->m_ControlType == UnitarySysCtrlType::CCMASHRAE)) {
+            std::string_view zoneName = input_data.controlling_zone_or_thermostat_location;
+            if (zoneName.empty() && this->ControlZoneNum > 0) {
+                zoneName = state.dataHeatBal->Zone(this->ControlZoneNum).Name;
+            }
             ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
-            ShowContinueError(state, "Did not find proper connection for AirLoopHVAC or ZoneHVAC system.");
-            ShowContinueError(
-                state, format("specified Controlling Zone or Thermostat Location name = {}", input_data.controlling_zone_or_thermostat_location));
+            ShowContinueError(state, "Did not find proper connections for AirLoopHVAC or ZoneHVAC system.");
+            ShowContinueError(state, format("specified Controlling Zone or Thermostat Location name = {}", zoneName));
             if (!AirNodeFound && !ZoneEquipmentFound) {
                 ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                 ShowContinueError(state, "Did not find air node (zone with thermostat).");
