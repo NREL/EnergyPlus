@@ -3825,7 +3825,7 @@ namespace UnitarySystems {
         // if part of ZoneHVAC:OutdoorAirUnit bypass most checks for connection to air loop or OASystem
         if (ZoneOAUnitNum > 0) OASysFound = true;
 
-        if (!AirLoopFound && !OASysFound) {
+        if (ZoneEquipment) {
             int ControlledZoneNum = 0;
             int ZoneExhNum = 0;
 
@@ -3903,9 +3903,34 @@ namespace UnitarySystems {
                     }
                 }
             }
-        }
-
-        if (!ZoneEquipmentFound) {
+            if (!ZoneExhaustNodeFound && !InducedNodeFound) {
+                // Exhaust Node was not found
+                ShowSevereError(state, format("Input errors for {}:{}", cCurrentModuleObject, thisObjectName));
+                ShowContinueError(state,
+                                  format("Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name or Induced Node Name. = {}",
+                                         input_data.air_inlet_node_name));
+                ShowContinueError(
+                    state,
+                    format("Air Inlet Node {} name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
+                           "object inputs.",
+                           input_data.air_inlet_node_name));
+                ShowContinueError(state, "or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.");
+                errorsFound = true;
+            } else if (!ZoneInletNodeFound) {
+                bool ZoneInletNodeExists = false;
+                int InletControlledZoneNum = 0;
+                int ZoneInletNum = 0;
+                ZoneInletNodeExists = searchZoneInletNodes(state, this->AirOutNode, InletControlledZoneNum, ZoneInletNum);
+                if (!ZoneInletNodeExists) {
+                    ShowSevereError(state, format("Input errors for {}:{}", cCurrentModuleObject, thisObjectName));
+                    ShowContinueError(state, format("Incorrect or misspelled Air Outlet Node Name = {}", input_data.air_outlet_node_name));
+                    ShowContinueError(state,
+                                      "Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections "
+                                      "object inputs.");
+                    errorsFound = true;
+                }
+            }
+        } else {
             // check if the UnitarySystem is connected to an air loop
 
             int compIndex;
@@ -3975,34 +4000,6 @@ namespace UnitarySystems {
                 }
             }
 
-            if (ZoneEquipment && !ZoneExhaustNodeFound && !InducedNodeFound) {
-                // Exhaust Node was not found
-                ShowSevereError(state, format("Input errors for {}:{}", cCurrentModuleObject, thisObjectName));
-                ShowContinueError(state,
-                                  format("Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name or Induced Node Name. = {}",
-                                         input_data.air_inlet_node_name));
-                ShowContinueError(
-                    state,
-                    format("Air Inlet Node {} name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
-                           "object inputs.",
-                           input_data.air_inlet_node_name));
-                ShowContinueError(state, "or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.");
-                errorsFound = true;
-            } else if (ZoneEquipment && !ZoneInletNodeFound) {
-                bool ZoneInletNodeExists = false;
-                int InletControlledZoneNum = 0;
-                int ZoneInletNum = 0;
-                ZoneInletNodeExists = searchZoneInletNodes(state, this->AirOutNode, InletControlledZoneNum, ZoneInletNum);
-                if (!ZoneInletNodeExists) {
-                    ShowSevereError(state, format("Input errors for {}:{}", cCurrentModuleObject, thisObjectName));
-                    ShowContinueError(state, format("Incorrect or misspelled Air Outlet Node Name = {}", input_data.air_outlet_node_name));
-                    ShowContinueError(state,
-                                      "Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections "
-                                      "object inputs.");
-                    errorsFound = true;
-                }
-            }
-
             // check if the UnitarySystem is connected to an outside air system
             if (!AirLoopFound && state.dataAirLoop->NumOASystems > 0) {
                 for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
@@ -4015,36 +4012,6 @@ namespace UnitarySystems {
                         break;
                     }
                 }
-            }
-        }
-
-        if (!AirLoopFound && !ZoneEquipmentFound && !OASysFound) {
-            // Unsucessful attempt to get all input data.
-            return;
-        } else {
-            if (AirLoopFound && (this->m_ZoneInletNode > 0 || this->m_ControlType == UnitarySysCtrlType::Setpoint)) {
-                this->m_OKToPrintSizing = true;
-                this->m_ThisSysInputShouldBeGotten = false;
-            } else if (ZoneEquipmentFound) {
-                this->m_OKToPrintSizing = true;
-                this->m_ThisSysInputShouldBeGotten = false;
-            } else if (OASysFound) {
-                this->m_OKToPrintSizing = true;
-                this->m_ThisSysInputShouldBeGotten = false;
-            }
-        }
-
-        this->m_AvailManagerListName = input_data.avail_manager_list_name;
-
-        if (!input_data.design_spec_zonehvac_sizing_object_name.empty()) {
-            this->m_HVACSizingIndex =
-                UtilityRoutines::FindItemInList(input_data.design_spec_zonehvac_sizing_object_name, state.dataSize->ZoneHVACSizing);
-            if (this->m_HVACSizingIndex == 0) {
-                ShowSevereError(state,
-                                "Design Specification ZoneHVAC Sizing Object Name = " + input_data.design_spec_zonehvac_sizing_object_name +
-                                    " not found.");
-                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + this->Name);
-                errorsFound = true;
             }
         }
 
@@ -4064,7 +4031,30 @@ namespace UnitarySystems {
             errorsFound = true;
         }
 
-        if (!ZoneEquipmentFound)
+        if (!AirLoopFound && !ZoneEquipmentFound && !OASysFound) {
+            // Unsucessful attempt to get all input data.
+            return;
+        } else if (ZoneEquipmentFound || OASysFound ||
+                   (AirLoopFound && (this->m_ZoneInletNode > 0) || this->m_ControlType == UnitarySysCtrlType::Setpoint)) {
+            this->m_OKToPrintSizing = true;
+            this->m_ThisSysInputShouldBeGotten = false;
+        }
+
+        this->m_AvailManagerListName = input_data.avail_manager_list_name;
+
+        if (!input_data.design_spec_zonehvac_sizing_object_name.empty()) {
+            this->m_HVACSizingIndex =
+                UtilityRoutines::FindItemInList(input_data.design_spec_zonehvac_sizing_object_name, state.dataSize->ZoneHVACSizing);
+            if (this->m_HVACSizingIndex == 0) {
+                ShowSevereError(state,
+                                "Design Specification ZoneHVAC Sizing Object Name = " + input_data.design_spec_zonehvac_sizing_object_name +
+                                    " not found.");
+                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + this->Name);
+                errorsFound = true;
+            }
+        }
+
+        if (!ZoneEquipment)
             BranchNodeConnections::TestCompSet(state,
                                                cCurrentModuleObject,
                                                UtilityRoutines::MakeUPPERCase(thisObjectName),
