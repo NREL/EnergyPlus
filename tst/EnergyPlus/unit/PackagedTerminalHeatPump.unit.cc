@@ -4349,7 +4349,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
         "   **   ~~~   ** Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.",
     });
 
-    ASSERT_TRUE(compare_err_stream(error_string,true));
+    ASSERT_TRUE(compare_err_stream(error_string, true));
     ASSERT_TRUE(errorsFound);
     int someOtherNode = UtilityRoutines::FindItemInList("SOME OTHER NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_EQ(someOtherNode, thisSys.AirInNode);
