@@ -10797,8 +10797,8 @@ TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
     state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::None;
 
     SetupUnitConversions(*state);
-    Real64 areaConv = getSpecificUnitDivider(*state, "m2", "ft2");
-    Real64 volConv = getSpecificUnitDivider(*state, "m3", "ft3");
+    // Real64 areaConv = getSpecificUnitDivider(*state, "m2", "ft2");
+    // Real64 volConv = getSpecificUnitDivider(*state, "m3", "ft3");
 
     // WriteVeriSumTable(*state);
     bool produceTabular = true;
@@ -10815,6 +10815,7 @@ TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
     state->dataOutRptTab->Wm2_unitConv = 1.0;
 
     state->dataGlobal->numSpaceTypes = 1;
+    state->dataHeatBal->spaceTypes.allocate(state->dataGlobal->numSpaceTypes);
 
     state->dataHeatBal->TotPeople = 1;
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
@@ -10861,4 +10862,23 @@ TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    EXPECT_EQ(80ul, tabularData.size());
+    // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
+    // columnId, value
+    // Zone Areas
+    EXPECT_EQ("      100.00", tabularData[0][10]);
+    EXPECT_EQ("      100.00", tabularData[1][10]);
+    // Space Areas
+    EXPECT_EQ("      200.00", tabularData[2][10]);
+    EXPECT_EQ("      200.00", tabularData[3][10]);
+
+    EXPECT_EQ("Yes", tabularData[6][10]);
+    EXPECT_EQ("Yes", tabularData[7][10]);
+
+    // values
+    EXPECT_NEAR(100.00, std::stod(tabularData[0][10]), 0.01);
+    EXPECT_NEAR(100.00, std::stod(tabularData[1][10]), 0.01);
+    EXPECT_NEAR(200.00, std::stod(tabularData[2][10]), 0.01);
+    EXPECT_NEAR(200.00, std::stod(tabularData[3][10]), 0.01);
 }
