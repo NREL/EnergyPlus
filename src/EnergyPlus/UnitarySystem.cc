@@ -4038,7 +4038,7 @@ namespace UnitarySystems {
             // Unsucessful attempt to get all input data.
             return;
         } else if (ZoneEquipmentFound || OASysFound ||
-                   (AirLoopFound && (this->m_ZoneInletNode > 0) || this->m_ControlType == UnitarySysCtrlType::Setpoint)) {
+                   (AirLoopFound && (this->m_ZoneInletNode > 0 || this->m_ControlType == UnitarySysCtrlType::Setpoint))) {
             this->m_OKToPrintSizing = true;
             this->m_ThisSysInputShouldBeGotten = false;
         }

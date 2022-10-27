@@ -4071,9 +4071,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
 TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
 {
 
-    bool ErrorsFound = false;
-    bool FirstHVACIteration = false;
-    int PTUnitNum = 0;
+    bool errorsFound = false;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Compact,",
@@ -4281,8 +4279,8 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ProcessScheduleInput(*state); // read schedules
-    GetZoneData(*state, ErrorsFound);
-    ASSERT_FALSE(ErrorsFound);
+    GetZoneData(*state, errorsFound);
+    ASSERT_FALSE(errorsFound);
 
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
@@ -4312,7 +4310,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     thisSys.input_specs.air_inlet_node_name = "PLENUM INDUCED AIR NODE";
     thisSys.ControlZoneNum = 0;
     state->dataUnitarySystems->getInputOnceFlag = true;
-    bool errorsFound = false;
+    errorsFound = false;
     state->dataBranchNodeConnections->NumCompSets = 0;
     state->dataBranchNodeConnections->CompSets.clear();
     int sysNum = 1;
