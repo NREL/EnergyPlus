@@ -123,15 +123,23 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZT = DataHeatBalFanSys::ZoneInitialTemp;       // Air Temperature Averaged over the System Time Increment
         Real64 ZTAVComf = DataHeatBalFanSys::ZoneInitialTemp; // Air Temperature Averaged over the Zone Time step used
         // in thermal comfort models (currently Fang model only)
-        Real64 XMAT = DataHeatBalFanSys::ZoneInitialTemp; // Temporary zone/space temperature to test convergence
-        Real64 XM2T = DataHeatBalFanSys::ZoneInitialTemp;
-        Real64 XM3T = DataHeatBalFanSys::ZoneInitialTemp;
-        Real64 XM4T = DataHeatBalFanSys::ZoneInitialTemp;
-        Real64 DSXMAT = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
-        Real64 DSXM2T = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
-        Real64 DSXM3T = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
-        Real64 DSXM4T = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
-        Real64 XMPT = DataHeatBalFanSys::ZoneInitialTemp;   // Zone/space air temperature at previous time step
+        std::array<Real64, 4> XMAT = {DataHeatBalFanSys::ZoneInitialTemp,
+                                      DataHeatBalFanSys::ZoneInitialTemp,
+                                      DataHeatBalFanSys::ZoneInitialTemp,
+                                      DataHeatBalFanSys::ZoneInitialTemp}; // Temporary zone/space temperature to test convergence
+        // Real64 XMAT = DataHeatBalFanSys::ZoneInitialTemp;                  // Temporary zone/space temperature to test convergence
+        // Real64 XM2T = DataHeatBalFanSys::ZoneInitialTemp;
+        // Real64 XM3T = DataHeatBalFanSys::ZoneInitialTemp;
+        // Real64 XM4T = DataHeatBalFanSys::ZoneInitialTemp;
+        std::array<Real64, 4> DSXMAT = {DataHeatBalFanSys::ZoneInitialTemp,
+                                        DataHeatBalFanSys::ZoneInitialTemp,
+                                        DataHeatBalFanSys::ZoneInitialTemp,
+                                        DataHeatBalFanSys::ZoneInitialTemp}; // Down Stepped MAT history storage
+        // Real64 DSXMAT = DataHeatBalFanSys::ZoneInitialTemp;
+        // Real64 DSXM2T = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
+        // Real64 DSXM3T = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
+        // Real64 DSXM4T = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
+        Real64 XMPT = DataHeatBalFanSys::ZoneInitialTemp; // Zone/space air temperature at previous time step
         // Exact and Euler solutions
         Real64 ZoneTMX = DataHeatBalFanSys::ZoneInitialTemp; // Temporary zone/space temperature to test convergence in Exact and Euler method
         Real64 ZoneTM2 = DataHeatBalFanSys::ZoneInitialTemp; // Temporary zone/space temperature at timestep t-2 in Exact and Euler method
@@ -159,9 +167,11 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZoneWM2 = 0.0; // Temporary humidity ratio at timestep t-2 in Exact and Euler method
         Real64 ZoneW1 = 0.0;  // Zone/space humidity ratio at the previous time step used in Exact and Euler method
 
-        Real64 ZTM1 = 0.0;                // zone air temperature at previous timestep
-        Real64 ZTM2 = 0.0;                // zone air temperature at timestep T-2
-        Real64 ZTM3 = 0.0;                // zone air temperature at previous T-3
+        std::array<Real64, 4> ZTM = {
+            0.0, 0.0, 0.0, 0.0}; // // zone air temperature at previous timesteps 1:3 (sized to 4 to be compatible with other similar arrays)
+        // Real64 ZTM1 = 0.0;                                                 // zone air temperature at previous timestep
+        // Real64 ZTM2 = 0.0;                // zone air temperature at timestep T-2
+        // Real64 ZTM3 = 0.0;                // zone air temperature at previous T-3
         Real64 WZoneTimeMinus1Temp = 0.0; // Zone air humidity ratio at previous timestep
         Real64 WZoneTimeMinus2Temp = 0.0; // Zone air humidity ratio at timestep T-2
         Real64 WZoneTimeMinus3Temp = 0.0; // Zone air humidity ratio at timestep T-3
@@ -313,9 +323,11 @@ namespace ZoneTempPredictorCorrector {
                                        Real64 &newVal0,
                                        Real64 &newVal1,
                                        Real64 &newVal2,
-                                       Real64 &newVal3, // unused 1208
-                                       Real64 &newVal4  // unused 1208
-    );
+                                       Real64 &newVal3,
+                                       Real64 &newVal4);
+
+    void DownInterpolate4HistoryValues(
+        Real64 OldTimeStep, Real64 NewTimeStep, std::array<Real64, 4> &oldVals, Real64 &newVal0, std::array<Real64, 4> &newVals);
 
     void InverseModelTemperature(EnergyPlusData &state,
                                  int ZoneNum,                         // Zone number

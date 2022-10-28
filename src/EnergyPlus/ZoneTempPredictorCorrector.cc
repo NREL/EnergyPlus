@@ -3372,9 +3372,7 @@ void ZoneSpaceHeatBalanceData::beginEnvironmentInit(EnergyPlusData &state)
     this->WZoneTimeMinus1Temp = 0.0;
     this->WZoneTimeMinus2Temp = 0.0;
     this->WZoneTimeMinus3Temp = 0.0;
-    this->ZTM1 = 0.0;
-    this->ZTM2 = 0.0;
-    this->ZTM3 = 0.0;
+    this->ZTM = {0.0, 0.0, 0.0, 0.0};
     this->ZoneAirHumRatTemp = 0.0;
     this->TempIndZnLd = 0.0;
     this->TempDepZnLd = 0.0;
@@ -3672,19 +3670,19 @@ void PredictSystemLoads(EnergyPlusData &state,
             thisZoneHB.SumIntGain + thisZoneHB.SumHATsurf - thisZoneHB.SumHATref + thisZoneHB.SumMCpT + thisZoneHB.SysDepZoneLoadsLagged;
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) {
             thisZoneHB.TempHistoryTerm =
-                thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+                thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
             thisZoneHB.TempDepZnLd = (11.0 / 6.0) * thisZoneHB.AirPowerCap + thisZoneHB.TempDepCoef;
             thisZoneHB.TempIndZnLd = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
         } else if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
             // UCSD displacement ventilation model - make dynamic term independent of TimeStepSys
             thisZoneHB.TempHistoryTerm =
-                thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+                thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
             thisZoneHB.TempDepZnLd = (11.0 / 6.0) * thisZoneHB.AirPowerCap + thisZoneHB.TempDepCoef;
             thisZoneHB.TempIndZnLd = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
         } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
             // UCSD UFAD model - make dynamic term independent of TimeStepSys
             thisZoneHB.TempHistoryTerm =
-                thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+                thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
             thisZoneHB.TempDepZnLd = (11.0 / 6.0) * thisZoneHB.AirPowerCap + thisZoneHB.TempDepCoef;
             thisZoneHB.TempIndZnLd = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
         } else if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
@@ -3704,7 +3702,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                                          RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir / (TimeStepSys * DataGlobalConstants::SecInHour);
                 thisZoneHB.AirPowerCap = thisZoneHB.AirPowerCap;
                 thisZoneHB.TempHistoryTerm =
-                    thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+                    thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
                 thisZoneHB.TempDepZnLd = (11.0 / 6.0) * thisZoneHB.AirPowerCap + thisZoneHB.TempDepCoef;
                 thisZoneHB.TempIndZnLd = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HasHVACAssigned)
@@ -3712,7 +3710,7 @@ void PredictSystemLoads(EnergyPlusData &state,
             }
         } else { // other imperfectly mixed room models
             thisZoneHB.TempHistoryTerm =
-                thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM1 - (3.0 / 2.0) * thisZoneHB.ZTM2 + (1.0 / 3.0) * thisZoneHB.ZTM3);
+                thisZoneHB.AirPowerCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
             thisZoneHB.TempDepZnLd = (11.0 / 6.0) * thisZoneHB.AirPowerCap + thisZoneHB.TempDepCoef;
             thisZoneHB.TempIndZnLd = thisZoneHB.TempHistoryTerm + thisZoneHB.TempIndCoef;
         }
@@ -4392,17 +4390,13 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
 
     // update the variables actually used in the balance equations.
     if (!useZoneTimeStepHistory) {
-        this->ZTM1 = this->DSXMAT;
-        this->ZTM2 = this->DSXM2T;
-        this->ZTM3 = this->DSXM3T;
+        this->ZTM = this->DSXMAT;
 
         this->WZoneTimeMinus1Temp = this->DSWZoneTimeMinus1;
         this->WZoneTimeMinus2Temp = this->DSWZoneTimeMinus2;
         this->WZoneTimeMinus3Temp = this->DSWZoneTimeMinus3;
     } else {
-        this->ZTM1 = this->XMAT;
-        this->ZTM2 = this->XM2T;
-        this->ZTM3 = this->XM3T;
+        this->ZTM = this->XMAT;
 
         this->WZoneTimeMinus1Temp = this->WZoneTimeMinus1;
         this->WZoneTimeMinus2Temp = this->WZoneTimeMinus2;
@@ -4456,7 +4450,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
         // Solve for zone air temperature
         switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
         case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-            this->ZT = (this->TempIndCoef + this->AirPowerCap * (3.0 * this->ZTM1 - (3.0 / 2.0) * this->ZTM2 + (1.0 / 3.0) * this->ZTM3)) /
+            this->ZT = (this->TempIndCoef + this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2])) /
                        ((11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef);
         } break;
         case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
@@ -4553,7 +4547,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
         // Solve for zone air temperature
         switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
         case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-            this->ZT = (this->TempIndCoef + this->AirPowerCap * (3.0 * this->ZTM1 - (3.0 / 2.0) * this->ZTM2 + (1.0 / 3.0) * this->ZTM3)) /
+            this->ZT = (this->TempIndCoef + this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2])) /
                        ((11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef);
             // Exact solution
         } break;
@@ -4625,7 +4619,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
         if (isMixed) {
-            tempChange = max(tempChange, std::abs(this->ZT - this->ZTM1));
+            tempChange = max(tempChange, std::abs(this->ZT - this->ZTM[0]));
         } else {
             tempChange = max(tempChange,
                              max(std::abs(state.dataRoomAirMod->ZTOC(zoneNum) - state.dataRoomAirMod->ZTM1OC(zoneNum)),
@@ -4683,10 +4677,10 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-        thisZoneHB.XM4T = thisZoneHB.XM3T;
-        thisZoneHB.XM3T = thisZoneHB.XM2T;
-        thisZoneHB.XM2T = thisZoneHB.XMAT;
-        thisZoneHB.XMAT = thisZoneHB.ZTAV; // using average for whole zone time step.
+        for (int iHistory = 3; iHistory >= 1; --iHistory) {
+            thisZoneHB.XMAT[iHistory] = std::move(thisZoneHB.XMAT[iHistory - 1]);
+        }
+        thisZoneHB.XMAT[0] = thisZoneHB.ZTAV; // using average for whole zone time step.
         thisZoneHB.XMPT = thisZoneHB.ZT;
 
         thisZoneHB.WZoneTimeMinus4 = thisZoneHB.WZoneTimeMinus3;
@@ -4778,10 +4772,10 @@ void PushSystemTimestepHistories(EnergyPlusData &state)
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-        thisZoneHB.DSXM4T = thisZoneHB.DSXM3T;
-        thisZoneHB.DSXM3T = thisZoneHB.DSXM2T;
-        thisZoneHB.DSXM2T = thisZoneHB.DSXMAT;
-        thisZoneHB.DSXMAT = thisZoneHB.MAT;
+        for (int iHistory = 3; iHistory >= 1; --iHistory) {
+            thisZoneHB.DSXMAT[iHistory] = std::move(thisZoneHB.DSXMAT[iHistory - 1]);
+        }
+        thisZoneHB.DSXMAT[0] = thisZoneHB.MAT;
 
         thisZoneHB.DSWZoneTimeMinus4 = thisZoneHB.DSWZoneTimeMinus3;
         thisZoneHB.DSWZoneTimeMinus3 = thisZoneHB.DSWZoneTimeMinus2;
@@ -4863,10 +4857,9 @@ void RevertZoneTimestepHistories(EnergyPlusData &state)
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-        //  thisZoneHB.MAT  = thisZoneHB.XMAT
-        thisZoneHB.XMAT = thisZoneHB.XM2T;
-        thisZoneHB.XM2T = thisZoneHB.XM3T;
-        thisZoneHB.XM3T = thisZoneHB.XM4T;
+        for (int iHistory = 0; iHistory <= 2; ++iHistory) {
+            thisZoneHB.XMAT[iHistory] = std::move(thisZoneHB.XMAT[iHistory + 1]);
+        }
 
         //   ZoneAirHumRat(ZoneNum)  = WZoneTimeMinus1(ZoneNum)
         thisZoneHB.WZoneTimeMinus1 = thisZoneHB.WZoneTimeMinus2;
@@ -5089,9 +5082,8 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
                                    Real64 &newVal0,
                                    Real64 &newVal1,
                                    Real64 &newVal2,
-                                   Real64 &newVal3, // unused 1208
-                                   Real64 &newVal4  // unused 1208
-)
+                                   Real64 &newVal3,
+                                   Real64 &newVal4)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
@@ -5145,6 +5137,78 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
     }
 }
 
+void DownInterpolate4HistoryValues(
+    Real64 OldTimeStep, Real64 NewTimeStep, std::array<Real64, 4> &oldVals, Real64 &newVal0, std::array<Real64, 4> &newVals)
+{
+    // first construct data on timestamps for interpolating with later
+    Real64 const oldTime0 = 0.0;
+    Real64 const oldTime1 = oldTime0 - OldTimeStep;
+
+    Real64 const newTime0 = 0.0;
+    Real64 const newTime1 = newTime0 - NewTimeStep;
+    Real64 const newTime2 = newTime1 - NewTimeStep;
+    Real64 const newTime3 = newTime2 - NewTimeStep;
+    Real64 const newTime4 = newTime3 - NewTimeStep;
+
+    Real64 const DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
+
+    newVal0 = oldVals[0];
+
+    if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
+        // first two points lie between oldVals[0] and oldVals[1]
+        Real64 delta10 = oldVals[1] - oldVals[0];
+        newVals[0] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
+        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
+        // last two points lie between oldVals[1] and oldVals[2]
+        Real64 delta21 = oldVals[2] - oldVals[1];
+        newVals[2] = oldVals[1] + delta21 * ((oldTime1 - newTime3) / OldTimeStep);
+        newVals[3] = oldVals[1] + delta21 * ((oldTime1 - newTime4) / OldTimeStep);
+    } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
+        // first three points lie between oldVals[0] and oldVals[1]
+        Real64 delta10 = oldVals[1] - oldVals[0];
+        newVals[0] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
+        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
+        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
+        // last point lie between oldVals[1] and oldVals[2]
+        Real64 delta21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
+        newVals[3] = oldVals[1] + delta21 * ((oldTime1 - newTime4) / OldTimeStep);
+
+    } else { // DSRatio = 4 or more
+        // all new points lie between oldVals[0] and oldVals[1]
+        Real64 delta10 = oldVals[1] - oldVals[0];
+        newVals[0] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
+        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
+        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
+        newVals[3] = oldVals[0] + delta10 * ((oldTime0 - newTime4) / OldTimeStep);
+    }
+    // if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
+    //     // first two points lie between oldVals[0] and oldVals[1]
+    //     Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
+    //     newVals[0] = oldVals[0] + ratio10 * (oldTime0 - newTime1);
+    //     newVals[1] = oldVals[0] + ratio10 * (oldTime0 - newTime2);
+    //     // last two points lie between oldVals[1] and oldVals[2]
+    //     Real64 ratio21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
+    //     newVals[2] = oldVals[1] + ratio21 * (oldTime1 - newTime3);
+    //     newVals[3] = oldVals[1] + ratio21 * (oldTime1 - newTime4);
+    // } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
+    //     // first three points lie between oldVals[0] and oldVals[1]
+    //     Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
+    //     newVals[0] = oldVals[0] + ratio10 * (oldTime0 - newTime1);
+    //     newVals[1] = oldVals[0] + ratio10 * (oldTime0 - newTime2);
+    //     newVals[2] = oldVals[0] + ratio10 * (oldTime0 - newTime3);
+    //     // last point lie between oldVals[1] and oldVals[2]
+    //     Real64 ratio21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
+    //     newVals[3] = oldVals[1] + ratio21 * (oldTime1 - newTime4);
+
+    //} else { // DSRatio = 4 or more
+    //    // all new points lie between oldVals[0] and oldVals[1]
+    //    Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
+    //    newVals[0] = oldVals[0] + ratio10 * (oldTime0 - newTime1);
+    //    newVals[1] = oldVals[0] + ratio10 * (oldTime0 - newTime2);
+    //    newVals[2] = oldVals[0] + ratio10 * (oldTime0 - newTime3);
+    //    newVals[3] = oldVals[0] + ratio10 * (oldTime0 - newTime4);
+    //}
+}
 void InverseModelTemperature(EnergyPlusData &state,
                              int const ZoneNum,                   // Zone number
                              Real64 const SumIntGain,             // Zone sum of convective internal gains
@@ -6005,7 +6069,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-        CzdTdt = RhoAir * CpAir * thisZone.Volume * thisZone.ZoneVolCapMultpSens * (thisZoneHB.MAT - thisZoneHB.ZTM1) /
+        CzdTdt = RhoAir * CpAir * thisZone.Volume * thisZone.ZoneVolCapMultpSens * (thisZoneHB.MAT - thisZoneHB.ZTM[0]) /
                  (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
         // Exact solution
     } break;
@@ -7131,34 +7195,35 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
         if (spaceNum == 0) {
             if (state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber > 0) { // roll back result for zone air node,
                 auto &zoneNode = state.dataLoopNodes->Node(state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber);
-                zoneNode.Temp = this->XMAT;
-                state.dataHeatBalFanSys->TempTstatAir(zoneNum) = this->XMAT;
+                zoneNode.Temp = this->XMAT[0];
+                state.dataHeatBalFanSys->TempTstatAir(zoneNum) = this->XMAT[0];
                 zoneNode.HumRat = this->WZoneTimeMinus1;
-                zoneNode.Enthalpy = Psychrometrics::PsyHFnTdbW(this->XMAT, this->WZoneTimeMinus1);
+                zoneNode.Enthalpy = Psychrometrics::PsyHFnTdbW(this->XMAT[0], this->WZoneTimeMinus1);
             }
         } else {
             if (state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber > 0) { // roll back result for space air node,
                 auto &spaceNode = state.dataLoopNodes->Node(state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber);
-                spaceNode.Temp = this->XMAT;
-                state.dataHeatBalFanSys->TempTstatAir(zoneNum) = this->XMAT;
+                spaceNode.Temp = this->XMAT[0];
+                state.dataHeatBalFanSys->TempTstatAir(zoneNum) = this->XMAT[0];
                 spaceNode.HumRat = this->WZoneTimeMinus1;
-                spaceNode.Enthalpy = Psychrometrics::PsyHFnTdbW(this->XMAT, this->WZoneTimeMinus1);
+                spaceNode.Enthalpy = Psychrometrics::PsyHFnTdbW(this->XMAT[0], this->WZoneTimeMinus1);
             }
         }
 
         if (state.dataHVACGlobal->NumOfSysTimeSteps !=
             state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
 
-            DownInterpolate4HistoryValues(PriorTimeStep,
-                                          state.dataHVACGlobal->TimeStepSys,
-                                          this->XMAT,
-                                          this->XM2T,
-                                          this->XM3T,
-                                          this->MAT,
-                                          this->DSXMAT,
-                                          this->DSXM2T,
-                                          this->DSXM3T,
-                                          this->DSXM4T);
+            DownInterpolate4HistoryValues(PriorTimeStep, state.dataHVACGlobal->TimeStepSys, this->XMAT, this->MAT, this->DSXMAT);
+            // DownInterpolate4HistoryValues(PriorTimeStep,
+            //                               state.dataHVACGlobal->TimeStepSys,
+            //                               this->XMAT[0],
+            //                               this->XMAT[1],
+            //                               this->XMAT[2],
+            //                               this->MAT,
+            //                               this->DSXMAT[0],
+            //                               this->DSXMAT[1],
+            //                               this->DSXMAT[2],
+            //                               this->DSXMAT[3]);
             DownInterpolate4HistoryValues(PriorTimeStep,
                                           state.dataHVACGlobal->TimeStepSys,
                                           this->WZoneTimeMinus1,
@@ -7234,18 +7299,14 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
     }
     // now update the variables actually used in the balance equations.
     if (UseZoneTimeStepHistory) {
-        this->ZTM1 = this->XMAT;
-        this->ZTM2 = this->XM2T;
-        this->ZTM3 = this->XM3T;
+        this->ZTM = this->XMAT;
 
         this->WZoneTimeMinus1Temp = this->WZoneTimeMinus1;
         this->WZoneTimeMinus2Temp = this->WZoneTimeMinus2;
         this->WZoneTimeMinus3Temp = this->WZoneTimeMinus3;
 
     } else { // use down-stepped history
-        this->ZTM1 = this->DSXMAT;
-        this->ZTM2 = this->DSXM2T;
-        this->ZTM3 = this->DSXM3T;
+        this->ZTM = this->DSXMAT;
 
         this->WZoneTimeMinus1Temp = this->DSWZoneTimeMinus1;
         this->WZoneTimeMinus2Temp = this->DSWZoneTimeMinus2;
