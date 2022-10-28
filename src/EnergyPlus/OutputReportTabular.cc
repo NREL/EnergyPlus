@@ -12117,7 +12117,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     spaceColumnWidth.allocate(spaceNumCol);
     spaceTableBody.allocate(spaceNumCol, state.dataGlobal->numSpaces + 4); // Extra rows for totals
     for (int iCol = 1; iCol <= spaceNumCol; ++iCol) {
-        spaceColumnWidth = 14;
+        spaceColumnWidth(iCol) = 14;
     }
 
     spaceColumnHead(1) = "Area " + state.dataOutRptTab->m2_unitName;
@@ -12172,7 +12172,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     spaceTypeColumnWidth.allocate(spaceTypeNumCol);
     spaceTypeTableBody.allocate(spaceTypeNumCol, state.dataGlobal->numSpaceTypes + 1); // Extra row for total
     for (int iCol = 1; iCol <= spaceTypeNumCol; ++iCol) {
-        spaceTypeColumnWidth = 14;
+        spaceTypeColumnWidth(iCol) = 14;
     }
     spaceTypeColumnHead(1) = "Total Area " + state.dataOutRptTab->m2_unitName;
     spaceTypeColumnHead(2) = "Conditioned Area " + state.dataOutRptTab->m2_unitName;
