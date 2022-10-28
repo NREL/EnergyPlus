@@ -466,7 +466,7 @@ void GetCoilDesFlowT(EnergyPlusData &state,
         }
     } else {
         if ((sysSizInput.CoolCapControl == VT) || (sysSizInput.CoolCapControl == Bypass)) {
-            ShowWarningError(state, "GetCoilDesFlow: AirLoopHVAC=" + sysSizInput.AirPriLoopName + "has no time of peak cooling load for sizing.");
+            ShowWarningError(state, format("GetCoilDesFlow: AirLoopHVAC = {} has no time of peak cooling load for sizing.", sysSizInput.AirPriLoopName));
             ShowContinueError(state, "Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
             sysSizInput.CoolCapControl = VAV;
         }
