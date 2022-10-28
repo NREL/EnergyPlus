@@ -482,25 +482,15 @@ void GetCoilDesFlowT(EnergyPlusData &state,
         DesFlow = state.dataSize->DataAirFlowUsedForSizing;
         DesExitHumRat = finalSysSizing.CoolSupHumRat;
     } else if (sysSizInput.CoolCapControl == CapacityControl::VT) {
-        if (finalSysSizing.CoolingPeakLoadType == SensibleCoolingLoad) {
-            ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
-            AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
-        } else if (finalSysSizing.CoolingPeakLoadType == TotalCoolingLoad) {
-            ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
-            AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
-        }
+        ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
+        AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
         DesExitTemp =
             max(finalSysSizing.CoolSupTemp, AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * finalSysSizing.DesCoolVolFlow));
         DesFlow = finalSysSizing.DesCoolVolFlow;
         DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
     } else if (sysSizInput.CoolCapControl == CapacityControl::Bypass) {
-        if (finalSysSizing.CoolingPeakLoadType == SensibleCoolingLoad) {
-            ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
-            AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
-        } else if (finalSysSizing.CoolingPeakLoadType == TotalCoolingLoad) {
-            ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
-            AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
-        }
+        ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
+        AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
         DesExitTemp = finalSysSizing.CoolSupTemp;
         if (calcSysSizing.MixTempAtCoolPeak > DesExitTemp) {
             Real64 AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * finalSysSizing.DesCoolVolFlow);
