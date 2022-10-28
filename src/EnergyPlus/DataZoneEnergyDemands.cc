@@ -57,10 +57,13 @@ void ZoneSystemSensibleDemand::beginEnvironmentInit()
 {
     this->RemainingOutputRequired = 0.0;
     this->TotalOutputRequired = 0.0;
-    if (allocated(this->SequencedOutputRequired)) this->SequencedOutputRequired = 0.0;
-    if (allocated(this->SequencedOutputRequiredToHeatingSP)) this->SequencedOutputRequiredToHeatingSP = 0.0;
-    if (allocated(this->SequencedOutputRequiredToCoolingSP)) this->SequencedOutputRequiredToCoolingSP = 0.0;
-    if (allocated(this->SequencedOutputRequired)) this->SequencedOutputRequired = 0.0;
+    if (allocated(this->SequencedOutputRequired)) {
+        for (int equipNum = 1; equipNum <= this->NumZoneEquipment; ++equipNum) {
+            this->SequencedOutputRequired(equipNum) = 0.0;
+            this->SequencedOutputRequiredToHeatingSP(equipNum) = 0.0;
+            this->SequencedOutputRequiredToCoolingSP(equipNum) = 0.0;
+        }
+    }
     this->ZoneSNLoadHeatEnergy = 0.0;
     this->ZoneSNLoadCoolEnergy = 0.0;
     this->ZoneSNLoadHeatRate = 0.0;
@@ -91,10 +94,13 @@ void ZoneSystemMoistureDemand::beginEnvironmentInit()
 {
     this->RemainingOutputRequired = 0.0;
     this->TotalOutputRequired = 0.0;
-    if (allocated(this->SequencedOutputRequired)) this->SequencedOutputRequired = 0.0;
-    if (allocated(this->SequencedOutputRequired)) this->SequencedOutputRequired = 0.0;
-    if (allocated(this->SequencedOutputRequiredToHumidSP)) this->SequencedOutputRequiredToHumidSP = 0.0;
-    if (allocated(this->SequencedOutputRequiredToDehumidSP)) this->SequencedOutputRequiredToDehumidSP = 0.0;
+    if (allocated(this->SequencedOutputRequired)) {
+        for (int equipNum = 1; equipNum <= this->NumZoneEquipment; ++equipNum) {
+            this->SequencedOutputRequired(equipNum) = 0.0;
+            this->SequencedOutputRequiredToHumidSP(equipNum) = 0.0;
+            this->SequencedOutputRequiredToDehumidSP(equipNum) = 0.0;
+        }
+    }
     this->ZoneLTLoadHeatEnergy = 0.0;
     this->ZoneLTLoadCoolEnergy = 0.0;
     this->ZoneLTLoadHeatRate = 0.0;
