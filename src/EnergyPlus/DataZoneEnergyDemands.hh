@@ -72,7 +72,7 @@ namespace DataZoneEnergyDemands {
         int StageNum = 0; // The stage number when staged thermostate is used:
         // 0 no load, >0 Heating stage, <0 Cooling stage
 
-        void virtual beginEnvironmentInit();
+        virtual void beginEnvironmentInit() = 0;
     };
 
     struct ZoneSystemSensibleDemand : ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)

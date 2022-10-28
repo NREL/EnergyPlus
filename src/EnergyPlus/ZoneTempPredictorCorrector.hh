@@ -115,43 +115,36 @@ namespace ZoneTempPredictorCorrector {
 
     struct ZoneSpaceHeatBalanceData
     {
-        // This entire struct is re-initialized during the simulation, so no static informat may be stored here (e.g. zone or space characteristics)
+        // This entire struct is re-initialized during the simulation, so no static data may be stored here (e.g. zone or space characteristics)
 
-        // Zone air drybulb conditions variables
-        Real64 MAT = DataHeatBalFanSys::ZoneInitialTemp;      // MEAN AIR TEMPERATURE (C)
-        Real64 ZTAV = DataHeatBalFanSys::ZoneInitialTemp;     // Air Temperature Averaged over the Zone Time step
-        Real64 ZT = DataHeatBalFanSys::ZoneInitialTemp;       // Air Temperature Averaged over the System Time Increment
-        Real64 ZTAVComf = DataHeatBalFanSys::ZoneInitialTemp; // Air Temperature Averaged over the Zone Time step used
-        // in thermal comfort models (currently Fang model only)
+        // Zone or space air drybulb temperature conditions
+        Real64 MAT = DataHeatBalFanSys::ZoneInitialTemp;      // Mean Air Temperature at end of Zone Time Step [C]
+        Real64 ZTAV = DataHeatBalFanSys::ZoneInitialTemp;     // Air Temperature Averaged over the Zone Time Step (during HVAC Time Steps)
+        Real64 ZT = DataHeatBalFanSys::ZoneInitialTemp;       // Air Temperature Averaged over the System Time step
+        Real64 ZTAVComf = DataHeatBalFanSys::ZoneInitialTemp; // Air Temperature Averaged used in thermal comfort models (currently Fang model only) -
+                                                              // TODO: lagged? could MAT be used instead?
         std::array<Real64, 4> XMAT = {DataHeatBalFanSys::ZoneInitialTemp,
                                       DataHeatBalFanSys::ZoneInitialTemp,
                                       DataHeatBalFanSys::ZoneInitialTemp,
-                                      DataHeatBalFanSys::ZoneInitialTemp}; // Temporary zone/space temperature to test convergence
-        // Real64 XMAT = DataHeatBalFanSys::ZoneInitialTemp;                  // Temporary zone/space temperature to test convergence
-        // Real64 XM2T = DataHeatBalFanSys::ZoneInitialTemp;
-        // Real64 XM3T = DataHeatBalFanSys::ZoneInitialTemp;
-        // Real64 XM4T = DataHeatBalFanSys::ZoneInitialTemp;
+                                      DataHeatBalFanSys::ZoneInitialTemp}; // Temporary air temperature history
         std::array<Real64, 4> DSXMAT = {DataHeatBalFanSys::ZoneInitialTemp,
                                         DataHeatBalFanSys::ZoneInitialTemp,
                                         DataHeatBalFanSys::ZoneInitialTemp,
-                                        DataHeatBalFanSys::ZoneInitialTemp}; // Down Stepped MAT history storage
-        // Real64 DSXMAT = DataHeatBalFanSys::ZoneInitialTemp;
-        // Real64 DSXM2T = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
-        // Real64 DSXM3T = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
-        // Real64 DSXM4T = DataHeatBalFanSys::ZoneInitialTemp; // Down Stepped MAT history storage
-        Real64 XMPT = DataHeatBalFanSys::ZoneInitialTemp; // Zone/space air temperature at previous time step
+                                        DataHeatBalFanSys::ZoneInitialTemp}; // Down Stepped air temperature history storage
+        Real64 XMPT = DataHeatBalFanSys::ZoneInitialTemp;                    // Air temperature at previous time step
         // Exact and Euler solutions
-        Real64 ZoneTMX = DataHeatBalFanSys::ZoneInitialTemp; // Temporary zone/space temperature to test convergence in Exact and Euler method
-        Real64 ZoneTM2 = DataHeatBalFanSys::ZoneInitialTemp; // Temporary zone/space temperature at timestep t-2 in Exact and Euler method
-        Real64 ZoneT1 = 0.0;                                 // Zone/space temperature at the previous time step used in Exact and Euler method
+        Real64 ZoneTMX = DataHeatBalFanSys::ZoneInitialTemp; // Temporary air temperature to test convergence in Exact and Euler method
+        Real64 ZoneTM2 = DataHeatBalFanSys::ZoneInitialTemp; // Temporary air temperature at timestep t-2 in Exact and Euler method
+        Real64 ZoneT1 = 0.0;                                 // Air temperature at the previous time step used in Exact and Euler method
 
-        // Zone Air moisture conditions variables
+        // Zone or space air moisture conditions
         Real64 ZoneAirHumRat = 0.01;        // Air Humidity Ratio
         Real64 ZoneAirHumRatAvg = 0.01;     // Air Humidity Ratio averaged over the zone time step
-        Real64 ZoneAirHumRatTemp = 0.01;    // Temp air humidity ratio at time plus 1
+        Real64 ZoneAirHumRatTemp = 0.01;    // Temporary air humidity ratio at time plus 1
         Real64 ZoneAirHumRatOld = 0.01;     // Last Time Steps air Humidity Ratio
         Real64 ZoneAirHumRatAvgComf = 0.01; // Air Humidity Ratio averaged over the zone time
                                             // step used in thermal comfort models (currently Fang model only)
+                                            // TODO: lagged? could ZoneAirHumRatAvg be used instead?
 
         Real64 WZoneTimeMinus1 = 0.0;   // Humidity ratio history terms for 3rd order derivative
         Real64 WZoneTimeMinus2 = 0.0;   // Time Minus 2 Zone Time Steps Term
@@ -248,8 +241,7 @@ namespace ZoneTempPredictorCorrector {
                                  int const zoneNum,
                                  int const spaceNum = 0);
 
-        virtual SumHATOutput
-        calcSumHAT([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int const zoneNum, [[maybe_unused]] int const spaceNum) = 0;
+        virtual SumHATOutput calcSumHAT(EnergyPlusData &state, int const zoneNum, int const spaceNum) = 0;
 
         void updateTemperatures(EnergyPlusData &state,
                                 bool const ShortenTimeStepSys,
@@ -317,17 +309,17 @@ namespace ZoneTempPredictorCorrector {
 
     void DownInterpolate4HistoryValues(Real64 OldTimeStep,
                                        Real64 NewTimeStep,
-                                       Real64 &oldVal0,
-                                       Real64 &oldVal1,
-                                       Real64 &oldVal2,
+                                       Real64 const oldVal0,
+                                       Real64 const oldVal1,
+                                       Real64 const oldVal2,
                                        Real64 &newVal0,
                                        Real64 &newVal1,
                                        Real64 &newVal2,
                                        Real64 &newVal3,
                                        Real64 &newVal4);
 
-    void DownInterpolate4HistoryValues(
-        Real64 OldTimeStep, Real64 NewTimeStep, std::array<Real64, 4> &oldVals, Real64 &newVal0, std::array<Real64, 4> &newVals);
+    Real64
+    DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std::array<Real64, 4> const &oldVals, std::array<Real64, 4> &newVals);
 
     void InverseModelTemperature(EnergyPlusData &state,
                                  int ZoneNum,                         // Zone number

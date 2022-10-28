@@ -5076,9 +5076,9 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
 
 void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
                                    Real64 const NewTimeStep,
-                                   Real64 &oldVal0,
-                                   Real64 &oldVal1,
-                                   Real64 &oldVal2,
+                                   Real64 const oldVal0,
+                                   Real64 const oldVal1,
+                                   Real64 const oldVal2,
                                    Real64 &newVal0,
                                    Real64 &newVal1,
                                    Real64 &newVal2,
@@ -5137,8 +5137,7 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
     }
 }
 
-void DownInterpolate4HistoryValues(
-    Real64 OldTimeStep, Real64 NewTimeStep, std::array<Real64, 4> &oldVals, Real64 &newVal0, std::array<Real64, 4> &newVals)
+Real64 DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std::array<Real64, 4> const &oldVals, std::array<Real64, 4> &newVals)
 {
     // first construct data on timestamps for interpolating with later
     Real64 const oldTime0 = 0.0;
@@ -5151,8 +5150,6 @@ void DownInterpolate4HistoryValues(
     Real64 const newTime4 = newTime3 - NewTimeStep;
 
     Real64 const DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
-
-    newVal0 = oldVals[0];
 
     if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
         // first two points lie between oldVals[0] and oldVals[1]
@@ -5181,6 +5178,8 @@ void DownInterpolate4HistoryValues(
         newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
         newVals[3] = oldVals[0] + delta10 * ((oldTime0 - newTime4) / OldTimeStep);
     }
+    return oldVals[0];
+
     // if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
     //     // first two points lie between oldVals[0] and oldVals[1]
     //     Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
@@ -5716,15 +5715,6 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
     this->SumHA += sumHATResults.sumHA;
     this->SumHATsurf += sumHATResults.sumHATsurf;
     this->SumHATref += sumHATResults.sumHATref;
-}
-
-SumHATOutput
-ZoneSpaceHeatBalanceData::calcSumHAT([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int const zoneNum, [[maybe_unused]] int const spaceNum)
-{
-    // TODO: This seems unnecessary, but it's the only way I could make the compiler/linker happy. This should never execute
-    assert(false);
-    SumHATOutput results;
-    return results;
 }
 
 SumHATOutput ZoneHeatBalanceData::calcSumHAT(EnergyPlusData &state, int const zoneNum, [[maybe_unused]] int const spaceNum)
@@ -7213,7 +7203,7 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
         if (state.dataHVACGlobal->NumOfSysTimeSteps !=
             state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
 
-            DownInterpolate4HistoryValues(PriorTimeStep, state.dataHVACGlobal->TimeStepSys, this->XMAT, this->MAT, this->DSXMAT);
+            this->MAT = DownInterpolate4HistoryValues(PriorTimeStep, state.dataHVACGlobal->TimeStepSys, this->XMAT, this->DSXMAT);
             // DownInterpolate4HistoryValues(PriorTimeStep,
             //                               state.dataHVACGlobal->TimeStepSys,
             //                               this->XMAT[0],

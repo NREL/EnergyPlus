@@ -46,17 +46,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 
 namespace EnergyPlus::DataZoneEnergyDemands {
-
-void ZoneSystemDemandData::beginEnvironmentInit()
-{
-    // Dummy function for overrides - should never execute
-    assert(false);
-}
 
 void ZoneSystemSensibleDemand::beginEnvironmentInit()
 {

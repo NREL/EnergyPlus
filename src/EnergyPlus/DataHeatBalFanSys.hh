@@ -149,7 +149,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> ZoneThermostatSetPointHiAver;
     Array1D<Real64> ZoneThermostatSetPointLoAver;
 
-    Array1D<Real64> LoadCorrectionFactor; // PH 3/3/04
+    EPVector<Real64> LoadCorrectionFactor; // PH 3/3/04
 
     // Hybrid Modeling
     Array1D<Real64> PreviousMeasuredZT1;     // Measured zone air temperature at previous timestep1
