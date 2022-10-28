@@ -3753,17 +3753,17 @@ void GetSystemSizingInput(EnergyPlusData &state)
             SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
         }
         // set the CoolCapControl input
-        SysSizInput(SysSizIndex).CoolCapControl = VAV;
+        SysSizInput(SysSizIndex).CoolCapControl = CapacityControl::VAV;
         {
             auto const CoolCapCtrl(state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum));
             if (CoolCapCtrl == "VAV") {
-                SysSizInput(SysSizIndex).CoolCapControl = VAV;
+                SysSizInput(SysSizIndex).CoolCapControl = CapacityControl::VAV;
             } else if (CoolCapCtrl == "BYPASS") {
-                SysSizInput(SysSizIndex).CoolCapControl = Bypass;
+                SysSizInput(SysSizIndex).CoolCapControl = CapacityControl::Bypass;
             } else if (CoolCapCtrl == "VT") {
-                SysSizInput(SysSizIndex).CoolCapControl = VT;
+                SysSizInput(SysSizIndex).CoolCapControl = CapacityControl::VT;
             } else if (CoolCapCtrl == "ONOFF") {
-                SysSizInput(SysSizIndex).CoolCapControl = OnOff;
+                SysSizInput(SysSizIndex).CoolCapControl = CapacityControl::OnOff;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
                 ShowContinueError(state,

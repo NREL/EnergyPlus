@@ -225,7 +225,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    state->dataSize->SysSizInput(1).CoolCapControl = VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
@@ -896,7 +896,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    state->dataSize->SysSizInput(1).CoolCapControl = VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
 
@@ -1015,7 +1015,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    state->dataSize->SysSizInput(1).CoolCapControl = VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->DataWaterLoopNum = 1;
@@ -1140,7 +1140,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    state->dataSize->SysSizInput(1).CoolCapControl = VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->DataWaterLoopNum = 1;

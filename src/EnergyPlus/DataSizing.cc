@@ -465,22 +465,23 @@ void GetCoilDesFlowT(EnergyPlusData &state,
             TimeStepAtPeak = sysSizPeakDDNum.TimeStepAtSensCoolPk(sysSizPeakDDNum.SensCoolPeakDD);
         }
     } else {
-        if ((sysSizInput.CoolCapControl == VT) || (sysSizInput.CoolCapControl == Bypass)) {
-            ShowWarningError(state, format("GetCoilDesFlow: AirLoopHVAC = {} has no time of peak cooling load for sizing.", sysSizInput.AirPriLoopName));
+        if ((sysSizInput.CoolCapControl == CapacityControl::VT) || (sysSizInput.CoolCapControl == CapacityControl::Bypass)) {
+            ShowWarningError(state,
+                             format("GetCoilDesFlow: AirLoopHVAC = {} has no time of peak cooling load for sizing.", sysSizInput.AirPriLoopName));
             ShowContinueError(state, "Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
-            sysSizInput.CoolCapControl = VAV;
+            sysSizInput.CoolCapControl = CapacityControl::VAV;
         }
     }
 
-    if (sysSizInput.CoolCapControl == VAV) {
+    if (sysSizInput.CoolCapControl == CapacityControl::VAV) {
         DesExitTemp = finalSysSizing.CoolSupTemp;
         DesFlow = finalSysSizing.MassFlowAtCoolPeak / state.dataEnvrn->StdRhoAir;
         DesExitHumRat = finalSysSizing.CoolSupHumRat;
-    } else if (sysSizInput.CoolCapControl == OnOff) {
+    } else if (sysSizInput.CoolCapControl == CapacityControl::OnOff) {
         DesExitTemp = finalSysSizing.CoolSupTemp;
         DesFlow = state.dataSize->DataAirFlowUsedForSizing;
         DesExitHumRat = finalSysSizing.CoolSupHumRat;
-    } else if (sysSizInput.CoolCapControl == VT) {
+    } else if (sysSizInput.CoolCapControl == CapacityControl::VT) {
         if (finalSysSizing.CoolingPeakLoadType == SensibleCoolingLoad) {
             ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
@@ -492,7 +493,7 @@ void GetCoilDesFlowT(EnergyPlusData &state,
             max(finalSysSizing.CoolSupTemp, AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * finalSysSizing.DesCoolVolFlow));
         DesFlow = finalSysSizing.DesCoolVolFlow;
         DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
-    } else if (sysSizInput.CoolCapControl == Bypass) {
+    } else if (sysSizInput.CoolCapControl == CapacityControl::Bypass) {
         if (finalSysSizing.CoolingPeakLoadType == SensibleCoolingLoad) {
             ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
