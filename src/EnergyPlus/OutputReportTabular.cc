@@ -12219,56 +12219,56 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
 
     // Accumulate internal gain totals by space and space type
     for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
-        auto& curPeople = state.dataHeatBal->People(iPeople);
+        auto &curPeople = state.dataHeatBal->People(iPeople);
         int const spaceNum = curPeople.spaceIndex;
         Real64 const people = curPeople.NumberOfPeople;
         spaceTotPeople(spaceNum) += people;
         spaceTypeTotPeople(state.dataHeatBal->space(spaceNum).spaceTypeNum) += people;
     }
     for (int iLights = 1; iLights <= state.dataHeatBal->TotLights; ++iLights) {
-        auto& curLighting = state.dataHeatBal->Lights(iLights);
+        auto &curLighting = state.dataHeatBal->Lights(iLights);
         int const spaceNum = curLighting.spaceIndex;
         Real64 const lighting = curLighting.DesignLevel;
         spaceTotLighting(spaceNum) += lighting;
         spaceTypeTotLighting(state.dataHeatBal->space(spaceNum).spaceTypeNum) += lighting;
     }
     for (int iElecEquip = 1; iElecEquip <= state.dataHeatBal->TotElecEquip; ++iElecEquip) {
-        auto& curElecEquip = state.dataHeatBal->ZoneElectric(iElecEquip);
+        auto &curElecEquip = state.dataHeatBal->ZoneElectric(iElecEquip);
         int const spaceNum = curElecEquip.spaceIndex;
         Real64 const elecEquip = curElecEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += elecEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += elecEquip;
     }
     for (int iGasEquip = 1; iGasEquip <= state.dataHeatBal->TotGasEquip; ++iGasEquip) {
-        auto& curGasEquip = state.dataHeatBal->ZoneGas(iGasEquip);
+        auto &curGasEquip = state.dataHeatBal->ZoneGas(iGasEquip);
         int const spaceNum = curGasEquip.spaceIndex;
         Real64 const gasEquip = curGasEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += gasEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += gasEquip;
     }
     for (int iOthEquip = 1; iOthEquip <= state.dataHeatBal->TotOthEquip; ++iOthEquip) {
-        auto& curOthEquip = state.dataHeatBal->ZoneOtherEq(iOthEquip);
+        auto &curOthEquip = state.dataHeatBal->ZoneOtherEq(iOthEquip);
         int const spaceNum = curOthEquip.spaceIndex;
         Real64 const othEquip = curOthEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += othEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += othEquip;
     }
     for (int iHWEquip = 1; iHWEquip <= state.dataHeatBal->TotHWEquip; ++iHWEquip) {
-        auto& curHWEquip = state.dataHeatBal->ZoneHWEq(iHWEquip);
+        auto &curHWEquip = state.dataHeatBal->ZoneHWEq(iHWEquip);
         int const spaceNum = curHWEquip.spaceIndex;
         Real64 const hwEquip = curHWEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += hwEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += hwEquip;
     }
     for (int iSteamEquip = 1; iSteamEquip <= state.dataHeatBal->TotStmEquip; ++iSteamEquip) {
-        auto& curSteamEquip = state.dataHeatBal->ZoneSteamEq(iSteamEquip);
+        auto &curSteamEquip = state.dataHeatBal->ZoneSteamEq(iSteamEquip);
         int const spaceNum = curSteamEquip.spaceIndex;
         Real64 const steamEquip = curSteamEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += steamEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += steamEquip;
     }
     for (int iITEquip = 1; iITEquip <= state.dataHeatBal->TotITEquip; ++iITEquip) {
-        auto& curITEquip = state.dataHeatBal->ZoneITEq(iITEquip);
+        auto &curITEquip = state.dataHeatBal->ZoneITEq(iITEquip);
         int const spaceNum = curITEquip.spaceIndex;
         Real64 const itEquip = curITEquip.DesignTotalPower;
         spaceTotPlugProcess(spaceNum) += itEquip;
@@ -12285,10 +12285,10 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
 
     int spaceTableRowNum = 0;
     for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-        auto& curZone = state.dataHeatBal->Zone(iZone);
+        auto &curZone = state.dataHeatBal->Zone(iZone);
         Real64 const mult = Real64(curZone.Multiplier) * Real64(curZone.ListMultiplier);
         for (int const spaceNum : curZone.spaceIndexes) {
-            auto curSpace = state.dataHeatBal->space(spaceNum);
+            auto &curSpace = state.dataHeatBal->space(spaceNum);
             bool spaceIsCond = false;
             bool useSpaceFloorArea = false;
             ++spaceTableRowNum;
