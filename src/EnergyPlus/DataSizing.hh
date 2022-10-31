@@ -140,10 +140,15 @@ namespace DataSizing {
     constexpr int DOACoolSup(3);
 
     // parameters for Type of Load to Size On
-    constexpr int Sensible(0);
-    constexpr int Latent(1);
-    constexpr int Total(2);
-    constexpr int Ventilation(3);
+    enum class LoadSizing
+    {
+        Invalid = -1,
+        Sensible,
+        Latent,
+        Total,
+        Ventilation,
+        Num
+    };
 
     // parameter for autosize
     constexpr Real64 AutoSize(-99999.0);
@@ -739,7 +744,7 @@ namespace DataSizing {
         // Members
         std::string AirPriLoopName; // name of an AirLoopHVAC object
         int AirLoopNum;             // index number of air loop
-        int LoadSizeType;           // type of load to size on;
+        LoadSizing LoadSizing;      // type of load to size on;
         // 0=sensible, 1=latent, 2=total, 3=ventilation
         int SizingOption;                  // 1 = noncoincident, 2 = coincident
         int CoolOAOption;                  // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
@@ -788,14 +793,14 @@ namespace DataSizing {
 
         // Default Constructor
         SystemSizingInputData()
-            : AirLoopNum(0), LoadSizeType(0), SizingOption(0), CoolOAOption(0), HeatOAOption(0), DesOutAirVolFlow(0.0), SysAirMinFlowRat(0.0),
-              SysAirMinFlowRatWasAutoSized(false), PreheatTemp(0.0), PrecoolTemp(0.0), PreheatHumRat(0.0), PrecoolHumRat(0.0), CoolSupTemp(0.0),
-              HeatSupTemp(0.0), CoolSupHumRat(0.0), HeatSupHumRat(0.0), CoolAirDesMethod(0), DesCoolAirFlow(0.0), HeatAirDesMethod(0),
-              DesHeatAirFlow(0.0), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), SystemOAMethod(SysOAMethod::Invalid), MaxZoneOAFraction(0.0),
-              OAAutoSized(false), CoolingCapMethod(0), HeatingCapMethod(0), ScaledCoolingCapacity(0.0), ScaledHeatingCapacity(0.0),
-              FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0), FlowPerFloorAreaCooled(0.0), FlowPerFloorAreaHeated(0.0),
-              FractionOfAutosizedCoolingAirflow(1.0), FractionOfAutosizedHeatingAirflow(1.0), FlowPerCoolingCapacity(0.0),
-              FlowPerHeatingCapacity(0.0), PeakLoad(PeakLoad::Invalid), CoolCapControl(0)
+            : AirLoopNum(0), LoadSizing(LoadSizing::Invalid), SizingOption(0), CoolOAOption(0), HeatOAOption(0), DesOutAirVolFlow(0.0),
+              SysAirMinFlowRat(0.0), SysAirMinFlowRatWasAutoSized(false), PreheatTemp(0.0), PrecoolTemp(0.0), PreheatHumRat(0.0), PrecoolHumRat(0.0),
+              CoolSupTemp(0.0), HeatSupTemp(0.0), CoolSupHumRat(0.0), HeatSupHumRat(0.0), CoolAirDesMethod(0), DesCoolAirFlow(0.0),
+              HeatAirDesMethod(0), DesHeatAirFlow(0.0), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), SystemOAMethod(SysOAMethod::Invalid),
+              MaxZoneOAFraction(0.0), OAAutoSized(false), CoolingCapMethod(0), HeatingCapMethod(0), ScaledCoolingCapacity(0.0),
+              ScaledHeatingCapacity(0.0), FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0), FlowPerFloorAreaCooled(0.0),
+              FlowPerFloorAreaHeated(0.0), FractionOfAutosizedCoolingAirflow(1.0), FractionOfAutosizedHeatingAirflow(1.0),
+              FlowPerCoolingCapacity(0.0), FlowPerHeatingCapacity(0.0), PeakLoad(PeakLoad::Invalid), CoolCapControl(0), OccupantDiversity(0.0)
         {
         }
     };
@@ -806,7 +811,7 @@ namespace DataSizing {
         std::string AirPriLoopName; // name of an AirLoopHVAC object
         std::string CoolDesDay;     // name of a cooling design day
         std::string HeatDesDay;     // name of a heating design day
-        int LoadSizeType;           // type of load to size on;
+        LoadSizing LoadSizing;      // type of load to size on;
         // 0=sensible, 1=latent, 2=total, 3=ventilation
         int SizingOption;                  // 1 = noncoincident, 2 = coincident.
         int CoolOAOption;                  // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
@@ -954,7 +959,7 @@ namespace DataSizing {
         int SysHeatLoadTimeStepPk;   // timestep in day of cooling load peak
         // Default Constructor
         SystemSizingData()
-            : LoadSizeType(0), SizingOption(0), CoolOAOption(0), HeatOAOption(0), DesOutAirVolFlow(0.0), SysAirMinFlowRat(0.0),
+            : LoadSizing(LoadSizing::Invalid), SizingOption(0), CoolOAOption(0), HeatOAOption(0), DesOutAirVolFlow(0.0), SysAirMinFlowRat(0.0),
               SysAirMinFlowRatWasAutoSized(false), PreheatTemp(0.0), PrecoolTemp(0.0), PreheatHumRat(0.0), PrecoolHumRat(0.0), CoolSupTemp(0.0),
               HeatSupTemp(0.0), CoolSupHumRat(0.0), HeatSupHumRat(0.0), CoolAirDesMethod(0), HeatAirDesMethod(0), InpDesCoolAirFlow(0.0),
               InpDesHeatAirFlow(0.0), CoinCoolMassFlow(0.0), EMSOverrideCoinCoolMassFlowOn(false), EMSValueCoinCoolMassFlow(0.0),
