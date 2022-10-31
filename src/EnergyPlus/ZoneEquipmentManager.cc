@@ -5262,19 +5262,18 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         Real64 CpAir = PsyCpAirFnW(HumRatExt);
 
         // Hybrid ventilation global control
-        Real64 hybridControlZoneMAT = 0.0; // Hybrid controlled zone MAT
         int I = 0;
         if (thisVentilation.HybridControlType == DataHeatBalance::HybridCtrlType::Global && thisVentilation.HybridControlMasterNum > 0) {
             I = thisVentilation.HybridControlMasterNum;
-            hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataHeatBal->Ventilation(I).ZonePtr).MixingMAT;
             if (j == I) {
                 thisVentilation.HybridControlMasterStatus = false;
             }
         } else {
             I = j;
-            hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisVentilation.ZonePtr).MixingMAT;
         }
         auto &hybridControlVentilation = state.dataHeatBal->Ventilation(I);
+        // Hybrid controlled zone MAT
+        Real64 hybridControlZoneMAT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(hybridControlVentilation.ZonePtr).MixingMAT;
 
         // Check scheduled temperatures
         if (hybridControlVentilation.MinIndoorTempSchedPtr > 0) {
