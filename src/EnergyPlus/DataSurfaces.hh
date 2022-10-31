@@ -729,7 +729,6 @@ namespace DataSurfaces {
         Real64 GndReflSolarRad;                // ground surface reflected solar radiation on exterior surfaces
         bool SurfHasSurroundingSurfProperty;   // true if surrounding surfaces properties are listed for an external surface
         bool SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
-        bool SurfHasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
         int SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
         int SurfExternalShadingSchInd;         // Schedule for a the external shading
         int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node, zero if none

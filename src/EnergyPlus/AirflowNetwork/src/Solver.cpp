@@ -8740,7 +8740,7 @@ namespace AirflowNetwork {
                 // Find a linkage from a zone to outdoors
                 if (ZN1 > 0 && ZN2 == 0) {
                     auto &zn1HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN1);
-                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfHasLinkedOutAirNode) {
+                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfLinkedOutAirNode > 0) {
                         Tamb = m_state.dataSurface->SurfOutDryBulbTemp(MultizoneSurfaceData(i).SurfNum);
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(m_state,
                                                                            Tamb,
@@ -8799,7 +8799,7 @@ namespace AirflowNetwork {
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
                     auto &zn2HB = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZN2);
-                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfHasLinkedOutAirNode) {
+                    if (m_state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SurfLinkedOutAirNode > 0) {
                         Tamb = m_state.dataSurface->SurfOutDryBulbTemp(MultizoneSurfaceData(i).SurfNum);
                         CpAir = PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(m_state,
                                                                            Tamb,
