@@ -476,7 +476,7 @@ void GetCoilDesFlowT(EnergyPlusData &state,
         DDAtTotPeak = SysSizPeakDDNum(SysNum).TotCoolPeakDD;
         TimeStepAtTotPeak = SysSizPeakDDNum(SysNum).TimeStepAtTotCoolPk(DDAtTotPeak);
 
-        if (SysSizInput(SysNum).PeakLoad == PeakLoad::TotalCooling) {
+        if (SysSizInput(SysNum).peakLoad == PeakLoad::TotalCooling) {
             TimeStepAtPeak = TimeStepAtTotPeak;
         } else {
             TimeStepAtPeak = TimeStepAtSensPeak;
@@ -499,10 +499,10 @@ void GetCoilDesFlowT(EnergyPlusData &state,
         DesFlow = state.dataSize->DataAirFlowUsedForSizing;
         DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
     } else if (CoolCapCtrl == VT) {
-        if (FinalSysSizing(SysNum).PeakLoad == PeakLoad::SensibleCooling) {
+        if (FinalSysSizing(SysNum).peakLoad == PeakLoad::SensibleCooling) {
             ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-        } else if (FinalSysSizing(SysNum).PeakLoad == PeakLoad::TotalCooling) {
+        } else if (FinalSysSizing(SysNum).peakLoad == PeakLoad::TotalCooling) {
             ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
         }
@@ -511,10 +511,10 @@ void GetCoilDesFlowT(EnergyPlusData &state,
         DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
         DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
     } else if (CoolCapCtrl == Bypass) {
-        if (FinalSysSizing(SysNum).PeakLoad == PeakLoad::SensibleCooling) {
+        if (FinalSysSizing(SysNum).peakLoad == PeakLoad::SensibleCooling) {
             ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-        } else if (FinalSysSizing(SysNum).PeakLoad == PeakLoad::TotalCooling) {
+        } else if (FinalSysSizing(SysNum).peakLoad == PeakLoad::TotalCooling) {
             ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
         }

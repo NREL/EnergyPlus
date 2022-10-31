@@ -790,13 +790,13 @@ void ManageSizing(EnergyPlusData &state)
             std::string coolPeakDDDate;
             int coolPeakDD = 0;
             Real64 coolCap = 0.;
-            if (FinalSysSizing(AirLoopNum).PeakLoad == DataSizing::PeakLoad::SensibleCooling) {
+            if (FinalSysSizing(AirLoopNum).peakLoad == DataSizing::PeakLoad::SensibleCooling) {
                 coolPeakLoadKind = "Sensible";
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
-            } else if (FinalSysSizing(AirLoopNum).PeakLoad == DataSizing::PeakLoad::TotalCooling) {
-                if (FinalSysSizing(AirLoopNum).LoadSizing == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing) {
+            } else if (FinalSysSizing(AirLoopNum).peakLoad == DataSizing::PeakLoad::TotalCooling) {
+                if (FinalSysSizing(AirLoopNum).loadSizing == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing) {
                     coolPeakLoadKind = "Total Based on Latent";
                 } else {
                     coolPeakLoadKind = "Total";
@@ -1349,7 +1349,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::VRP ||
              state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) &&
             state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 &&
-            FinalSysSizing(AirLoopNum).LoadSizing != DataSizing::LoadSizing::Ventilation) {
+            FinalSysSizing(AirLoopNum).loadSizing != DataSizing::LoadSizing::Ventilation) {
 
             // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
             // each zone
@@ -3735,17 +3735,17 @@ void GetSystemSizingInput(EnergyPlusData &state)
 
         constexpr std::array<std::string_view, static_cast<int>(DataSizing::LoadSizing::Num)> LoadSizingNamesUC{
             "SENSIBLE", "LATENT", "TOTAL", "VENTILATIONREQUIREMENT"};
-        SysSizInput(SysSizIndex).LoadSizing = static_cast<DataSizing::LoadSizing>(
+        SysSizInput(SysSizIndex).loadSizing = static_cast<DataSizing::LoadSizing>(
             getEnumerationValue(LoadSizingNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum))));
 
         // assign PeakLoad based on LoadSizing for now
-        if (SysSizInput(SysSizIndex).LoadSizing == DataSizing::LoadSizing::Sensible) {
-            SysSizInput(SysSizIndex).PeakLoad = DataSizing::PeakLoad::SensibleCooling;
-        } else if (SysSizInput(SysSizIndex).LoadSizing == DataSizing::LoadSizing::Total ||
-                   (SysSizInput(SysSizIndex).LoadSizing == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing)) {
-            SysSizInput(SysSizIndex).PeakLoad = DataSizing::PeakLoad::TotalCooling;
+        if (SysSizInput(SysSizIndex).loadSizing == DataSizing::LoadSizing::Sensible) {
+            SysSizInput(SysSizIndex).peakLoad = DataSizing::PeakLoad::SensibleCooling;
+        } else if (SysSizInput(SysSizIndex).loadSizing == DataSizing::LoadSizing::Total ||
+                   (SysSizInput(SysSizIndex).loadSizing == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing)) {
+            SysSizInput(SysSizIndex).peakLoad = DataSizing::PeakLoad::TotalCooling;
         } else {
-            SysSizInput(SysSizIndex).PeakLoad = DataSizing::PeakLoad::SensibleCooling;
+            SysSizInput(SysSizIndex).peakLoad = DataSizing::PeakLoad::SensibleCooling;
         }
         // set the CoolCapControl input
         SysSizInput(SysSizIndex).CoolCapControl = VAV;
@@ -4017,7 +4017,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::ZoneSum;
             } else if (systemOAMethod == "STANDARD62.1VENTILATIONRATEPROCEDURE") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::VRP;
-                if (SysSizInput(SysSizIndex).LoadSizing == DataSizing::LoadSizing::Ventilation) {
+                if (SysSizInput(SysSizIndex).loadSizing == DataSizing::LoadSizing::Ventilation) {
                     ShowWarningError(
                         state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid combination of inputs.");
                     ShowContinueError(state,

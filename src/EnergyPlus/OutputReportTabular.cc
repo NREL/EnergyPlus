@@ -15549,14 +15549,14 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 auto &sysSizPeakDDNum = SysSizPeakDDNum(iAirLoop);
                 zoneToAirLoopCool = 0;
                 zoneToAirLoopHeat = 0;
-                if (finalSysSizing.LoadSizing == DataSizing::LoadSizing::Sensible) {
+                if (finalSysSizing.loadSizing == DataSizing::LoadSizing::Sensible) {
                     coolDesSelected = sysSizPeakDDNum.SensCoolPeakDD;
                     if (coolDesSelected != 0) {
                         timeCoolMax = sysSizPeakDDNum.TimeStepAtSensCoolPk(coolDesSelected);
                     } else {
                         timeCoolMax = 0;
                     }
-                } else if (finalSysSizing.LoadSizing == DataSizing::LoadSizing::Ventilation) {
+                } else if (finalSysSizing.loadSizing == DataSizing::LoadSizing::Ventilation) {
                     coolDesSelected = sysSizPeakDDNum.CoolFlowPeakDD;
                     if (coolDesSelected != 0) {
                         timeCoolMax = sysSizPeakDDNum.TimeStepAtCoolFlowPk(coolDesSelected);

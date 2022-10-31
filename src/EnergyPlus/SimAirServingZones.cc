@@ -5275,7 +5275,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                                      state.dataSize->ZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesCoolMassFlowNoOA);
                 state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).NonCoinCoolMassFlow +=
                     adjCoolMassFlow / (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
-                if (state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).LoadSizing == DataSizing::LoadSizing::Latent &&
+                if (state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).loadSizing == DataSizing::LoadSizing::Latent &&
                     !state.dataSize->FinalZoneSizing.empty()) {
                     if (!state.dataSize->FinalZoneSizing(CtrlZoneNum).zoneLatentSizing && state.dataSize->CurOverallSimDay == 1) {
                         ShowWarningError(state,
@@ -5421,14 +5421,14 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 sysSizing.SysCoolOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
                 sysSizing.SysCoolOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
                 // adjust supply air humidity ratio to meet latent load
-                if (sysSizing.LoadSizing == DataSizing::LoadSizing::Latent) {
+                if (sysSizing.loadSizing == DataSizing::LoadSizing::Latent) {
                     if (state.dataHeatBal->isAnyLatentLoad) {
                         sysSizing.CoolSupHumRat = std::min(SysLatCoolHumRat, sysSizing.CoolSupHumRat);
                         state.dataSize->FinalSysSizing(AirLoopNum).CoolSupHumRat = sysSizing.CoolSupHumRat;
                     } else {
                         // switch back to sensible load if all latent zone loads are smaller than sensible load
-                        sysSizing.PeakLoad = DataSizing::PeakLoad::SensibleCooling;
-                        state.dataSize->FinalSysSizing(AirLoopNum).PeakLoad = DataSizing::PeakLoad::SensibleCooling;
+                        sysSizing.peakLoad = DataSizing::PeakLoad::SensibleCooling;
+                        state.dataSize->FinalSysSizing(AirLoopNum).peakLoad = DataSizing::PeakLoad::SensibleCooling;
                     }
                 }
                 // From the mixed air temp, system design supply air temp, and the mass flow rate
@@ -5453,7 +5453,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             if (SysSensCoolCap > state.dataSize->SensCoolCapTemp(AirLoopNum)) {
                 state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(state.dataSize->CurOverallSimDay) = TimeStepInDay;
                 state.dataSize->SensCoolCapTemp(AirLoopNum) = SysSensCoolCap;
-                if (sysSizing.PeakLoad == DataSizing::PeakLoad::SensibleCooling) {
+                if (sysSizing.peakLoad == DataSizing::PeakLoad::SensibleCooling) {
                     sysSizing.SensCoolCap = SysSensCoolCap;
                     sysSizing.TotCoolCap = SysTotCoolCap;
                     sysSizing.MixTempAtCoolPeak = SysCoolMixTemp;
@@ -5469,7 +5469,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             if (SysTotCoolCap > state.dataSize->TotCoolCapTemp(AirLoopNum)) {
                 state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk(state.dataSize->CurOverallSimDay) = TimeStepInDay;
                 state.dataSize->TotCoolCapTemp(AirLoopNum) = SysTotCoolCap;
-                if (sysSizing.PeakLoad == DataSizing::PeakLoad::TotalCooling) {
+                if (sysSizing.peakLoad == DataSizing::PeakLoad::TotalCooling) {
                     sysSizing.SensCoolCap = SysSensCoolCap;
                     sysSizing.TotCoolCap = SysTotCoolCap;
                     sysSizing.MixTempAtCoolPeak = SysCoolMixTemp;
@@ -6430,7 +6430,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD = DDNum;
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                     state.dataSize->SensCoolCapTemp(AirLoopNum) = sysSizing.SensCoolCap;
-                    if (sysSizing.PeakLoad == DataSizing::PeakLoad::SensibleCooling) {
+                    if (sysSizing.peakLoad == DataSizing::PeakLoad::SensibleCooling) {
                         state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow = sysSizing.DesCoolVolFlow;
                         state.dataSize->CalcSysSizing(AirLoopNum).CoolDesDay = sysSizing.CoolDesDay;
                         // state.dataSize->CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow;
@@ -6464,7 +6464,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD = DDNum;
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                     state.dataSize->TotCoolCapTemp(AirLoopNum) = sysSizing.TotCoolCap;
-                    if (sysSizing.PeakLoad == DataSizing::PeakLoad::TotalCooling) {
+                    if (sysSizing.peakLoad == DataSizing::PeakLoad::TotalCooling) {
                         state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow = sysSizing.DesCoolVolFlow;
                         state.dataSize->CalcSysSizing(AirLoopNum).CoolDesDay = sysSizing.CoolDesDay;
                         // state.dataSize->CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow;
@@ -6842,7 +6842,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 SysHeatSizingRat = 1.0;
             }
 
-            if (calcSysSizing.LoadSizing == DataSizing::LoadSizing::Ventilation && SysCoolSizingRat == 1.0) {
+            if (calcSysSizing.loadSizing == DataSizing::LoadSizing::Ventilation && SysCoolSizingRat == 1.0) {
                 if (calcSysSizing.DesCoolVolFlow > 0.0) {
                     SysCoolSizingRat = calcSysSizing.DesOutAirVolFlow / calcSysSizing.DesCoolVolFlow;
                     state.dataSize->VotClgBySys(AirLoopNum) = finalSysSizing.DesOutAirVolFlow;
@@ -6850,7 +6850,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     SysCoolSizingRat = 1.0;
                 }
             }
-            if (calcSysSizing.LoadSizing == DataSizing::LoadSizing::Ventilation && SysHeatSizingRat == 1.0) {
+            if (calcSysSizing.loadSizing == DataSizing::LoadSizing::Ventilation && SysHeatSizingRat == 1.0) {
                 if (calcSysSizing.DesHeatVolFlow > 0.0) {
                     SysHeatSizingRat = calcSysSizing.DesOutAirVolFlow / calcSysSizing.DesHeatVolFlow;
                     state.dataSize->VotHtgBySys(AirLoopNum) = finalSysSizing.DesOutAirVolFlow;
@@ -6918,7 +6918,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 // take account of the user input system flow rates and alter the zone flow rates to match
                 for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) {
                     int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
-                    if ((SysCoolSizingRat != 1.0) && (finalSysSizing.LoadSizing == DataSizing::LoadSizing::Ventilation) &&
+                    if ((SysCoolSizingRat != 1.0) && (finalSysSizing.loadSizing == DataSizing::LoadSizing::Ventilation) &&
                         (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0)) {
                         // size on ventilation load
                         if (state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).MinOA > 0.0) {
@@ -6984,7 +6984,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over the heated zones
                         int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
                         auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex);
-                        if ((SysHeatSizingRat != 1.0) && (finalSysSizing.LoadSizing == DataSizing::LoadSizing::Ventilation) &&
+                        if ((SysHeatSizingRat != 1.0) && (finalSysSizing.loadSizing == DataSizing::LoadSizing::Ventilation) &&
                             (termUnitFinalZoneSizing.MinOA > 0.0)) {
                             // size on ventilation load
                             if (termUnitFinalZoneSizing.MinOA > 0.0) {
@@ -7004,14 +7004,14 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over the cooled zones
                         int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
                         auto &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex);
-                        if ((SysHeatSizingRat != 1.0) && (finalSysSizing.LoadSizing == DataSizing::LoadSizing::Ventilation) &&
+                        if ((SysHeatSizingRat != 1.0) && (finalSysSizing.loadSizing == DataSizing::LoadSizing::Ventilation) &&
                             (termUnitFinalZoneSizing.MinOA <= 0.0)) {
                             ShowWarningError(state,
                                              "FinalSystemSizing: AirLoop=\"" + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName +
                                                  "\", Requested sizing on Ventilation,");
                             ShowContinueError(state, "but Zone has no design OA Flow. Zone=\"" + termUnitFinalZoneSizing.ZoneName + "\".");
                         }
-                        if ((SysHeatSizingRat != 1.0) && (finalSysSizing.LoadSizing == DataSizing::LoadSizing::Ventilation) &&
+                        if ((SysHeatSizingRat != 1.0) && (finalSysSizing.loadSizing == DataSizing::LoadSizing::Ventilation) &&
                             (termUnitFinalZoneSizing.MinOA > 0.0)) {
                             // size on ventilation load
                             if (termUnitFinalZoneSizing.MinOA > 0.0) {
@@ -7022,7 +7022,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                                 ZoneOARatio = 0.0;
                             }
                             termUnitFinalZoneSizing.scaleZoneHeating(ZoneOARatio);
-                        } else if ((SysHeatSizingRat != 1.0) && (finalSysSizing.LoadSizing == DataSizing::LoadSizing::Ventilation) &&
+                        } else if ((SysHeatSizingRat != 1.0) && (finalSysSizing.loadSizing == DataSizing::LoadSizing::Ventilation) &&
                                    (termUnitFinalZoneSizing.MinOA > 0.0)) {
                             // size on user input system design flows
                             termUnitFinalZoneSizing.scaleZoneHeating(SysHeatSizingRat);
