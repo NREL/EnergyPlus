@@ -109,9 +109,14 @@ namespace DataSizing {
     constexpr int NonCoincident(1);
     constexpr int Coincident(2);
 
-    // parameters for Cooling Peak Load TYpe
-    constexpr int SensibleCoolingLoad(1);
-    constexpr int TotalCoolingLoad(2);
+    // parameters for Cooling Peak Load Type
+    enum class PeakLoad
+    {
+        Invalid = -1,
+        SensibleCooling,
+        TotalCooling,
+        Num
+    };
 
     // parameters for Central Cooling Capacity Control Method
     constexpr int VAV(1);
@@ -777,7 +782,7 @@ namespace DataSizing {
         Real64 FractionOfAutosizedHeatingAirflow; // fraction of of heating supply air flow rate an airloop
         Real64 FlowPerCoolingCapacity;            // ratio of cooling supply air flow rate to cooling capacity of an airloop
         Real64 FlowPerHeatingCapacity;            // ratio of heating supply air flow rate to heating capacity of an airloop
-        int CoolingPeakLoadType;                  // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCoolingLoad
+        PeakLoad PeakLoad;                        // Type of peak to size cooling coils on SensibleCooling or TotalCooling
         int CoolCapControl;                       // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
         Real64 OccupantDiversity;                 // occupant diversity
 
@@ -790,8 +795,7 @@ namespace DataSizing {
               OAAutoSized(false), CoolingCapMethod(0), HeatingCapMethod(0), ScaledCoolingCapacity(0.0), ScaledHeatingCapacity(0.0),
               FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0), FlowPerFloorAreaCooled(0.0), FlowPerFloorAreaHeated(0.0),
               FractionOfAutosizedCoolingAirflow(1.0), FractionOfAutosizedHeatingAirflow(1.0), FlowPerCoolingCapacity(0.0),
-              FlowPerHeatingCapacity(0.0), CoolingPeakLoadType(0), // wfb
-              CoolCapControl(0)                                    // wfb
+              FlowPerHeatingCapacity(0.0), PeakLoad(PeakLoad::Invalid), CoolCapControl(0)
         {
         }
     };
@@ -925,7 +929,7 @@ namespace DataSizing {
         Real64 FractionOfAutosizedHeatingCapacity; // fraction of of heating total capacity
         Real64 CoolingTotalCapacity;               // system total cooling capacity
         Real64 HeatingTotalCapacity;               // system total heating capacity
-        int CoolingPeakLoadType;                   // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
+        PeakLoad PeakLoad;                         // Type of peak to size cooling coils on SensibleCooling or TotalCooling
         int CoolCapControl;                        // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
         bool sysSizeHeatingDominant;
         bool sysSizeCoolingDominant;
@@ -967,7 +971,7 @@ namespace DataSizing {
               FlowPerFloorAreaCooled(0.0), FlowPerFloorAreaHeated(0.0), FractionOfAutosizedCoolingAirflow(1.0),
               FractionOfAutosizedHeatingAirflow(1.0), FlowPerCoolingCapacity(0.0), FlowPerHeatingCapacity(0.0),
               FractionOfAutosizedCoolingCapacity(1.0), FractionOfAutosizedHeatingCapacity(1.0), CoolingTotalCapacity(0.0), HeatingTotalCapacity(0.0),
-              CoolingPeakLoadType(0), // wfb
+              PeakLoad(PeakLoad::Invalid), // wfb
               CoolCapControl(0), sysSizeHeatingDominant(false), sysSizeCoolingDominant(false), CoinCoolCoilMassFlow(0.0), CoinHeatCoilMassFlow(0.0),
               DesCoolCoilVolFlow(0.0), DesHeatCoilVolFlow(0.0), DesMainCoilVolFlow(0.0), SysHeatCoilTimeStepPk(0), SysHeatAirTimeStepPk(0),
               HeatDDNum(0), CoolDDNum(0), SysCoolCoinSpaceSens(0.0), SysHeatCoinSpaceSens(0.0), SysDesCoolLoad(0.0), SysCoolLoadTimeStepPk(0),

@@ -468,7 +468,6 @@ void GetCoilDesFlowT(EnergyPlusData &state,
     auto &CalcSysSizing(state.dataSize->CalcSysSizing);
 
     CoolCapCtrl = SysSizInput(SysNum).CoolCapControl;
-    PeakLoadType = SysSizInput(SysNum).CoolingPeakLoadType;
     DDAtSensPeak = SysSizPeakDDNum(SysNum).SensCoolPeakDD;
     if (DDAtSensPeak > 0) {
         TimeStepAtSensPeak = SysSizPeakDDNum(SysNum).TimeStepAtSensCoolPk(DDAtSensPeak);
@@ -477,7 +476,7 @@ void GetCoilDesFlowT(EnergyPlusData &state,
         DDAtTotPeak = SysSizPeakDDNum(SysNum).TotCoolPeakDD;
         TimeStepAtTotPeak = SysSizPeakDDNum(SysNum).TimeStepAtTotCoolPk(DDAtTotPeak);
 
-        if (PeakLoadType == TotalCoolingLoad) {
+        if (SysSizInput(SysNum).PeakLoad == PeakLoad::TotalCooling) {
             TimeStepAtPeak = TimeStepAtTotPeak;
         } else {
             TimeStepAtPeak = TimeStepAtSensPeak;
@@ -500,10 +499,10 @@ void GetCoilDesFlowT(EnergyPlusData &state,
         DesFlow = state.dataSize->DataAirFlowUsedForSizing;
         DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
     } else if (CoolCapCtrl == VT) {
-        if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
+        if (FinalSysSizing(SysNum).PeakLoad == PeakLoad::SensibleCooling) {
             ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-        } else if (FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
+        } else if (FinalSysSizing(SysNum).PeakLoad == PeakLoad::TotalCooling) {
             ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
         }
@@ -512,10 +511,10 @@ void GetCoilDesFlowT(EnergyPlusData &state,
         DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
         DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
     } else if (CoolCapCtrl == Bypass) {
-        if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
+        if (FinalSysSizing(SysNum).PeakLoad == PeakLoad::SensibleCooling) {
             ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-        } else if (FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
+        } else if (FinalSysSizing(SysNum).PeakLoad == PeakLoad::TotalCooling) {
             ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
             AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
         }

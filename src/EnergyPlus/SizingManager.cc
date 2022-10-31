@@ -790,12 +790,12 @@ void ManageSizing(EnergyPlusData &state)
             std::string coolPeakDDDate;
             int coolPeakDD = 0;
             Real64 coolCap = 0.;
-            if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == SensibleCoolingLoad) {
+            if (FinalSysSizing(AirLoopNum).PeakLoad == DataSizing::PeakLoad::SensibleCooling) {
                 coolPeakLoadKind = "Sensible";
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
-            } else if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == TotalCoolingLoad) {
+            } else if (FinalSysSizing(AirLoopNum).PeakLoad == DataSizing::PeakLoad::TotalCooling) {
                 if (FinalSysSizing(AirLoopNum).LoadSizeType == DataSizing::Latent && state.dataHeatBal->DoLatentSizing) {
                     coolPeakLoadKind = "Total Based on Latent";
                 } else {
@@ -3743,14 +3743,14 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 SysSizInput(SysSizIndex).LoadSizeType = Ventilation;
             }
         }
-        // assign CoolingPeakLoadType based on LoadSizeType for now
+        // assign PeakLoad based on LoadSizeType for now
         if (SysSizInput(SysSizIndex).LoadSizeType == Sensible) {
-            SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
+            SysSizInput(SysSizIndex).PeakLoad = DataSizing::PeakLoad::SensibleCooling;
         } else if (SysSizInput(SysSizIndex).LoadSizeType == Total ||
                    (SysSizInput(SysSizIndex).LoadSizeType == Latent && state.dataHeatBal->DoLatentSizing)) {
-            SysSizInput(SysSizIndex).CoolingPeakLoadType = TotalCoolingLoad;
+            SysSizInput(SysSizIndex).PeakLoad = DataSizing::PeakLoad::TotalCooling;
         } else {
-            SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
+            SysSizInput(SysSizIndex).PeakLoad = DataSizing::PeakLoad::SensibleCooling;
         }
         // set the CoolCapControl input
         SysSizInput(SysSizIndex).CoolCapControl = VAV;

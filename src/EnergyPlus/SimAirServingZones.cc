@@ -4188,7 +4188,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             int SysSizNum = UtilityRoutines::FindItemInList(sysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum > 0) { // move data from system sizing input
                 sysSizing.LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
-                sysSizing.CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
+                sysSizing.PeakLoad = SysSizInput(SysSizNum).PeakLoad;
                 sysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
                 sysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
                 sysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
@@ -4222,7 +4222,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
 
             } else { // Set missing inputs to the first
                 sysSizing.LoadSizeType = SysSizInput(1).LoadSizeType;
-                sysSizing.CoolingPeakLoadType = SysSizInput(1).CoolingPeakLoadType;
+                sysSizing.PeakLoad = SysSizInput(1).PeakLoad;
                 sysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
                 sysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
                 sysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
@@ -4286,7 +4286,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
         int SysSizNum = UtilityRoutines::FindItemInList(finalSysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum > 0) { // move data from system sizing input
             finalSysSizing.LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
-            finalSysSizing.CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
+            finalSysSizing.PeakLoad = SysSizInput(SysSizNum).PeakLoad;
             finalSysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
             finalSysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
             finalSysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
@@ -4331,7 +4331,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             finalSysSizing.FlowPerHeatingCapacity = SysSizInput(SysSizNum).FlowPerHeatingCapacity;
 
             calcSysSizing.LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
-            calcSysSizing.CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
+            calcSysSizing.PeakLoad = SysSizInput(SysSizNum).PeakLoad;
             calcSysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
             calcSysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
             calcSysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
@@ -4378,7 +4378,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
                              "SetUpSysSizingArrays: Sizing for System (HVACAirLoop)=\"" + finalSysSizing.AirPriLoopName +
                                  "\" will use Sizing:System specifications listed for System=\"" + SysSizInput(1).AirPriLoopName + "\".");
             finalSysSizing.LoadSizeType = SysSizInput(1).LoadSizeType;
-            finalSysSizing.CoolingPeakLoadType = SysSizInput(1).CoolingPeakLoadType;
+            finalSysSizing.PeakLoad = SysSizInput(1).PeakLoad;
             finalSysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
             finalSysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
             finalSysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
@@ -4422,7 +4422,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             finalSysSizing.FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
 
             calcSysSizing.LoadSizeType = SysSizInput(1).LoadSizeType;
-            calcSysSizing.CoolingPeakLoadType = SysSizInput(1).CoolingPeakLoadType;
+            calcSysSizing.PeakLoad = SysSizInput(1).PeakLoad;
             calcSysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
             calcSysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
             calcSysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
@@ -5427,8 +5427,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                         state.dataSize->FinalSysSizing(AirLoopNum).CoolSupHumRat = sysSizing.CoolSupHumRat;
                     } else {
                         // switch back to sensible load if all latent zone loads are smaller than sensible load
-                        sysSizing.CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
-                        state.dataSize->FinalSysSizing(AirLoopNum).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
+                        sysSizing.PeakLoad = DataSizing::PeakLoad::SensibleCooling;
+                        state.dataSize->FinalSysSizing(AirLoopNum).PeakLoad = DataSizing::PeakLoad::SensibleCooling;
                     }
                 }
                 // From the mixed air temp, system design supply air temp, and the mass flow rate
@@ -5453,7 +5453,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             if (SysSensCoolCap > state.dataSize->SensCoolCapTemp(AirLoopNum)) {
                 state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(state.dataSize->CurOverallSimDay) = TimeStepInDay;
                 state.dataSize->SensCoolCapTemp(AirLoopNum) = SysSensCoolCap;
-                if (sysSizing.CoolingPeakLoadType == SensibleCoolingLoad) {
+                if (sysSizing.PeakLoad == DataSizing::PeakLoad::SensibleCooling) {
                     sysSizing.SensCoolCap = SysSensCoolCap;
                     sysSizing.TotCoolCap = SysTotCoolCap;
                     sysSizing.MixTempAtCoolPeak = SysCoolMixTemp;
@@ -5469,7 +5469,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             if (SysTotCoolCap > state.dataSize->TotCoolCapTemp(AirLoopNum)) {
                 state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk(state.dataSize->CurOverallSimDay) = TimeStepInDay;
                 state.dataSize->TotCoolCapTemp(AirLoopNum) = SysTotCoolCap;
-                if (sysSizing.CoolingPeakLoadType == TotalCoolingLoad) {
+                if (sysSizing.PeakLoad == DataSizing::PeakLoad::TotalCooling) {
                     sysSizing.SensCoolCap = SysSensCoolCap;
                     sysSizing.TotCoolCap = SysTotCoolCap;
                     sysSizing.MixTempAtCoolPeak = SysCoolMixTemp;
@@ -6430,7 +6430,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD = DDNum;
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                     state.dataSize->SensCoolCapTemp(AirLoopNum) = sysSizing.SensCoolCap;
-                    if (sysSizing.CoolingPeakLoadType == SensibleCoolingLoad) {
+                    if (sysSizing.PeakLoad == DataSizing::PeakLoad::SensibleCooling) {
                         state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow = sysSizing.DesCoolVolFlow;
                         state.dataSize->CalcSysSizing(AirLoopNum).CoolDesDay = sysSizing.CoolDesDay;
                         // state.dataSize->CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow;
@@ -6464,7 +6464,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD = DDNum;
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                     state.dataSize->TotCoolCapTemp(AirLoopNum) = sysSizing.TotCoolCap;
-                    if (sysSizing.CoolingPeakLoadType == TotalCoolingLoad) {
+                    if (sysSizing.PeakLoad == DataSizing::PeakLoad::TotalCooling) {
                         state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow = sysSizing.DesCoolVolFlow;
                         state.dataSize->CalcSysSizing(AirLoopNum).CoolDesDay = sysSizing.CoolDesDay;
                         // state.dataSize->CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow;
