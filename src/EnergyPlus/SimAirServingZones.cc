@@ -4186,74 +4186,42 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             auto &sysSizing = SysSizing(DesDayEnvrnNum, AirLoopNum);
             sysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
             int SysSizNum = UtilityRoutines::FindItemInList(sysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
-            if (SysSizNum > 0) { // move data from system sizing input
-                sysSizing.loadSizing = SysSizInput(SysSizNum).loadSizing;
-                sysSizing.peakLoad = SysSizInput(SysSizNum).peakLoad;
-                sysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
-                sysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
-                sysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
-                sysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(SysSizNum).SysAirMinFlowRatWasAutoSized;
-                sysSizing.PreheatTemp = SysSizInput(SysSizNum).PreheatTemp;
-                sysSizing.PreheatHumRat = SysSizInput(SysSizNum).PreheatHumRat;
-                sysSizing.PrecoolTemp = SysSizInput(SysSizNum).PrecoolTemp;
-                sysSizing.PrecoolHumRat = SysSizInput(SysSizNum).PrecoolHumRat;
-                sysSizing.CoolSupTemp = SysSizInput(SysSizNum).CoolSupTemp;
-                sysSizing.HeatSupTemp = SysSizInput(SysSizNum).HeatSupTemp;
-                sysSizing.CoolSupHumRat = SysSizInput(SysSizNum).CoolSupHumRat;
-                sysSizing.HeatSupHumRat = SysSizInput(SysSizNum).HeatSupHumRat;
-                sysSizing.SizingOption = SysSizInput(SysSizNum).SizingOption;
-                if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                    sysSizing.CoolOAOption = AllOA;
-                    sysSizing.HeatOAOption = AllOA;
-                } else {
-                    sysSizing.CoolOAOption = SysSizInput(SysSizNum).CoolOAOption;
-                    sysSizing.HeatOAOption = SysSizInput(SysSizNum).HeatOAOption;
-                }
-                sysSizing.CoolAirDesMethod = SysSizInput(SysSizNum).CoolAirDesMethod;
-                sysSizing.HeatAirDesMethod = SysSizInput(SysSizNum).HeatAirDesMethod;
-                sysSizing.ScaleCoolSAFMethod = SysSizInput(SysSizNum).ScaleCoolSAFMethod;
-                sysSizing.ScaleHeatSAFMethod = SysSizInput(SysSizNum).ScaleHeatSAFMethod;
-                sysSizing.CoolingCapMethod = SysSizInput(SysSizNum).CoolingCapMethod;
-                sysSizing.HeatingCapMethod = SysSizInput(SysSizNum).HeatingCapMethod;
-                sysSizing.InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
-                sysSizing.InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
-                sysSizing.MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
-                sysSizing.OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
-
-            } else { // Set missing inputs to the first
-                sysSizing.loadSizing = SysSizInput(1).loadSizing;
-                sysSizing.peakLoad = SysSizInput(1).peakLoad;
-                sysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
-                sysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
-                sysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
-                sysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(1).SysAirMinFlowRatWasAutoSized;
-                sysSizing.PreheatTemp = SysSizInput(1).PreheatTemp;
-                sysSizing.PreheatHumRat = SysSizInput(1).PreheatHumRat;
-                sysSizing.PrecoolTemp = SysSizInput(1).PrecoolTemp;
-                sysSizing.PrecoolHumRat = SysSizInput(1).PrecoolHumRat;
-                sysSizing.CoolSupTemp = SysSizInput(1).CoolSupTemp;
-                sysSizing.HeatSupTemp = SysSizInput(1).HeatSupTemp;
-                sysSizing.CoolSupHumRat = SysSizInput(1).CoolSupHumRat;
-                sysSizing.HeatSupHumRat = SysSizInput(1).HeatSupHumRat;
-                sysSizing.SizingOption = SysSizInput(1).SizingOption;
-                if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                    sysSizing.CoolOAOption = AllOA;
-                    sysSizing.HeatOAOption = AllOA;
-                } else {
-                    sysSizing.CoolOAOption = SysSizInput(1).CoolOAOption;
-                    sysSizing.HeatOAOption = SysSizInput(1).HeatOAOption;
-                }
-                sysSizing.CoolAirDesMethod = SysSizInput(1).CoolAirDesMethod;
-                sysSizing.HeatAirDesMethod = SysSizInput(1).HeatAirDesMethod;
-                sysSizing.ScaleCoolSAFMethod = SysSizInput(1).ScaleCoolSAFMethod;
-                sysSizing.ScaleHeatSAFMethod = SysSizInput(1).ScaleHeatSAFMethod;
-                sysSizing.CoolingCapMethod = SysSizInput(1).CoolingCapMethod;
-                sysSizing.HeatingCapMethod = SysSizInput(1).HeatingCapMethod;
-                sysSizing.InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
-                sysSizing.InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
-                sysSizing.MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
-                sysSizing.OAAutoSized = SysSizInput(1).OAAutoSized;
+            if (SysSizNum <= 0) SysSizNum = 1;
+            auto &sysSizInput = SysSizInput(SysSizNum);
+            // move data from system sizing input
+            sysSizing.loadSizing = sysSizInput.loadSizing;
+            sysSizing.peakLoad = sysSizInput.peakLoad;
+            sysSizing.CoolCapControl = sysSizInput.CoolCapControl;
+            sysSizing.DesOutAirVolFlow = sysSizInput.DesOutAirVolFlow;
+            sysSizing.SysAirMinFlowRat = sysSizInput.SysAirMinFlowRat;
+            sysSizing.SysAirMinFlowRatWasAutoSized = sysSizInput.SysAirMinFlowRatWasAutoSized;
+            sysSizing.PreheatTemp = sysSizInput.PreheatTemp;
+            sysSizing.PreheatHumRat = sysSizInput.PreheatHumRat;
+            sysSizing.PrecoolTemp = sysSizInput.PrecoolTemp;
+            sysSizing.PrecoolHumRat = sysSizInput.PrecoolHumRat;
+            sysSizing.CoolSupTemp = sysSizInput.CoolSupTemp;
+            sysSizing.HeatSupTemp = sysSizInput.HeatSupTemp;
+            sysSizing.CoolSupHumRat = sysSizInput.CoolSupHumRat;
+            sysSizing.HeatSupHumRat = sysSizInput.HeatSupHumRat;
+            sysSizing.SizingOption = sysSizInput.SizingOption;
+            if (PrimaryAirSystems(AirLoopNum).isAllOA) {
+                sysSizing.CoolOAOption = AllOA;
+                sysSizing.HeatOAOption = AllOA;
+            } else {
+                sysSizing.CoolOAOption = sysSizInput.CoolOAOption;
+                sysSizing.HeatOAOption = sysSizInput.HeatOAOption;
             }
+            sysSizing.CoolAirDesMethod = sysSizInput.CoolAirDesMethod;
+            sysSizing.HeatAirDesMethod = sysSizInput.HeatAirDesMethod;
+            sysSizing.ScaleCoolSAFMethod = sysSizInput.ScaleCoolSAFMethod;
+            sysSizing.ScaleHeatSAFMethod = sysSizInput.ScaleHeatSAFMethod;
+            sysSizing.CoolingCapMethod = sysSizInput.CoolingCapMethod;
+            sysSizing.HeatingCapMethod = sysSizInput.HeatingCapMethod;
+            sysSizing.InpDesCoolAirFlow = sysSizInput.DesCoolAirFlow;
+            sysSizing.InpDesHeatAirFlow = sysSizInput.DesHeatAirFlow;
+            sysSizing.MaxZoneOAFraction = sysSizInput.MaxZoneOAFraction;
+            sysSizing.OAAutoSized = sysSizInput.OAAutoSized;
+
             sysSizing.HeatFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
             sysSizing.SumZoneHeatLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
             sysSizing.CoolFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
@@ -4284,186 +4252,96 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
         finalSysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
         calcSysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
         int SysSizNum = UtilityRoutines::FindItemInList(finalSysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
-        if (SysSizNum > 0) { // move data from system sizing input
-            finalSysSizing.loadSizing = SysSizInput(SysSizNum).loadSizing;
-            finalSysSizing.peakLoad = SysSizInput(SysSizNum).peakLoad;
-            finalSysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
-            finalSysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
-            finalSysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
-            finalSysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(SysSizNum).SysAirMinFlowRatWasAutoSized;
-            finalSysSizing.PreheatTemp = SysSizInput(SysSizNum).PreheatTemp;
-            finalSysSizing.PreheatHumRat = SysSizInput(SysSizNum).PreheatHumRat;
-            finalSysSizing.PrecoolTemp = SysSizInput(SysSizNum).PrecoolTemp;
-            finalSysSizing.PrecoolHumRat = SysSizInput(SysSizNum).PrecoolHumRat;
-            finalSysSizing.CoolSupTemp = SysSizInput(SysSizNum).CoolSupTemp;
-            finalSysSizing.HeatSupTemp = SysSizInput(SysSizNum).HeatSupTemp;
-            finalSysSizing.CoolSupHumRat = SysSizInput(SysSizNum).CoolSupHumRat;
-            finalSysSizing.HeatSupHumRat = SysSizInput(SysSizNum).HeatSupHumRat;
-            finalSysSizing.SizingOption = SysSizInput(SysSizNum).SizingOption;
-            if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                finalSysSizing.CoolOAOption = AllOA;
-                finalSysSizing.HeatOAOption = AllOA;
-            } else {
-                finalSysSizing.CoolOAOption = SysSizInput(SysSizNum).CoolOAOption;
-                finalSysSizing.HeatOAOption = SysSizInput(SysSizNum).HeatOAOption;
-            }
-            finalSysSizing.CoolAirDesMethod = SysSizInput(SysSizNum).CoolAirDesMethod;
-            finalSysSizing.HeatAirDesMethod = SysSizInput(SysSizNum).HeatAirDesMethod;
-            finalSysSizing.ScaleCoolSAFMethod = SysSizInput(SysSizNum).ScaleCoolSAFMethod;
-            finalSysSizing.ScaleHeatSAFMethod = SysSizInput(SysSizNum).ScaleHeatSAFMethod;
-            finalSysSizing.CoolingCapMethod = SysSizInput(SysSizNum).CoolingCapMethod;
-            finalSysSizing.HeatingCapMethod = SysSizInput(SysSizNum).HeatingCapMethod;
-
-            finalSysSizing.ScaledCoolingCapacity = SysSizInput(SysSizNum).ScaledCoolingCapacity;
-            finalSysSizing.ScaledHeatingCapacity = SysSizInput(SysSizNum).ScaledHeatingCapacity;
-
-            finalSysSizing.InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
-            finalSysSizing.InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
-            finalSysSizing.SystemOAMethod = SysSizInput(SysSizNum).SystemOAMethod;
-            finalSysSizing.MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
-            finalSysSizing.OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
-
-            finalSysSizing.FlowPerFloorAreaCooled = SysSizInput(SysSizNum).FlowPerFloorAreaCooled;
-            finalSysSizing.FlowPerFloorAreaHeated = SysSizInput(SysSizNum).FlowPerFloorAreaHeated;
-            finalSysSizing.FractionOfAutosizedCoolingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedCoolingAirflow;
-            finalSysSizing.FractionOfAutosizedHeatingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedHeatingAirflow;
-            finalSysSizing.FlowPerCoolingCapacity = SysSizInput(SysSizNum).FlowPerCoolingCapacity;
-            finalSysSizing.FlowPerHeatingCapacity = SysSizInput(SysSizNum).FlowPerHeatingCapacity;
-
-            calcSysSizing.loadSizing = SysSizInput(SysSizNum).loadSizing;
-            calcSysSizing.peakLoad = SysSizInput(SysSizNum).peakLoad;
-            calcSysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
-            calcSysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
-            calcSysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
-            calcSysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(SysSizNum).SysAirMinFlowRatWasAutoSized;
-            calcSysSizing.PreheatTemp = SysSizInput(SysSizNum).PreheatTemp;
-            calcSysSizing.PreheatHumRat = SysSizInput(SysSizNum).PreheatHumRat;
-            calcSysSizing.PrecoolTemp = SysSizInput(SysSizNum).PrecoolTemp;
-            calcSysSizing.PrecoolHumRat = SysSizInput(SysSizNum).PrecoolHumRat;
-            calcSysSizing.CoolSupTemp = SysSizInput(SysSizNum).CoolSupTemp;
-            calcSysSizing.HeatSupTemp = SysSizInput(SysSizNum).HeatSupTemp;
-            calcSysSizing.CoolSupHumRat = SysSizInput(SysSizNum).CoolSupHumRat;
-            calcSysSizing.HeatSupHumRat = SysSizInput(SysSizNum).HeatSupHumRat;
-            calcSysSizing.SizingOption = SysSizInput(SysSizNum).SizingOption;
-            if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                calcSysSizing.CoolOAOption = AllOA;
-                calcSysSizing.HeatOAOption = AllOA;
-            } else {
-                calcSysSizing.CoolOAOption = SysSizInput(SysSizNum).CoolOAOption;
-                calcSysSizing.HeatOAOption = SysSizInput(SysSizNum).HeatOAOption;
-            }
-            calcSysSizing.CoolAirDesMethod = SysSizInput(SysSizNum).CoolAirDesMethod;
-            calcSysSizing.HeatAirDesMethod = SysSizInput(SysSizNum).HeatAirDesMethod;
-            calcSysSizing.ScaleCoolSAFMethod = SysSizInput(SysSizNum).ScaleCoolSAFMethod;
-            calcSysSizing.ScaleHeatSAFMethod = SysSizInput(SysSizNum).ScaleHeatSAFMethod;
-            calcSysSizing.CoolingCapMethod = SysSizInput(SysSizNum).CoolingCapMethod;
-            calcSysSizing.HeatingCapMethod = SysSizInput(SysSizNum).HeatingCapMethod;
-            calcSysSizing.ScaledCoolingCapacity = SysSizInput(SysSizNum).ScaledCoolingCapacity;
-            calcSysSizing.ScaledHeatingCapacity = SysSizInput(SysSizNum).ScaledHeatingCapacity;
-
-            calcSysSizing.InpDesCoolAirFlow = SysSizInput(SysSizNum).DesCoolAirFlow;
-            calcSysSizing.InpDesHeatAirFlow = SysSizInput(SysSizNum).DesHeatAirFlow;
-            calcSysSizing.SystemOAMethod = SysSizInput(SysSizNum).SystemOAMethod;
-            calcSysSizing.MaxZoneOAFraction = SysSizInput(SysSizNum).MaxZoneOAFraction;
-            calcSysSizing.OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
-            calcSysSizing.FlowPerFloorAreaCooled = SysSizInput(SysSizNum).FlowPerFloorAreaCooled;
-            calcSysSizing.FlowPerFloorAreaHeated = SysSizInput(SysSizNum).FlowPerFloorAreaHeated;
-            calcSysSizing.FractionOfAutosizedCoolingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedCoolingAirflow;
-            calcSysSizing.FractionOfAutosizedHeatingAirflow = SysSizInput(SysSizNum).FractionOfAutosizedHeatingAirflow;
-            calcSysSizing.FlowPerCoolingCapacity = SysSizInput(SysSizNum).FlowPerCoolingCapacity;
-            calcSysSizing.FlowPerHeatingCapacity = SysSizInput(SysSizNum).FlowPerHeatingCapacity;
-
-        } else { // Set missing inputs to the first
+        if (SysSizNum <= 0) {
+            SysSizNum = 1;
             ShowWarningError(state,
                              "SetUpSysSizingArrays: Sizing for System (HVACAirLoop)=\"" + finalSysSizing.AirPriLoopName +
                                  "\" will use Sizing:System specifications listed for System=\"" + SysSizInput(1).AirPriLoopName + "\".");
-            finalSysSizing.loadSizing = SysSizInput(1).loadSizing;
-            finalSysSizing.peakLoad = SysSizInput(1).peakLoad;
-            finalSysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
-            finalSysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
-            finalSysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
-            finalSysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(1).SysAirMinFlowRatWasAutoSized;
-            finalSysSizing.PreheatTemp = SysSizInput(1).PreheatTemp;
-            finalSysSizing.PreheatHumRat = SysSizInput(1).PreheatHumRat;
-            finalSysSizing.PrecoolTemp = SysSizInput(1).PrecoolTemp;
-            finalSysSizing.PrecoolHumRat = SysSizInput(1).PrecoolHumRat;
-            finalSysSizing.CoolSupTemp = SysSizInput(1).CoolSupTemp;
-            finalSysSizing.HeatSupTemp = SysSizInput(1).HeatSupTemp;
-            finalSysSizing.CoolSupHumRat = SysSizInput(1).CoolSupHumRat;
-            finalSysSizing.HeatSupHumRat = SysSizInput(1).HeatSupHumRat;
-            finalSysSizing.SizingOption = SysSizInput(1).SizingOption;
-            if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                finalSysSizing.CoolOAOption = AllOA;
-                finalSysSizing.HeatOAOption = AllOA;
-            } else {
-                finalSysSizing.CoolOAOption = SysSizInput(1).CoolOAOption;
-                finalSysSizing.HeatOAOption = SysSizInput(1).HeatOAOption;
-            }
-            finalSysSizing.CoolAirDesMethod = SysSizInput(1).CoolAirDesMethod;
-            finalSysSizing.HeatAirDesMethod = SysSizInput(1).HeatAirDesMethod;
-            finalSysSizing.ScaleCoolSAFMethod = SysSizInput(1).ScaleCoolSAFMethod;
-            finalSysSizing.ScaleHeatSAFMethod = SysSizInput(1).ScaleHeatSAFMethod;
-            finalSysSizing.CoolingCapMethod = SysSizInput(1).CoolingCapMethod;
-            finalSysSizing.HeatingCapMethod = SysSizInput(1).HeatingCapMethod;
-            finalSysSizing.ScaledCoolingCapacity = SysSizInput(1).ScaledCoolingCapacity;
-            finalSysSizing.ScaledHeatingCapacity = SysSizInput(1).ScaledHeatingCapacity;
-
-            finalSysSizing.InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
-            finalSysSizing.InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
-            finalSysSizing.SystemOAMethod = SysSizInput(1).SystemOAMethod;
-            finalSysSizing.MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
-            finalSysSizing.OAAutoSized = SysSizInput(1).OAAutoSized;
-
-            finalSysSizing.FlowPerFloorAreaCooled = SysSizInput(1).FlowPerFloorAreaCooled;
-            finalSysSizing.FlowPerFloorAreaHeated = SysSizInput(1).FlowPerFloorAreaHeated;
-            finalSysSizing.FractionOfAutosizedCoolingAirflow = SysSizInput(1).FractionOfAutosizedCoolingAirflow;
-            finalSysSizing.FractionOfAutosizedHeatingAirflow = SysSizInput(1).FractionOfAutosizedHeatingAirflow;
-            finalSysSizing.FlowPerCoolingCapacity = SysSizInput(1).FlowPerCoolingCapacity;
-            finalSysSizing.FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
-
-            calcSysSizing.loadSizing = SysSizInput(1).loadSizing;
-            calcSysSizing.peakLoad = SysSizInput(1).peakLoad;
-            calcSysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
-            calcSysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
-            calcSysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
-            calcSysSizing.SysAirMinFlowRatWasAutoSized = SysSizInput(1).SysAirMinFlowRatWasAutoSized;
-            calcSysSizing.PreheatTemp = SysSizInput(1).PreheatTemp;
-            calcSysSizing.PreheatHumRat = SysSizInput(1).PreheatHumRat;
-            calcSysSizing.PrecoolTemp = SysSizInput(1).PrecoolTemp;
-            calcSysSizing.PrecoolHumRat = SysSizInput(1).PrecoolHumRat;
-            calcSysSizing.CoolSupTemp = SysSizInput(1).CoolSupTemp;
-            calcSysSizing.HeatSupTemp = SysSizInput(1).HeatSupTemp;
-            calcSysSizing.CoolSupHumRat = SysSizInput(1).CoolSupHumRat;
-            calcSysSizing.HeatSupHumRat = SysSizInput(1).HeatSupHumRat;
-            calcSysSizing.SizingOption = SysSizInput(1).SizingOption;
-            if (PrimaryAirSystems(AirLoopNum).isAllOA) {
-                calcSysSizing.CoolOAOption = AllOA;
-                calcSysSizing.HeatOAOption = AllOA;
-            } else {
-                calcSysSizing.CoolOAOption = SysSizInput(1).CoolOAOption;
-                calcSysSizing.HeatOAOption = SysSizInput(1).HeatOAOption;
-            }
-            calcSysSizing.CoolAirDesMethod = SysSizInput(1).CoolAirDesMethod;
-            calcSysSizing.HeatAirDesMethod = SysSizInput(1).HeatAirDesMethod;
-            calcSysSizing.ScaleCoolSAFMethod = SysSizInput(1).ScaleCoolSAFMethod;
-            calcSysSizing.ScaleHeatSAFMethod = SysSizInput(1).ScaleHeatSAFMethod;
-            calcSysSizing.CoolingCapMethod = SysSizInput(1).CoolingCapMethod;
-            calcSysSizing.HeatingCapMethod = SysSizInput(1).HeatingCapMethod;
-            calcSysSizing.ScaledCoolingCapacity = SysSizInput(1).ScaledCoolingCapacity;
-            calcSysSizing.ScaledHeatingCapacity = SysSizInput(1).ScaledHeatingCapacity;
-            calcSysSizing.InpDesCoolAirFlow = SysSizInput(1).DesCoolAirFlow;
-            calcSysSizing.InpDesHeatAirFlow = SysSizInput(1).DesHeatAirFlow;
-            calcSysSizing.SystemOAMethod = SysSizInput(1).SystemOAMethod;
-            calcSysSizing.MaxZoneOAFraction = SysSizInput(1).MaxZoneOAFraction;
-            calcSysSizing.OAAutoSized = SysSizInput(1).OAAutoSized;
-
-            calcSysSizing.FlowPerFloorAreaCooled = SysSizInput(1).FlowPerFloorAreaCooled;
-            calcSysSizing.FlowPerFloorAreaHeated = SysSizInput(1).FlowPerFloorAreaHeated;
-            calcSysSizing.FractionOfAutosizedCoolingAirflow = SysSizInput(1).FractionOfAutosizedCoolingAirflow;
-            calcSysSizing.FractionOfAutosizedHeatingAirflow = SysSizInput(1).FractionOfAutosizedHeatingAirflow;
-            calcSysSizing.FlowPerCoolingCapacity = SysSizInput(1).FlowPerCoolingCapacity;
-            calcSysSizing.FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
         }
+        auto &sysSizInput = SysSizInput(SysSizNum);
+        // move data from system sizing input
+        finalSysSizing.loadSizing = sysSizInput.loadSizing;
+        finalSysSizing.peakLoad = sysSizInput.peakLoad;
+        finalSysSizing.CoolCapControl = sysSizInput.CoolCapControl;
+        finalSysSizing.DesOutAirVolFlow = sysSizInput.DesOutAirVolFlow;
+        finalSysSizing.SysAirMinFlowRat = sysSizInput.SysAirMinFlowRat;
+        finalSysSizing.SysAirMinFlowRatWasAutoSized = sysSizInput.SysAirMinFlowRatWasAutoSized;
+        finalSysSizing.PreheatTemp = sysSizInput.PreheatTemp;
+        finalSysSizing.PreheatHumRat = sysSizInput.PreheatHumRat;
+        finalSysSizing.PrecoolTemp = sysSizInput.PrecoolTemp;
+        finalSysSizing.PrecoolHumRat = sysSizInput.PrecoolHumRat;
+        finalSysSizing.CoolSupTemp = sysSizInput.CoolSupTemp;
+        finalSysSizing.HeatSupTemp = sysSizInput.HeatSupTemp;
+        finalSysSizing.CoolSupHumRat = sysSizInput.CoolSupHumRat;
+        finalSysSizing.HeatSupHumRat = sysSizInput.HeatSupHumRat;
+        finalSysSizing.SizingOption = sysSizInput.SizingOption;
+        finalSysSizing.CoolAirDesMethod = sysSizInput.CoolAirDesMethod;
+        finalSysSizing.HeatAirDesMethod = sysSizInput.HeatAirDesMethod;
+        finalSysSizing.ScaleCoolSAFMethod = sysSizInput.ScaleCoolSAFMethod;
+        finalSysSizing.ScaleHeatSAFMethod = sysSizInput.ScaleHeatSAFMethod;
+        finalSysSizing.CoolingCapMethod = sysSizInput.CoolingCapMethod;
+        finalSysSizing.HeatingCapMethod = sysSizInput.HeatingCapMethod;
+        finalSysSizing.ScaledCoolingCapacity = sysSizInput.ScaledCoolingCapacity;
+        finalSysSizing.ScaledHeatingCapacity = sysSizInput.ScaledHeatingCapacity;
+        finalSysSizing.InpDesCoolAirFlow = sysSizInput.DesCoolAirFlow;
+        finalSysSizing.InpDesHeatAirFlow = sysSizInput.DesHeatAirFlow;
+        finalSysSizing.SystemOAMethod = sysSizInput.SystemOAMethod;
+        finalSysSizing.MaxZoneOAFraction = sysSizInput.MaxZoneOAFraction;
+        finalSysSizing.OAAutoSized = sysSizInput.OAAutoSized;
+        finalSysSizing.FlowPerFloorAreaCooled = sysSizInput.FlowPerFloorAreaCooled;
+        finalSysSizing.FlowPerFloorAreaHeated = sysSizInput.FlowPerFloorAreaHeated;
+        finalSysSizing.FractionOfAutosizedCoolingAirflow = sysSizInput.FractionOfAutosizedCoolingAirflow;
+        finalSysSizing.FractionOfAutosizedHeatingAirflow = sysSizInput.FractionOfAutosizedHeatingAirflow;
+        finalSysSizing.FlowPerCoolingCapacity = sysSizInput.FlowPerCoolingCapacity;
+        finalSysSizing.FlowPerHeatingCapacity = sysSizInput.FlowPerHeatingCapacity;
+
+        if (PrimaryAirSystems(AirLoopNum).isAllOA) {
+            finalSysSizing.CoolOAOption = AllOA;
+            finalSysSizing.HeatOAOption = AllOA;
+            calcSysSizing.CoolOAOption = AllOA;
+            calcSysSizing.HeatOAOption = AllOA;
+        } else {
+            finalSysSizing.CoolOAOption = sysSizInput.CoolOAOption;
+            finalSysSizing.HeatOAOption = sysSizInput.HeatOAOption;
+            calcSysSizing.CoolOAOption = sysSizInput.CoolOAOption;
+            calcSysSizing.HeatOAOption = sysSizInput.HeatOAOption;
+        }
+
+        calcSysSizing.loadSizing = sysSizInput.loadSizing;
+        calcSysSizing.peakLoad = sysSizInput.peakLoad;
+        calcSysSizing.CoolCapControl = sysSizInput.CoolCapControl;
+        calcSysSizing.DesOutAirVolFlow = sysSizInput.DesOutAirVolFlow;
+        calcSysSizing.SysAirMinFlowRat = sysSizInput.SysAirMinFlowRat;
+        calcSysSizing.SysAirMinFlowRatWasAutoSized = sysSizInput.SysAirMinFlowRatWasAutoSized;
+        calcSysSizing.PreheatTemp = sysSizInput.PreheatTemp;
+        calcSysSizing.PreheatHumRat = sysSizInput.PreheatHumRat;
+        calcSysSizing.PrecoolTemp = sysSizInput.PrecoolTemp;
+        calcSysSizing.PrecoolHumRat = sysSizInput.PrecoolHumRat;
+        calcSysSizing.CoolSupTemp = sysSizInput.CoolSupTemp;
+        calcSysSizing.HeatSupTemp = sysSizInput.HeatSupTemp;
+        calcSysSizing.CoolSupHumRat = sysSizInput.CoolSupHumRat;
+        calcSysSizing.HeatSupHumRat = sysSizInput.HeatSupHumRat;
+        calcSysSizing.SizingOption = sysSizInput.SizingOption;
+        calcSysSizing.CoolAirDesMethod = sysSizInput.CoolAirDesMethod;
+        calcSysSizing.HeatAirDesMethod = sysSizInput.HeatAirDesMethod;
+        calcSysSizing.ScaleCoolSAFMethod = sysSizInput.ScaleCoolSAFMethod;
+        calcSysSizing.ScaleHeatSAFMethod = sysSizInput.ScaleHeatSAFMethod;
+        calcSysSizing.CoolingCapMethod = sysSizInput.CoolingCapMethod;
+        calcSysSizing.HeatingCapMethod = sysSizInput.HeatingCapMethod;
+        calcSysSizing.ScaledCoolingCapacity = sysSizInput.ScaledCoolingCapacity;
+        calcSysSizing.ScaledHeatingCapacity = sysSizInput.ScaledHeatingCapacity;
+        calcSysSizing.InpDesCoolAirFlow = sysSizInput.DesCoolAirFlow;
+        calcSysSizing.InpDesHeatAirFlow = sysSizInput.DesHeatAirFlow;
+        calcSysSizing.SystemOAMethod = sysSizInput.SystemOAMethod;
+        calcSysSizing.MaxZoneOAFraction = sysSizInput.MaxZoneOAFraction;
+        calcSysSizing.OAAutoSized = sysSizInput.OAAutoSized;
+        calcSysSizing.FlowPerFloorAreaCooled = sysSizInput.FlowPerFloorAreaCooled;
+        calcSysSizing.FlowPerFloorAreaHeated = sysSizInput.FlowPerFloorAreaHeated;
+        calcSysSizing.FractionOfAutosizedCoolingAirflow = sysSizInput.FractionOfAutosizedCoolingAirflow;
+        calcSysSizing.FractionOfAutosizedHeatingAirflow = sysSizInput.FractionOfAutosizedHeatingAirflow;
+        calcSysSizing.FlowPerCoolingCapacity = sysSizInput.FlowPerCoolingCapacity;
+        calcSysSizing.FlowPerHeatingCapacity = sysSizInput.FlowPerHeatingCapacity;
+
         finalSysSizing.HeatFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
         finalSysSizing.SumZoneHeatLoadSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
         finalSysSizing.CoolFlowSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
