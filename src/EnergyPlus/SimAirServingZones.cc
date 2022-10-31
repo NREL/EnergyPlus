@@ -4187,8 +4187,8 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             sysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
             int SysSizNum = UtilityRoutines::FindItemInList(sysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum > 0) { // move data from system sizing input
-                sysSizing.LoadSizing = SysSizInput(SysSizNum).LoadSizing;
-                sysSizing.PeakLoad = SysSizInput(SysSizNum).PeakLoad;
+                sysSizing.loadSizing = SysSizInput(SysSizNum).loadSizing;
+                sysSizing.peakLoad = SysSizInput(SysSizNum).peakLoad;
                 sysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
                 sysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
                 sysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
@@ -4221,8 +4221,8 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
                 sysSizing.OAAutoSized = SysSizInput(SysSizNum).OAAutoSized;
 
             } else { // Set missing inputs to the first
-                sysSizing.LoadSizing = SysSizInput(1).LoadSizing;
-                sysSizing.PeakLoad = SysSizInput(1).PeakLoad;
+                sysSizing.loadSizing = SysSizInput(1).loadSizing;
+                sysSizing.peakLoad = SysSizInput(1).peakLoad;
                 sysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
                 sysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
                 sysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
@@ -4285,8 +4285,8 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
         calcSysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
         int SysSizNum = UtilityRoutines::FindItemInList(finalSysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum > 0) { // move data from system sizing input
-            finalSysSizing.LoadSizing = SysSizInput(SysSizNum).LoadSizing;
-            finalSysSizing.PeakLoad = SysSizInput(SysSizNum).PeakLoad;
+            finalSysSizing.loadSizing = SysSizInput(SysSizNum).loadSizing;
+            finalSysSizing.peakLoad = SysSizInput(SysSizNum).peakLoad;
             finalSysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
             finalSysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
             finalSysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
@@ -4330,8 +4330,8 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             finalSysSizing.FlowPerCoolingCapacity = SysSizInput(SysSizNum).FlowPerCoolingCapacity;
             finalSysSizing.FlowPerHeatingCapacity = SysSizInput(SysSizNum).FlowPerHeatingCapacity;
 
-            calcSysSizing.LoadSizing = SysSizInput(SysSizNum).LoadSizing;
-            calcSysSizing.PeakLoad = SysSizInput(SysSizNum).PeakLoad;
+            calcSysSizing.loadSizing = SysSizInput(SysSizNum).loadSizing;
+            calcSysSizing.peakLoad = SysSizInput(SysSizNum).peakLoad;
             calcSysSizing.CoolCapControl = SysSizInput(SysSizNum).CoolCapControl;
             calcSysSizing.DesOutAirVolFlow = SysSizInput(SysSizNum).DesOutAirVolFlow;
             calcSysSizing.SysAirMinFlowRat = SysSizInput(SysSizNum).SysAirMinFlowRat;
@@ -4377,8 +4377,8 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             ShowWarningError(state,
                              "SetUpSysSizingArrays: Sizing for System (HVACAirLoop)=\"" + finalSysSizing.AirPriLoopName +
                                  "\" will use Sizing:System specifications listed for System=\"" + SysSizInput(1).AirPriLoopName + "\".");
-            finalSysSizing.LoadSizing = SysSizInput(1).LoadSizing;
-            finalSysSizing.PeakLoad = SysSizInput(1).PeakLoad;
+            finalSysSizing.loadSizing = SysSizInput(1).loadSizing;
+            finalSysSizing.peakLoad = SysSizInput(1).peakLoad;
             finalSysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
             finalSysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
             finalSysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
@@ -4421,8 +4421,8 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             finalSysSizing.FlowPerCoolingCapacity = SysSizInput(1).FlowPerCoolingCapacity;
             finalSysSizing.FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
 
-            calcSysSizing.LoadSizing = SysSizInput(1).LoadSizing;
-            calcSysSizing.PeakLoad = SysSizInput(1).PeakLoad;
+            calcSysSizing.loadSizing = SysSizInput(1).loadSizing;
+            calcSysSizing.peakLoad = SysSizInput(1).peakLoad;
             calcSysSizing.CoolCapControl = SysSizInput(1).CoolCapControl;
             calcSysSizing.DesOutAirVolFlow = SysSizInput(1).DesOutAirVolFlow;
             calcSysSizing.SysAirMinFlowRat = SysSizInput(1).SysAirMinFlowRat;
