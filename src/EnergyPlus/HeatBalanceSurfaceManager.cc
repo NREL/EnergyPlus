@@ -2132,7 +2132,6 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
         thisZoneHB.ZoneAirHumRatAvg = state.dataEnvrn->OutHumRat;
         thisZoneHB.ZoneAirHumRat = state.dataEnvrn->OutHumRat;
-        thisZoneHB.ZoneAirHumRatOld = state.dataEnvrn->OutHumRat;
         state.dataHeatBalFanSys->TempTstatAir(zoneNum) = DataHeatBalFanSys::ZoneInitialTemp;
     }
     // Reset spaceHeatBalance even if doSpaceHeatBalance is false, beause spaceHB is used to gether zoneHB

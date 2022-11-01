@@ -5454,7 +5454,7 @@ namespace AirflowNetwork {
                 if (RollBackFlag) {
                     for (i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
                         ANZT(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).XMAT[0];
-                        ANZW(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).WZoneTimeMinus1;
+                        ANZW(i) = m_state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).WPrevZoneTS[0];
                         if (m_state.dataContaminantBalance->Contaminant.CO2Simulation) ANCO(i) = m_state.dataContaminantBalance->CO2ZoneTimeMinus1(i);
                         if (m_state.dataContaminantBalance->Contaminant.GenericContamSimulation)
                             ANGC(i) = m_state.dataContaminantBalance->GCZoneTimeMinus1(i);
