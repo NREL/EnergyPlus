@@ -4115,8 +4115,6 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   February 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Allocate and fill the SysSizing data array.
@@ -4126,69 +4124,73 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
     // calculated in InitAirLoops and stored in AirToZoneNodeInfo in DataLoopNode..
 
     bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-
-    auto &CalcSysSizing(state.dataSize->CalcSysSizing);
-    auto &SysSizing(state.dataSize->SysSizing);
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &NumAirTerminalUnits(state.dataSize->NumAirTerminalUnits);
-    auto &SysSizInput(state.dataSize->SysSizInput);
-    auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
-    auto &NumPrimaryAirSys(state.dataHVACGlobal->NumPrimaryAirSys);
+    int numAirTerminalUnits = state.dataSize->NumAirTerminalUnits;
+    int numPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     // have moved a large number of std 62.1 variables to DataSizing.hh so they can be used outside of this routine
 
     // allocate arrays used to store values for standard 62.1 tabular report
     if (!allocated(state.dataSize->VpzClgByZone)) {
-        state.dataSize->VdzClgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->VdzMinClgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->VdzHtgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->VdzMinHtgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->ZdzClgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->ZdzHtgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->VpzClgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->VpzMinClgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->VpzHtgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->VpzMinHtgByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->VpzClgSumBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->VpzHtgSumBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->VbzByZone.dimension(NumAirTerminalUnits, 0.0);
-        state.dataSize->PzSumBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->PsBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->DBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->SumRpxPzBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->SumRaxAzBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->PeakPsOccurrenceDateTimeStringBySys.dimension(NumPrimaryAirSys, "");
-        state.dataSize->PeakPsOccurrenceEnvironmentStringBySys.dimension(NumPrimaryAirSys, "");
-        state.dataSize->VouBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->VpsClgBySys.dimension(NumPrimaryAirSys, 0.0);
-        state.dataSize->VpsHtgBySys.dimension(NumPrimaryAirSys, 0.0);
+        state.dataSize->VdzClgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->VdzMinClgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->VdzHtgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->VdzMinHtgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->ZdzClgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->ZdzHtgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->VpzClgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->VpzMinClgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->VpzHtgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->VpzMinHtgByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->VbzByZone.dimension(numAirTerminalUnits, 0.0);
+        state.dataSize->VpzClgSumBySys.dimension(numPrimaryAirSys, 0.0);
+        state.dataSize->VpzHtgSumBySys.dimension(numPrimaryAirSys, 0.0);
+        state.dataSize->PzSumBySys.dimension(numPrimaryAirSys, 0.0);
+        state.dataSize->PsBySys.dimension(numPrimaryAirSys, 0.0);
+        state.dataSize->DBySys.dimension(numPrimaryAirSys, 0.0);
+        state.dataSize->SumRpxPzBySys.dimension(numPrimaryAirSys, 0.0);
+        state.dataSize->SumRaxAzBySys.dimension(numPrimaryAirSys, 0.0);
+        state.dataSize->PeakPsOccurrenceDateTimeStringBySys.dimension(numPrimaryAirSys, "");
+        state.dataSize->PeakPsOccurrenceEnvironmentStringBySys.dimension(numPrimaryAirSys, "");
+        state.dataSize->VouBySys.dimension(numPrimaryAirSys, 0.0);
+        state.dataSize->VpsClgBySys.dimension(numPrimaryAirSys, 0.0);
+        state.dataSize->VpsHtgBySys.dimension(numPrimaryAirSys, 0.0);
     }
 
     for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
-        int PrimAirIndex = UtilityRoutines::FindItemInList(SysSizInput(SysSizIndex).AirPriLoopName, PrimaryAirSystems);
+        auto &sysSizInput = state.dataSize->SysSizInput(SysSizIndex);
+        int PrimAirIndex = UtilityRoutines::FindItemInList(sysSizInput.AirPriLoopName, state.dataAirSystemsData->PrimaryAirSystems);
         if (PrimAirIndex == 0) {
-            ShowSevereError(state, "Sizing:System: " + SysSizInput(SysSizIndex).AirPriLoopName + " references unknown AirLoopHVAC");
+            ShowSevereError(state, format("Sizing:System: {} references unknown AirLoopHVAC", sysSizInput.AirPriLoopName));
             ErrorsFound = true;
         } else {
-            SysSizInput(SysSizIndex).AirLoopNum = PrimAirIndex;
+            sysSizInput.AirLoopNum = PrimAirIndex;
         }
     }
     if (ErrorsFound) {
         ShowFatalError(state, "Errors found in Sizing:System input");
     }
 
-    SysSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, NumPrimaryAirSys);
-    FinalSysSizing.allocate(NumPrimaryAirSys);
-    CalcSysSizing.allocate(NumPrimaryAirSys);
-    state.dataSize->SysSizPeakDDNum.allocate(NumPrimaryAirSys);
+    state.dataSize->SysSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, numPrimaryAirSys);
+    state.dataSize->FinalSysSizing.allocate(numPrimaryAirSys);
+    state.dataSize->CalcSysSizing.allocate(numPrimaryAirSys);
+    state.dataSize->SysSizPeakDDNum.allocate(numPrimaryAirSys);
 
-    for (int DesDayEnvrnNum = 1; DesDayEnvrnNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayEnvrnNum) {
-        for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            auto &sysSizing = SysSizing(DesDayEnvrnNum, AirLoopNum);
-            sysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
-            int SysSizNum = UtilityRoutines::FindItemInList(sysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
-            if (SysSizNum <= 0) SysSizNum = 1;
-            auto &sysSizInput = SysSizInput(SysSizNum);
+    for (int AirLoopNum = 1; AirLoopNum <= numPrimaryAirSys; ++AirLoopNum) {
+        auto &primaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
+        int SysSizNum = UtilityRoutines::FindItemInList(primaryAirSystems.Name, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        if (SysSizNum <= 0) {
+            SysSizNum = 1;
+            ShowWarningError(
+                state,
+                format(
+                    "SetUpSysSizingArrays: Sizing for System (HVACAirLoop)=\" {}\" will use Sizing:System specifications listed for System=\" {}\".",
+                    primaryAirSystems.Name,
+                    state.dataSize->SysSizInput(1).AirPriLoopName));
+        }
+        auto &sysSizInput = state.dataSize->SysSizInput(SysSizNum);
+        for (int DesDayEnvrnNum = 1; DesDayEnvrnNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayEnvrnNum) {
+            auto &sysSizing = state.dataSize->SysSizing(DesDayEnvrnNum, AirLoopNum);
             // move data from system sizing input
+            sysSizing.AirPriLoopName = primaryAirSystems.Name;
             sysSizing.loadSizing = sysSizInput.loadSizing;
             sysSizing.peakLoad = sysSizInput.peakLoad;
             sysSizing.CoolCapControl = sysSizInput.CoolCapControl;
@@ -4204,7 +4206,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             sysSizing.CoolSupHumRat = sysSizInput.CoolSupHumRat;
             sysSizing.HeatSupHumRat = sysSizInput.HeatSupHumRat;
             sysSizing.SizingOption = sysSizInput.SizingOption;
-            if (PrimaryAirSystems(AirLoopNum).isAllOA) {
+            if (primaryAirSystems.isAllOA) {
                 sysSizing.CoolOAOption = AllOA;
                 sysSizing.HeatOAOption = AllOA;
             } else {
@@ -4242,23 +4244,13 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             sysSizing.SysHeatOutHumRatSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
             sysSizing.SysDOASHeatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
             sysSizing.SysDOASLatAddSeq.dimension(state.dataSimAirServingZones->NumOfTimeStepInDay, 0.0);
-        } // end the primary air system loop
-    }
+        } // end the design day loop
 
-    for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+        auto &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
+        auto &calcSysSizing = state.dataSize->CalcSysSizing(AirLoopNum);
+        finalSysSizing.AirPriLoopName = primaryAirSystems.Name;
+        calcSysSizing.AirPriLoopName = primaryAirSystems.Name;
 
-        auto &finalSysSizing = FinalSysSizing(AirLoopNum);
-        auto &calcSysSizing = CalcSysSizing(AirLoopNum);
-        finalSysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
-        calcSysSizing.AirPriLoopName = PrimaryAirSystems(AirLoopNum).Name;
-        int SysSizNum = UtilityRoutines::FindItemInList(finalSysSizing.AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
-        if (SysSizNum <= 0) {
-            SysSizNum = 1;
-            ShowWarningError(state,
-                             "SetUpSysSizingArrays: Sizing for System (HVACAirLoop)=\"" + finalSysSizing.AirPriLoopName +
-                                 "\" will use Sizing:System specifications listed for System=\"" + SysSizInput(1).AirPriLoopName + "\".");
-        }
-        auto &sysSizInput = SysSizInput(SysSizNum);
         // move data from system sizing input
         finalSysSizing.loadSizing = sysSizInput.loadSizing;
         finalSysSizing.peakLoad = sysSizInput.peakLoad;
@@ -4295,7 +4287,7 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
         finalSysSizing.FlowPerCoolingCapacity = sysSizInput.FlowPerCoolingCapacity;
         finalSysSizing.FlowPerHeatingCapacity = sysSizInput.FlowPerHeatingCapacity;
 
-        if (PrimaryAirSystems(AirLoopNum).isAllOA) {
+        if (primaryAirSystems.isAllOA) {
             finalSysSizing.CoolOAOption = AllOA;
             finalSysSizing.HeatOAOption = AllOA;
             calcSysSizing.CoolOAOption = AllOA;
