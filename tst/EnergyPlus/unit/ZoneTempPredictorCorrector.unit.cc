@@ -1459,12 +1459,13 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     Real64 AcceptableTolerance = 0.00001;
 
     // Test 1: Zone Multipliers are all unity (1.0).  So, single zone loads should be the same as total loads
-    thisZoneSysMoistureDemand.TotalOutputRequired = 1000.0;
-    thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 2000.0;
-    thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 3000.0;
+    Real64 totalOutputRequired = 1000.0;
+    Real64 outputRequiredToHumidifyingSP = 2000.0;
+    Real64 outputRequiredToDehumidifyingSP = 3000.0;
     thisZone.Multiplier = 1.0;
     thisZone.ListMultiplier = 1.0;
-    thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(*state, zoneNum);
+    thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(
+        *state, zoneNum, totalOutputRequired, outputRequiredToHumidifyingSP, outputRequiredToDehumidifyingSP);
     EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, thisZoneSysMoistureDemand.ZoneMoisturePredictedRate, AcceptableTolerance);
     EXPECT_NEAR(
         thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP, thisZoneSysMoistureDemand.ZoneMoisturePredictedHumSPRate, AcceptableTolerance);
@@ -1472,12 +1473,10 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
         thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP, thisZoneSysMoistureDemand.ZoneMoisturePredictedDehumSPRate, AcceptableTolerance);
 
     // Test 2a: Zone Multiplier (non-list) is greater than 1, list Zone Multiplier is still one
-    thisZoneSysMoistureDemand.TotalOutputRequired = 1000.0;
-    thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 2000.0;
-    thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 3000.0;
     thisZone.Multiplier = 7.0;
     thisZone.ListMultiplier = 1.0;
-    thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(*state, zoneNum);
+    thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(
+        *state, zoneNum, totalOutputRequired, outputRequiredToHumidifyingSP, outputRequiredToDehumidifyingSP);
     ExpectedResult = 1000.0;
     EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
@@ -1492,12 +1491,10 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 2b: list Zone Multiplier is greater than 1, non-list Zone Multiplier is one
-    thisZoneSysMoistureDemand.TotalOutputRequired = 1000.0;
-    thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 2000.0;
-    thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 3000.0;
     thisZone.Multiplier = 1.0;
     thisZone.ListMultiplier = 7.0;
-    thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(*state, zoneNum);
+    thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(
+        *state, zoneNum, totalOutputRequired, outputRequiredToHumidifyingSP, outputRequiredToDehumidifyingSP);
     ExpectedResult = 1000.0;
     EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
@@ -1512,12 +1509,13 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 3: both zone multipliers are greater than 1.0
-    thisZoneSysMoistureDemand.TotalOutputRequired = 300.0;
-    thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 150.0;
-    thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 100.0;
+    totalOutputRequired = 300.0;
+    outputRequiredToHumidifyingSP = 150.0;
+    outputRequiredToDehumidifyingSP = 100.0;
     thisZone.Multiplier = 2.0;
     thisZone.ListMultiplier = 3.0;
-    thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(*state, zoneNum);
+    thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(
+        *state, zoneNum, totalOutputRequired, outputRequiredToHumidifyingSP, outputRequiredToDehumidifyingSP);
     ExpectedResult = 300.0;
     EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedRate, AcceptableTolerance);
     ExpectedResult = 150.0;
@@ -1540,8 +1538,6 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     Real64 &SingleZoneTotRate = thisZoneSysEnergyDemand.ZoneSNLoadPredictedRate;
     Real64 &SingleZoneHeatRate = thisZoneSysEnergyDemand.ZoneSNLoadPredictedHSPRate;
     Real64 &SingleZoneCoolRate = thisZoneSysEnergyDemand.ZoneSNLoadPredictedCSPRate;
-    Real64 HeatToSP;
-    Real64 CoolToSP;
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(zoneNum);
     Real64 &CorrectionFactor = state->dataHeatBalFanSys->LoadCorrectionFactor(zoneNum);
     state->dataHeatBal->Zone.allocate(zoneNum);
@@ -1550,29 +1546,31 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     Real64 AcceptableTolerance = 0.00001;
 
     // Test 1: Zone Multipliers and Load Correction Factor are all unity (1.0).  So, single zone loads should be the same as total loads
-    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
-    HeatToSP = 2000.0;
-    CoolToSP = 3000.0;
+    Real64 totalOutputRequired = 1000.0;
+    Real64 HeatToSP = 2000.0;
+    Real64 CoolToSP = 3000.0;
     CorrectionFactor = 1.0;
     thisZone.Multiplier = 1.0;
     thisZone.ListMultiplier = 1.0;
-    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
+    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, zoneNum, totalOutputRequired, HeatToSP, CoolToSP);
     EXPECT_NEAR(thisZoneSysEnergyDemand.TotalOutputRequired, SingleZoneTotRate, AcceptableTolerance);
     EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToHeatingSP, SingleZoneHeatRate, AcceptableTolerance);
     EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToCoolingSP, SingleZoneCoolRate, AcceptableTolerance);
 
     // Test 2a: Zone Multiplier (non-list) is greater than 1, list Zone Multiplier and Load Correction are still one
-    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
+    totalOutputRequired = 1000.0;
     HeatToSP = 2000.0;
     CoolToSP = 3000.0;
     CorrectionFactor = 1.0;
     thisZone.Multiplier = 4.0;
     thisZone.ListMultiplier = 1.0;
-    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
+    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, zoneNum, totalOutputRequired, HeatToSP, CoolToSP);
     ExpectedResult = 1000.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
@@ -1587,15 +1585,16 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToCoolingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 2b: list Zone Multiplier is greater than 1, non-list Zone Multiplier and Load Correction are still one
-    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
+    totalOutputRequired = 1000.0;
     HeatToSP = 2000.0;
     CoolToSP = 3000.0;
     CorrectionFactor = 1.0;
     thisZone.Multiplier = 1.0;
     thisZone.ListMultiplier = 5.0;
-    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
+    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, zoneNum, totalOutputRequired, HeatToSP, CoolToSP);
     ExpectedResult = 1000.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
@@ -1610,15 +1609,16 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToCoolingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 2c: list Zone Multiplier and Zone Multiplier are unity, Load Correction is not equal to 1.0
-    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
+    totalOutputRequired = 1000.0;
     HeatToSP = 2000.0;
     CoolToSP = 3000.0;
     CorrectionFactor = 1.1;
     thisZone.Multiplier = 1.0;
     thisZone.ListMultiplier = 1.0;
-    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
+    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, zoneNum, totalOutputRequired, HeatToSP, CoolToSP);
     ExpectedResult = 1100.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
     ExpectedResult = 2200.0;
@@ -1633,15 +1633,16 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     EXPECT_NEAR(thisZoneSysEnergyDemand.OutputRequiredToCoolingSP, ExpectedResult, AcceptableTolerance);
 
     // Test 3: none of the multipliers are unity
-    thisZoneSysEnergyDemand.TotalOutputRequired = 1000.0;
+    thisZoneSysEnergyDemand.TotalOutputRequired = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToHeatingSP = 0.0;
     thisZoneSysEnergyDemand.OutputRequiredToCoolingSP = 0.0;
+    totalOutputRequired = 1000.0;
     HeatToSP = 2000.0;
     CoolToSP = 3000.0;
     CorrectionFactor = 1.2;
     thisZone.Multiplier = 1.0;
     thisZone.ListMultiplier = 3.0;
-    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, HeatToSP, CoolToSP, zoneNum);
+    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(*state, zoneNum, totalOutputRequired, HeatToSP, CoolToSP);
     ExpectedResult = 1200.0;
     EXPECT_NEAR(ExpectedResult, SingleZoneTotRate, AcceptableTolerance);
     ExpectedResult = 2400.0;

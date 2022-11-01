@@ -3767,7 +3767,13 @@ void PredictSystemLoads(EnergyPlusData &state,
         }
 
         // Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
-        thisZoneHB.calcPredictedHumidityRatio(state, RAFNFrac, ZoneNum);
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).calcPredictedHumidityRatio(state, RAFNFrac, ZoneNum, spaceNum);
+            }
+        } else {
+            thisZoneHB.calcPredictedHumidityRatio(state, RAFNFrac, ZoneNum);
+        }
     }
 
     if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
@@ -4026,14 +4032,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
     Real64 ZoneRHDehumidifyingSetPoint = 0.0; // Zone dehumidifying set point (%)
 
     auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-    auto &zoneSysMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum);
-
-    Real64 LoadToHumidifySetPoint = 0.0;   // Moisture load at humidifying set point
-    Real64 LoadToDehumidifySetPoint = 0.0; // Moisture load at dehumidifying set point
-    bool SingleSetPoint = false;           // This determines whether both setpoint are equal or not
-    zoneSysMoistureDemand.TotalOutputRequired = 0.0;
-    zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 0.0;
-    zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 0.0;
+    bool SingleSetPoint = false; // This determines whether both setpoint are equal or not
 
     // Check to see if this is a "humidity controlled zone"
     bool ControlledHumidZoneFlag = false;
@@ -4211,7 +4210,11 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         }
     }
 
+    Real64 LoadToHumidifySetPoint = 0.0;   // Moisture load at humidifying set point
+    Real64 LoadToDehumidifySetPoint = 0.0; // Moisture load at dehumidifying set point
+    Real64 totalOutputRequired = 0.0;
     if (ControlledHumidZoneFlag) {
+
         // Calculate hourly humidity ratio from infiltration + humidity added from latent load
         // to determine system added/subtracted moisture.
         Real64 LatentGain =
@@ -4243,7 +4246,13 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
                 this->SumHmARaW + this->MixingMassFlowXHumRat + this->MDotOA * state.dataEnvrn->OutHumRat;
             A = this->OAMFL + this->VAMFL + this->EAMFL + this->CTMFL + this->SumHmARa + this->MixingMassFlowZone + this->MDotOA;
         }
-        C = RhoAir * thisZone.Volume * thisZone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+        Real64 volume = 0.0;
+        if (spaceNum > 0) {
+            volume = state.dataHeatBal->space(spaceNum).Volume;
+        } else {
+            volume = thisZone.Volume;
+        }
+        C = RhoAir * volume * thisZone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
         if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             auto &roomAFNInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum);
@@ -4280,7 +4289,6 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             LoadToHumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
-        zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
         WZoneSetPoint =
             Psychrometrics::PsyWFnTdbRhPb(state, this->ZT, (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
         if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::ThirdOrder) {
@@ -4298,20 +4306,20 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             LoadToDehumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToDehumidifySetPoint = LoadToDehumidifySetPoint / RAFNFrac;
-        zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = LoadToDehumidifySetPoint;
 
         // The load is added to the TotalOutputRequired as in the Temperature Predictor.  There is also the remaining
         // output variable for those who will use this for humidity control and stored in DataZoneEnergyDemands with the
         // analogous temperature terms.
+
         if (SingleSetPoint) {
-            zoneSysMoistureDemand.TotalOutputRequired = LoadToHumidifySetPoint;
+            totalOutputRequired = LoadToHumidifySetPoint;
         } else {
             if (LoadToHumidifySetPoint > 0.0 && LoadToDehumidifySetPoint > 0.0) {
-                zoneSysMoistureDemand.TotalOutputRequired = LoadToHumidifySetPoint;
+                totalOutputRequired = LoadToHumidifySetPoint;
             } else if (LoadToHumidifySetPoint < 0.0 && LoadToDehumidifySetPoint < 0.0) {
-                zoneSysMoistureDemand.TotalOutputRequired = LoadToDehumidifySetPoint;
+                totalOutputRequired = LoadToDehumidifySetPoint;
             } else if (LoadToHumidifySetPoint <= 0.0 && LoadToDehumidifySetPoint >= 0.0) { // deadband includes zero loads
-                zoneSysMoistureDemand.TotalOutputRequired = 0.0;
+                totalOutputRequired = 0.0;
             } else { // this should never occur!
                 ShowSevereError(
                     state, "Humidistat: Unanticipated combination of humidifying and dehumidifying loads - report to EnergyPlus Development Team");
@@ -4324,16 +4332,28 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
                 ShowFatalError(state, "Program terminates due to above conditions.");
             }
         }
-        // Apply zone multipliers as needed
-        zoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(state, zoneNum);
+    }
 
-        // init each sequenced demand to the full output
-        if (thisZone.IsControlled && zoneSysMoistureDemand.NumZoneEquipment > 0) {
-            for (int equipNum = 1; equipNum <= zoneSysMoistureDemand.NumZoneEquipment; ++equipNum) {
-                zoneSysMoistureDemand.SequencedOutputRequired(equipNum) = zoneSysMoistureDemand.TotalOutputRequired;
-                zoneSysMoistureDemand.SequencedOutputRequiredToHumidSP(equipNum) = zoneSysMoistureDemand.OutputRequiredToHumidifyingSP;
-                zoneSysMoistureDemand.SequencedOutputRequiredToDehumidSP(equipNum) = zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP;
-            }
+    // Apply zone multipliers as needed or set to zero
+    if (spaceNum > 0) {
+        auto &thisspaceSysMoistureDemand = state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum);
+        if (ControlledHumidZoneFlag) {
+            thisspaceSysMoistureDemand.reportMoistLoadsZoneMultiplier(
+                state, zoneNum, totalOutputRequired, LoadToHumidifySetPoint, LoadToDehumidifySetPoint);
+        } else {
+            thisspaceSysMoistureDemand.TotalOutputRequired = 0.0;
+            thisspaceSysMoistureDemand.OutputRequiredToDehumidifyingSP = 0.0;
+            thisspaceSysMoistureDemand.OutputRequiredToHumidifyingSP = 0.0;
+        }
+    } else {
+        auto &thisZoneSysMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum);
+        if (ControlledHumidZoneFlag) {
+            thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(
+                state, zoneNum, totalOutputRequired, LoadToHumidifySetPoint, LoadToDehumidifySetPoint);
+        } else {
+            thisZoneSysMoistureDemand.TotalOutputRequired = 0.0;
+            thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 0.0;
+            thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 0.0;
         }
     }
 }
@@ -7313,11 +7333,11 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     auto &thisTempZoneThermostatSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
     auto &thisZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum);
     auto &thisZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum);
-    auto &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
     auto &thisDeadBandOrSetBack = state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum);
 
     thisDeadBandOrSetBack = false;
     Real64 ZoneSetPoint = 0.0;
+    Real64 totalLoad = 0.0;
     Real64 LoadToHeatingSetPoint = 0.0;
     Real64 LoadToCoolingSetPoint = 0.0;
 
@@ -7326,7 +7346,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         // Uncontrolled Zone
         LoadToHeatingSetPoint = 0.0;
         LoadToCoolingSetPoint = 0.0;
-        thisZoneSysEnergyDemand.TotalOutputRequired = 0.0;
+        totalLoad = 0.0;
         break;
     case DataHVACGlobals::ThermostatType::SingleHeating:
         switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
@@ -7354,12 +7374,12 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         }
         }
         if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
-        thisZoneSysEnergyDemand.TotalOutputRequired = LoadToHeatingSetPoint;
+        totalLoad = LoadToHeatingSetPoint;
         ZoneSetPoint = thisTempZoneThermostatSetPoint;
         LoadToCoolingSetPoint = LoadToHeatingSetPoint;
         // for consistency with the other cases, use LE instead of LT and don't subtract 1.0 Watt as a way of pushing the zero load
         // case over the threshold
-        if ((thisZoneSysEnergyDemand.TotalOutputRequired) <= 0.0) thisDeadBandOrSetBack = true;
+        if ((totalLoad) <= 0.0) thisDeadBandOrSetBack = true;
 
         break;
     case DataHVACGlobals::ThermostatType::SingleCooling:
@@ -7391,12 +7411,12 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         if (thisZone.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
             LoadToCoolingSetPoint = this->TempDepZnLd * thisZone.AdjustedReturnTempByITE - this->TempIndZnLd;
         }
-        thisZoneSysEnergyDemand.TotalOutputRequired = LoadToCoolingSetPoint;
+        totalLoad = LoadToCoolingSetPoint;
         ZoneSetPoint = thisTempZoneThermostatSetPoint;
         LoadToHeatingSetPoint = LoadToCoolingSetPoint;
         // for consistency with the other cases, use GE instead of GT and don't add 1.0 Watt as a way of pushing the zero load
         // case over the threshold
-        if ((thisZoneSysEnergyDemand.TotalOutputRequired) >= 0.0) thisDeadBandOrSetBack = true;
+        if ((totalLoad) >= 0.0) thisDeadBandOrSetBack = true;
         break;
     case DataHVACGlobals::ThermostatType::SingleHeatCool:
         switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
@@ -7463,11 +7483,11 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         }
 
         if (LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0) {
-            thisZoneSysEnergyDemand.TotalOutputRequired = LoadToHeatingSetPoint;
+            totalLoad = LoadToHeatingSetPoint;
         } else if (LoadToHeatingSetPoint < 0.0 && LoadToCoolingSetPoint < 0.0) {
-            thisZoneSysEnergyDemand.TotalOutputRequired = LoadToCoolingSetPoint;
+            totalLoad = LoadToCoolingSetPoint;
         } else if (LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0) { // deadband includes zero loads
-            thisZoneSysEnergyDemand.TotalOutputRequired = 0.0;
+            totalLoad = 0.0;
             if (thisZone.SystemZoneNodeNumber > 0) {
                 ZoneSetPoint = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber).Temp;
                 ZoneSetPoint = max(ZoneSetPoint, thisZoneThermostatSetPointLo); // trap out of deadband
@@ -7546,14 +7566,14 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         }
 
         if (LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0) {
-            thisZoneSysEnergyDemand.TotalOutputRequired = LoadToHeatingSetPoint;
+            totalLoad = LoadToHeatingSetPoint;
             ZoneSetPoint = thisZoneThermostatSetPointLo;
         } else if (LoadToHeatingSetPoint < 0.0 && LoadToCoolingSetPoint < 0.0) {
-            thisZoneSysEnergyDemand.TotalOutputRequired = LoadToCoolingSetPoint;
+            totalLoad = LoadToCoolingSetPoint;
             ZoneSetPoint = thisZoneThermostatSetPointHi;
         } else if (LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0) { // deadband includes zero loads
             // this turns out to cause instabilities sometimes? that lead to setpoint errors if predictor is off.
-            thisZoneSysEnergyDemand.TotalOutputRequired = 0.0;
+            totalLoad = 0.0;
             if (thisZone.SystemZoneNodeNumber > 0) {
                 ZoneSetPoint = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber).Temp;
                 ZoneSetPoint = max(ZoneSetPoint, thisZoneThermostatSetPointLo); // trap out of deadband
@@ -7579,20 +7599,29 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         break;
     }
 
+    int systemNodeNumber = 0;
+    int stageNum = 0;
+    if (spaceNum > 0) {
+        systemNodeNumber = state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber;
+        stageNum = state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).StageNum;
+    } else {
+        systemNodeNumber = thisZone.SystemZoneNodeNumber;
+        stageNum = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).StageNum;
+    }
     // Staged control zone
     if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
         if (state.dataZoneCtrls->StageZoneLogic(zoneNum)) {
-            if (thisZoneSysEnergyDemand.StageNum == 0) { // No load
+            if (stageNum == 0) { // No load
                 LoadToHeatingSetPoint = 0.0;
                 LoadToCoolingSetPoint = 0.0;
-                thisZoneSysEnergyDemand.TotalOutputRequired = 0.0;
-                if (thisZone.SystemZoneNodeNumber > 0) {
-                    ZoneSetPoint = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber).Temp;
+                totalLoad = 0.0;
+                if (systemNodeNumber > 0) {
+                    ZoneSetPoint = state.dataLoopNodes->Node(systemNodeNumber).Temp;
                     ZoneSetPoint = max(ZoneSetPoint, thisZoneThermostatSetPointLo); // trap out of deadband
                     ZoneSetPoint = min(ZoneSetPoint, thisZoneThermostatSetPointHi); // trap out of deadband
                 }
                 thisDeadBandOrSetBack = true;
-            } else if (thisZoneSysEnergyDemand.StageNum < 0) { // Cooling load
+            } else if (stageNum < 0) { // Cooling load
                 switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
                 case DataHeatBalance::SolutionAlgo::ThirdOrder: {
                     LoadToCoolingSetPoint = (this->TempDepZnLd * (thisZoneThermostatSetPointHi) - this->TempIndZnLd);
@@ -7617,10 +7646,10 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
                     assert(false);
                 }
                 }
-                thisZoneSysEnergyDemand.TotalOutputRequired = LoadToCoolingSetPoint;
+                totalLoad = LoadToCoolingSetPoint;
                 ZoneSetPoint = thisZoneThermostatSetPointHi;
                 LoadToHeatingSetPoint = LoadToCoolingSetPoint;
-                if ((thisZoneSysEnergyDemand.TotalOutputRequired) >= 0.0) thisDeadBandOrSetBack = true;
+                if ((totalLoad) >= 0.0) thisDeadBandOrSetBack = true;
             } else { // Heating load
                 switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
                 case DataHeatBalance::SolutionAlgo::ThirdOrder: {
@@ -7646,10 +7675,10 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
                     assert(false);
                 }
                 }
-                thisZoneSysEnergyDemand.TotalOutputRequired = LoadToHeatingSetPoint;
+                totalLoad = LoadToHeatingSetPoint;
                 ZoneSetPoint = thisZoneThermostatSetPointLo;
                 LoadToCoolingSetPoint = LoadToHeatingSetPoint;
-                if ((thisZoneSysEnergyDemand.TotalOutputRequired) <= 0.0) thisDeadBandOrSetBack = true;
+                if ((totalLoad) <= 0.0) thisDeadBandOrSetBack = true;
             }
         }
     }
@@ -7670,15 +7699,12 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     state.dataZoneEnergyDemand->CurDeadBandOrSetback(zoneNum) = thisDeadBandOrSetBack;
 
     // Apply the Zone Multiplier and Load Correction factor as needed
-    thisZoneSysEnergyDemand.reportSensibleLoadsZoneMultiplier(state, LoadToHeatingSetPoint, LoadToCoolingSetPoint, zoneNum);
-
-    // init each sequenced demand to the full output
-    if (thisZone.IsControlled && thisZoneSysEnergyDemand.NumZoneEquipment > 0) {
-        for (int equipNum = 1; equipNum <= thisZoneSysEnergyDemand.NumZoneEquipment; ++equipNum) {
-            thisZoneSysEnergyDemand.SequencedOutputRequired(equipNum) = thisZoneSysEnergyDemand.TotalOutputRequired;
-            thisZoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP(equipNum) = thisZoneSysEnergyDemand.OutputRequiredToHeatingSP;
-            thisZoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP(equipNum) = thisZoneSysEnergyDemand.OutputRequiredToCoolingSP;
-        }
+    if (spaceNum > 0) {
+        state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).reportSensibleLoadsZoneMultiplier(
+            state, zoneNum, totalLoad, LoadToHeatingSetPoint, LoadToCoolingSetPoint);
+    } else {
+        state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).reportSensibleLoadsZoneMultiplier(
+            state, zoneNum, totalLoad, LoadToHeatingSetPoint, LoadToCoolingSetPoint);
     }
 }
 } // namespace EnergyPlus::ZoneTempPredictorCorrector

@@ -73,23 +73,6 @@ void ZoneSystemSensibleDemand::beginEnvironmentInit()
     this->ZoneSNLoadPredictedCSPRate = 0.0;
 }
 
-void ZoneSystemSensibleDemand::reportSensibleLoadsZoneMultiplier(EnergyPlusData &state,
-                                                                 Real64 const loadToHeatingSetPoint,
-                                                                 Real64 const loadToCoolingSetPoint,
-                                                                 int const zoneNum)
-{
-    Real64 loadCorrFactor = state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum);
-
-    this->ZoneSNLoadPredictedRate = this->TotalOutputRequired * loadCorrFactor;
-    this->ZoneSNLoadPredictedHSPRate = loadToHeatingSetPoint * loadCorrFactor;
-    this->ZoneSNLoadPredictedCSPRate = loadToCoolingSetPoint * loadCorrFactor;
-
-    Real64 ZoneMultFac = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
-    this->TotalOutputRequired = this->ZoneSNLoadPredictedRate * ZoneMultFac;
-    this->OutputRequiredToHeatingSP = this->ZoneSNLoadPredictedHSPRate * ZoneMultFac;
-    this->OutputRequiredToCoolingSP = this->ZoneSNLoadPredictedCSPRate * ZoneMultFac;
-}
-
 void ZoneSystemMoistureDemand::beginEnvironmentInit()
 {
     this->RemainingOutputRequired = 0.0;
@@ -111,17 +94,51 @@ void ZoneSystemMoistureDemand::beginEnvironmentInit()
     this->ZoneMoisturePredictedHumSPRate = 0.0;
     this->ZoneMoisturePredictedDehumSPRate = 0.0;
 }
-void ZoneSystemMoistureDemand::reportMoistLoadsZoneMultiplier(EnergyPlusData &state, int const zoneNum)
+void ZoneSystemSensibleDemand::reportSensibleLoadsZoneMultiplier(
+    EnergyPlusData &state, int const zoneNum, Real64 const totalLoad, Real64 const loadToHeatingSetPoint, Real64 const loadToCoolingSetPoint)
 {
-    this->ZoneMoisturePredictedRate = this->TotalOutputRequired;
-    this->ZoneMoisturePredictedHumSPRate = this->OutputRequiredToHumidifyingSP;
-    this->ZoneMoisturePredictedDehumSPRate = this->OutputRequiredToDehumidifyingSP;
+    Real64 loadCorrFactor = state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum);
+
+    this->ZoneSNLoadPredictedRate = totalLoad * loadCorrFactor;
+    this->ZoneSNLoadPredictedHSPRate = loadToHeatingSetPoint * loadCorrFactor;
+    this->ZoneSNLoadPredictedCSPRate = loadToCoolingSetPoint * loadCorrFactor;
+
+    Real64 ZoneMultFac = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
+    this->TotalOutputRequired = this->ZoneSNLoadPredictedRate * ZoneMultFac;
+    this->OutputRequiredToHeatingSP = this->ZoneSNLoadPredictedHSPRate * ZoneMultFac;
+    this->OutputRequiredToCoolingSP = this->ZoneSNLoadPredictedCSPRate * ZoneMultFac;
+
+    // init each sequenced demand to the full output
+    if (state.dataHeatBal->Zone(zoneNum).IsControlled && this->NumZoneEquipment > 0) {
+        for (int equipNum = 1; equipNum <= this->NumZoneEquipment; ++equipNum) {
+            this->SequencedOutputRequired(equipNum) = this->TotalOutputRequired;
+            this->SequencedOutputRequiredToHeatingSP(equipNum) = this->OutputRequiredToHeatingSP;
+            this->SequencedOutputRequiredToCoolingSP(equipNum) = this->OutputRequiredToCoolingSP;
+        }
+    }
+}
+
+void ZoneSystemMoistureDemand::reportMoistLoadsZoneMultiplier(
+    EnergyPlusData &state, int const zoneNum, Real64 const totalLoad, Real64 const loadToHumidifySetPoint, Real64 const loadToDehumidifySetPoint)
+{
+    this->ZoneMoisturePredictedRate = totalLoad;
+    this->ZoneMoisturePredictedHumSPRate = loadToHumidifySetPoint;
+    this->ZoneMoisturePredictedDehumSPRate = loadToDehumidifySetPoint;
 
     Real64 zoneMultFac = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
 
-    this->TotalOutputRequired *= zoneMultFac;
-    this->OutputRequiredToHumidifyingSP *= zoneMultFac;
-    this->OutputRequiredToDehumidifyingSP *= zoneMultFac;
+    this->TotalOutputRequired = totalLoad * zoneMultFac;
+    this->OutputRequiredToHumidifyingSP = loadToHumidifySetPoint * zoneMultFac;
+    this->OutputRequiredToDehumidifyingSP = loadToDehumidifySetPoint * zoneMultFac;
+
+    // init each sequenced demand to the full output
+    if (state.dataHeatBal->Zone(zoneNum).IsControlled && this->NumZoneEquipment > 0) {
+        for (int equipNum = 1; equipNum <= this->NumZoneEquipment; ++equipNum) {
+            this->SequencedOutputRequired(equipNum) = this->TotalOutputRequired;
+            this->SequencedOutputRequiredToHumidSP(equipNum) = this->OutputRequiredToHumidifyingSP;
+            this->SequencedOutputRequiredToDehumidSP(equipNum) = this->OutputRequiredToDehumidifyingSP;
+        }
+    }
 }
 
 } // namespace EnergyPlus::DataZoneEnergyDemands
