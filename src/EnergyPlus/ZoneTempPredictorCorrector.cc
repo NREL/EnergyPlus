@@ -4686,8 +4686,8 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         for (int iHistory = 3; iHistory >= 1; --iHistory) {
-            thisZoneHB.XMAT[iHistory] = std::move(thisZoneHB.XMAT[iHistory - 1]);
-            thisZoneHB.WPrevZoneTS[iHistory] = std::move(thisZoneHB.WPrevZoneTS[iHistory - 1]);
+            thisZoneHB.XMAT[iHistory] = thisZoneHB.XMAT[iHistory - 1];
+            thisZoneHB.WPrevZoneTS[iHistory] = thisZoneHB.WPrevZoneTS[iHistory - 1];
         }
         thisZoneHB.XMAT[0] = thisZoneHB.ZTAV; // using average for whole zone time step.
         thisZoneHB.XMPT = thisZoneHB.ZT;
@@ -4778,8 +4778,8 @@ void PushSystemTimestepHistories(EnergyPlusData &state)
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         for (int iHistory = 3; iHistory >= 1; --iHistory) {
-            thisZoneHB.DSXMAT[iHistory] = std::move(thisZoneHB.DSXMAT[iHistory - 1]);
-            thisZoneHB.DSWPrevZoneTS[iHistory] = std::move(thisZoneHB.DSWPrevZoneTS[iHistory - 1]);
+            thisZoneHB.DSXMAT[iHistory] = thisZoneHB.DSXMAT[iHistory - 1];
+            thisZoneHB.DSWPrevZoneTS[iHistory] = thisZoneHB.DSWPrevZoneTS[iHistory - 1];
         }
         thisZoneHB.DSXMAT[0] = thisZoneHB.MAT;
         thisZoneHB.DSWPrevZoneTS[0] = thisZoneHB.ZoneAirHumRat;
@@ -4860,8 +4860,8 @@ void RevertZoneTimestepHistories(EnergyPlusData &state)
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         for (int iHistory = 0; iHistory <= 2; ++iHistory) {
-            thisZoneHB.XMAT[iHistory] = std::move(thisZoneHB.XMAT[iHistory + 1]);
-            thisZoneHB.WPrevZoneTS[iHistory] = std::move(thisZoneHB.WPrevZoneTS[iHistory + 1]);
+            thisZoneHB.XMAT[iHistory] = thisZoneHB.XMAT[iHistory + 1];
+            thisZoneHB.WPrevZoneTS[iHistory] = thisZoneHB.WPrevZoneTS[iHistory + 1];
         }
 
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
@@ -7202,26 +7202,8 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
             state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
 
             this->MAT = DownInterpolate4HistoryValues(PriorTimeStep, state.dataHVACGlobal->TimeStepSys, this->XMAT, this->DSXMAT);
-            // DownInterpolate4HistoryValues(PriorTimeStep,
-            //                               state.dataHVACGlobal->TimeStepSys,
-            //                               this->XMAT[0],
-            //                               this->XMAT[1],
-            //                               this->XMAT[2],
-            //                               this->MAT,
-            //                               this->DSXMAT[0],
-            //                               this->DSXMAT[1],
-            //                               this->DSXMAT[2],
-            //                               this->DSXMAT[3]);
-            DownInterpolate4HistoryValues(PriorTimeStep,
-                                          state.dataHVACGlobal->TimeStepSys,
-                                          this->WPrevZoneTS[0],
-                                          this->WPrevZoneTS[1],
-                                          this->WPrevZoneTS[2],
-                                          this->ZoneAirHumRat,
-                                          this->DSWPrevZoneTS[0],
-                                          this->DSWPrevZoneTS[1],
-                                          this->DSWPrevZoneTS[2],
-                                          this->DSWPrevZoneTS[3]);
+            this->ZoneAirHumRat =
+                DownInterpolate4HistoryValues(PriorTimeStep, state.dataHVACGlobal->TimeStepSys, this->WPrevZoneTS, this->DSWPrevZoneTS);
 
             if (state.dataRoomAirMod->IsZoneDV(zoneNum) || state.dataRoomAirMod->IsZoneUI(zoneNum)) {
 
