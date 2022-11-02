@@ -100,10 +100,10 @@ namespace DataZoneEnergyDemands {
 
         void beginEnvironmentInit() override;
 
-        void reportZoneAirSystemSensibleLoads(EnergyPlusData &state, Real64 const SNLoad);
+        void reportZoneAirSystemSensibleLoads(EnergyPlusData &state, Real64 SNLoad);
 
         void reportSensibleLoadsZoneMultiplier(
-            EnergyPlusData &state, int const zoneNum, Real64 const totalLoad, Real64 const loadToHeatingSetPoint, Real64 const loadToCoolingSetPoint);
+            EnergyPlusData &state, int zoneNum, Real64 totalLoad, Real64 loadToHeatingSetPoint, Real64 loadToCoolingSetPoint);
     };
     struct ZoneSystemMoistureDemand : ZoneSystemDemandData // Humidification/dehumidification loads to be met (kg water per second)
     {
@@ -133,14 +133,10 @@ namespace DataZoneEnergyDemands {
 
         void beginEnvironmentInit() override;
 
-        void
-        reportZoneAirSystemMoistureLoads(EnergyPlusData &state, Real64 const latentGain, Real64 const sensibleLoad, Real64 const vaporPressureDiff);
+        void reportZoneAirSystemMoistureLoads(EnergyPlusData &state, Real64 latentGain, Real64 sensibleLoad, Real64 vaporPressureDiff);
 
-        void reportMoistLoadsZoneMultiplier(EnergyPlusData &state,
-                                            int const zoneNum,
-                                            Real64 const totalLoad,
-                                            Real64 const loadToHumidifySetPoint,
-                                            Real64 const loadToDehumidifySetPoint);
+        void reportMoistLoadsZoneMultiplier(
+            EnergyPlusData &state, int zoneNum, Real64 totalLoad, Real64 loadToHumidifySetPoint, Real64 loadToDehumidifySetPoint);
     };
 
 } // namespace DataZoneEnergyDemands
