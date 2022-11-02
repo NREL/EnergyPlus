@@ -207,6 +207,14 @@ void ManageHVAC(EnergyPlusData &state)
         thisZoneHB.ZTAV = 0.0;
         thisZoneHB.ZoneAirHumRatAvg = 0.0;
     }
+    if (state.dataHeatBal->doSpaceHeatBalance) {
+        for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+            thisSpaceHB.ZT = thisSpaceHB.MAT;
+            // save for use with thermal comfort control models (Fang, Pierce, and KSU)
+            thisSpaceHB.ZTAV = 0.0;
+            thisSpaceHB.ZoneAirHumRatAvg = 0.0;
+        }
+    }
     state.dataHeatBalFanSys->ZoneThermostatSetPointHiAver = 0.0;
     state.dataHeatBalFanSys->ZoneThermostatSetPointLoAver = 0.0;
     state.dataHVACMgr->PrintedWarmup = false;
@@ -270,6 +278,11 @@ void ManageHVAC(EnergyPlusData &state)
 
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.SysDepZoneLoadsLagged = thisZoneHB.SysDepZoneLoads;
+    }
+    if (state.dataHeatBal->doSpaceHeatBalance) {
+        for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+            thisSpaceHB.SysDepZoneLoadsLagged = thisSpaceHB.SysDepZoneLoads;
+        }
     }
 
     UpdateInternalGainValues(state, true, true);
@@ -390,6 +403,13 @@ void ManageHVAC(EnergyPlusData &state)
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             thisZoneHB.ZTAV += thisZoneHB.ZT * FracTimeStepZone;
             thisZoneHB.ZoneAirHumRatAvg += thisZoneHB.ZoneAirHumRat * FracTimeStepZone;
+            if (state.dataHeatBal->doSpaceHeatBalance) {
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+                    thisSpaceHB.ZTAV += thisSpaceHB.ZT * FracTimeStepZone;
+                    thisSpaceHB.ZoneAirHumRatAvg += thisSpaceHB.ZoneAirHumRat * FracTimeStepZone;
+                }
+            }
             if (state.dataContaminantBalance->Contaminant.CO2Simulation)
                 state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) += state.dataContaminantBalance->ZoneAirCO2(ZoneNum) * FracTimeStepZone;
             if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
@@ -536,6 +556,12 @@ void ManageHVAC(EnergyPlusData &state)
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.ZTAVComf = thisZoneHB.ZTAV;
         thisZoneHB.ZoneAirHumRatAvgComf = thisZoneHB.ZoneAirHumRatAvg;
+    }
+    if (state.dataHeatBal->doSpaceHeatBalance) {
+        for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+            thisSpaceHB.ZTAVComf = thisSpaceHB.ZTAV;
+            thisSpaceHB.ZoneAirHumRatAvgComf = thisSpaceHB.ZoneAirHumRatAvg;
+        }
     }
 
     ManageZoneAirUpdates(state,

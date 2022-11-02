@@ -246,6 +246,12 @@ namespace ZoneTempPredictorCorrector {
         void correctHumRat(EnergyPlusData &state, int zoneNum, int spaceNum = 0);
 
         void calcPredictedHumidityRatio(EnergyPlusData &state, Real64 RAFNFrac, int zoneNum, int spaceNum = 0);
+
+        void pushZoneTimestepHistory(EnergyPlusData &state, int zoneNum, int spaceNum = 0);
+
+        void pushSystemTimestepHistory(EnergyPlusData &state, int zoneNum, int spaceNum = 0);
+
+        void revertZoneTimestepHistory(EnergyPlusData &state, int zoneNum, int spaceNum = 0);
     };
 
     struct ZoneHeatBalanceData : ZoneSpaceHeatBalanceData
