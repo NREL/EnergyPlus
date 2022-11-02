@@ -100,6 +100,8 @@ namespace DataZoneEnergyDemands {
 
         void beginEnvironmentInit() override;
 
+        void reportZoneAirSystemSensibleLoads(EnergyPlusData &state, Real64 const SNLoad);
+
         void reportSensibleLoadsZoneMultiplier(
             EnergyPlusData &state, int const zoneNum, Real64 const totalLoad, Real64 const loadToHeatingSetPoint, Real64 const loadToCoolingSetPoint);
     };
@@ -130,6 +132,9 @@ namespace DataZoneEnergyDemands {
         Real64 ZoneVaporPressureDifference = 0.0;            // vapor pressure depression [Pa]
 
         void beginEnvironmentInit() override;
+
+        void
+        reportZoneAirSystemMoistureLoads(EnergyPlusData &state, Real64 const latentGain, Real64 const sensibleLoad, Real64 const vaporPressureDiff);
 
         void reportMoistLoadsZoneMultiplier(EnergyPlusData &state,
                                             int const zoneNum,

@@ -201,6 +201,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (state.dataHeatBalMgr->ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
+            if (state.dataGlobal->DoingSizing) state.dataHeatBal->doSpaceHeatBalance = state.dataHeatBal->doSpaceHeatBalanceSizing;
             HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
             // Surface octree setup

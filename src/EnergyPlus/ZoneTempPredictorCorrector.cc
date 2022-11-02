@@ -3628,13 +3628,12 @@ void PredictSystemLoads(EnergyPlusData &state,
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         // Update zone/space temperatures
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+        thisZoneHB.updateTemperatures(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep, ZoneNum);
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                 state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).updateTemperatures(
                     state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep, ZoneNum, spaceNum);
             }
-        } else {
-            thisZoneHB.updateTemperatures(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep, ZoneNum);
         }
 
         thisZoneHB.AirPowerCap = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
@@ -3645,12 +3644,11 @@ void PredictSystemLoads(EnergyPlusData &state,
         // Calculate the various heat balance sums
 
         // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
+        thisZoneHB.calcZoneOrSpaceSums(state, false, ZoneNum);
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                 state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).calcZoneOrSpaceSums(state, false, ZoneNum, spaceNum);
             }
-        } else {
-            thisZoneHB.calcZoneOrSpaceSums(state, false, ZoneNum);
         }
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
@@ -3752,21 +3750,19 @@ void PredictSystemLoads(EnergyPlusData &state,
         }
 
         // Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
+        thisZoneHB.calcPredictedSystemLoad(state, RAFNFrac, ZoneNum);
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                 state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).calcPredictedSystemLoad(state, RAFNFrac, ZoneNum, spaceNum);
             }
-        } else {
-            thisZoneHB.calcPredictedSystemLoad(state, RAFNFrac, ZoneNum);
         }
 
         // Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
+        thisZoneHB.calcPredictedHumidityRatio(state, RAFNFrac, ZoneNum);
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                 state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).calcPredictedHumidityRatio(state, RAFNFrac, ZoneNum, spaceNum);
             }
-        } else {
-            thisZoneHB.calcPredictedHumidityRatio(state, RAFNFrac, ZoneNum);
         }
     }
 
@@ -4357,18 +4353,16 @@ Real64 correctZoneAirTemps(EnergyPlusData &state,
 )
 {
     Real64 maxTempChange = DataPrecisionGlobals::constant_zero; // Max absolute air temperature change between previous and current timestep
-    Real64 tempChange = DataPrecisionGlobals::constant_zero;    // Zone or space air temperature change between previous and current timestep
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        Real64 zoneTempChange = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).correctAirTemp(state, useZoneTimeStepHistory, zoneNum);
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                tempChange =
+                Real64 spaceTempChange =
                     state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).correctAirTemp(state, useZoneTimeStepHistory, zoneNum, spaceNum);
-                maxTempChange = max(maxTempChange, tempChange);
+                maxTempChange = max(maxTempChange, spaceTempChange);
             }
-        } else {
-            tempChange = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).correctAirTemp(state, useZoneTimeStepHistory, zoneNum);
         }
-        maxTempChange = max(maxTempChange, tempChange);
+        maxTempChange = max(maxTempChange, zoneTempChange);
     }
     return maxTempChange;
 }
@@ -4606,16 +4600,14 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     this->MAT = this->ZT;
 
     // Determine sensible load heating/cooling rate and energy
-    auto &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
-    thisZoneSysEnergyDemand.ZoneSNLoadHeatRate = max(SNLoad, 0.0);
-    thisZoneSysEnergyDemand.ZoneSNLoadCoolRate = std::abs(min(SNLoad, 0.0));
-    thisZoneSysEnergyDemand.ZoneSNLoadHeatEnergy =
-        thisZoneSysEnergyDemand.ZoneSNLoadHeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    thisZoneSysEnergyDemand.ZoneSNLoadCoolEnergy =
-        thisZoneSysEnergyDemand.ZoneSNLoadCoolRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    if (spaceNum > 0) {
+        state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).reportZoneAirSystemSensibleLoads(state, SNLoad);
+    } else {
+        state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).reportZoneAirSystemSensibleLoads(state, SNLoad);
+    }
 
     // Final humidity calcs
-    CorrectZoneHumRat(state, zoneNum);
+    this->correctHumRat(state, zoneNum, spaceNum);
 
     this->ZoneAirHumRat = this->ZoneAirHumRatTemp;
     this->ZoneAirRelHum = 100.0 * Psychrometrics::PsyRhFnTdbWPb(state, this->ZT, this->ZoneAirHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
@@ -4896,7 +4888,7 @@ void RevertZoneTimestepHistories(EnergyPlusData &state)
     }
 }
 
-void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
+void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zoneNum, int const spaceNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -4904,18 +4896,18 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     //       DATE WRITTEN   2000
     // REFERENCES: Routine FinalZnCalcs - FINAL ZONE CALCULATIONS, authored by Dale Herron for BLAST.
 
-    static constexpr std::string_view RoutineName("CorrectZoneHumRat");
+    static constexpr std::string_view RoutineName("correctHumRat");
 
     Real64 MoistureMassFlowRate = 0.0;
     Real64 ZoneMassFlowRate = 0.0;
-    auto &zone = state.dataHeatBal->Zone(ZoneNum);
+    auto &zone = state.dataHeatBal->Zone(zoneNum);
     int ZoneMult = zone.Multiplier * zone.ListMultiplier;
     bool ControlledZoneAirFlag = zone.IsControlled;
     bool ZoneRetPlenumAirFlag = zone.IsReturnPlenum;
     bool ZoneSupPlenumAirFlag = zone.IsSupplyPlenum;
 
     if (ControlledZoneAirFlag) { // If there is system flow then calculate the flow rates
-        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
+        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
         // Calculate moisture flow rate into each zone
         for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumInletNodes; ++NodeNum) {
             auto &inletNode = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(NodeNum));
@@ -4955,10 +4947,8 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
         ZoneMassFlowRate += inletNode.MassFlowRate / ZoneMult;
     }
 
-    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
     // Calculate hourly humidity ratio from infiltration + humidity added from latent load + system added moisture
-    Real64 LatentGain =
-        thisZoneHB.ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
+    Real64 LatentGain = this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
 
     Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
@@ -4967,108 +4957,101 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     // heat balance.  There are 2 cases that should be considered, system
     // operating and system shutdown.
 
-    Real64 const RhoAir =
-        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.ZT, thisZoneHB.ZoneAirHumRat, RoutineName);
-    Real64 const H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.ZT);
+    Real64 const RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->ZT, this->ZoneAirHumRat, RoutineName);
+    Real64 const H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(this->ZoneAirHumRat, this->ZT);
 
-    Real64 B = (LatentGain / H2OHtOfVap) + ((thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.CTMFL) * state.dataEnvrn->OutHumRat) +
-               thisZoneHB.EAMFLxHumRat + (MoistureMassFlowRate) + thisZoneHB.SumHmARaW + thisZoneHB.MixingMassFlowXHumRat +
-               thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
-    Real64 A = ZoneMassFlowRate + thisZoneHB.OAMFL + thisZoneHB.VAMFL + thisZoneHB.EAMFL + thisZoneHB.CTMFL + thisZoneHB.SumHmARa +
-               thisZoneHB.MixingMassFlowZone + thisZoneHB.MDotOA;
+    Real64 B = (LatentGain / H2OHtOfVap) + ((this->OAMFL + this->VAMFL + this->CTMFL) * state.dataEnvrn->OutHumRat) + this->EAMFLxHumRat +
+               (MoistureMassFlowRate) + this->SumHmARaW + this->MixingMassFlowXHumRat + this->MDotOA * state.dataEnvrn->OutHumRat;
+    Real64 A = ZoneMassFlowRate + this->OAMFL + this->VAMFL + this->EAMFL + this->CTMFL + this->SumHmARa + this->MixingMassFlowZone + this->MDotOA;
 
     if (state.afn->multizone_always_simulated ||
         (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation &&
          state.afn->AirflowNetworkFanActivated)) {
-        auto &exchangeData = state.afn->exchangeData(ZoneNum);
+        auto &exchangeData = state.afn->exchangeData(zoneNum);
         // Multizone airflow calculated in AirflowNetwork
-        B = (LatentGain / H2OHtOfVap) + (exchangeData.SumMHrW + exchangeData.SumMMHrW) + (MoistureMassFlowRate) + thisZoneHB.SumHmARaW;
-        A = ZoneMassFlowRate + exchangeData.SumMHr + exchangeData.SumMMHr + thisZoneHB.SumHmARa;
+        B = (LatentGain / H2OHtOfVap) + (exchangeData.SumMHrW + exchangeData.SumMMHrW) + (MoistureMassFlowRate) + this->SumHmARaW;
+        A = ZoneMassFlowRate + exchangeData.SumMHr + exchangeData.SumMMHr + this->SumHmARa;
     }
     Real64 C = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
     if (state.afn->distribution_simulated) {
-        B += state.afn->exchangeData(ZoneNum).TotalLat;
+        B += state.afn->exchangeData(zoneNum).TotalLat;
     }
 
     // Use a 3rd order derivative to predict final zone humidity ratio and
     // smooth the changes using the zone air capacitance.
-    auto &zoneAirHumRatTemp = thisZoneHB.ZoneAirHumRatTemp;
-    auto &zoneW1 = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneW1;
+    // auto &zoneAirHumRatTemp = this->ZoneAirHumRatTemp;
+    // auto &zoneW1 = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneW1;
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-        zoneAirHumRatTemp = (B + C * (3.0 * thisZoneHB.WPrevZoneTSTemp[0] - (3.0 / 2.0) * thisZoneHB.WPrevZoneTSTemp[1] +
-                                      (1.0 / 3.0) * thisZoneHB.WPrevZoneTSTemp[2])) /
-                            ((11.0 / 6.0) * C + A);
+        this->ZoneAirHumRatTemp =
+            (B + C * (3.0 * this->WPrevZoneTSTemp[0] - (3.0 / 2.0) * this->WPrevZoneTSTemp[1] + (1.0 / 3.0) * this->WPrevZoneTSTemp[2])) /
+            ((11.0 / 6.0) * C + A);
         // Exact solution
     } break;
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
         if (A == 0.0) { // B=0
-            zoneAirHumRatTemp = zoneW1 + B / C;
+            this->ZoneAirHumRatTemp = this->ZoneW1 + B / C;
         } else {
-            zoneAirHumRatTemp = (zoneW1 - B / A) * std::exp(min(700.0, -A / C)) + B / A;
+            this->ZoneAirHumRatTemp = (this->ZoneW1 - B / A) * std::exp(min(700.0, -A / C)) + B / A;
         }
     } break;
     case DataHeatBalance::SolutionAlgo::EulerMethod: {
-        zoneAirHumRatTemp = (C * zoneW1 + B) / (C + A);
+        this->ZoneAirHumRatTemp = (C * this->ZoneW1 + B) / (C + A);
     } break;
     default:
         break;
     }
 
     // Set the humidity ratio to zero if the zone has been dried out
-    if (zoneAirHumRatTemp < 0.0) zoneAirHumRatTemp = 0.0;
+    if (this->ZoneAirHumRatTemp < 0.0) this->ZoneAirHumRatTemp = 0.0;
 
     // Check to make sure that is saturated there is condensation in the zone
     // by resetting to saturation conditions.
-    Real64 const WZSat = Psychrometrics::PsyWFnTdbRhPb(state, thisZoneHB.ZT, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
+    Real64 const WZSat = Psychrometrics::PsyWFnTdbRhPb(state, this->ZT, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
 
-    if (zoneAirHumRatTemp > WZSat) zoneAirHumRatTemp = WZSat;
+    if (this->ZoneAirHumRatTemp > WZSat) this->ZoneAirHumRatTemp = WZSat;
 
-    if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
-        zoneAirHumRatTemp = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum)
-                                .Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID)
-                                .HumRat;
+    if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+        this->ZoneAirHumRatTemp = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum)
+                                      .Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).ControlAirNodeID)
+                                      .HumRat;
     }
 
     // HybridModel with measured humidity ratio begins
-    if ((state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_H || state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_H) &&
+    if ((state.dataHybridModel->HybridModelZone(zoneNum).InfiltrationCalc_H || state.dataHybridModel->HybridModelZone(zoneNum).PeopleCountCalc_H) &&
         (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
         Real64 LatentGainExceptPeople = 0.0;
-        if (state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_H) {
-            LatentGainExceptPeople = thisZoneHB.ZoneLatentGainExceptPeople + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) +
-                                     state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
+        if (state.dataHybridModel->HybridModelZone(zoneNum).PeopleCountCalc_H) {
+            LatentGainExceptPeople = this->ZoneLatentGainExceptPeople + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) +
+                                     state.dataHeatBalFanSys->SumLatentPool(zoneNum);
         }
 
-        InverseModelHumidity(state, ZoneNum, LatentGain, LatentGainExceptPeople, ZoneMassFlowRate, MoistureMassFlowRate, H2OHtOfVap, RhoAir);
+        InverseModelHumidity(state, zoneNum, LatentGain, LatentGainExceptPeople, ZoneMassFlowRate, MoistureMassFlowRate, H2OHtOfVap, RhoAir);
     }
 
     // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
     int ZoneNodeNum = zone.SystemZoneNodeNumber;
     if (ZoneNodeNum > 0) {
-        state.dataLoopNodes->Node(ZoneNodeNum).HumRat = thisZoneHB.ZoneAirHumRatTemp;
-        state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(thisZoneHB.ZT, thisZoneHB.ZoneAirHumRatTemp);
+        state.dataLoopNodes->Node(ZoneNodeNum).HumRat = this->ZoneAirHumRatTemp;
+        state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(this->ZT, this->ZoneAirHumRatTemp);
     }
     if (state.dataHeatBal->DoLatentSizing) {
-        auto &thisZoneSysMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum);
-        thisZoneSysMoistureDemand.ZoneLTLoadHeatRate = std::abs(min(LatentGain, 0.0));
-        thisZoneSysMoistureDemand.ZoneLTLoadCoolRate = max(LatentGain, 0.0);
-        thisZoneSysMoistureDemand.ZoneLTLoadHeatEnergy =
-            thisZoneSysMoistureDemand.ZoneLTLoadHeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        thisZoneSysMoistureDemand.ZoneLTLoadCoolEnergy =
-            thisZoneSysMoistureDemand.ZoneLTLoadCoolRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        Real64 sensibleLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadHeatRate +
-                              state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadCoolRate;
-        if ((sensibleLoad + LatentGain) != 0.0) {
-            thisZoneSysMoistureDemand.ZoneSensibleHeatRatio = sensibleLoad / (sensibleLoad + LatentGain);
-        } else if (sensibleLoad != 0.0) {
-            thisZoneSysMoistureDemand.ZoneSensibleHeatRatio = 1.0;
+        Real64 sensibleLoad = 0.0;
+        Real64 pSat = Psychrometrics::PsyPsatFnTemp(state, this->ZT, RoutineName);
+        Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, this->ZoneAirHumRatTemp, state.dataEnvrn->StdBaroPress);
+        Real64 vaporPressureDiff = pSat - Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName);
+        if (spaceNum > 0) {
+            sensibleLoad = state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).ZoneSNLoadHeatRate +
+                           state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).ZoneSNLoadCoolRate;
+            state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum).reportZoneAirSystemMoistureLoads(
+                state, LatentGain, sensibleLoad, vaporPressureDiff);
         } else {
-            thisZoneSysMoistureDemand.ZoneSensibleHeatRatio = 0.0;
+            sensibleLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).ZoneSNLoadHeatRate +
+                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).ZoneSNLoadCoolRate;
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum).reportZoneAirSystemMoistureLoads(
+                state, LatentGain, sensibleLoad, vaporPressureDiff);
         }
-        Real64 pSat = Psychrometrics::PsyPsatFnTemp(state, thisZoneHB.ZT, RoutineName);
-        Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, thisZoneHB.ZoneAirHumRatTemp, state.dataEnvrn->StdBaroPress);
-        thisZoneSysMoistureDemand.ZoneVaporPressureDifference = pSat - Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName);
     }
 }
 
@@ -5630,7 +5613,7 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
         if (spaceNum == 0) {
             this->SumIntGain += InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, zoneNum, 0);
         } else {
-            this->SumIntGain = InternalHeatGains::spaceSumAllReturnAirConvectionGains(state, spaceNum, 0);
+            this->SumIntGain += InternalHeatGains::spaceSumAllReturnAirConvectionGains(state, spaceNum, 0);
         }
     }
 
@@ -5710,9 +5693,9 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
     SumHATOutput sumHATResults; // space or zone return values
     sumHATResults = this->calcSumHAT(state, zoneNum, spaceNum);
     this->SumIntGain += sumHATResults.sumIntGain;
-    this->SumHA += sumHATResults.sumHA;
-    this->SumHATsurf += sumHATResults.sumHATsurf;
-    this->SumHATref += sumHATResults.sumHATref;
+    this->SumHA = sumHATResults.sumHA;
+    this->SumHATsurf = sumHATResults.sumHATsurf;
+    this->SumHATref = sumHATResults.sumHATref;
 }
 
 SumHATOutput ZoneHeatBalanceData::calcSumHAT(EnergyPlusData &state, int const zoneNum, [[maybe_unused]] int const spaceNum)

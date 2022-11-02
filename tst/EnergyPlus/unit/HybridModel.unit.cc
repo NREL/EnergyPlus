@@ -267,7 +267,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     thisZoneHB.MCPTV = 270.10;
     state->dataEnvrn->OutBaroPress = 99500;
 
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(0.5, state->dataHeatBal->Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 4: Hybrid model people count with measured temperature (free-floating)
@@ -326,7 +326,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataScheduleMgr->Schedule(state->dataHybridModel->HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue =
         0.002506251487737;
 
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(4, state->dataHeatBal->Zone(1).NumOccHM, 0.1);
 
     // Case 6: Hybrid model infiltration with measured temperature (with HVAC)
@@ -391,7 +391,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataScheduleMgr->Schedule(state->dataHybridModel->HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.8345;
     state->dataEnvrn->OutBaroPress = 99500;
 
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(0.5, state->dataHeatBal->Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 8: Hybrid model people count with measured temperature (with HVAC)
@@ -466,7 +466,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataScheduleMgr->Schedule(state->dataHybridModel->HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
     state->dataEnvrn->OutBaroPress = 99500;
 
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(4, state->dataHeatBal->Zone(1).NumOccHM, 0.1);
 }
 

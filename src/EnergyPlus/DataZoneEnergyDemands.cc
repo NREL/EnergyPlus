@@ -94,6 +94,13 @@ void ZoneSystemMoistureDemand::beginEnvironmentInit()
     this->ZoneMoisturePredictedHumSPRate = 0.0;
     this->ZoneMoisturePredictedDehumSPRate = 0.0;
 }
+void ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads(EnergyPlusData &state, Real64 const SNLoad)
+{
+    this->ZoneSNLoadHeatRate = max(SNLoad, 0.0);
+    this->ZoneSNLoadCoolRate = std::abs(min(SNLoad, 0.0));
+    this->ZoneSNLoadHeatEnergy = this->ZoneSNLoadHeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->ZoneSNLoadCoolEnergy = this->ZoneSNLoadCoolRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+}
 void ZoneSystemSensibleDemand::reportSensibleLoadsZoneMultiplier(
     EnergyPlusData &state, int const zoneNum, Real64 const totalLoad, Real64 const loadToHeatingSetPoint, Real64 const loadToCoolingSetPoint)
 {
@@ -116,6 +123,25 @@ void ZoneSystemSensibleDemand::reportSensibleLoadsZoneMultiplier(
             this->SequencedOutputRequiredToCoolingSP(equipNum) = this->OutputRequiredToCoolingSP;
         }
     }
+}
+
+void ZoneSystemMoistureDemand::reportZoneAirSystemMoistureLoads(EnergyPlusData &state,
+                                                                Real64 const latentGain,
+                                                                Real64 const sensibleLoad,
+                                                                Real64 const vaporPressureDiff)
+{
+    this->ZoneLTLoadHeatRate = std::abs(min(latentGain, 0.0));
+    this->ZoneLTLoadCoolRate = max(latentGain, 0.0);
+    this->ZoneLTLoadHeatEnergy = this->ZoneLTLoadHeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->ZoneLTLoadCoolEnergy = this->ZoneLTLoadCoolRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    if ((sensibleLoad + latentGain) != 0.0) {
+        this->ZoneSensibleHeatRatio = sensibleLoad / (sensibleLoad + latentGain);
+    } else if (sensibleLoad != 0.0) {
+        this->ZoneSensibleHeatRatio = 1.0;
+    } else {
+        this->ZoneSensibleHeatRatio = 0.0;
+    }
+    this->ZoneVaporPressureDifference = vaporPressureDiff;
 }
 
 void ZoneSystemMoistureDemand::reportMoistLoadsZoneMultiplier(

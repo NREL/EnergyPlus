@@ -247,6 +247,8 @@ namespace ZoneTempPredictorCorrector {
                               int const zoneNum,
                               int const spaceNum = 0);
 
+        void correctHumRat(EnergyPlusData &state, int const zoneNum, int const spaceNum = 0);
+
         void calcPredictedHumidityRatio(EnergyPlusData &state, Real64 const RAFNFrac, int const zoneNum, int const spaceNum = 0);
     };
 
@@ -296,8 +298,6 @@ namespace ZoneTempPredictorCorrector {
     void PushSystemTimestepHistories(EnergyPlusData &state);
 
     void RevertZoneTimestepHistories(EnergyPlusData &state);
-
-    void CorrectZoneHumRat(EnergyPlusData &state, int ZoneNum);
 
     void DownInterpolate4HistoryValues(Real64 OldTimeStep,
                                        Real64 NewTimeStep,

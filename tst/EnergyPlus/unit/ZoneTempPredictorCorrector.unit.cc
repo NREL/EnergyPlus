@@ -181,7 +181,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     // HybridModel
     state->dataHybridModel->HybridModelZone(1).PeopleCountCalc_H = false;
 
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Case 2 - Unbalanced exhaust flow
@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     thisZoneHB.MixingMassFlowZone = 0.0;
     thisZoneHB.MDotOA = 0.0;
 
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Case 3 - Balanced exhaust flow with proper source flow from mixing
@@ -235,7 +235,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     thisZoneHB.MixingMassFlowZone = 0.02;
     thisZoneHB.MDotOA = 0.0;
 
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Case 4 - Balanced exhaust flow without source flow from mixing
@@ -262,16 +262,16 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     thisZoneHB.MixingMassFlowZone = 0.0;
     thisZoneHB.MDotOA = 0.0;
 
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Add a section to check #6119 by L. Gu on 5/16/17
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 
     // Issue 6233
     state->dataHeatBal->Zone(1).IsControlled = true;
-    CorrectZoneHumRat(*state, 1);
+    thisZoneHB.correctHumRat(*state, 1);
     EXPECT_NEAR(0.008, state->dataLoopNodes->Node(5).HumRat, 0.00001);
 }
 
