@@ -226,6 +226,13 @@ namespace ZoneTempPredictorCorrector {
 
         void beginEnvironmentInit(EnergyPlusData &state);
 
+        void predictSystemLoad(EnergyPlusData &state,
+                               bool shortenTimeStepSys,
+                               bool useZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
+                               Real64 priorTimeStep,        // the old value for timestep length is passed for possible use in interpolating
+                               int zoneNum,
+                               int spaceNum = 0);
+
         void calcPredictedSystemLoad(EnergyPlusData &state, Real64 RAFNFrac, int zoneNum, int spaceNum = 0);
 
         void calcZoneOrSpaceSums(EnergyPlusData &state,
