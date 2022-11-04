@@ -697,7 +697,7 @@ namespace HeatingCoils {
                                        Alphas(1)));
                 state.dataHeatingCoils->InputErrorsFound = true;
             }
-            std::string const FuelType(GetResourceTypeChar(heatingCoil.ResourceType));
+            std::string const FuelType(DataGlobalConstants::ResourceTypeNames[static_cast<int>(heatingCoil.ResourceType)]);
 
             heatingCoil.Efficiency = Numbers(1);
             heatingCoil.NominalCapacity = Numbers(2);

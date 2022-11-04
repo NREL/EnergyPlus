@@ -1232,7 +1232,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
 
             elcc->CashFlow[cashFlowCounter].Resource = iResource;
             elcc->CashFlow[cashFlowCounter].SourceKind = SourceKindType::Resource;
-            elcc->CashFlow[cashFlowCounter].name = GetResourceTypeChar(iResource);
+            elcc->CashFlow[cashFlowCounter].name = DataGlobalConstants::ResourceTypeNames[static_cast<int>(iResource)];
             if (cashFlowCounter <= elcc->numCashFlow) {
                 // put the monthly energy costs into the cashflow prior to adjustments
                 // energy costs (a.k.a. resource costs) start at the start of service and repeat
@@ -1778,7 +1778,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         for (jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
             columnHead(jObj) = elcc->UsePriceEscalation(jObj).name;
-            tableBody(jObj, 1) = GetResourceTypeChar(elcc->UsePriceEscalation(jObj).resource);
+            tableBody(jObj, 1) = DataGlobalConstants::ResourceTypeNames[static_cast<int>(elcc->UsePriceEscalation(jObj).resource)];
             tableBody(jObj, 2) = format("{} {}",
                                         UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->UsePriceEscalation(jObj).escalationStartMonth)],
                                         elcc->UsePriceEscalation(jObj).escalationStartYear);
@@ -1819,7 +1819,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
             for (jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = elcc->UseAdjustment(jObj).name;
-                tableBody(jObj, 1) = GetResourceTypeChar(elcc->UseAdjustment(jObj).resource);
+                tableBody(jObj, 1) = DataGlobalConstants::ResourceTypeNames[static_cast<int>(elcc->UseAdjustment(jObj).resource)];
             }
             for (jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) {
                 for (iYear = 1; iYear <= numYears; ++iYear) {

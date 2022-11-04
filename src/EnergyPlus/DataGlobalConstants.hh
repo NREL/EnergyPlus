@@ -277,8 +277,6 @@ namespace DataGlobalConstants {
     int constexpr ScheduleAlwaysOn = -1;                    // Value when passed to schedule routines gives back 1.0 (on)
     int constexpr MaxCTFTerms = 19; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
-    std::string GetResourceTypeChar(ResourceType ResourceTypeNum);
-
 } // namespace DataGlobalConstants
 
 struct DataGlobalConstantsData : BaseGlobalStruct
