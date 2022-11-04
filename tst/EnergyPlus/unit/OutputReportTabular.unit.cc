@@ -6627,21 +6627,31 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
+    state->dataHeatBal->People.allocate(2);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(2).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 3;
+    state->dataHeatBal->People(2).NumberOfPeople = 5;
+
     CollectPeakZoneConditions(*state, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
     EXPECT_EQ(compLoad.peakDateHrMin, "5/21 15:45:00");
     EXPECT_EQ(compLoad.outsideDryBulb, 38.);
     EXPECT_EQ(compLoad.outsideHumRatio, 0.01459);
+    EXPECT_NEAR(compLoad.outsideWetBulb, 25.003, 0.001);
     EXPECT_EQ(compLoad.zoneDryBulb, 24.);
     EXPECT_EQ(compLoad.zoneHumRatio, 0.00979);
+    EXPECT_NEAR(compLoad.zoneRelHum, 0.526, 0.001);
     EXPECT_EQ(compLoad.peakDesSensLoad, 500.);
     EXPECT_EQ(compLoad.designPeakLoad, 600.);
     EXPECT_EQ(compLoad.supAirTemp, 13.);
     EXPECT_EQ(compLoad.mainFanAirFlow, 3.3);
+    EXPECT_EQ(compLoad.numPeople, 8.0);
     EXPECT_NEAR(compLoad.airflowPerFlrArea, 3.3 / 12., 0.0001);
     EXPECT_NEAR(compLoad.totCapPerArea, 600. / 12., 0.0001);
     EXPECT_NEAR(compLoad.airflowPerTotCap, 3.3 / 600., 0.0001);
     EXPECT_NEAR(compLoad.areaPerTotCap, 12. / 600., 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->StdBaroPress, 101325.0, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ComputeEngineeringChecks_test)
