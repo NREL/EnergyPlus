@@ -130,7 +130,7 @@ namespace HybridModel {
         state.dataHybridModel->NumOfHybridModelZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (state.dataHybridModel->NumOfHybridModelZones > 0) {
-        state.dataHybridModel->HybridModelZone.allocate(state.dataGlobal->NumOfZones);
+            state.dataHybridModel->HybridModelZone.allocate(state.dataGlobal->NumOfZones);
             for (int HybridModelNum = 1; HybridModelNum <= state.dataHybridModel->NumOfHybridModelZones; ++HybridModelNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,

@@ -4428,6 +4428,11 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         ShowSevereError(state, "Too many " + cCurrentModuleObject + ".  Cannot exceed the number of Zones.");
         ErrorsFound = true;
     }
+    if (NumOfAirModels > 0) {
+        state.dataRoomAirMod->IsZoneDV.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataRoomAirMod->IsZoneCV.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataRoomAirMod->IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
+    }
 
     for (AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
