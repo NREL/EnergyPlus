@@ -103,6 +103,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     // ZoneTempPredictorCorrector variable initialization
     state->dataHeatBal->Zone.allocate(1);
     state->dataHybridModel->HybridModelZone.allocate(1);
+    state->dataHybridModel->FlagHybridModel = true;
     state->dataRoomAirMod->AirModel.allocate(1);
     state->dataRoomAirMod->ZTOC.allocate(1);
     state->dataRoomAirMod->ZTMX.allocate(1);
@@ -476,6 +477,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     // ZoneContaminantPredictorCorrector variable initialization
     state->dataHeatBal->Zone.allocate(1);
     state->dataHybridModel->HybridModelZone.allocate(1);
+    state->dataHybridModel->FlagHybridModel = true;
     state->dataRoomAirMod->AirModel.allocate(1);
     state->dataRoomAirMod->ZTOC.allocate(1);
     state->afn->exchangeData.allocate(1);

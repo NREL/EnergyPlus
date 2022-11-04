@@ -3694,7 +3694,6 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
             this->AirPowerCap = thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).AirVolume * state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens *
                                 thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).RhoAir * thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).CpAir /
                                 (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-            this->AirPowerCap = this->AirPowerCap;
             this->TempHistoryTerm = this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2]);
             this->TempDepZnLd = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
             this->TempIndZnLd = this->TempHistoryTerm + this->TempIndCoef;
@@ -4561,7 +4560,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
 
     // Hybrid modeling start
     // SpaceHB TODO: For now, hybrid model is only for zones
-    if (spaceNum == 0) {
+    if (spaceNum == 0 && state.dataHybridModel->FlagHybridModel) {
         if ((state.dataHybridModel->HybridModelZone(zoneNum).InfiltrationCalc_T ||
              state.dataHybridModel->HybridModelZone(zoneNum).InternalThermalMassCalc_T ||
              state.dataHybridModel->HybridModelZone(zoneNum).PeopleCountCalc_T) &&
@@ -4627,39 +4626,6 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
         break;
     }
 
-    // if (!state.dataGlobal->DoingSizing) {
-    //     ShowContinueErrorTimeStamp(state,
-    //                                format("correctAirTemps: Zone {}, Space {}, tempChange={}, ZT={}, ZTM[0]={}, ZTM[1]={}, ZTM[2]={}, ZTM[3]={}",
-    //                                       zoneNum,
-    //                                       spaceNum,
-    //                                       tempChange,
-    //                                       this->ZT,
-    //                                       this->ZTM[0],
-    //                                       this->ZTM[1],
-    //                                       this->ZTM[2],
-    //                                       this->ZTM[3]));
-    //     ShowContinueError(state,
-    //                       format("correctAirTemps: Zone {}, Space {}, tempChange={}, ZT={}, XMAT[0]={}, XMAT[1]={}, XMAT[2]={}, XMAT[3]={}",
-    //                              zoneNum,
-    //                              spaceNum,
-    //                              tempChange,
-    //                              this->ZT,
-    //                              this->XMAT[0],
-    //                              this->XMAT[1],
-    //                              this->XMAT[2],
-    //                              this->XMAT[3]));
-    //     ShowContinueError(state,
-    //                       format("correctAirTemps: Zone {}, Space {}, tempChange={}, ZT={}, DSXMAT[0]={}, DSXMAT[1]={}, DSXMAT[2]={},
-    //                       DSXMAT[3]={}",
-    //                              zoneNum,
-    //                              spaceNum,
-    //                              tempChange,
-    //                              this->ZT,
-    //                              this->DSXMAT[0],
-    //                              this->DSXMAT[1],
-    //                              this->DSXMAT[2],
-    //                              this->DSXMAT[3]));
-    // }
     CalcZoneComponentLoadSums(state,
                               zoneNum,
                               this->TempDepCoef,
@@ -5081,15 +5047,19 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
     }
 
     // HybridModel with measured humidity ratio begins
-    if ((state.dataHybridModel->HybridModelZone(zoneNum).InfiltrationCalc_H || state.dataHybridModel->HybridModelZone(zoneNum).PeopleCountCalc_H) &&
-        (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
-        Real64 LatentGainExceptPeople = 0.0;
-        if (state.dataHybridModel->HybridModelZone(zoneNum).PeopleCountCalc_H) {
-            LatentGainExceptPeople = this->ZoneLatentGainExceptPeople + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) +
-                                     state.dataHeatBalFanSys->SumLatentPool(zoneNum);
-        }
+    // SpaceHB TODO: For now, hybrid model is only for zones
+    if (spaceNum == 0 && state.dataHybridModel->FlagHybridModel) {
+        if ((state.dataHybridModel->HybridModelZone(zoneNum).InfiltrationCalc_H ||
+             state.dataHybridModel->HybridModelZone(zoneNum).PeopleCountCalc_H) &&
+            (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
+            Real64 LatentGainExceptPeople = 0.0;
+            if (state.dataHybridModel->HybridModelZone(zoneNum).PeopleCountCalc_H) {
+                LatentGainExceptPeople = this->ZoneLatentGainExceptPeople + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) +
+                                         state.dataHeatBalFanSys->SumLatentPool(zoneNum);
+            }
 
-        InverseModelHumidity(state, zoneNum, LatentGain, LatentGainExceptPeople, ZoneMassFlowRate, MoistureMassFlowRate, H2OHtOfVap, RhoAir);
+            InverseModelHumidity(state, zoneNum, LatentGain, LatentGainExceptPeople, ZoneMassFlowRate, MoistureMassFlowRate, H2OHtOfVap, RhoAir);
+        }
     }
 
     // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone

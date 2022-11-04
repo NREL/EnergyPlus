@@ -2532,10 +2532,12 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             if (zoneAirCO2Temp < 0.0) zoneAirCO2Temp = 0.0;
             state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = zoneAirCO2Temp;
 
-            if ((state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C ||
-                 state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_C) &&
-                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
-                InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
+            if (state.dataHybridModel->FlagHybridModel) {
+                if ((state.dataHybridModel->HybridModelZone(ZoneNum).InfiltrationCalc_C ||
+                     state.dataHybridModel->HybridModelZone(ZoneNum).PeopleCountCalc_C) &&
+                    (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
+                    InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
+                }
             }
             // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
             const int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
