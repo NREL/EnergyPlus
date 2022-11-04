@@ -79,7 +79,6 @@ set(test_src
     DOASEffectOnZoneSizing.unit.cc
     DXCoils.unit.cc
     DataEnvironment.unit.cc
-    DataGlobalConstants.unit.cc
     DataHeatBalance.unit.cc
     DataPlant.unit.cc
     DataRuntimeLanguage.unit.cc
