@@ -6968,20 +6968,16 @@ namespace InternalHeatGains {
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
                 if (state.dataHeatBal->People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
-                    if (!(state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ))) {
-                        SensiblePeopleGain =
-                            NumberOccupants *
-                            (C[0] + ActivityLevel_WperPerson * (C[1] + ActivityLevel_WperPerson * C[2]) +
-                             thisZoneHB.MAT * ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
-                                               thisZoneHB.MAT * (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
-                    } else { // UCSD - DV or UI
-                        SensiblePeopleGain =
-                            NumberOccupants *
-                            (C[0] + ActivityLevel_WperPerson * (C[1] + ActivityLevel_WperPerson * C[2]) +
-                             state.dataRoomAirMod->TCMF(NZ) *
-                                 ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
-                                  state.dataRoomAirMod->TCMF(NZ) * (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
+                    Real64 airTemp = thisZoneHB.MAT;
+                    if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
+                        if (state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ)) {
+                            airTemp = state.dataRoomAirMod->TCMF(NZ);
+                        }
                     }
+                    SensiblePeopleGain =
+                        NumberOccupants * (C[0] + ActivityLevel_WperPerson * (C[1] + ActivityLevel_WperPerson * C[2]) +
+                                           airTemp * ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
+                                                      airTemp * (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
                 } else { // if the user did specify a sensible fraction, use it
                     SensiblePeopleGain = TotalPeopleGain * state.dataHeatBal->People(Loop).UserSpecSensFrac;
                 }

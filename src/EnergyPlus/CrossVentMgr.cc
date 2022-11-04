@@ -392,6 +392,7 @@ namespace CrossVentMgr {
         int NodeNum1(0); // The first node number in an AirflowNetwork linkage data
         int NodeNum2(0); // The Second node number in an AirflowNetwork linkage data
 
+        assert(state.dataRoomAirMod->AirModel.allocated());
         state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
         auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 

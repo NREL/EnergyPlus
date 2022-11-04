@@ -704,7 +704,7 @@ namespace DataRoomAirModel {
 
 struct RoomAirModelData : BaseGlobalStruct
 {
-
+    bool anyNonMixingRoomAirModel = false; // True if any zone RoomAirModelType is not Mixing
     int TotNumOfAirNodes = 0;
     int TotNumOfRoomAFNNodes = 0;
     Array1D_int TotNumOfZoneAirNodes;
@@ -845,6 +845,7 @@ struct RoomAirModelData : BaseGlobalStruct
 
     void clear_state() override
     {
+        anyNonMixingRoomAirModel = false;
         TotNumOfAirNodes = 0;
         TotNumOfRoomAFNNodes = 0;
         TotNumOfZoneAirNodes.clear();

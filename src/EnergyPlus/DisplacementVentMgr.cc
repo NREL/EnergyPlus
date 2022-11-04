@@ -573,6 +573,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     auto &TempIndCoef = state.dataDispVentMgr->TempIndCoef;
 
     Real64 RetAirGain;
+    assert(state.dataRoomAirMod->AirModel.allocated());
 
     // Exact solution or Euler method
     if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {

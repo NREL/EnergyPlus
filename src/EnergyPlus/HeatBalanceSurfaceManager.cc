@@ -336,9 +336,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             std::any_of(state.dataViewFactor->EnclSolInfo.begin(),
                         state.dataViewFactor->EnclSolInfo.end(),
                         [](DataViewFactorInformation::EnclosureViewFactorInformation const &e) { return e.HasInterZoneWindow; });
-        state.dataRoomAirMod->IsZoneDV.dimension(state.dataGlobal->NumOfZones, false);
-        state.dataRoomAirMod->IsZoneCV.dimension(state.dataGlobal->NumOfZones, false);
-        state.dataRoomAirMod->IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
     }
     if (state.dataGlobal->BeginSimFlag || state.dataGlobal->AnySurfPropOverridesInModel) {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
@@ -1277,20 +1274,9 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   February 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine
 
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger variable allocation.
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    //  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
 
     auto &Surface(state.dataSurface->Surface);
 

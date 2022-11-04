@@ -4591,6 +4591,10 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         // this used to be an if (NumOfAirModels == 0) block, but both the IF and the ELSE had the same content, these two lines:
         state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + state.dataHeatBal->Zone(ZoneNum).Name;
         state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
+        // set global flag for non-mixing model
+        if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
+            state.dataRoomAirMod->anyNonMixingRoomAirModel = true;
+        }
     }
 
     // Write RoomAir Model details onto EIO file

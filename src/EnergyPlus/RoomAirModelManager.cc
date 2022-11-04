@@ -122,6 +122,8 @@ namespace RoomAirModelManager {
             state.dataRoomAirModelMgr->GetAirModelData = false;
         }
 
+        if (!state.dataRoomAirMod->anyNonMixingRoomAirModel) return;
+
         if (state.dataRoomAirMod->UCSDModelUsed) {
             SharedDVCVUFDataInit(state, ZoneNum);
         }

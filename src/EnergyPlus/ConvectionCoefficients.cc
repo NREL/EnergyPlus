@@ -3231,6 +3231,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
             }
         }
 
+        assert(state.dataRoomAirMod->AirModel.allocated());
         if (state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
             state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
             state.dataRoomAirMod->AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
