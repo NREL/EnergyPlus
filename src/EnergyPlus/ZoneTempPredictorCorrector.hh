@@ -226,6 +226,8 @@ namespace ZoneTempPredictorCorrector {
 
         void beginEnvironmentInit(EnergyPlusData &state);
 
+        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name);
+
         void predictSystemLoad(EnergyPlusData &state,
                                bool shortenTimeStepSys,
                                bool useZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step

@@ -73,6 +73,9 @@ namespace DataZoneEnergyDemands {
         // 0 no load, >0 Heating stage, <0 Cooling stage
 
         virtual void beginEnvironmentInit() = 0;
+
+        virtual void
+        setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name, int zoneMult, int listMult, bool staged) = 0;
     };
 
     struct ZoneSystemSensibleDemand : ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
@@ -99,6 +102,8 @@ namespace DataZoneEnergyDemands {
         Real64 ZoneSNLoadCoolEnergy = 0.0;                   // sensible cooling energy [J] (unmultiplied)
 
         void beginEnvironmentInit() override;
+
+        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name, int zoneMult, int listMult, bool staged) override;
 
         void reportZoneAirSystemSensibleLoads(EnergyPlusData &state, Real64 SNLoad);
 
@@ -132,6 +137,13 @@ namespace DataZoneEnergyDemands {
         Real64 ZoneVaporPressureDifference = 0.0;            // vapor pressure depression [Pa]
 
         void beginEnvironmentInit() override;
+
+        void setUpOutputVars(EnergyPlusData &state,
+                             std::string_view prefix,
+                             std::string_view name,
+                             [[maybe_unused]] int zoneMult,
+                             [[maybe_unused]] int listMult,
+                             [[maybe_unused]] bool staged) override;
 
         void reportZoneAirSystemMoistureLoads(EnergyPlusData &state, Real64 latentGain, Real64 sensibleLoad, Real64 vaporPressureDiff);
 

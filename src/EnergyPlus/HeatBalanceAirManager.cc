@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -338,152 +339,81 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     // Following used for reporting
     state.dataHeatBal->ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
+    if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+        state.dataHeatBal->spaceAirRpt.allocate(state.dataGlobal->NumOfZones);
+    }
 
     for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+        std::string_view name = state.dataHeatBal->Zone(Loop).Name;
+        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(Loop);
+        thisZnAirRpt.setUpOutputVars(state, DataStringGlobals::zonePrefix, name);
+        if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+            for (int spaceNum : state.dataHeatBal->Zone(Loop).spaceIndexes) {
+                state.dataHeatBal->spaceAirRpt(spaceNum).setUpOutputVars(
+                    state, DataStringGlobals::spacePrefix, state.dataHeatBal->space(spaceNum).Name);
+            }
+        }
+
         // CurrentModuleObject='Zone'
-        SetupOutputVariable(state,
-                            "Zone Mean Air Temperature",
-                            OutputProcessor::Unit::C,
-                            state.dataHeatBal->ZnAirRpt(Loop).MeanAirTemp,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Operative Temperature",
-                            OutputProcessor::Unit::C,
-                            state.dataHeatBal->ZnAirRpt(Loop).OperativeTemp,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Mean Air Dewpoint Temperature",
-                            OutputProcessor::Unit::C,
-                            state.dataHeatBal->ZnAirRpt(Loop).MeanAirDewPointTemp,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Mean Air Humidity Ratio",
-                            OutputProcessor::Unit::kgWater_kgDryAir,
-                            state.dataHeatBal->ZnAirRpt(Loop).MeanAirHumRat,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Internal Convective Heat Gain Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumIntGains,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Surface Convection Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumHADTsurfs,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Interzone Air Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumMCpDTzones,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Outdoor Air Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumMCpDtInfil,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance System Air Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumMCpDTsystem,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance System Convective Heat Gain Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).SumNonAirSystem,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
-        SetupOutputVariable(state,
-                            "Zone Air Heat Balance Air Energy Storage Rate",
-                            OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).CzdTdt,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
             SetupOutputVariable(state,
                                 "Zone Phase Change Material Melting Enthalpy",
                                 OutputProcessor::Unit::J_kg,
-                                state.dataHeatBal->ZnAirRpt(Loop).SumEnthalpyM,
+                                thisZnAirRpt.SumEnthalpyM,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
+                                name);
             SetupOutputVariable(state,
                                 "Zone Phase Change Material Freezing Enthalpy",
                                 OutputProcessor::Unit::J_kg,
-                                state.dataHeatBal->ZnAirRpt(Loop).SumEnthalpyH,
+                                thisZnAirRpt.SumEnthalpyH,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
-            SetupOutputVariable(state,
-                                "Zone Air Heat Balance Deviation Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZnAirRpt(Loop).imBalance,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(Loop).Name);
+                                name);
         }
 
         SetupOutputVariable(state,
                             "Zone Exfiltration Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExfilTotalLoss,
+                            thisZnAirRpt.ExfilTotalLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exfiltration Sensible Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExfilSensiLoss,
+                            thisZnAirRpt.ExfilSensiLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exfiltration Latent Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExfilLatentLoss,
+                            thisZnAirRpt.ExfilLatentLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exhaust Air Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExhTotalLoss,
+                            thisZnAirRpt.ExhTotalLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exhaust Air Sensible Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExhSensiLoss,
+                            thisZnAirRpt.ExhSensiLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
         SetupOutputVariable(state,
                             "Zone Exhaust Air Latent Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHeatBal->ZnAirRpt(Loop).ExhLatentLoss,
+                            thisZnAirRpt.ExhLatentLoss,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHeatBal->Zone(Loop).Name);
+                            name);
     }
 
     SetupOutputVariable(state,

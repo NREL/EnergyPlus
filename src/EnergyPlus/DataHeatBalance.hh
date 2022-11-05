@@ -1687,6 +1687,8 @@ namespace DataHeatBalance {
         Real64 OABalanceFanElec = 0.0;       // Fan Electricity {W} due to OA air balance
         Real64 SumEnthalpyM = 0.0;           // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;           // Zone sum of EnthalpyH
+
+        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name);
     };
 
     struct ZonePreDefRepType
@@ -2273,6 +2275,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimVS_DXCoil;
     EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
     EPVector<DataHeatBalance::AirReportVars> ZnAirRpt;
+    EPVector<DataHeatBalance::AirReportVars> spaceAirRpt;
     EPVector<DataHeatBalance::TCGlazingsType> TCGlazings;
     EPVector<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
     EPVector<DataHeatBalance::ZoneReportVars> ZoneRpt;

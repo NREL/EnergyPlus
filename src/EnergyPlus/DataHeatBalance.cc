@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::DataHeatBalance {
@@ -200,6 +201,96 @@ void ZoneData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
 void ZoneData::SetWindDirAt(Real64 const fac)
 {
     WindDir = fac;
+}
+
+void AirReportVars::setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name)
+{
+    SetupOutputVariable(state,
+                        format("{} Mean Air Temperature", prefix),
+                        OutputProcessor::Unit::C,
+                        this->MeanAirTemp,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Operative Temperature", prefix),
+                        OutputProcessor::Unit::C,
+                        this->OperativeTemp,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Mean Air Dewpoint Temperature", prefix),
+                        OutputProcessor::Unit::C,
+                        this->MeanAirDewPointTemp,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Mean Air Humidity Ratio", prefix),
+                        OutputProcessor::Unit::kgWater_kgDryAir,
+                        this->MeanAirHumRat,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Internal Convective Heat Gain Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumIntGains,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Surface Convection Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumHADTsurfs,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Interzone Air Transfer Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumMCpDTzones,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Outdoor Air Transfer Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumMCpDtInfil,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance System Air Transfer Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumMCpDTsystem,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance System Convective Heat Gain Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->SumNonAirSystem,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    SetupOutputVariable(state,
+                        format("{} Air Heat Balance Air Energy Storage Rate", prefix),
+                        OutputProcessor::Unit::W,
+                        this->CzdTdt,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        name);
+    if (state.dataGlobal->DisplayAdvancedReportVariables) {
+        SetupOutputVariable(state,
+                            format("{} Air Heat Balance Deviation Rate", prefix),
+                            OutputProcessor::Unit::W,
+                            this->imBalance,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
+    }
 }
 
 void SetZoneOutBulbTempAt(EnergyPlusData &state)
