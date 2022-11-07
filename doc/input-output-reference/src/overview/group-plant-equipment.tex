@@ -4132,7 +4132,7 @@ Eff = normalized boiler efficiency
 
 PLR = boiler part-load ratio
 
-T\(_{w}\) = boiler water temperature {[}ºC{]} {]}, this can be either entering or leaving temperature depending on the setting in the previous field
+T\(_{w}\) = boiler water temperature {[}$^\circ$C{]}, this can be either entering or leaving temperature depending on the setting in the previous field
 
 \paragraph{Field: Design Water Flow Rate}\label{field-design-water-flow-rate-001}
 
@@ -4391,11 +4391,11 @@ This numeric field contains the maximum value of pressure up to which the boiler
 
 \paragraph{Field: Theoretical Efficiency}\label{field-theoretical-efficiency}
 
-This numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner
+This numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.
 
 \paragraph{Field: Design Outlet Steam Temperature}\label{field-design-outlet-steam-temperature}
 
-The maximum value of steam temperature the boiler can provide. (Celcius)
+The maximum value of steam temperature the boiler can provide. (Celsius)
 
 \paragraph{Field: Nominal Capacity}\label{field-nominal-capacity-7}
 
@@ -5630,7 +5630,9 @@ This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It 
 
 \paragraph{Field: Defrost Control Type}
 
-The defrost control type. There are two options for this input: \emph{Timed}, or \emph{OnDemand}. The \emph{Timed} option will use a fraction of time per hour to account for the defrost action. The \emph{OnDemand} option will work when the outdoor air temperature drops to a certain point. The default choice is \emph{Timed}.
+The defrost control type. There are two options for this input: \emph{Timed}, or \emph{OnDemand}. The \emph{Timed} option will use a fraction of time per hour to account for the defrost action. The \emph{OnDemand} option will work when the outdoor air temperature drops to a certain point. The default choice is \emph{OnDemand}.
+
+Currently, the \emph{Timed} option is to be used with an electric resistive defrost heater only (see Field: Resistive Defrost Heater Capacity). the \emph{OnDemand} option is used with fuel resources and the defrost EIR curve is used for the fuel energy adjustment.
 
 This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
@@ -5642,13 +5644,13 @@ This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It 
 
 \paragraph{Field: Resistive Defrost Heater Capacity}
 
-This numeric field defines the capacity of the resistive defrost heating element in Watts. This input field is used only when the selected defrost control is ``OnDemand''. The value for this input field must be greater than or equal to 0.0. If the input field is left blank, the default value is 0.0.
+This numeric field defines the capacity of the resistive defrost heating element in Watts. This input field is used only when the selected defrost control is ``Timed''. The value for this input field must be greater than or equal to 0.0. If the input field is left blank, the default value is 0.0.
 
 This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Defrost Operation}
 
-The maximum outdoor air dry-bulb temperature in degree [C] that the defrost operation will be turned on. When the outdoor air dry-bulb temperature rises above this temperature, the will be no defrost operation. The maximum value for this value is 10$^\circ$C. The default value is 5$^\circ$C.
+The maximum outdoor air dry-bulb temperature in degree Celsius that the defrost operation will be turned on. When the outdoor air dry-bulb temperature rises above this temperature, the will be no defrost operation. The maximum value for this value is 10$^\circ$C. The default value is 5$^\circ$C.
 
 This field applies to the HeatPump:AirToWater:FuelFired:Heating object only. It does not apply to the HeatPump:AirToWater:FuelFired:Cooling object.
 
