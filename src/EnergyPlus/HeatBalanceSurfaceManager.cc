@@ -1298,7 +1298,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         state.dataHeatBalFanSys->CTFTuserConstPart.dimension(state.dataSurface->TotSurfaces, 0.0);
     }
 
-    state.dataHeatBal->SurfTempEffBulkAir.dimension(state.dataSurface->TotSurfaces, DataHeatBalFanSys::ZoneInitialTemp);
+    state.dataHeatBal->SurfTempEffBulkAir.dimension(state.dataSurface->TotSurfaces, DataHeatBalance::ZoneInitialTemp);
     state.dataHeatBalSurf->SurfHConvInt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfHcExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfHAirExt.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -2111,14 +2111,14 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
 
     // First do the "bulk" initializations of arrays sized to NumOfZones
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        state.dataHeatBal->ZoneMRT(zoneNum) = DataHeatBalFanSys::ZoneInitialTemp; // module level array
+        state.dataHeatBal->ZoneMRT(zoneNum) = DataHeatBalance::ZoneInitialTemp; // module level array
         // TODO: Reinitializing this entire struct may cause diffs
         new (&state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum)) ZoneTempPredictorCorrector::ZoneHeatBalanceData();
         // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
         thisZoneHB.ZoneAirHumRatAvg = state.dataEnvrn->OutHumRat;
         thisZoneHB.ZoneAirHumRat = state.dataEnvrn->OutHumRat;
-        state.dataHeatBalFanSys->TempTstatAir(zoneNum) = DataHeatBalFanSys::ZoneInitialTemp;
+        state.dataHeatBalFanSys->TempTstatAir(zoneNum) = DataHeatBalance::ZoneInitialTemp;
     }
     // Reset spaceHeatBalance even if doSpaceHeatBalance is false, beause spaceHB is used to gether zoneHB in some cases
     for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {

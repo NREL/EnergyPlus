@@ -61,6 +61,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -118,25 +119,24 @@ namespace ZoneTempPredictorCorrector {
         // This entire struct is re-initialized during the simulation, so no static data may be stored here (e.g. zone or space characteristics)
 
         // Zone or space air drybulb temperature conditions
-        Real64 MAT = DataHeatBalFanSys::ZoneInitialTemp;  // Mean Air Temperature at end of zone time step [C]
-        Real64 ZTAV = DataHeatBalFanSys::ZoneInitialTemp; // Air Temperature Averaged over the zone time step (during HVAC Time Steps)
-        Real64 ZT = DataHeatBalFanSys::ZoneInitialTemp;   // Air Temperature Averaged over the system time step
-        Real64 ZTAVComf =
-            DataHeatBalFanSys::ZoneInitialTemp;           // Air Temperature Averaged used in thermal comfort models (currently Fanger model only) -
-                                                          // TODO: lagged? could MAT be used instead?
-        Real64 XMPT = DataHeatBalFanSys::ZoneInitialTemp; // Air temperature at previous system time step
-        std::array<Real64, 4> XMAT = {DataHeatBalFanSys::ZoneInitialTemp,
-                                      DataHeatBalFanSys::ZoneInitialTemp,
-                                      DataHeatBalFanSys::ZoneInitialTemp,
-                                      DataHeatBalFanSys::ZoneInitialTemp}; // Temporary air temperature history
-        std::array<Real64, 4> DSXMAT = {DataHeatBalFanSys::ZoneInitialTemp,
-                                        DataHeatBalFanSys::ZoneInitialTemp,
-                                        DataHeatBalFanSys::ZoneInitialTemp,
-                                        DataHeatBalFanSys::ZoneInitialTemp}; // Down Stepped air temperature history storage
+        Real64 MAT = DataHeatBalance::ZoneInitialTemp;      // Mean Air Temperature at end of zone time step [C]
+        Real64 ZTAV = DataHeatBalance::ZoneInitialTemp;     // Air Temperature Averaged over the zone time step (during HVAC Time Steps)
+        Real64 ZT = DataHeatBalance::ZoneInitialTemp;       // Air Temperature Averaged over the system time step
+        Real64 ZTAVComf = DataHeatBalance::ZoneInitialTemp; // Air Temperature Averaged used in thermal comfort models (currently Fanger model only) -
+                                                            // TODO: lagged? could MAT be used instead?
+        Real64 XMPT = DataHeatBalance::ZoneInitialTemp;     // Air temperature at previous system time step
+        std::array<Real64, 4> XMAT = {DataHeatBalance::ZoneInitialTemp,
+                                      DataHeatBalance::ZoneInitialTemp,
+                                      DataHeatBalance::ZoneInitialTemp,
+                                      DataHeatBalance::ZoneInitialTemp}; // Temporary air temperature history
+        std::array<Real64, 4> DSXMAT = {DataHeatBalance::ZoneInitialTemp,
+                                        DataHeatBalance::ZoneInitialTemp,
+                                        DataHeatBalance::ZoneInitialTemp,
+                                        DataHeatBalance::ZoneInitialTemp}; // Down Stepped air temperature history storage
         // Exact and Euler solutions
-        Real64 ZoneTMX = DataHeatBalFanSys::ZoneInitialTemp; // Temporary air temperature to test convergence in Exact and Euler method
-        Real64 ZoneTM2 = DataHeatBalFanSys::ZoneInitialTemp; // Temporary air temperature at timestep t-2 in Exact and Euler method
-        Real64 ZoneT1 = 0.0;                                 // Air temperature at the previous time step used in Exact and Euler method
+        Real64 ZoneTMX = DataHeatBalance::ZoneInitialTemp; // Temporary air temperature to test convergence in Exact and Euler method
+        Real64 ZoneTM2 = DataHeatBalance::ZoneInitialTemp; // Temporary air temperature at timestep t-2 in Exact and Euler method
+        Real64 ZoneT1 = 0.0;                               // Air temperature at the previous time step used in Exact and Euler method
 
         // Zone or space air moisture conditions
         Real64 ZoneAirHumRat = 0.01;        // Air Humidity Ratio
@@ -213,10 +213,10 @@ namespace ZoneTempPredictorCorrector {
         // HVAC time step
         Real64 MDotCPOA = 0.0; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
         Real64 MDotOA = 0.0;   // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
-        Real64 MixingMAT = DataHeatBalFanSys::ZoneInitialTemp; // Air temperature for mixing
-        Real64 MixingHumRat = 0.01;                            // Air humidity ratio for mixing
-        Real64 MixingMassFlowZone = 0.0;                       // Mixing MASS FLOW (kg/s)
-        Real64 MixingMassFlowXHumRat = 0.0;                    // Mixing MASS FLOW * Humidity Ratio
+        Real64 MixingMAT = DataHeatBalance::ZoneInitialTemp; // Air temperature for mixing
+        Real64 MixingHumRat = 0.01;                          // Air humidity ratio for mixing
+        Real64 MixingMassFlowZone = 0.0;                     // Mixing MASS FLOW (kg/s)
+        Real64 MixingMassFlowXHumRat = 0.0;                  // Mixing MASS FLOW * Humidity Ratio
 
         Real64 ZoneSetPointLast = 0.0;
         Real64 TempIndZnLd = 0.0;

@@ -66,7 +66,6 @@ namespace DataHeatBalFanSys {
     // Thus, all variables in this module must be PUBLIC.
 
     constexpr Real64 MaxRadHeatFlux = 4000.0; // [W/m2] max limit for radiant heat flux at a surface due to HVAC equipment
-    constexpr Real64 ZoneInitialTemp(23.0);   // Zone temperature for initialization
 
     enum class PredictorCorrectorCtrl
     {

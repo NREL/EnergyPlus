@@ -6000,7 +6000,7 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneMassBalanceFlag.dimension(state.dataGlobal->NumOfZones, false);
         state.dataHeatBalFanSys->ZoneInfiltrationFlag.dimension(state.dataGlobal->NumOfZones, false);
         state.dataHeatBalFanSys->ZoneReOrder = 0;
-        state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, DataHeatBalFanSys::ZoneInitialTemp);
+        state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, DataHeatBalance::ZoneInitialTemp);
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
             state.dataContaminantBalance->ZoneAirCO2.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
