@@ -1278,6 +1278,49 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // get setpoint on the load side outlet
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
 
+    // 2022-11: flow mode control simulation
+    // it seems that this should be done when the flow is unlocked?
+    // Either set the flow to the Constant value or calculate the flow for the variable volume
+    Real64 FFPLHPDeltaTemp = 0.0;
+    Real64 Cp = 4180; // should be obtained form loop
+    if ((this->flowMode == DataPlant::FlowMode::Constant) || (this->flowMode == DataPlant::FlowMode::NotModulated)) {
+        // Then find the flow rate and outlet temp
+        this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
+        PlantUtilities::SetComponentFlowRate(
+            state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->plantLoc);
+
+        if ((this->loadSideMassFlowRate != 0.0) && (currentLoad > 0.0)) {
+            FFPLHPDeltaTemp = currentLoad / this->loadSideMassFlowRate / Cp;
+        } else {
+            FFPLHPDeltaTemp = 0.0;
+        }
+        state.dataLoopNodes->Node(this->loadSideNodes.outlet).Temp = FFPLHPDeltaTemp + state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+
+    } else if (this->flowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
+        // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
+        // Then find the flow rate and outlet temp
+
+        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+            FFPLHPDeltaTemp =
+                state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint - state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+        } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
+            FFPLHPDeltaTemp =
+                state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointLo - state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+        }
+
+        state.dataLoopNodes->Node(this->loadSideNodes.outlet).Temp = FFPLHPDeltaTemp + state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+
+        if ((FFPLHPDeltaTemp > 0.0) && (currentLoad > 0.0)) {
+            this->loadSideMassFlowRate = currentLoad / Cp / FFPLHPDeltaTemp;
+            this->loadSideMassFlowRate = min(this->loadSideDesignMassFlowRate, this->loadSideMassFlowRate);
+        } else {
+            this->loadSideMassFlowRate = 0.0;
+        }
+        PlantUtilities::SetComponentFlowRate(
+            state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->plantLoc);
+
+    } // End of Constant/Variable Flow If Block
+
     // Determine which air variable to use for GAHP:
     // Source (air) side variable to use
     Real64 oaTempforCurve = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
@@ -2444,7 +2487,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         }
 
         // 2022-11: Implement plant loop flow mode control
-        //      
+        //
         // Locate the fuel fired heat pump on the plant loops for later usage
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(
