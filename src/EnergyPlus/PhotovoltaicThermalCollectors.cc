@@ -1605,10 +1605,10 @@ namespace PhotovoltaicThermalCollectors {
             {
                 vel = mdot_bipvt / (density_air * w * depth_channel);
                 reynolds = density_air * (vel) * (4 * w * depth_channel / (2 * (w + depth_channel))) / mu_air;
-                nusselt = 0.052 * (std::pow(reynolds, 0.78)) * (std::pow(prandtl_air, 0.4));//Candanedo et al. 2011
-                hconvf1 = k_air * nusselt / (4 * w * depth_channel / (2 * (w + depth_channel))); 
+                nusselt = 0.052 * (std::pow(reynolds, 0.78)) * (std::pow(prandtl_air, 0.4)); // Candanedo et al. 2011
+                hconvf1 = k_air * nusselt / (4 * w * depth_channel / (2 * (w + depth_channel)));
                 nusselt = 1.017 * (std::pow(reynolds, 0.471)) * (std::pow(prandtl_air, 0.4));
-                hconvf2 = k_air * nusselt / (4 * w * depth_channel / (2 * (w + depth_channel)));//Candanedo et al. 2011
+                hconvf2 = k_air * nusselt / (4 * w * depth_channel / (2 * (w + depth_channel))); // Candanedo et al. 2011
                 a = -(w / (mdot_bipvt * cp_in)) * (hconvf1 + hconvf2);
                 b = (w / (mdot_bipvt * cp_in)) * (hconvf1 * t1 + hconvf2 * t2);
                 tfavg = (1.0 / (a * l)) * (tfin + b / a) * (std::exp(a * l) - 1.0) - b / a;
@@ -1621,11 +1621,13 @@ namespace PhotovoltaicThermalCollectors {
                 } else {
                     beta = slope;
                 }
-                nusselt = 1.0 +
-                          1.44 * (1.0 - 1708.0 * (std::pow((std::sin(1.8 * beta)), 1.6)) / raleigh / std::cos(beta)) *
-                              std::max(0.0, (1.0 - 1708.0 / raleigh / std::cos(beta))) +
-                          std::max(0.0, ((std::pow((raleigh * std::cos(beta) / 5830.0), (1.0 / 3.0))) - 1.0)); //Hollands et al J. Heat transfer v.98, 1976
-                hconvf1 = 2.0 * k_air * nusselt / depth_channel;//cavity is split in two; hconvf1 and hconvf2. hconvf1 is assumed equal to hconvf2. Therefore, hconvf1 = 2*hcavity = hconvf2
+                nusselt =
+                    1.0 +
+                    1.44 * (1.0 - 1708.0 * (std::pow((std::sin(1.8 * beta)), 1.6)) / raleigh / std::cos(beta)) *
+                        std::max(0.0, (1.0 - 1708.0 / raleigh / std::cos(beta))) +
+                    std::max(0.0, ((std::pow((raleigh * std::cos(beta) / 5830.0), (1.0 / 3.0))) - 1.0)); // Hollands et al J. Heat transfer v.98, 1976
+                hconvf1 = 2.0 * k_air * nusselt / depth_channel; // cavity is split in two; hconvf1 and hconvf2. hconvf1 is assumed equal to hconvf2.
+                                                                 // Therefore, hconvf1 = 2*hcavity = hconvf2
                 hconvf2 = hconvf1;
                 c = s + s1 + hconvt * (tamb - tpvg) + hrad_surr * (tsurr - tpvg) + hrad12 * (t2 - t1);
                 d = c + hconvf2 * t2;
