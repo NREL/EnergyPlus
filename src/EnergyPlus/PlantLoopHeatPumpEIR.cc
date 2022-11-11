@@ -398,7 +398,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 }
 
 void EIRPlantLoopHeatPump::getDesignCapacities(
-    EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
 {
     if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
         MinLoad = 0.0;
