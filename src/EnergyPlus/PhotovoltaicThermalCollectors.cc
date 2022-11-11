@@ -304,20 +304,18 @@ namespace PhotovoltaicThermalCollectors {
             tmpBIPVTperf(Item).PVEffGapWidth = state.dataIPShortCut->rNumericArgs(1);
             tmpBIPVTperf(Item).EffCollHeight = state.dataIPShortCut->rNumericArgs(2);
             tmpBIPVTperf(Item).EffCollWidth = state.dataIPShortCut->rNumericArgs(3);
-            tmpBIPVTperf(Item).PVTranAbsProduct = state.dataIPShortCut->rNumericArgs(4);
-            tmpBIPVTperf(Item).PVCellTransAbsProduct = state.dataIPShortCut->rNumericArgs(5);
-            tmpBIPVTperf(Item).PVBackTransAbsProduct = state.dataIPShortCut->rNumericArgs(6);
-            tmpBIPVTperf(Item).BackMatTranAbsProduct = state.dataIPShortCut->rNumericArgs(7);
-            tmpBIPVTperf(Item).CladTranAbsProduct = state.dataIPShortCut->rNumericArgs(8);
-            tmpBIPVTperf(Item).PVAreaFract = state.dataIPShortCut->rNumericArgs(9);
-            tmpBIPVTperf(Item).PVCellAreaFract = state.dataIPShortCut->rNumericArgs(10);
-            tmpBIPVTperf(Item).PVRTop = state.dataIPShortCut->rNumericArgs(11);
-            tmpBIPVTperf(Item).PVRBot = state.dataIPShortCut->rNumericArgs(12);
-            tmpBIPVTperf(Item).PVGEmiss = state.dataIPShortCut->rNumericArgs(13);
-            tmpBIPVTperf(Item).BackMatEmiss = state.dataIPShortCut->rNumericArgs(14);
-            tmpBIPVTperf(Item).ThGlass = state.dataIPShortCut->rNumericArgs(15);
-            tmpBIPVTperf(Item).RIndGlass = state.dataIPShortCut->rNumericArgs(16);
-            tmpBIPVTperf(Item).ECoffGlass = state.dataIPShortCut->rNumericArgs(17);
+            tmpBIPVTperf(Item).PVCellTransAbsProduct = state.dataIPShortCut->rNumericArgs(4);
+            tmpBIPVTperf(Item).BackMatTranAbsProduct = state.dataIPShortCut->rNumericArgs(5);
+            tmpBIPVTperf(Item).CladTranAbsProduct = state.dataIPShortCut->rNumericArgs(6);
+            tmpBIPVTperf(Item).PVAreaFract = state.dataIPShortCut->rNumericArgs(7);
+            tmpBIPVTperf(Item).PVCellAreaFract = state.dataIPShortCut->rNumericArgs(8);
+            tmpBIPVTperf(Item).PVRTop = state.dataIPShortCut->rNumericArgs(9);
+            tmpBIPVTperf(Item).PVRBot = state.dataIPShortCut->rNumericArgs(10);
+            tmpBIPVTperf(Item).PVGEmiss = state.dataIPShortCut->rNumericArgs(11);
+            tmpBIPVTperf(Item).BackMatEmiss = state.dataIPShortCut->rNumericArgs(12);
+            tmpBIPVTperf(Item).ThGlass = state.dataIPShortCut->rNumericArgs(13);
+            tmpBIPVTperf(Item).RIndGlass = state.dataIPShortCut->rNumericArgs(14);
+            tmpBIPVTperf(Item).ECoffGlass = state.dataIPShortCut->rNumericArgs(15);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 tmpBIPVTperf(Item).SchedPtr = ScheduleAlwaysOn;
             } else {

@@ -4951,9 +4951,7 @@
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     12.616, !- Effective Overall Height of Collector
     8.795, !- Effective Overall Width of Collector
-    0.87, !- PV Module Normal Transmittance-Absorptance Product
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
     0.85, !- Fraction of Collector Gross Area Covered by PV module
@@ -4973,9 +4971,7 @@
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     4.57, !- Effective Overall Height of Collector
     13.36, !- Effective Overall Width of Collector
-    0.87, !- PV Module Normal Transmittance-Absorptance Product
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
     0.85, !- Fraction of Collector Gross Area Covered by PV module
@@ -4995,9 +4991,7 @@
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     17.18, !- Effective Overall Height of Collector
     4.57, !- Effective Overall Width of Collector
-    0.87, !- PV Module Normal Transmittance-Absorptance Product
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
     0.85, !- Fraction of Collector Gross Area Covered by PV module
@@ -5017,9 +5011,7 @@
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     4.57, !- Effective Overall Height of Collector
     13.36, !- Effective Overall Width of Collector
-    0.87, !- PV Module Normal Transmittance-Absorptance Product
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
     0.85, !- Fraction of Collector Gross Area Covered by PV module
@@ -5039,9 +5031,7 @@
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     17.18, !- Effective Overall Height of Collector
     4.57, !- Effective Overall Width of Collector
-    0.87, !- PV Module Normal Transmittance-Absorptance Product
     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
     0.87, !- Backing Material Normal Transmittance-Absorptance Product
     0.85, !- Cladding Normal Transmittance-Absorptance Product
     0.85, !- Fraction of Collector Gross Area Covered by PV module
