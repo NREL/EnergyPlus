@@ -359,6 +359,15 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
     this->oneTimeInit(state); // plant setup
 
     if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+        if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
+            this->sizeLoadSide(state);
+            if (this->waterSource) {
+                this->sizeSrcSideWSHP(state);
+            } else if (this->airSource) {
+                this->sizeSrcSideASHP(state);
+            }
+        }
+
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                        DataGlobalConstants::InitConvTemp,
@@ -392,12 +401,6 @@ void EIRPlantLoopHeatPump::getDesignCapacities(
     EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
 {
     if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
-        this->sizeLoadSide(state);
-        if (this->waterSource) {
-            this->sizeSrcSideWSHP(state);
-        } else if (this->airSource) {
-            this->sizeSrcSideASHP(state);
-        }
         MinLoad = 0.0;
         MaxLoad = this->referenceCapacity;
         OptLoad = this->referenceCapacity;
