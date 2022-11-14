@@ -2630,9 +2630,6 @@ TEST_F(EnergyPlusFixture, TestSizing_AutosizedFlowWithCompanion_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(2);
 
-    Real64 constexpr plantSizingLoadVolFlow = 0.01;
-    Real64 constexpr plantSizingLoadDeltaT = 1.0;
-
     state->dataSize->PlantSizData.allocate(2);
     state->dataSize->PlantSizData(1).DeltaT = 25.0;
     state->dataSize->PlantSizData(2).DeltaT = 20.0;
