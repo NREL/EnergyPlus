@@ -2565,7 +2565,7 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     EXPECT_NEAR(expectedCapacity, tmpOpt, 0.001);
 }
 
-TEST_F(EnergyPlusFixture, TestSizing_AutosizedCoolingWithCompanion_AirSource)
+TEST_F(EnergyPlusFixture, TestSizing_AutosizedFlowWithCompanion_AirSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
