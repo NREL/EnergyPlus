@@ -59,6 +59,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -2403,14 +2404,15 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.IgnitionDelay = state.dataIPShortCut->rNumericArgs(7); // Not yet implemented
 
         // Validate Heater Fuel Type
-        Tank.FuelType = static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+        Tank.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         switch (Tank.FuelType) {
-        case Fuel::Invalid: {
+        case DataGlobalConstants::ResourceType::Invalid: {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                 ":  Invalid Heater Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(4));
             // Set to Electric to avoid errors when setting up output variables
-            Tank.FuelType = Fuel::Electricity;
+            Tank.FuelType = DataGlobalConstants::ResourceType::Electricity;
             ErrorsFound = true;
             break;
         }
@@ -2458,10 +2460,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OffCycParaLoad = state.dataIPShortCut->rNumericArgs(9);
 
         // Validate Off-Cycle Parasitic Fuel Type
-        Tank.OffCycParaFuelType =
-            static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
+        Tank.OffCycParaFuelType = static_cast<DataGlobalConstants::ResourceType>(
+            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
         switch (Tank.OffCycParaFuelType) {
-        case Fuel::Invalid:
+        case DataGlobalConstants::ResourceType::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(6).empty()) { // If blank, default to Fuel Type for heater
                 Tank.OffCycParaFuelType = Tank.FuelType;
             } else { // could have been an unsupported value
@@ -2469,7 +2471,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(6));
                 // Set to Electric to avoid errors when setting up output variables
-                Tank.OffCycParaFuelType = Fuel::Electricity;
+                Tank.OffCycParaFuelType = DataGlobalConstants::ResourceType::Electricity;
                 ErrorsFound = true;
             }
             break;
@@ -2482,10 +2484,10 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(11);
 
         // Validate On-Cycle Parasitic Fuel Type
-        Tank.OnCycParaFuelType =
-            static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
+        Tank.OnCycParaFuelType = static_cast<DataGlobalConstants::ResourceType>(
+            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
         switch (Tank.OnCycParaFuelType) {
-        case Fuel::Invalid:
+        case DataGlobalConstants::ResourceType::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(7).empty()) { // If blank, default to Fuel Type for heater
                 Tank.OnCycParaFuelType = Tank.FuelType;
             } else { // could have been an unsupported value
@@ -2493,7 +2495,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid On-Cycle Parasitic Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(7));
                 // Set to Electric to avoid errors when setting up output variables
-                Tank.OnCycParaFuelType = Fuel::Electricity;
+                Tank.OnCycParaFuelType = DataGlobalConstants::ResourceType::Electricity;
                 ErrorsFound = true;
             }
             break;
@@ -2928,16 +2930,16 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate Heater Fuel Type
-        Tank.FuelType = static_cast<Fuel>(
-            getEnumerationValue(FuelTypeNamesUC,
+        Tank.FuelType = static_cast<DataGlobalConstants::ResourceType>(
+            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC,
                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                                     7)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
-        if (Tank.FuelType == Fuel::Invalid) {
+        if (Tank.FuelType == DataGlobalConstants::ResourceType::Invalid) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                 ":  Invalid Heater Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(7));
             // Set to Electric to avoid errors when setting up output variables
-            Tank.FuelType = Fuel::Electricity;
+            Tank.FuelType = DataGlobalConstants::ResourceType::Electricity;
             ErrorsFound = true;
         }
 
@@ -2953,11 +2955,11 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OffCycParaLoad = state.dataIPShortCut->rNumericArgs(12);
 
         // Validate Off-Cycle Parasitic Fuel Type
-        Tank.OffCycParaFuelType = static_cast<Fuel>(
-            getEnumerationValue(FuelTypeNamesUC,
+        Tank.OffCycParaFuelType = static_cast<DataGlobalConstants::ResourceType>(
+            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC,
                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                                     8)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
-        if (Tank.OffCycParaFuelType == Fuel::Invalid) {
+        if (Tank.OffCycParaFuelType == DataGlobalConstants::ResourceType::Invalid) {
             if (state.dataIPShortCut->cAlphaArgs(8).empty()) {
                 Tank.OffCycParaFuelType = Tank.FuelType;
             } else {
@@ -2965,7 +2967,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(8));
                 // Set to Electric to avoid errors when setting up output variables
-                Tank.OffCycParaFuelType = Fuel::Electricity;
+                Tank.OffCycParaFuelType = DataGlobalConstants::ResourceType::Electricity;
                 ErrorsFound = true;
             }
         }
@@ -2976,11 +2978,11 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(15);
 
         // Validate On-Cycle Parasitic Fuel Type
-        Tank.OnCycParaFuelType = static_cast<Fuel>(getEnumerationValue(
-            FuelTypeNamesUC,
+        Tank.OnCycParaFuelType = static_cast<DataGlobalConstants::ResourceType>(getEnumerationValue(
+            DataGlobalConstants::ResourceTypeNamesUC,
             UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                 9)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
-        if (Tank.OnCycParaFuelType == Fuel::Invalid) {
+        if (Tank.OnCycParaFuelType == DataGlobalConstants::ResourceType::Invalid) {
             if (state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 Tank.OnCycParaFuelType = Tank.FuelType;
             } else {
@@ -2988,7 +2990,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid On-Cycle Parasitic Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(9));
                 // Set to Electric to avoid errors when setting up output variables
-                Tank.OnCycParaFuelType = Fuel::Electricity;
+                Tank.OnCycParaFuelType = DataGlobalConstants::ResourceType::Electricity;
                 ErrorsFound = true;
             }
         }
@@ -3413,14 +3415,14 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
 
         Tank.MassFlowRateMin = 0.0;
         Tank.IgnitionDelay = 0.0;
-        Tank.FuelType = Fuel::Electricity;
+        Tank.FuelType = DataGlobalConstants::ResourceType::Electricity;
         Tank.Efficiency = 1.0;
         Tank.PLFCurve = 0;
         Tank.OffCycParaLoad = 0.0;
-        Tank.OffCycParaFuelType = Fuel::Electricity;
+        Tank.OffCycParaFuelType = DataGlobalConstants::ResourceType::Electricity;
         Tank.OffCycParaFracToTank = 0.0;
         Tank.OnCycParaLoad = 0.0;
-        Tank.OnCycParaFuelType = Fuel::Electricity;
+        Tank.OnCycParaFuelType = DataGlobalConstants::ResourceType::Electricity;
         Tank.OnCycParaFracToTank = 0.0;
 
         Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
@@ -3737,14 +3739,14 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         Tank.SetPointTempSchedule2 = 0;
         Tank.MaxCapacity2 = 0.0;
         Tank.HeaterHeight2 = 0.0;
-        Tank.FuelType = Fuel::Electricity;
+        Tank.FuelType = DataGlobalConstants::ResourceType::Electricity;
 
         Tank.OffCycParaLoad = 0.0;
-        Tank.OffCycParaFuelType = Fuel::Electricity;
+        Tank.OffCycParaFuelType = DataGlobalConstants::ResourceType::Electricity;
         Tank.OffCycParaFracToTank = 0.0;
         Tank.OffCycParaHeight = 0.0;
         Tank.OnCycParaLoad = 0.0;
-        Tank.OnCycParaFuelType = Fuel::Electricity;
+        Tank.OnCycParaFuelType = DataGlobalConstants::ResourceType::Electricity;
         Tank.OnCycParaFracToTank = 0.0;
         Tank.OnCycParaHeight = 0.0;
 
@@ -5264,64 +5266,68 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        format("Water Heater {} Rate", FuelTypeNames[static_cast<int>(this->FuelType)]),
+                        format("Water Heater {} Rate", DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)]),
                         OutputProcessor::Unit::W,
                         this->FuelRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        format("Water Heater {} Energy", FuelTypeNames[static_cast<int>(this->FuelType)]),
+                        format("Water Heater {} Energy", DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)]),
                         OutputProcessor::Unit::J,
                         this->FuelEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
-                        FuelTypeNames[static_cast<int>(this->FuelType)],
+                        DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)],
                         "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
-    SetupOutputVariable(state,
-                        format("Water Heater Off Cycle Parasitic {} Rate", FuelTypeNames[static_cast<int>(this->OffCycParaFuelType)]),
-                        OutputProcessor::Unit::W,
-                        this->OffCycParaFuelRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
-                        this->Name);
-    SetupOutputVariable(state,
-                        format("Water Heater Off Cycle Parasitic {} Energy", FuelTypeNames[static_cast<int>(this->OffCycParaFuelType)]),
-                        OutputProcessor::Unit::J,
-                        this->OffCycParaFuelEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
-                        this->Name,
-                        _,
-                        FuelTypeNames[static_cast<int>(this->OffCycParaFuelType)],
-                        "DHW",
-                        this->EndUseSubcategoryName,
-                        "Plant");
+    SetupOutputVariable(
+        state,
+        format("Water Heater Off Cycle Parasitic {} Rate", DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->OffCycParaFuelType)]),
+        OutputProcessor::Unit::W,
+        this->OffCycParaFuelRate,
+        OutputProcessor::SOVTimeStepType::System,
+        OutputProcessor::SOVStoreType::Average,
+        this->Name);
+    SetupOutputVariable(
+        state,
+        format("Water Heater Off Cycle Parasitic {} Energy", DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->OffCycParaFuelType)]),
+        OutputProcessor::Unit::J,
+        this->OffCycParaFuelEnergy,
+        OutputProcessor::SOVTimeStepType::System,
+        OutputProcessor::SOVStoreType::Summed,
+        this->Name,
+        _,
+        DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->OffCycParaFuelType)],
+        "DHW",
+        this->EndUseSubcategoryName,
+        "Plant");
 
-    SetupOutputVariable(state,
-                        format("Water Heater On Cycle Parasitic {} Rate", FuelTypeNames[static_cast<int>(this->OnCycParaFuelType)]),
-                        OutputProcessor::Unit::W,
-                        this->OnCycParaFuelRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
-                        this->Name);
-    SetupOutputVariable(state,
-                        format("Water Heater On Cycle Parasitic {} Energy", FuelTypeNames[static_cast<int>(this->OnCycParaFuelType)]),
-                        OutputProcessor::Unit::J,
-                        this->OnCycParaFuelEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
-                        this->Name,
-                        _,
-                        FuelTypeNames[static_cast<int>(this->OnCycParaFuelType)],
-                        "DHW",
-                        this->EndUseSubcategoryName,
-                        "Plant");
+    SetupOutputVariable(
+        state,
+        format("Water Heater On Cycle Parasitic {} Rate", DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->OnCycParaFuelType)]),
+        OutputProcessor::Unit::W,
+        this->OnCycParaFuelRate,
+        OutputProcessor::SOVTimeStepType::System,
+        OutputProcessor::SOVStoreType::Average,
+        this->Name);
+    SetupOutputVariable(
+        state,
+        format("Water Heater On Cycle Parasitic {} Energy", DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->OnCycParaFuelType)]),
+        OutputProcessor::Unit::J,
+        this->OnCycParaFuelEnergy,
+        OutputProcessor::SOVTimeStepType::System,
+        OutputProcessor::SOVStoreType::Summed,
+        this->Name,
+        _,
+        DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->OnCycParaFuelType)],
+        "DHW",
+        this->EndUseSubcategoryName,
+        "Plant");
 
     SetupOutputVariable(state,
                         "Water Heater Water Volume Flow Rate",
@@ -10942,17 +10948,17 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         // assume can propagate rules for gas to other fuels.
         bool FuelTypeIsLikeGas = false;
         switch (this->FuelType) {
-        case Fuel::NaturalGas:
-        case Fuel::Diesel:
-        case Fuel::Gasoline:
-        case Fuel::Coal:
-        case Fuel::FuelOilNo1:
-        case Fuel::FuelOilNo2:
-        case Fuel::Propane:
-        case Fuel::Steam:
-        case Fuel::OtherFuel1:
-        case Fuel::OtherFuel2:
-        case Fuel::DistrictHeating:
+        case DataGlobalConstants::ResourceType::NaturalGas:
+        case DataGlobalConstants::ResourceType::Diesel:
+        case DataGlobalConstants::ResourceType::Gasoline:
+        case DataGlobalConstants::ResourceType::Coal:
+        case DataGlobalConstants::ResourceType::FuelOilNo1:
+        case DataGlobalConstants::ResourceType::FuelOilNo2:
+        case DataGlobalConstants::ResourceType::Propane:
+        case DataGlobalConstants::ResourceType::Steam:
+        case DataGlobalConstants::ResourceType::OtherFuel1:
+        case DataGlobalConstants::ResourceType::OtherFuel2:
+        case DataGlobalConstants::ResourceType::DistrictHeating:
             FuelTypeIsLikeGas = true;
             break;
         default: // FuelTypeIsLikeGas stays false
@@ -10960,7 +10966,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         }
 
         if (this->Sizing.NumberOfBedrooms == 1) {
-            if (this->FuelType == Fuel::Electricity) {
+            if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                 if (this->VolumeWasAutoSized) tmpTankVolume = 20.0 * GalTocubicMeters;
                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 2.5 * 1000.0; // 2.5 kW
             } else if (FuelTypeIsLikeGas) {
@@ -10970,7 +10976,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
 
         } else if (this->Sizing.NumberOfBedrooms == 2) {
             if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 30.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 3.5 * 1000.0; // 3.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -10978,7 +10984,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                 }
             } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -10986,7 +10992,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                 }
             } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -10996,7 +11002,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
             }
         } else if (this->Sizing.NumberOfBedrooms == 3) {
             if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -11004,7 +11010,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                 }
             } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -11012,7 +11018,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                 }
             } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -11022,7 +11028,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
             }
         } else if (this->Sizing.NumberOfBedrooms == 4) {
             if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -11030,7 +11036,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                 }
             } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -11038,7 +11044,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; // 38 kBtu/hr
                 }
             } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -11047,7 +11053,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                 }
             }
         } else if (this->Sizing.NumberOfBedrooms == 5) {
-            if (this->FuelType == Fuel::Electricity) {
+            if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                 if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
             } else if (FuelTypeIsLikeGas) {
@@ -11055,7 +11061,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; // 47 kBtu/hr
             }
         } else if (this->Sizing.NumberOfBedrooms >= 6) {
-            if (this->FuelType == Fuel::Electricity) {
+            if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                 if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
             } else if (FuelTypeIsLikeGas) {
@@ -11664,17 +11670,17 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             // assume can propagate rules for gas to other fuels.
             bool FuelTypeIsLikeGas = false;
             switch (this->FuelType) {
-            case Fuel::NaturalGas:
-            case Fuel::Diesel:
-            case Fuel::Gasoline:
-            case Fuel::Coal:
-            case Fuel::FuelOilNo1:
-            case Fuel::FuelOilNo2:
-            case Fuel::Propane:
-            case Fuel::Steam:
-            case Fuel::OtherFuel1:
-            case Fuel::OtherFuel2:
-            case Fuel::DistrictHeating:
+            case DataGlobalConstants::ResourceType::NaturalGas:
+            case DataGlobalConstants::ResourceType::Diesel:
+            case DataGlobalConstants::ResourceType::Gasoline:
+            case DataGlobalConstants::ResourceType::Coal:
+            case DataGlobalConstants::ResourceType::FuelOilNo1:
+            case DataGlobalConstants::ResourceType::FuelOilNo2:
+            case DataGlobalConstants::ResourceType::Propane:
+            case DataGlobalConstants::ResourceType::Steam:
+            case DataGlobalConstants::ResourceType::OtherFuel1:
+            case DataGlobalConstants::ResourceType::OtherFuel2:
+            case DataGlobalConstants::ResourceType::DistrictHeating:
                 FuelTypeIsLikeGas = true;
                 break;
             default: // FuelTypeIsLikeGas stays false
@@ -11682,7 +11688,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             }
 
             if (this->Sizing.NumberOfBedrooms == 1) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 20.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 2.5 * 1000.0; // 2.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -11692,7 +11698,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
 
             } else if (this->Sizing.NumberOfBedrooms == 2) {
                 if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                    if (this->FuelType == Fuel::Electricity) {
+                    if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 30.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 3.5 * 1000.0; // 3.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11700,7 +11706,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                     }
                 } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                    if (this->FuelType == Fuel::Electricity) {
+                    if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11708,7 +11714,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                     }
                 } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                    if (this->FuelType == Fuel::Electricity) {
+                    if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11718,7 +11724,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                 }
             } else if (this->Sizing.NumberOfBedrooms == 3) {
                 if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                    if (this->FuelType == Fuel::Electricity) {
+                    if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11726,7 +11732,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                     }
                 } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                    if (this->FuelType == Fuel::Electricity) {
+                    if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11734,7 +11740,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                     }
                 } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                    if (this->FuelType == Fuel::Electricity) {
+                    if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11744,7 +11750,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                 }
             } else if (this->Sizing.NumberOfBedrooms == 4) {
                 if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                    if (this->FuelType == Fuel::Electricity) {
+                    if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11752,7 +11758,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                     }
                 } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                    if (this->FuelType == Fuel::Electricity) {
+                    if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11760,7 +11766,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; // 38 kBtu/hr
                     }
                 } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                    if (this->FuelType == Fuel::Electricity) {
+                    if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11769,7 +11775,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                     }
                 }
             } else if (this->Sizing.NumberOfBedrooms == 5) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                 } else if (FuelTypeIsLikeGas) {
@@ -11777,7 +11783,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; // 47 kBtu/hr
                 }
             } else if (this->Sizing.NumberOfBedrooms >= 6) {
-                if (this->FuelType == Fuel::Electricity) {
+                if (this->FuelType == DataGlobalConstants::ResourceType::Electricity) {
                     if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                     if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                 } else if (FuelTypeIsLikeGas) {
