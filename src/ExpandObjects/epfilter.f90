@@ -23101,7 +23101,7 @@ DO iSys = 1, numCompactSysVRF
    ' HeatingEIRHiPLR')
   CALL AddToObjFld('Heating Combination Ratio Correction Factor Curve Name', base + vrfsNameOff,' HeatingCombRatio')
   CALL AddToObjFld('Heating Part-Load Fraction Correlation Curve Name', base + vrfsNameOff,' VRFCPLFFPLR')
-  CALL AddToObjStr('Minimum Heat Pump Part-Load Ratio','0.25')
+  CALL AddToObjFld('Minimum Heat Pump Part-Load Ratio', base + vrfsHPMinPLROff,'')
   CALL AddToObjFld('Zone Name for Master Thermostat Location', base + vrfsTstatZoneNameOff,'')
   CALL AddToObjFld('Master Thermostat Priority Control Type', base + vrfsTstatPriorityCtrlTypeOff,'')
   CALL AddToObjFld('Thermostat Priority Schedule Name', base + vrfsTstatPrioritySchedNameOff,'')
