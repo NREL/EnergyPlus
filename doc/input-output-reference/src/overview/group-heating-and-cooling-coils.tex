@@ -1275,7 +1275,7 @@ This numeric field defines the gross sensible heat ratio (sensible capacity divi
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate}
 
-The air volume flow rate, in m\(^{3}\) per second, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of rated total cooling capacity (300 to 450 cfm/ton). The gross rated total cooling capacity and gross rated SHR should be performance information for the unit with at this rated air volume flow rate.
+The air volume flow rate, in \si{\volumeFlowRate}, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of rated total cooling capacity (300 to 450 cfm/ton). The gross rated total cooling capacity and gross rated SHR should be performance information for the unit with at this rated air volume flow rate.
 
 \paragraph{Field: Cooling Capacity Ratio Modifier Function of Temperature Curve Name}\label{field-cooling-capacity-ratio-modifier-function-of-temperature-curve-name}
 
@@ -1420,7 +1420,7 @@ This numeric field defines the total, full load gross heating capacity in watts 
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-1}
 
-This numeric field defines the volume air flow rate, in m\(^{3}\) per second, across the DX heating coil at rated conditions. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated heating capacity. The gross rated heating capacity and the gross rated COP should be performance information for the unit with outside air dry-bulb temperature of 8.33$^\circ$C, outside air wet-bulb temperature of 6.11$^\circ$C, heating coil entering air dry-bulb temperature of 21.11$^\circ$C, heating coil entering air wet-bulb temperature of 15.55$^\circ$C, and the rated air volume flow rate defined here.
+This numeric field defines the volume air flow rate, in \si{\volumeFlowRate}, across the DX heating coil at rated conditions. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated heating capacity. The gross rated heating capacity and the gross rated COP should be performance information for the unit with outside air dry-bulb temperature of 8.33$^\circ$C, outside air wet-bulb temperature of 6.11$^\circ$C, heating coil entering air dry-bulb temperature of 21.11$^\circ$C, heating coil entering air wet-bulb temperature of 15.55$^\circ$C, and the rated air volume flow rate defined here.
 
 \paragraph{Field: Coil Air Inlet Node}\label{field-coil-air-inlet-node}
 
@@ -2091,7 +2091,7 @@ The coefficient of performance is the ratio of the gross total cooling capacity 
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-2}
 
-The air volume flow rate, in m\(^{3}\) per second, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated total cooling capacity (300 to 450 cfm/ton). For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
+The air volume flow rate, in \si{\volumeFlowRate}, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated total cooling capacity (300 to 450 cfm/ton). For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
 
 \paragraph{Field: 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2017-rated-evaporator-fan-power-per-volume-flow-rate}
 
@@ -2201,7 +2201,7 @@ If the user wishes to model an air-cooled condenser that has evaporative media p
 
 \paragraph{Field: Evaporative Condenser Air Flow Rate}\label{field-evaporative-condenser-air-flow-rate}
 
-The air volume flow rate, in m\(^{3}\) per second, entering the evaporative condenser. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000144 m\(^{3}\)/s per watt of rated total cooling capacity {[}850 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
+The air volume flow rate, in \si{\volumeFlowRate}, entering the evaporative condenser. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000144 m\(^{3}\)/s per watt of rated total cooling capacity {[}850 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
 
 \paragraph{Field: Evaporative Condenser Pump Rated Power Consumption}\label{field-evaporative-condenser-pump-rated-power-consumption}
 
@@ -2314,7 +2314,7 @@ The coefficient of performance is the ratio of the gross total cooling capacity 
 
 \paragraph{Field: High Speed Rated Air Flow Rate}\label{field-high-speed-rated-air-flow-rate}
 
-The high speed air volume flow rate, in m\(^{3}\) per second, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated total cooling capacity. For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
+The high speed air volume flow rate, in \si{\volumeFlowRate}, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated total cooling capacity. For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
 
 \paragraph{Field: Unit Internal Static Air Pressure}\label{field-unit-internal-static-air-pressure}
 
@@ -2380,7 +2380,7 @@ The coefficient of performance is the ratio of gross total cooling capacity in w
 
 \paragraph{Field: Low Speed Rated Air Flow Rate}\label{field-low-speed-rated-air-flow-rate}
 
-The low speed volume air flow rate, in m\(^{3}\) per second, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated total cooling capacity. For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
+The low speed volume air flow rate, in \si{\volumeFlowRate}, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated total cooling capacity. For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
 
 \paragraph{Field: Low Speed Total Cooling Capacity Function of Temperature Curve Name}\label{field-low-speed-total-cooling-capacity-function-of-temperature-curve-name}
 
@@ -2428,7 +2428,7 @@ If the user wishes to model an air-cooled condenser that has evaporative media p
 
 \paragraph{Field: High Speed Evaporative Condenser Air Flow Rate}\label{field-high-speed-evaporative-condenser-air-flow-rate}
 
-The air volume flow rate, in m\(^{3}\) per second, entering the evaporative condenser at high compressor/fan speed. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000144 m\(^{3}\)/s per watt of rated high-speed total cooling capacity {[}850 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
+The air volume flow rate, in \si{\volumeFlowRate}, entering the evaporative condenser at high compressor/fan speed. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000144 m\(^{3}\)/s per watt of rated high-speed total cooling capacity {[}850 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
 
 \paragraph{Field: High Speed Evaporative Condenser Pump Rated Power Consumption}\label{field-high-speed-evaporative-condenser-pump-rated-power-consumption}
 
@@ -2454,7 +2454,7 @@ The resulting condenser inlet air temperature is used by the Total Cooling Capac
 
 \paragraph{Field: Low Speed Evaporative Condenser Air Flow Rate}\label{field-low-speed-evaporative-condenser-air-flow-rate}
 
-The air volume flow rate, in m\(^{3}\) per second, entering the evaporative condenser at low compressor/fan speed. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000048 m\(^{3}\)/s per watt of rated high-speed total cooling capacity {[}280 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
+The air volume flow rate, in \si{\volumeFlowRate}, entering the evaporative condenser at low compressor/fan speed. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000048 m\(^{3}\)/s per watt of rated high-speed total cooling capacity {[}280 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
 
 \paragraph{Field: Low Speed Evaporative Condenser Pump Rated Power Consumption}\label{field-low-speed-evaporative-condenser-pump-rated-power-consumption}
 
@@ -2811,7 +2811,7 @@ The coefficient of performance is the ratio of the gross total cooling capacity 
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Rated Air Flow Rate}\label{field-speed-x-rated-air-flow-rate}
 
-The volumetric air flow rate for Speed \textless{}x\textgreater{}, in m\(^{3}\) per second, across the DX cooling coil at rated conditions. The rated air volume flow rate for Speed \textless{}x\textgreater{} should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated total cooling capacity for Speed \textless{}x\textgreater{}. The gross rated total cooling capacity, gross rated SHR and gross rated COP for Speed \textless{}x\textgreater{} should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
+The volumetric air flow rate for Speed \textless{}x\textgreater{}, in \si{\volumeFlowRate}, across the DX cooling coil at rated conditions. The rated air volume flow rate for Speed \textless{}x\textgreater{} should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated total cooling capacity for Speed \textless{}x\textgreater{}. The gross rated total cooling capacity, gross rated SHR and gross rated COP for Speed \textless{}x\textgreater{} should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
 
 \paragraph{Field: Speed \textless{}X\textgreater{} 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-2017-rated-evaporator-fan-power-per-volume-flow-rate}
 
@@ -2911,7 +2911,7 @@ If the user wishes to model an air-cooled condenser that has evaporative media p
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Evaporative Condenser Air Flow Rate}\label{field-speed-x-evaporative-condenser-air-flow-rate}
 
-The air volume flow rate, in m\(^{3}\) per second, entering the evaporative condenser at Speed \textless{}x\textgreater{}. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000114 m\(^{3}\)/s per watt of rated total cooling capacity for Speed \textless{}x\textgreater{} {[}850 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
+The air volume flow rate, in \si{\volumeFlowRate}, entering the evaporative condenser at Speed \textless{}x\textgreater{}. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000114 m\(^{3}\)/s per watt of rated total cooling capacity for Speed \textless{}x\textgreater{} {[}850 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Rated Evaporative Condenser Pump Power Consumption}\label{field-speed-x-rated-evaporative-condenser-pump-power-consumption}
 
@@ -3346,11 +3346,11 @@ This numeric field defines the coefficient of performance (COP = the gross total
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate}
 
-This numeric field defines the volumetric air flow rate, in m\(^{3}\) per second, across the cooling coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given cooling capacity and COP at the speed, as above.
+This numeric field defines the volumetric air flow rate, in \si{\volumeFlowRate}, across the cooling coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given cooling capacity and COP at the speed, as above.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Condenser Air Flow Rate}\label{field-speed-x-reference-unit-rated-condenser-air-flow-rate}
 
-This numeric field defines the condenser volumetric air flow rate, in m\(^{3}\) per second, across the condenser coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data. This field is used to calculate water evaporation rate for an evaporatively-cooled condenser. For an air-cooled condenser, this input is not used.
+This numeric field defines the condenser volumetric air flow rate, in \si{\volumeFlowRate}, across the condenser coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data. This field is used to calculate water evaporation rate for an evaporatively-cooled condenser. For an air-cooled condenser, this input is not used.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Pad Effectiveness of Evap Precooling}\label{field-speed-x-reference-unit-rated-pad-effectiveness-of-evap-precooling}
 
@@ -3736,7 +3736,7 @@ The coefficient of performance is the ratio of the gross total cooling capacity 
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-3}
 
-The air volume flow rate, in m\(^{3}\) per second, across the DX cooling coil at rated conditions. The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
+The air volume flow rate, in \si{\volumeFlowRate}, across the DX cooling coil at rated conditions. The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
 
 \paragraph{Field: Fraction of Air Flow Bypassed Around Coil}\label{field-fraction-of-air-flow-bypassed-around-coil}
 
@@ -3830,7 +3830,7 @@ If the user wishes to model an air-cooled condenser that has evaporative media p
 
 \paragraph{Field: Evaporative Condenser Air Flow Rate}\label{field-evaporative-condenser-air-flow-rate-1}
 
-The air volume flow rate, in m\(^{3}\) per second, entering the evaporative condenser. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000144 m\(^{3}\)/s per watt of rated total cooling capacity {[}850 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
+The air volume flow rate, in \si{\volumeFlowRate}, entering the evaporative condenser. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000144 m\(^{3}\)/s per watt of rated total cooling capacity {[}850 cfm/ton{]}). This field is not used when Condenser Type = Air Cooled.
 
 \paragraph{Field: Evaporative Condenser Pump Rated Power Consumption}\label{field-evaporative-condenser-pump-rated-power-consumption-2}
 
@@ -4019,7 +4019,7 @@ This numeric field defines the coefficient of performance (COP = the gross heati
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-4}
 
-This numeric field defines the volume air flow rate, in m\(^{3}\) per second, across the DX heating coil at rated conditions. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated heating capacity. The gross rated heating capacity and gross rated COP should be performance information for the unit with outdoor air dry-bulb temperature of 8.33$^\circ$C, outdoor air wet-bulb temperature of 6.11$^\circ$C, heating coil entering air dry-bulb temperature of 21.11$^\circ$C, heating coil entering air wet-bulb temperature of 15.55$^\circ$C, and the rated air volume flow rate defined here.
+This numeric field defines the volume air flow rate, in \si{\volumeFlowRate}, across the DX heating coil at rated conditions. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated heating capacity. The gross rated heating capacity and gross rated COP should be performance information for the unit with outdoor air dry-bulb temperature of 8.33$^\circ$C, outdoor air wet-bulb temperature of 6.11$^\circ$C, heating coil entering air dry-bulb temperature of 21.11$^\circ$C, heating coil entering air wet-bulb temperature of 15.55$^\circ$C, and the rated air volume flow rate defined here.
 
 \paragraph{Field: 2017 Rated Supply Fan Power Per Volume Flow Rate}\label{field-2017-rated-supply-fan-power-per-volume-flow-rate-1}
 
@@ -4351,7 +4351,7 @@ This numeric field defines the coefficient of performance (COP = gross heating c
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Rated Air Flow Rate}\label{field-speed-x-rated-air-flow-rate-1}
 
-This numeric field defines the volume air flow rate, in m\(^{3}\) per second, across the DX heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated heating capacity. The gross rated heating capacity and gross rated COP should be performance information for the unit with outdoor air dry-bulb temperature of 8.33$^\circ$C, outdoor air wet-bulb temperature of 6.11$^\circ$C, heating coil entering air dry-bulb temperature of 21.11$^\circ$C, heating coil entering air wet-bulb temperature of 15.55$^\circ$C, and the rated air volume flow rate defined here.
+This numeric field defines the volume air flow rate, in \si{\volumeFlowRate}, across the DX heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated heating capacity. The gross rated heating capacity and gross rated COP should be performance information for the unit with outdoor air dry-bulb temperature of 8.33$^\circ$C, outdoor air wet-bulb temperature of 6.11$^\circ$C, heating coil entering air dry-bulb temperature of 21.11$^\circ$C, heating coil entering air wet-bulb temperature of 15.55$^\circ$C, and the rated air volume flow rate defined here.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} 2017 Rated Supply Air Fan Power Per Volume Flow Rate}\label{field-speed-x-2017-rated-supply-air-fan-power-per-volume-flow-rate-1}
 
@@ -4715,7 +4715,7 @@ This numeric field defines the coefficient of performance (COP = gross heating c
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate-1}
 
-This numeric field defines the volume air flow rate, in m\(^{3}\) per second, across the heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated heating capacity and gross rated heating COP at the speed, as above.
+This numeric field defines the volume air flow rate, in \si{\volumeFlowRate}, across the heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated heating capacity and gross rated heating COP at the speed, as above.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Heating Capacity Function of Temperature Curve Name}\label{field-speed-x-heating-capacity-function-of-temperature-curve-name-1}
 
@@ -7404,11 +7404,11 @@ This numeric field defines the coefficient of performance (COP = gross total coo
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate-2}
 
-This numeric field defines the volumetric air flow rate, in m\(^{3}\) per second, across the cooling coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated total cooling capacity and gross rated cooling COP at the speed, as above.
+This numeric field defines the volumetric air flow rate, in \si{\volumeFlowRate}, across the cooling coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated total cooling capacity and gross rated cooling COP at the speed, as above.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Water Flow Rate}\label{field-speed-x-reference-unit-rated-water-flow-rate}
 
-This numeric field defines the volumetric water flow rate, in m\(^{3}\) per second, flowing at the source side of the cooling coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated total cooling capacity and gross rated cooling COP at the speed, as above.
+This numeric field defines the volumetric water flow rate, in \si{\volumeFlowRate}, flowing at the source side of the cooling coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated total cooling capacity and gross rated cooling COP at the speed, as above.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Total Cooling Capacity Function of Temperature Curve Name}\label{field-speed-x-total-cooling-capacity-function-of-temperature-curve-name-2}
 
@@ -8208,11 +8208,11 @@ This numeric field defines the coefficient of performance (COP = gross heating c
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate-3}
 
-This numeric field defines the volume air flow rate, in m\(^{3}\) per second, across the heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated heating capacity and gross rated heating COP at the speed, as above.
+This numeric field defines the volume air flow rate, in \si{\volumeFlowRate}, across the heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated heating capacity and gross rated heating COP at the speed, as above.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Water Flow Rate}\label{field-speed-x-reference-unit-rated-water-flow-rate-1}
 
-This numeric field defines the volume water flow rate, in m\(^{3}\) per second, flowing at the source side of the heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated heating capacity and gross rated heating COP at the speed, as above.
+This numeric field defines the volume water flow rate, in \si{\volumeFlowRate}, flowing at the source side of the heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated heating capacity and gross rated heating COP at the speed, as above.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Heating Capacity Function of Temperature Curve Name}\label{field-speed-x-heating-capacity-function-of-temperature-curve-name-2}
 
