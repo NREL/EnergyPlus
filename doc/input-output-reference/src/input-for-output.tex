@@ -702,7 +702,7 @@ The EnvironmentalImpactFactors object contains additional information that is no
 
 The District Heating Efficiency value is used to convert the district (purchased) heating energy to Natural Gas for the environmental impact calculation. The efficiency is a number between 0 and 1 and divided into the district heating energy and the default is 0.3.
 
-\paragraph{Field: Disctrict Cooling COP}\label{field-disctrict-cooling-cop}
+\paragraph{Field: District Cooling COP}\label{field-district-cooling-cop}
 
 The District Cooling COP value is used to convert the district (purchased) cooling energy to electricity for the environmental impact calculation. The Coefficient of Performance (COP) is a number greater than 0 and divided into the purchased cooling energy with a default of 3.0.
 
@@ -726,7 +726,7 @@ An example of specifying in the IDF:
 
 \begin{lstlisting}
 EnvironmentalImpactFactors,
-  0.3,         !- Disctrict Heating Efficiency
+  0.3,         !- District Heating Efficiency
   3.0,         !- District Cooling COP
   0.25,        !- Steam Conversion Efficiency
   80.7272,     !- Total Carbon Equivalent Emission Factor From N2O
