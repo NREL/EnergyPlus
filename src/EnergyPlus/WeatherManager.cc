@@ -1177,7 +1177,7 @@ namespace WeatherManager {
                                 print(state.files.eio, EnvDSTNFormat, Source);
                             }
                             for (int i = 1; i <= state.dataWeatherManager->NumSpecialDays; ++i) {
-                                static constexpr std::string_view EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
+                                static constexpr std::string_view EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}\n");
                                 if (state.dataWeatherManager->SpecialDays(i).WthrFile && state.dataWeatherManager->UseSpecialDays &&
                                     state.dataReportFlag->DoWeatherInitReporting) {
                                     StDate = format(DateFormat,
@@ -8796,6 +8796,7 @@ namespace WeatherManager {
                 // Start with Minimum number of NumHdArgs
                 uppercase(Line);
                 NumHdArgs = 4;
+                int CurCount = 0;
                 for (int i = 1; i <= NumHdArgs; ++i) {
                     strip(Line);
                     Pos = index(Line, ',');
@@ -8816,7 +8817,6 @@ namespace WeatherManager {
                     int PDay;
                     int PWeekDay;
                     bool IOStatus;
-                    int CurCount = 0;
                     if (i == 1) {
                         state.dataWeatherManager->WFAllowsLeapYears = (Line[0] == 'Y');
                     } else if (i == 2) {
