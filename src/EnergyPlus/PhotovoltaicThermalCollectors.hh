@@ -160,22 +160,30 @@ namespace PhotovoltaicThermalCollectors {
         }
     };
 
+    enum class PVTModelTypes
+    {
+        invalid = -1,
+        SimplePVTmodel = 1001,
+        BIPVTmodel = 1002,
+        Num
+    };
+
     struct PVTCollectorStruct : PlantComponent
     {
         // Members
-        std::string Name;                   // Name of PVT collector
-        DataPlant::PlantEquipmentType Type; // Plant Side Connection: 'Type' assigned in DataPlant
-        PlantLocation WPlantLoc;            // Water plant loop component location
-        bool EnvrnInit;                     // manage begin environment inits
-        bool SizingInit;                    // manage when sizing is complete
-        std::string PVTModelName;           // Name of PVT performance object
-        int PVTModelType;                   // model type indicator, only simple avail now
-        int SurfNum;                        // surface index
-        std::string PVname;                 // named Generator:Photovoltaic object
-        int PVnum;                          // PV index
-        bool PVfound;                       // init, need to delay get input until PV gotten
-        SimplePVTModelStruct Simple;        // Simple performance data structure.
-        BIPVTModelStruct BIPVT;             // BIPVT performance data structure.
+        std::string Name;                                    // Name of PVT collector
+        DataPlant::PlantEquipmentType Type;                  // Plant Side Connection: 'Type' assigned in DataPlant
+        PlantLocation WPlantLoc;                             // Water plant loop component location
+        bool EnvrnInit;                                      // manage begin environment inits
+        bool SizingInit;                                     // manage when sizing is complete
+        std::string PVTModelName;                            // Name of PVT performance object
+        PVTModelTypes PVTModelType = PVTModelTypes::invalid; // model type indicator
+        int SurfNum;                                         // surface index
+        std::string PVname;                                  // named Generator:Photovoltaic object
+        int PVnum;                                           // PV index
+        bool PVfound;                                        // init, need to delay get input until PV gotten
+        SimplePVTModelStruct Simple;                         // Simple performance data structure.
+        BIPVTModelStruct BIPVT;                              // BIPVT performance data structure.
         WorkingFluidEnum WorkingFluidType;
         int PlantInletNodeNum;
         int PlantOutletNodeNum;
@@ -197,10 +205,10 @@ namespace PhotovoltaicThermalCollectors {
 
         // Default Constructor
         PVTCollectorStruct()
-            : Type(DataPlant::PlantEquipmentType::Invalid), WPlantLoc{}, EnvrnInit(true), SizingInit(true), PVTModelType(0), SurfNum(0), PVnum(0),
-              PVfound(false), WorkingFluidType(WorkingFluidEnum::LIQUID), PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0),
-              HVACOutletNodeNum(0), DesignVolFlowRate(0.0), DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0),
-              AreaCol(0.0), BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true), MyOneTimeFlag(true),
+            : Type(DataPlant::PlantEquipmentType::Invalid), WPlantLoc{}, EnvrnInit(true), SizingInit(true), SurfNum(0), PVnum(0), PVfound(false),
+              WorkingFluidType(WorkingFluidEnum::LIQUID), PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0), HVACOutletNodeNum(0),
+              DesignVolFlowRate(0.0), DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0), AreaCol(0.0),
+              BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true), MyOneTimeFlag(true),
               SetLoopIndexFlag(true), QdotSource(0.0)
         {
         }
@@ -225,14 +233,14 @@ namespace PhotovoltaicThermalCollectors {
 
         void calculate(EnergyPlusData &state);
 
-        void SimplePVTcalculate(EnergyPlusData &state);
+        void calculateSimplePVT(EnergyPlusData &state);
 
-        void BIPVTcalculate(EnergyPlusData &state);
+        void calculateBIPVT(EnergyPlusData &state);
 
-        void BIPVT_MaxHeatGain_calculate(
+        void calculateBIPVTMaxHeatGain(
             EnergyPlusData &state, Real64 tsp, std::string Mode, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv);
 
-        void solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
+        void solveLinSysBackSub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
 
         Real64 calc_k_taoalpha(Real64 theta, Real64 glass_thickness, Real64 refrac_index_glass, Real64 k_glass);
 

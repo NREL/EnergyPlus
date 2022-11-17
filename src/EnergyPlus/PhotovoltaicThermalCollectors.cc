@@ -106,9 +106,6 @@ namespace PhotovoltaicThermalCollectors {
     //  the first model is a "simple" or "ideal" model useful for sizing, early design, or policy analyses
     //  Simple PV/T model just converts incoming solar to electricity and temperature rise of a working fluid.
 
-    int constexpr SimplePVTmodel(1001);
-    int constexpr BIPVTmodel(1002);
-
     Real64 constexpr SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
     int NumPVT(0); // count of all types of PVT in input file
@@ -157,7 +154,6 @@ namespace PhotovoltaicThermalCollectors {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2008
-        //       MODIFIED       K. Haddad, March 2020, add support to read inputs for BIPVT objects
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -168,7 +164,6 @@ namespace PhotovoltaicThermalCollectors {
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
         int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        using ScheduleManager::GetScheduleIndex;
 
         // Object Data
         Array1D<SimplePVTModelStruct> tmpSimplePVTperf;
@@ -197,13 +192,6 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTSimpleCollectorsInput(EnergyPlusData &state, int NumSimplePVTPerform, Array1D<SimplePVTModelStruct> &tmpSimplePVTperf)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   June 2008
-        //       MODIFIED       K. Haddad, March 2020, subroutine created from original code in subroutine
-        //                      "GetPVTcollectorsInput" to read inputs for PVT objects
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // Get input for PVT Simple objects
 
@@ -254,13 +242,6 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetBIPVTCollectorsInput(EnergyPlusData &state, int NumBIPVTPerform, Array1D<BIPVTModelStruct> &tmpBIPVTperf)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         B. Griffith
-        //       DATE WRITTEN   June 2008
-        //       MODIFIED       K. Haddad, March 2020, subroutine created from original code in subroutine
-        //                      "GetPVTcollectorsInput" to read inputs for BIPVT objects
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // Get input for BIPVT objects
 
@@ -340,7 +321,6 @@ namespace PhotovoltaicThermalCollectors {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2008
-        //       MODIFIED       K. Haddad, March 2020, add linkage to BIPVT objects
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -426,7 +406,7 @@ namespace PhotovoltaicThermalCollectors {
                     state.dataPhotovoltaicThermalCollector->PVT(Item).AreaCol =
                         state.dataSurface->Surface(state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum).Area *
                         state.dataPhotovoltaicThermalCollector->PVT(Item).Simple.ThermalActiveFract;
-                    state.dataPhotovoltaicThermalCollector->PVT(Item).PVTModelType = SimplePVTmodel;
+                    state.dataPhotovoltaicThermalCollector->PVT(Item).PVTModelType = PVTModelTypes::SimplePVTmodel;
                 } else {
                     ThisParamObj = UtilityRoutines::FindItemInList(PVT(Item).PVTModelName, tmpBIPVTperf);
                     if (ThisParamObj > 0) {
@@ -435,7 +415,7 @@ namespace PhotovoltaicThermalCollectors {
                         state.dataPhotovoltaicThermalCollector->PVT(Item).AreaCol =
                             state.dataPhotovoltaicThermalCollector->PVT(Item).BIPVT.EffCollWidth *
                             state.dataPhotovoltaicThermalCollector->PVT(Item).BIPVT.EffCollHeight;
-                        state.dataPhotovoltaicThermalCollector->PVT(Item).PVTModelType = BIPVTmodel;
+                        state.dataPhotovoltaicThermalCollector->PVT(Item).PVTModelType = PVTModelTypes::BIPVTmodel;
                     } else {
                         ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
                         ShowContinueError(state,
@@ -645,7 +625,6 @@ namespace PhotovoltaicThermalCollectors {
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   June 2008
         //       MODIFIED       B. Griffith, May 2009, EMS setpoint check
-        //                      K. Haddad, March 2020, add support for BIPVT objects
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -984,7 +963,6 @@ namespace PhotovoltaicThermalCollectors {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2008
-        //       MODIFIED       K. Haddad, March 2020, add support for BIPVT objects
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -994,7 +972,7 @@ namespace PhotovoltaicThermalCollectors {
         // decide if PVT should be in cooling or heat mode and if it should be bypassed or not
 
         if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
-            if ((this->PVTModelType == SimplePVTmodel) || (this->PVTModelType == BIPVTmodel)) {
+            if ((this->PVTModelType == PVTModelTypes::SimplePVTmodel) || (this->PVTModelType == PVTModelTypes::BIPVTmodel)) {
                 if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
@@ -1022,7 +1000,7 @@ namespace PhotovoltaicThermalCollectors {
             }
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
-            if (this->PVTModelType == SimplePVTmodel) {
+            if (this->PVTModelType == PVTModelTypes::SimplePVTmodel) {
                 if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     this->HeatingUseful = true;
@@ -1042,7 +1020,6 @@ namespace PhotovoltaicThermalCollectors {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2008
-        //       MODIFIED       K. Haddad, March 2020, add support for BIPVT objects
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -1052,21 +1029,19 @@ namespace PhotovoltaicThermalCollectors {
 
         static constexpr std::string_view RoutineName("CalcPVTcollectors");
 
-        if (this->PVTModelType == SimplePVTmodel) {
-            SimplePVTcalculate(state);
-        } else if (this->PVTModelType == BIPVTmodel) {
-            BIPVTcalculate(state);
+        if (this->PVTModelType == PVTModelTypes::SimplePVTmodel) {
+            calculateSimplePVT(state);
+        } else if (this->PVTModelType == PVTModelTypes::BIPVTmodel) {
+            calculateBIPVT(state);
         }
     }
 
-    void PVTCollectorStruct::SimplePVTcalculate(EnergyPlusData &state)
+    void PVTCollectorStruct::calculateSimplePVT(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2008
-        //       MODIFIED       K. Haddad, March 2020, subroutine created from original code in subroutine
-        //                      "PVTCollectorStruct::calculate()"
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -1234,15 +1209,8 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void PVTCollectorStruct::BIPVTcalculate(EnergyPlusData &state)
+    void PVTCollectorStruct::calculateBIPVT(EnergyPlusData &state)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   August 2008
-        //       MODIFIED       K. Haddad, March 2020, subroutine created from original code in subroutine
-        //                      "PVTCollectorStruct::calculate()" to model BIPVT systems.
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate BIPVT collector thermal peformancce
@@ -1267,14 +1235,14 @@ namespace PhotovoltaicThermalCollectors {
         if (this->HeatingUseful && this->BypassDamperOff && (GetCurrentScheduleValue(state, this->BIPVT.SchedPtr) > 0.0)) {
 
             if ((state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint - Tinlet) > 0.1) {
-                BIPVT_MaxHeatGain_calculate(state,
-                                            state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint,
-                                            Mode,
-                                            BypassFraction,
-                                            PotentialHeatGain,
-                                            PotentialOutletTemp,
-                                            Eff,
-                                            Tcollector);
+                calculateBIPVTMaxHeatGain(state,
+                                          state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint,
+                                          Mode,
+                                          BypassFraction,
+                                          PotentialHeatGain,
+                                          PotentialOutletTemp,
+                                          Eff,
+                                          Tcollector);
                 if (PotentialHeatGain < 0.0) {
                     BypassFraction = 1.0;
                     PotentialHeatGain = 0.0;
@@ -1297,14 +1265,14 @@ namespace PhotovoltaicThermalCollectors {
 
             Mode = "Cooling";
             if ((Tinlet - state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint) > 0.1) {
-                BIPVT_MaxHeatGain_calculate(state,
-                                            state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint,
-                                            Mode,
-                                            BypassFraction,
-                                            PotentialHeatGain,
-                                            PotentialOutletTemp,
-                                            Eff,
-                                            Tcollector);
+                calculateBIPVTMaxHeatGain(state,
+                                          state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint,
+                                          Mode,
+                                          BypassFraction,
+                                          PotentialHeatGain,
+                                          PotentialOutletTemp,
+                                          Eff,
+                                          Tcollector);
                 if (PotentialHeatGain > 0.0) {
                     PotentialHeatGain = 0.0;
                     BypassFraction = 1.0;
@@ -1320,7 +1288,7 @@ namespace PhotovoltaicThermalCollectors {
                     // trap for air not being cooled below its dewpoint.
                     if ((PotentialOutletTemp < DewPointInlet) && ((Tinlet - DewPointInlet) > 0.1)) {
                         //  water removal would be needed.. not going to allow that for now.  limit cooling to dew point and model bypass
-                        BIPVT_MaxHeatGain_calculate(
+                        calculateBIPVTMaxHeatGain(
                             state, DewPointInlet, Mode, BypassFraction, PotentialHeatGain, PotentialOutletTemp, Eff, Tcollector);
                         PotentialOutletTemp = DewPointInlet;
                     }
@@ -1353,15 +1321,9 @@ namespace PhotovoltaicThermalCollectors {
         }
     } // namespace PhotovoltaicThermalCollectors
 
-    void PVTCollectorStruct::BIPVT_MaxHeatGain_calculate(
+    void PVTCollectorStruct::calculateBIPVTMaxHeatGain(
         EnergyPlusData &state, Real64 tsp, std::string Mode, Real64 &bfr, Real64 &q, Real64 &tmixed, Real64 &ThEff, Real64 &tpv)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         K. Haddad & S. Brideau
-        //       DATE WRITTEN   March 2020
-        //       MODIFIED       Jan 2022
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the maximum heat transfer from the BIPVT system to the air stream in the channel behind the PV module
 
@@ -1655,7 +1617,7 @@ namespace PhotovoltaicThermalCollectors {
             f[0] = hconvt * tamb + hrad_surr * tsurr;
             f[1] = -s;
             f[2] = -s1 - hconvf1 * tfavg - hrad12 * t2;
-            solve_lin_sys_back_sub(jj, f, y);
+            solveLinSysBackSub(jj, f, y);
             tpvg_new = y[0];
             tpv_new = y[1];
             t1_new = y[2];
@@ -1683,7 +1645,7 @@ namespace PhotovoltaicThermalCollectors {
             ebal3 = hconvt * (tpvg - tamb) + hrad_surr * (tpvg - tsurr) + hpvg_pv * (tpvg - tpv);
             iter += 1;
             if (iter == 50) {
-                ShowSevereError(state, "Function PVTCollectorStruct::BIPVT_MaxHeatGain_calculate: Maximum number of iterations 50 reached");
+                ShowSevereError(state, "Function PVTCollectorStruct::calculateBIPVTMaxHeatGain: Maximum number of iterations 50 reached");
                 break;
             }
         }
@@ -1694,14 +1656,8 @@ namespace PhotovoltaicThermalCollectors {
         this->BIPVT.HcPlen = hconvf2;
     }
 
-    void PVTCollectorStruct::solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3])
+    void PVTCollectorStruct::solveLinSysBackSub(Real64 jj[9], Real64 f[3], Real64 (&y)[3])
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         K. Haddad
-        //       DATE WRITTEN   March 2020
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // Solve a system of linear equations using Gaussian elimination and back substitution method.
 
@@ -1763,12 +1719,6 @@ namespace PhotovoltaicThermalCollectors {
                                              Real64 refrac_index_glass,
                                              Real64 k_glass) // typ refrac_index_glass is 1.526, k_glass typ 4 m^-1, glass_thickness typ 0.002 m
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         S.Brideau
-        //       DATE WRITTEN   May 2020
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // calculates the transmissivity absorptance of a glass/air interface, assuming all transmitted is absorbed
 
@@ -1794,12 +1744,6 @@ namespace PhotovoltaicThermalCollectors {
                                                Real64 refrac_index_glass,
                                                Real64 k_glass) // typ refrac_index_glass is 1.526, k_glass typ 4 m^-1, glass_thickness typ 0.002 m
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         S.Brideau
-        //       DATE WRITTEN   May 2020
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // calculates the off-normal angle factor K for the tao-alpha product
         Real64 taoalpha(0.0);
@@ -1855,7 +1799,7 @@ namespace PhotovoltaicThermalCollectors {
                     Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, state.dataLoopNodes->Node(OutletNode).HumRat);
 
                 // update the OtherSideConditionsModel coefficients for BIPVT
-                if (this->PVTModelType == BIPVTmodel) {
+                if (this->PVTModelType == PVTModelTypes::BIPVTmodel) {
                     thisOSCM = this->BIPVT.OSCMPtr;
                     state.dataSurface->OSCM(thisOSCM).TConv = this->BIPVT.Tplen;
                     state.dataSurface->OSCM(thisOSCM).HConv = this->BIPVT.HcPlen;
@@ -1891,13 +1835,6 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTThermalPowerProduction(EnergyPlusData &state, int const PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         int PVTnum(0);
 
         // first find PVT index that is associated with this PV generator
@@ -2012,13 +1949,6 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTmodelIndex(EnergyPlusData &state, int const SurfacePtr, int &PVTIndex)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         K. Haddad (adpated from subroutine "GetTranspiredCollectorIndex")
-        //       DATE WRITTEN   May 2020.
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // object oriented "Get" routine for establishing correct integer index from outside this module
 
@@ -2064,13 +1994,6 @@ namespace PhotovoltaicThermalCollectors {
                           Real64 const QSource // source term in Watts
     )
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         K. Haddad (adapted from subroutine "SetUTSCQdotSource")
-        //       DATE WRITTEN   May 2020
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // object oriented "Set" routine for updating sink term without exposing variables
 
@@ -2082,18 +2005,11 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTTsColl(EnergyPlusData &state, int const PVTNum, Real64 &TsColl)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         <author>
-        //       DATE WRITTEN   <date_written>
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // object oriented "Get" routine for collector surface temperature
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (state.dataPhotovoltaicThermalCollector->PVT(PVTNum).PVTModelType == BIPVTmodel) {
+        if (state.dataPhotovoltaicThermalCollector->PVT(PVTNum).PVTModelType == PVTModelTypes::BIPVTmodel) {
             TsColl = state.dataPhotovoltaicThermalCollector->PVT(PVTNum).BIPVT.LastCollectorTemp;
         }
     }
