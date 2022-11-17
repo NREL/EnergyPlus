@@ -162,7 +162,7 @@ namespace PhotovoltaicThermalCollectors {
 
     enum class PVTModelTypes
     {
-        invalid = -1,
+        Invalid = -1,
         SimplePVTmodel = 1001,
         BIPVTmodel = 1002,
         Num
@@ -177,7 +177,7 @@ namespace PhotovoltaicThermalCollectors {
         bool EnvrnInit;                                      // manage begin environment inits
         bool SizingInit;                                     // manage when sizing is complete
         std::string PVTModelName;                            // Name of PVT performance object
-        PVTModelTypes PVTModelType = PVTModelTypes::invalid; // model type indicator
+        PVTModelTypes PVTModelType = PVTModelTypes::Invalid; // model type indicator
         int SurfNum;                                         // surface index
         std::string PVname;                                  // named Generator:Photovoltaic object
         int PVnum;                                           // PV index
