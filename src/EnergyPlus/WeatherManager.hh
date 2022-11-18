@@ -71,6 +71,8 @@ struct EnergyPlusData;
 
 namespace WeatherManager {
 
+    extern const std::array<std::string_view, 8> epwHeaders;
+
     // Following are Date Types read in from EPW file or IDF
     enum class DateType
     {
@@ -785,7 +787,7 @@ namespace WeatherManager {
 
     Real64 GetSTM(Real64 Longitude); // Longitude from user input
 
-    void ProcessEPWHeader(EnergyPlusData &state, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
+    void ProcessEPWHeader(EnergyPlusData &state, std::string_view HeaderString, std::string &Line, bool &ErrorsFound);
 
     void SkipEPlusWFHeader(EnergyPlusData &state);
 

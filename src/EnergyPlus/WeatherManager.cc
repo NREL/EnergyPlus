@@ -124,6 +124,15 @@ namespace WeatherManager {
                                                  {"FRIDAY", WeekDay::Friday},
                                                  {"SATURDAY", WeekDay::Saturday}};
 
+    static constexpr std::array<std::string_view, 8> epwHeaders({"LOCATION",
+                                                                 "DESIGN CONDITIONS",
+                                                                 "TYPICAL/EXTREME PERIODS",
+                                                                 "GROUND TEMPERATURES",
+                                                                 "HOLIDAYS/DAYLIGHT SAVING",
+                                                                 "COMMENTS 1",
+                                                                 "COMMENTS 2",
+                                                                 "DATA PERIODS"});
+
     // Functions
 
     void ManageWeather(EnergyPlusData &state)
@@ -4755,8 +4764,6 @@ namespace WeatherManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   June 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine opens the EnergyPlus Weather File (in.epw) and processes
@@ -4764,16 +4771,6 @@ namespace WeatherManager {
 
         // METHODOLOGY EMPLOYED:
         // List directed reads, as possible.
-
-        static Array1D_string const Header(8,
-                                           {"LOCATION",
-                                            "DESIGN CONDITIONS",
-                                            "TYPICAL/EXTREME PERIODS",
-                                            "GROUND TEMPERATURES",
-                                            "HOLIDAYS/DAYLIGHT SAVING",
-                                            "COMMENTS 1",
-                                            "COMMENTS 2",
-                                            "DATA PERIODS"});
 
         state.files.inputWeatherFile.close();
         state.files.inputWeatherFile.filePath = state.files.inputWeatherFilePath.filePath;
@@ -4786,15 +4783,15 @@ namespace WeatherManager {
             // Read in Header Information
 
             // Headers should come in order
-            int HdLine = 1; // Look for first Header
+            int HdLine = 0; // Look for first Header
             bool StillLooking = true;
             while (StillLooking) {
                 auto Line = state.files.inputWeatherFile.readLine();
                 if (Line.eof) {
                     ShowFatalError(
                         state,
-                        "OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
-                            Header(HdLine),
+                        format("OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header={}",
+                               epwHeaders[HdLine]),
                         OptionalOutputFileRef(state.files.eso));
                 }
 
@@ -4809,11 +4806,11 @@ namespace WeatherManager {
                     }
                 }
                 std::string::size_type const Pos = FindNonSpace(Line.data);
-                std::string::size_type const HdPos = index(Line.data, Header(HdLine));
+                std::string::size_type const HdPos = index(Line.data, epwHeaders[HdLine]);
                 if (Pos != HdPos) continue;
-                ProcessEPWHeader(state, Header(HdLine), Line.data, ErrorsFound);
+                ProcessEPWHeader(state, epwHeaders[HdLine], Line.data, ErrorsFound);
                 ++HdLine;
-                if (HdLine == 9) StillLooking = false;
+                if (HdLine == 8) StillLooking = false;
             }
         } else { // Header already processed, just read
             SkipEPlusWFHeader(state);
@@ -8397,7 +8394,7 @@ namespace WeatherManager {
         return GetSTM;
     }
 
-    void ProcessEPWHeader(EnergyPlusData &state, std::string const &HeaderString, std::string &Line, bool &ErrorsFound)
+    void ProcessEPWHeader(EnergyPlusData &state, std::string_view const HeaderString, std::string &Line, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8428,7 +8425,7 @@ namespace WeatherManager {
         {
             auto const HeaderStringUppercase(UtilityRoutines::MakeUPPERCase(HeaderString));
 
-            if (HeaderStringUppercase == "LOCATION") {
+            if (HeaderStringUppercase == epwHeaders[0]) {
 
                 // LOCATION, A1 [City], A2 [State/Province/Region], A3 [Country],
                 // A4 [Source], N1 [WMO], N2 [Latitude],
@@ -8490,7 +8487,7 @@ namespace WeatherManager {
                         }
                     } break;
                     default:
-                        ShowSevereError(state, "GetEPWHeader:LOCATION, invalid numeric=" + Line.substr(0, Pos));
+                        ShowSevereError(state, format("GetEPWHeader:LOCATION, invalid numeric={}", Line.substr(0, Pos)));
                         ErrorsFound = true;
                         break;
                     }
@@ -8498,7 +8495,7 @@ namespace WeatherManager {
                 }
                 state.dataEnvrn->WeatherFileLocationTitle = stripped(state.dataWeatherManager->EPWHeaderTitle);
 
-            } else if (HeaderStringUppercase == "TYPICAL/EXTREME PERIODS") {
+            } else if (HeaderStringUppercase == epwHeaders[2]) { // TYPICAL/EXTREME PERIODS
                 strip(Line);
                 Pos = index(Line, ',');
                 if (Pos == std::string::npos) {
@@ -8524,7 +8521,8 @@ namespace WeatherManager {
                         state.dataWeatherManager->TypicalExtremePeriods(i).Title = Line.substr(0, Pos);
                         Line.erase(0, Pos + 1);
                     } else {
-                        ShowWarningError(state, "ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)=" + Line.substr(0, Pos));
+                        ShowWarningError(state,
+                                         format("ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)={}", Line.substr(0, Pos)));
                         ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
                         state.dataWeatherManager->NumEPWTypExtSets = i - 1;
                         break;
@@ -8615,7 +8613,7 @@ namespace WeatherManager {
                     int PWeekDay;
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
-                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        General::ProcessDateString(state, uppercase(Line.substr(0, Pos)), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth = PMonth;
@@ -8631,7 +8629,7 @@ namespace WeatherManager {
                     }
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
-                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        General::ProcessDateString(state, uppercase(Line.substr(0, Pos)), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
@@ -8645,7 +8643,7 @@ namespace WeatherManager {
                         }
                         Line.erase(0, Pos + 1);
                     } else { // Pos=0, probably last one
-                        General::ProcessDateString(state, Line, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                        General::ProcessDateString(state, uppercase(Line), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
@@ -8739,7 +8737,7 @@ namespace WeatherManager {
                     }
                 }
 
-            } else if (HeaderStringUppercase == "GROUND TEMPERATURES") {
+            } else if (HeaderStringUppercase == epwHeaders[3]) { // "GROUND TEMPERATURES"
                 // Added for ground surfaces defined with F or c factor method. TH 7/2009
                 // Assume the 0.5 m set of ground temperatures
                 // or first set on a weather file, if any.
@@ -8780,7 +8778,7 @@ namespace WeatherManager {
                     }
                 }
 
-            } else if (HeaderStringUppercase == "HOLIDAYS/DAYLIGHT SAVING") {
+            } else if (HeaderStringUppercase == epwHeaders[4]) { // "HOLIDAYS/DAYLIGHT SAVING"
                 // A1, \field LeapYear Observed
                 // \type choice
                 // \key Yes
@@ -8840,8 +8838,9 @@ namespace WeatherManager {
                         } else {
                             // ErrorsFound is untouched
                             ShowContinueError(
-                                state, "ProcessEPWHeader: Invalid Daylight Saving Period Start Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                            ShowContinueError(state, "...invalid header=" + HeaderString);
+                                state,
+                                format("ProcessEPWHeader: Invalid Daylight Saving Period Start Date Field(WeatherFile)={}", Line.substr(0, Pos)));
+                            ShowContinueError(state, format("...invalid header={}", HeaderString));
                             ShowContinueError(state, "...Setting Weather File DST to false.");
                             state.dataWeatherManager->EPWDaylightSaving = false;
                         }
@@ -8856,7 +8855,8 @@ namespace WeatherManager {
                                 state.dataWeatherManager->EPWDST.EnWeekDay = PWeekDay;
                             } else {
                                 ShowWarningError(
-                                    state, "ProcessEPWHeader: Invalid Daylight Saving Period End Date Field(WeatherFile)=" + Line.substr(0, Pos));
+                                    state,
+                                    format("ProcessEPWHeader: Invalid Daylight Saving Period End Date Field(WeatherFile)={}", Line.substr(0, Pos)));
                                 ShowContinueError(state, "...Setting Weather File DST to false.");
                                 state.dataWeatherManager->EPWDaylightSaving = false;
                             }
@@ -8903,7 +8903,7 @@ namespace WeatherManager {
                                     state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
                                 } else if (dateType == DateType::Invalid) {
-                                    ShowSevereError(state, "Invalid SpecialDay Date Field(WeatherFile)=" + Line.substr(0, Pos));
+                                    ShowSevereError(state, format("Invalid SpecialDay Date Field(WeatherFile)={}", Line.substr(0, Pos)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -8933,10 +8933,10 @@ namespace WeatherManager {
                     }
                 }
 
-            } else if ((HeaderStringUppercase == "COMMENTS 1") || (HeaderStringUppercase == "COMMENTS 2") ||
-                       (HeaderStringUppercase == "DESIGN CONDITIONS")) {
+            } else if ((HeaderStringUppercase == epwHeaders[5]) || (HeaderStringUppercase == epwHeaders[6]) ||
+                       (HeaderStringUppercase == epwHeaders[1])) { // "COMMENTS 1" or "COMMENTS 2" or "DESIGN CONDITIONS"
                 // no action
-            } else if (HeaderStringUppercase == "DATA PERIODS") {
+            } else if (HeaderStringUppercase == epwHeaders[7]) { // "DATA PERIODS"
                 //     N1, \field Number of Data Periods
                 //     N2, \field Number of Records per hour
                 //     A1, \field Data Period 1 Name/Description
@@ -9024,8 +9024,8 @@ namespace WeatherManager {
                                     if (PYear != 0) state.dataWeatherManager->DataPeriods(CurCount).HasYearData = true;
                                 } else {
                                     ShowSevereError(state,
-                                                    "Data Periods must be of the form <DayOfYear> or <Month Day> (WeatherFile), found=" +
-                                                        Line.substr(0, Pos));
+                                                    format("Data Periods must be of the form <DayOfYear> or <Month Day> (WeatherFile), found={}",
+                                                           Line.substr(0, Pos)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -9045,8 +9045,8 @@ namespace WeatherManager {
                                     }
                                 } else {
                                     ShowSevereError(state,
-                                                    "Data Periods must be of the form <DayOfYear> or <Month Day>, (WeatherFile) found=" +
-                                                        Line.substr(0, Pos));
+                                                    format("Data Periods must be of the form <DayOfYear> or <Month Day>, (WeatherFile) found={}",
+                                                           Line.substr(0, Pos)));
                                     ErrorsFound = true;
                                 }
                             }
@@ -9091,7 +9091,7 @@ namespace WeatherManager {
                 }
 
             } else {
-                ShowFatalError(state, "Invalid EPW Header designation found=" + HeaderString);
+                ShowFatalError(state, format("Invalid EPW Header designation found={}", HeaderString));
             }
         }
     }
