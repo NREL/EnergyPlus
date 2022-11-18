@@ -2091,7 +2091,7 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
     // Test for #9743
     bool errorsFound = false;
     std::string location = "LOCATION,NADI,-,FJI,IWEC Data,916800,-17.75,177.45,12.0,18.0";
-    WeatherManager::ProcessEPWHeader(*state, WeatherManager::epwHeaders[0], location, errorsFound);
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::Location, location, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_FALSE(has_err_output());
     EXPECT_EQ(state->dataWeatherManager->EPWHeaderTitle, "NADI - FJI IWEC Data WMO#=916800");
@@ -2104,14 +2104,14 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
                                    "Handbook,,Heating,7,16.3,17.3,12.5,9,21.2,13.4,9.6,21.2,9,25.8,8.2,25.8,2,120,Cooling,1,7.5,32.3,25.3,31.9,25.3,"
                                    "31.2,25.2,26.9,30.5,26.5,30.1,26.2,29.7,5.2,300,26,21.4,28.8,25.6,20.8,28.5,25.2,20.3,28.2,84.8,30.6,83.2,30.3,"
                                    "81.9,29.8,21,Extremes,8.4,7.4,6.6,30.4,14.3,34.6,1,1.7,13.5,35.8,12.9,36.9,12.4,37.8,11.6,39.1";
-    WeatherManager::ProcessEPWHeader(*state, WeatherManager::epwHeaders[1], designConditions, errorsFound);
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::DesignConditions, designConditions, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_FALSE(has_err_output());
     // Design Conditions are skipped - nothing to check
 
     std::string typicalExtreme = "TYPICAL/EXTREME PERIODS,3,No Dry Season - Week Near Average Annual,Typical,4/16,4/22,No Dry Season "
                                  "- Week Near Annual Max,Extreme,2/ 5,2/11,No Dry Season - Week Near Annual Min,Extreme,July 16,Jul 22";
-    WeatherManager::ProcessEPWHeader(*state, WeatherManager::epwHeaders[2], typicalExtreme, errorsFound);
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::TypicalExtremePeriods, typicalExtreme, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_FALSE(has_err_output());
     EXPECT_EQ(state->dataWeatherManager->NumEPWTypExtSets, 3);
@@ -2141,7 +2141,7 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
         "GROUND "
         "TEMPERATURES,3,.5,,,,26.85,26.98,26.68,26.23,25.09,24.22,23.64,23.49,23.82,24.51,25.43,26.27,2,,,,26.27,26.54,26.46,26.22,25.45,24.76,24.22,"
         "23.94,24.02,24.42,25.06,25.72,4,,,,25.79,26.07,26.12,26.03,25.58,25.12,24.70,24.41,24.35,24.53,24.91,25.36";
-    WeatherManager::ProcessEPWHeader(*state, WeatherManager::epwHeaders[3], groundTemps, errorsFound);
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::GroundTemperatures, groundTemps, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_FALSE(has_err_output());
     // apparently only the first set of ground temps are used
@@ -2159,7 +2159,7 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
     EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(12), 26.27);
 
     std::string holidaysDST = "HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0";
-    WeatherManager::ProcessEPWHeader(*state, WeatherManager::epwHeaders[4], holidaysDST, errorsFound);
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::HolidaysDST, holidaysDST, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_FALSE(has_err_output());
     EXPECT_FALSE(state->dataWeatherManager->WFAllowsLeapYears);
@@ -2167,7 +2167,7 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
     EXPECT_EQ(state->dataWeatherManager->NumSpecialDays, 0);
 
     holidaysDST = "HOLIDAYS/DAYLIGHT SAVINGS,Yes,1st Monday in May,7/31,0";
-    WeatherManager::ProcessEPWHeader(*state, WeatherManager::epwHeaders[4], holidaysDST, errorsFound);
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::HolidaysDST, holidaysDST, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_FALSE(has_err_output());
     EXPECT_TRUE(state->dataWeatherManager->WFAllowsLeapYears);
@@ -2182,19 +2182,19 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
     EXPECT_EQ(state->dataWeatherManager->EPWDST.EnWeekDay, 2);
 
     std::string comments1 = "COMMENTS 1,IWEC- WMO#916800 - South-west Pacific -- Original Source Data (c) 2001 ASHRAE Inc.,";
-    WeatherManager::ProcessEPWHeader(*state, WeatherManager::epwHeaders[5], comments1, errorsFound);
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::Comments1, comments1, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_FALSE(has_err_output());
     // Comments are skipped - nothing to check
 
     std::string comments2 = "COMMENTS 2, -- Ground temps produced with a standard soil diffusivity of 2.3225760E-03 {m**2/day}";
-    WeatherManager::ProcessEPWHeader(*state, WeatherManager::epwHeaders[6], comments2, errorsFound);
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::Comments2, comments2, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_FALSE(has_err_output());
     // Comments are skipped - nothing to check
 
     std::string dataPeriods = "DATA PERIODS,2,10,Data1,Sunday, 1/ 1/1989,12/31/1990,Data2,Friday, FEBRUARY 1,Mar 15";
-    WeatherManager::ProcessEPWHeader(*state, WeatherManager::epwHeaders[7], dataPeriods, errorsFound);
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::DataPeriods, dataPeriods, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_FALSE(has_err_output());
     EXPECT_EQ(state->dataWeatherManager->NumDataPeriods, 2);
