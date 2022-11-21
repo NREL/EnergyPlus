@@ -1012,7 +1012,7 @@ namespace WeatherManager {
                                   kindOfRunPeriod,
                                   StDate,
                                   EnDate,
-                                  ScheduleManager::dayTypeNames[TWeekDay - 1],
+                                  ScheduleManager::dayTypeNames[TWeekDay],
                                   fmt::to_string(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TotalDays),
                                   "Use RunPeriod Specified Day",
                                   AlpUseDST,
@@ -1202,8 +1202,7 @@ namespace WeatherManager {
                                 ScheduleManager::dayTypeNames[state.dataWeatherManager
                                                                   ->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn)
                                                                                     .DesignDayNum)
-                                                                  .DayType -
-                                                              1],
+                                                                  .DayType],
                                 "1",
                                 "N/A",
                                 "N/A",
@@ -5514,8 +5513,8 @@ namespace WeatherManager {
             // A2 , \field Day of Week for Start Day
             bool inputWeekday = false;
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) { // Have input
-                int dayType = 1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
-                if (dayType < 0) {
+                int dayType = getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
+                if (dayType < 1) {
                     ShowWarningError(state,
                                      state.dataIPShortCut->cCurrentModuleObject + ": object=" + state.dataWeatherManager->RunPeriodInput(i).title +
                                          state.dataIPShortCut->cAlphaFieldNames(2) + " invalid (Day of Week) [" +
@@ -5568,7 +5567,7 @@ namespace WeatherManager {
                                                         state.dataWeatherManager->RunPeriodInput(i).title,
                                                         state.dataIPShortCut->cAlphaArgs(2),
                                                         state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                        ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday) - 1]));
+                                                        ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday)]));
                                 state.dataWeatherManager->RunPeriodInput(i).startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
@@ -5615,7 +5614,7 @@ namespace WeatherManager {
                                                         state.dataWeatherManager->RunPeriodInput(i).title,
                                                         state.dataIPShortCut->cAlphaArgs(2),
                                                         state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                        ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday) - 1]));
+                                                        ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday)]));
                                 state.dataWeatherManager->RunPeriodInput(i).startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
@@ -5957,8 +5956,8 @@ namespace WeatherManager {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
             } else {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
-                    1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
-                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 0 ||
+                    getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
+                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek < 1 ||
                     state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 8) {
                     ShowWarningError(state,
                                      state.dataIPShortCut->cCurrentModuleObject +
@@ -6143,9 +6142,9 @@ namespace WeatherManager {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
             } else {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
-                    1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(3));
-                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 0 ||
-                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 8) {
+                    getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(3));
+                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek < 1 ||
+                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek > 7) {
                     ShowWarningError(state,
                                      state.dataIPShortCut->cCurrentModuleObject +
                                          ": object=" + state.dataWeatherManager->RunPeriodDesignInput(Count).title + ' ' +
@@ -7387,8 +7386,8 @@ namespace WeatherManager {
 
             //   A2,  \field Day Type
             state.dataWeatherManager->DesDayInput(EnvrnNum).DayType =
-                1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
-            if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayType == 0) {
+                getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
+            if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayType <= 0) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
                                     "\", invalid data.");
@@ -8908,7 +8907,7 @@ namespace WeatherManager {
                         if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
                             state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek = Line.substr(0, Pos);
                             state.dataWeatherManager->DataPeriods(CurCount).WeekDay =
-                                1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek);
+                                getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek);
                             if (state.dataWeatherManager->DataPeriods(CurCount).WeekDay < 1 ||
                                 state.dataWeatherManager->DataPeriods(CurCount).WeekDay > 7) {
                                 ShowSevereError(state,

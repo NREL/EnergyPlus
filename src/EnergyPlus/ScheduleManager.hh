@@ -69,8 +69,8 @@ struct EnergyPlusData;
 namespace ScheduleManager {
 
     int constexpr maxDayTypes(12);
-    extern const std::array<std::string_view, maxDayTypes> dayTypeNames;
-    extern const std::array<std::string_view, maxDayTypes> dayTypeNamesUC;
+    extern const std::array<std::string_view, maxDayTypes + 1> dayTypeNames;
+    extern const std::array<std::string_view, maxDayTypes + 1> dayTypeNamesUC;
 
     enum class SchedType : int
     {

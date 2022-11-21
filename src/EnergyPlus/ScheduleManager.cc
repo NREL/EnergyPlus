@@ -95,31 +95,34 @@ namespace ScheduleManager {
 
     // MODULE PARAMETER DEFINITIONS
     static constexpr std::string_view BlankString;
-    constexpr std::array<std::string_view, maxDayTypes> dayTypeNames{"Sunday",
-                                                                     "Monday",
-                                                                     "Tuesday",
-                                                                     "Wednesday",
-                                                                     "Thursday",
-                                                                     "Friday",
-                                                                     "Saturday",
-                                                                     "Holiday",
-                                                                     "SummerDesignDay",
-                                                                     "WinterDesignDay",
-                                                                     "CustomDay1",
-                                                                     "CustomDay2"};
+    // Day types are 1-based for EMS and output and other uses, so add a dummy
+    constexpr std::array<std::string_view, maxDayTypes + 1> dayTypeNames{"dummy",
+                                                                         "Sunday",
+                                                                         "Monday",
+                                                                         "Tuesday",
+                                                                         "Wednesday",
+                                                                         "Thursday",
+                                                                         "Friday",
+                                                                         "Saturday",
+                                                                         "Holiday",
+                                                                         "SummerDesignDay",
+                                                                         "WinterDesignDay",
+                                                                         "CustomDay1",
+                                                                         "CustomDay2"};
 
-    constexpr std::array<std::string_view, maxDayTypes> dayTypeNamesUC{"SUNDAY",
-                                                                       "MONDAY",
-                                                                       "TUESDAY",
-                                                                       "WEDNESDAY",
-                                                                       "THURSDAY",
-                                                                       "FRIDAY",
-                                                                       "SATURDAY",
-                                                                       "HOLIDAY",
-                                                                       "SUMMERDESIGNDAY",
-                                                                       "WINTERDESIGNDAY",
-                                                                       "CUSTOMDAY1",
-                                                                       "CUSTOMDAY2"};
+    constexpr std::array<std::string_view, maxDayTypes + 1> dayTypeNamesUC{"dummy",
+                                                                           "SUNDAY",
+                                                                           "MONDAY",
+                                                                           "TUESDAY",
+                                                                           "WEDNESDAY",
+                                                                           "THURSDAY",
+                                                                           "FRIDAY",
+                                                                           "SATURDAY",
+                                                                           "HOLIDAY",
+                                                                           "SUMMERDESIGNDAY",
+                                                                           "WINTERDESIGNDAY",
+                                                                           "CUSTOMDAY1",
+                                                                           "CUSTOMDAY2"};
 
     int constexpr numScheduleTypeLimitUnitTypes = 14;
     static constexpr std::array<std::string_view, static_cast<int>(numScheduleTypeLimitUnitTypes)> scheduleTypeLimitUnitTypes{"DIMENSIONLESS",
@@ -1467,7 +1470,7 @@ namespace ScheduleManager {
                                          "\" has missing day types in Through=" + CurrentThrough);
                     ShowContinueError(state, "Last \"For\" field=" + LastFor);
                     errmsg = "Missing day types=,";
-                    for (kdy = 0; kdy < maxDayTypes; ++kdy) {
+                    for (kdy = 1; kdy <= maxDayTypes; ++kdy) {
                         if (AllDays(kdy)) continue;
                         errmsg.erase(errmsg.length() - 1);
                         errmsg += "\"" + static_cast<std::string>(dayTypeNames[kdy]) + "\",-";
@@ -2290,7 +2293,7 @@ namespace ScheduleManager {
                 print(state.files.eio, "\n");
                 // SchWFmt Header (WeekSchedule)
                 std::string SchWFmt("! <WeekSchedule>,Name");
-                for (int Count = 0; Count < maxDayTypes; ++Count) {
+                for (int Count = 1; Count <= maxDayTypes; ++Count) {
                     SchWFmt += "," + static_cast<std::string>(dayTypeNames[Count]);
                 }
                 print(state.files.eio, "{}\n", SchWFmt);
