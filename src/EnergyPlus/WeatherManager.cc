@@ -112,7 +112,22 @@ namespace WeatherManager {
                                                                                              "COMMENTS 2",
                                                                                              "DATA PERIODS"});
 
-    // Functions
+    static constexpr std::array<std::string_view, static_cast<int>(WaterMainsTempCalcMethod::Num)> waterMainsCalcMethodNames{
+        "Schedule", "Correlation", "CorrelationFromWeatherFile", "FixedDefault"};
+
+    static constexpr std::array<std::string_view, static_cast<int>(WaterMainsTempCalcMethod::Num)> waterMainsCalcMethodNamesUC{
+        "SCHEDULE", "CORRELATION", "CORRELATIONFROMWEATHERFILE", "FIXEDDEFAULT"};
+
+    static constexpr std::array<std::string_view, static_cast<int>(SkyTempCalcType::Num)> SkyTempModelInputNamesUC{
+        "CLARKALLEN", "SCHEDULEVALUE", "DIFFERENCESCHEDULEDRYBULBVALUE", "DIFFERENCESCHEDULEDEWPOINTVALUE", "BRUNT", "IDSO", "BERDAHLMARTIN"};
+
+    static constexpr std::array<std::string_view, static_cast<int>(SkyTempCalcType::Num)> SkyTempModelNames{"Clark and Allen",
+                                                                                                            "Schedule Value",
+                                                                                                            "DryBulb Difference Schedule Value",
+                                                                                                            "Dewpoint Difference Schedule Value",
+                                                                                                            "Brunt",
+                                                                                                            "Idso",
+                                                                                                            "Berdahl and Martin"};
 
     void ManageWeather(EnergyPlusData &state)
     {
@@ -334,15 +349,6 @@ namespace WeatherManager {
         static constexpr std::string_view EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
         static constexpr std::string_view DateFormat("{:02}/{:02}");
         static constexpr std::string_view DateFormatWithYear("{:02}/{:02}/{:04}");
-        static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
-        static std::map<EmissivityCalcType, std::string> const SkyTempModelNames{
-            {EmissivityCalcType::ClarkAllenModel, "Clark and Allen"},
-            {EmissivityCalcType::ScheduleValue, "Schedule Value"},
-            {EmissivityCalcType::DryBulbDelta, "DryBulb Difference Schedule Value"},
-            {EmissivityCalcType::DewPointDelta, "Dewpoint Difference Schedule Value"},
-            {EmissivityCalcType::BruntModel, "Brunt"},
-            {EmissivityCalcType::IdsoModel, "Idso"},
-            {EmissivityCalcType::BerdahlMartinModel, "Berdahl and Martin"}};
         std::string StDate;
         std::string EnDate;
         int DSTActStMon;
@@ -1020,7 +1026,8 @@ namespace WeatherManager {
                                   ApWkRule,
                                   AlpUseRain,
                                   AlpUseSnow,
-                                  SkyTempModelNames.at(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel));
+                                  SkyTempModelNames[static_cast<int>(
+                                      state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel)]);
                         }
 
                         if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
@@ -1161,7 +1168,7 @@ namespace WeatherManager {
                                     print(state.files.eio,
                                           EnvSpDyFormat,
                                           state.dataWeatherManager->SpecialDays(i).Name,
-                                          SpecialDayNames(state.dataWeatherManager->SpecialDays(i).DayType),
+                                          ScheduleManager::dayTypeNames[state.dataWeatherManager->SpecialDays(i).DayType],
                                           "WeatherFile",
                                           StDate,
                                           state.dataWeatherManager->SpecialDays(i).Duration);
@@ -1173,7 +1180,7 @@ namespace WeatherManager {
                                     print(state.files.eio,
                                           EnvSpDyFormat,
                                           state.dataWeatherManager->SpecialDays(i).Name,
-                                          SpecialDayNames(state.dataWeatherManager->SpecialDays(i).DayType),
+                                          ScheduleManager::dayTypeNames[state.dataWeatherManager->SpecialDays(i).DayType],
                                           "InputFile",
                                           StDate,
                                           state.dataWeatherManager->SpecialDays(i).Duration);
@@ -1210,7 +1217,8 @@ namespace WeatherManager {
                                 "N/A",
                                 "N/A",
                                 "N/A",
-                                SkyTempModelNames.at(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel));
+                                SkyTempModelNames[static_cast<int>(
+                                    state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel)]);
                         }
                         if (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
                                     .DSTIndicator == 0 &&
@@ -2234,9 +2242,9 @@ namespace WeatherManager {
                 state.dataWeatherManager->SPSiteDiffuseSolarScheduleValue(envrnDayNum) =
                     state.dataWeatherManager->DDDiffuseSolarValues(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ScheduleValue ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::DryBulbDelta ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::DewPointDelta) {
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::ScheduleValue ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::DryBulbDelta ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::DewPointDelta) {
                 state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue(envrnDayNum) =
                     state.dataWeatherManager->DDSkyTempScheduleValues(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
@@ -3275,7 +3283,7 @@ namespace WeatherManager {
 
         if (state.dataWeatherManager->Environment(Environ).WP_Type1 != 0) {
             switch (state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).CalculationType) {
-            case EmissivityCalcType::ScheduleValue:
+            case SkyTempCalcType::ScheduleValue:
                 ScheduleManager::GetScheduleValuesForDay(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).SchedulePtr,
@@ -3283,7 +3291,7 @@ namespace WeatherManager {
                     state.dataWeatherManager->TomorrowVariables.DayOfYear_Schedule,
                     state.dataWeatherManager->CurDayOfWeek);
                 break;
-            case EmissivityCalcType::DryBulbDelta:
+            case SkyTempCalcType::DryBulbDelta:
                 ScheduleManager::GetScheduleValuesForDay(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).SchedulePtr,
@@ -3297,7 +3305,7 @@ namespace WeatherManager {
                     }
                 }
                 break;
-            case EmissivityCalcType::DewPointDelta:
+            case SkyTempCalcType::DewPointDelta:
                 ScheduleManager::GetScheduleValuesForDay(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).SchedulePtr,
@@ -3335,7 +3343,7 @@ namespace WeatherManager {
     }
 
     Real64 CalcSkyEmissivity(EnergyPlusData &state,
-                             EmissivityCalcType const ESkyCalcType,
+                             SkyTempCalcType const ESkyCalcType,
                              Real64 const OSky,
                              Real64 const DryBulb,
                              Real64 const DewPoint,
@@ -3351,13 +3359,13 @@ namespace WeatherManager {
 
         Real64 ESky;
 
-        if (ESkyCalcType == EmissivityCalcType::BruntModel) {
+        if (ESkyCalcType == SkyTempCalcType::BruntModel) {
             double const PartialPress = RelHum * Psychrometrics::PsyPsatFnTemp(state, DryBulb) * 0.01;
             ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
-        } else if (ESkyCalcType == EmissivityCalcType::IdsoModel) {
+        } else if (ESkyCalcType == SkyTempCalcType::IdsoModel) {
             double const PartialPress = RelHum * Psychrometrics::PsyPsatFnTemp(state, DryBulb) * 0.01;
             ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + DataGlobalConstants::KelvinConv));
-        } else if (ESkyCalcType == EmissivityCalcType::BerdahlMartinModel) {
+        } else if (ESkyCalcType == SkyTempCalcType::BerdahlMartinModel) {
             double const TDewC = min(DryBulb, DewPoint);
             ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
         } else {
@@ -4109,11 +4117,10 @@ namespace WeatherManager {
                 state.dataWeatherManager->TomorrowHorizIRSky(ts, hour) =
                     ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobalConstants::KelvinConv);
 
-                if (state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BruntModel ||
-                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+                if (state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::BruntModel ||
+                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::IdsoModel ||
+                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::BerdahlMartinModel ||
+                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::ClarkAllenModel) {
                     // Design day not scheduled
                     state.dataWeatherManager->TomorrowSkyTemp(ts, hour) =
                         (DryBulb + DataGlobalConstants::KelvinConv) * root_4(ESky) - DataGlobalConstants::KelvinConv;
@@ -4254,14 +4261,14 @@ namespace WeatherManager {
         if (state.dataWeatherManager->Environment(EnvrnNum).WP_Type1 != 0) {
 
             switch (state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).CalculationType) {
-            case EmissivityCalcType::ScheduleValue:
+            case SkyTempCalcType::ScheduleValue:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr,
                     state.dataWeatherManager->TomorrowSkyTemp);
                 state.dataWeatherManager->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
                 break;
-            case EmissivityCalcType::DryBulbDelta:
+            case SkyTempCalcType::DryBulbDelta:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr,
@@ -4274,7 +4281,7 @@ namespace WeatherManager {
                     }
                 }
                 break;
-            case EmissivityCalcType::DewPointDelta:
+            case SkyTempCalcType::DewPointDelta:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr,
@@ -6236,8 +6243,6 @@ namespace WeatherManager {
         //        \key CustomDay1
         //        \key CustomDay2
 
-        static Array1D_string const ValidDayTypes(5, {"HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2"});
-
         state.dataIPShortCut->cCurrentModuleObject = "RunPeriodControl:SpecialDays";
         int NumSpecDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
         int Count;
@@ -6299,7 +6304,7 @@ namespace WeatherManager {
                 ErrorsFound = true;
             }
 
-            int DayType = UtilityRoutines::FindItemInList(AlphArray(3), ValidDayTypes, 5);
+            int DayType = getEnumerationValue(ScheduleManager::dayTypeNamesUC, AlphArray(3));
             if (DayType == 0) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + ": " + AlphArray(1) + " Invalid " +
@@ -6495,14 +6500,15 @@ namespace WeatherManager {
         //   N13, \field ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
         //   N14; \field Sky Clearness
 
-        static std::map<DDHumIndType, std::string> const DDHumIndTypeStringRep{{DDHumIndType::WetBulb, "Wetbulb [C]"},
-                                                                               {DDHumIndType::DewPoint, "Dewpoint [C]"},
-                                                                               {DDHumIndType::Enthalpy, "Enthalpy [J/kg]"},
-                                                                               {DDHumIndType::HumRatio, "Humidity Ratio []"},
-                                                                               {DDHumIndType::RelHumSch, "Schedule []"},
-                                                                               {DDHumIndType::WBProfDef, "WetBulbProfileDefaultMultipliers []"},
-                                                                               {DDHumIndType::WBProfDif, "WetBulbProfileDifferenceSchedule []"},
-                                                                               {DDHumIndType::WBProfMul, "WetBulbProfileMultiplierSchedule []"}};
+        static constexpr std::array<std::string_view, static_cast<int>(DDHumIndType::Num)> DDHumIndTypeStringRep = {
+            "Wetbulb [C]",
+            "Dewpoint [C]",
+            "Enthalpy [J/kg]",
+            "Humidity Ratio []",
+            "Schedule []",
+            "WetBulbProfileDefaultMultipliers []",
+            "WetBulbProfileDifferenceSchedule []",
+            "WetBulbProfileMultiplierSchedule []"};
 
         // Below are the 2009 fractions, HOF, Chap 14, Table 6
         static constexpr std::array<Real64, 24> DefaultTempRangeMult = {0.88, 0.92, 0.95, 0.98, 1.0,  0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13,
@@ -7431,10 +7437,11 @@ namespace WeatherManager {
             } else {
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDDhumid, envTitle, "N/A");
             }
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchDDhumTyp,
-                                                     envTitle,
-                                                     DDHumIndTypeStringRep.at(state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType));
+            OutputReportPredefined::PreDefTableEntry(
+                state,
+                state.dataOutRptPredefined->pdchDDhumTyp,
+                envTitle,
+                DDHumIndTypeStringRep[static_cast<int>(state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType)]);
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchDDwindSp, envTitle, state.dataWeatherManager->DesDayInput(EnvrnNum).WindSpeed);
             OutputReportPredefined::PreDefTableEntry(
@@ -7611,41 +7618,41 @@ namespace WeatherManager {
             // Validate Calculation Type.
             std::string units;
             OutputProcessor::Unit unitType;
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ScheduleValue")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::ScheduleValue;
+            state.dataWeatherManager->WPSkyTemperature(i).CalculationType =
+                static_cast<SkyTempCalcType>(getEnumerationValue(WeatherManager::SkyTempModelInputNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
+
+            switch (state.dataWeatherManager->WPSkyTemperature(i).CalculationType) {
+            case SkyTempCalcType::ScheduleValue: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = true;
                 units = "[C]";
                 unitType = OutputProcessor::Unit::C;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "DifferenceScheduleDryBulbValue")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::DryBulbDelta;
+            } break;
+            case SkyTempCalcType::DryBulbDelta: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "DifferenceScheduleDewPointValue")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::DewPointDelta;
+            } break;
+            case SkyTempCalcType::DewPointDelta: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Brunt")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::BruntModel;
+            } break;
+            case SkyTempCalcType::BruntModel: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Idso")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::IdsoModel;
+            } break;
+            case SkyTempCalcType::IdsoModel: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "BerdahlMartin")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::BerdahlMartinModel;
+            } break;
+            case SkyTempCalcType::BerdahlMartinModel: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ClarkAllen")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::ClarkAllenModel;
+            } break;
+            case SkyTempCalcType::ClarkAllenModel: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
-            } else {
-                ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '.');
-                ShowContinueError(state,
-                                  "...entered value=\"" + state.dataIPShortCut->cAlphaArgs(2) +
-                                      "\", should be one of: ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue.");
-                ErrorsFound = true;
+            } break;
+            default: {
+                // Bad inputs are trapped by input processor
+                assert(false);
+            }
             }
 
             if (state.dataWeatherManager->WPSkyTemperature(i).IsSchedule) {
@@ -7929,8 +7936,9 @@ namespace WeatherManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            if (UtilityRoutines::SameString(AlphArray(1), "Schedule")) {
-                state.dataWeatherManager->WaterMainsTempsMethod = WaterMainsTempCalcMethod::Schedule;
+            state.dataWeatherManager->WaterMainsTempsMethod =
+                static_cast<WeatherManager::WaterMainsTempCalcMethod>(getEnumerationValue(waterMainsCalcMethodNamesUC, AlphArray(1)));
+            if (state.dataWeatherManager->WaterMainsTempsMethod == WaterMainsTempCalcMethod::Schedule) {
                 state.dataWeatherManager->WaterMainsTempsScheduleName = AlphArray(2);
                 state.dataWeatherManager->WaterMainsTempsSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWeatherManager->WaterMainsTempsSchedule == 0) {
@@ -7940,9 +7948,7 @@ namespace WeatherManager {
                     ErrorsFound = true;
                 }
 
-            } else if (UtilityRoutines::SameString(AlphArray(1), "Correlation")) {
-                state.dataWeatherManager->WaterMainsTempsMethod = WaterMainsTempCalcMethod::Correlation;
-
+            } else if (state.dataWeatherManager->WaterMainsTempsMethod == WaterMainsTempCalcMethod::Correlation) {
                 if (NumNums == 0) {
                     ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ": Missing Annual Average and Maximum Difference fields.");
                     ErrorsFound = true;
@@ -7953,8 +7959,8 @@ namespace WeatherManager {
                     state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp = NumArray(1);
                     state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp = NumArray(2);
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(1), "CorrelationFromWeatherFile")) {
-                state.dataWeatherManager->WaterMainsTempsMethod = WaterMainsTempCalcMethod::CorrelationFromWeatherFile;
+            } else if (state.dataWeatherManager->WaterMainsTempsMethod == WaterMainsTempCalcMethod::CorrelationFromWeatherFile) {
+                // No action
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
@@ -9663,11 +9669,6 @@ namespace WeatherManager {
         // report site water mains temperature object user inputs and/or parameters calculated
         // from weather or stat file
 
-        std::map<WeatherManager::WaterMainsTempCalcMethod, std::string> const calcMethodMap{
-            {WeatherManager::WaterMainsTempCalcMethod::Schedule, "Schedule"},
-            {WeatherManager::WaterMainsTempCalcMethod::Correlation, "Correlation"},
-            {WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile, "CorrelationFromWeatherFile"}};
-
         if (!state.files.eio.good()) {
             return;
         }
@@ -9686,7 +9687,7 @@ namespace WeatherManager {
         switch (state.dataWeatherManager->WaterMainsTempsMethod) {
         case WaterMainsTempCalcMethod::Schedule:
             *eiostream << "Site Water Mains Temperature Information,";
-            *eiostream << calcMethodMap.at(state.dataWeatherManager->WaterMainsTempsMethod) << ","
+            *eiostream << waterMainsCalcMethodNames[static_cast<int>(state.dataWeatherManager->WaterMainsTempsMethod)] << ","
                        << state.dataWeatherManager->WaterMainsTempsScheduleName << ",";
             *eiostream << format("{:.2R}", state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp) << ","
                        << format("{:.2R}", state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp) << ",";
@@ -9694,7 +9695,7 @@ namespace WeatherManager {
             break;
         case WaterMainsTempCalcMethod::Correlation:
             *eiostream << "Site Water Mains Temperature Information,";
-            *eiostream << calcMethodMap.at(state.dataWeatherManager->WaterMainsTempsMethod) << ","
+            *eiostream << waterMainsCalcMethodNames[static_cast<int>(state.dataWeatherManager->WaterMainsTempsMethod)] << ","
                        << "NA"
                        << ",";
             *eiostream << format("{:.2R}", state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp) << ","
@@ -9704,7 +9705,7 @@ namespace WeatherManager {
         case WaterMainsTempCalcMethod::CorrelationFromWeatherFile:
             if (state.dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                 *eiostream << "Site Water Mains Temperature Information,";
-                *eiostream << calcMethodMap.at(state.dataWeatherManager->WaterMainsTempsMethod) << ","
+                *eiostream << waterMainsCalcMethodNames[static_cast<int>(state.dataWeatherManager->WaterMainsTempsMethod)] << ","
                            << "NA"
                            << ",";
                 *eiostream << format("{:.2R}", state.dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp) << ","
@@ -9760,11 +9761,10 @@ namespace WeatherManager {
                                      DewPoint,
                                      RelHum);
             HorizIRSky = ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobalConstants::KelvinConv);
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::BruntModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::IdsoModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::BerdahlMartinModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::ClarkAllenModel) {
                 SkyTemp = (DryBulb + DataGlobalConstants::KelvinConv) * root_4(ESky) - DataGlobalConstants::KelvinConv;
             } else {
                 SkyTemp = 0.0; // dealt with later
@@ -9772,11 +9772,10 @@ namespace WeatherManager {
         } else {
             // Valid IR from weather files
             HorizIRSky = IRHoriz;
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::BruntModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::IdsoModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::BerdahlMartinModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::ClarkAllenModel) {
                 SkyTemp = root_4(IRHoriz / state.dataWeatherManager->Sigma) - DataGlobalConstants::KelvinConv;
             } else {
                 SkyTemp = 0.0; // dealt with later

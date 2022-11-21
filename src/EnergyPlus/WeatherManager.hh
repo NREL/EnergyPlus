@@ -100,10 +100,10 @@ namespace WeatherManager {
     enum class WaterMainsTempCalcMethod
     {
         Invalid = -1,
-        FixedDefault,
         Schedule,
         Correlation,
         CorrelationFromWeatherFile,
+        FixedDefault,
         Num
     };
 
@@ -144,7 +144,7 @@ namespace WeatherManager {
         Num
     };
 
-    enum class EmissivityCalcType
+    enum class SkyTempCalcType
     {
         Invalid = -1,
         ClarkAllenModel,    // Use Clark & Allen model for sky emissivity calculation
@@ -154,7 +154,6 @@ namespace WeatherManager {
         BruntModel,         // Use Brunt model for sky emissivity calculation
         IdsoModel,          // Use Isdo model for sky emissivity calculation
         BerdahlMartinModel, // Use Martin & Berdahl model for sky emissivity calculation
-        SkyTAlgorithmA,     // place holder
         Num
     };
 
@@ -190,7 +189,7 @@ namespace WeatherManager {
         int NumSimYears;                 // Total Number of times this period to be performed
         int CurrentCycle;                // Current cycle through weather file in NumSimYears repeats
         int WP_Type1;                    // WeatherProperties SkyTemperature Pointer
-        EmissivityCalcType SkyTempModel; // WeatherProperties SkyTemperature CalculationType
+        SkyTempCalcType SkyTempModel;    // WeatherProperties SkyTemperature CalculationType
         bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
         int CurrentYear;                 // Current year
         bool IsLeapYear;                 // True if current year is leap year.
@@ -212,7 +211,7 @@ namespace WeatherManager {
               HVACSizingIterationNum(0), TotalDays(0), StartJDay(0), StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0),
               EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0), UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true),
               UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false), NumSimYears(1), CurrentCycle(0), WP_Type1(0),
-              SkyTempModel(EmissivityCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
+              SkyTempModel(SkyTempCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
               RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0),
               firstHrInterpUseHr1(false)
         {
@@ -534,14 +533,14 @@ namespace WeatherManager {
         std::string Name;         // Reference Name
         std::string ScheduleName; // Schedule Name or Algorithm Name
         bool IsSchedule;          // Default is using Schedule
-        EmissivityCalcType CalculationType;
+        SkyTempCalcType CalculationType;
         int SchedulePtr; // pointer to schedule when used
         bool UsedForEnvrn;
         bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
 
         // Default Constructor
         WeatherProperties()
-            : IsSchedule(true), CalculationType(EmissivityCalcType::ClarkAllenModel), SchedulePtr(0), UsedForEnvrn(false),
+            : IsSchedule(true), CalculationType(SkyTempCalcType::ClarkAllenModel), SchedulePtr(0), UsedForEnvrn(false),
               UseWeatherFileHorizontalIR(true)
         {
         }
@@ -672,7 +671,7 @@ namespace WeatherManager {
     Real64 AirMass(Real64 CosZen); // COS( solar zenith), 0 - 1
 
     // Calculate sky temperature from weather data
-    Real64 CalcSkyEmissivity(EnergyPlusData &state, EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
+    Real64 CalcSkyEmissivity(EnergyPlusData &state, SkyTempCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
     void ASHRAETauModel([[maybe_unused]] EnergyPlusData &state,
                         DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017

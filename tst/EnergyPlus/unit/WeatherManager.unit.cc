@@ -161,10 +161,10 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 {
     // setup environment state
     state->dataWeatherManager->Environment.allocate(4);
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
-    state->dataWeatherManager->Environment(2).SkyTempModel = EmissivityCalcType::BruntModel;
-    state->dataWeatherManager->Environment(3).SkyTempModel = EmissivityCalcType::IdsoModel;
-    state->dataWeatherManager->Environment(4).SkyTempModel = EmissivityCalcType::BerdahlMartinModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(2).SkyTempModel = SkyTempCalcType::BruntModel;
+    state->dataWeatherManager->Environment(3).SkyTempModel = SkyTempCalcType::IdsoModel;
+    state->dataWeatherManager->Environment(4).SkyTempModel = SkyTempCalcType::BerdahlMartinModel;
 
     // init local variables
     Real64 OpaqueSkyCover(0.0);
@@ -1175,7 +1175,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataWeatherManager->Environment.allocate(1);
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
 
     AllocateWeatherData(*state);
     OpenWeatherFile(*state, ErrorsFound);
@@ -1267,7 +1267,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataWeatherManager->Environment.allocate(1);
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
     state->dataWeatherManager->Environment(1).StartMonth = 1;
     state->dataWeatherManager->Environment(1).StartDay = 1;
 
@@ -1350,7 +1350,7 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
     state->dataWeatherManager->Environment(1).StartMonth = 1;
     state->dataWeatherManager->Environment(1).StartDay = 1;
 
@@ -1487,7 +1487,7 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataWeatherManager->Environment.allocate(1);
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
     state->dataWeatherManager->Environment(1).StartMonth = 1;
     state->dataWeatherManager->Environment(1).StartDay = 1;
 
