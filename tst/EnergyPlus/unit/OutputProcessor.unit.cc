@@ -64,6 +64,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -655,7 +656,7 @@ namespace OutputProcessor {
                                  EndMinute,
                                  StartMinute,
                                  DSTIndicator,
-                                 DayTypes(CurDayType));
+                                 ScheduleManager::dayTypeNames[CurDayType - 1]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // TSMeter
@@ -672,7 +673,7 @@ namespace OutputProcessor {
                                  EndMinute,
                                  StartMinute,
                                  DSTIndicator,
-                                 DayTypes(CurDayType));
+                                 ScheduleManager::dayTypeNames[CurDayType - 1]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // HRMeter
@@ -689,7 +690,7 @@ namespace OutputProcessor {
                                  _,
                                  _,
                                  DSTIndicator,
-                                 DayTypes(CurDayType));
+                                 ScheduleManager::dayTypeNames[CurDayType - 1]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay"}, "\n")));
 
         // DYMeter
@@ -706,7 +707,7 @@ namespace OutputProcessor {
                                  _,
                                  _,
                                  DSTIndicator,
-                                 DayTypes(CurDayType));
+                                 ScheduleManager::dayTypeNames[CurDayType - 1]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0,WinterDesignDay"}, "\n")));
 
         // MNMeter

@@ -2602,7 +2602,7 @@ namespace OutputProcessor {
                                          EndMinute,
                                          StartMinute,
                                          state.dataEnvrn->DSTIndicator,
-                                         DayTypes(CurDayType));
+                                         ScheduleManager::dayTypeNames[CurDayType - 1]);
                 if (state.dataResultsFramework->resultsFramework->TSMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->TSMeters.newRow(
                         state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, EndMinute);
@@ -2629,7 +2629,7 @@ namespace OutputProcessor {
                                          EndMinute,
                                          StartMinute,
                                          state.dataEnvrn->DSTIndicator,
-                                         DayTypes(CurDayType));
+                                         ScheduleManager::dayTypeNames[CurDayType - 1]);
                 PrintESOTimeStamp = false;
             }
 
@@ -2729,7 +2729,7 @@ namespace OutputProcessor {
                                          _,
                                          _,
                                          state.dataEnvrn->DSTIndicator,
-                                         DayTypes(CurDayType));
+                                         ScheduleManager::dayTypeNames[CurDayType - 1]);
                 if (state.dataResultsFramework->resultsFramework->HRMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->HRMeters.newRow(
                         state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
@@ -2831,7 +2831,7 @@ namespace OutputProcessor {
                                          _,
                                          _,
                                          state.dataEnvrn->DSTIndicator,
-                                         DayTypes(CurDayType));
+                                         ScheduleManager::dayTypeNames[CurDayType - 1]);
                 if (state.dataResultsFramework->resultsFramework->DYMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->DYMeters.newRow(
                         state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
@@ -5645,7 +5645,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              op->TimeValue.at(t_TimeStepTypeKey).CurMinute,
                                              StartMinute,
                                              state.dataEnvrn->DSTIndicator,
-                                             DayTypes(CurDayType));
+                                             ScheduleManager::dayTypeNames[CurDayType - 1]);
                     op->LHourP = state.dataGlobal->HourOfDay;
                     op->LStartMin = StartMinute;
                     op->LEndMin = op->TimeValue.at(t_TimeStepTypeKey).CurMinute;
@@ -5729,7 +5729,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              op->TimeValue.at(t_TimeStepTypeKey).CurMinute,
                                              StartMinute,
                                              state.dataEnvrn->DSTIndicator,
-                                             DayTypes(CurDayType));
+                                             ScheduleManager::dayTypeNames[CurDayType - 1]);
                     op->LHourP = state.dataGlobal->HourOfDay;
                     op->LStartMin = StartMinute;
                     op->LEndMin = op->TimeValue.at(t_TimeStepTypeKey).CurMinute;
@@ -5820,7 +5820,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      op->TimeValue.at(thisTimeStepType).CurMinute,
                                                      StartMinute,
                                                      state.dataEnvrn->DSTIndicator,
-                                                     DayTypes(CurDayType));
+                                                     ScheduleManager::dayTypeNames[CurDayType - 1]);
                             op->LHourP = state.dataGlobal->HourOfDay;
                             op->LStartMin = StartMinute;
                             op->LEndMin = op->TimeValue.at(thisTimeStepType).CurMinute;
@@ -5876,7 +5876,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      op->TimeValue.at(thisTimeStepType).CurMinute,
                                                      StartMinute,
                                                      state.dataEnvrn->DSTIndicator,
-                                                     DayTypes(CurDayType));
+                                                     ScheduleManager::dayTypeNames[CurDayType - 1]);
                             op->LHourP = state.dataGlobal->HourOfDay;
                             op->LStartMin = StartMinute;
                             op->LEndMin = op->TimeValue.at(thisTimeStepType).CurMinute;
@@ -5922,7 +5922,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      _,
                                      _,
                                      state.dataEnvrn->DSTIndicator,
-                                     DayTypes(CurDayType));
+                                     ScheduleManager::dayTypeNames[CurDayType - 1]);
             TimePrint = false;
         }
 
@@ -6026,7 +6026,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      _,
                                      _,
                                      state.dataEnvrn->DSTIndicator,
-                                     DayTypes(CurDayType));
+                                     ScheduleManager::dayTypeNames[CurDayType - 1]);
             TimePrint = false;
         }
         if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {

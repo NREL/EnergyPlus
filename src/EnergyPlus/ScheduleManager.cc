@@ -84,51 +84,58 @@ namespace ScheduleManager {
     //                      J. Glazer January 2005 -- added Schedule:File
     //                      Michael Wetter February 2010 -- added Schedule for external Interface
     //                      L Lawrie - October 2012 - added sub-hourly option for Schedule:File
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // To provide the capabilities of getting the schedule data from the input,
     // validating it, and storing it in such a manner that the schedule manager
     // can provide the scheduling value needs for the simulation.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // Proposal for Schedule Manager in EnergyPlus (Rick Strand)
 
     // MODULE PARAMETER DEFINITIONS
     static constexpr std::string_view BlankString;
-    Array1D_string ValidDayTypes(MaxDayTypes,
-                                 {"Sunday",
-                                  "Monday",
-                                  "Tuesday",
-                                  "Wednesday",
-                                  "Thursday",
-                                  "Friday",
-                                  "Saturday",
-                                  "Holiday",
-                                  "SummerDesignDay",
-                                  "WinterDesignDay",
-                                  "CustomDay1",
-                                  "CustomDay2"});
+    constexpr std::array<std::string_view, maxDayTypes> dayTypeNames{"Sunday",
+                                                                     "Monday",
+                                                                     "Tuesday",
+                                                                     "Wednesday",
+                                                                     "Thursday",
+                                                                     "Friday",
+                                                                     "Saturday",
+                                                                     "Holiday",
+                                                                     "SummerDesignDay",
+                                                                     "WinterDesignDay",
+                                                                     "CustomDay1",
+                                                                     "CustomDay2"};
 
-    int constexpr NumScheduleTypeLimitUnitTypes(14);
-    Array1D_string ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes,
-                                              {"Dimensionless",
-                                               "Temperature",
-                                               "DeltaTemperature",
-                                               "PrecipitationRate",
-                                               "Angle",
-                                               "ConvectionCoefficient",
-                                               "ActivityLevel",
-                                               "Velocity",
-                                               "Capacity",
-                                               "Power",
-                                               "Availability",
-                                               "Percent",
-                                               "Control",
-                                               "Mode"});
+    constexpr std::array<std::string_view, maxDayTypes> dayTypeNamesUC{"SUNDAY",
+                                                                       "MONDAY",
+                                                                       "TUESDAY",
+                                                                       "WEDNESDAY",
+                                                                       "THURSDAY",
+                                                                       "FRIDAY",
+                                                                       "SATURDAY",
+                                                                       "HOLIDAY",
+                                                                       "SUMMERDESIGNDAY",
+                                                                       "WINTERDESIGNDAY",
+                                                                       "CUSTOMDAY1",
+                                                                       "CUSTOMDAY2"};
+
+    int constexpr numScheduleTypeLimitUnitTypes = 14;
+    static constexpr std::array<std::string_view, static_cast<int>(numScheduleTypeLimitUnitTypes)> scheduleTypeLimitUnitTypes{"DIMENSIONLESS",
+                                                                                                                              "TEMPERATURE",
+                                                                                                                              "DELTATEMPERATURE",
+                                                                                                                              "PRECIPITATIONRATE",
+                                                                                                                              "ANGLE",
+                                                                                                                              "CONVECTIONCOEFFICIENT",
+                                                                                                                              "ACTIVITYLEVEL",
+                                                                                                                              "VELOCITY",
+                                                                                                                              "CAPACITY",
+                                                                                                                              "POWER",
+                                                                                                                              "AVAILABILITY",
+                                                                                                                              "PERCENT",
+                                                                                                                              "CONTROL",
+                                                                                                                              "MODE"};
 
     constexpr std::array<std::string_view, static_cast<int>(OutputReportLevel::Num)> outputScheduleReportLevelNames = {"Hourly", "Timestep"};
     constexpr std::array<std::string_view, static_cast<int>(OutputReportLevel::Num)> outputScheduleReportLevelNamesUC = {"HOURLY", "TIMESTEP"};
@@ -137,7 +144,6 @@ namespace ScheduleManager {
 
     void ProcessScheduleInput(EnergyPlusData &state)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -224,8 +230,8 @@ namespace ScheduleManager {
         int MaxAlps;
         int AddWeekSch;
         int AddDaySch;
-        Array1D_bool AllDays(MaxDayTypes);
-        Array1D_bool TheseDays(MaxDayTypes);
+        Array1D_bool AllDays(maxDayTypes);
+        Array1D_bool TheseDays(maxDayTypes);
         bool ErrorHere;
         int SchNum;
         int WkCount;
@@ -609,8 +615,7 @@ namespace ScheduleManager {
             }
             if (NumAlphas >= 3) {
                 if (!lAlphaBlanks(3)) {
-                    state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType =
-                        UtilityRoutines::FindItem(Alphas(3), ScheduleTypeLimitUnitTypes, NumScheduleTypeLimitUnitTypes);
+                    state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType = getEnumerationValue(scheduleTypeLimitUnitTypes, Alphas(3)) + 1;
                     if (state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType == 0) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" +
@@ -1007,7 +1012,7 @@ namespace ScheduleManager {
                 state, state.dataScheduleMgr->UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             state.dataScheduleMgr->WeekSchedule(LoopIndex).Name = Alphas(1);
             // Rest of Alphas are processed into Pointers
-            for (InLoopIndex = 1; InLoopIndex <= MaxDayTypes; ++InLoopIndex) {
+            for (InLoopIndex = 1; InLoopIndex <= maxDayTypes; ++InLoopIndex) {
                 DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
                 if (DayIndex == 0) {
                     ShowSevereError(state,
@@ -1062,7 +1067,7 @@ namespace ScheduleManager {
                         ShowContinueError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1));
                         ErrorsFound = true;
                     } else {
-                        for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
+                        for (Hr = 1; Hr <= maxDayTypes; ++Hr) {
                             if (TheseDays(Hr)) {
                                 state.dataScheduleMgr->WeekSchedule(Count).DaySchedulePointer(Hr) = DayIndex;
                             }
@@ -1333,7 +1338,7 @@ namespace ScheduleManager {
                             ShowContinueError(state, "ref Through field=" + Alphas(ThruField));
                             ErrorsFound = true;
                         } else {
-                            for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
+                            for (Hr = 1; Hr <= maxDayTypes; ++Hr) {
                                 if (TheseDays(Hr)) {
                                     state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
                                 }
@@ -1462,10 +1467,10 @@ namespace ScheduleManager {
                                          "\" has missing day types in Through=" + CurrentThrough);
                     ShowContinueError(state, "Last \"For\" field=" + LastFor);
                     errmsg = "Missing day types=,";
-                    for (kdy = 1; kdy <= MaxDayTypes; ++kdy) {
+                    for (kdy = 0; kdy < maxDayTypes; ++kdy) {
                         if (AllDays(kdy)) continue;
                         errmsg.erase(errmsg.length() - 1);
-                        errmsg += "\"" + ValidDayTypes(kdy) + "\",-";
+                        errmsg += "\"" + static_cast<std::string>(dayTypeNames[kdy]) + "\",-";
                     }
                     errmsg.erase(errmsg.length() - 2);
                     ShowContinueError(state, errmsg);
@@ -1742,7 +1747,7 @@ namespace ScheduleManager {
                     // define week schedule
                     state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = fmt::format("{}_wk_{}", Alphas(1), iDay);
                     // for all day types point the week schedule to the newly defined day schedule
-                    for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
+                    for (kDayType = 1; kDayType <= maxDayTypes; ++kDayType) {
                         state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
                     }
                     // day schedule
@@ -1846,7 +1851,7 @@ namespace ScheduleManager {
                     // define week schedule
                     state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = fmt::format("{}_wk_{}", curName, iDay);
                     // for all day types point the week schedule to the newly defined day schedule
-                    for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
+                    for (kDayType = 1; kDayType <= maxDayTypes; ++kDayType) {
                         state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
                     }
                     // day schedule
@@ -1917,7 +1922,7 @@ namespace ScheduleManager {
             // define week schedule
             state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_";
             // for all day types point the week schedule to the newly defined day schedule
-            for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
+            for (kDayType = 1; kDayType <= maxDayTypes; ++kDayType) {
                 state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
             }
             // day schedule
@@ -1986,7 +1991,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1);
             state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
             state.dataScheduleMgr->DaySchedule(AddDaySch).Used = true;
-            for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
+            for (Hr = 1; Hr <= maxDayTypes; ++Hr) {
                 state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
             }
             //   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
@@ -2059,7 +2064,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1);
             state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
             state.dataScheduleMgr->DaySchedule(AddDaySch).Used = true;
-            for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
+            for (Hr = 1; Hr <= maxDayTypes; ++Hr) {
                 state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
             }
             //   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
@@ -2133,7 +2138,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1);
             state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
             state.dataScheduleMgr->DaySchedule(AddDaySch).Used = true;
-            for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
+            for (Hr = 1; Hr <= maxDayTypes; ++Hr) {
                 state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
             }
             //   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
@@ -2212,7 +2217,6 @@ namespace ScheduleManager {
     void ReportScheduleDetails(EnergyPlusData &state,
                                OutputReportLevel const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   January 2003
@@ -2286,8 +2290,8 @@ namespace ScheduleManager {
                 print(state.files.eio, "\n");
                 // SchWFmt Header (WeekSchedule)
                 std::string SchWFmt("! <WeekSchedule>,Name");
-                for (int Count = 1; Count <= MaxDayTypes; ++Count) {
-                    SchWFmt += "," + ValidDayTypes(Count);
+                for (int Count = 0; Count < maxDayTypes; ++Count) {
+                    SchWFmt += "," + static_cast<std::string>(dayTypeNames[Count]);
                 }
                 print(state.files.eio, "{}\n", SchWFmt);
                 std::string_view constexpr SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
@@ -2354,7 +2358,7 @@ namespace ScheduleManager {
             for (int Count = 1; Count <= state.dataScheduleMgr->NumWeekSchedules; ++Count) {
                 std::string_view constexpr SchWFmtdata("Schedule:Week:Daily,{}");
                 print(state.files.eio, SchWFmtdata, state.dataScheduleMgr->WeekSchedule(Count).Name);
-                for (NumF = 1; NumF <= MaxDayTypes; ++NumF) {
+                for (NumF = 1; NumF <= maxDayTypes; ++NumF) {
                     print(state.files.eio,
                           ",{}",
                           state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(Count).DaySchedulePointer(NumF)).Name);
@@ -2527,7 +2531,6 @@ namespace ScheduleManager {
 
     Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex)
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -2580,7 +2583,6 @@ namespace ScheduleManager {
 
     void UpdateScheduleValues(EnergyPlusData &state)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2011; adapted from Autodesk (time reduction)
@@ -2728,7 +2730,6 @@ namespace ScheduleManager {
 
     int GetScheduleIndex(EnergyPlusData &state, std::string const &ScheduleName)
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -2760,7 +2761,7 @@ namespace ScheduleManager {
                         if (state.dataScheduleMgr->Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr) > 0) {
                             state.dataScheduleMgr->WeekSchedule(state.dataScheduleMgr->Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr)).Used =
                                 true;
-                            for (DayCtr = 1; DayCtr <= MaxDayTypes; ++DayCtr) {
+                            for (DayCtr = 1; DayCtr <= maxDayTypes; ++DayCtr) {
                                 state.dataScheduleMgr
                                     ->DaySchedule(state.dataScheduleMgr
                                                       ->WeekSchedule(state.dataScheduleMgr->Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr))
@@ -2780,7 +2781,6 @@ namespace ScheduleManager {
 
     std::string GetScheduleType(EnergyPlusData &state, int const ScheduleIndex)
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   July 2007
@@ -2836,7 +2836,6 @@ namespace ScheduleManager {
 
     int GetDayScheduleIndex(EnergyPlusData &state, std::string &ScheduleName)
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2003
@@ -2870,7 +2869,6 @@ namespace ScheduleManager {
     void GetScheduleValuesForDay(
         EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay, Optional_int_const CurDayofWeek)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   September 1997
@@ -2929,7 +2927,6 @@ namespace ScheduleManager {
                                     Array2S<Real64> DayValues   // Returned set of values
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2003
@@ -3037,7 +3034,6 @@ namespace ScheduleManager {
                                ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -3252,7 +3248,6 @@ namespace ScheduleManager {
                          ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K Lawrie
         //       DATE WRITTEN   January 2003
@@ -3375,7 +3370,6 @@ namespace ScheduleManager {
                             bool &ErrorsFound               // Will be true if error found.
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -3396,8 +3390,8 @@ namespace ScheduleManager {
         // na
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(TheseDays, MaxDayTypes);
-        EP_SIZE_CHECK(AlReady, MaxDayTypes);
+        EP_SIZE_CHECK(TheseDays, maxDayTypes);
+        EP_SIZE_CHECK(AlReady, maxDayTypes);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3525,7 +3519,7 @@ namespace ScheduleManager {
             OneValid = true;
         }
         if (has(ForDayField, "ALLDAY")) {
-            TheseDays({1, MaxDayTypes}) = true;
+            TheseDays({1, maxDayTypes}) = true;
             if (any(AlReady)) {
                 DupAssignment = true;
             } else {
@@ -3561,7 +3555,7 @@ namespace ScheduleManager {
             OneValid = true;
         }
         if (has(ForDayField, "ALLOTHERDAY")) {
-            for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+            for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                 if (AlReady(DayT)) continue;
                 TheseDays(DayT) = true;
                 AlReady(DayT) = true;
@@ -3585,7 +3579,6 @@ namespace ScheduleManager {
                                   Real64 const Minimum          // Minimum desired value
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -3646,7 +3639,7 @@ namespace ScheduleManager {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (DayT = 2; DayT <= maxDayTypes; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -3656,7 +3649,7 @@ namespace ScheduleManager {
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                         MinValue = min(
                             MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -3692,7 +3685,6 @@ namespace ScheduleManager {
                                   Real64 const Maximum          // Maximum desired value
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -3764,7 +3756,7 @@ namespace ScheduleManager {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValMin;
                 MaxValue = state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValMax;
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (DayT = 2; DayT <= maxDayTypes; ++DayT) {
                     MinValue = min(MinValue,
                                    state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMin);
                     MaxValue = max(MaxValue,
@@ -3772,7 +3764,7 @@ namespace ScheduleManager {
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                         MinValue =
                             min(MinValue,
                                 state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMin);
@@ -3812,7 +3804,6 @@ namespace ScheduleManager {
                                   Real32 const Minimum          // Minimum desired value
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -3873,7 +3864,7 @@ namespace ScheduleManager {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (DayT = 2; DayT <= maxDayTypes; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -3883,7 +3874,7 @@ namespace ScheduleManager {
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                         MinValue = min(
                             MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -3919,7 +3910,6 @@ namespace ScheduleManager {
                                   Real32 const Maximum          // Maximum desired value
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -3980,7 +3970,7 @@ namespace ScheduleManager {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (DayT = 2; DayT <= maxDayTypes; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -3990,7 +3980,7 @@ namespace ScheduleManager {
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                         MinValue = min(
                             MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4031,7 +4021,6 @@ namespace ScheduleManager {
                             Real64 const Value       // Actual desired value
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2004
@@ -4086,7 +4075,7 @@ namespace ScheduleManager {
             CheckScheduleValue = false;
             for (Loop = 1; Loop <= 366; ++Loop) {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                     if (any_eq(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue,
                                Value)) {
                         CheckScheduleValue = true;
@@ -4105,7 +4094,6 @@ namespace ScheduleManager {
                             int const Value          // Actual desired value
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2004
@@ -4158,7 +4146,7 @@ namespace ScheduleManager {
         if (ScheduleIndex > 0) {
             for (Loop = 1; Loop <= 366; ++Loop) {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                     if (any_eq(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue,
                                double(Value))) {
                         CheckScheduleValue = true;
@@ -4180,7 +4168,6 @@ namespace ScheduleManager {
                                      bool const exclusiveMax  // Maximum indicator ('<', ',=')
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -4265,7 +4252,6 @@ namespace ScheduleManager {
                                      bool const exclusiveMin  // Minimum indicator ('>', '>=')
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2003
@@ -4334,7 +4320,6 @@ namespace ScheduleManager {
 
     bool HasFractionalScheduleValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   March 2008
@@ -4386,7 +4371,7 @@ namespace ScheduleManager {
 
         if (ScheduleIndex > 0) {
             WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
-            for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+            for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                 for (Hour = 1; Hour <= 24; ++Hour) {
                     for (TStep = 1; TStep <= state.dataGlobal->NumOfTimeStepInHour; ++TStep) {
                         if (state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT))
@@ -4403,7 +4388,7 @@ namespace ScheduleManager {
             if (!HasFractions) {
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                         for (Hour = 1; Hour <= 24; ++Hour) {
                             for (TStep = 1; TStep <= state.dataGlobal->NumOfTimeStepInHour; ++TStep) {
                                 if (state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT))
@@ -4426,7 +4411,6 @@ namespace ScheduleManager {
 
     Real64 GetScheduleMinValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
@@ -4483,7 +4467,7 @@ namespace ScheduleManager {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (DayT = 2; DayT <= maxDayTypes; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4493,7 +4477,7 @@ namespace ScheduleManager {
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                         MinValue = min(
                             MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4518,7 +4502,6 @@ namespace ScheduleManager {
 
     Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
@@ -4575,7 +4558,7 @@ namespace ScheduleManager {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (DayT = 2; DayT <= maxDayTypes; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4585,7 +4568,7 @@ namespace ScheduleManager {
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
                         MinValue = min(
                             MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4611,7 +4594,6 @@ namespace ScheduleManager {
 
     std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex)
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2008
@@ -4668,7 +4650,6 @@ namespace ScheduleManager {
 
     void ReportScheduleValues(EnergyPlusData &state)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2004
@@ -4705,7 +4686,6 @@ namespace ScheduleManager {
 
     void ReportOrphanSchedules(EnergyPlusData &state)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2008
@@ -4840,7 +4820,6 @@ namespace ScheduleManager {
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2006
@@ -4917,7 +4896,6 @@ namespace ScheduleManager {
 
     int GetNumberOfSchedules(EnergyPlusData &state)
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   September 2008

@@ -356,19 +356,6 @@ namespace WeatherManager {
         static constexpr std::string_view DateFormat("{:02}/{:02}");
         static constexpr std::string_view DateFormatWithYear("{:02}/{:02}/{:04}");
         static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
-        static Array1D_string const ValidDayNames(12,
-                                                  {"Sunday",
-                                                   "Monday",
-                                                   "Tuesday",
-                                                   "Wednesday",
-                                                   "Thursday",
-                                                   "Friday",
-                                                   "Saturday",
-                                                   "Holiday",
-                                                   "SummerDesignDay",
-                                                   "WinterDesignDay",
-                                                   "CustomDay1",
-                                                   "CustomDay2"});
         static std::map<EmissivityCalcType, std::string> const SkyTempModelNames{
             {EmissivityCalcType::ClarkAllenModel, "Clark and Allen"},
             {EmissivityCalcType::ScheduleValue, "Schedule Value"},
@@ -1046,7 +1033,7 @@ namespace WeatherManager {
                                   kindOfRunPeriod,
                                   StDate,
                                   EnDate,
-                                  ValidDayNames(TWeekDay),
+                                  ScheduleManager::dayTypeNames[TWeekDay - 1],
                                   fmt::to_string(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TotalDays),
                                   "Use RunPeriod Specified Day",
                                   AlpUseDST,
@@ -5905,26 +5892,10 @@ namespace WeatherManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the run period design info from User input and the
         //  simulation dates
-
-        static Array1D_string const ValidNames(12,
-                                               {"SUNDAY",
-                                                "MONDAY",
-                                                "TUESDAY",
-                                                "WEDNESDAY",
-                                                "THURSDAY",
-                                                "FRIDAY",
-                                                "SATURDAY",
-                                                "HOLIDAY",
-                                                "SUMMERDESIGNDAY",
-                                                "WINTERDESIGNDAY",
-                                                "CUSTOMDAY1",
-                                                "CUSTOMDAY2"});
 
         // Call Input Get routine to retrieve annual run data
         int RPD1 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
@@ -6027,7 +5998,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
             } else {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), ValidNames, 12);
+                    1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 0 ||
                     state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 8) {
                     ShowWarningError(state,
@@ -6213,7 +6184,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
             } else {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), ValidNames, 12);
+                    1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 0 ||
                     state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 8) {
                     ShowWarningError(state,
@@ -6562,19 +6533,6 @@ namespace WeatherManager {
         //   N13, \field ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
         //   N14; \field Sky Clearness
 
-        static Array1D_string const ValidNames(12,
-                                               {"SUNDAY",
-                                                "MONDAY",
-                                                "TUESDAY",
-                                                "WEDNESDAY",
-                                                "THURSDAY",
-                                                "FRIDAY",
-                                                "SATURDAY",
-                                                "HOLIDAY",
-                                                "SUMMERDESIGNDAY",
-                                                "WINTERDESIGNDAY",
-                                                "CUSTOMDAY1",
-                                                "CUSTOMDAY2"});
         static std::map<DDHumIndType, std::string> const DDHumIndTypeStringRep{{DDHumIndType::WetBulb, "Wetbulb [C]"},
                                                                                {DDHumIndType::DewPoint, "Dewpoint [C]"},
                                                                                {DDHumIndType::Enthalpy, "Enthalpy [J/kg]"},
@@ -7470,7 +7428,7 @@ namespace WeatherManager {
 
             //   A2,  \field Day Type
             state.dataWeatherManager->DesDayInput(EnvrnNum).DayType =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), ValidNames, 12);
+                1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayType == 0) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
