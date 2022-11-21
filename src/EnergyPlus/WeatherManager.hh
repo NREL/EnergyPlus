@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -154,19 +155,6 @@ namespace WeatherManager {
         IdsoModel,          // Use Isdo model for sky emissivity calculation
         BerdahlMartinModel, // Use Martin & Berdahl model for sky emissivity calculation
         SkyTAlgorithmA,     // place holder
-        Num
-    };
-
-    enum class WeekDay
-    {
-        Invalid = -1,
-        Sunday = 1,
-        Monday,
-        Tuesday,
-        Wednesday,
-        Thursday,
-        Friday,
-        Saturday,
         Num
     };
 
@@ -312,15 +300,15 @@ namespace WeatherManager {
         int startYear;       // entered in "consecutive"/real runperiod object
         int endMonth;
         int endDay;
-        int endJulianDate;     // Calculated end date (Julian or ordinal) for a weather file run period
-        int endYear;           // entered in "consecutive"/real runperiod object
-        int dayOfWeek;         // Day of Week that the RunPeriod will start on (User Input)
-        WeekDay startWeekDay;  // Day of the week that the RunPeriod will start on (User Input)
-        bool useDST;           // True if DaylightSavingTime is used for this RunPeriod
-        bool useHolidays;      // True if Holidays are used for this RunPeriod (from WeatherFile)
-        bool applyWeekendRule; // True if "Weekend Rule" is to be applied to RunPeriod
-        bool useRain;          // True if Rain from weather file should be used (set rain to true)
-        bool useSnow;          // True if Snow from weather file should be used (set Snow to true)
+        int endJulianDate;                     // Calculated end date (Julian or ordinal) for a weather file run period
+        int endYear;                           // entered in "consecutive"/real runperiod object
+        int dayOfWeek;                         // Day of Week that the RunPeriod will start on (User Input)
+        ScheduleManager::DayType startWeekDay; // Day of the week that the RunPeriod will start on (User Input)
+        bool useDST;                           // True if DaylightSavingTime is used for this RunPeriod
+        bool useHolidays;                      // True if Holidays are used for this RunPeriod (from WeatherFile)
+        bool applyWeekendRule;                 // True if "Weekend Rule" is to be applied to RunPeriod
+        bool useRain;                          // True if Rain from weather file should be used (set rain to true)
+        bool useSnow;                          // True if Snow from weather file should be used (set Snow to true)
         Array1D_int monWeekDay;
         int numSimYears;              // Total Number of years of simulation to be performed
         bool isLeapYear;              // True if Begin Year is leap year.
@@ -332,9 +320,9 @@ namespace WeatherManager {
         // Default Constructor
         RunPeriodData()
             : totalDays(365), startMonth(1), startDay(1), startJulianDate(2457755), startYear(2017), endMonth(12), endDay(31), endJulianDate(2458119),
-              endYear(2017), dayOfWeek(1), startWeekDay(WeekDay::Sunday), useDST(false), useHolidays(false), applyWeekendRule(false), useRain(true),
-              useSnow(true), monWeekDay{{1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6}}, numSimYears(1), isLeapYear(false), RollDayTypeOnRepeat(true),
-              TreatYearsAsConsecutive(true), actualWeather(false), firstHrInterpUsingHr1(false)
+              endYear(2017), dayOfWeek(1), startWeekDay(ScheduleManager::DayType::Sunday), useDST(false), useHolidays(false), applyWeekendRule(false),
+              useRain(true), useSnow(true), monWeekDay{{1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6}}, numSimYears(1), isLeapYear(false),
+              RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), actualWeather(false), firstHrInterpUsingHr1(false)
         {
         }
     };
@@ -828,7 +816,7 @@ namespace WeatherManager {
 
     GregorianDate computeGregorianDate(int jdate);
 
-    WeekDay calculateDayOfWeek(EnergyPlusData &state, int year, int month, int day);
+    ScheduleManager::DayType calculateDayOfWeek(EnergyPlusData &state, int year, int month, int day);
 
     int calculateDayOfYear(int Month, int Day, bool leapYear = false);
 

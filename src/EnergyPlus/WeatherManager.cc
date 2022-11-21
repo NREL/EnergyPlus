@@ -1676,11 +1676,11 @@ namespace WeatherManager {
                                            state.dataWeatherManager->LeapYearAdd);
                 if (state.dataWeatherManager->SpecialDays(i).Duration == 1 &&
                     state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ApplyWeekendRule) {
-                    if (state.dataWeatherManager->WeekDayTypes(JDay) == 1) {
+                    if (state.dataWeatherManager->WeekDayTypes(JDay) == static_cast<int>(ScheduleManager::DayType::Sunday)) {
                         // Sunday, must go to Monday
                         ++JDay;
                         if (JDay == 366 && state.dataWeatherManager->LeapYearAdd == 0) JDay = 1;
-                    } else if (state.dataWeatherManager->WeekDayTypes(JDay) == 7) {
+                    } else if (state.dataWeatherManager->WeekDayTypes(JDay) == static_cast<int>(ScheduleManager::DayType::Saturday)) {
                         ++JDay;
                         if (JDay == 366 && state.dataWeatherManager->LeapYearAdd == 0) JDay = 1;
                         ++JDay;
@@ -5207,7 +5207,7 @@ namespace WeatherManager {
         }
     }
 
-    static int findYearForWeekday(int const month, int const day, WeekDay const weekday)
+    static int findYearForWeekday(int const month, int const day, ScheduleManager::DayType const weekday)
     {
         // Find a year that goes with a month/day and a weekday. A lookup table is used with the most recent year that includes
         // the date with the weekday specified.
@@ -5219,7 +5219,7 @@ namespace WeatherManager {
         return defaultYear[static_cast<int>(weekday) - rem + 5]; // static_cast<int>(weekday) - rem + 1 + 4
     }
 
-    static int findLeapYearForWeekday(int const month, int const day, WeekDay const weekday)
+    static int findLeapYearForWeekday(int const month, int const day, ScheduleManager::DayType const weekday)
     {
         // Find a leap year that goes with a month/day and a weekday. A lookup table is used with the most recent year that includes
         // the date with the weekday specified.
@@ -5519,13 +5519,13 @@ namespace WeatherManager {
                                      state.dataIPShortCut->cCurrentModuleObject + ": object=" + state.dataWeatherManager->RunPeriodInput(i).title +
                                          state.dataIPShortCut->cAlphaFieldNames(2) + " invalid (Day of Week) [" +
                                          state.dataIPShortCut->cAlphaArgs(2) + "] for Start is not valid, Sunday will be used.");
-                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = WeekDay::Sunday;
+                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = ScheduleManager::DayType::Sunday;
                 } else {
-                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = static_cast<WeekDay>(dayType);
+                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = static_cast<ScheduleManager::DayType>(dayType);
                     inputWeekday = true;
                 }
             } else { // No input, set the default as Sunday. This may get overriden below
-                state.dataWeatherManager->RunPeriodInput(i).startWeekDay = WeekDay::Sunday;
+                state.dataWeatherManager->RunPeriodInput(i).startWeekDay = ScheduleManager::DayType::Sunday;
             }
 
             // Validate the dates now that the weekday field has been looked at
@@ -5555,10 +5555,10 @@ namespace WeatherManager {
                                                state.dataWeatherManager->RunPeriodInput(i).startYear));
                         ErrorsFound = true;
                     } else { // Start year is a leap year
-                        WeekDay weekday = calculateDayOfWeek(state,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startMonth,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startDay);
+                        ScheduleManager::DayType weekday = calculateDayOfWeek(state,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startYear,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startMonth,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startDay);
                         if (inputWeekday) { // Check for correctness of input
                             if (weekday != state.dataWeatherManager->RunPeriodInput(i).startWeekDay) {
                                 ShowWarningError(state,
@@ -5602,10 +5602,10 @@ namespace WeatherManager {
                                                    state.dataWeatherManager->RunPeriodInput(i).startDay);
                         }
                     } else { // Have an input starting year
-                        WeekDay weekday = calculateDayOfWeek(state,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startMonth,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startDay);
+                        ScheduleManager::DayType weekday = calculateDayOfWeek(state,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startYear,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startMonth,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startDay);
                         if (inputWeekday) { // Check for correctness of input
                             if (weekday != state.dataWeatherManager->RunPeriodInput(i).startWeekDay) {
                                 ShowWarningError(state,
@@ -5953,7 +5953,8 @@ namespace WeatherManager {
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
+                state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
+                    static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
             } else {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
                     getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
@@ -5964,7 +5965,8 @@ namespace WeatherManager {
                                          ": object=" + state.dataWeatherManager->RunPeriodDesignInput(Count).title + ' ' +
                                          state.dataIPShortCut->cAlphaFieldNames(1) + " invalid (Day of Week) [" +
                                          state.dataIPShortCut->cAlphaArgs(1) + " for Start is not Valid, Monday will be Used.");
-                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
+                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
+                        static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
                 }
             }
 
@@ -6139,18 +6141,20 @@ namespace WeatherManager {
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
+                state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
+                    static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
             } else {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
                     getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(3));
-                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek < 1 ||
-                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek > 7) {
+                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek < static_cast<int>(ScheduleManager::DayType::Sunday) ||
+                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek > static_cast<int>(ScheduleManager::DayType::Saturday)) {
                     ShowWarningError(state,
                                      state.dataIPShortCut->cCurrentModuleObject +
                                          ": object=" + state.dataWeatherManager->RunPeriodDesignInput(Count).title + ' ' +
                                          state.dataIPShortCut->cAlphaFieldNames(3) + " invalid (Day of Week) [" +
                                          state.dataIPShortCut->cAlphaArgs(3) + " for Start is not Valid, Monday will be Used.");
-                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
+                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
+                        static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
                 }
             }
 
@@ -9418,14 +9422,13 @@ namespace WeatherManager {
         return {tyyyy, tmm, tdd};
     }
 
-    WeekDay calculateDayOfWeek(EnergyPlusData &state, int const year, int const month, int const day)
+    ScheduleManager::DayType calculateDayOfWeek(EnergyPlusData &state, int const year, int const month, int const day)
     {
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2012
         //       MODIFIED       October 2017, Jason DeGraw
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // Calculate the correct day of week.
@@ -9449,7 +9452,7 @@ namespace WeatherManager {
         state.dataEnvrn->DayOfWeek = mod(day + (13 * (Gmm + 1) / 5) + Gyyyy + (Gyyyy / 4) + 6 * (Gyyyy / 100) + (Gyyyy / 400), 7);
         if (state.dataEnvrn->DayOfWeek == 0) state.dataEnvrn->DayOfWeek = 7;
 
-        return static_cast<WeekDay>(state.dataEnvrn->DayOfWeek);
+        return static_cast<ScheduleManager::DayType>(state.dataEnvrn->DayOfWeek);
     }
 
     int calculateDayOfYear(int const Month, int const Day, bool const leapYear)

@@ -656,7 +656,7 @@ namespace OutputProcessor {
                                  EndMinute,
                                  StartMinute,
                                  DSTIndicator,
-                                 ScheduleManager::dayTypeNames[CurDayType - 1]);
+                                 ScheduleManager::dayTypeNames[CurDayType]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // TSMeter
@@ -673,7 +673,7 @@ namespace OutputProcessor {
                                  EndMinute,
                                  StartMinute,
                                  DSTIndicator,
-                                 ScheduleManager::dayTypeNames[CurDayType - 1]);
+                                 ScheduleManager::dayTypeNames[CurDayType]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // HRMeter
@@ -690,7 +690,7 @@ namespace OutputProcessor {
                                  _,
                                  _,
                                  DSTIndicator,
-                                 ScheduleManager::dayTypeNames[CurDayType - 1]);
+                                 ScheduleManager::dayTypeNames[CurDayType]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay"}, "\n")));
 
         // DYMeter
@@ -707,7 +707,7 @@ namespace OutputProcessor {
                                  _,
                                  _,
                                  DSTIndicator,
-                                 ScheduleManager::dayTypeNames[CurDayType - 1]);
+                                 ScheduleManager::dayTypeNames[CurDayType]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0,WinterDesignDay"}, "\n")));
 
         // MNMeter
