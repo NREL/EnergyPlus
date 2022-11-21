@@ -164,7 +164,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
         int EndMinute = 10;
         int StartMinute = 0;
         bool PrintESOTimeStamp = true;
@@ -231,7 +231,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
         int EndMinute = 10;
         int StartMinute = 0;
         bool PrintESOTimeStamp = false;
@@ -296,7 +296,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         ReportHRMeters(*state, true);
 
@@ -365,7 +365,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         ReportDYMeters(*state, true);
 
@@ -439,7 +439,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         ReportMNMeters(*state, true);
 
@@ -513,7 +513,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         ReportSMMeters(*state, true);
 
@@ -589,7 +589,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         OutputProcessor::ReportYRMeters(*state, true);
 

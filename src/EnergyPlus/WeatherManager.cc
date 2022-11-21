@@ -96,33 +96,12 @@ namespace WeatherManager {
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   May 1997
     //       MODIFIED       December 1998, FW; December 1999, LKL.
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This module contains all of the weather handling routines for
     // EnergyPlus.  That includes getting user input, defining design day
     // weather, retrieving data from weather files, and supplying the
     // outdoor environment for each time step.
-
-    // METHODOLOGY EMPLOYED:
-    // Setting up the design days is similar to BLAST/IBLAST.  Reading the
-    // BLAST weather files is similar to that code in BLAST/IBLAST.  The EnergyPlus
-    // Weather file (EPW) is new code.
-
-    // REFERENCES:
-    // (I)BLAST legacy code, internal Reverse Engineering documentation,
-    // and internal Evolutionary Engineering documentation.
-
-    // Data
-
-    Array1D_string const DaysOfWeek(7, {"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"}); // NOLINT(cert-err58-cpp)
-    std::map<std::string, WeekDay> weekDayLookUp{{"SUNDAY", WeekDay::Sunday},                                           // NOLINT(cert-err58-cpp)
-                                                 {"MONDAY", WeekDay::Monday},
-                                                 {"TUESDAY", WeekDay::Tuesday},
-                                                 {"WEDNESDAY", WeekDay::Wednesday},
-                                                 {"THURSDAY", WeekDay::Thursday},
-                                                 {"FRIDAY", WeekDay::Friday},
-                                                 {"SATURDAY", WeekDay::Saturday}};
 
     constexpr std::array<std::string_view, static_cast<int>(EpwHeaderType::Num)> epwHeaders({"LOCATION",
                                                                                              "DESIGN CONDITIONS",
@@ -1212,28 +1191,7 @@ namespace WeatherManager {
                             state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
                                 .DayOfMonth);
                         EnDate = StDate;
-                        if (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                                    .DayType <= 7 &&
-                            state.dataReportFlag->DoWeatherInitReporting) {
-
-                            print(state.files.eio,
-                                  EnvNameFormat,
-                                  state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title,
-                                  "SizingPeriod:DesignDay",
-                                  StDate,
-                                  EnDate,
-                                  DaysOfWeek(state.dataWeatherManager
-                                                 ->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                                                 .DayType),
-                                  "1",
-                                  "N/A",
-                                  "N/A",
-                                  "N/A",
-                                  "N/A",
-                                  "N/A",
-                                  "N/A",
-                                  SkyTempModelNames.at(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel));
-                        } else if (state.dataReportFlag->DoWeatherInitReporting) {
+                        if (state.dataReportFlag->DoWeatherInitReporting) {
                             print(
                                 state.files.eio,
                                 EnvNameFormat,
@@ -1241,10 +1199,11 @@ namespace WeatherManager {
                                 "SizingPeriod:DesignDay",
                                 StDate,
                                 EnDate,
-                                SpecialDayNames(state.dataWeatherManager
-                                                    ->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                                                    .DayType -
-                                                7),
+                                ScheduleManager::dayTypeNames[state.dataWeatherManager
+                                                                  ->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn)
+                                                                                    .DesignDayNum)
+                                                                  .DayType -
+                                                              1],
                                 "1",
                                 "N/A",
                                 "N/A",
@@ -2135,7 +2094,7 @@ namespace WeatherManager {
         state.dataEnvrn->DayOfWeek = state.dataWeatherManager->TodayVariables.DayOfWeek;
         state.dataEnvrn->HolidayIndex = state.dataWeatherManager->TodayVariables.HolidayIndex;
         if (state.dataEnvrn->HolidayIndex > 0) {
-            state.dataWeatherManager->RptDayType = 7 + state.dataEnvrn->HolidayIndex;
+            state.dataWeatherManager->RptDayType = state.dataEnvrn->HolidayIndex;
         } else {
             state.dataWeatherManager->RptDayType = state.dataEnvrn->DayOfWeek;
         }
@@ -3862,7 +3821,7 @@ namespace WeatherManager {
         // set Holiday as indicated by user input
         state.dataWeatherManager->DesignDay(EnvrnNum).HolidayIndex = 0;
         if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayType > 7)
-            state.dataWeatherManager->DesignDay(EnvrnNum).HolidayIndex = state.dataWeatherManager->DesDayInput(EnvrnNum).DayType - 7;
+            state.dataWeatherManager->DesignDay(EnvrnNum).HolidayIndex = state.dataWeatherManager->DesDayInput(EnvrnNum).DayType;
 
         state.dataWeatherManager->DesignDay(EnvrnNum).DaylightSavingIndex = state.dataWeatherManager->DesDayInput(EnvrnNum).DSTIndicator;
 
@@ -5555,15 +5514,15 @@ namespace WeatherManager {
             // A2 , \field Day of Week for Start Day
             bool inputWeekday = false;
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) { // Have input
-                auto result = weekDayLookUp.find(state.dataIPShortCut->cAlphaArgs(2));
-                if (result == weekDayLookUp.end()) {
+                int dayType = 1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
+                if (dayType < 0) {
                     ShowWarningError(state,
                                      state.dataIPShortCut->cCurrentModuleObject + ": object=" + state.dataWeatherManager->RunPeriodInput(i).title +
                                          state.dataIPShortCut->cAlphaFieldNames(2) + " invalid (Day of Week) [" +
                                          state.dataIPShortCut->cAlphaArgs(2) + "] for Start is not valid, Sunday will be used.");
                     state.dataWeatherManager->RunPeriodInput(i).startWeekDay = WeekDay::Sunday;
                 } else {
-                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = result->second;
+                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = static_cast<WeekDay>(dayType);
                     inputWeekday = true;
                 }
             } else { // No input, set the default as Sunday. This may get overriden below
@@ -5609,7 +5568,7 @@ namespace WeatherManager {
                                                         state.dataWeatherManager->RunPeriodInput(i).title,
                                                         state.dataIPShortCut->cAlphaArgs(2),
                                                         state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                        DaysOfWeek(static_cast<int>(weekday))));
+                                                        ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday) - 1]));
                                 state.dataWeatherManager->RunPeriodInput(i).startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
@@ -5656,7 +5615,7 @@ namespace WeatherManager {
                                                         state.dataWeatherManager->RunPeriodInput(i).title,
                                                         state.dataIPShortCut->cAlphaArgs(2),
                                                         state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                        DaysOfWeek(static_cast<int>(weekday))));
+                                                        ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday) - 1]));
                                 state.dataWeatherManager->RunPeriodInput(i).startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
@@ -8560,7 +8519,8 @@ namespace WeatherManager {
                 int PWeekDay;
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
-                    General::ProcessDateString(state, uppercase(Line.substr(0, Pos)), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                    std::string const dateStringUC = uppercase(Line.substr(0, Pos));
+                    General::ProcessDateString(state, dateStringUC, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                     if (dateType != DateType::Invalid) {
                         if (PMonth != 0 && PDay != 0) {
                             state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth = PMonth;
@@ -8576,7 +8536,8 @@ namespace WeatherManager {
                 }
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
-                    General::ProcessDateString(state, uppercase(Line.substr(0, Pos)), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                    std::string const dateStringUC = uppercase(Line.substr(0, Pos));
+                    General::ProcessDateString(state, dateStringUC, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                     if (dateType != DateType::Invalid) {
                         if (PMonth != 0 && PDay != 0) {
                             state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
@@ -8590,7 +8551,8 @@ namespace WeatherManager {
                     }
                     Line.erase(0, Pos + 1);
                 } else { // Pos=0, probably last one
-                    General::ProcessDateString(state, uppercase(Line), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                    std::string const dateStringUC = uppercase(Line);
+                    General::ProcessDateString(state, dateStringUC, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                     if (dateType != DateType::Invalid) {
                         if (PMonth != 0 && PDay != 0) {
                             state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
@@ -8944,8 +8906,9 @@ namespace WeatherManager {
                         if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
                             state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek = Line.substr(0, Pos);
                             state.dataWeatherManager->DataPeriods(CurCount).WeekDay =
-                                UtilityRoutines::FindItemInList(state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek, DaysOfWeek, 7);
-                            if (state.dataWeatherManager->DataPeriods(CurCount).WeekDay == 0) {
+                                1 + getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek);
+                            if (state.dataWeatherManager->DataPeriods(CurCount).WeekDay < 1 ||
+                                state.dataWeatherManager->DataPeriods(CurCount).WeekDay > 7) {
                                 ShowSevereError(state,
                                                 fmt::format("Weather File -- Invalid Start Day of Week for Data Period #{}, Invalid day={}",
                                                             CurCount,

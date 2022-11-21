@@ -205,8 +205,9 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->CurrentTimeVariableNum).Value = SetErlValueNumber(tmpCurrentTime);
     tmpMinutes = ((tmpCurrentTime - double(state.dataGlobal->HourOfDay - 1)) * 60.0); // -1.0 // off by 1
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->MinuteVariableNum).Value = SetErlValueNumber(tmpMinutes);
+    // Subtract 7 from HolidayIndex to maintain compatability for EMS where 1=Holiday,2=SummerDesignDay, 3=WinterDesignDay, 4=CustomDay1, 5=CustomDay2
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->HolidayVariableNum).Value =
-        SetErlValueNumber(double(state.dataEnvrn->HolidayIndex));
+        SetErlValueNumber(double(state.dataEnvrn->HolidayIndex - 7));
     if (state.dataEnvrn->SunIsUp) {
         state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->SunIsUpVariableNum).Value = SetErlValueNumber(1.0);
     } else {

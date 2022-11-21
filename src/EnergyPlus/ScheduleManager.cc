@@ -2713,10 +2713,8 @@ namespace ScheduleManager {
         int WeekSchedulePointer = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(thisDayOfYear);
         int DaySchedulePointer;
 
-        // TODO: the (thisDayOfWeek < 7) looks fishy and maybe unnecessary... how about if there are more than 7 holidays?
-        // It should use 7 + thisHolidayIndex in that case but it won't
-        if (thisDayOfWeek <= 7 && thisHolidayIndex > 0) {
-            DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + thisHolidayIndex);
+        if (thisHolidayIndex > 0) {
+            DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(thisHolidayIndex);
         } else {
             DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(thisDayOfWeek);
         }
@@ -2907,13 +2905,13 @@ namespace ScheduleManager {
 
         // Now, which day?
         if (!present(CurDayofWeek)) {
-            if (state.dataEnvrn->DayOfWeek <= 7 && state.dataEnvrn->HolidayIndex > 0) {
-                DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
+            if (state.dataEnvrn->HolidayIndex > 0) {
+                DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(state.dataEnvrn->HolidayIndex);
             } else {
                 DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(state.dataEnvrn->DayOfWeek);
             }
         } else if (CurDayofWeek <= 7 && state.dataEnvrn->HolidayIndex > 0) {
-            DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
+            DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(state.dataEnvrn->HolidayIndex);
         } else {
             DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(CurDayofWeek);
         }
