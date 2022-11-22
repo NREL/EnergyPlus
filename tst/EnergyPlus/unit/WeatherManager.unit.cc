@@ -2172,11 +2172,11 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
     EXPECT_FALSE(has_err_output());
     EXPECT_TRUE(state->dataWeatherManager->WFAllowsLeapYears);
     EXPECT_TRUE(state->dataWeatherManager->EPWDaylightSaving);
-    EXPECT_EQ(state->dataWeatherManager->EPWDST.StDateType, WeatherManager::DateType::NthDayInMonth);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->EPWDST.StDateType, WeatherManager::DateType::NthDayInMonth));
     EXPECT_EQ(state->dataWeatherManager->EPWDST.StMon, 5);
     EXPECT_EQ(state->dataWeatherManager->EPWDST.StDay, 1);
     EXPECT_EQ(state->dataWeatherManager->EPWDST.StWeekDay, 2);
-    EXPECT_EQ(state->dataWeatherManager->EPWDST.EnDateType, WeatherManager::DateType::MonthDay);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->EPWDST.EnDateType, WeatherManager::DateType::MonthDay));
     EXPECT_EQ(state->dataWeatherManager->EPWDST.EnMon, 7);
     EXPECT_EQ(state->dataWeatherManager->EPWDST.EnDay, 31);
     EXPECT_EQ(state->dataWeatherManager->EPWDST.EnWeekDay, 2);
