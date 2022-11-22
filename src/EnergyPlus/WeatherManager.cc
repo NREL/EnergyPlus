@@ -6154,14 +6154,10 @@ namespace WeatherManager {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
                     getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek < static_cast<int>(ScheduleManager::DayType::Sunday) ||
-                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek > static_cast<int>(ScheduleManager::DayType::Saturday)) {
-                    ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject +
-                                         ": object=" + state.dataWeatherManager->RunPeriodDesignInput(Count).title + ' ' +
-                                         state.dataIPShortCut->cAlphaFieldNames(3) + " invalid (Day of Week) [" +
-                                         state.dataIPShortCut->cAlphaArgs(3) + " for Start is not Valid, Monday will be Used.");
-                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
-                        static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
+                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == static_cast<int>(ScheduleManager::DayType::Holiday)) {
+                    // Sunday-Saturday, SummerDesignDay, WinterDesignDay, CustomDay1, and CustomDay2 are all valid. Holiday is not valid.
+                    // The input processor should trap invalid key choices, so this should never trip.
+                    assert(false);
                 }
             }
 

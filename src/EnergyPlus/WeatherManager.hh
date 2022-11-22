@@ -292,38 +292,29 @@ namespace WeatherManager {
         // Members
         std::string title;
         std::string periodType;
-        int totalDays; // total number of days in requested period
-        int startMonth;
-        int startDay;
-        int startJulianDate; // Calculated start date (Julian or ordinal) for a weather file run period
-        int startYear;       // entered in "consecutive"/real runperiod object
-        int endMonth;
-        int endDay;
-        int endJulianDate;                     // Calculated end date (Julian or ordinal) for a weather file run period
-        int endYear;                           // entered in "consecutive"/real runperiod object
-        int dayOfWeek;                         // Day of Week that the RunPeriod will start on (User Input)
-        ScheduleManager::DayType startWeekDay; // Day of the week that the RunPeriod will start on (User Input)
-        bool useDST;                           // True if DaylightSavingTime is used for this RunPeriod
-        bool useHolidays;                      // True if Holidays are used for this RunPeriod (from WeatherFile)
-        bool applyWeekendRule;                 // True if "Weekend Rule" is to be applied to RunPeriod
-        bool useRain;                          // True if Rain from weather file should be used (set rain to true)
-        bool useSnow;                          // True if Snow from weather file should be used (set Snow to true)
-        Array1D_int monWeekDay;
-        int numSimYears;              // Total Number of years of simulation to be performed
-        bool isLeapYear;              // True if Begin Year is leap year.
-        bool RollDayTypeOnRepeat;     // If repeating run period, increment day type on repeat.
-        bool TreatYearsAsConsecutive; // When year rolls over, increment year and recalculate Leap Year
-        bool actualWeather;           // true when using actual weather data
-        bool firstHrInterpUsingHr1;   // true for using Hour 1 for first hour interpolate; fals for using Hour 24
-
-        // Default Constructor
-        RunPeriodData()
-            : totalDays(365), startMonth(1), startDay(1), startJulianDate(2457755), startYear(2017), endMonth(12), endDay(31), endJulianDate(2458119),
-              endYear(2017), dayOfWeek(1), startWeekDay(ScheduleManager::DayType::Sunday), useDST(false), useHolidays(false), applyWeekendRule(false),
-              useRain(true), useSnow(true), monWeekDay{{1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6}}, numSimYears(1), isLeapYear(false),
-              RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), actualWeather(false), firstHrInterpUsingHr1(false)
-        {
-        }
+        int totalDays = 365; // total number of days in requested period
+        int startMonth = 1;
+        int startDay = 1;
+        int startJulianDate = 2457755; // Calculated start date (Julian or ordinal) for a weather file run period
+        int startYear = 2017;          // entered in "consecutive"/real runperiod object
+        int endMonth = 12;
+        int endDay = 31;
+        int endJulianDate = 2458119; // Calculated end date (Julian or ordinal) for a weather file run period
+        int endYear = 2017;          // entered in "consecutive"/real runperiod object
+        int dayOfWeek = 1;           // Day of Week that the RunPeriod will start on (User Input)
+        ScheduleManager::DayType startWeekDay = ScheduleManager::DayType::Sunday; // Day of the week that the RunPeriod will start on (User Input)
+        bool useDST = false;                                                      // True if DaylightSavingTime is used for this RunPeriod
+        bool useHolidays = false;                                                 // True if Holidays are used for this RunPeriod (from WeatherFile)
+        bool applyWeekendRule = false;                                            // True if "Weekend Rule" is to be applied to RunPeriod
+        bool useRain = true;                                                      // True if Rain from weather file should be used (set rain to true)
+        bool useSnow = true;                                                      // True if Snow from weather file should be used (set Snow to true)
+        Array1D_int monWeekDay = {1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6};            // Weekday for first day of each month
+        int numSimYears = 1;                                                      // Total Number of years of simulation to be performed
+        bool isLeapYear = false;                                                  // True if Begin Year is leap year.
+        bool RollDayTypeOnRepeat = true;                                          // If repeating run period, increment day type on repeat.
+        bool TreatYearsAsConsecutive = true;                                      // When year rolls over, increment year and recalculate Leap Year
+        bool actualWeather = false;                                               // true when using actual weather data
+        bool firstHrInterpUsingHr1 = false; // true for using Hour 1 for first hour interpolate; false for using Hour 24
     };
 
     struct DayWeatherVariables // Derived Type for Storing Weather "Header" Data

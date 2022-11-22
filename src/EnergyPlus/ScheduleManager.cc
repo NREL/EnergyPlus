@@ -97,18 +97,18 @@ namespace ScheduleManager {
     static constexpr std::string_view BlankString;
     // Day types are 1-based for EMS and output and other uses, so add a dummy
     constexpr std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNames{"dummy",
-                                                                         "Sunday",
-                                                                         "Monday",
-                                                                         "Tuesday",
-                                                                         "Wednesday",
-                                                                         "Thursday",
-                                                                         "Friday",
-                                                                         "Saturday",
-                                                                         "Holiday",
-                                                                         "SummerDesignDay",
-                                                                         "WinterDesignDay",
-                                                                         "CustomDay1",
-                                                                         "CustomDay2"};
+                                                                                        "Sunday",
+                                                                                        "Monday",
+                                                                                        "Tuesday",
+                                                                                        "Wednesday",
+                                                                                        "Thursday",
+                                                                                        "Friday",
+                                                                                        "Saturday",
+                                                                                        "Holiday",
+                                                                                        "SummerDesignDay",
+                                                                                        "WinterDesignDay",
+                                                                                        "CustomDay1",
+                                                                                        "CustomDay2"};
 
     constexpr std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNamesUC{"dummy",
                                                                                           "SUNDAY",

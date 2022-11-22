@@ -88,8 +88,8 @@ namespace ScheduleManager {
     };
 
     int constexpr maxDayTypes = static_cast<int>(DayType::Num) - 1;
-    extern const std::array<std::string_view, maxDayTypes + 1> dayTypeNames;
-    extern const std::array<std::string_view, maxDayTypes + 1> dayTypeNamesUC;
+    extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNames;
+    extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNamesUC;
 
     enum class SchedType : int
     {
