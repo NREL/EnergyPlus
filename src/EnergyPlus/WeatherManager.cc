@@ -8528,7 +8528,7 @@ namespace WeatherManager {
                 int PWeekDay;
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
-                    std::string dateStringUC = uppercase(Line.substr(0, Pos));
+                    std::string dateStringUC = Line.substr(0, Pos);
                     dateStringUC = uppercase(dateStringUC);
                     General::ProcessDateString(state, dateStringUC, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                     if (dateType != DateType::Invalid) {
@@ -8546,7 +8546,7 @@ namespace WeatherManager {
                 }
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
-                    std::string dateStringUC = uppercase(Line.substr(0, Pos));
+                    std::string dateStringUC = Line.substr(0, Pos);
                     dateStringUC = uppercase(dateStringUC);
                     General::ProcessDateString(state, dateStringUC, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                     if (dateType != DateType::Invalid) {
