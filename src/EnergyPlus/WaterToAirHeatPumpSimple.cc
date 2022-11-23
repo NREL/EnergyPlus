@@ -2115,10 +2115,14 @@ namespace WaterToAirHeatPumpSimple {
                                                          state.dataOutRptPredefined->pdchCoolCoilLatCap,
                                                          simpleWatertoAirHP.Name,
                                                          simpleWatertoAirHP.RatedCapCoolTotal - simpleWatertoAirHP.RatedCapCoolSens);
-                OutputReportPredefined::PreDefTableEntry(state,
-                                                         state.dataOutRptPredefined->pdchCoolCoilSHR,
-                                                         simpleWatertoAirHP.Name,
-                                                         simpleWatertoAirHP.RatedCapCoolSens / simpleWatertoAirHP.RatedCapCoolTotal);
+                if (simpleWatertoAirHP.RatedCapCoolTotal > 0) {
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchCoolCoilSHR,
+                                                             simpleWatertoAirHP.Name,
+                                                             simpleWatertoAirHP.RatedCapCoolSens / simpleWatertoAirHP.RatedCapCoolTotal);
+                } else {
+                    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, simpleWatertoAirHP.Name, 0.0);
+                }
                 if (RatedCapCoolTotalAutoSized) {
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchWAHPRatedCapAtRatedCdts,
