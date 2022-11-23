@@ -273,8 +273,12 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
             ListPtr = this_component.OpScheme(CurCompLevelOpNum).EquipList(ListNum).ListPtr;
             RangeHiLimit = this_op_scheme.EquipList(ListPtr).RangeUpperLimit;
             RangeLoLimit = this_op_scheme.EquipList(ListPtr).RangeLowerLimit;
-            // these limits are stored with absolute values, but the LoopDemand can be negative for cooling
-            TestRangeVariable = std::abs(RangeVariable);
+            if (CurSchemeType == OpScheme::HeatingRB || CurSchemeType == OpScheme::CoolingRB) {
+                // these limits are stored with absolute values, but the LoopDemand can be negative for cooling
+                TestRangeVariable = std::abs(RangeVariable);
+            } else {
+                TestRangeVariable = RangeVariable;
+            }
 
             // trying to do something where the last stage still runs the equipment but at the hi limit.
 
