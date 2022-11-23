@@ -106,9 +106,9 @@
 \DeclareSIUnit\specificHeatCapacity{\J\per\kg\per\K}
 \DeclareSIUnit\specificEnthalpy{\J\per\kg}
 \DeclareSIUnit\coefficientOfPerformance{\watt\per\watt}
-\DeclareSIUnit\wattperVolumeFlowRate{\watt\per({\volumeFlowRate})} % Displays "W/(m^3/s)"
-\DeclareSIUnit\volumeFlowRateperArea{({\volumeFlowRate})\per\area}
-\DeclareSIUnit\volumeFlowRateperWatt{({\volumeFlowRate})\per\watt}
+\DeclareSIUnit\wattperVolumeFlowRate{\watt\s\per\m\cubed} % Displays "W s/m^3"
+\DeclareSIUnit\volumeFlowRateperArea{\volumeFlowRate\per\area} % Unused
+\DeclareSIUnit\volumeFlowRateperWatt{\volumeFlowRate\per\watt} % Displays "m^3/(s W)"
 
 % Make alias, so its clear these are IP units
 \let\DeclareIPUnit\DeclareSIUnit
