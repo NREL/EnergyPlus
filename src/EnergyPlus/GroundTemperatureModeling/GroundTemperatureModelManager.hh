@@ -68,7 +68,7 @@ class BaseGroundTempsModel;
 
 namespace GroundTemperatureManager {
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &type, std::string const &name);
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string_view const &type, std::string const &name);
 
 } // namespace GroundTemperatureManager
 
@@ -78,7 +78,7 @@ struct GroundTemperatureManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-        *this = GroundTemperatureManagerData();
+        new (this) GroundTemperatureManagerData();
     }
 };
 
