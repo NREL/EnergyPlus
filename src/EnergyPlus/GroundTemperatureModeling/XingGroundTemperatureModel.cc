@@ -89,7 +89,7 @@ XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTempObjType ob
     // New shared pointer for this model object
     std::shared_ptr<XingGroundTempsModel> thisModel(new XingGroundTempsModel());
 
-    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::XingGroundTemp));
+    std::string const cCurrentModuleObject = static_cast<std::string>(groundTempModelNamesUC[static_cast<int>(GroundTempObjType::XingGroundTemp)]);
     int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
