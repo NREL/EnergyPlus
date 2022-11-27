@@ -134,7 +134,7 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTe
         // Return the pointer
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model");
+        ShowFatalError(state, fmt::format("{}--Errors getting input for ground temperature model", cCurrentModuleObject));
         return nullptr;
     }
 }

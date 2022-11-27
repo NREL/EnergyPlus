@@ -68,7 +68,7 @@ namespace EnergyPlus {
 namespace GroundTemperatureManager {
 
     std::shared_ptr<BaseGroundTempsModel>
-    GetGroundTempModelAndInit(EnergyPlusData &state, std::string_view const &objectType_str, std::string const &objectName)
+    GetGroundTempModelAndInit(EnergyPlusData &state, std::string_view const objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
@@ -80,12 +80,10 @@ namespace GroundTemperatureManager {
         // Called by objects requiring ground temperature models. Determines type and calls appropriate factory method.
 
         // Set object type
-        auto objectType = static_cast<GroundTempObjType>(getEnumerationValue(groundTempModelNamesUC, UtilityRoutines::MakeUPPERCase(objectType_str)));
+        GroundTempObjType objectType =
+            static_cast<GroundTempObjType>(getEnumerationValue(groundTempModelNamesUC, UtilityRoutines::MakeUPPERCase(objectType_str)));
 
-        if (objectType == GroundTempObjType::Invalid || objectType == GroundTempObjType::Num) {
-            // Error out if no ground temperature object types recognized
-            ShowFatalError(state, fmt::format("GetGroundTempsModelAndInit: Ground temperature object \"{}\" not recognized", objectType_str));
-        }
+        assert (objectType != GroundTempObjType::Invalid);
 
         int numGTMs = state.dataGrndTempModelMgr->groundTempModels.size();
 
@@ -114,7 +112,7 @@ namespace GroundTemperatureManager {
         } else if (objectType == GroundTempObjType::XingGroundTemp) {
             return XingGroundTempsModel::XingGTMFactory(state, objectType, objectName);
         } else {
-            // Error
+            ShowFatalError(state, fmt::format("Ground temperature object \"{}\" not recognized", objectType_str));
             return nullptr;
         }
     }

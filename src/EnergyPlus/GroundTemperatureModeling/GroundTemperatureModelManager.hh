@@ -68,7 +68,7 @@ class BaseGroundTempsModel;
 
 namespace GroundTemperatureManager {
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string_view const &type, std::string const &name);
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string_view const type, std::string const &name);
 
 } // namespace GroundTemperatureManager
 

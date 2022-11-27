@@ -84,6 +84,7 @@ SiteShallowGroundTemps::ShallowGTMFactory(EnergyPlusData &state, GroundTempObjTy
     int NumNums;
     int NumAlphas;
     int IOStat;
+    bool errorsFound = false;
 
     // New shared pointer for this model object
     std::shared_ptr<SiteShallowGroundTemps> thisModel(new SiteShallowGroundTemps());
@@ -103,7 +104,7 @@ SiteShallowGroundTemps::ShallowGTMFactory(EnergyPlusData &state, GroundTempObjTy
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
-            thisModel->errorsFound = true;
+            errorsFound = true;
         }
 
         // Assign the ground temps to the variable
@@ -115,7 +116,7 @@ SiteShallowGroundTemps::ShallowGTMFactory(EnergyPlusData &state, GroundTempObjTy
 
     } else if (numCurrObjects > 1) {
         ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
-        thisModel->errorsFound = true;
+        errorsFound = true;
     } else {
         thisModel->surfaceGroundTemps = 13.0;
     }
@@ -123,11 +124,11 @@ SiteShallowGroundTemps::ShallowGTMFactory(EnergyPlusData &state, GroundTempObjTy
     // Write Final Ground Temp Information to the initialization output file
     write_ground_temps(state.files.eio, "Shallow", thisModel->surfaceGroundTemps);
 
-    if (!thisModel->errorsFound) {
+    if (!errorsFound) {
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError(state, "Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");
+        ShowFatalError(state, fmt::format("{}--Errors getting input for ground temperature model", cCurrentModuleObject));
         return nullptr;
     }
 }

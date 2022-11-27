@@ -167,7 +167,7 @@ KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjTyp
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");
+        ShowFatalError(state, fmt::format("{}--Errors getting input for ground temperature model", cCurrentModuleObject));
         return nullptr;
     }
 }

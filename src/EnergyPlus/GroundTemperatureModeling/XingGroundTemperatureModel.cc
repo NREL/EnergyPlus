@@ -119,7 +119,7 @@ XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTempObjType ob
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
+        ShowFatalError(state, fmt::format("{}--Errors getting input for ground temperature model", cCurrentModuleObject));
         return nullptr;
     }
 }

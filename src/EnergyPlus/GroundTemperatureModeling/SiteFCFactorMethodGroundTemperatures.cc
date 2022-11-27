@@ -85,6 +85,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, GroundT
     int NumNums;
     int NumAlphas;
     int IOStat;
+    bool errorsFound = false;
 
     // New shared pointer for this model object
     std::shared_ptr<SiteFCFactorMethodGroundTemps> thisModel(new SiteFCFactorMethodGroundTemps());
@@ -104,7 +105,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, GroundT
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
-            thisModel->errorsFound = true;
+            errorsFound = true;
         }
 
         // overwrite values read from weather file for the 0.5m set ground temperatures
@@ -117,7 +118,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, GroundT
 
     } else if (numCurrObjects > 1) {
         ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
-        thisModel->errorsFound = true;
+        errorsFound = true;
 
     } else if (state.dataWeatherManager->wthFCGroundTemps) {
 
@@ -138,11 +139,11 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, GroundT
         write_ground_temps(state.files.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
     }
 
-    if (found && !thisModel->errorsFound) {
+    if (found && !errorsFound) {
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError(state, "Site:GroundTemperature:FCFactorMethod--Errors getting input for ground temperature model");
+        ShowFatalError(state, fmt::format("{}--Errors getting input for ground temperature model", cCurrentModuleObject));
         return nullptr;
     }
 }

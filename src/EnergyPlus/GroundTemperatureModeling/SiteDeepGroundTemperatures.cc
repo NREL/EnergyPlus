@@ -83,6 +83,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     int NumNums;
     int NumAlphas;
     int IOStat;
+    bool errorsFound = false;
 
     // New shared pointer for this model object
     std::shared_ptr<SiteDeepGroundTemps> thisModel(new SiteDeepGroundTemps());
@@ -102,7 +103,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
 
         if (NumNums < 12) {
             ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
-            thisModel->errorsFound = true;
+            errorsFound = true;
         }
 
         // overwrite values read from weather file for the 0.5m set ground temperatures
@@ -114,7 +115,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
 
     } else if (numCurrObjects > 1) {
         ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
-        thisModel->errorsFound = true;
+        errorsFound = true;
 
     } else {
         thisModel->deepGroundTemps = 16.0;
@@ -123,11 +124,11 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     // Write Final Ground Temp Information to the initialization output file
     write_ground_temps(state.files.eio, "Deep", thisModel->deepGroundTemps);
 
-    if (!thisModel->errorsFound) {
+    if (!errorsFound) {
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError(state, "Site:GroundTemperature:Deep--Errors getting input for ground temperature model");
+        ShowFatalError(state, fmt::format("{}--Errors getting input for ground temperature model", cCurrentModuleObject));
         return nullptr;
     }
 }
