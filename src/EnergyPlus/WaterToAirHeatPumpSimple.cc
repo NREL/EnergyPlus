@@ -2345,8 +2345,7 @@ namespace WaterToAirHeatPumpSimple {
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOAHeatCoils ==
                                 0) { // there is no preheating of the OA stream
                                 HeatMixTemp = HeatOutAirFrac * finalSysSizing.HeatOutTemp + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetTemp;
-                                HeatMixHumRat =
-                                    HeatOutAirFrac * finalSysSizing.HeatOutHumRat + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetHumRat;
+                                HeatMixHumRat = HeatOutAirFrac * finalSysSizing.HeatOutHumRat + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetHumRat;
                                 // calculate mixed air temperature with system airflow
                                 HeatMixTempSys =
                                     HeatOutAirFracSys * finalSysSizing.HeatOutTemp + (1.0 - HeatOutAirFracSys) * finalSysSizing.HeatRetTemp;
@@ -2355,8 +2354,7 @@ namespace WaterToAirHeatPumpSimple {
                             } else { // there is preheating of OA stream
                                 HeatOutAirFrac = min(1.0, max(0.0, HeatOutAirFrac));
                                 HeatMixTemp = HeatOutAirFrac * finalSysSizing.PreheatTemp + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetTemp;
-                                HeatMixHumRat =
-                                    HeatOutAirFrac * finalSysSizing.PreheatHumRat + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetHumRat;
+                                HeatMixHumRat = HeatOutAirFrac * finalSysSizing.PreheatHumRat + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetHumRat;
                                 // calculate mixed air temperature with system airflow
                                 HeatMixTempSys =
                                     HeatOutAirFracSys * finalSysSizing.PreheatTemp + (1.0 - HeatOutAirFracSys) * finalSysSizing.HeatRetTemp;
