@@ -86,14 +86,24 @@ N/A
  
 ## References
 
-[1]	T. Karlessi, M. Santamouris, K. Apostolakis, A. Synnefa, and I. Livada, “Development and testing of thermochromic coatings for buildings and urban structures,” Sol. Energy, vol. 83, no. 4, pp. 538–551, 2009.<br>
-[2]	A. Butt et al., “Investigating the energy saving potential of thermochromic coatings on building envelopes,” Appl. Energy, vol. 291, p. 116788, Jun. 2021, doi: 10.1016/j.apenergy.2021.116788.<br>
-[3]	S. Taylor, Y. Yang, and L. Wang, “Vanadium dioxide based Fabry-Perot emitter for dynamic radiative cooling applications,” J. Quant. Spectrosc. Radiat. Transf., vol. 197, pp. 76–83, Aug. 2017, doi: 10.1016/j.jqsrt.2017.01.014.<br>
-[4]	C. Wang, Y. Zhu, and X. Guo, “Thermally responsive coating on building heating and cooling energy efficiency and indoor comfort improvement,” Appl. Energy, vol. 253, p. 113506, 2019.<br>
-[5]	X. Li et al., “Integration of daytime radiative cooling and solar heating for year-round energy saving in buildings,” Nat. Commun., vol. 11, no. 1, pp. 1–9, 2020.<br>
-[6]	Z. Yang, Y. Jia, and J. Zhang, “Hierarchical-Morphology Metal/Polymer Heterostructure for Scalable Multimodal Thermal Management,” ACS Appl. Mater. Interfaces, 2022.<br>
-[7]	H. Zhao, Q. Sun, J. Zhou, X. Deng, and J. Cui, “Switchable Cavitation in Silicone Coatings for Energy-Saving Cooling and Heating,” Adv. Mater., vol. 32, no. 29, p. 2000870, 2020, doi: 10.1002/adma.202000870.<br>
-[8]	A. Butler and C. Argyropoulos, “Mechanically tunable radiative cooling for adaptive thermal control,” Appl. Therm. Eng., vol. 211, p. 118527, Jul. 2022, doi: 10.1016/j.applthermaleng.2022.118527.<br>
-[9]	J. Fei et al., “Switchable Surface Coating for Bifunctional Passive Radiative Cooling and Solar Heating,” Adv. Funct. Mater., vol. 32, no. 27, p. 2203582, 2022, doi: 10.1002/adfm.202203582.<br>
-[10]	P.-C. Hsu, “Electrochemical non-volatile dynamic tuning between solar heating and radiative cooling,” in Photonic and Phononic Properties of Engineered Nanostructures XII, Mar. 2022, vol. PC12010, p. PC1201010. doi: 10.1117/12.2610174.<br>
-[11]	K. Tang et al., “Temperature-adaptive radiative coating for all-season household thermal regulation,” Science, vol. 374, no. 6574, pp. 1504–1509, Dec. 2021, doi: 10.1126/science.abf7136.<br>
+[1]	T. Karlessi, M. Santamouris, K. Apostolakis, A. Synnefa, and I. Livada, “Development and testing of thermochromic coatings for buildings and urban structures,” Sol. Energy, vol. 83, no. 4, pp. 538–551, 2009.
+
+[2]	A. Butt et al., “Investigating the energy saving potential of thermochromic coatings on building envelopes,” Appl. Energy, vol. 291, p. 116788, Jun. 2021, doi: 10.1016/j.apenergy.2021.116788.
+
+[3]	S. Taylor, Y. Yang, and L. Wang, “Vanadium dioxide based Fabry-Perot emitter for dynamic radiative cooling applications,” J. Quant. Spectrosc. Radiat. Transf., vol. 197, pp. 76–83, Aug. 2017, doi: 10.1016/j.jqsrt.2017.01.014.
+
+[4]	C. Wang, Y. Zhu, and X. Guo, “Thermally responsive coating on building heating and cooling energy efficiency and indoor comfort improvement,” Appl. Energy, vol. 253, p. 113506, 2019.
+
+[5]	X. Li et al., “Integration of daytime radiative cooling and solar heating for year-round energy saving in buildings,” Nat. Commun., vol. 11, no. 1, pp. 1–9, 2020.
+
+[6]	Z. Yang, Y. Jia, and J. Zhang, “Hierarchical-Morphology Metal/Polymer Heterostructure for Scalable Multimodal Thermal Management,” ACS Appl. Mater. Interfaces, 2022.
+
+[7]	H. Zhao, Q. Sun, J. Zhou, X. Deng, and J. Cui, “Switchable Cavitation in Silicone Coatings for Energy-Saving Cooling and Heating,” Adv. Mater., vol. 32, no. 29, p. 2000870, 2020, doi: 10.1002/adma.202000870.
+
+[8]	A. Butler and C. Argyropoulos, “Mechanically tunable radiative cooling for adaptive thermal control,” Appl. Therm. Eng., vol. 211, p. 118527, Jul. 2022, doi: 10.1016/j.applthermaleng.2022.118527.
+
+[9]	J. Fei et al., “Switchable Surface Coating for Bifunctional Passive Radiative Cooling and Solar Heating,” Adv. Funct. Mater., vol. 32, no. 27, p. 2203582, 2022, doi: 10.1002/adfm.202203582.
+
+[10]	P.-C. Hsu, “Electrochemical non-volatile dynamic tuning between solar heating and radiative cooling,” in Photonic and Phononic Properties of Engineered Nanostructures XII, Mar. 2022, vol. PC12010, p. PC1201010. doi: 10.1117/12.2610174.
+
+[11]	K. Tang et al., “Temperature-adaptive radiative coating for all-season household thermal regulation,” Science, vol. 374, no. 6574, pp. 1504–1509, Dec. 2021, doi: 10.1126/science.abf7136.
