@@ -26,20 +26,11 @@ ASHRAE 90.1-2019:
 |8	|UEF <br/> [(CFR-430-2016 Appendix E)](https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE) | ASHRAE 90.1-2019|	Uniform Energy Factor|	Water Heaters	|[[9]](https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE)|
 |9	|FEI  <br/>[(AMCA 208-2018)](https://www.techstreet.com/amca/searches/35955048) | ASHRAE 90.1-2019 |	fan energy index	| Fan Energy |	[[10]](https://www.techstreet.com/amca/searches/35955048) |
 
-In a previous Task Order, we implemented support for calculation and
-reporting of SEER2 and HSPF2. In this Task Order we propose to implement
-support for calculation and reporting of the 2022 version of the AHRI
-IEER metric and, if budget allows, to extend the range of coils
-reporting SEER2 and HSPF2.
+In a previous Task Order, we implemented support for calculation and reporting of SEER2 and HSPF2.  This was done for SingleSpeed, TwoSpeed, MultiSpeed Cooling and Heating coils.  It was also done for CurveFit: Speed Cooling coils.
+In this Task Order we propose to implement support for calculation and reporting of the 2022 version of the AHRI IEER metric.  If budget allows, we will also extend the range of coils reporting SEER2 and HSPF2 to include VariableSpeed Cool and heating Coils.
 
 ## IEER = Integrated Energy Efficiency Rating (2022)
-The Integrated Energy Efficiency Ratio (IEER) will be calculated and
-reported as defined in the 2022 version of the AHRI 340/360 standard --
-"Performance Rating of Commercial and Industrial Unitary Air
-Conditioning and Heat Pump Equipment." When compared to the previous
-implementation for the 2008 version of this standard, the Temperature
-time bins have changed and been increased, and various test conditions
-for the calculation have also changed.
+The Integrated Energy Efficiency Ratio (IEER) will be calculated and reported as defined in the 2022 version of the AHRI 340/360 standard -- "Performance Rating of Commercial and Industrial Unitary Air Conditioning and Heat Pump Equipment." When compared to the previous (limited) implementation of the 2008 version of this standard, the Temperature time bins have changed and various test conditions for calculation of this metric have have changed & been expanded.
 
 ## SEER2 = Seasonal Energy Efficiency Rating (2023)
 Currently, there is at least one DX cooling coil for which SEER2 is not calculated & reported. We proposal to extend SEER2 calculation and reporting to include Coil:Cooling:DX:VariableSpeed.
@@ -48,27 +39,15 @@ Currently, there is at least one DX cooling coil for which SEER2 is not calculat
 Currently, there is at least one DX cooling coils for which HSPF2 is not calculated. We proposal to extend HSPF2 calculation and reporting to include Coil:Heating:DX:VariableSpeed.
 
 ## Approach
-For each metric, we will first identify a set of EnergyPlus components
-to which the metric applies. We will then locate sample files that
-contain these object types -- to be used in testing.
+For each metric, we will first identify a set of EnergyPlus components to which the metric applies. We will then locate sample files that contain these object types -- to be used in testing. Coils we currently belive will be included are shown in the outline below.
 
-For IEER, we will update code written in 2010, for partial support of
-the 2008 version of IEER. We will also add new code to fully support the
-newest version of this rating, written in 2022. This will include
-support for the updated Time Bins and expanded test conditions. We will
-also update existing unit tests and possibly add one or more unit tests
-to test the new implementation.
+For IEER, we will update code written in 2010, for partial support of the 2008 version of IEER. We will also add new code to fully support the newest version of this rating, written in 2022. This will include support for the updated Time Bins and expanded test conditions. We will also update existing unit tests and possibly add one or more unit tests to test the new implementation.
 
-For SEER2 and HSPF2, we will update code written in the E+ 22-2 cycle to
-include support for the variable speed DX coils. As before, this will
-require adding new fields to these coils -- to enable users to specify
+For SEER2 and HSPF2, we will update code written in the E+ 22-2 cycle to include support for the variable speed DX coils. As before, this will require adding new fields to these coils -- to enable users to specify the 'Fan Power Per Volume Flow Rate {W/(m3/s)}' inputs to the SEER2 & HSPF2 calculations. 
 
-Once the metrics are calculated we can integrate them into the
-corresponding report code of the equipment summary table.
+Once the metrics are calculated we can integrate them into the corresponding report code of the equipment summary table.
 
-To accomplish this we will extend the implementation in
-StandardRatings.hh & StandardRatings.cc as follows:
-
+This will all be done by extending the implementation in StandardRatings.hh & StandardRatings.cc.  Our initial estimate for the scope of this work includes the following:
 -   For IEER
     -   SingleSpeedDXCoolingCoilStandardRatings -- used for the
         following E+ coils:
@@ -84,6 +63,7 @@ StandardRatings.hh & StandardRatings.cc as follows:
     -   SingleSpeedDXHeatingCoilStandardRatings -- used for the
         following E+ coils:
         -   Coil: Heating:DX:SingleSpeed
+
     -   MultiSpeedDXHeatingCoilStandardRatings -- used for the following
         E+ coils:
         -   Coil: Heating:DX:TwoSpeed
@@ -103,27 +83,14 @@ StandardRatings.hh & StandardRatings.cc as follows:
         -   Coil: Heating:DX:VariableSpeed
 
 ## Testing/Validation/Data Source(s)
-Unit tests will confirm and test the calculation of the metrics to
-ensure the code produces correct results and does not fail. Example
-files will be tested using of the new metrics. Simulation results will
-be compared with values generated by a third-party implementation,
-assuming we can locate one. Peer reviewer input on this is eagerly
-invited.
+Example files will be simulated to confirm calculation and reporting of the new metrics. Simulation results will be compared with values generated by a third-party implementation (assuming we can locate one).  Peer reviewer input on this is eagerly invited.
+Unit tests for the Continuous Integration pipeline will also be updated/extended to confirm the calculation of the metrics and ensure the code produces correct results and does not fail when future code changes are merged.
 
 ## Input Output Reference Documentation
-The Input Output Documentation will be expanded to include the new
-metrics. There will be an update in two places: first on the related
-section of the EnergyPlus components for which the metric is calculated
-and second in the reports section, specifically the Equipment Summary
-report. We will also add a disclaimer: \"It is not reasonable to expect
-AHRI ratings calculated from model inputs to match the actual ratings in
-the AHRI directory. This is largely because it is common practice for
-manufacturers to underrate their equipment for marketing reasons and/or
-to build in some safety margin in case DOE audits their ratings.\"
+The Input Output Documentation will be expanded to include the new metrics. There will be an update in two places: first on the related section of the EnergyPlus components for which the metric is calculated and second in the reports section, specifically the Equipment Summary report. We will also add a disclaimer: \"It is not reasonable to expect AHRI ratings calculated from model inputs to match the actual ratings in the AHRI directory. This is largely because it is common practice for manufacturers to underrate their equipment for marketing reasons and/or to build in some safety margin in case DOE audits their ratings.\"
 
 ## Input Description
-New fields will be added to the variable speed DX coils (both cooling
-and heating).
+New fields will be added to the variable speed DX coils (both cooling and heating).
 
 ## Outputs Description
 There will be an update to the reports to include the metrics as
@@ -135,11 +102,10 @@ of the calculations with links/references to Formulae (by number)
 defined in the standards. formulas used to calculate the two metrics and
 be referenced from the corresponding EnergyPlus components.
 
-## Example Files
-TBD
-
-## Transition Changes
-TBD
+## Example Files and Transition Changes
+Transition rules will be required to accomodate the new fields added to the VariableSpeed DX coils.
+Example files the include the VariableSpeed DX coils will need to be updated.
+More detail to be added in design.
 
 ## Acknowledgments
 TBD
