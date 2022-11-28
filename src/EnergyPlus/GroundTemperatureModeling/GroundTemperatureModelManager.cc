@@ -76,6 +76,15 @@ namespace GroundTemperatureManager {
         "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD",
         "SITE:GROUNDTEMPERATURE:UNDISTURBED:XING"};
 
+    constexpr std::array<std::string_view, static_cast<int>(GroundTempObjType::Num)> groundTempModelNames = {
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach",
+        "Site:GroundTemperature:Undisturbed:FiniteDifference",
+        "Site:GroundTemperature:BuildingSurface",
+        "Site:GroundTemperature:Shallow",
+        "Site:GroundTemperature:Deep",
+        "Site:GroundTemperature:FCfactorMethod",
+        "Site:GroundTemperature:Undisturbed:Xing"};
+
     std::shared_ptr<BaseGroundTempsModel>
     GetGroundTempModelAndInit(EnergyPlusData &state, std::string_view const objectType_str, std::string const &objectName)
     {
@@ -107,21 +116,21 @@ namespace GroundTemperatureManager {
 
         // If not found, create new instance of the model
         if (objectType == GroundTempObjType::KusudaGroundTemp) {
-            return KusudaGroundTempsModel::KusudaGTMFactory(state, objectType, objectName);
+            return KusudaGroundTempsModel::KusudaGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::FiniteDiffGroundTemp) {
-            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectType, objectName);
+            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::SiteBuildingSurfaceGroundTemp) {
-            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state, objectType, objectName);
+            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::SiteShallowGroundTemp) {
-            return SiteShallowGroundTemps::ShallowGTMFactory(state, objectType, objectName);
+            return SiteShallowGroundTemps::ShallowGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::SiteDeepGroundTemp) {
-            return SiteDeepGroundTemps::DeepGTMFactory(state, objectType, objectName);
+            return SiteDeepGroundTemps::DeepGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::SiteFCFactorMethodGroundTemp) {
-            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state, objectType, objectName);
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::XingGroundTemp) {
-            return XingGroundTempsModel::XingGTMFactory(state, objectType, objectName);
+            return XingGroundTempsModel::XingGTMFactory(state, objectName);
         } else {
-            ShowFatalError(state, fmt::format("Ground temperature object \"{}\" not recognized", objectType_str));
+            assert(false);
             return nullptr;
         }
     }
