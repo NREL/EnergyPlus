@@ -1448,20 +1448,20 @@ namespace WaterToAirHeatPumpSimple {
                     }
                     // cooling design day calculations
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
-                        auto &finalZoneSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
+                        auto &finalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
-                            MixTemp = finalZoneSizing.OutTempAtCoolPeak;
-                            MixHumRat = finalZoneSizing.OutHumRatAtCoolPeak;
-                            SupTemp = finalZoneSizing.PrecoolTemp;
-                            SupHumRat = finalZoneSizing.PrecoolHumRat;
+                            MixTemp = finalSysSizing.OutTempAtCoolPeak;
+                            MixHumRat = finalSysSizing.OutHumRatAtCoolPeak;
+                            SupTemp = finalSysSizing.PrecoolTemp;
+                            SupHumRat = finalSysSizing.PrecoolHumRat;
                             MixTempSys = MixTemp;
                             MixHumRatSys = MixHumRat;
                         } else { // coil is on the main air loop
-                            SupTemp = finalZoneSizing.CoolSupTemp;
-                            SupHumRat = finalZoneSizing.CoolSupHumRat;
+                            SupTemp = finalSysSizing.CoolSupTemp;
+                            SupHumRat = finalSysSizing.CoolSupHumRat;
                             if (VolFlowRate > 0.0) {
-                                OutAirFrac = finalZoneSizing.DesOutAirVolFlow / VolFlowRate;
-                                OutAirFracSys = finalZoneSizing.DesOutAirVolFlow / RatedAirVolFlowRateDes;
+                                OutAirFrac = finalSysSizing.DesOutAirVolFlow / VolFlowRate;
+                                OutAirFracSys = finalSysSizing.DesOutAirVolFlow / RatedAirVolFlowRateDes;
                             } else {
                                 OutAirFrac = 1.0;
                                 OutAirFracSys = OutAirFrac;
@@ -1470,20 +1470,20 @@ namespace WaterToAirHeatPumpSimple {
                             OutAirFracSys = min(1.0, max(0.0, OutAirFracSys));
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils ==
                                 0) { // there is no precooling of the OA stream
-                                MixTemp = finalZoneSizing.MixTempAtCoolPeak;
-                                MixHumRat = finalZoneSizing.MixHumRatAtCoolPeak;
+                                MixTemp = finalSysSizing.MixTempAtCoolPeak;
+                                MixHumRat = finalSysSizing.MixHumRatAtCoolPeak;
                                 // calculate mixed air temperature with system airflow
                                 MixTempSys =
-                                    OutAirFracSys * finalZoneSizing.OutTempAtCoolPeak + (1.0 - OutAirFracSys) * finalZoneSizing.RetTempAtCoolPeak;
+                                    OutAirFracSys * finalSysSizing.OutTempAtCoolPeak + (1.0 - OutAirFracSys) * finalSysSizing.RetTempAtCoolPeak;
                                 MixHumRatSys =
-                                    OutAirFracSys * finalZoneSizing.OutHumRatAtCoolPeak + (1.0 - OutAirFracSys) * finalZoneSizing.RetHumRatAtCoolPeak;
+                                    OutAirFracSys * finalSysSizing.OutHumRatAtCoolPeak + (1.0 - OutAirFracSys) * finalSysSizing.RetHumRatAtCoolPeak;
                             } else { // there is precooling of OA stream
-                                MixTemp = OutAirFrac * finalZoneSizing.PrecoolTemp + (1.0 - OutAirFrac) * finalZoneSizing.RetTempAtCoolPeak;
-                                MixHumRat = OutAirFrac * finalZoneSizing.PrecoolHumRat + (1.0 - OutAirFrac) * finalZoneSizing.RetHumRatAtCoolPeak;
+                                MixTemp = OutAirFrac * finalSysSizing.PrecoolTemp + (1.0 - OutAirFrac) * finalSysSizing.RetTempAtCoolPeak;
+                                MixHumRat = OutAirFrac * finalSysSizing.PrecoolHumRat + (1.0 - OutAirFrac) * finalSysSizing.RetHumRatAtCoolPeak;
                                 // calculate mixed air temperature with system airflow
-                                MixTempSys = OutAirFracSys * finalZoneSizing.PrecoolTemp + (1.0 - OutAirFracSys) * finalZoneSizing.RetTempAtCoolPeak;
+                                MixTempSys = OutAirFracSys * finalSysSizing.PrecoolTemp + (1.0 - OutAirFracSys) * finalSysSizing.RetTempAtCoolPeak;
                                 MixHumRatSys =
-                                    OutAirFracSys * finalZoneSizing.PrecoolHumRat + (1.0 - OutAirFracSys) * finalZoneSizing.RetHumRatAtCoolPeak;
+                                    OutAirFracSys * finalSysSizing.PrecoolHumRat + (1.0 - OutAirFracSys) * finalSysSizing.RetHumRatAtCoolPeak;
                             }
                         }
                         // supply air condition is capped with that of mixed air to avoid SHR > 1.0
@@ -1747,34 +1747,34 @@ namespace WaterToAirHeatPumpSimple {
                         VolFlowRate = HeatingAirVolFlowRateDes; // system air flow
                     }
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
-                        auto &finalZoneSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
+                        auto &finalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
-                            MixTemp = finalZoneSizing.OutTempAtCoolPeak;
-                            MixHumRat = finalZoneSizing.OutHumRatAtCoolPeak;
-                            SupTemp = finalZoneSizing.PrecoolTemp;
-                            SupHumRat = finalZoneSizing.PrecoolHumRat;
+                            MixTemp = finalSysSizing.OutTempAtCoolPeak;
+                            MixHumRat = finalSysSizing.OutHumRatAtCoolPeak;
+                            SupTemp = finalSysSizing.PrecoolTemp;
+                            SupHumRat = finalSysSizing.PrecoolHumRat;
                         } else { // coil is on the main air loop
-                            SupTemp = finalZoneSizing.CoolSupTemp;
-                            SupHumRat = finalZoneSizing.CoolSupHumRat;
+                            SupTemp = finalSysSizing.CoolSupTemp;
+                            SupHumRat = finalSysSizing.CoolSupHumRat;
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils ==
                                 0) { // there is no precooling of the OA stream
-                                MixTemp = finalZoneSizing.MixTempAtCoolPeak;
-                                MixHumRat = finalZoneSizing.MixHumRatAtCoolPeak;
+                                MixTemp = finalSysSizing.MixTempAtCoolPeak;
+                                MixHumRat = finalSysSizing.MixHumRatAtCoolPeak;
                             } else { // there is precooling of OA stream
                                 if (VolFlowRate > 0.0) {
-                                    OutAirFrac = finalZoneSizing.DesOutAirVolFlow / VolFlowRate;
+                                    OutAirFrac = finalSysSizing.DesOutAirVolFlow / VolFlowRate;
                                 } else {
                                     OutAirFrac = 1.0;
                                 }
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                                MixTemp = OutAirFrac * finalZoneSizing.PrecoolTemp + (1.0 - OutAirFrac) * finalZoneSizing.RetTempAtCoolPeak;
-                                MixHumRat = OutAirFrac * finalZoneSizing.PrecoolHumRat + (1.0 - OutAirFrac) * finalZoneSizing.RetHumRatAtCoolPeak;
+                                MixTemp = OutAirFrac * finalSysSizing.PrecoolTemp + (1.0 - OutAirFrac) * finalSysSizing.RetTempAtCoolPeak;
+                                MixHumRat = OutAirFrac * finalSysSizing.PrecoolHumRat + (1.0 - OutAirFrac) * finalSysSizing.RetHumRatAtCoolPeak;
                             }
                         }
                         // supply air condition is capped with that of mixed air to avoid SHR > 1.0
                         SupTemp = min(MixTemp, SupTemp);
                         SupHumRat = min(MixHumRat, SupHumRat);
-                        OutTemp = finalZoneSizing.OutTempAtCoolPeak;
+                        OutTemp = finalSysSizing.OutTempAtCoolPeak;
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, MixHumRat);
@@ -2326,42 +2326,42 @@ namespace WaterToAirHeatPumpSimple {
                     }
                     // heating design day calculations
                     if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
-                        auto &finalZoneSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
+                        auto &finalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
-                            HeatMixTemp = finalZoneSizing.HeatOutTemp;
-                            HeatMixHumRat = finalZoneSizing.HeatOutHumRat;
-                            HeatSupTemp = finalZoneSizing.PreheatTemp;
+                            HeatMixTemp = finalSysSizing.HeatOutTemp;
+                            HeatMixHumRat = finalSysSizing.HeatOutHumRat;
+                            HeatSupTemp = finalSysSizing.PreheatTemp;
                         } else { // coil is on the main air loop
                             if (VolFlowRate > 0.0) {
-                                HeatOutAirFrac = finalZoneSizing.DesOutAirVolFlow / VolFlowRate;
-                                HeatOutAirFracSys = finalZoneSizing.DesOutAirVolFlow / RatedAirVolFlowRateDes;
+                                HeatOutAirFrac = finalSysSizing.DesOutAirVolFlow / VolFlowRate;
+                                HeatOutAirFracSys = finalSysSizing.DesOutAirVolFlow / RatedAirVolFlowRateDes;
                             } else {
                                 HeatOutAirFrac = 1.0;
                                 HeatOutAirFracSys = HeatOutAirFrac;
                             }
                             HeatOutAirFrac = min(1.0, max(0.0, HeatOutAirFrac));
                             HeatOutAirFracSys = min(1.0, max(0.0, HeatOutAirFracSys));
-                            HeatSupTemp = finalZoneSizing.HeatSupTemp;
+                            HeatSupTemp = finalSysSizing.HeatSupTemp;
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOAHeatCoils ==
                                 0) { // there is no preheating of the OA stream
-                                HeatMixTemp = HeatOutAirFrac * finalZoneSizing.HeatOutTemp + (1.0 - HeatOutAirFrac) * finalZoneSizing.HeatRetTemp;
+                                HeatMixTemp = HeatOutAirFrac * finalSysSizing.HeatOutTemp + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetTemp;
                                 HeatMixHumRat =
-                                    HeatOutAirFrac * finalZoneSizing.HeatOutHumRat + (1.0 - HeatOutAirFrac) * finalZoneSizing.HeatRetHumRat;
+                                    HeatOutAirFrac * finalSysSizing.HeatOutHumRat + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetHumRat;
                                 // calculate mixed air temperature with system airflow
                                 HeatMixTempSys =
-                                    HeatOutAirFracSys * finalZoneSizing.HeatOutTemp + (1.0 - HeatOutAirFracSys) * finalZoneSizing.HeatRetTemp;
+                                    HeatOutAirFracSys * finalSysSizing.HeatOutTemp + (1.0 - HeatOutAirFracSys) * finalSysSizing.HeatRetTemp;
                                 HeatMixHumRatSys =
-                                    HeatOutAirFracSys * finalZoneSizing.HeatOutHumRat + (1.0 - HeatOutAirFracSys) * finalZoneSizing.HeatRetHumRat;
+                                    HeatOutAirFracSys * finalSysSizing.HeatOutHumRat + (1.0 - HeatOutAirFracSys) * finalSysSizing.HeatRetHumRat;
                             } else { // there is preheating of OA stream
                                 HeatOutAirFrac = min(1.0, max(0.0, HeatOutAirFrac));
-                                HeatMixTemp = HeatOutAirFrac * finalZoneSizing.PreheatTemp + (1.0 - HeatOutAirFrac) * finalZoneSizing.HeatRetTemp;
+                                HeatMixTemp = HeatOutAirFrac * finalSysSizing.PreheatTemp + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetTemp;
                                 HeatMixHumRat =
-                                    HeatOutAirFrac * finalZoneSizing.PreheatHumRat + (1.0 - HeatOutAirFrac) * finalZoneSizing.HeatRetHumRat;
+                                    HeatOutAirFrac * finalSysSizing.PreheatHumRat + (1.0 - HeatOutAirFrac) * finalSysSizing.HeatRetHumRat;
                                 // calculate mixed air temperature with system airflow
                                 HeatMixTempSys =
-                                    HeatOutAirFracSys * finalZoneSizing.PreheatTemp + (1.0 - HeatOutAirFracSys) * finalZoneSizing.HeatRetTemp;
+                                    HeatOutAirFracSys * finalSysSizing.PreheatTemp + (1.0 - HeatOutAirFracSys) * finalSysSizing.HeatRetTemp;
                                 HeatMixHumRatSys =
-                                    HeatOutAirFracSys * finalZoneSizing.PreheatHumRat + (1.0 - HeatOutAirFracSys) * finalZoneSizing.HeatRetHumRat;
+                                    HeatOutAirFracSys * finalSysSizing.PreheatHumRat + (1.0 - HeatOutAirFracSys) * finalSysSizing.HeatRetHumRat;
                             }
                             // determine the coil ratio of coil dT with system air flow to design heating air flow
                             HeatdTratio = (HeatSupTemp - HeatMixTempSys) / (HeatSupTemp - HeatMixTemp);
