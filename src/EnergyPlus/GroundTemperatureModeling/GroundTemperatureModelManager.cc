@@ -67,6 +67,15 @@ namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
 
+    constexpr std::array<std::string_view, static_cast<int>(GroundTempObjType::Num)> groundTempModelNamesUC = {
+        "SITE:GROUNDTEMPERATURE:UNDISTURBED:KUSUDAACHENBACH",
+        "SITE:GROUNDTEMPERATURE:UNDISTURBED:FINITEDIFFERENCE",
+        "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE",
+        "SITE:GROUNDTEMPERATURE:SHALLOW",
+        "SITE:GROUNDTEMPERATURE:DEEP",
+        "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD",
+        "SITE:GROUNDTEMPERATURE:UNDISTURBED:XING"};
+
     std::shared_ptr<BaseGroundTempsModel>
     GetGroundTempModelAndInit(EnergyPlusData &state, std::string_view const objectType_str, std::string const &objectName)
     {
@@ -83,7 +92,7 @@ namespace GroundTemperatureManager {
         GroundTempObjType objectType =
             static_cast<GroundTempObjType>(getEnumerationValue(groundTempModelNamesUC, UtilityRoutines::MakeUPPERCase(objectType_str)));
 
-        assert (objectType != GroundTempObjType::Invalid);
+        assert(objectType != GroundTempObjType::Invalid);
 
         int numGTMs = state.dataGrndTempModelMgr->groundTempModels.size();
 

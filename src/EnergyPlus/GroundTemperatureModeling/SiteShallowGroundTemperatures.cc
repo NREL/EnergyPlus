@@ -90,7 +90,7 @@ SiteShallowGroundTemps::ShallowGTMFactory(EnergyPlusData &state, GroundTempObjTy
     std::shared_ptr<SiteShallowGroundTemps> thisModel(new SiteShallowGroundTemps());
 
     std::string const cCurrentModuleObject =
-        static_cast<std::string>(groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)]);
+        static_cast<std::string>(GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)]);
     int numCurrObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
