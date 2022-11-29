@@ -14979,7 +14979,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     bool ErrorsFound(false);
     Real64 FanHeatCorrection;
     Real64 FanPowerCorrection;
-    Real64 FanPowerPerEvapAirFlowRate;
+    Real64 FanPowerPerEvapAirFlowRate = 0.0;
     Real64 FanPowerPerEvapAirFlowRateSEER2;
     Real64 SpeedRatio;
     Real64 CycRatio;
