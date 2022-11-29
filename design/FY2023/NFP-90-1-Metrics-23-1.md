@@ -104,7 +104,7 @@ be referenced from the corresponding EnergyPlus components.
 
 ## Example Files and Transition Changes
 Transition rules will be required to accomodate the new fields added to the VariableSpeed DX coils.
-Example files the include the VariableSpeed DX coils will need to be updated.
+Example files that include the VariableSpeed DX coils will need to be updated.
 More detail to be added in design.
 
 ## Acknowledgments
@@ -114,40 +114,31 @@ TBD
 \[1\] ASHRAE, ANSI/ASHRAE/IES Standard 90.1-2019: Energy Standard for
 Buildings Except Low-Rise Residential Buildings. 2019.
 
-\[2\] Jonestone Supply: The SEER2 Guide. 2022. URL: https://seer2.com/
+\[2\] Jonestone Supply: The SEER2 Guide. 2022. URL: [AHRI 210/240-202](https://seer2.com/)
 
 \[3\] AHRI: Air Conditioning, Heating & Refrigeration Institute. 2023
 (2020) Standard for Performance Rating of Unitary Air-conditioning &
-Air-source Heat Pump Equipment. 2020. URL:
-https://www.ahrinet.org/Portals/\_Appleseed/documents/Standards/AHRI%20Standard%20210.240-2023%20(2020).pdf
+Air-source Heat Pump Equipment. 2020. URL: [AHRI 210/240-2023](https://www.ahrinet.org/Portals/\_Appleseed/documents/Standards/AHRI%20Standard%20210.240-2023%20(2020).pdf)
 
 \[4\] AHRI: AHRI Standard 340/360-2022 (I-P): 2022 Standard for
 Performance Rating of Commercial and Industrial Unitary Air-conditioning
-and Heat Pump Equipment. 2019. URL:
-https://www.ahrinet.org/Portals/Standards/AHRI%20Standard%20340-360-2022%20(I-P).pdf
+and Heat Pump Equipment. 2019. URL: [AHRI 340/360-2022](https://www.ahrinet.org/Portals/Standards/AHRI%20Standard%20340-360-2022%20(I-P).pdf)
 
-\[5\] ANSI/AHAM: ANSI/AHAM RAC-1-2015: Room Air Conditioners. 2015.
-https://webstore.ansi.org/standards/aham/ansiahamrac2015
+\[5\] ANSI/AHAM: ANSI/AHAM RAC-1-2015: Room Air Conditioners. 2015. URL: [ANSI/AHAM RAC-1-2020](https://webstore.ansi.org/standards/aham/ansiahamrac2015)
 
 \[6\] ANSI/AHAM: ANSI/AHRI 910-I-P-2014: Performance Rating of Indoor
-Pool Dehumidifiers. 2014.
-http://www.ahrinet.org/App_Content/ahri/files/STANDARDS/AHRI/AHRI_Standard_910_I-P_2014.pdf
+Pool Dehumidifiers. 2014. URL: [AHRI 910-2020](http://www.ahrinet.org/App_Content/ahri/files/STANDARDS/AHRI/AHRI_Standard_910_I-P_2014.pdf)
 
 \[7\] HPAC Engineering. Understanding AHRI 920 and ISMRE Ratings for
-Most Efficient DOAS Specification. 2018.
-https://www.hpac.com/columns/managing-facilities/article/20929562/understanding-ahri-920-and-ismre-ratings-for-most-efficient-doas-specification
+Most Efficient DOAS Specification. 2018. URL:[AHRI 920-2020](https://www.hpac.com/columns/managing-facilities/article/20929562/understanding-ahri-920-and-ismre-ratings-for-most-efficient-doas-specification)
 
 \[8\] ANSI/AHAM: ANSI/AHRI 920-I-P-2015: 2015 Standard for Performance
-Rating of DX-Dedicated Outdoor Air System Units. 2015.
-https://www.ahrinet.org/App_Content/ahri/files/STANDARDS/ANSI/ANSI_AHRI_Standard_920_I-P_2015.pdf
+Rating of DX-Dedicated Outdoor Air System Units. 2015.<br/>&ensp;&ensp; URL: [AHRI 920-2020](https://www.ahrinet.org/App_Content/ahri/files/STANDARDS/ANSI/ANSI_AHRI_Standard_920_I-P_2015.pdf)
 
 \[9\] 10 CFR Appendix E to Subpart B of Part 430 - Uniform Test Method
-for Measuring the Energy Consumption of Water Heaters. 2016.
-https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE
+for Measuring the Energy Consumption of Water Heaters. 2016.<br/>&ensp;&ensp; URL: [FR-430-2016 Appendix E](https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE)
 
 \[10\] ANSI/AMCA Standard 208, Calculation of the Fan Energy Index.
-2019.
-https://www.amca.org/news/press-releases/ansi/amca-standard-208,-calculation-of-the-fan-energy-index,-available-for-free-download.html&usg=AOvVaw2eZxHxgdq183Y9WsZlgjTB
+2019. URL: [AMCA 208-2018](https://www.amca.org/news/press-releases/ansi/amca-standard-208,-calculation-of-the-fan-energy-index,-available-for-free-download.html&usg=AOvVaw2eZxHxgdq183Y9WsZlgjTB)
 
-\[11\] Differences between SEER and HSOPF and SEER2 and HSPF2
-https://www.ahrinet.org/Portals/AHRI%20CAC%20HP%20Appendix%20M1%20Presentation%20-%20AHR%20Expo.pdf
+\[11\] Differences between SEER and HSOPF and SEER2 and HSPF2 URL: [Presentation](https://www.ahrinet.org/Portals/AHRI%20CAC%20HP%20Appendix%20M1%20Presentation%20-%20AHR%20Expo.pdf)
