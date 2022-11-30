@@ -53,13 +53,42 @@ A new object Material:DynamicCoating object is proposed.
           \required-field
           \type alpha
           \reference MaterialName
-      …
-      N5 , \field Visible Absorptance
+     A2 , \field Roughness
+          \required-field
+          \type choice
+          \key VeryRough
+          \key Rough
+          \key MediumRough
+          \key MediumSmooth
+          \key Smooth
+          \key VerySmooth
+     N1 , \field Thickness
+          \required-field
+          \units m
+          \type real
+          \minimum> 0
+          \ip-units in
+     N2 , \field Conductivity
+          \required-field
+          \units W/m-K
+          \type real
+          \minimum> 0
+     N3 , \field Density
+          \required-field
+          \units kg/m3
+          \type real
+          \minimum> 0
+     N4 , \field Specific Heat
+          \required-field
+          \units J/kg-K
+          \type real
+          \minimum 100
+     N5 , \field Visible Absorptance
           \type real
           \minimum 0
           \default .7
           \maximum 1
-      A3 , \field Stimuli Indicator
+     A3 , \field Stimuli Indicator
           \required-field
           \type choice
           \key SurfaceTemperature
