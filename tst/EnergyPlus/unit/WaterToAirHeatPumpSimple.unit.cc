@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataSize->DesDayWeath.allocate(1);
     state->dataSize->DesDayWeath(1).Temp.allocate(24);
 
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPType = WatertoAirHP::Cooling;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens = AutoSize;
@@ -1114,7 +1114,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     int HPNum(2);
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(HPNum);
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).Name = "WAHP";
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WatertoAirHPType = "COOLING";
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPType = WatertoAirHP::Cooling;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedAirVolFlowRate = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolTotal = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolSens = AutoSize;
@@ -1194,7 +1194,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_CheckSimpleWAHPRatedCurve
     EXPECT_TRUE(compare_err_stream("", true));
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).Name = "WAHP 2";
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WatertoAirHPType = "COOLING";
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPType = WatertoAirHP::Cooling;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedAirVolFlowRate = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolTotal = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolSens = AutoSize;
@@ -1300,7 +1300,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     state->dataSize->DesDayWeath.allocate(1);
     state->dataSize->DesDayWeath(1).Temp.allocate(24);
 
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WatertoAirHPType = "COOLING";
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPType = WatertoAirHP::Cooling;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedAirVolFlowRate = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolTotal = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolSens = AutoSize;
@@ -1313,7 +1313,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CompanionHeatingCoilNum = 2;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
 
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WatertoAirHPType = "HEATING";
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPType = WatertoAirHP::Heating;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedAirVolFlowRate = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCapHeat = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedWaterVolFlowRate = 0.0;
