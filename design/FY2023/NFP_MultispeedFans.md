@@ -5,17 +5,75 @@ Improved Support for Multi-speed Fans
 
 **Florida Solar Energy Center**
 
- - 11/21/22
- - Revision Date (none)
+ - 11/30/22 (First revision )
+ - 11/21/22 (Original draft)
  
-
 ## Justification for New Feature ##
 
 Many Water-to-Air Heat Pump units and VRF indoor units in the market are equipped with multi-speed components to reduce energy use and noise. During actual operation, the fan air flow is coordinated with the compressor stage control. At low compression stage, the fan is going to run at low air flow rate. To support this operation, supply air flow ratio input fields (low, medium, high) should be added to the ZoneHVAC:WaterToAirHeatPump and ZoneHVAC:TerminalUnit:VariableRefrigerantFlow objects. In simulation, for each time step, the fan air flow shall cycle between adjacent speeds based on the cooling / heating capacity (or coordinate with the cooling / heating coil stage for variable speed water to air coils).
 
 ## E-mail and  Conference Call Conclusions ##
 
-NA
+Mike Witte made comments before ther conference call. The NFP was discussed in the conference call of EnergyPlus Technicalities on 11/30/22
+
+###Mike's comments###
+
+@mjwitte commented on this pull request.
+________________________________________
+In design/FY2023/NFP_MultispeedFans.md:
+> +       \type choice
++       \key FanPerformance:Multispeed
++       \note Enter the type of performance specification object used to describe the multispeed fan.
++  	A21; \field Design Specification Multispeed Fan Object Name
++       \type object-list
++       \object-list FanPerformaceNames
++       \note Enter the name of the performance specification object used to describe the multispeed fan.
+</span>
++
++###FanPerformance:Multispeed###
++
++This section provides inputs of the new object.
++
++<span style="color:red">
++
++An alternative way is to use the existing object of UnitarySystemPerformance:Multispeed. Since this object is not used only for UnitarySystem, the name of the object may be changed.
+@lgu1234 I would support changing the existing object name rather than making a new object. Of course, that will require a transition rule for the existing field in AirloopHVAC:UnitarySystem.
+________________________________________
+In design/FY2023/NFP_MultispeedFans.md:
+> +
+<span style="color:red">
++
++An alternative way is to use the existing object of UnitarySystemPerformance:Multispeed. Since this object is not used only for UnitarySystem, the name of the object may be changed.
++
++It should be pointed out that since this object mainly specify airflow ratios at different speeds, it is OK to use the object with minor name change.
++  
+</span>
++
++
++	FanPerformance:Multispeed,
++       \memo The FanPerformance object is used to specify the air flow ratio at each
++       \memo operating speed. This object is primarily used for ZoneHVAC:WaterToAirHeatPump and 
++       \memo ZoneHVAC:TerminalUnit:VariableRefrigerantFlow objects to allow operation at 
++       \memo different fan flow rates.
++       \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
+@rraustad If this object is truly extensible, then the fields for Number of Speeds for Heating/Cooling should not have \maximum declared in the IDD.
+________________________________________
+In design/FY2023/NFP_MultispeedFans.md:
+> +       \note Used only for Multi speed coils
++       \note Enter the next highest operating supply air flow ratio during heating
++       \note operation or specify autosize. This value is the ratio of air flow
++       \note at this speed to the maximum air flow rate.
+These notes don't need to be repeated for every speed.
+
+</span>
+
+### EnergyPlus Technicalities on 11/30/22 ###
+
+The conference call focused on the issue whether we need to use the exsting object of UnitarySystemPerformance:Multispeed or not, if the FanModel object can be used to simulate multiuple fan speeds. The suggestion is to provide comparison between two objects. 
+
+###Action item:###
+
+Add a section to compare both objects to see whether FanSystemModel can be used to specify multispeed fans.
 
 ## Overview ##
 
@@ -98,6 +156,77 @@ An alternative way is to use the existing object of UnitarySystemPerformance:Mul
 It should be pointed out that since this object mainly specify airflow ratios at different speeds, it is OK to use the object with minor name change.
   
 </span>
+
+###Comparison between UnitarySystemPerformance:Multispeed and Fan:SystemModel###
+
+For simplicity, the object inputs are listed in this section.
+
+####Input of UnitarySystemPerformance:Multispeed####
+
+The object inputs are extracted from UnitarySystem_MultiSpeedDX.idf.
+
+  	UnitarySystemPerformance:Multispeed,
+    Sys 1 Furnace DX Cool Unitary System MultiSpeed Performance,  !- Name
+    1,                       !- Number of Speeds for Heating
+    2,                       !- Number of Speeds for Cooling
+    No,                      !- Single Mode Operation
+    ,                        !- No Load Supply Air Flow Rate Ratio
+    autosize,                !- Heating Speed 1 Supply Air Flow Ratio
+    autosize,                !- Cooling Speed 1 Supply Air Flow Ratio
+    autosize,                !- Heating Speed 2 Supply Air Flow Ratio
+    autosize,                !- Cooling Speed 2 Supply Air Flow Ratio
+    autosize,                !- Heating Speed 3 Supply Air Flow Ratio
+    autosize,                !- Cooling Speed 3 Supply Air Flow Ratio
+    autosize,                !- Heating Speed 4 Supply Air Flow Ratio
+    autosize,                !- Cooling Speed 4 Supply Air Flow Ratio
+    autosize,                !- Heating Speed 5 Supply Air Flow Ratio
+    autosize,                !- Cooling Speed 5 Supply Air Flow Ratio
+    autosize,                !- Heating Speed 6 Supply Air Flow Ratio
+    autosize,                !- Cooling Speed 6 Supply Air Flow Ratio
+    autosize,                !- Heating Speed 7 Supply Air Flow Ratio
+    autosize,                !- Cooling Speed 7 Supply Air Flow Ratio
+    autosize,                !- Heating Speed 8 Supply Air Flow Ratio
+    autosize,                !- Cooling Speed 8 Supply Air Flow Ratio
+    autosize,                !- Heating Speed 9 Supply Air Flow Ratio
+    autosize,                !- Cooling Speed 9 Supply Air Flow Ratio
+    autosize,                !- Heating Speed 10 Supply Air Flow Ratio
+    autosize;                !- Cooling Speed 10 Supply Air Flow Ratio
+
+####Input of Fan:SystemModel####
+
+The object inputs are extracted from ASHRAE901_RetailStripmall_STD2019_Denver.idf.
+
+  	Fan:SystemModel,
+    PSZ-AC_1:1_addAQ_Unitary_Package_fan,  !- Name
+    Type1_FAN_SCH,           !- Availability Schedule Name
+    PSZ-AC_1:1_OA-PSZ-AC_1:1_Unitary_PackageNode,  !- Air Inlet Node Name
+    PSZ-AC_1:1_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    1,                       !- Electric Power Minimum Flow Rate Fraction
+    622.5,                   !- Design Pressure Rise {Pa}
+    0.895,                   !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.58175,                 !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    622.5,                   !- Night Ventilation Mode Pressure Rise {Pa}
+    1.0,                     !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General,                 !- End-Use Subcategory
+    2,                       !- Number of Speeds
+    0.66,                    !- Speed 1 Flow Fraction
+    0.4,                     !- Speed 1 Electric Power Fraction
+    1,                       !- Speed 2 Flow Fraction
+    1;                       !- Speed 2 Electric Power Fraction
+
+####Differences####
+
+The Fan:SystemModel does provide multiple flow fration. The UnitarySystemPerformance:Multispeed object provides more choices than the Fan:SystemModel with No Load Supply Air Flow Rate Ratio, and different fan flow ratios between heating and cooling. The latter (different flow ratios between cooling and heating) can be justified, because the real system has only a single supply fan. The real missed item is No Load Supply Air Flow Rate Ratio. As long as the No Load Supply Air Flow Rate defined in the parent object is desinged correctly, the ratio input can be avoided. 
 
 ## Testing/Validation/Data Sources ##
 
