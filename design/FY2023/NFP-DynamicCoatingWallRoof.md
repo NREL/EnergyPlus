@@ -100,9 +100,9 @@ Adding an idd object Material:DynamicCoating object:
           \key SpaceHeatingCoolingMode
           \key Scheduled
           \default SurfaceTemperature
-      A4 , \field Trigger Thermal Absorptance Relationship Data Name
+      A4 , \field Trigger Thermal Absorptance Function Name
           \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance. For longwave radiation.
-      A5 , \field Trigger Solar Absorptance Relationship Data Name
+      A5 , \field Trigger Solar Absorptance Function Name
           \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance
       A6 , \field Thermal Absorptance Schedule Name
           \note only used when the Trigger Indicator = “Scheduled”
@@ -128,7 +128,7 @@ Adding two material add-on objects Material:DynamicCoating object:
            \key SpaceHeatingCoolingMode
            \key Scheduled
            \default SurfaceTemperature
-      A3 , \field Trigger Thermal Absorptance Relationship Data Name
+      A3 , \field Trigger Thermal Absorptance Function Name
           \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance. For longwave radiation.
       A4 ; \field Thermal Absorptance Schedule Name
            \note only used when Trigger Indicator = “Scheduled”
@@ -148,7 +148,7 @@ Adding two material add-on objects Material:DynamicCoating object:
            \key SpaceHeatingCoolingMode
            \key Scheduled
            \default SurfaceTemperature
-      A3 , \field Trigger Solar Absorptance Relationship Data Name
+      A3 , \field Trigger Solar Absorptance Function Name
           \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface solar absorptance. For longwave radiation.
       A4 ; \field Solar Absorptance Schedule Name
            \note only used when Trigger Indicator = “Scheduled”
