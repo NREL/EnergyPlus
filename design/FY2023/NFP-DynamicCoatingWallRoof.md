@@ -12,16 +12,16 @@ Modeling Dynamic Coating for Opaque Surfaces
 
 Currently, EnergyPlus assumes constant thermal and solar absorptance for exterior wall and roof materials. In order to model dynamic coatings with changing solar or thermal absorptance, users need to use the EnergyManagementSystem (EMS) feature to write code to overwrite these properties. Although this can be done by advanced users, it can be a challenge for normal EnergyPlus users as learning and debugging EMS code is not an easy task. 
 
-The proposed new feature will enable user input of the stimulus-absorptance relationship in the form of a table or curve. The variables triggering solar or thermal absorptance change can be surface temperature, solar radiation, space heating/cooling status, a schedule, etc. An idd object will be added to capture detailed input of solar and thermal absorptance as a function of different stimuli.
+The proposed new feature will enable user input of the stimulus-absorptance relationship in the form of a table or curve. The variables triggering solar or thermal absorptance change can be surface temperature, solar radiation, space heating/cooling status, a schedule, etc. An idd object will be added to capture detailed input of solar and thermal absorptance as a function of different triggers.
 
 ## Overview ##
 
-Dynamic coatings are among the hottest topics of novel building materials that have significant potentials of reducing heating and cooling loads in buildings. Such materials can change their solar or thermal absorptance with a variety of stimuli. Based on the type of stimuli, they can be classified into passive and active. Most passive dynamic coatings are driven by surface temperature. For these materials, there is usually a high value and a low value for thermal emissivity or solar reflectance. When the surface temperature is higher than a certain threshold, the material will switch to a state with high emissivity or reflectance. When the surface temperature is lower than a certain threshold (which could be different from the previous one), the material will switch to another state with lower emissivity or reflectance. Active dynamic coatings can be tuned with control signals based on space heating/cooling status, occupancy, indoor temperature or thermal comfort metrics. The control signal can actuate the change in material optical/thermal properties by changing the position of movable structures, applying forces, or distributing chemical content to the material. The following table lists examples of dynamic coating studies with various stimuli.
+Dynamic coatings are among the hottest topics of novel building materials that have significant potentials of reducing heating and cooling loads in buildings. Such materials can change their solar or thermal absorptance with a variety of triggers. Based on the type of triggers, they can be classified into passive and active. Most passive dynamic coatings are driven by surface temperature. For these materials, there is usually a high value and a low value for thermal emissivity or solar reflectance. When the surface temperature is higher than a certain threshold, the material will switch to a state with high emissivity or reflectance. When the surface temperature is lower than a certain threshold (which could be different from the previous one), the material will switch to another state with lower emissivity or reflectance. Active dynamic coatings can be tuned with control signals based on space heating/cooling status, occupancy, indoor temperature or thermal comfort metrics. The control signal can actuate the change in material optical/thermal properties by changing the position of movable structures, applying forces, or distributing chemical content to the material. The following table lists examples of dynamic coating studies with various triggers.
 
 
-<p style="text-align: center;"> Table 1. Common stimuli of dynamic coating material.</p>
+<p style="text-align: center;"> Table 1. Common triggers of dynamic coating material.</p>
 
-|type|stimuli|Example studies|
+|type|trigger|example studies|
 |----|-------|---------------|
 |Passive|Surface temperature|[1]–[4]|
 |Active	|Mechanical structure|[5], [6]|
@@ -29,11 +29,11 @@ Dynamic coatings are among the hottest topics of novel building materials that h
 ||Distribution of chemical content|[9]|
 ||Electric current|[10]|
 
-Based on the above brief review of dynamic coating material, we propose to enable the modeling of the stimuli-solar/thermal absorption in EnergyPlus directly as opposed to relying on EMS. We propose to add a new Material object to hold stimuli-solar/thermal absorption curve or table data. This user input will overwrite the corresponding material properties based on the value of the stimuli.
+Based on the above brief review of dynamic coating material, we propose to enable the modeling of the trigger-solar/thermal absorption in EnergyPlus directly as opposed to relying on EMS. We propose to add a new Material object to hold trigger-solar/thermal absorption curve or table data. This user input will overwrite the corresponding material properties based on the value of the trigger.
 
 ## Approach
 
-A new idd object, *Material:DynamicCoating* will be added to host user input data on the stimuli-coating property relationship.
+A new idd object, *Material:DynamicCoating* will be added to host user input data on the trigger-coating property relationship.
 
 ## Testing/Validation/Data Source(s)
 
@@ -44,7 +44,11 @@ The feature will be tested and demonstrated with a test file derived from *"RefB
 
 ## IDD Object changes
 
-A new object Material:DynamicCoating object is proposed.
+There could be two potential idd designs as follows. The first design creates a material object with the full set of properties users can specify, including roughness, thickness, conductivity, etc. The second approach will add the specification of the trigger-solar/thermal absorption alone. We will choose one to implement.
+
+### Approach 1:
+
+Adding an idd object Material:DynamicCoating object:
  
     Material:DynamicCoating,
         \memo Materials with variable properties of thermal emissivity and/or solar reflectance
@@ -88,7 +92,7 @@ A new object Material:DynamicCoating object is proposed.
           \minimum 0
           \default .7
           \maximum 1
-     A3 , \field Stimuli Indicator
+     A3 , \field Trigger Indicator
           \required-field
           \type choice
           \key SurfaceTemperature
@@ -96,15 +100,59 @@ A new object Material:DynamicCoating object is proposed.
           \key SpaceHeatingCoolingMode
           \key Scheduled
           \default SurfaceTemperature
-      A4 , \field Stimuli Thermal Absorptance Relationship Data Name
-          \note A Curve:* or Table:Lookup object encoding the relationship between the stimuli and surface thermal absorptance. For longwave radiation.
-      A5 , \field Stimuli Solar Absorptance Relationship Data Name
-          \note A Curve:* or Table:Lookup object encoding the relationship between the stimuli and surface thermal absorptance
+      A4 , \field Trigger Thermal Absorptance Relationship Data Name
+          \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance. For longwave radiation.
+      A5 , \field Trigger Solar Absorptance Relationship Data Name
+          \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance
       A6 , \field Thermal Absorptance Schedule Name
-          \note only used when Stimuli variable = “scheduled”
+          \note only used when the Trigger Indicator = “Scheduled”
       A7 ; \field Solar Absorptance Schedule Name
-          \note only used when Stimuli variable = “scheduled”
- 
+          \note only used when the Trigger Indicator = “Scheduled”
+
+### Approach 2:
+
+Adding two material add-on objects Material:DynamicCoating object:
+
+    MaterialProperty:VariableThermalAbsorptance,
+      A1 , \field Name
+           \required-field
+           \type object-list
+           \object-list MaterialName
+           \note Regular Material Name to which the additional properties will be added.
+           \note this the material name for the basic material properties.
+      A2 , \field Trigger Indicator
+           \required-field
+           \type choice
+           \key SurfaceTemperature
+           \key SurfaceReceivedSolarRadiation
+           \key SpaceHeatingCoolingMode
+           \key Scheduled
+           \default SurfaceTemperature
+      A3 , \field Trigger Thermal Absorptance Relationship Data Name
+          \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance. For longwave radiation.
+      A4 ; \field Thermal Absorptance Schedule Name
+           \note only used when Trigger Indicator = “Scheduled”
+
+    MaterialProperty:VariableSolarAbsorptance,
+      A1 , \field Name
+           \required-field
+           \type object-list
+           \object-list MaterialName
+           \note Regular Material Name to which the additional properties will be added.
+           \note this the material name for the basic material properties.
+      A2 , \field Trigger Indicator
+           \required-field
+           \type choice
+           \key SurfaceTemperature
+           \key SurfaceReceivedSolarRadiation
+           \key SpaceHeatingCoolingMode
+           \key Scheduled
+           \default SurfaceTemperature
+      A3 , \field Trigger Solar Absorptance Relationship Data Name
+          \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface solar absorptance. For longwave radiation.
+      A4 ; \field Solar Absorptance Schedule Name
+           \note only used when Trigger Indicator = “Scheduled”
+
 ## Proposed additions to Meters:
 
 N/A
