@@ -33,7 +33,7 @@ Based on the above brief review of dynamic coating material, we propose to enabl
 
 ## Approach
 
-A new idd object, *Material:DynamicCoating* will be added to host user input data on the trigger-coating property relationship.
+Two new idd object, *MaterialProperty:VariableThermalAbsorptance* and *MaterialProperty:VariableSolarAbsorptance*, will be added to host user input data on the trigger-coating property relationship.
 
 ## Testing/Validation/Data Source(s)
 
@@ -44,74 +44,9 @@ The feature will be tested and demonstrated with a test file derived from *"RefB
 
 ## IDD Object changes
 
-There could be two potential idd designs as follows. The first design creates a material object with the full set of properties users can specify, including roughness, thickness, conductivity, etc. The second approach will add the specification of the trigger-solar/thermal absorption alone. We will choose one to implement.
+There could be two potential idd designs as follows. The first design creates a material object with the full set of properties users can specify, including roughness, thickness, conductivity, etc. The second approach will add the specification of the trigger-solar/thermal absorption alone. The first approach has the flexibility of specifying the roughness, thickness, conductivity, etc. for the new material itself, but on the other hand, could be challenging for users when some of this information is not readily available. The second approach only requires the trigger-solar/thermal absorptance information, which could be handy for users to test out the performance of the coating while assuming the coating itself is thin enough and the conductivity difference between the coating and the opaque layer beneath it is negligible. When the "coating" is a thick structure, where such differences are not negligible, users can first create a *Material* layer with the roughness, thickness, conductivity, etc. of the thick dynamic coating layer, then add the *MaterialProperty:VariableThermalAbsorptance* on top of it to hold the trigger-solar/thermal absorptance data.
 
-### Approach 1:
-
-Adding an idd object Material:DynamicCoating object:
- 
-    Material:DynamicCoating,
-        \memo Materials with variable properties of thermal emissivity and/or solar reflectance
-        \min-fields 8
-      A1 , \field Name
-          \required-field
-          \type alpha
-          \reference MaterialName
-     A2 , \field Roughness
-          \required-field
-          \type choice
-          \key VeryRough
-          \key Rough
-          \key MediumRough
-          \key MediumSmooth
-          \key Smooth
-          \key VerySmooth
-     N1 , \field Thickness
-          \required-field
-          \units m
-          \type real
-          \minimum> 0
-          \ip-units in
-     N2 , \field Conductivity
-          \required-field
-          \units W/m-K
-          \type real
-          \minimum> 0
-     N3 , \field Density
-          \required-field
-          \units kg/m3
-          \type real
-          \minimum> 0
-     N4 , \field Specific Heat
-          \required-field
-          \units J/kg-K
-          \type real
-          \minimum 100
-     N5 , \field Visible Absorptance
-          \type real
-          \minimum 0
-          \default .7
-          \maximum 1
-     A3 , \field Trigger Indicator
-          \required-field
-          \type choice
-          \key SurfaceTemperature
-          \key SurfaceReceivedSolarRadiation
-          \key SpaceHeatingCoolingMode
-          \key Scheduled
-          \default SurfaceTemperature
-      A4 , \field Trigger Thermal Absorptance Function Name
-          \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance. For longwave radiation.
-      A5 , \field Trigger Solar Absorptance Function Name
-          \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance
-      A6 , \field Thermal Absorptance Schedule Name
-          \note only used when the Trigger Indicator = “Scheduled”
-      A7 ; \field Solar Absorptance Schedule Name
-          \note only used when the Trigger Indicator = “Scheduled”
-
-### Approach 2:
-
-Adding two material add-on objects Material:DynamicCoating object:
+Based on the reasoning above, two material add-on objects will be added, *MaterialProperty:VariableThermalAbsorptance* and *MaterialProperty:VariableSolarAbsorptance*.
 
     MaterialProperty:VariableThermalAbsorptance,
       A1 , \field Name
@@ -120,7 +55,7 @@ Adding two material add-on objects Material:DynamicCoating object:
            \object-list MaterialName
            \note Regular Material Name to which the additional properties will be added.
            \note this the material name for the basic material properties.
-      A2 , \field Trigger Indicator
+      A2 , \field Control Signal
            \required-field
            \type choice
            \key SurfaceTemperature
@@ -131,7 +66,7 @@ Adding two material add-on objects Material:DynamicCoating object:
       A3 , \field Trigger Thermal Absorptance Function Name
           \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance. For longwave radiation.
       A4 ; \field Thermal Absorptance Schedule Name
-           \note only used when Trigger Indicator = “Scheduled”
+           \note only used when Control Signal = “Scheduled”
 
     MaterialProperty:VariableSolarAbsorptance,
       A1 , \field Name
@@ -140,7 +75,7 @@ Adding two material add-on objects Material:DynamicCoating object:
            \object-list MaterialName
            \note Regular Material Name to which the additional properties will be added.
            \note this the material name for the basic material properties.
-      A2 , \field Trigger Indicator
+      A2 , \field Control Signal
            \required-field
            \type choice
            \key SurfaceTemperature
@@ -151,7 +86,7 @@ Adding two material add-on objects Material:DynamicCoating object:
       A3 , \field Trigger Solar Absorptance Function Name
           \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface solar absorptance. For longwave radiation.
       A4 ; \field Solar Absorptance Schedule Name
-           \note only used when Trigger Indicator = “Scheduled”
+           \note only used when Control Signal = “Scheduled”
 
 ## Proposed additions to Meters:
 
