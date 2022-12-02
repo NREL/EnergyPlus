@@ -63,8 +63,7 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Xing model factory
-std::shared_ptr<XingGroundTempsModel>
-XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
+std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -89,7 +88,9 @@ XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTempObjType ob
     // New shared pointer for this model object
     std::shared_ptr<XingGroundTempsModel> thisModel(new XingGroundTempsModel());
 
-    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::XingGroundTemp));
+    GroundTempObjType objType = GroundTempObjType::XingGroundTemp;
+
+    std::string_view const cCurrentModuleObject = GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(objType)];
     int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
@@ -101,7 +102,7 @@ XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTempObjType ob
             // Read input into object here
 
             thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
-            thisModel->objectType = objectType;
+            thisModel->objectType = objType;
             thisModel->groundThermalDiffisivity =
                 state.dataIPShortCut->rNumericArgs(1) / (state.dataIPShortCut->rNumericArgs(2) * state.dataIPShortCut->rNumericArgs(3));
             thisModel->aveGroundTemp = state.dataIPShortCut->rNumericArgs(4);
@@ -119,7 +120,9 @@ XingGroundTempsModel::XingGTMFactory(EnergyPlusData &state, GroundTempObjType ob
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
+        ShowFatalError(state,
+                       fmt::format("{}--Errors getting input for ground temperature model",
+                                   GroundTemperatureManager::groundTempModelNames[static_cast<int>(objType)]));
         return nullptr;
     }
 }
