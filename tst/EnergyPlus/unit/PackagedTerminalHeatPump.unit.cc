@@ -58,6 +58,7 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -4065,6 +4066,294 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     int zone5ReturnNode = state->dataZoneEquip->ZoneEquipConfig(6).ReturnNode(1);
     int zone5InletNode1 = state->dataZoneEquip->ZoneEquipConfig(6).InletNode(1);
     EXPECT_NEAR(state->dataLoopNodes->Node(zone5InletNode1).MassFlowRate, state->dataLoopNodes->Node(zone5ReturnNode).MassFlowRate, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
+{
+
+    bool errorsFound = false;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Compact,",
+        "    ContinuousFanSch,        !- Name",
+        "    ,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,            !- Field 3",
+        "    1.0;                     !- Field 4",
+
+        "ZoneHVAC:EquipmentList,",
+        "    SPACE1-1 Equipment,      !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type",
+        "    SPACE1-1 PTAC,           !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "  ZoneHVAC:PackagedTerminalAirConditioner,",
+        "    SPACE1-1 PTAC,           !- Name",
+        "    ,           !- Availability Schedule Name",
+        "    SPACE1-1 HP Inlet Node,  !- Air Inlet Node Name",
+        "    SPACE1-1 Supply Inlet,   !- Air Outlet Node Name",
+        "    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type",
+        "    PTACOAMixer,             !- Outdoor Air Mixer Name",
+        "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
+        "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
+        "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
+        "    0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
+        "    0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+        "    SPACE1-1 Supply Fan,     !- Supply Air Fan Name",
+        "    Coil:Heating:Fuel,       !- Heating Coil Object Type",
+        "    SPACE1-1 Heating Coil,   !- Heating Coil Name",
+        "    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type",
+        "    SPACE1-1 PTAC CCoil,     !- Cooling Coil Name",
+        "    BlowThrough,             !- Fan Placement",
+        "    ContinuousFanSch;        !- Supply Air Fan Operating Mode Schedule Name",
+
+        "  OutdoorAir:Mixer,",
+        "	 PTACOAMixer,             !- Name",
+        "	 PTACOAMixerOutletNode,   !- Mixed Air Node Name",
+        "    PTACOAInNode,            !- Outdoor Air Stream Node Name",
+        "    ZoneExhausts,            !- Relief Air Stream Node Name",
+        "    SPACE1-1 HP Inlet Node;  !- Return Air Stream Node Name",
+
+        "Fan:ConstantVolume,",
+        "    SPACE1-1 Supply Fan,     !- Name",
+        "    ,           !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    75,                      !- Pressure Rise {Pa}",
+        "    0.500,                   !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1,                       !- Motor In Airstream Fraction",
+        "    PTACOAMixerOutletNode,   !- Air Inlet Node Name",
+        "    SPACE1-1 Fan Outlet Node;!- Air Outlet Node Name",
+
+        "Coil:Heating:Fuel,",
+        "    SPACE1-1 Heating Coil,   !- Name",
+        "    ,           !- Availability Schedule Name",
+        "    NaturalGas,              !- Fuel Type",
+        "    0.8,                     !- Gas Burner Efficiency",
+        "    10000.0,                 !- Nominal Capacity {W}",
+        "    SPACE1-1 CCoil Outlet Node,  !- Air Inlet Node Name",
+        "    SPACE1-1 Supply Inlet;   !- Air Outlet Node Name",
+
+        "  Coil:Cooling:DX:SingleSpeed,",
+        "    SPACE1-1 PTAC CCoil,     !- Name",
+        "    ,           !- Availability Schedule Name",
+        "    6680.0,                  !- Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- Gross Rated Sensible Heat Ratio",
+        "    3.0,                     !- Gross Rated Cooling COP {W/W}",
+        "    0.500,                   !- Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    SPACE1-1 Fan Outlet Node,!- Air Inlet Node Name",
+        "    SPACE1-1 CCoil Outlet Node,  !- Air Outlet Node Name",
+        "    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    HPACEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    HPACPLFFPLR;             !- Part Load Fraction Correlation Curve Name",
+
+        "  Curve:Quadratic,",
+        "    HPACCoolCapFFF,          !- Name",
+        "    0.8,                     !- Coefficient1 Constant",
+        "    0.2,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    HPACEIRFFF,              !- Name",
+        "    1.1552,                  !- Coefficient1 Constant",
+        "    -0.1808,                 !- Coefficient2 x",
+        "    0.0256,                  !- Coefficient3 x**2",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    HPACPLFFPLR,             !- Name",
+        "    0.85,                    !- Coefficient1 Constant",
+        "    0.15,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+
+        "  Curve:Cubic,",
+        "    FanEffRatioCurve,        !- Name",
+        "    0.33856828,              !- Coefficient1 Constant",
+        "    1.72644131,              !- Coefficient2 x",
+        "    -1.49280132,             !- Coefficient3 x**2",
+        "    0.42776208,              !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    0.3,                     !- Minimum Curve Output",
+        "    1.0;                     !- Maximum Curve Output",
+
+        "  Curve:Exponent,",
+        "    FanPowerRatioCurve,      !- Name",
+        "    0.0,                     !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 Constant",
+        "    3.0,                     !- Coefficient3 Constant",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    0.01,                    !- Minimum Curve Output",
+        "    1.5;                     !- Maximum Curve Output",
+
+        "  Curve:Biquadratic,",
+        "    HPACCoolCapFT,           !- Name",
+        "    0.942587793,             !- Coefficient1 Constant",
+        "    0.009543347,             !- Coefficient2 x",
+        "    0.000683770,             !- Coefficient3 x**2",
+        "    -0.011042676,            !- Coefficient4 y",
+        "    0.000005249,             !- Coefficient5 y**2",
+        "    -0.000009720,            !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    18.0,                    !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Biquadratic,",
+        "    HPACEIRFT,               !- Name",
+        "    0.342414409,             !- Coefficient1 Constant",
+        "    0.034885008,             !- Coefficient2 x",
+        "    -0.000623700,            !- Coefficient3 x**2",
+        "    0.004977216,             !- Coefficient4 y",
+        "    0.000437951,             !- Coefficient5 y**2",
+        "    -0.000728028,            !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    18.0,                    !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "Zone,",
+        "    SPACE1-1;                !- Name",
+
+        "Zone,",
+        "    Plenum zone;                !- Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "    SPACE1-1,                !- Zone Name",
+        "    SPACE1-1 Equipment,      !- Zone Conditioning Equipment List Name",
+        "    SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name",
+        "    SPACE1-1 Exhausts,       !- Zone Air Exhaust Node or NodeList Name",
+        "    SPACE1-1 Zone Air Node,  !- Zone Air Node Name",
+        "    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name",
+
+        "NodeList,",
+        "    SPACE1-1 Inlets,         !- Name",
+        "    SPACE1-1 Supply Inlet;   !- Node 1 Name",
+
+        "NodeList,",
+        "    SPACE1-1 Exhausts,       !- Name",
+        "    SPACE1-1 HP Inlet Node;  !- Node 1 Name",
+
+        "NodeList,",
+        "    OutsideAirInletNodes,    !- Name",
+        "    PTACOAInNode;            !- Node 1 Name",
+
+        "OutdoorAir:NodeList,",
+        "    OutsideAirInletNodes;    !- Name",
+
+        "AirLoopHVAC:ReturnPlenum,",
+        "  Zone Return Plenum,  !- Name",
+        "  Plenum zone,              !- Zone Name",
+        "  Plenum Node,              !- Zone Node Name", // illegal use of non-unique zone node name
+        "  Plenum Outlet Node,       !- Outlet Node Name",
+        "  Plenum Induced Air Node,  !- Induced Air Outlet Node or NodeList Name",
+        "  Plenum Inlet Node 1,           !- Inlet 1 Node Name",
+        "  SPACE1-1 Return Outlet;        !- Inlet 2 Node Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ProcessScheduleInput(*state); // read schedules
+    GetZoneData(*state, errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    GetZoneEquipmentData(*state);
+    GetZoneAirLoopEquipment(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    ZonePlenum::GetZonePlenumInput(*state);
+    ASSERT_TRUE(has_err_output(true)); // clear schedule warnings from err stream
+    HVACSystemData *mySys;
+    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
+    bool isZoneEquipment = true;
+    thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", isZoneEquipment, 0);
+    state->dataUnitarySystems->getInputOnceFlag = false;
+
+    int zoneSupplyInlet = UtilityRoutines::FindItemInList("SPACE1-1 SUPPLY INLET", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneExhaustNode = UtilityRoutines::FindItemInList("SPACE1-1 HP INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneNum = UtilityRoutines::FindItemInList("SPACE1-1", state->dataHeatBal->Zone);
+
+    // Test 1 - PTAC Inlet node is zone exhaust node
+    ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
+    EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", thisSys.UnitType); // zoneHVAC equipment type
+    EXPECT_EQ(zoneExhaustNode, thisSys.AirInNode);
+    EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
+    EXPECT_EQ(zoneExhaustNode, thisSys.m_ZoneInletNode);
+    EXPECT_EQ(zoneNum, thisSys.ControlZoneNum);
+
+    // Test 2 - PTAC Inlet node is plenum induced air node
+    thisSys.input_specs.air_inlet_node_name = "PLENUM INDUCED AIR NODE";
+    thisSys.ControlZoneNum = 0;
+    state->dataUnitarySystems->getInputOnceFlag = true;
+    errorsFound = false;
+    state->dataBranchNodeConnections->NumCompSets = 0;
+    state->dataBranchNodeConnections->CompSets.clear();
+    int sysNum = 1;
+    int zoneOAUnit = 0;
+    thisSys.processInputSpec(*state, thisSys.input_specs, sysNum, errorsFound, isZoneEquipment, zoneOAUnit);
+    ASSERT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(errorsFound);
+    int plenumInducedNode =
+        UtilityRoutines::FindItemInList("PLENUM INDUCED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    EXPECT_EQ(plenumInducedNode, thisSys.AirInNode);
+    EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
+    EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
+    EXPECT_EQ(zoneNum, thisSys.ControlZoneNum);
+
+    // Test 3 - PTAC Inlet node not found
+    thisSys.input_specs.air_inlet_node_name = "SOME OTHER NODE";
+    thisSys.ControlZoneNum = 0;
+    state->dataUnitarySystems->getInputOnceFlag = true;
+    errorsFound = false;
+    state->dataBranchNodeConnections->NumCompSets = 0;
+    state->dataBranchNodeConnections->CompSets.clear();
+    thisSys.processInputSpec(*state, thisSys.input_specs, sysNum, errorsFound, isZoneEquipment, zoneOAUnit);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** Input errors for ZoneHVAC:PackagedTerminalAirConditioner:SPACE1-1 PTAC",
+        "   **   ~~~   ** Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name or Induced Node Name. = SOME OTHER NODE",
+        "   **   ~~~   ** Air Inlet Node SOME OTHER NODE name does not match any controlled zone exhaust node name. Check "
+        "ZoneHVAC:EquipmentConnections object inputs.",
+        "   **   ~~~   ** or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.",
+        "   ** Severe  ** ZoneHVAC:PackagedTerminalAirConditioner = SPACE1-1 PTAC",
+        "   **   ~~~   ** Did not find proper connections for AirLoopHVAC or ZoneHVAC system.",
+        "   **   ~~~   ** specified Controlling Zone or Thermostat Location name = SPACE1-1",
+        "   ** Severe  ** ZoneHVAC:PackagedTerminalAirConditioner = SPACE1-1 PTAC",
+        "   **   ~~~   ** Did not find air node (zone with thermostat).",
+        "   **   ~~~   ** Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.",
+    });
+
+    ASSERT_TRUE(compare_err_stream(error_string, true));
+    ASSERT_TRUE(errorsFound);
+    int someOtherNode = UtilityRoutines::FindItemInList("SOME OTHER NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    EXPECT_EQ(someOtherNode, thisSys.AirInNode);
+    EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
+    EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
+    EXPECT_EQ(zoneNum, thisSys.ControlZoneNum);
 }
 
 } // namespace EnergyPlus
