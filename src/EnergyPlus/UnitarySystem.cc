@@ -8359,6 +8359,7 @@ namespace UnitarySystems {
             }
             this->m_WSHPRuntimeFrac = CoolPLR;
         }
+        this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
         this->calcUnitarySystemToLoad(state,
                                       AirLoopNum,
                                       FirstHVACIteration,
@@ -10960,8 +10961,14 @@ namespace UnitarySystems {
         if (SpeedNum > 1) {
             if ((state.dataUnitarySystems->CoolingLoad && this->m_MultiOrVarSpeedCoolCoil) ||
                 (state.dataUnitarySystems->HeatingLoad && this->m_MultiOrVarSpeedHeatCoil)) {
-                AverageUnitMassFlow = FanPartLoadRatio * state.dataUnitarySystems->CompOnMassFlow +
-                                      (1.0 - FanPartLoadRatio) * state.dataUnitarySystems->CompOffMassFlow;
+                if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
+                    AverageUnitMassFlow = FanPartLoadRatio * state.dataUnitarySystems->CompOnMassFlow +
+                                          (1.0 - FanPartLoadRatio) * state.dataUnitarySystems->CompOffMassFlow;
+                } else {
+                    Real64 tempSpeedRatio = state.dataUnitarySystems->CoolingLoad ? this->m_CoolingSpeedRatio : this->m_HeatingSpeedRatio;
+                    AverageUnitMassFlow = tempSpeedRatio * state.dataUnitarySystems->CompOnMassFlow +
+                                          (1.0 - tempSpeedRatio) * state.dataUnitarySystems->CompOffMassFlow;
+                }
             } else {
                 AverageUnitMassFlow = state.dataUnitarySystems->CompOnMassFlow;
             }
