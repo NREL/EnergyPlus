@@ -1026,9 +1026,9 @@ class DataExchange:
         :return: An integer indicator for current day holiday type.
         """
         if self.api.holidayIndex(state) == 0:
-          return 0
+            return 0
         else:
-          return self.api.holidayIndex(state) - 7
+            return self.api.holidayIndex(state) - 7
 
     def sun_is_up(self, state: c_void_p) -> bool:
         """
