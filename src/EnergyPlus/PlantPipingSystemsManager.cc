@@ -1086,9 +1086,6 @@ namespace PlantPipingSystemsManager {
 
             // setup output variables
             thisDomain.SetupZoneCoupledOutputVariables(state);
-
-            // add it to the main vector
-            // domains.push_back(thisDomain);
         }
     }
 
@@ -1414,9 +1411,6 @@ namespace PlantPipingSystemsManager {
 
             // setup output variables
             thisDomain.SetupZoneCoupledOutputVariables(state);
-
-            // add it to the main vector
-            // domains.push_back(thisDomain);
         }
     }
 

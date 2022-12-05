@@ -6627,21 +6627,31 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
+    state->dataHeatBal->People.allocate(2);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(2).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 3;
+    state->dataHeatBal->People(2).NumberOfPeople = 5;
+
     CollectPeakZoneConditions(*state, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
     EXPECT_EQ(compLoad.peakDateHrMin, "5/21 15:45:00");
     EXPECT_EQ(compLoad.outsideDryBulb, 38.);
     EXPECT_EQ(compLoad.outsideHumRatio, 0.01459);
+    EXPECT_NEAR(compLoad.outsideWetBulb, 25.003, 0.001);
     EXPECT_EQ(compLoad.zoneDryBulb, 24.);
     EXPECT_EQ(compLoad.zoneHumRatio, 0.00979);
+    EXPECT_NEAR(compLoad.zoneRelHum, 0.526, 0.001);
     EXPECT_EQ(compLoad.peakDesSensLoad, 500.);
     EXPECT_EQ(compLoad.designPeakLoad, 600.);
     EXPECT_EQ(compLoad.supAirTemp, 13.);
     EXPECT_EQ(compLoad.mainFanAirFlow, 3.3);
+    EXPECT_EQ(compLoad.numPeople, 8.0);
     EXPECT_NEAR(compLoad.airflowPerFlrArea, 3.3 / 12., 0.0001);
     EXPECT_NEAR(compLoad.totCapPerArea, 600. / 12., 0.0001);
     EXPECT_NEAR(compLoad.airflowPerTotCap, 3.3 / 600., 0.0001);
     EXPECT_NEAR(compLoad.areaPerTotCap, 12. / 600., 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->StdBaroPress, 101325.0, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ComputeEngineeringChecks_test)
@@ -10704,4 +10714,181 @@ TEST_F(SQLiteFixture, StatFile_TMYx)
     ASSERT_EQ(1, result.size());
     ASSERT_FALSE(result[0].empty());
     EXPECT_EQ("Mar", result[0][0]);
+}
+
+TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
+{
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displayTabularVeriSum = true;
+    state->dataEnvrn->Latitude = 12.3;
+    state->dataEnvrn->Longitude = 45.6;
+
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+
+    // walls
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).FrameDivider = 0;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
+
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).FrameDivider = 0;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 1;
+
+    // windows
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).FrameDivider = 1;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
+
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).FrameDivider = 2;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 1;
+
+    // frames
+    state->dataHeatBal->TotFrameDivider = 2;
+    state->dataSurface->FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
+    state->dataSurface->FrameDivider(1).FrameWidth = 0.3;
+    state->dataSurface->FrameDivider(2).FrameWidth = 0.2;
+
+    // zone
+    state->dataGlobal->NumOfZones = 2;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(1).FloorArea = 100.0; // 10 x 10
+    state->dataHeatBal->Zone(1).Volume = 500.0;    // 10 x 10 x 5
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(1).ExtGrossWallArea = 200;
+    state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(1).ExtWindowArea = 0.0; // state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
+    state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes(1) = 1;
+
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 2;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(2).FloorArea = 100.0; // 10 x 10
+    state->dataHeatBal->Zone(2).Volume = 500.0;    // 10 x 10 x 5
+    state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(2).ExtGrossWallArea = 200.0;
+    state->dataHeatBal->Zone(2).ExteriorTotalGroundSurfArea = 100.0;
+    state->dataHeatBal->Zone(2).ExtWindowArea = 9.0; // state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
+    state->dataHeatBal->Zone(2).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(2).spaceIndexes(1) = 2;
+
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::None;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::None;
+
+    SetupUnitConversions(*state);
+    // Real64 areaConv = getSpecificUnitDivider(*state, "m2", "ft2");
+    // Real64 volConv = getSpecificUnitDivider(*state, "m3", "ft3");
+
+    // WriteVeriSumTable(*state);
+    bool produceTabular = true;
+    bool produceSQLite = true;
+    state->dataGlobal->numSpaces = 2;
+
+    state->dataOutRptTab->m_unitName = "[m]";
+    state->dataOutRptTab->m_unitConv = 1.0;
+    state->dataOutRptTab->m2_unitName = "[m2]";
+    state->dataOutRptTab->m2_unitConvWVST = 1.0;
+    state->dataOutRptTab->m3_unitName = "[m3]";
+    state->dataOutRptTab->m3_unitConv = 1.0;
+    state->dataOutRptTab->Wm2_unitName = "[W/m2]";
+    state->dataOutRptTab->Wm2_unitConv = 1.0;
+
+    state->dataGlobal->numSpaceTypes = 1;
+    state->dataHeatBal->spaceTypes.allocate(state->dataGlobal->numSpaceTypes);
+
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).spaceIndex = 2;
+    state->dataHeatBal->People(1).NumberOfPeople = 10;
+
+    state->dataHeatBal->TotLights = 1;
+    state->dataHeatBal->Lights.allocate(state->dataHeatBal->TotLights);
+    state->dataHeatBal->Lights(1).spaceIndex = 2;
+    state->dataHeatBal->Lights(1).DesignLevel = 10;
+
+    state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
+    state->dataHeatBal->space(1).spaceTypeNum = 1;
+    state->dataHeatBal->space(2).spaceTypeNum = 1;
+
+    state->dataHeatBal->TotITEquip = 1;
+    state->dataHeatBal->ZoneITEq.allocate(state->dataHeatBal->TotITEquip);
+    state->dataHeatBal->ZoneITEq(1).spaceIndex = 2;
+    state->dataHeatBal->ZoneITEq(1).DesignTotalPower = 5;
+
+    state->dataHeatBal->Zone(1).Name = "Zone_1";
+    state->dataHeatBal->Zone(2).Name = "Zone_2";
+    state->dataHeatBal->space(1).Name = "Zone_Space_1";
+    state->dataHeatBal->space(2).Name = "Zone_Space_2";
+    // state->dataHeatBal->space(1).spaceType = "GENERAL";
+    // state->dataHeatBal->space(2).spaceType = "GENERAL";
+
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
+    state->dataHeatBal->space(2).solarEnclosureNum = 2;
+
+    state->dataViewFactor->EnclSolInfo.allocate(2);
+    state->dataViewFactor->EnclSolInfo(1).Name = "Enclosure_1";
+    state->dataViewFactor->EnclSolInfo(2).Name = "Enclosure_2";
+
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
+
+    state->dataHeatBal->space(1).floorArea = 100.0;
+    state->dataHeatBal->space(2).floorArea = 100.0;
+
+    OutputReportTabular::writeVeriSumSpaceTables(*state, produceTabular, produceSQLite);
+
+    auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
+    auto strings = queryResult("SELECT * FROM Strings;", "Strings");
+    auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    EXPECT_EQ(80ul, tabularData.size());
+    // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
+    // columnId, value
+    // Zone Areas
+    EXPECT_EQ("      100.00", tabularData[0][10]);
+    EXPECT_EQ("      100.00", tabularData[1][10]);
+    // Space Areas
+    EXPECT_EQ("      200.00", tabularData[2][10]);
+    EXPECT_EQ("      200.00", tabularData[3][10]);
+
+    EXPECT_EQ("Yes", tabularData[6][10]);
+    EXPECT_EQ("Yes", tabularData[7][10]);
+
+    // values
+    EXPECT_NEAR(100.00, std::stod(tabularData[0][10]), 0.01);
+    EXPECT_NEAR(100.00, std::stod(tabularData[1][10]), 0.01);
+    EXPECT_NEAR(200.00, std::stod(tabularData[2][10]), 0.01);
+    EXPECT_NEAR(200.00, std::stod(tabularData[3][10]), 0.01);
 }
