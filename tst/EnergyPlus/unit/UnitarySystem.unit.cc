@@ -17302,6 +17302,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     Real64 latOut = 0.0;
 
     // Speed 1
+    // thisSys->m_EMSOverrideCoilSpeedNumOn = false, state->dataGlobal->DoCoilDirectSolutions = false
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -17316,6 +17317,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       latOut);
     EXPECT_NEAR(thisSys->m_CycRatio, 0.02063, 0.001);
     EXPECT_NEAR(sensOut, -227.705, 0.1);
+
+    // thisSys->m_EMSOverrideCoilSpeedNumOn = false, state->dataGlobal->DoCoilDirectSolutions = true
     state->dataGlobal->DoCoilDirectSolutions = true;
     thisSys->FullOutput.resize(3);
     thisSys->simulate(*state,
@@ -17332,10 +17335,13 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       latOut);
     EXPECT_NEAR(thisSys->m_CycRatio, 0.02063, 0.001);
     EXPECT_NEAR(sensOut, -227.705, 0.1);
+
     // speed 2
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -12000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -12000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
+
+    // thisSys->m_EMSOverrideCoilSpeedNumOn = false, state->dataGlobal->DoCoilDirectSolutions = false
     state->dataGlobal->DoCoilDirectSolutions = false;
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -17353,6 +17359,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.087, 0.001);
     EXPECT_NEAR(sensOut, -11998.0, 3.0);
 
+    // thisSys->m_EMSOverrideCoilSpeedNumOn = false, state->dataGlobal->DoCoilDirectSolutions = true
     state->dataGlobal->DoCoilDirectSolutions = true;
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -17375,9 +17382,31 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     EXPECT_EQ(thisSys->m_NumOfSpeedCooling, 2);
     EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
 
+    // thisSys->m_EMSOverrideCoilSpeedNumOn = true, state->dataGlobal->DoCoilDirectSolutions = false
     thisSys->m_EMSOverrideCoilSpeedNumOn = true;
     thisSys->m_EMSOverrideCoilSpeedNumValue = 1.087;
     state->dataGlobal->DoCoilDirectSolutions = false;
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+    EXPECT_NEAR(thisSys->m_CycRatio, 1.00, 0.01);
+    EXPECT_NEAR(thisSys->m_SpeedRatio, 0.087, 0.01);
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.087, 0.01);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
+    EXPECT_NEAR(sensOut, -11998.0, 3.0);
+
+    // thisSys->m_EMSOverrideCoilSpeedNumOn = true, state->dataGlobal->DoCoilDirectSolutions = true
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 1.087;
+    state->dataGlobal->DoCoilDirectSolutions = true;
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,

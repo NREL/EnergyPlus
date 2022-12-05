@@ -2094,19 +2094,23 @@ namespace UnitarySystems {
             Real64 NoLoadCoolingAirFlowRateRatio = 1.0;
             Real64 NoLoadHeatingAirFlowRateRatio = 1.0;
             if (MSHPIndex > -1) {
-                if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].coolingVolFlowRatio[0] == DataSizing::AutoSize) {
-                    NoLoadCoolingAirFlowRateRatio =
-                        min(this->m_NoLoadAirFlowRateRatio, 1.0 / double(state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedCooling));
-                } else {
-                    NoLoadCoolingAirFlowRateRatio =
-                        min(this->m_NoLoadAirFlowRateRatio, state.dataUnitarySystems->designSpecMSHP[MSHPIndex].coolingVolFlowRatio[0]);
+                if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedCooling > 0) {
+                    if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].coolingVolFlowRatio[0] == DataSizing::AutoSize) {
+                        NoLoadCoolingAirFlowRateRatio =
+                            min(this->m_NoLoadAirFlowRateRatio, 1.0 / double(state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedCooling));
+                    } else {
+                        NoLoadCoolingAirFlowRateRatio =
+                            min(this->m_NoLoadAirFlowRateRatio, state.dataUnitarySystems->designSpecMSHP[MSHPIndex].coolingVolFlowRatio[0]);
+                    }
                 }
-                if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[0] == DataSizing::AutoSize) {
-                    NoLoadHeatingAirFlowRateRatio =
-                        min(this->m_NoLoadAirFlowRateRatio, 1.0 / double(state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedHeating));
-                } else {
-                    NoLoadHeatingAirFlowRateRatio =
-                        min(this->m_NoLoadAirFlowRateRatio, state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[0]);
+                if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedHeating > 0) {
+                    if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[0] == DataSizing::AutoSize) {
+                        NoLoadHeatingAirFlowRateRatio =
+                            min(this->m_NoLoadAirFlowRateRatio, 1.0 / double(state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedHeating));
+                    } else {
+                        NoLoadHeatingAirFlowRateRatio =
+                            min(this->m_NoLoadAirFlowRateRatio, state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[0]);
+                    }
                 }
                 this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
             } else {
@@ -8399,8 +8403,12 @@ namespace UnitarySystems {
         Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).HumRat);
         Real64 CoolingOnlySensibleOutput =
             state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).MassFlowRate * CpAir *
-            ((state.dataLoopNodes->Node(this->NodeNumOfControlledZone).Temp - state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).Temp) -
-             (state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp - state.dataLoopNodes->Node(this->HeatCoilInletNodeNum).Temp));
+            (state.dataLoopNodes->Node(this->NodeNumOfControlledZone).Temp - state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).Temp);
+        if (this->m_HeatCoilExists) {
+            CoolingOnlySensibleOutput -=
+                state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).MassFlowRate * CpAir *
+                (state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp - state.dataLoopNodes->Node(this->HeatCoilInletNodeNum).Temp);
+        }
         if (state.dataUnitarySystems->QToHeatSetPt < 0.0) {
             //   Calculate the reheat coil load wrt the heating setpoint temperature. Reheat coil picks up
             //   the entire excess sensible cooling (DX cooling coil and impact of outdoor air).
@@ -11583,19 +11591,23 @@ namespace UnitarySystems {
                     } else
                         CoilPLR = 0.0;
                 } else {
-                    if (state.dataUnitarySystems->CoolingLoad) {
-                        if (this->m_CoolingSpeedNum > 1) {
-                            if (!singleMode) {
-                                CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
-                                this->m_CoolingSpeedRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                    if (this->m_EMSOverrideCoilSpeedNumOn) {
+                        CoilPLR = this->m_CoolingSpeedRatio;
+                    } else {
+                        if (state.dataUnitarySystems->CoolingLoad) {
+                            if (this->m_CoolingSpeedNum > 1) {
+                                if (!singleMode) {
+                                    CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
+                                    this->m_CoolingSpeedRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                                } else {
+                                    CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                                }
                             } else {
                                 CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
                             }
                         } else {
-                            CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                            CoilPLR = 0.0;
                         }
-                    } else {
-                        CoilPLR = 0.0;
                     }
                 }
                 int OperationMode = DataHVACGlobals::coilNormalMode;
@@ -12622,6 +12634,9 @@ namespace UnitarySystems {
                     } else {
                         doIt = true;
                     }
+                } else if (this->m_EMSOverrideCoilSpeedNumOn &&
+                           (CoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling || CoilType_Num == DataHVACGlobals::CoilDX_Cooling)) {
+                    // do nothing, PartLoadFrac set above
                 } else if (((NoLoadTempOut - DesOutTemp) < Acc) && ((NoLoadHumRatOut - DesOutHumRat) < HumRatAcc)) {
                     PartLoadFrac = 0.0;
                 } else {         // need to turn on compressor to see if load is met
