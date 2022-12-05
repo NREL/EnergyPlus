@@ -53,7 +53,7 @@ Based on the reasoning above, two material add-on objects will be added, *Materi
            \required-field
            \type alpha
            \note The name of the dynamic coating material with variable thermal absorptance.
-      A2 , \field Name
+      A2 , \field Reference Material Name
            \required-field
            \type object-list
            \object-list MaterialName
@@ -77,7 +77,7 @@ Based on the reasoning above, two material add-on objects will be added, *Materi
            \required-field
            \type alpha
            \note The name of the dynamic coating material with variable solar absorptance.
-      A2 , \field Name
+      A2 , \field Reference Material Name
            \required-field
            \type object-list
            \object-list MaterialName
