@@ -72,8 +72,7 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Finite difference model factory
-std::shared_ptr<FiniteDiffGroundTempsModel>
-FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
+std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -98,9 +97,10 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTe
     // New shared pointer for this model object
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
+    GroundTempObjType objType = GroundTempObjType::FiniteDiffGroundTemp;
+
     // Search through finite diff models here
-    std::string const cCurrentModuleObject =
-        state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::FiniteDiffGroundTemp));
+    std::string_view const cCurrentModuleObject = GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(objType)];
     int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
@@ -111,7 +111,7 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTe
         if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
             // Read input into object here
 
-            thisModel->objectType = objectType;
+            thisModel->objectType = objType;
             thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
             thisModel->baseConductivity = state.dataIPShortCut->rNumericArgs(1);
             thisModel->baseDensity = state.dataIPShortCut->rNumericArgs(2);
@@ -134,7 +134,9 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTe
         // Return the pointer
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model");
+        ShowFatalError(state,
+                       fmt::format("{}--Errors getting input for ground temperature model",
+                                   GroundTemperatureManager::groundTempModelNames[static_cast<int>(objType)]));
         return nullptr;
     }
 }

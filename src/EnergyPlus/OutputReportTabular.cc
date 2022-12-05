@@ -12117,7 +12117,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     spaceColumnWidth.allocate(spaceNumCol);
     spaceTableBody.allocate(spaceNumCol, state.dataGlobal->numSpaces + 4); // Extra rows for totals
     for (int iCol = 1; iCol <= spaceNumCol; ++iCol) {
-        spaceColumnWidth = 14;
+        spaceColumnWidth(iCol) = 14;
     }
 
     spaceColumnHead(1) = "Area " + state.dataOutRptTab->m2_unitName;
@@ -12172,7 +12172,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     spaceTypeColumnWidth.allocate(spaceTypeNumCol);
     spaceTypeTableBody.allocate(spaceTypeNumCol, state.dataGlobal->numSpaceTypes + 1); // Extra row for total
     for (int iCol = 1; iCol <= spaceTypeNumCol; ++iCol) {
-        spaceTypeColumnWidth = 14;
+        spaceTypeColumnWidth(iCol) = 14;
     }
     spaceTypeColumnHead(1) = "Total Area " + state.dataOutRptTab->m2_unitName;
     spaceTypeColumnHead(2) = "Conditioned Area " + state.dataOutRptTab->m2_unitName;
@@ -12219,56 +12219,56 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
 
     // Accumulate internal gain totals by space and space type
     for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
-        auto curPeople = state.dataHeatBal->People(iPeople);
+        auto &curPeople = state.dataHeatBal->People(iPeople);
         int const spaceNum = curPeople.spaceIndex;
         Real64 const people = curPeople.NumberOfPeople;
         spaceTotPeople(spaceNum) += people;
         spaceTypeTotPeople(state.dataHeatBal->space(spaceNum).spaceTypeNum) += people;
     }
     for (int iLights = 1; iLights <= state.dataHeatBal->TotLights; ++iLights) {
-        auto curLighting = state.dataHeatBal->Lights(iLights);
+        auto &curLighting = state.dataHeatBal->Lights(iLights);
         int const spaceNum = curLighting.spaceIndex;
         Real64 const lighting = curLighting.DesignLevel;
         spaceTotLighting(spaceNum) += lighting;
         spaceTypeTotLighting(state.dataHeatBal->space(spaceNum).spaceTypeNum) += lighting;
     }
     for (int iElecEquip = 1; iElecEquip <= state.dataHeatBal->TotElecEquip; ++iElecEquip) {
-        auto curElecEquip = state.dataHeatBal->ZoneElectric(iElecEquip);
+        auto &curElecEquip = state.dataHeatBal->ZoneElectric(iElecEquip);
         int const spaceNum = curElecEquip.spaceIndex;
         Real64 const elecEquip = curElecEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += elecEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += elecEquip;
     }
     for (int iGasEquip = 1; iGasEquip <= state.dataHeatBal->TotGasEquip; ++iGasEquip) {
-        auto curGasEquip = state.dataHeatBal->ZoneGas(iGasEquip);
+        auto &curGasEquip = state.dataHeatBal->ZoneGas(iGasEquip);
         int const spaceNum = curGasEquip.spaceIndex;
         Real64 const gasEquip = curGasEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += gasEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += gasEquip;
     }
     for (int iOthEquip = 1; iOthEquip <= state.dataHeatBal->TotOthEquip; ++iOthEquip) {
-        auto curOthEquip = state.dataHeatBal->ZoneOtherEq(iOthEquip);
+        auto &curOthEquip = state.dataHeatBal->ZoneOtherEq(iOthEquip);
         int const spaceNum = curOthEquip.spaceIndex;
         Real64 const othEquip = curOthEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += othEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += othEquip;
     }
     for (int iHWEquip = 1; iHWEquip <= state.dataHeatBal->TotHWEquip; ++iHWEquip) {
-        auto curHWEquip = state.dataHeatBal->ZoneHWEq(iHWEquip);
+        auto &curHWEquip = state.dataHeatBal->ZoneHWEq(iHWEquip);
         int const spaceNum = curHWEquip.spaceIndex;
         Real64 const hwEquip = curHWEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += hwEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += hwEquip;
     }
     for (int iSteamEquip = 1; iSteamEquip <= state.dataHeatBal->TotStmEquip; ++iSteamEquip) {
-        auto curSteamEquip = state.dataHeatBal->ZoneSteamEq(iSteamEquip);
+        auto &curSteamEquip = state.dataHeatBal->ZoneSteamEq(iSteamEquip);
         int const spaceNum = curSteamEquip.spaceIndex;
         Real64 const steamEquip = curSteamEquip.DesignLevel;
         spaceTotPlugProcess(spaceNum) += steamEquip;
         spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += steamEquip;
     }
     for (int iITEquip = 1; iITEquip <= state.dataHeatBal->TotITEquip; ++iITEquip) {
-        auto curITEquip = state.dataHeatBal->ZoneITEq(iITEquip);
+        auto &curITEquip = state.dataHeatBal->ZoneITEq(iITEquip);
         int const spaceNum = curITEquip.spaceIndex;
         Real64 const itEquip = curITEquip.DesignTotalPower;
         spaceTotPlugProcess(spaceNum) += itEquip;
@@ -12280,15 +12280,15 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
         state.dataOutRptTab->zstArea(iTotal) = 0.0;
         state.dataOutRptTab->zstLight(iTotal) = 0.0;
         state.dataOutRptTab->zstPlug(iTotal) = 0.0;
-        state.dataOutRptTab->zstArea(iTotal) = 0.0;
+        state.dataOutRptTab->zstPeople(iTotal) = 0.0;
     }
 
     int spaceTableRowNum = 0;
     for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-        auto curZone = state.dataHeatBal->Zone(iZone);
+        auto &curZone = state.dataHeatBal->Zone(iZone);
         Real64 const mult = Real64(curZone.Multiplier) * Real64(curZone.ListMultiplier);
         for (int const spaceNum : curZone.spaceIndexes) {
-            auto curSpace = state.dataHeatBal->space(spaceNum);
+            auto &curSpace = state.dataHeatBal->space(spaceNum);
             bool spaceIsCond = false;
             bool useSpaceFloorArea = false;
             ++spaceTableRowNum;
@@ -16278,16 +16278,13 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 void CollectPeakZoneConditions(
     EnergyPlusData &state, CompLoadTablesType &compLoad, int const desDaySelected, int const timeOfMax, int const zoneIndex, bool const isCooling)
 {
-    using DataSizing::SupplyAirTemperature;
-    using Psychrometrics::PsyRhFnTdbWPb;
-    using Psychrometrics::PsyTwbFnTdbWPb;
-
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &CalcFinalZoneSizing(state.dataSize->CalcFinalZoneSizing);
 
     if (timeOfMax != 0) {
 
-        Real64 mult = Zone(zoneIndex).Multiplier * Zone(zoneIndex).ListMultiplier;
+        auto &zone = state.dataHeatBal->Zone(zoneIndex);
+        auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(zoneIndex);
+
+        Real64 mult = zone.Multiplier * zone.ListMultiplier;
         if (mult == 0.0) mult = 1.0;
 
         if (isCooling) {
@@ -16302,50 +16299,49 @@ void CollectPeakZoneConditions(
             }
 
             // Outside Dry Bulb Temperature
-            compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax);
+            compLoad.outsideDryBulb = calcFinalZoneSizing.CoolOutTempSeq(timeOfMax);
 
             // Outside Wet Bulb Temperature
-            // use standard sea level air pressure because air pressure is not tracked with sizing data
-            if (CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) < 1.0 &&
-                CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) > 0.0) {
-                compLoad.outsideWetBulb = PsyTwbFnTdbWPb(state,
-                                                         CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax),
-                                                         CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax),
-                                                         101325.0);
+            // use standard air pressure because air pressure is not tracked with sizing data
+            if (calcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax) < 1.0 && calcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax) > 0.0) {
+                compLoad.outsideWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
+                                                                         calcFinalZoneSizing.CoolOutTempSeq(timeOfMax),
+                                                                         calcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax),
+                                                                         state.dataEnvrn->StdBaroPress);
             }
 
             // Outside Humidity Ratio at Peak
-            compLoad.outsideHumRatio = CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax);
+            compLoad.outsideHumRatio = calcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax);
 
             // Zone Dry Bulb Temperature
-            compLoad.zoneDryBulb = CalcFinalZoneSizing(zoneIndex).CoolZoneTempSeq(timeOfMax);
+            compLoad.zoneDryBulb = calcFinalZoneSizing.CoolZoneTempSeq(timeOfMax);
 
             // Zone Relative Humdity
-            // use standard sea level air pressure because air pressure is not tracked with sizing data
-            compLoad.zoneRelHum = PsyRhFnTdbWPb(state,
-                                                CalcFinalZoneSizing(zoneIndex).CoolZoneTempSeq(timeOfMax),
-                                                CalcFinalZoneSizing(zoneIndex).CoolZoneHumRatSeq(timeOfMax),
-                                                101325.0);
+            // use standard air pressure because air pressure is not tracked with sizing data
+            compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(state,
+                                                                calcFinalZoneSizing.CoolZoneTempSeq(timeOfMax),
+                                                                calcFinalZoneSizing.CoolZoneHumRatSeq(timeOfMax),
+                                                                state.dataEnvrn->StdBaroPress);
 
             // Zone Humidity Ratio at Peak
-            compLoad.zoneHumRatio = CalcFinalZoneSizing(zoneIndex).CoolZoneHumRatSeq(timeOfMax);
+            compLoad.zoneHumRatio = calcFinalZoneSizing.CoolZoneHumRatSeq(timeOfMax);
 
             // Peak Design Sensible Load
-            compLoad.peakDesSensLoad = CalcFinalZoneSizing(zoneIndex).DesCoolLoad / mult; // change sign
+            compLoad.peakDesSensLoad = calcFinalZoneSizing.DesCoolLoad / mult; // change sign
 
             // Design Peak Load
             compLoad.designPeakLoad = state.dataSize->FinalZoneSizing(zoneIndex).DesCoolLoad / mult;
 
             // Supply air temperature
-            if (CalcFinalZoneSizing(zoneIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
-                compLoad.supAirTemp = CalcFinalZoneSizing(zoneIndex).CoolDesTemp;
+            if (calcFinalZoneSizing.ZnCoolDgnSAMethod == DataSizing::SupplyAirTemperature) {
+                compLoad.supAirTemp = calcFinalZoneSizing.CoolDesTemp;
             } else {
-                Real64 DeltaTemp = -std::abs(CalcFinalZoneSizing(zoneIndex).CoolDesTempDiff);
-                compLoad.supAirTemp = DeltaTemp + CalcFinalZoneSizing(zoneIndex).ZoneTempAtCoolPeak;
+                Real64 DeltaTemp = -std::abs(calcFinalZoneSizing.CoolDesTempDiff);
+                compLoad.supAirTemp = DeltaTemp + calcFinalZoneSizing.ZoneTempAtCoolPeak;
             }
 
             // Main fan air flow
-            compLoad.mainFanAirFlow = CalcFinalZoneSizing(zoneIndex).DesCoolVolFlow;
+            compLoad.mainFanAirFlow = calcFinalZoneSizing.DesCoolVolFlow;
 
         } else {
             // Time of Peak Load
@@ -16359,61 +16355,60 @@ void CollectPeakZoneConditions(
             }
 
             // Outside Dry Bulb Temperature
-            compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax);
+            compLoad.outsideDryBulb = calcFinalZoneSizing.HeatOutTempSeq(timeOfMax);
 
             // Outside Wet Bulb Temperature
-            // use standard sea level air pressure because air pressure is not tracked with sizing data
-            if (CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) < 1.0 &&
-                CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) > 0.0) {
-                compLoad.outsideWetBulb = PsyTwbFnTdbWPb(state,
-                                                         CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax),
-                                                         CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax),
-                                                         101325.0);
+            // use standard air pressure because air pressure is not tracked with sizing data
+            if (calcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax) < 1.0 && calcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax) > 0.0) {
+                compLoad.outsideWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
+                                                                         calcFinalZoneSizing.HeatOutTempSeq(timeOfMax),
+                                                                         calcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax),
+                                                                         state.dataEnvrn->StdBaroPress);
             }
 
             // Outside Humidity Ratio at Peak
-            compLoad.outsideHumRatio = CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax);
+            compLoad.outsideHumRatio = calcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax);
 
             // Zone Dry Bulb Temperature
-            compLoad.zoneDryBulb = CalcFinalZoneSizing(zoneIndex).HeatZoneTempSeq(timeOfMax);
+            compLoad.zoneDryBulb = calcFinalZoneSizing.HeatZoneTempSeq(timeOfMax);
 
             // Zone Relative Humdity
-            // use standard sea level air pressure because air pressure is not tracked with sizing data
-            compLoad.zoneRelHum = PsyRhFnTdbWPb(state,
-                                                CalcFinalZoneSizing(zoneIndex).HeatZoneTempSeq(timeOfMax),
-                                                CalcFinalZoneSizing(zoneIndex).HeatZoneHumRatSeq(timeOfMax),
-                                                101325.0);
+            // use standard air pressure because air pressure is not tracked with sizing data
+            compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(state,
+                                                                calcFinalZoneSizing.HeatZoneTempSeq(timeOfMax),
+                                                                calcFinalZoneSizing.HeatZoneHumRatSeq(timeOfMax),
+                                                                state.dataEnvrn->StdBaroPress);
 
             // Zone Humidity Ratio at Peak
-            compLoad.zoneHumRatio = CalcFinalZoneSizing(zoneIndex).HeatZoneHumRatSeq(timeOfMax);
+            compLoad.zoneHumRatio = calcFinalZoneSizing.HeatZoneHumRatSeq(timeOfMax);
 
             // Peak Design Sensible Load
-            compLoad.peakDesSensLoad = -CalcFinalZoneSizing(zoneIndex).DesHeatLoad / mult; // change sign
+            compLoad.peakDesSensLoad = -calcFinalZoneSizing.DesHeatLoad / mult; // change sign
 
             // Design Peak Load
             compLoad.designPeakLoad = -state.dataSize->FinalZoneSizing(zoneIndex).DesHeatLoad / mult;
 
             // Supply air temperature
-            if (CalcFinalZoneSizing(zoneIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
-                compLoad.supAirTemp = CalcFinalZoneSizing(zoneIndex).HeatDesTemp;
+            if (calcFinalZoneSizing.ZnHeatDgnSAMethod == DataSizing::SupplyAirTemperature) {
+                compLoad.supAirTemp = calcFinalZoneSizing.HeatDesTemp;
             } else {
-                Real64 DeltaTemp = -std::abs(CalcFinalZoneSizing(zoneIndex).HeatDesTempDiff);
-                compLoad.supAirTemp = DeltaTemp + CalcFinalZoneSizing(zoneIndex).ZoneTempAtHeatPeak;
+                Real64 DeltaTemp = -std::abs(calcFinalZoneSizing.HeatDesTempDiff);
+                compLoad.supAirTemp = DeltaTemp + calcFinalZoneSizing.ZoneTempAtHeatPeak;
             }
 
             // Main fan air flow
-            compLoad.mainFanAirFlow = CalcFinalZoneSizing(zoneIndex).DesHeatVolFlow;
+            compLoad.mainFanAirFlow = calcFinalZoneSizing.DesHeatVolFlow;
         }
 
         // Outside air flow
-        compLoad.outsideAirFlow = CalcFinalZoneSizing(zoneIndex).MinOA;
+        compLoad.outsideAirFlow = calcFinalZoneSizing.MinOA;
 
         // outside air %
         if (compLoad.mainFanAirFlow != 0.) {
             compLoad.outsideAirRatio = compLoad.outsideAirFlow / compLoad.mainFanAirFlow;
         }
 
-        compLoad.floorArea = Zone(zoneIndex).FloorArea;
+        compLoad.floorArea = zone.FloorArea;
 
         if (compLoad.floorArea != 0.) {
             // airflow per floor area
@@ -16427,14 +16422,14 @@ void CollectPeakZoneConditions(
             compLoad.airflowPerTotCap = compLoad.mainFanAirFlow / compLoad.designPeakLoad;
 
             // floor area per capacity
-            compLoad.areaPerTotCap = Zone(zoneIndex).FloorArea / compLoad.designPeakLoad;
+            compLoad.areaPerTotCap = zone.FloorArea / compLoad.designPeakLoad;
         }
 
         // Number of people
         Real64 totNumPeople = 0.;
-        for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
-            if (zoneIndex == state.dataHeatBal->People(iPeople).ZonePtr) {
-                totNumPeople += state.dataHeatBal->People(iPeople).NumberOfPeople;
+        for (auto &people : state.dataHeatBal->People) {
+            if (zoneIndex == people.ZonePtr) {
+                totNumPeople += people.NumberOfPeople;
             }
         }
         compLoad.numPeople = totNumPeople;

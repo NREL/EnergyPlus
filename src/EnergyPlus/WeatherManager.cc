@@ -5191,7 +5191,7 @@ namespace WeatherManager {
 
         GetLocationInfo(state, ErrorsFound);
 
-        GetGroundTemps(state, ErrorsFound);
+        GetGroundTemps(state);
 
         GetGroundReflectances(state, ErrorsFound);
 
@@ -7732,7 +7732,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound)
+    void GetGroundTemps(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7746,32 +7746,20 @@ namespace WeatherManager {
         //  in a new variable.
 
         // Initialize Site:GroundTemperature:BuildingSurface object
-        state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr =
-            GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
-        if (state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr) {
-            ErrorsFound = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->errorsFound || ErrorsFound;
-        }
+        state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(
+            state, GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteBuildingSurfaceGroundTemp)], "");
 
         // Initialize Site:GroundTemperature:FCFactorMethod object
-        state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr =
-            GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
-        if (state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr) {
-            ErrorsFound = state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr->errorsFound || ErrorsFound;
-        }
+        state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(
+            state, GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteFCFactorMethodGroundTemp)], "");
 
         // Initialize Site:GroundTemperature:Shallow object
-        state.dataWeatherManager->siteShallowGroundTempsPtr =
-            GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:SHALLOW", "");
-        if (state.dataWeatherManager->siteShallowGroundTempsPtr) {
-            ErrorsFound = state.dataWeatherManager->siteShallowGroundTempsPtr->errorsFound || ErrorsFound;
-        }
+        state.dataWeatherManager->siteShallowGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(
+            state, GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)], "");
 
         // Initialize Site:GroundTemperature:Deep object
-        state.dataWeatherManager->siteDeepGroundTempsPtr =
-            GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:DEEP", "");
-        if (state.dataWeatherManager->siteDeepGroundTempsPtr) {
-            ErrorsFound = state.dataWeatherManager->siteDeepGroundTempsPtr->errorsFound || ErrorsFound;
-        }
+        state.dataWeatherManager->siteDeepGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(
+            state, GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteDeepGroundTemp)], "");
     }
 
     void GetGroundReflectances(EnergyPlusData &state, bool &ErrorsFound)

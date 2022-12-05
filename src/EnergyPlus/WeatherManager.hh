@@ -751,7 +751,7 @@ namespace WeatherManager {
 
     void GetWeatherProperties(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound);
+    void GetGroundTemps(EnergyPlusData &state);
 
     void GetGroundReflectances(EnergyPlusData &state, bool &ErrorsFound);
 
