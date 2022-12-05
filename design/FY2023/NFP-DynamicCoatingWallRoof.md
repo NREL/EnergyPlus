@@ -51,11 +51,15 @@ Based on the reasoning above, two material add-on objects will be added, *Materi
     MaterialProperty:VariableThermalAbsorptance,
       A1 , \field Name
            \required-field
+           \type alpha
+           \note The name of the dynamic coating material with variable thermal absorptance.
+      A2 , \field Name
+           \required-field
            \type object-list
            \object-list MaterialName
            \note Regular Material Name to which the additional properties will be added.
            \note this the material name for the basic material properties.
-      A2 , \field Control Signal
+      A3 , \field Control Signal
            \required-field
            \type choice
            \key SurfaceTemperature
@@ -63,19 +67,23 @@ Based on the reasoning above, two material add-on objects will be added, *Materi
            \key SpaceHeatingCoolingMode
            \key Scheduled
            \default SurfaceTemperature
-      A3 , \field Trigger Thermal Absorptance Function Name
+      A4 , \field Trigger Thermal Absorptance Function Name
           \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface thermal absorptance. For longwave radiation.
-      A4 ; \field Thermal Absorptance Schedule Name
+      A5 ; \field Thermal Absorptance Schedule Name
            \note only used when Control Signal = “Scheduled”
 
     MaterialProperty:VariableSolarAbsorptance,
       A1 , \field Name
            \required-field
+           \type alpha
+           \note The name of the dynamic coating material with variable solar absorptance.
+      A2 , \field Name
+           \required-field
            \type object-list
            \object-list MaterialName
            \note Regular Material Name to which the additional properties will be added.
            \note this the material name for the basic material properties.
-      A2 , \field Control Signal
+      A3 , \field Control Signal
            \required-field
            \type choice
            \key SurfaceTemperature
@@ -83,9 +91,9 @@ Based on the reasoning above, two material add-on objects will be added, *Materi
            \key SpaceHeatingCoolingMode
            \key Scheduled
            \default SurfaceTemperature
-      A3 , \field Trigger Solar Absorptance Function Name
+      A4 , \field Trigger Solar Absorptance Function Name
           \note A Curve:* or Table:Lookup object encoding the relationship between the trigger and surface solar absorptance. For longwave radiation.
-      A4 ; \field Solar Absorptance Schedule Name
+      A5 ; \field Solar Absorptance Schedule Name
            \note only used when Control Signal = “Scheduled”
 
 ## Proposed additions to Meters:
