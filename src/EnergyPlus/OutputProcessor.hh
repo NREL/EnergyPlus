@@ -136,39 +136,6 @@ namespace OutputProcessor {
 
     constexpr int N_WriteTimeStampFormatData(100);
 
-    constexpr const char *DayTypes(int &d)
-    {
-        switch (d) {
-        case 1:
-            return "Sunday";
-        case 2:
-            return "Monday";
-        case 3:
-            return "Tuesday";
-        case 4:
-            return "Wednesday";
-        case 5:
-            return "Thursday";
-        case 6:
-            return "Friday";
-        case 7:
-            return "Saturday";
-        case 8:
-            return "Holiday";
-        case 9:
-            return "SummerDesignDay";
-        case 10:
-            return "WinterDesignDay";
-        case 11:
-            return "CustomDay1";
-        case 12:
-            return "CustomDay2";
-        default:
-            assert(false);
-        }
-        return "Impossible day"; // even though the above switch block will *always* either return a string or assert, compilers still warn...
-    }
-
     static constexpr std::array<std::string_view, 14> endUseCategoryNames = {"HEATING",
                                                                              "COOLING",
                                                                              "INTERIORLIGHTS",
