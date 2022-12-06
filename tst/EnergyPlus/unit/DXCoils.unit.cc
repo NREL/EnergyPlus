@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
@@ -4487,6 +4488,248 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
     CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
     EXPECT_EQ("8.72", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
     EXPECT_EQ("10.15", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+}
+
+TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
+{
+    // Test the PR 9694 that fixes Issue 9301; will report severe error if tested in original develop branch
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "    OnOff,                   !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    1,                       !- Upper Limit Value",
+        "    Discrete,                !- Numeric Type",
+        "    availability;            !- Unit Type",
+
+        "Schedule:Constant,",
+        "    Always On Discrete,      !- Name",
+        "    OnOff,                   !- Schedule Type Limits Name",
+        "    1;                       !- Hourly Value",
+
+        "Fan:VariableVolume,",
+        "    Fan Variable Volume,     !- Name",
+        "    Always On Discrete,      !- Availability Schedule Name",
+        "    0.60,                    !- Fan Total Efficiency",
+        "    500,                     !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    0,                       !- Fan Power Minimum Flow Fraction",
+        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.90,                    !- Motor Efficiency",
+        "    1,                       !- Motor In Airstream Fraction",
+        "    0.040759894,             !- Fan Power Coefficient 1",
+        "    0.08804497,              !- Fan Power Coefficient 2",
+        "    -0.07292612,             !- Fan Power Coefficient 3",
+        "    0.943739823,             !- Fan Power Coefficient 4",
+        "    0,                       !- Fan Power Coefficient 5",
+        "    Node 11,                 !- Air Inlet Node Name",
+        "    Node 3;                  !- Air Outlet Node Name",
+
+        "Coil:Cooling:DX:TwoSpeed,",
+        "    CCooling DX Two Speed,   !- Name",
+        "    Always On Discrete,      !- Availability Schedule Name",
+        "    17580.0,                 !- High Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- High Speed Rated Sensible Heat Ratio",
+        "    3,                       !- High Speed Gross Rated Cooling COP {W/W}",
+        "    1.0,                     !- High Speed Rated Air Flow Rate {m3/s}",
+        "    400,                     !- Unit Internal Static Air Pressure {Pa}",
+        "    Node 9,                  !- Air Inlet Node Name",
+        "    Node 10,                 !- Air Outlet Node Name",
+        "    CoolCAPFT,               !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    CoolCAPFFF,              !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    CoolEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name",
+        "    CoolEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    CoolPLFFPLR,             !- Part Load Fraction Correlation Curve Name",
+        "    4300.0,                  !- Low Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.70,                    !- Low Speed Gross Rated Sensible Heat Ratio",
+        "    3,                       !- Low Speed Gross Rated Cooling COP {W/W}",
+        "    0.30,                    !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    CapFT2_Lookup_Table,             !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
+        "    LSCoolEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
+        "    ,                        !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- High Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- High Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Low Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- Low Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Low Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    ,                        !- Condensate Collection Water Storage Tank Name",
+        "    0,                       !- Basin Heater Capacity {W/K}",
+        "    2;                       !- Basin Heater Setpoint Temperature {C}",
+
+        "Curve:Quadratic,CoolCAPFFF,0.77136,0.34053,-0.11088,0.75918,1.13877, 0.0, 2.0, Dimensionless, Dimensionless; ",
+        "Curve:Quadratic,CoolEIRFFF,1.2055,-0.32953,0.12308,0.75918,1.13877, 0.0, 2.0, Dimensionless, Dimensionless; ",
+        "Curve:Quadratic,CoolPLFFPLR,0.771,0.229, 0.0, 0.0, 1.0, 0.0, 1.0, Dimensionless, Dimensionless; ",
+        "Curve:Biquadratic,CoolCAPFT,0.42415,0.04426,-0.00042,0.00333,-8e-005,-0.00021,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,CoolEIRFT,1.23649,-0.02431,0.00057,-0.01434,0.00063,-0.00038,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,LSCoolCAPFT,0.42415,0.04426,-0.00042,0.00333,-8e-005,-0.00021,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,LSCoolEIRFT,1.23649,-0.02431,0.00057,-0.01434,0.00063,-0.00038,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+
+        "  Table:IndependentVariable,                                      ",
+        "    CapFT2_Lookup_Table_IndependentVariable_1,  !- Name ",
+        "    Cubic,                   !- Interpolation Method              ",
+        "    Constant,                !- Extrapolation Method              ",
+        "    12.2222222222222,        !- Minimum Value                     ",
+        "    26.6666666666667,        !- Maximum Value                     ",
+        "    ,                        !- Normalization Reference Value     ",
+        "    Dimensionless,           !- Unit Type                         ",
+        "    ,                        !- External File Name                ",
+        "    ,                        !- External File Column Number       ",
+        "    ,                        !- External File Starting Row Number ",
+        "    12.2222222222222,        !- Value 1                           ",
+        "    14.4444444444444,        !- Value 2                           ",
+        "    16.6666666666667,        !- <none>                            ",
+        "    19.4444444444444,        !- <none>                            ",
+        "    22.2222222222222,        !- <none>                            ",
+        "    24.4444444444444,        !- <none>                            ",
+        "    26.6666666666667;        !- <none>                            ",
+        "                                                                  ",
+        "  Table:IndependentVariable,                                      ",
+        "    CapFT2_Lookup_Table_IndependentVariable_2,  !- Name ",
+        "    Cubic,                   !- Interpolation Method              ",
+        "    Constant,                !- Extrapolation Method              ",
+        "    18.3333333333333,        !- Minimum Value                     ",
+        "    51.6666666666667,        !- Maximum Value                     ",
+        "    ,                        !- Normalization Reference Value     ",
+        "    Dimensionless,           !- Unit Type                         ",
+        "    ,                        !- External File Name                ",
+        "    ,                        !- External File Column Number       ",
+        "    ,                        !- External File Starting Row Number ",
+        "    18.3333333333333,        !- Value 1                           ",
+        "    23.8888888888889,        !- Value 2                           ",
+        "    29.4444444444444,        !- <none>                            ",
+        "    35,                      !- <none>                            ",
+        "    40.5555555555556,        !- <none>                            ",
+        "    46.1111111111111,        !- <none>                            ",
+        "    51.6666666666667;        !- <none>                            ",
+        "                                                                  ",
+        "                                                                  ",
+        "  Table:IndependentVariableList,                                                               ",
+        "    CapFT2_Lookup_Table_IndependentVariableList,  !- Name                            ",
+        "    CapFT2_Lookup_Table_IndependentVariable_1,  !- Independent Variable 1 Name       ",
+        "    CapFT2_Lookup_Table_IndependentVariable_2;  !- Independent Variable 2 Name       ",
+        "                                                                                               ",
+        "  Table:Lookup,                                                                                ",
+        "    CapFT2_Lookup_Table,  !- Name                                                    ",
+        "    CapFT2_Lookup_Table_IndependentVariableList,  !- Independent Variable List Name  ",
+        "    ,                        !- Normalization Method                                           ",
+        "    ,                        !- Normalization Divisor                                          ",
+        "    ,                        !- Minimum Output                                                 ",
+        "    ,                        !- Maximum Output                                                 ",
+        "    Dimensionless,           !- Output Unit Type                                               ",
+        "    ,                        !- External File Name                                             ",
+        "    ,                        !- External File Column Number                                    ",
+        "    ,                        !- External File Starting Row Number                              ",
+        "    1.01443897684415,        !- Output Value 1                                                 ",
+        "    0.98190971215566,        !- Output Value 2                                                 ",
+        "    0.944262991348902,       !- <none>                                                         ",
+        "    0.902464389801025,       !- <none>                                                         ",
+        "    0.856867303450902,       !- <none>                                                         ",
+        "    0.806505292654037,       !- <none>                                                         ",
+        "    0.770701512694359,       !- <none>                                                         ",
+        "    1.01543273528417,        !- <none>                                                         ",
+        "    0.982820928096771,       !- <none>                                                         ",
+        "    0.945059061050415,       !- <none>                                                         ",
+        "    0.90331569314003,        !- <none>                                                         ",
+        "    0.857631295919418,       !- <none>                                                         ",
+        "    0.807194809118907,       !- <none>                                                         ",
+        "    0.771346032619476,       !- <none>                                                         ",
+        "    1.04978396495183,        !- <none>                                                         ",
+        "    1.00899545351664,        !- <none>                                                         ",
+        "    0.961967547734578,       !- <none>                                                         ",
+        "    0.91093651453654,        !- <none>                                                         ",
+        "    0.859048008918762,       !- <none>                                                         ",
+        "    0.807978371779124,       !- <none>                                                         ",
+        "    0.772054821252823,       !- <none>                                                         ",
+        "    1.14711582660675,        !- <none>                                                         ",
+        "    1.1034460067749,         !- <none>                                                         ",
+        "    1.05519445737203,        !- <none>                                                         ",
+        "    1,                       !- <none>                                                         ",
+        "    0.938460657993952,       !- <none>                                                         ",
+        "    0.870475401480993,       !- <none>                                                         ",
+        "    0.815074309706688,       !- <none>                                                         ",
+        "    1.24975691239039,        !- <none>                                                         ",
+        "    1.20405109723409,        !- <none>                                                         ",
+        "    1.15290776888529,        !- <none>                                                         ",
+        "    1.09695122639338,        !- <none>                                                         ",
+        "    1.03253835439682,        !- <none>                                                         ",
+        "    0.959350367387136,       !- <none>                                                         ",
+        "    0.895228445529938,       !- <none>                                                         ",
+        "    1.33291016022364,        !- <none>                                                         ",
+        "    1.28505523999532,        !- <none>                                                         ",
+        "    1.23106513420741,        !- <none>                                                         ",
+        "    1.17154357830683,        !- <none>                                                         ",
+        "    1.10512377818425,        !- <none>                                                         ",
+        "    1.02879746754964,        !- <none>                                                         ",
+        "    0.962242349982262,       !- <none>                                                         ",
+        "    1.41531632343928,        !- <none>                                                         ",
+        "    1.36335378885269,        !- <none>                                                         ",
+        "    1.30721437931061,        !- <none>                                                         ",
+        "    1.24311178922653,        !- <none>                                                         ",
+        "    1.17164691289266,        !- <none>                                                         ",
+        "    1.0931831796964,         !- <none>                                                         ",
+        "    1.02748036384583;        !- <none>                                                         "});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    GetCurveInput(*state);
+    Fans::GetFanInput(*state);
+    GetDXCoils(*state);
+    int dXCoilIndex = UtilityRoutines::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
+    int fanIndex = UtilityRoutines::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
+    auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
+    auto &supplyFan = state->dataFans->Fan(fanIndex);
+    coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan.FanName;
+    coolcoilTwoSpeed.SupplyFan_TypeNum = supplyFan.FanType_Num;
+    state->dataGlobal->SysSizingCalc = true;
+    coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
+    coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
+    supplyFan.MaxAirMassFlowRate = supplyFan.MaxAirFlowRate * state->dataEnvrn->StdRhoAir;
+    supplyFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    auto &InletNode = state->dataLoopNodes->Node(supplyFan.InletNodeNum);
+    auto &OutletNode = state->dataLoopNodes->Node(supplyFan.OutletNodeNum);
+    InletNode.MassFlowRate = 1.0;
+    InletNode.MassFlowRateMax = 1.0;
+    InletNode.MassFlowRateMaxAvail = 1.0;
+    InletNode.MassFlowRateMinAvail = 0.0;
+    OutletNode.MassFlowRate = 1.0;
+    OutletNode.MassFlowRateMax = 1.0;
+    OutletNode.MassFlowRateMaxAvail = 1.0;
+    OutletNode.MassFlowRateMinAvail = 0.0;
+    OutputReportPredefined::SetPredefinedTables(*state);
+
+    // test 1: using internal static and fan pressure rise
+
+    CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
+    EXPECT_EQ(coolcoilTwoSpeed.Name, "CCOOLING DX TWO SPEED");
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType, "Coil:Cooling:DX:TwoSpeed");
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType_Num, CoilDX_CoolingTwoSpeed);
+    EXPECT_EQ(coolcoilTwoSpeed.InternalStaticPressureDrop, 400.0);
+    EXPECT_TRUE(coolcoilTwoSpeed.RateWithInternalStaticAndFanObject);
+    EXPECT_EQ("8.77", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
+    EXPECT_EQ("11.25", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+
+    // test 2: using default fan power per evap air flow rate, 365 W/1000 scfm or 773.3 W/(m3/s)
+
+    coolcoilTwoSpeed.RateWithInternalStaticAndFanObject = false;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
+    EXPECT_EQ("8.72", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
+    EXPECT_EQ("10.16", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
 }
 
 } // namespace EnergyPlus

@@ -71,7 +71,7 @@ using namespace EnergyPlus::ScheduleManager;
 TEST_F(EnergyPlusFixture, RunPeriod_Defaults)
 {
     RunPeriodData runperiod;
-    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Sunday, runperiod.startWeekDay));
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Sunday, runperiod.startWeekDay));
 
     EXPECT_EQ(1, runperiod.startMonth);
     EXPECT_EQ(1, runperiod.startDay);
@@ -202,22 +202,22 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
     WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
     EXPECT_FALSE(errors_in_input);
 
-    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Monday, state->dataWeatherManager->RunPeriodInput[0].startWeekDay));
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Monday, state->dataWeatherManager->RunPeriodInput[0].startWeekDay));
     EXPECT_EQ(2016, state->dataWeatherManager->RunPeriodInput[0].startYear);
     EXPECT_EQ(2457448, state->dataWeatherManager->RunPeriodInput[0].startJulianDate);
     EXPECT_EQ(2457451, state->dataWeatherManager->RunPeriodInput[0].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Wednesday, state->dataWeatherManager->RunPeriodInput[1].startWeekDay));
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Wednesday, state->dataWeatherManager->RunPeriodInput[1].startWeekDay));
     EXPECT_EQ(2012, state->dataWeatherManager->RunPeriodInput[1].startYear);
     EXPECT_EQ(2455987, state->dataWeatherManager->RunPeriodInput[1].startJulianDate);
     EXPECT_EQ(2455990, state->dataWeatherManager->RunPeriodInput[1].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Thursday, state->dataWeatherManager->RunPeriodInput[2].startWeekDay));
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Thursday, state->dataWeatherManager->RunPeriodInput[2].startWeekDay));
     EXPECT_EQ(2015, state->dataWeatherManager->RunPeriodInput[2].startYear);
     EXPECT_EQ(2457024, state->dataWeatherManager->RunPeriodInput[2].startJulianDate);
     EXPECT_EQ(2457388, state->dataWeatherManager->RunPeriodInput[2].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Sunday, state->dataWeatherManager->RunPeriodInput[3].startWeekDay));
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Sunday, state->dataWeatherManager->RunPeriodInput[3].startWeekDay));
     EXPECT_EQ(2017, state->dataWeatherManager->RunPeriodInput[3].startYear);
     EXPECT_EQ(2457755, state->dataWeatherManager->RunPeriodInput[3].startJulianDate);
     EXPECT_EQ(2458119, state->dataWeatherManager->RunPeriodInput[3].endJulianDate);
@@ -227,17 +227,17 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
         EXPECT_EQ(startDays[i], state->dataWeatherManager->RunPeriodInput[3].monWeekDay[i]);
     }
 
-    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Wednesday, state->dataWeatherManager->RunPeriodInput[4].startWeekDay));
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Wednesday, state->dataWeatherManager->RunPeriodInput[4].startWeekDay));
     EXPECT_EQ(2010, state->dataWeatherManager->RunPeriodInput[4].startYear);
     EXPECT_EQ(2455427, state->dataWeatherManager->RunPeriodInput[4].startJulianDate);
     EXPECT_EQ(2455562, state->dataWeatherManager->RunPeriodInput[4].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Saturday, state->dataWeatherManager->RunPeriodInput[5].startWeekDay));
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Saturday, state->dataWeatherManager->RunPeriodInput[5].startWeekDay));
     EXPECT_EQ(1992, state->dataWeatherManager->RunPeriodInput[5].startYear);
     EXPECT_EQ(2448682, state->dataWeatherManager->RunPeriodInput[5].startJulianDate);
     EXPECT_EQ(2448988, state->dataWeatherManager->RunPeriodInput[5].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(WeatherManager::WeekDay::Friday, state->dataWeatherManager->RunPeriodInput[6].startWeekDay));
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Friday, state->dataWeatherManager->RunPeriodInput[6].startWeekDay));
     EXPECT_EQ(2016, state->dataWeatherManager->RunPeriodInput[6].startYear);
     EXPECT_EQ(2457389, state->dataWeatherManager->RunPeriodInput[6].startJulianDate);
     EXPECT_EQ(2458940, state->dataWeatherManager->RunPeriodInput[6].endJulianDate);

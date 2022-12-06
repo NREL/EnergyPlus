@@ -68,26 +68,21 @@ class BaseGroundTempsModel;
 
 namespace GroundTemperatureManager {
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &type, std::string const &name);
+    extern const std::array<std::string_view, static_cast<int>(GroundTempObjType::Num)> groundTempModelNamesUC;
+
+    extern const std::array<std::string_view, static_cast<int>(GroundTempObjType::Num)> groundTempModelNames;
+
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string_view const type, std::string const &name);
 
 } // namespace GroundTemperatureManager
 
 struct GroundTemperatureManagerData : BaseGlobalStruct
 {
-    Array1D_string const CurrentModuleObjects = Array1D_string({0, 6},
-                                                               {"Site:GroundTemperature:Undisturbed:KusudaAchenbach",
-                                                                "Site:GroundTemperature:Undisturbed:FiniteDifference",
-                                                                "Site:GroundTemperature:BuildingSurface",
-                                                                "Site:GroundTemperature:Shallow",
-                                                                "Site:GroundTemperature:Deep",
-                                                                "Site:GroundTemperature:FCfactorMethod",
-                                                                "Site:GroundTemperature:Undisturbed:Xing"});
-
     std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 
     void clear_state() override
     {
-        this->groundTempModels.clear();
+        new (this) GroundTemperatureManagerData();
     }
 };
 

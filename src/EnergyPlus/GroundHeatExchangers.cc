@@ -255,9 +255,6 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     std::string const gtmType = UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_type"].get<std::string>());
     std::string const gtmName = UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_name"].get<std::string>());
     this->groundTempModel = GetGroundTempModelAndInit(state, gtmType, gtmName);
-    if (this->groundTempModel) {
-        errorsFound = this->groundTempModel->errorsFound;
-    }
 
     // Check for Errors
     if (errorsFound) {
@@ -424,9 +421,6 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
         GetGroundTempModelAndInit(state,
                                   UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_type"].get<std::string>()),
                                   UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_name"].get<std::string>()));
-    if (this->groundTempModel) {
-        errorsFound = this->groundTempModel->errorsFound;
-    }
 
     // Check for Errors
     if (errorsFound) {

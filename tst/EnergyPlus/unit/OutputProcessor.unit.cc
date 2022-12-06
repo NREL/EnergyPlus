@@ -64,6 +64,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -163,7 +164,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
         int EndMinute = 10;
         int StartMinute = 0;
         bool PrintESOTimeStamp = true;
@@ -230,7 +231,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
         int EndMinute = 10;
         int StartMinute = 0;
         bool PrintESOTimeStamp = false;
@@ -295,7 +296,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         ReportHRMeters(*state, true);
 
@@ -364,7 +365,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         ReportDYMeters(*state, true);
 
@@ -438,7 +439,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         ReportMNMeters(*state, true);
 
@@ -512,7 +513,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         ReportSMMeters(*state, true);
 
@@ -588,7 +589,7 @@ namespace OutputProcessor {
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
-        state->dataEnvrn->HolidayIndex = 3;
+        state->dataEnvrn->HolidayIndex = 3 + 7; // Holiday index is now based on the full set of dayTypeNames
 
         OutputProcessor::ReportYRMeters(*state, true);
 
@@ -655,7 +656,7 @@ namespace OutputProcessor {
                                  EndMinute,
                                  StartMinute,
                                  DSTIndicator,
-                                 DayTypes(CurDayType));
+                                 ScheduleManager::dayTypeNames[CurDayType]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // TSMeter
@@ -672,7 +673,7 @@ namespace OutputProcessor {
                                  EndMinute,
                                  StartMinute,
                                  DSTIndicator,
-                                 DayTypes(CurDayType));
+                                 ScheduleManager::dayTypeNames[CurDayType]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // HRMeter
@@ -689,7 +690,7 @@ namespace OutputProcessor {
                                  _,
                                  _,
                                  DSTIndicator,
-                                 DayTypes(CurDayType));
+                                 ScheduleManager::dayTypeNames[CurDayType]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay"}, "\n")));
 
         // DYMeter
@@ -706,7 +707,7 @@ namespace OutputProcessor {
                                  _,
                                  _,
                                  DSTIndicator,
-                                 DayTypes(CurDayType));
+                                 ScheduleManager::dayTypeNames[CurDayType]);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0,WinterDesignDay"}, "\n")));
 
         // MNMeter
