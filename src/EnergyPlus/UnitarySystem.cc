@@ -8359,7 +8359,6 @@ namespace UnitarySystems {
             }
             this->m_WSHPRuntimeFrac = CoolPLR;
         }
-        this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
         this->calcUnitarySystemToLoad(state,
                                       AirLoopNum,
                                       FirstHVACIteration,
