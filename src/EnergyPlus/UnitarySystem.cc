@@ -11566,9 +11566,7 @@ namespace UnitarySystems {
         } else {
             OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         }
-        //        if (this->m_EMSOverrideCoilSpeedNumOn) {
-        // pass
-        //        } else {
+
         switch (this->m_CoolingCoilType_Num) {
         case DataHVACGlobals::CoilDX_CoolingSingleSpeed: { // Coil:Cooling:DX:SingleSpeed
             DXCoils::SimDXCoil(state,
@@ -11795,7 +11793,6 @@ namespace UnitarySystems {
         default:
             break;
         }
-        //        }
 
         this->m_CoolingPartLoadFrac = PartLoadRatio;
     }

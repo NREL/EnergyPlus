@@ -6489,28 +6489,6 @@ void GetDXCoils(EnergyPlusData &state)
                                     Coil.Name);
             }
 
-            if (Coil.ReportCoolingCoilCrankcasePower) {
-                SetupOutputVariable(state,
-                                    "Cooling Coil Crankcase Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
-                                    Coil.CrankcaseHeaterPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    Coil.Name);
-                SetupOutputVariable(state,
-                                    "Cooling Coil Crankcase Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
-                                    Coil.CrankcaseHeaterConsumption,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    Coil.Name,
-                                    _,
-                                    "Electricity",
-                                    "DHW",
-                                    _,
-                                    "Plant");
-            }
-
         }
 
         else if (Coil.DXCoilType_Num == CoilDX_MultiSpeedHeating) {
