@@ -581,7 +581,7 @@ This field is the unique name for the BIPVT solar collector.
 
 \paragraph{Field: Boundary Conditions Model Name}\label{BIPVT-field-BC}
 
-This field contains the name of a SurfaceProperty:OtherSideConditionsModel object declared elsewhere in the input file. The “\textit{Type of Modelling}” for this object will be set to “\textit{GapConvectionRadiation}”. This will connect the collector to the exterior boundary conditions for the underlying heat transfer surface in the EnergyPlus building envelope model.
+This field contains the name of a \hyperref[surfacepropertyothersideconditionsmodel]{SurfaceProperty:OtherSideConditionsModel} object declared elsewhere in the input file. The “\textit{Type of Modelling}” for this object will be set to “\textit{GapConvectionRadiation}”. This will connect the collector to the exterior boundary conditions for the underlying heat transfer surface in the EnergyPlus building envelope model.
 
 \paragraph{Field: Availability Schedule Name}\label{BIPVT-field-Sched}
 
@@ -589,15 +589,15 @@ This field contains the name of a schedule to indicate when the solar collector 
 
 \paragraph{Field: Effective Plenum Gap Thickness Behind PV modules}\label{BIPVT-field-Gap}
 
-This field is used to enter a nominal thickness of the air channel between the PV modules and the building. This is used to calculate the convective heat transfer coefficient behind the PV modules and on the building wall/roof surface. Units are m. 
+This field is used to enter a nominal thickness of the air channel between the PV modules and the building. This is used to calculate the convective heat transfer coefficient behind the PV modules and on the building wall/roof surface. Units are \si{\m}. 
 
 \paragraph{Field: Effective Overall Height of Collector}\label{BIPVT-field-Height}
 
-This field is used to enter the nominal height (or length) of the collector. This is defined as the distance from the inlet, (typically at the bottom of the collector), to the outlet (typically at the top of the collector), along flow direction. Units are m.
+This field is used to enter the nominal height (or length) of the collector. This is defined as the distance from the inlet, (typically at the bottom of the collector), to the outlet (typically at the top of the collector), along flow direction. Units are \si{\m}.
 
 \paragraph{Field: Effective Overall Width of Collector}\label{BIPVT-field-Width}
 
-This field is used to enter the nominal width of the collector. Units are m.
+This field is used to enter the nominal width of the collector. Units are \si{\m}.
 
 
 
@@ -614,42 +614,42 @@ This field is used to enter the Normal Transmittance-Absorptance Product of the 
 This field is used to enter Normal Transmittance-Absorptance Product of cladding material surrounding PV modules. Since it is likely that cladding is not covered by glass, this value is generally equal to the solar absorptivity of the cladding. Generally around 0.85 but can vary. This is used when the entire BIPVT area is not covered by PV modules (when \textit{Field:Fraction of Collector Gross Area Covered by PV module}  is not equal to 1). Unitless.
 
 
-\paragraph{Field: Fraction of Collector Gross Area Covered by PV module}\label{BIPVT-field-fraction-module}
+\paragraph{Field: Fraction of Collector Gross Area Covered by PV Module}\label{BIPVT-field-fraction-module}
 
 This field is used to enter the fraction of BIPVT collector gross area covered by PV modules. The fraction of collector area not covered by PV module is assumed to be covered by cladding. Default is 0.85. Unitless.
 
-\paragraph{Field: Fraction of PV cell area to PV module area}\label{BIPVT-field-fraction-PVcell}
+\paragraph{Field: Fraction of PV Cell Area to PV Module Area}\label{BIPVT-field-fraction-PVcell}
 
 This field is used to enter the fraction of PV module’s gross area covered by PV cells. Default is 0.85. Unitless
 
-\paragraph{Field:PV module thermal resistance – Top}\label{BIPVT-field-PVmodule-resistance-top}
+\paragraph{Field: PV Module Thermal Resistance – Top}\label{BIPVT-field-PVmodule-resistance-top}
 
-This field is used to enter the PV module thermal resistance above the cells. This value is the total thermal resistance of the encapsulating glass and EVA (or any other materials) above the cells and is typically between 0.0035 and 0.0052 \(m^2\cdot K/W\). Default is set to 0.0044 \(m^2\cdot K/W\). Units are \(m^2\cdot K/W\).
+This field is used to enter the PV module thermal resistance above the cells. This value is the total thermal resistance of the encapsulating glass and EVA (or any other materials) above the cells and is typically between 0.0035 and \SI{0.0052}{\area\K\per\watt}. Default is set to \SI{0.0044}{\area\K\per\watt}.
 
 
-\paragraph{Field:PV module thermal resistance – Bottom}\label{BIPVT-field-PVmodule-resistance-bottom}
+\paragraph{Field: PV Module Thermal Resistance – Bottom}\label{BIPVT-field-PVmodule-resistance-bottom}
 
-This field is used to enter the PV module thermal resistance below the cells. This value is the total thermal resistance of the encapsulating tedlar and EVA (or any other materials) below the cells and is typically between 0.0031 and 0.0046 \(m^2\cdot K/W\). Default is set to 0.0039 \(m^2\cdot K/W\). Units are \(m^2\cdot K/W\).
+This field is used to enter the PV module thermal resistance below the cells. This value is the total thermal resistance of the encapsulating tedlar and EVA (or any other materials) below the cells and is typically between 0.0031 and \SI{0.0046}{\area\K\per\watt}. Default is set to \SI{0.0039}{\area\K\per\watt}.
 
-\paragraph{Field:PV Module Longwave Emissivity}\label{BIPVT-field-PVmodule-emissivity}
+\paragraph{Field: PV Module Longwave Emissivity}\label{BIPVT-field-PVmodule-emissivity}
 
 This field is used to enter the emissivity of the PV modules. Usually not known. Default is 0.85 for typical PV modules. Unitless.
 
-\paragraph{Field:Back of Modules Material Longwave Emissivity}\label{BIPVT-field-moduleBack-emissivity}
+\paragraph{Field: Back of Modules Material Longwave Emissivity}\label{BIPVT-field-moduleBack-emissivity}
 
 This field is used to enter the emissivity of the back of PV module material. Usually not known. Default is 0.9. Unitless.
 
-\paragraph{Field:Glass Thickness}\label{BIPVT-field-PVglass-thickness}
+\paragraph{Field: Glass Thickness}\label{BIPVT-field-PVglass-thickness}
 
-This field is used to enter the thickness of the PV module glass. Used to calculate Incident Angle Modifier. Default is 0.002. Units are m.
+This field is used to enter the thickness of the PV module glass. Used to calculate Incident Angle Modifier. Default is \SI{0.002}{\m}.
 
-\paragraph{Field:Glass Refraction Index}\label{BIPVT-field-PVglass-refraction}
+\paragraph{Field: Glass Refraction Index}\label{BIPVT-field-PVglass-refraction}
 
 This field is used to enter the refraction index of the PV module glass. Used to calculate Incident Angle Modifier. Default is 1.526. Unitless.
 
-\paragraph{Field:Glass Extinction Coefficient}\label{BIPVT-field-PVglass-extinction}
+\paragraph{Field: Glass Extinction Coefficient}\label{BIPVT-field-PVglass-extinction}
 
-This field is used to enter the extinction coefficient of the PV module glass. Used to calculate Incident Angle Modifier. Default is 4.0. Units are \(m^{-1}\).
+This field is used to enter the extinction coefficient of the PV module glass. Used to calculate Incident Angle Modifier. Default is \SI{4.0}{\per\m}.
 
 
 An example input object follows.
