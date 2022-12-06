@@ -189,7 +189,7 @@ namespace WindowManager {
             auto &construction(state.dataConstruction->Construct(ConstrNum));
             if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
-                    auto &material(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
+                    auto &material(*state.dataMaterial->Material(construction.LayerPoint(LayNum)));
                     if (BITF_TEST_NONE(BITF(material.Group),
                                        BITF(DataHeatBalance::MaterialGroup::WindowGas) | BITF(DataHeatBalance::MaterialGroup::WindowGasMixture) |
                                            BITF(DataHeatBalance::MaterialGroup::ComplexWindowGap) |
@@ -227,15 +227,15 @@ namespace WindowManager {
             auto IntBlind = false;
             auto ShadeLayPtr = 0;
             auto BlNum = 0;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group ==
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
                 DataHeatBalance::MaterialGroup::Shade) {
                 IntShade = true;
                 ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
             }
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group ==
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
                 DataHeatBalance::MaterialGroup::WindowBlind) {
                 IntBlind = true;
-                BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
+                BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->BlindDataPtr;
             }
 
             if (IntShade || IntBlind) {
@@ -244,12 +244,12 @@ namespace WindowManager {
                     auto RhoGlIR = 0.0;
                     if (IntShade || IntBlind) {
                         EpsGlIR =
-                            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1)).AbsorpThermalBack;
+                            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
                         RhoGlIR = 1 - EpsGlIR;
                     }
                     if (IntShade) {
-                        auto TauShIR = state.dataMaterial->Material(ShadeLayPtr).TransThermal;
-                        auto EpsShIR = state.dataMaterial->Material(ShadeLayPtr).AbsorpThermal;
+                        auto TauShIR = state.dataMaterial->Material(ShadeLayPtr)->TransThermal;
+                        auto EpsShIR = state.dataMaterial->Material(ShadeLayPtr)->AbsorpThermal;
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1) =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));

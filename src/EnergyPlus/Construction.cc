@@ -214,47 +214,47 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         // Obtain thermal properties from the Material derived type
 
-        dl(Layer) = state.dataMaterial->Material(CurrentLayer).Thickness;
-        rk(Layer) = state.dataMaterial->Material(CurrentLayer).Conductivity;
-        rho(Layer) = state.dataMaterial->Material(CurrentLayer).Density;
-        cp(Layer) = state.dataMaterial->Material(CurrentLayer).SpecHeat; // Must convert
+        dl(Layer) = state.dataMaterial->Material(CurrentLayer)->Thickness;
+        rk(Layer) = state.dataMaterial->Material(CurrentLayer)->Conductivity;
+        rho(Layer) = state.dataMaterial->Material(CurrentLayer)->Density;
+        cp(Layer) = state.dataMaterial->Material(CurrentLayer)->SpecHeat; // Must convert
         // from kJ/kg-K to J/kg-k due to rk units
 
-        if (this->SourceSinkPresent && !state.dataMaterial->Material(CurrentLayer).WarnedForHighDiffusivity) {
+        if (this->SourceSinkPresent && !state.dataMaterial->Material(CurrentLayer)->WarnedForHighDiffusivity) {
             // check for materials that are too conductive or thin
             if ((rho(Layer) * cp(Layer)) > 0.0) {
                 Real64 Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
                 if (Alpha > DataHeatBalance::HighDiffusivityThreshold) {
                     DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                     Real64 const ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
-                    if (state.dataMaterial->Material(CurrentLayer).Thickness < ThicknessThreshold) {
+                    if (state.dataMaterial->Material(CurrentLayer)->Thickness < ThicknessThreshold) {
                         ShowSevereError(state,
                                         "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
                                         "material name = " +
-                                            state.dataMaterial->Material(CurrentLayer).Name);
+                                            state.dataMaterial->Material(CurrentLayer)->Name);
                         ShowContinueError(state,
                                           format("High conductivity Material layers are not well supported for internal source constructions, "
                                                  "material conductivity = {:.3R} [W/m-K]",
-                                                 state.dataMaterial->Material(CurrentLayer).Conductivity));
+                                                 state.dataMaterial->Material(CurrentLayer)->Conductivity));
                         ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
                         ShowContinueError(state,
                                           format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
-                        if (state.dataMaterial->Material(CurrentLayer).Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
+                        if (state.dataMaterial->Material(CurrentLayer)->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
                             ShowContinueError(state,
                                               format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
-                                                     state.dataMaterial->Material(CurrentLayer).Thickness));
+                                                     state.dataMaterial->Material(CurrentLayer)->Thickness));
                             ShowContinueError(state,
                                               format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                      DataHeatBalance::ThinMaterialLayerThreshold));
                         }
-                        state.dataMaterial->Material(CurrentLayer).WarnedForHighDiffusivity = true;
+                        state.dataMaterial->Material(CurrentLayer)->WarnedForHighDiffusivity = true;
                     }
                 }
             }
         }
-        if (state.dataMaterial->Material(CurrentLayer).Thickness > 3.0) {
+        if (state.dataMaterial->Material(CurrentLayer)->Thickness > 3.0) {
             ShowSevereError(state, "InitConductionTransferFunctions: Material too thick for CTF calculation");
-            ShowContinueError(state, "material name = " + state.dataMaterial->Material(CurrentLayer).Name);
+            ShowContinueError(state, "material name = " + state.dataMaterial->Material(CurrentLayer)->Name);
             ErrorsFound = true;
         }
 
@@ -271,13 +271,13 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         if (ResLayer(Layer)) {                                                 // Resistive layer-check for R-value, etc.
             ++NumResLayers;                                                    // Increment number of resistive layers
-            lr(Layer) = state.dataMaterial->Material(CurrentLayer).Resistance; // User defined thermal resistivity
+            lr(Layer) = state.dataMaterial->Material(CurrentLayer)->Resistance; // User defined thermal resistivity
             if (lr(Layer) < RValueLowLimit) {                                  // User didn't define enough
                 // parameters to calculate CTFs for a building element
                 // containing this layer.
 
                 ShowSevereError(state,
-                                "InitConductionTransferFunctions: Material=" + state.dataMaterial->Material(CurrentLayer).Name +
+                                "InitConductionTransferFunctions: Material=" + state.dataMaterial->Material(CurrentLayer)->Name +
                                     "R Value below lowest allowed value");
                 ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                 ErrorsFound = true;
@@ -292,7 +292,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 // then use the "exact" approach to model a massless layer
                 // based on the node equations for the state space method.
 
-                if ((Layer == 1) || (Layer == this->TotLayers) || (!state.dataMaterial->Material(this->LayerPoint(Layer)).ROnly)) {
+                if ((Layer == 1) || (Layer == this->TotLayers) || (!state.dataMaterial->Material(this->LayerPoint(Layer))->ROnly)) {
                     cp(Layer) = 1.007;
                     rho(Layer) = 1.1614;
                     rk(Layer) = 0.0263;
@@ -933,12 +933,12 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 if (this->CTFTimeStep >= MaxAllowedTimeStep) {
                     ShowSevereError(state, "CTF calculation convergence problem for Construction=\"" + this->Name + "\".");
                     ShowContinueError(state, "...with Materials (outside layer to inside)");
-                    ShowContinueError(state, "(outside)=\"" + state.dataMaterial->Material(this->LayerPoint(1)).Name + "\"");
+                    ShowContinueError(state, "(outside)=\"" + state.dataMaterial->Material(this->LayerPoint(1))->Name + "\"");
                     for (int Layer = 2; Layer <= this->TotLayers; ++Layer) {
                         if (Layer != this->TotLayers) {
-                            ShowContinueError(state, "(next)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
+                            ShowContinueError(state, "(next)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer))->Name + "\"");
                         } else {
-                            ShowContinueError(state, "(inside)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
+                            ShowContinueError(state, "(inside)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer))->Name + "\"");
                         }
                     }
                     ShowContinueError(state,
@@ -1902,15 +1902,15 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint(I);
-        switch (state.dataMaterial->Material(Layer).Group) {
+        switch (state.dataMaterial->Material(Layer)->Group) {
         case DataHeatBalance::MaterialGroup::Air: {
             static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
-            print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
+            print(state.files.eio, Format_702, state.dataMaterial->Material(Layer)->Name, state.dataMaterial->Material(Layer)->Resistance);
         } break;
         default: {
             static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-            Material::MaterialProperties &mp = state.dataMaterial->Material(Layer);
-            print(state.files.eio, Format_701, mp.Name, mp.Thickness, mp.Conductivity, mp.Density, mp.SpecHeat, mp.Resistance);
+            Material::MaterialProperties const *mp = state.dataMaterial->Material(Layer);
+            print(state.files.eio, Format_701, mp->Name, mp->Thickness, mp->Conductivity, mp->Density, mp->SpecHeat, mp->Resistance);
         } break;
         }
     }
@@ -1957,7 +1957,7 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // PURPOSE OF THIS SUBROUTINE:
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
-    auto const MaterialGroup = state.dataMaterial->Material(LayerPoint(1)).Group;
+    auto const MaterialGroup = state.dataMaterial->Material(LayerPoint(1))->Group;
     return BITF_TEST_ANY(BITF(MaterialGroup),
                          BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::Shade) |
                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |

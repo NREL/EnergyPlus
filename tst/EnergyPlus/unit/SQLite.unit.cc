@@ -832,8 +832,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     state->dataSQLiteProcedures->sqlite->addZoneListData(2, *zoneListData1);
     state->dataSQLiteProcedures->sqlite->addZoneGroupData(1, *zoneGroupData0);
     state->dataSQLiteProcedures->sqlite->addZoneGroupData(2, *zoneGroupData1);
-    state->dataSQLiteProcedures->sqlite->addMaterialData(1, *materialData0);
-    state->dataSQLiteProcedures->sqlite->addMaterialData(2, *materialData1);
+    state->dataSQLiteProcedures->sqlite->addMaterialData(1, &*materialData0);
+    state->dataSQLiteProcedures->sqlite->addMaterialData(2, &*materialData1);
     state->dataSQLiteProcedures->sqlite->addConstructionData(1, *constructData0, zero);
     state->dataSQLiteProcedures->sqlite->addConstructionData(2, *constructData1, two);
     state->dataSQLiteProcedures->sqlite->addSurfaceData(1, *surfaceData0, window);

@@ -115,8 +115,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataConstruction->Construct(ConstrNum).CTFCross(0) = 0.0;
     state->dataConstruction->Construct(ConstrNum).CTFOutside(0) = 1.0;
     state->dataConstruction->Construct(ConstrNum).SourceSinkPresent = true;
-    state->dataMaterial->Material.allocate(1);
-    state->dataMaterial->Material(1).Name = "TestMaterial";
+    Material::MaterialProperties *p = new Material::MaterialProperties;
+    state->dataMaterial->Material.push_back(p);
+    state->dataMaterial->Material(1)->Name = "TestMaterial";
 
     state->dataSurface->TotSurfaces = SurfNum;
     state->dataGlobal->NumOfZones = ZoneNum;
@@ -293,7 +294,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
-    state->dataMaterial->Material.allocate(state->dataHeatBal->TotMaterials);
+    for (int i = 1; i <= state->dataHeatBal->TotMaterials; i++) {
+        Material::MaterialProperties *p = new Material::MaterialProperties;
+        state->dataMaterial->Material.push_back(p);
+    }
     state->dataSurface->SurfaceWindow(1).EffShBlindEmiss(1) = 0.1;
     state->dataSurface->SurfaceWindow(1).EffGlassEmiss(1) = 0.1;
 

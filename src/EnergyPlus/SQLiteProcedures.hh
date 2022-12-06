@@ -120,7 +120,7 @@ public:
     void addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData);
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
-    void addMaterialData(int const number, Material::MaterialProperties const &materialData);
+    void addMaterialData(int const number, Material::MaterialProperties const *materialData);
     void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
@@ -562,12 +562,12 @@ private:
         Material(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
-                 EnergyPlus::Material::MaterialProperties const &materialData)
-            : SQLiteData(errorStream, db), number(materialNumber), name(materialData.Name), group(materialData.Group),
-              roughness(materialData.Roughness), conductivity(materialData.Conductivity), density(materialData.Density),
-              isoMoistCap(materialData.IsoMoistCap), porosity(materialData.Porosity), resistance(materialData.Resistance), rOnly(materialData.ROnly),
-              specHeat(materialData.SpecHeat), thermGradCoef(materialData.ThermGradCoef), thickness(materialData.Thickness),
-              vaporDiffus(materialData.VaporDiffus)
+                 EnergyPlus::Material::MaterialProperties const *materialData)
+            : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->Group),
+              roughness(materialData->Roughness), conductivity(materialData->Conductivity), density(materialData->Density),
+              isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance), rOnly(materialData->ROnly),
+              specHeat(materialData->SpecHeat), thermGradCoef(materialData->ThermGradCoef), thickness(materialData->Thickness),
+              vaporDiffus(materialData->VaporDiffus)
         {
         }
 

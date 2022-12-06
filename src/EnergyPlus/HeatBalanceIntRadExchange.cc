@@ -445,7 +445,7 @@ namespace HeatBalanceIntRadExchange {
         if (state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) != state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(SurfNum)) {
             auto const &thissurf(state.dataSurface->Surface(SurfNum));
             Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal -
-                                         state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).AbsorpThermal);
+                                         state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->AbsorpThermal);
             if (AbsorpDiff > 0.01) {
                 MovableInsulationChange = true;
             }

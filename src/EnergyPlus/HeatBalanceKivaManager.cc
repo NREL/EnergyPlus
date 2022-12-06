@@ -902,19 +902,19 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                     // Push back construction's layers
                     for (int layer = 1; layer <= c.TotLayers; layer++) {
-                        auto &mat = Materials(c.LayerPoint(layer));
-                        if (mat.ROnly) {
+                        auto const *mat = Materials(c.LayerPoint(layer));
+                        if (mat->ROnly) {
                             ErrorsFound = true;
                             ShowSevereError(state, "Construction=\"" + c.Name + "\", constructions referenced by surfaces with a");
                             ShowContinueError(state, "\"Foundation\" Outside Boundary Condition must use only regular material objects");
-                            ShowContinueError(state, "Material=\"" + mat.Name + "\", is not a regular material object");
+                            ShowContinueError(state, "Material=\"" + mat->Name + "\", is not a regular material object");
                             return ErrorsFound;
                         }
 
                         Kiva::Layer tempLayer;
 
-                        tempLayer.material = Kiva::Material(mat.Conductivity, mat.Density, mat.SpecHeat);
-                        tempLayer.thickness = mat.Thickness;
+                        tempLayer.material = Kiva::Material(mat->Conductivity, mat->Density, mat->SpecHeat);
+                        tempLayer.thickness = mat->Thickness;
 
                         fnd.wall.layers.push_back(tempLayer);
                     }
@@ -926,20 +926,20 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                 // Set slab construction
                 for (int i = 0; i < Constructs(surface.Construction).TotLayers; ++i) {
-                    auto &mat = Materials(Constructs(surface.Construction).LayerPoint[i]);
-                    if (mat.ROnly) {
+                    auto const *mat = Materials(Constructs(surface.Construction).LayerPoint[i]);
+                    if (mat->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(
                             state, "Construction=\"" + Constructs(surface.Construction).Name + "\", constructions referenced by surfaces with a");
                         ShowContinueError(state, "\"Foundation\" Outside Boundary Condition must use only regular material objects");
-                        ShowContinueError(state, "Material=\"" + mat.Name + "\", is not a regular material object");
+                        ShowContinueError(state, "Material=\"" + mat->Name + "\", is not a regular material object");
                         return ErrorsFound;
                     }
 
                     Kiva::Layer tempLayer;
 
-                    tempLayer.material = Kiva::Material(mat.Conductivity, mat.Density, mat.SpecHeat);
-                    tempLayer.thickness = mat.Thickness;
+                    tempLayer.material = Kiva::Material(mat->Conductivity, mat->Density, mat->SpecHeat);
+                    tempLayer.thickness = mat->Thickness;
 
                     fnd.slab.layers.push_back(tempLayer);
                 }

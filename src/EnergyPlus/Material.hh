@@ -287,7 +287,7 @@ namespace Material {
 
 struct MaterialData : BaseGlobalStruct
 {
-    Array1D<Material::MaterialProperties> Material;
+    EPVector<Material::MaterialProperties *> Material;
 
     void clear_state() override
     {

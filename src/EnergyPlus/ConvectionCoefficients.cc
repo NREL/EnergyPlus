@@ -5313,7 +5313,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
     }
 
     DataSurfaces::SurfaceRoughness Roughness =
-        state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+        state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1))->Roughness;
 
     switch (ForcedConvModelEqNum) {
     case ConvectionConstants::HcExt_None:
@@ -8868,7 +8868,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
     Real64 x; // distance to roof edge toward wind direction
 
     DataSurfaces::SurfaceRoughness const RoughnessIndex =
-        state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+        state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1))->Roughness;
     // find x, don't know x. avoid time consuming geometry algorithm
     x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 

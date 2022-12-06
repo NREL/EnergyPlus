@@ -877,17 +877,17 @@ namespace PlantPipingSystemsManager {
 
             // Get slab material properties
             if (thisDomain.SlabInGradeFlag) {
-                thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(
+                thisDomain.SlabMaterialNum = UtilityRoutines::FindPtrItemInList(
                     state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.SlabMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" + state.dataIPShortCut->cAlphaArgs(6));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.SlabThickness = state.dataMaterial->Material(thisDomain.SlabMaterialNum).Thickness;
-                    thisDomain.SlabProperties.Density = state.dataMaterial->Material(thisDomain.SlabMaterialNum).Density;
-                    thisDomain.SlabProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.SlabMaterialNum).SpecHeat;
-                    thisDomain.SlabProperties.Conductivity = state.dataMaterial->Material(thisDomain.SlabMaterialNum).Conductivity;
+                    thisDomain.SlabThickness = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->Thickness;
+                    thisDomain.SlabProperties.Density = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->Density;
+                    thisDomain.SlabProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->SpecHeat;
+                    thisDomain.SlabProperties.Conductivity = state.dataMaterial->Material(thisDomain.SlabMaterialNum)->Conductivity;
                 }
             }
 
@@ -906,17 +906,17 @@ namespace PlantPipingSystemsManager {
 
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
-                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(
+                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindPtrItemInList(
                     state.dataIPShortCut->cAlphaArgs(8), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + "=" + state.dataIPShortCut->cAlphaArgs(8));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).Thickness;
-                    thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).Density;
-                    thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).SpecHeat;
-                    thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).Conductivity;
+                    thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Thickness;
+                    thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Density;
+                    thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->SpecHeat;
+                    thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                         ErrorsFound = true;
                         SiteGroundDomainNoMassMatError(
@@ -955,17 +955,17 @@ namespace PlantPipingSystemsManager {
 
             // Get vertical insulation material properties
             if (thisDomain.VertInsPresentFlag) {
-                thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(
+                thisDomain.VertInsMaterialNum = UtilityRoutines::FindPtrItemInList(
                     state.dataIPShortCut->cAlphaArgs(11), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + "=" + state.dataIPShortCut->cAlphaArgs(11));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).Thickness;
-                    thisDomain.VertInsProperties.Density = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).Density;
-                    thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).SpecHeat;
-                    thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).Conductivity;
+                    thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Thickness;
+                    thisDomain.VertInsProperties.Density = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Density;
+                    thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->SpecHeat;
+                    thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                         ErrorsFound = true;
                         SiteGroundDomainNoMassMatError(
@@ -1288,17 +1288,17 @@ namespace PlantPipingSystemsManager {
 
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
-                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(
+                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindPtrItemInList(
                     state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" + state.dataIPShortCut->cAlphaArgs(6));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).Thickness;
-                    thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).Density;
-                    thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).SpecHeat;
-                    thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).Conductivity;
+                    thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Thickness;
+                    thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Density;
+                    thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->SpecHeat;
+                    thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum)->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                         ErrorsFound = true;
                         SiteGroundDomainNoMassMatError(
@@ -1343,17 +1343,17 @@ namespace PlantPipingSystemsManager {
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
-                thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(
+                thisDomain.VertInsMaterialNum = UtilityRoutines::FindPtrItemInList(
                     state.dataIPShortCut->cAlphaArgs(10), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + "=" + state.dataIPShortCut->cAlphaArgs(10));
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
-                    thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).Thickness;
-                    thisDomain.VertInsProperties.Density = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).Density;
-                    thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).SpecHeat;
-                    thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).Conductivity;
+                    thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Thickness;
+                    thisDomain.VertInsProperties.Density = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Density;
+                    thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->SpecHeat;
+                    thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(thisDomain.VertInsMaterialNum)->Conductivity;
                     if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                         ErrorsFound = true;
                         SiteGroundDomainNoMassMatError(
@@ -1423,7 +1423,7 @@ namespace PlantPipingSystemsManager {
     bool SiteGroundDomainUsingNoMassMat([[maybe_unused]] EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum)
     {
 
-        if ((MaterialThickness <= 0.0) || (state.dataMaterial->Material(MaterialNum).ROnly)) {
+        if ((MaterialThickness <= 0.0) || (state.dataMaterial->Material(MaterialNum)->ROnly)) {
             return true;
         } else {
             return false;
