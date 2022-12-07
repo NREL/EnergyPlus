@@ -1959,7 +1959,7 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // PURPOSE OF THIS SUBROUTINE:
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
-    auto const MaterialGroup = state.dataMaterial->Material(LayerPoint(1))->Group;
+    const DataHeatBalance::MaterialGroup MaterialGroup = state.dataMaterial->Material(LayerPoint(1))->Group;
     return BITF_TEST_ANY(BITF(MaterialGroup),
                          BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::Shade) |
                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |

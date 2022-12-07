@@ -1581,8 +1581,8 @@ namespace HeatBalFiniteDiffManager {
             state.dataHeatBalFiniteDiffMgr->QHeatOutFlux(Surf) = QNetSurfFromOutside;
 
         } else if (surface_ExtBoundCond <= 0) { // regular outside conditions
-            auto TDT_i(TDT(i));
-            auto const TDT_p(TDT(i + 1));
+            Real64 TDT_i(TDT(i));
+            Real64 const TDT_p(TDT(i + 1));
 
             Real64 Tgndsurface = 0.0;
             if (state.dataSurface->Surface(Surf).UseSurfPropertyGndSurfTemp) {
@@ -1624,7 +1624,7 @@ namespace HeatBalFiniteDiffManager {
                     // Set Thermal Conductivity. Can be constant, simple linear temp dep or multiple linear segment temp function dep.
                     auto const &matFD_TempCond(matFD.TempCond);
                     assert(matFD_TempCond.u2() >= 3);
-                    auto const lTC(matFD_TempCond.index(2, 1));
+                    Real64 const lTC(matFD_TempCond.index(2, 1));
                     Real64 kt;
                     if (matFD_TempCond[lTC] + matFD_TempCond[lTC + 1] + matFD_TempCond[lTC + 2] >= 0.0) { // Multiple Linear Segment Function
                         // Use average temp of surface and first node for k
@@ -1636,7 +1636,7 @@ namespace HeatBalFiniteDiffManager {
                     }
 
                     // Check for phase change material
-                    auto const TD_i(TD(i));
+                    Real64 const TD_i(TD(i));
                     Real64 const Cpo(mat->SpecHeat); // Specific heat from idf
                     Real64 Cp(Cpo);                 // Specific heat modified if PCM, otherwise equal to Cpo // Will be changed if PCM
                     auto const &matFD_TempEnth(matFD.TempEnth);
@@ -1781,18 +1781,18 @@ namespace HeatBalFiniteDiffManager {
         auto const &condActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condMaterialActuators(Lay));
         auto const &specHeatActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatMaterialActuators(Lay));
 
-        auto const TD_i(TD(i));
+        Real64 const TD_i(TD(i));
 
-        auto const TDT_m(TDT(i - 1));
-        auto TDT_i(TDT(i));
-        auto const TDT_p(TDT(i + 1));
-        auto const TDT_mi((TDT_m + TDT_i) / 2.0);
-        auto const TDT_ip((TDT_i + TDT_p) / 2.0);
+        Real64 const TDT_m(TDT(i - 1));
+        Real64 TDT_i(TDT(i));
+        Real64 const TDT_p(TDT(i + 1));
+        Real64 const TDT_mi((TDT_m + TDT_i) / 2.0);
+        Real64 const TDT_ip((TDT_i + TDT_p) / 2.0);
 
         //  Set Thermal Conductivity.  Can be constant, simple linear temp dep or multiple linear segment temp function dep.
         auto const &matFD_TempCond(matFD.TempCond);
         assert(matFD_TempCond.u2() >= 3);
-        auto const lTC(matFD_TempCond.index(2, 1));
+        Real64 const lTC(matFD_TempCond.index(2, 1));
         Real64 ktA1; // Variable Outer Thermal conductivity in temperature equation
         Real64 ktA2; // Thermal Inner conductivity in temperature equation
         if (matFD_TempCond[lTC] + matFD_TempCond[lTC + 1] + matFD_TempCond[lTC + 2] >= 0.0) { // Multiple Linear Segment Function
@@ -1919,8 +1919,8 @@ namespace HeatBalFiniteDiffManager {
 
             auto const &heatFluxActuator(state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).heatSourceFluxMaterialActuators(Lay));
 
-            auto const TDT_m(TDT(i - 1));
-            auto const TDT_p(TDT(i + 1));
+            Real64 const TDT_m(TDT(i - 1));
+            Real64 const TDT_p(TDT(i + 1));
 
             bool const RLayerPresent(mat->ROnly || mat->Group == DataHeatBalance::MaterialGroup::Air);
             bool const RLayer2Present(mat2->ROnly || mat2->Group == DataHeatBalance::MaterialGroup::Air);
@@ -1936,7 +1936,7 @@ namespace HeatBalFiniteDiffManager {
 
                 auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
                 auto const &matFD2(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay2));
-                auto TDT_i(TDT(i));
+                Real64 TDT_i(TDT(i));
 
                 // Set Thermal Conductivity. Can be constant, simple linear temp dep or multiple linear segment temp function dep.
 
@@ -1944,7 +1944,7 @@ namespace HeatBalFiniteDiffManager {
                 if (!RLayerPresent) {
                     auto const &matFD_TempCond(matFD.TempCond);
                     assert(matFD_TempCond.u2() >= 3);
-                    auto const lTC(matFD_TempCond.index(2, 1));
+                    Real64 const lTC(matFD_TempCond.index(2, 1));
                     if (matFD_TempCond[lTC] + matFD_TempCond[lTC + 1] + matFD_TempCond[lTC + 2] >= 0.0) { // Multiple Linear Segment Function
                         kt1 = terpld(matFD.TempCond, (TDT_i + TDT_m) / 2.0, 1, 2);                        // 1: Temperature, 2: Thermal conductivity
                     } else {
@@ -2015,7 +2015,7 @@ namespace HeatBalFiniteDiffManager {
 
                 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-                auto const TD_i(TD(i));
+                Real64 const TD_i(TD(i));
 
                 auto const &matFD_TempEnth(matFD.TempEnth);
                 assert(matFD_TempEnth.u2() >= 3);
@@ -2310,7 +2310,7 @@ namespace HeatBalFiniteDiffManager {
 
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
-        auto TDT_i(TDT(i));
+        Real64 TDT_i(TDT(i));
         Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + SurfQdotRadHVACInPerAreaFD);
         if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
@@ -2336,12 +2336,12 @@ namespace HeatBalFiniteDiffManager {
                 state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) = 0.0; // Inside face  does not have an inner half node
 
             } else { //  Regular or PCM
-                auto const TDT_m(TDT(i - 1));
+                Real64 const TDT_m(TDT(i - 1));
 
                 // Set Thermal Conductivity. Can be constant, simple linear temp dep or multiple linear segment temp function dep.
                 auto const &matFD_TempCond(matFD.TempCond);
                 assert(matFD_TempCond.u2() >= 3);
-                auto const lTC(matFD_TempCond.index(2, 1));
+                Real64 const lTC(matFD_TempCond.index(2, 1));
                 Real64 kt;
                 if (matFD_TempCond[lTC] + matFD_TempCond[lTC + 1] + matFD_TempCond[lTC + 2] >= 0.0) { // Multiple Linear Segment Function
                     // Use average of surface and first node temp for determining k
@@ -2353,7 +2353,7 @@ namespace HeatBalFiniteDiffManager {
                 }
 
                 Real64 RhoS(mat->Density);
-                auto const TD_i(TD(i));
+                Real64 const TD_i(TD(i));
                 Real64 const Cpo(mat->SpecHeat);
                 Real64 Cp(Cpo); // Will be changed if PCM
                 auto const &matFD_TempEnth(matFD.TempEnth);
