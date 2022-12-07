@@ -300,21 +300,21 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             MaterNum = thisConstruct.LayerPoint(Layer);
             auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
-            WrongMaterialsMix = !thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGlass &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGas &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGasMixture &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::Shade &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowBlind &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::Screen &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowShade &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowGap &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer &&
-                                !thisMaterial->Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer;
+            WrongMaterialsMix = !((thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGas) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGasMixture) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::Shade) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowBlind) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::Screen) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) ||
+                                  (thisMaterial->Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer));
         }
 
         if (WrongMaterialsMix) { // Illegal material for a window construction
