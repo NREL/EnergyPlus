@@ -426,24 +426,28 @@ namespace VentilatedSlab {
 
                 for (SurfNum = 1; SurfNum <= ventSlab.NumOfSurfaces; ++SurfNum) {
 
+                    int const ConstrNum = state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Construction;
+                    auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
                     if (ventSlab.SurfacePtr(SurfNum) == 0) continue; // invalid surface -- detected earlier
                     if (ventSlab.ZPtr(SurfNum) == 0) continue;       // invalid zone -- detected earlier
                     if (state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Construction == 0)
                         continue; // invalid construction, detected earlier
-                    if (!state.dataConstruction->Construct(state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                    if (!thisConstruct.SourceSinkPresent) {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid surface=\"" +
                                             state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Name + "\".");
                         ShowContinueError(
                             state,
                             "Surface Construction does not have a source/sink, Construction name= \"" +
-                                state.dataConstruction->Construct(state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Construction).Name +
+                                thisConstruct.Name +
                                 "\".");
                         ErrorsFound = true;
                     }
                 }
             } else {
                 for (SurfNum = 1; SurfNum <= ventSlab.NumOfSurfaces; ++SurfNum) {
+                    int const ConstrNum = state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Construction;
+                    auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
                     if (ventSlab.SurfacePtr(SurfNum) == 0) continue; // invalid surface -- detected earlier
                     if (ventSlab.ZonePtr == 0) continue;             // invalid zone -- detected earlier
                     if (state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Zone != ventSlab.ZonePtr) {
@@ -458,14 +462,14 @@ namespace VentilatedSlab {
                     }
                     if (state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Construction == 0)
                         continue; // invalid construction, detected earlier
-                    if (!state.dataConstruction->Construct(state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+                    if (!thisConstruct.SourceSinkPresent) {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid surface=\"" +
                                             state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Name + "\".");
                         ShowContinueError(
                             state,
                             "Surface Construction does not have a source/sink, Construction name= \"" +
-                                state.dataConstruction->Construct(state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Construction).Name +
+                                thisConstruct.Name +
                                 "\".");
                         ErrorsFound = true;
                     }
@@ -3786,6 +3790,7 @@ namespace VentilatedSlab {
                     // The coefficients are based on the Constant Flow Radiation System.
 
                     ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+                    auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
 
                     Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
                     Cb = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum);
@@ -3796,9 +3801,9 @@ namespace VentilatedSlab {
                     Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                    Ch = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0));
-                    Ci = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0));
-                    Cj = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0));
+                    Ch = double(thisConstruct.CTFTSourceQ(0));
+                    Ci = double(thisConstruct.CTFTSourceIn(0));
+                    Cj = double(thisConstruct.CTFTSourceOut(0));
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));

@@ -214,47 +214,49 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         // Obtain thermal properties from the Material derived type
 
-        dl(Layer) = state.dataMaterial->Material(CurrentLayer)->Thickness;
-        rk(Layer) = state.dataMaterial->Material(CurrentLayer)->Conductivity;
-        rho(Layer) = state.dataMaterial->Material(CurrentLayer)->Density;
-        cp(Layer) = state.dataMaterial->Material(CurrentLayer)->SpecHeat; // Must convert
+        auto *thisMaterial = state.dataMaterial->Material(CurrentLayer);
+
+        dl(Layer) = thisMaterial->Thickness;
+        rk(Layer) = thisMaterial->Conductivity;
+        rho(Layer) = thisMaterial->Density;
+        cp(Layer) = thisMaterial->SpecHeat; // Must convert
         // from kJ/kg-K to J/kg-k due to rk units
 
-        if (this->SourceSinkPresent && !state.dataMaterial->Material(CurrentLayer)->WarnedForHighDiffusivity) {
+        if (this->SourceSinkPresent && !thisMaterial->WarnedForHighDiffusivity) {
             // check for materials that are too conductive or thin
             if ((rho(Layer) * cp(Layer)) > 0.0) {
                 Real64 Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
                 if (Alpha > DataHeatBalance::HighDiffusivityThreshold) {
                     DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                     Real64 const ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
-                    if (state.dataMaterial->Material(CurrentLayer)->Thickness < ThicknessThreshold) {
+                    if (thisMaterial->Thickness < ThicknessThreshold) {
                         ShowSevereError(state,
                                         "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
                                         "material name = " +
-                                            state.dataMaterial->Material(CurrentLayer)->Name);
+                                            thisMaterial->Name);
                         ShowContinueError(state,
                                           format("High conductivity Material layers are not well supported for internal source constructions, "
                                                  "material conductivity = {:.3R} [W/m-K]",
-                                                 state.dataMaterial->Material(CurrentLayer)->Conductivity));
+                                                 thisMaterial->Conductivity));
                         ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
                         ShowContinueError(state,
                                           format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
-                        if (state.dataMaterial->Material(CurrentLayer)->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
+                        if (thisMaterial->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
                             ShowContinueError(state,
                                               format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
-                                                     state.dataMaterial->Material(CurrentLayer)->Thickness));
+                                                     thisMaterial->Thickness));
                             ShowContinueError(state,
                                               format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                      DataHeatBalance::ThinMaterialLayerThreshold));
                         }
-                        state.dataMaterial->Material(CurrentLayer)->WarnedForHighDiffusivity = true;
+                        thisMaterial->WarnedForHighDiffusivity = true;
                     }
                 }
             }
         }
-        if (state.dataMaterial->Material(CurrentLayer)->Thickness > 3.0) {
+        if (thisMaterial->Thickness > 3.0) {
             ShowSevereError(state, "InitConductionTransferFunctions: Material too thick for CTF calculation");
-            ShowContinueError(state, "material name = " + state.dataMaterial->Material(CurrentLayer)->Name);
+            ShowContinueError(state, "material name = " + thisMaterial->Name);
             ErrorsFound = true;
         }
 
@@ -271,13 +273,13 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
         if (ResLayer(Layer)) {                                                 // Resistive layer-check for R-value, etc.
             ++NumResLayers;                                                    // Increment number of resistive layers
-            lr(Layer) = state.dataMaterial->Material(CurrentLayer)->Resistance; // User defined thermal resistivity
+            lr(Layer) = thisMaterial->Resistance; // User defined thermal resistivity
             if (lr(Layer) < RValueLowLimit) {                                  // User didn't define enough
                 // parameters to calculate CTFs for a building element
                 // containing this layer.
 
                 ShowSevereError(state,
-                                "InitConductionTransferFunctions: Material=" + state.dataMaterial->Material(CurrentLayer)->Name +
+                                "InitConductionTransferFunctions: Material=" + thisMaterial->Name +
                                     "R Value below lowest allowed value");
                 ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                 ErrorsFound = true;

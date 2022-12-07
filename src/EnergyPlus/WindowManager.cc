@@ -338,27 +338,29 @@ namespace WindowManager {
         //   shade, screen or blind
         // Loop over constructions and find those that are glazing constructions
         for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
-            if (!state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
-            if (state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) continue; // Skip Complex Fenestrations, they have separate
-            if (state.dataConstruction->Construct(ConstrNum).WindowTypeEQL) continue;  // skip Equivalent Layer Fenestration
+            auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+            auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
+            if (!thisConstruct.TypeIsWindow) continue;
+            if (thisConstruct.WindowTypeBSDF) continue; // Skip Complex Fenestrations, they have separate
+            if (thisConstruct.WindowTypeEQL) continue;  // skip Equivalent Layer Fenestration
             // handling of optical properties
 
             for (IPhi = 1; IPhi <= 10; ++IPhi) {
                 state.dataWindowManager->CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * DataGlobalConstants::DegToRadians);
             }
 
-            TotLay = state.dataConstruction->Construct(ConstrNum).TotLayers;
+            TotLay = thisConstruct.TotLayers;
 
             // First layer must be glass, shade, screen or blind to be a glazing construction
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group !=
+            if (thisMaterial->Group !=
                     DataHeatBalance::MaterialGroup::WindowGlass &&
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group !=
+                thisMaterial->Group !=
                     DataHeatBalance::MaterialGroup::Shade &&
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group !=
+                thisMaterial->Group !=
                     DataHeatBalance::MaterialGroup::Screen &&
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group !=
+                thisMaterial->Group !=
                     DataHeatBalance::MaterialGroup::WindowBlind &&
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group !=
+                thisMaterial->Group !=
                     DataHeatBalance::MaterialGroup::WindowSimpleGlazing)
                 continue;
 
@@ -373,73 +375,73 @@ namespace WindowManager {
             StormWinConst = false;
             state.dataWindowManager->lSimpleGlazingSystem = false;
 
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group ==
+            if (thisMaterial->Group ==
                 DataHeatBalance::MaterialGroup::WindowSimpleGlazing) {
                 // what if outside layer is shade, blind, or screen?
                 state.dataWindowManager->lSimpleGlazingSystem = true;
                 state.dataWindowManager->SimpleGlazingSHGC =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->SimpleWindowSHGC;
+                    thisMaterial->SimpleWindowSHGC;
                 state.dataWindowManager->SimpleGlazingU =
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->SimpleWindowUfactor;
+                    thisMaterial->SimpleWindowUfactor;
             }
 
-            if (has_prefix(state.dataConstruction->Construct(ConstrNum).Name, "BARECONSTRUCTIONWITHSTORMWIN") ||
-                has_prefix(state.dataConstruction->Construct(ConstrNum).Name, "SHADEDCONSTRUCTIONWITHSTORMWIN"))
+            if (has_prefix(thisConstruct.Name, "BARECONSTRUCTIONWITHSTORMWIN") ||
+                has_prefix(thisConstruct.Name, "SHADEDCONSTRUCTIONWITHSTORMWIN"))
                 StormWinConst = true;
 
             // Get layer number of shade/blind
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group ==
+            if (thisMaterial->Group ==
                 DataHeatBalance::MaterialGroup::Shade) {
                 ExtShade = true;
                 ShadeLayNum = 1;
-            } else if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLay))->Group ==
+            } else if (state.dataMaterial->Material(thisConstruct.LayerPoint(TotLay))->Group ==
                        DataHeatBalance::MaterialGroup::Shade) {
                 IntShade = true;
                 ShadeLayNum = TotLay;
-            } else if (state.dataConstruction->Construct(ConstrNum).TotLayers == 5) {
-                if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group ==
+            } else if (thisConstruct.TotLayers == 5) {
+                if (state.dataMaterial->Material(thisConstruct.LayerPoint(3))->Group ==
                     DataHeatBalance::MaterialGroup::Shade) {
                     BGShade = true;
                     ShadeLayNum = 3;
                 }
-            } else if (state.dataConstruction->Construct(ConstrNum).TotLayers == 7) {
-                if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group ==
+            } else if (thisConstruct.TotLayers == 7) {
+                if (state.dataMaterial->Material(thisConstruct.LayerPoint(5))->Group ==
                     DataHeatBalance::MaterialGroup::Shade) {
                     BGShade = true;
                     ShadeLayNum = 5;
                 }
             }
 
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group ==
+            if (thisMaterial->Group ==
                 DataHeatBalance::MaterialGroup::WindowBlind) {
                 ExtBlind = true;
                 ShadeLayNum = 1;
-                BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->BlindDataPtr;
-            } else if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLay))->Group ==
+                BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
+            } else if (state.dataMaterial->Material(thisConstruct.LayerPoint(TotLay))->Group ==
                        DataHeatBalance::MaterialGroup::WindowBlind) {
                 IntBlind = true;
                 ShadeLayNum = TotLay;
-                BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->BlindDataPtr;
-            } else if (state.dataConstruction->Construct(ConstrNum).TotLayers == 5) {
-                if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group ==
+                BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
+            } else if (thisConstruct.TotLayers == 5) {
+                if (state.dataMaterial->Material(thisConstruct.LayerPoint(3))->Group ==
                     DataHeatBalance::MaterialGroup::WindowBlind) {
                     BGBlind = true;
                     ShadeLayNum = 3;
-                    BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->BlindDataPtr;
+                    BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
                 }
-            } else if (state.dataConstruction->Construct(ConstrNum).TotLayers == 7) {
-                if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group ==
+            } else if (thisConstruct.TotLayers == 7) {
+                if (state.dataMaterial->Material(thisConstruct.LayerPoint(5))->Group ==
                     DataHeatBalance::MaterialGroup::WindowBlind) {
                     BGBlind = true;
                     ShadeLayNum = 5;
-                    BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->BlindDataPtr;
+                    BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
                 }
             }
 
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group ==
+            if (thisMaterial->Group ==
                 DataHeatBalance::MaterialGroup::Screen) {
                 ShadeLayNum = 1;
-                ScNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->ScreenDataPtr;
+                ScNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->ScreenDataPtr;
                 //   Disregard orphaned constructs with exterior screen
                 if (ScNum == 0) continue;
                 ExtScreen = true;
@@ -455,7 +457,7 @@ namespace WindowManager {
             // for presence of interior shade. Assumes inner and outer glass layers have zero thermal transmittance.
 
             if (IntShade || ExtShade || ExtScreen) {
-                ShadeLayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum);
+                ShadeLayPtr = thisConstruct.LayerPoint(ShadeLayNum);
                 if (ExtScreen) {
                     TauShIR = state.dataHeatBal->SurfaceScreens(ScNum).DifDifTrans;
                 } else {
@@ -464,13 +466,13 @@ namespace WindowManager {
                 EpsShIR = state.dataMaterial->Material(ShadeLayPtr)->AbsorpThermal;
                 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                 if (ExtShade || ExtScreen) { // Exterior shade or screen
-                    EpsGlIR = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(2))->AbsorpThermalFront;
+                    EpsGlIR = state.dataMaterial->Material(thisConstruct.LayerPoint(2))->AbsorpThermalFront;
                 } else { // Interior shade
-                    EpsGlIR = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLay - 1))->AbsorpThermalBack;
+                    EpsGlIR = state.dataMaterial->Material(thisConstruct.LayerPoint(TotLay - 1))->AbsorpThermalBack;
                 }
                 RhoGlIR = max(0.0, 1.0 - EpsGlIR);
-                state.dataConstruction->Construct(ConstrNum).ShadeAbsorpThermal = EpsShIR * (1.0 + TauShIR * RhoGlIR / (1.0 - RhoShIR * RhoGlIR));
-                if (IntShade) state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal *= TauShIR / (1.0 - RhoShIR * RhoGlIR);
+                thisConstruct.ShadeAbsorpThermal = EpsShIR * (1.0 + TauShIR * RhoGlIR / (1.0 - RhoShIR * RhoGlIR));
+                if (IntShade) thisConstruct.InsideAbsorpThermal *= TauShIR / (1.0 - RhoShIR * RhoGlIR);
             }
 
             // From the individual glass layer properties, get the glazing system optical properties
@@ -483,7 +485,7 @@ namespace WindowManager {
             // a correction is made for the effect of a shade, screen or blind if one of these
             // is present in the construction.
 
-            NGlass = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
+            NGlass = thisConstruct.TotGlassLayers;
 
             //--------------------------------------------------------------------------------------------
             // Front calculation (solar incident from outside of room); bare glass portion of construction
@@ -509,7 +511,7 @@ namespace WindowManager {
                 }
 
                 state.dataWindowManager->LayerNum[IGlass - 1] = LayNum;
-                LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(LayNum);
+                LayPtr = thisConstruct.LayerPoint(LayNum);
                 SpecDataNum = state.dataMaterial->Material(LayPtr)->GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
                     if (!state.dataWindowManager->BGFlag) AllGlassIsSpectralAverage = false;
@@ -538,7 +540,7 @@ namespace WindowManager {
                                              "\" was defined with full spectral data and has been converted to average spectral data");
                         ShowContinueError(state,
                                           "due to its use with between-glass shades or blinds of the window construction \"" +
-                                              state.dataConstruction->Construct(ConstrNum).Name + "\".");
+                                              thisConstruct.Name + "\".");
                         ShowContinueError(state, "All occurrences of this glazing material will be modeled as SpectralAverage.");
                         ShowContinueError(state,
                                           "If this material is also used in other window constructions  without between-glass shades or blinds,");
@@ -594,7 +596,7 @@ namespace WindowManager {
                                              "\" was defined with full spectral and angular data and has been converted to average spectral data");
                         ShowContinueError(state,
                                           "due to its use with between-glass shades or blinds of the window construction \"" +
-                                              state.dataConstruction->Construct(ConstrNum).Name + "\".");
+                                              thisConstruct.Name + "\".");
                         ShowContinueError(state, "All occurrences of this glazing material will be modeled as SpectralAverage.");
                         ShowContinueError(state,
                                           "If this material is also used in other window constructions  without between-glass shades or blinds,");
@@ -638,7 +640,7 @@ namespace WindowManager {
             if (TotalIPhi > state.dataWindowManager->MaxNumOfIncidentAngles) {
                 ShowSevereError(state,
                                 format("WindowManage::InitGlassOpticalCalculations = {}, Invalid maximum value of common incidet angles = {}.",
-                                       state.dataConstruction->Construct(ConstrNum).Name,
+                                       thisConstruct.Name,
                                        TotalIPhi));
                 ShowContinueError(state,
                                   format("The maximum number of incident angles for each construct is {}. Please rearrange the dataset.",
@@ -659,7 +661,7 @@ namespace WindowManager {
                 // For each wavelength, get glass layer properties at this angle of incidence
                 // from properties at normal incidence
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                    LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataWindowManager->LayerNum[IGlass - 1]);
+                    LayPtr = thisConstruct.LayerPoint(state.dataWindowManager->LayerNum[IGlass - 1]);
                     if (!state.dataMaterial->Material(LayPtr)->GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= state.dataWindowManager->numpt[IGlass - 1]; ++ILam) {
                             TransAndReflAtPhi(CosPhi,
@@ -741,84 +743,84 @@ namespace WindowManager {
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).tBareSolCoef(IGlass));
+                             thisConstruct.tBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              tBareVisPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).tBareVisCoef(IGlass));
+                             thisConstruct.tBareVisCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rfBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rfBareSolCoef(IGlass));
+                             thisConstruct.rfBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rfBareVisPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rfBareVisCoef(IGlass));
+                             thisConstruct.rfBareVisCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rbBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rbBareSolCoef(IGlass));
+                             thisConstruct.rbBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              rbBareVisPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).rbBareVisCoef(IGlass));
+                             thisConstruct.rbBareVisCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              afBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).afBareSolCoef(IGlass));
+                             thisConstruct.afBareSolCoef(IGlass));
                     W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                              abBareSolPhi(IGlass, _),
                              6,
                              1,
                              TotalIPhi,
-                             state.dataConstruction->Construct(ConstrNum).abBareSolCoef(IGlass));
+                             thisConstruct.abBareSolCoef(IGlass));
                 }
             }
 
-            state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront = DiffuseAverage(state.dataWindowManager->rfsolPhi);
-            state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack = DiffuseAverage(state.dataWindowManager->rbsolPhi);
-            state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront = DiffuseAverage(state.dataWindowManager->rfvisPhi);
-            state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack = DiffuseAverage(state.dataWindowManager->rbvisPhi);
+            thisConstruct.ReflectSolDiffFront = DiffuseAverage(state.dataWindowManager->rfsolPhi);
+            thisConstruct.ReflectSolDiffBack = DiffuseAverage(state.dataWindowManager->rbsolPhi);
+            thisConstruct.ReflectVisDiffFront = DiffuseAverage(state.dataWindowManager->rfvisPhi);
+            thisConstruct.ReflectVisDiffBack = DiffuseAverage(state.dataWindowManager->rbvisPhi);
 
             tsolDiff = DiffuseAverage(state.dataWindowManager->tsolPhi);
             tvisDiff = DiffuseAverage(state.dataWindowManager->tvisPhi);
-            state.dataConstruction->Construct(ConstrNum).TransDiff = tsolDiff;
-            state.dataConstruction->Construct(ConstrNum).TransDiffVis = tvisDiff;
+            thisConstruct.TransDiff = tsolDiff;
+            thisConstruct.TransDiffVis = tvisDiff;
             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                 solabsPhiLay({1, TotalIPhi}) = state.dataWindowManager->solabsPhi(IGlass, {1, TotalIPhi});
                 solabsDiff(IGlass) = DiffuseAverage(solabsPhiLay);
-                state.dataConstruction->Construct(ConstrNum).AbsDiff(IGlass) = solabsDiff(IGlass);
+                thisConstruct.AbsDiff(IGlass) = solabsDiff(IGlass);
 
                 // For use with between-glass shade/blind, get diffuse properties of isolated glass for case when
                 // all glass layers were input with spectral-average properties
                 //  only used by between-glass shades or blinds
                 if (AllGlassIsSpectralAverage) {
-                    state.dataConstruction->Construct(ConstrNum).tBareSolDiff(IGlass) = DiffuseAverage(tBareSolPhi(IGlass, {1, TotalIPhi}));
-                    state.dataConstruction->Construct(ConstrNum).tBareVisDiff(IGlass) = DiffuseAverage(tBareVisPhi(IGlass, {1, TotalIPhi}));
-                    state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(IGlass) = DiffuseAverage(rfBareSolPhi(IGlass, {1, TotalIPhi}));
-                    state.dataConstruction->Construct(ConstrNum).rfBareVisDiff(IGlass) = DiffuseAverage(rfBareVisPhi(IGlass, {1, TotalIPhi}));
-                    state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(IGlass) = DiffuseAverage(rbBareSolPhi(IGlass, {1, TotalIPhi}));
-                    state.dataConstruction->Construct(ConstrNum).rbBareVisDiff(IGlass) = DiffuseAverage(rbBareVisPhi(IGlass, {1, TotalIPhi}));
-                    state.dataConstruction->Construct(ConstrNum).afBareSolDiff(IGlass) =
+                    thisConstruct.tBareSolDiff(IGlass) = DiffuseAverage(tBareSolPhi(IGlass, {1, TotalIPhi}));
+                    thisConstruct.tBareVisDiff(IGlass) = DiffuseAverage(tBareVisPhi(IGlass, {1, TotalIPhi}));
+                    thisConstruct.rfBareSolDiff(IGlass) = DiffuseAverage(rfBareSolPhi(IGlass, {1, TotalIPhi}));
+                    thisConstruct.rfBareVisDiff(IGlass) = DiffuseAverage(rfBareVisPhi(IGlass, {1, TotalIPhi}));
+                    thisConstruct.rbBareSolDiff(IGlass) = DiffuseAverage(rbBareSolPhi(IGlass, {1, TotalIPhi}));
+                    thisConstruct.rbBareVisDiff(IGlass) = DiffuseAverage(rbBareVisPhi(IGlass, {1, TotalIPhi}));
+                    thisConstruct.afBareSolDiff(IGlass) =
                         max(0.0,
-                            1.0 - (state.dataConstruction->Construct(ConstrNum).tBareSolDiff(IGlass) +
-                                   state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(IGlass)));
-                    state.dataConstruction->Construct(ConstrNum).abBareSolDiff(IGlass) =
+                            1.0 - (thisConstruct.tBareSolDiff(IGlass) +
+                                   thisConstruct.rfBareSolDiff(IGlass)));
+                    thisConstruct.abBareSolDiff(IGlass) =
                         max(0.0,
-                            1.0 - (state.dataConstruction->Construct(ConstrNum).tBareSolDiff(IGlass) +
-                                   state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(IGlass)));
+                            1.0 - (thisConstruct.tBareSolDiff(IGlass) +
+                                   thisConstruct.rbBareSolDiff(IGlass)));
                 }
             }
 
@@ -844,7 +846,7 @@ namespace WindowManager {
                     }
                 }
                 state.dataWindowManager->LayerNum[IGlass - 1] = LayNum;
-                LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(LayNum);
+                LayPtr = thisConstruct.LayerPoint(LayNum);
 
                 SpecDataNum = state.dataMaterial->Material(LayPtr)->GlassSpectralDataPtr;
                 if (SpecDataNum != 0) {
@@ -901,7 +903,7 @@ namespace WindowManager {
                 // For each wavelength, get glass layer properties at this angle of incidence
                 // from properties at normal incidence
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                    LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataWindowManager->LayerNum[IGlass - 1]);
+                    LayPtr = thisConstruct.LayerPoint(state.dataWindowManager->LayerNum[IGlass - 1]);
                     if (!state.dataMaterial->Material(LayPtr)->GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= state.dataWindowManager->numpt[IGlass - 1]; ++ILam) {
 
@@ -948,7 +950,7 @@ namespace WindowManager {
 
             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                 IGlassBack = NGlass - IGlass + 1;
-                state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass) =
+                thisConstruct.AbsDiffBack(IGlass) =
                     DiffuseAverage(state.dataWindowManager->solabsBackPhi(IGlassBack, {1, 10}));
             }
 
@@ -971,12 +973,12 @@ namespace WindowManager {
                 for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
 
                     if (ShadeOn) {
-                        ShadeAbs = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->AbsorpSolar;
-                        ShadeTrans = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->Trans;
-                        ShadeTransVis = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->TransVis;
-                        ShadeRefl = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->ReflectShade;
+                        ShadeAbs = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->AbsorpSolar;
+                        ShadeTrans = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->Trans;
+                        ShadeTransVis = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->TransVis;
+                        ShadeRefl = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->ReflectShade;
                         ShadeReflVis =
-                            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(ShadeLayNum))->ReflectShadeVis;
+                            state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->ReflectShadeVis;
                         rsh = ShadeRefl;
                         rshv = ShadeReflVis;
                         tsh = ShadeTrans;
@@ -1030,11 +1032,11 @@ namespace WindowManager {
                     // Correction factors for inter-reflections between glass and shading device
 
                     if (ExtShade || ExtBlind || ExtScreen) {
-                        ShadeReflFac = 1.0 / (1.0 - ShadeRefl * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront);
-                        ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront);
+                        ShadeReflFac = 1.0 / (1.0 - ShadeRefl * thisConstruct.ReflectSolDiffFront);
+                        ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * thisConstruct.ReflectVisDiffFront);
                     } else if (IntShade || IntBlind) {
-                        ShadeReflFac = 1.0 / (1.0 - ShadeRefl * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack);
-                        ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack);
+                        ShadeReflFac = 1.0 / (1.0 - ShadeRefl * thisConstruct.ReflectSolDiffBack);
+                        ShadeReflFacVis = 1.0 / (1.0 - ShadeReflVis * thisConstruct.ReflectVisDiffBack);
                     }
 
                     if (ExtShade || ExtBlind || ExtScreen) { // Exterior shade or blind
@@ -1049,7 +1051,7 @@ namespace WindowManager {
                                 state.dataWindowManager->tsolPhi(IPhi) = ShadeTrans * ShadeReflFac * tsolDiff;
                                 state.dataWindowManager->tvisPhi(IPhi) = ShadeTransVis * ShadeReflFacVis * tvisDiff;
                                 state.dataWindowManager->solabsShadePhi(IPhi) =
-                                    ShadeAbs * (1.0 + ShadeTrans * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront);
+                                    ShadeAbs * (1.0 + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront);
                             }
                         }
 
@@ -1057,70 +1059,70 @@ namespace WindowManager {
 
                         for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                             if (ExtBlind) {
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiff(ISlatAng, IGlass) =
+                                thisConstruct.BlAbsDiff(ISlatAng, IGlass) =
                                     ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffGnd(ISlatAng, IGlass) =
+                                thisConstruct.BlAbsDiffGnd(ISlatAng, IGlass) =
                                     ShadeTransGnd * ShadeReflFac * solabsDiff(IGlass);
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffSky(ISlatAng, IGlass) =
+                                thisConstruct.BlAbsDiffSky(ISlatAng, IGlass) =
                                     ShadeTransSky * ShadeReflFac * solabsDiff(IGlass);
                             }
                             if (ExtShade || ExtScreen)
-                                state.dataConstruction->Construct(ConstrNum).AbsDiff(IGlass) = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
+                                thisConstruct.AbsDiff(IGlass) = ShadeTrans * ShadeReflFac * solabsDiff(IGlass);
                         }
                         if (ExtBlind) {
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBlind(ISlatAng) =
+                            thisConstruct.AbsDiffBlind(ISlatAng) =
                                 state.dataHeatBal->Blind(BlNum).SolFrontDiffAbs(ISlatAng) +
-                                ShadeTrans * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront * ShadeAbs;
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBlindGnd(ISlatAng) =
+                                ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
+                            thisConstruct.AbsDiffBlindGnd(ISlatAng) =
                                 state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsGnd(ISlatAng) +
-                                ShadeTransGnd * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront * ShadeAbs;
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBlindSky(ISlatAng) =
+                                ShadeTransGnd * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
+                            thisConstruct.AbsDiffBlindSky(ISlatAng) =
                                 state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsSky(ISlatAng) +
-                                ShadeTransSky * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront * ShadeAbs;
-                            state.dataConstruction->Construct(ConstrNum).BlTransDiff(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTrans;
-                            state.dataConstruction->Construct(ConstrNum).BlTransDiffGnd(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransGnd;
-                            state.dataConstruction->Construct(ConstrNum).BlTransDiffSky(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransSky;
-                            state.dataConstruction->Construct(ConstrNum).BlTransDiffVis(ISlatAng) = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                            state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffFront(ISlatAng) =
-                                ShadeRefl + pow_2(ShadeTrans) * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront * ShadeReflFac;
-                            state.dataConstruction->Construct(ConstrNum).BlReflectVisDiffFront(ISlatAng) =
+                                ShadeTransSky * ShadeReflFac * thisConstruct.ReflectSolDiffFront * ShadeAbs;
+                            thisConstruct.BlTransDiff(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTrans;
+                            thisConstruct.BlTransDiffGnd(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransGnd;
+                            thisConstruct.BlTransDiffSky(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransSky;
+                            thisConstruct.BlTransDiffVis(ISlatAng) = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                            thisConstruct.BlReflectSolDiffFront(ISlatAng) =
+                                ShadeRefl + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffFront * ShadeReflFac;
+                            thisConstruct.BlReflectVisDiffFront(ISlatAng) =
                                 ShadeReflVis +
-                                pow_2(ShadeTransVis) * state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront * ShadeReflFacVis;
+                                pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffFront * ShadeReflFacVis;
                         }
                         if (ExtShade || ExtScreen) {
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffShade =
-                                ShadeAbs * (1.0 + ShadeTrans * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront);
-                            state.dataConstruction->Construct(ConstrNum).TransDiff = tsolDiff * ShadeReflFac * ShadeTrans;
-                            state.dataConstruction->Construct(ConstrNum).TransDiffVis = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                            state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront =
-                                ShadeRefl + pow_2(ShadeTrans) * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront * ShadeReflFac;
-                            state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront =
+                            thisConstruct.AbsDiffShade =
+                                ShadeAbs * (1.0 + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffFront);
+                            thisConstruct.TransDiff = tsolDiff * ShadeReflFac * ShadeTrans;
+                            thisConstruct.TransDiffVis = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                            thisConstruct.ReflectSolDiffFront =
+                                ShadeRefl + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffFront * ShadeReflFac;
+                            thisConstruct.ReflectVisDiffFront =
                                 ShadeReflVis +
-                                pow_2(ShadeTransVis) * state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront * ShadeReflFacVis;
+                                pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffFront * ShadeReflFacVis;
                         }
 
                         // Back incident solar, diffuse, exterior shade/blind
 
                         if (ExtBlind) {
                             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffBack(ISlatAng, IGlass) =
-                                    state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass) +
+                                thisConstruct.BlAbsDiffBack(ISlatAng, IGlass) =
+                                    thisConstruct.AbsDiffBack(IGlass) +
                                     tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
                             }
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBackBlind(ISlatAng) = tsolDiff * ShadeReflFac * ShadeAbs;
-                            state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack(ISlatAng) =
-                                state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack + tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                            state.dataConstruction->Construct(ConstrNum).BlReflectVisDiffBack(ISlatAng) =
-                                state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+                            thisConstruct.AbsDiffBackBlind(ISlatAng) = tsolDiff * ShadeReflFac * ShadeAbs;
+                            thisConstruct.BlReflectSolDiffBack(ISlatAng) =
+                                thisConstruct.ReflectSolDiffBack + tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                            thisConstruct.BlReflectVisDiffBack(ISlatAng) =
+                                thisConstruct.ReflectVisDiffBack + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
                         }
                         if (ExtShade || ExtScreen) {
                             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass) +=
+                                thisConstruct.AbsDiffBack(IGlass) +=
                                     tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
                             }
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBackShade = tsolDiff * ShadeReflFac * ShadeAbs;
-                            state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack += tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                            state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack += tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+                            thisConstruct.AbsDiffBackShade = tsolDiff * ShadeReflFac * ShadeAbs;
+                            thisConstruct.ReflectSolDiffBack += tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                            thisConstruct.ReflectVisDiffBack += tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
                         }
 
                     } // End check if exterior shade, screen or blind
@@ -1134,7 +1136,7 @@ namespace WindowManager {
                                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                                     state.dataWindowManager->solabsPhi(IGlass, IPhi) +=
                                         state.dataWindowManager->tsolPhi(IPhi) * ShadeRefl * ShadeReflFac *
-                                        state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass);
+                                        thisConstruct.AbsDiffBack(IGlass);
                                 }
                                 state.dataWindowManager->solabsShadePhi(IPhi) = state.dataWindowManager->tsolPhi(IPhi) * ShadeReflFac * ShadeAbs;
                                 state.dataWindowManager->tsolPhi(IPhi) *= ShadeReflFac * ShadeTrans;
@@ -1146,76 +1148,76 @@ namespace WindowManager {
 
                         if (IntBlind) {
                             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiff(ISlatAng, IGlass) =
-                                    state.dataConstruction->Construct(ConstrNum).AbsDiff(IGlass) +
-                                    tsolDiff * ShadeRefl * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass);
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffGnd(ISlatAng, IGlass) =
-                                    state.dataConstruction->Construct(ConstrNum).AbsDiff(IGlass) +
-                                    tsolDiff * ShadeReflGnd * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass);
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffSky(ISlatAng, IGlass) =
-                                    state.dataConstruction->Construct(ConstrNum).AbsDiff(IGlass) +
-                                    tsolDiff * ShadeReflSky * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass);
+                                thisConstruct.BlAbsDiff(ISlatAng, IGlass) =
+                                    thisConstruct.AbsDiff(IGlass) +
+                                    tsolDiff * ShadeRefl * ShadeReflFac * thisConstruct.AbsDiffBack(IGlass);
+                                thisConstruct.BlAbsDiffGnd(ISlatAng, IGlass) =
+                                    thisConstruct.AbsDiff(IGlass) +
+                                    tsolDiff * ShadeReflGnd * ShadeReflFac * thisConstruct.AbsDiffBack(IGlass);
+                                thisConstruct.BlAbsDiffSky(ISlatAng, IGlass) =
+                                    thisConstruct.AbsDiff(IGlass) +
+                                    tsolDiff * ShadeReflSky * ShadeReflFac * thisConstruct.AbsDiffBack(IGlass);
                             }
 
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBlind(ISlatAng) = tsolDiff * ShadeReflFac * ShadeAbs;
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBlindGnd(ISlatAng) =
+                            thisConstruct.AbsDiffBlind(ISlatAng) = tsolDiff * ShadeReflFac * ShadeAbs;
+                            thisConstruct.AbsDiffBlindGnd(ISlatAng) =
                                 tsolDiff * ShadeReflFac * state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsGnd(ISlatAng);
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBlindSky(ISlatAng) =
+                            thisConstruct.AbsDiffBlindSky(ISlatAng) =
                                 tsolDiff * ShadeReflFac * state.dataHeatBal->Blind(BlNum).SolFrontDiffAbsSky(ISlatAng);
-                            state.dataConstruction->Construct(ConstrNum).BlTransDiff(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTrans;
-                            state.dataConstruction->Construct(ConstrNum).BlTransDiffGnd(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransGnd;
-                            state.dataConstruction->Construct(ConstrNum).BlTransDiffSky(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransSky;
-                            state.dataConstruction->Construct(ConstrNum).BlTransDiffVis(ISlatAng) = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                            state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffFront(ISlatAng) =
-                                state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront + tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                            state.dataConstruction->Construct(ConstrNum).BlReflectVisDiffFront(ISlatAng) =
-                                state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+                            thisConstruct.BlTransDiff(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTrans;
+                            thisConstruct.BlTransDiffGnd(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransGnd;
+                            thisConstruct.BlTransDiffSky(ISlatAng) = tsolDiff * ShadeReflFac * ShadeTransSky;
+                            thisConstruct.BlTransDiffVis(ISlatAng) = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                            thisConstruct.BlReflectSolDiffFront(ISlatAng) =
+                                thisConstruct.ReflectSolDiffFront + tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                            thisConstruct.BlReflectVisDiffFront(ISlatAng) =
+                                thisConstruct.ReflectVisDiffFront + tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
 
                             // Back incident solar, diffuse, interior blind
 
                             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffBack(ISlatAng, IGlass) =
-                                    state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass) * ShadeTrans * ShadeReflFac;
+                                thisConstruct.BlAbsDiffBack(ISlatAng, IGlass) =
+                                    thisConstruct.AbsDiffBack(IGlass) * ShadeTrans * ShadeReflFac;
                             }
 
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBackBlind(ISlatAng) =
+                            thisConstruct.AbsDiffBackBlind(ISlatAng) =
                                 state.dataHeatBal->Blind(BlNum).SolBackDiffAbs(ISlatAng) +
-                                ShadeTrans * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack * ShadeAbs;
-                            state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack(ISlatAng) =
+                                ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffBack * ShadeAbs;
+                            thisConstruct.BlReflectSolDiffBack(ISlatAng) =
                                 state.dataHeatBal->Blind(BlNum).SolBackDiffDiffRefl(ISlatAng) +
-                                pow_2(ShadeTrans) * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack * ShadeReflFac;
-                            state.dataConstruction->Construct(ConstrNum).BlReflectVisDiffBack(ISlatAng) =
+                                pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffBack * ShadeReflFac;
+                            thisConstruct.BlReflectVisDiffBack(ISlatAng) =
                                 state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(ISlatAng) +
-                                pow_2(ShadeTransVis) * state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack * ShadeReflFacVis;
+                                pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffBack * ShadeReflFacVis;
                         } // End of check if interior blind
 
                         // Front incident solar, diffuse, interior shade
 
                         if (IntShade) {
                             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                state.dataConstruction->Construct(ConstrNum).AbsDiff(IGlass) +=
+                                thisConstruct.AbsDiff(IGlass) +=
                                     tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff(IGlass);
                             }
 
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffShade = tsolDiff * ShadeReflFac * ShadeAbs;
-                            state.dataConstruction->Construct(ConstrNum).TransDiff = tsolDiff * ShadeReflFac * ShadeTrans;
-                            state.dataConstruction->Construct(ConstrNum).TransDiffVis = tvisDiff * ShadeReflFacVis * ShadeTransVis;
-                            state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront += tsolDiff_2 * ShadeRefl * ShadeReflFac;
-                            state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront += tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
+                            thisConstruct.AbsDiffShade = tsolDiff * ShadeReflFac * ShadeAbs;
+                            thisConstruct.TransDiff = tsolDiff * ShadeReflFac * ShadeTrans;
+                            thisConstruct.TransDiffVis = tvisDiff * ShadeReflFacVis * ShadeTransVis;
+                            thisConstruct.ReflectSolDiffFront += tsolDiff_2 * ShadeRefl * ShadeReflFac;
+                            thisConstruct.ReflectVisDiffFront += tvisDiff_2 * ShadeReflVis * ShadeReflFacVis;
 
                             // Back incident solar, diffuse, interior shade
 
                             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass) *= ShadeTrans * ShadeReflFac;
+                                thisConstruct.AbsDiffBack(IGlass) *= ShadeTrans * ShadeReflFac;
                             }
 
-                            state.dataConstruction->Construct(ConstrNum).AbsDiffBackShade =
-                                ShadeAbs * (1 + ShadeTrans * ShadeReflFac * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack);
-                            state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack =
-                                ShadeRefl + pow_2(ShadeTrans) * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack * ShadeReflFac;
-                            state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack =
+                            thisConstruct.AbsDiffBackShade =
+                                ShadeAbs * (1 + ShadeTrans * ShadeReflFac * thisConstruct.ReflectSolDiffBack);
+                            thisConstruct.ReflectSolDiffBack =
+                                ShadeRefl + pow_2(ShadeTrans) * thisConstruct.ReflectSolDiffBack * ShadeReflFac;
+                            thisConstruct.ReflectVisDiffBack =
                                 ShadeReflVis +
-                                pow_2(ShadeTransVis) * state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack * ShadeReflFacVis;
+                                pow_2(ShadeTransVis) * thisConstruct.ReflectVisDiffBack * ShadeReflFacVis;
                         } // End of check if interior shade
 
                     } // End check if interior shade or blind
@@ -1224,22 +1226,22 @@ namespace WindowManager {
 
                         tsh2 = pow_2(tsh);
                         tshv2 = pow_2(tshv);
-                        td1 = state.dataConstruction->Construct(ConstrNum).tBareSolDiff(1);
-                        td2 = state.dataConstruction->Construct(ConstrNum).tBareSolDiff(2);
-                        td1v = state.dataConstruction->Construct(ConstrNum).tBareVisDiff(1);
-                        td2v = state.dataConstruction->Construct(ConstrNum).tBareVisDiff(2);
-                        afd1 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(1);
-                        afd2 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(2);
-                        abd1 = state.dataConstruction->Construct(ConstrNum).abBareSolDiff(1);
-                        abd2 = state.dataConstruction->Construct(ConstrNum).abBareSolDiff(2);
-                        rb1 = state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(1);
-                        rb2 = state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(2);
-                        rb1v = state.dataConstruction->Construct(ConstrNum).rbBareVisDiff(1);
-                        rb2v = state.dataConstruction->Construct(ConstrNum).rbBareVisDiff(2);
-                        rf1 = state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(1);
-                        rf2 = state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(2);
-                        rf1v = state.dataConstruction->Construct(ConstrNum).rfBareVisDiff(1);
-                        rf2v = state.dataConstruction->Construct(ConstrNum).rfBareVisDiff(2);
+                        td1 = thisConstruct.tBareSolDiff(1);
+                        td2 = thisConstruct.tBareSolDiff(2);
+                        td1v = thisConstruct.tBareVisDiff(1);
+                        td2v = thisConstruct.tBareVisDiff(2);
+                        afd1 = thisConstruct.afBareSolDiff(1);
+                        afd2 = thisConstruct.afBareSolDiff(2);
+                        abd1 = thisConstruct.abBareSolDiff(1);
+                        abd2 = thisConstruct.abBareSolDiff(2);
+                        rb1 = thisConstruct.rbBareSolDiff(1);
+                        rb2 = thisConstruct.rbBareSolDiff(2);
+                        rb1v = thisConstruct.rbBareVisDiff(1);
+                        rb2v = thisConstruct.rbBareVisDiff(2);
+                        rf1 = thisConstruct.rfBareSolDiff(1);
+                        rf2 = thisConstruct.rfBareSolDiff(2);
+                        rf1v = thisConstruct.rfBareVisDiff(1);
+                        rf2v = thisConstruct.rfBareVisDiff(2);
 
                         if (BGShade) {
                             if (NGlass == 2) {
@@ -1260,40 +1262,40 @@ namespace WindowManager {
 
                                 // Front incident solar, diffuse, between-glass shade, NGlass = 2
 
-                                state.dataConstruction->Construct(ConstrNum).TransDiff = td1 * (tsh + rsh * rb1 * tsh + tsh * rb2 * rsh) * td2;
-                                state.dataConstruction->Construct(ConstrNum).TransDiffVis =
+                                thisConstruct.TransDiff = td1 * (tsh + rsh * rb1 * tsh + tsh * rb2 * rsh) * td2;
+                                thisConstruct.TransDiffVis =
                                     td1v * (tshv + rshv * rb1v * tshv + tshv * rb2v * rshv) * td2v;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffShade = td1 * (ash + rsh * rb1 * ash + tsh * rf2 * ash);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiff(1) = afd1 + td1 * (rsh + tsh * rb2 * tsh) * abd1;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiff(2) = td1 * (tsh + rsh * rb1 * tsh + tsh * rf2 * rsh) * afd2;
-                                state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront =
+                                thisConstruct.AbsDiffShade = td1 * (ash + rsh * rb1 * ash + tsh * rf2 * ash);
+                                thisConstruct.AbsDiff(1) = afd1 + td1 * (rsh + tsh * rb2 * tsh) * abd1;
+                                thisConstruct.AbsDiff(2) = td1 * (tsh + rsh * rb1 * tsh + tsh * rf2 * rsh) * afd2;
+                                thisConstruct.ReflectSolDiffFront =
                                     rf1 + td1 * (rsh + rsh * rb1 * rsh + tsh * rf2 * tsh) * td1;
-                                state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront =
+                                thisConstruct.ReflectVisDiffFront =
                                     rf1v + td1v * (rshv + rshv * rb1v * rshv + tshv * rf2v * tshv) * td1v;
 
                                 // Back incident solar, diffuse, between-glass shade, NGlass = 2
 
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBackShade = td2 * (ash + rsh * rf2 * ash + tsh * rb1 * ash);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBack(1) = td2 * (tsh + rsh * rf2 * tsh + tsh * rb1 * rsh) * abd1;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBack(2) =
+                                thisConstruct.AbsDiffBackShade = td2 * (ash + rsh * rf2 * ash + tsh * rb1 * ash);
+                                thisConstruct.AbsDiffBack(1) = td2 * (tsh + rsh * rf2 * tsh + tsh * rb1 * rsh) * abd1;
+                                thisConstruct.AbsDiffBack(2) =
                                     abd2 + td2 * (rsh + rsh * rf2 * rsh + tsh * rb1 * tsh) * afd2;
-                                state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack =
+                                thisConstruct.ReflectSolDiffBack =
                                     rb2 + td2 * (rsh + rsh * rf2 * rsh + tsh * rb1 * tsh) * td2;
-                                state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack =
+                                thisConstruct.ReflectVisDiffBack =
                                     rb2v + td2v * (rshv + rshv * rf2v * rshv + tshv * rb1v * tshv) * td2v;
 
                             } // End of check if NGlass = 2
 
                             if (NGlass == 3) {
 
-                                td3 = state.dataConstruction->Construct(ConstrNum).tBareSolDiff(3);
-                                td3v = state.dataConstruction->Construct(ConstrNum).tBareVisDiff(3);
-                                afd3 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(3);
-                                abd3 = state.dataConstruction->Construct(ConstrNum).abBareSolDiff(3);
-                                rb3 = state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(3);
-                                rb3v = state.dataConstruction->Construct(ConstrNum).rbBareVisDiff(3);
-                                rf3 = state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(3);
-                                rf3v = state.dataConstruction->Construct(ConstrNum).rfBareVisDiff(3);
+                                td3 = thisConstruct.tBareSolDiff(3);
+                                td3v = thisConstruct.tBareVisDiff(3);
+                                afd3 = thisConstruct.afBareSolDiff(3);
+                                abd3 = thisConstruct.abBareSolDiff(3);
+                                rb3 = thisConstruct.rbBareSolDiff(3);
+                                rb3v = thisConstruct.rbBareVisDiff(3);
+                                rf3 = thisConstruct.rfBareSolDiff(3);
+                                rf3v = thisConstruct.rfBareVisDiff(3);
 
                                 // Front incident solar, beam, between-glass shade, NGlass = 3
 
@@ -1323,38 +1325,38 @@ namespace WindowManager {
 
                                 // Front incident solar, diffuse, between-glass shade, NGlass = 3
 
-                                state.dataConstruction->Construct(ConstrNum).TransDiff =
+                                thisConstruct.TransDiff =
                                     td1 * td2 * (tsh + rsh * td2 * rb1 * td2 * tsh + rsh * rb2 * tsh + tsh * rf3 * rsh) * td3;
-                                state.dataConstruction->Construct(ConstrNum).TransDiffVis =
+                                thisConstruct.TransDiffVis =
                                     td1v * td2v * (tshv + rshv * td2v * rb1v * td2v * tshv + rshv * rb2v * tshv + tshv * rf3v * rshv) * td3v;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffShade =
+                                thisConstruct.AbsDiffShade =
                                     td1 * td2 * (ash * (1 + rsh * td2 * rb1 * td2 + rsh * rb2 * ash) + tsh * rf3 * ash);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiff(1) =
+                                thisConstruct.AbsDiff(1) =
                                     afd1 + td1 * (rf2 + td2 * (rsh + rsh * rb2 * rsh + tsh * rf3 * tsh + rsh * td2 * rb1 * td2 * rsh) * td2) * abd1;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiff(2) =
+                                thisConstruct.AbsDiff(2) =
                                     td1 * (afd2 + td2 * (rsh + rsh * rb2 * rsh + tsh * rf3 * tsh) * abd2);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiff(3) =
+                                thisConstruct.AbsDiff(3) =
                                     td1 * td2 * (tsh + rsh * rb2 * tsh + rsh * td2 * rb1 * td2 * tsh + tsh * rf3 * rsh) * afd3;
-                                state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront =
+                                thisConstruct.ReflectSolDiffFront =
                                     rf1 + td1 * rf2 * td1 +
                                     td1 * td2 * (rsh + tsh * rf3 * tsh + rsh * rb2 * rsh + rsh * td2 * rb1 * td2 * rsh) * td2 * td1;
-                                state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront =
+                                thisConstruct.ReflectVisDiffFront =
                                     rf1v + td1v * rf2v * td1v +
                                     td1v * td2v * (rshv + tshv * rf3v * tshv + rshv * rb2v * rshv + rshv * td2v * rb1v * td2v * rshv) * td2v * td1v;
 
                                 // Back incident solar, diffuse, between-glass shade, NGlass = 3
 
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBackShade =
+                                thisConstruct.AbsDiffBackShade =
                                     td3 * ((1 + rsh * rf3) * ash + (tsh * td2 * rb1 * td2 + tsh * rb2) * ash);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBack(1) =
+                                thisConstruct.AbsDiffBack(1) =
                                     td3 * (tsh + rsh * rf3 * tsh + tsh * rb2 * rsh + tsh * td2 * rb1 * td2 * rsh) * td2 * abd1;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBack(2) =
+                                thisConstruct.AbsDiffBack(2) =
                                     td3 * ((tsh + rsh * rf3 * tsh) * abd2 + (tsh * td2 * rb1 * td2 + tsh * rb2) * afd2);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBack(3) =
+                                thisConstruct.AbsDiffBack(3) =
                                     abd3 + td3 * (rsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * afd3;
-                                state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack =
+                                thisConstruct.ReflectSolDiffBack =
                                     rb3 + td3 * (rsh + rsh * rf3 * rsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * td3;
-                                state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack =
+                                thisConstruct.ReflectVisDiffBack =
                                     rb3v + td3v * (rshv + rshv * rf3 * rshv + tshv * rb2v * tshv + tshv * td2v * rb1v * td2v * tshv) * td3v;
 
                             } // End of check if NGlass = 3
@@ -1367,125 +1369,125 @@ namespace WindowManager {
 
                                 // Front incident solar, diffuse, between-glass blind, NGlass = 2
 
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiff(ISlatAng, 1) =
+                                thisConstruct.BlAbsDiff(ISlatAng, 1) =
                                     afd1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rb2 * tsh) * abd1;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffGnd(ISlatAng, 1) =
+                                thisConstruct.BlAbsDiffGnd(ISlatAng, 1) =
                                     afd1 + td1 * (rfshGnd + rfshGnd * rb1 * rfshGnd + tshGnd * rb2 * tsh) * abd1;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffSky(ISlatAng, 1) =
+                                thisConstruct.BlAbsDiffSky(ISlatAng, 1) =
                                     afd1 + td1 * (rfshSky + rfshSky * rb1 * rfshSky + tshSky * rb2 * tsh) * abd1;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiff(ISlatAng, 2) =
+                                thisConstruct.BlAbsDiff(ISlatAng, 2) =
                                     td1 * (tsh + rfsh * rb1 * tsh + tsh * rf2 * rbsh) * afd2;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffGnd(ISlatAng, 2) =
+                                thisConstruct.BlAbsDiffGnd(ISlatAng, 2) =
                                     td1 * (tshGnd + rfshGnd * rb1 * tsh + tshGnd * rf2 * rbsh) * afd2;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffSky(ISlatAng, 2) =
+                                thisConstruct.BlAbsDiffSky(ISlatAng, 2) =
                                     td1 * (tshSky + rfshSky * rb1 * tsh + tshSky * rf2 * rbsh) * afd2;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBlind(ISlatAng) =
+                                thisConstruct.AbsDiffBlind(ISlatAng) =
                                     td1 * (afsh + rfsh * rb1 * afsh + tsh * rf2 * absh);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBlindGnd(ISlatAng) =
+                                thisConstruct.AbsDiffBlindGnd(ISlatAng) =
                                     td1 * (afshGnd + rfsh * rb1 * afsh + tshGnd * rf2 * absh);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBlindSky(ISlatAng) =
+                                thisConstruct.AbsDiffBlindSky(ISlatAng) =
                                     td1 * (afshSky + rfsh * rb1 * afsh + tshSky * rf2 * absh);
-                                state.dataConstruction->Construct(ConstrNum).BlTransDiff(ISlatAng) =
+                                thisConstruct.BlTransDiff(ISlatAng) =
                                     td1 * (tsh + rfsh * rb1 * tsh + tsh * rb2 * rbsh) * td2;
-                                state.dataConstruction->Construct(ConstrNum).BlTransDiffGnd(ISlatAng) =
+                                thisConstruct.BlTransDiffGnd(ISlatAng) =
                                     td1 * (tshGnd + rfsh * rb1 * tshGnd + tshGnd * rb2 * rbsh) * td2;
-                                state.dataConstruction->Construct(ConstrNum).BlTransDiffSky(ISlatAng) =
+                                thisConstruct.BlTransDiffSky(ISlatAng) =
                                     td1 * (tshSky + rfsh * rb1 * tshSky + tshSky * rb2 * rbsh) * td2;
-                                state.dataConstruction->Construct(ConstrNum).BlTransDiffVis(ISlatAng) =
+                                thisConstruct.BlTransDiffVis(ISlatAng) =
                                     td1v * (tshv + rfshv * rb1v * tshv + tshv * rb2v * rbshv) * td2v;
-                                state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffFront(ISlatAng) =
+                                thisConstruct.BlReflectSolDiffFront(ISlatAng) =
                                     rf1 + td1 * (rfsh + rfsh * rb1 * rfsh + tsh * rf2 * tsh) * td1;
-                                state.dataConstruction->Construct(ConstrNum).BlReflectVisDiffFront(ISlatAng) =
+                                thisConstruct.BlReflectVisDiffFront(ISlatAng) =
                                     rf1v + td1v * (rfshv + rfshv * rb1v * rfshv + tshv * rf2v * tshv) * td1v;
 
                                 // Back incident solar, diffuse, between-glass blind, NGlass = 2
 
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffBack(ISlatAng, 1) =
+                                thisConstruct.BlAbsDiffBack(ISlatAng, 1) =
                                     td2 * (tsh + rbsh * rf2 * tsh + tsh * rb1 * rfsh) * abd1;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffBack(ISlatAng, 2) =
+                                thisConstruct.BlAbsDiffBack(ISlatAng, 2) =
                                     abd2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * afd2;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBackBlind(ISlatAng) =
+                                thisConstruct.AbsDiffBackBlind(ISlatAng) =
                                     td2 * (absh + rbsh * rf2 * absh + tsh * rb1 * afsh);
-                                state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack(ISlatAng) =
+                                thisConstruct.BlReflectSolDiffBack(ISlatAng) =
                                     rb2 + td2 * (rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh) * td2;
-                                state.dataConstruction->Construct(ConstrNum).BlReflectVisDiffBack(ISlatAng) =
+                                thisConstruct.BlReflectVisDiffBack(ISlatAng) =
                                     rb2v + td2v * (rbshv + rbshv * rf2v * rbshv + tshv * rb1v * tshv) * td2v;
 
                             } // End of check if NGlass = 2
 
                             if (NGlass == 3) {
 
-                                td3 = state.dataConstruction->Construct(ConstrNum).tBareSolDiff(3);
-                                td3v = state.dataConstruction->Construct(ConstrNum).tBareVisDiff(3);
-                                afd3 = state.dataConstruction->Construct(ConstrNum).afBareSolDiff(3);
-                                abd3 = state.dataConstruction->Construct(ConstrNum).abBareSolDiff(3);
-                                rb3 = state.dataConstruction->Construct(ConstrNum).rbBareSolDiff(3);
-                                rb3v = state.dataConstruction->Construct(ConstrNum).rbBareVisDiff(3);
-                                rf3 = state.dataConstruction->Construct(ConstrNum).rfBareSolDiff(3);
-                                rf3v = state.dataConstruction->Construct(ConstrNum).rfBareVisDiff(3);
+                                td3 = thisConstruct.tBareSolDiff(3);
+                                td3v = thisConstruct.tBareVisDiff(3);
+                                afd3 = thisConstruct.afBareSolDiff(3);
+                                abd3 = thisConstruct.abBareSolDiff(3);
+                                rb3 = thisConstruct.rbBareSolDiff(3);
+                                rb3v = thisConstruct.rbBareVisDiff(3);
+                                rf3 = thisConstruct.rfBareSolDiff(3);
+                                rf3v = thisConstruct.rfBareVisDiff(3);
 
                                 // Front incident solar, diffuse, between-glass blind, NGlass = 3
 
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiff(ISlatAng, 1) =
+                                thisConstruct.BlAbsDiff(ISlatAng, 1) =
                                     afd1 +
                                     td1 * (rf2 + td2 * (rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh + rfsh * td2 * rb1 * td2 * rfsh) * td2) * abd1;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffGnd(ISlatAng, 1) =
+                                thisConstruct.BlAbsDiffGnd(ISlatAng, 1) =
                                     afd1 +
                                     td1 *
                                         (rf2 + td2 * (rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh + rfshGnd * td2 * rb1 * td2 * rfsh) * td2) *
                                         abd1;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffSky(ISlatAng, 1) =
+                                thisConstruct.BlAbsDiffSky(ISlatAng, 1) =
                                     afd1 +
                                     td1 *
                                         (rf2 + td2 * (rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh + rfshSky * td2 * rb1 * td2 * rfsh) * td2) *
                                         abd1;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiff(ISlatAng, 2) =
+                                thisConstruct.BlAbsDiff(ISlatAng, 2) =
                                     td1 * (afd2 + td2 * (rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh) * abd2);
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffGnd(ISlatAng, 2) =
+                                thisConstruct.BlAbsDiffGnd(ISlatAng, 2) =
                                     td1 * (afd2 + td2 * (rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh) * abd2);
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffSky(ISlatAng, 2) =
+                                thisConstruct.BlAbsDiffSky(ISlatAng, 2) =
                                     td1 * (afd2 + td2 * (rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh) * abd2);
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiff(ISlatAng, 3) =
+                                thisConstruct.BlAbsDiff(ISlatAng, 3) =
                                     td1 * td2 * (tsh + rfsh * rb2 * tsh + rfsh * td2 * rb1 * td2 * tsh + tsh * rf3 * rbsh) * afd3;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffGnd(ISlatAng, 3) =
+                                thisConstruct.BlAbsDiffGnd(ISlatAng, 3) =
                                     td1 * td2 * (tshGnd + rfshGnd * rb2 * tsh + rfshGnd * td2 * rb1 * td2 * tsh + tshGnd * rf3 * rbsh) * afd3;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffSky(ISlatAng, 3) =
+                                thisConstruct.BlAbsDiffSky(ISlatAng, 3) =
                                     td1 * td2 * (tshSky + rfshSky * rb2 * tsh + rfshSky * td2 * rb1 * td2 * tsh + tshSky * rf3 * rbsh) * afd3;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBlind(ISlatAng) =
+                                thisConstruct.AbsDiffBlind(ISlatAng) =
                                     td1 * td2 * (afsh * (1 + rfsh * td2 * rb1 * td2) + rfsh * rb2 * afsh + tsh * rf3 * absh);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBlindGnd(ISlatAng) =
+                                thisConstruct.AbsDiffBlindGnd(ISlatAng) =
                                     td1 * td2 * (afshGnd + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshGnd * rf3 * absh);
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBlindSky(ISlatAng) =
+                                thisConstruct.AbsDiffBlindSky(ISlatAng) =
                                     td1 * td2 * (afshSky + afsh * rfsh * (td2 * rb1 * td2 + rb2) + tshSky * rf3 * absh);
-                                state.dataConstruction->Construct(ConstrNum).BlTransDiff(ISlatAng) =
+                                thisConstruct.BlTransDiff(ISlatAng) =
                                     td1 * td2 * (tsh + rfsh * td2 * rb1 * td2 * tsh + rfsh * rb2 * tsh + tsh * rf3 * rbsh) * td3;
-                                state.dataConstruction->Construct(ConstrNum).BlTransDiffGnd(ISlatAng) =
+                                thisConstruct.BlTransDiffGnd(ISlatAng) =
                                     td1 * td2 * (tshGnd + rfsh * td2 * rb1 * td2 * tshGnd + rfsh * rb2 * tshGnd + tshGnd * rf3 * rbsh) * td3;
-                                state.dataConstruction->Construct(ConstrNum).BlTransDiffSky(ISlatAng) =
+                                thisConstruct.BlTransDiffSky(ISlatAng) =
                                     td1 * td2 * (tshSky + rfsh * td2 * rb1 * td2 * tshSky + rfsh * rb2 * tshSky + tshSky * rf3 * rbsh) * td3;
-                                state.dataConstruction->Construct(ConstrNum).BlTransDiffVis(ISlatAng) =
+                                thisConstruct.BlTransDiffVis(ISlatAng) =
                                     td1v * td2v * (tshv + rfshv * td2v * rb1v * td2v * tshv + rfshv * rb2v * tshv + tshv * rf3v * rbshv) * td3v;
-                                state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffFront(ISlatAng) =
+                                thisConstruct.BlReflectSolDiffFront(ISlatAng) =
                                     rf1 + td1 * rf2 * td1 +
                                     td1 * td2 * (rfsh + tsh * rf3 * tsh + rfsh * rb2 * rfsh + rfsh * td2 * rb1 * td2 * rfsh) * td2 * td1;
-                                state.dataConstruction->Construct(ConstrNum).BlReflectVisDiffFront(ISlatAng) =
+                                thisConstruct.BlReflectVisDiffFront(ISlatAng) =
                                     rf1v + td1v * rf2v * td1v +
                                     td1v * td2v * (rfshv + tshv * rf3v * tshv + rfshv * rb2v * rfshv + rfshv * td2v * rb1v * td2v * rfshv) * td2v *
                                         td1v;
 
                                 // Back incident solar, diffuse, between-glass blind, NGlass = 3
 
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffBack(ISlatAng, 1) =
+                                thisConstruct.BlAbsDiffBack(ISlatAng, 1) =
                                     td3 * (tsh + rbsh * rf3 * tsh + tsh * rb2 * rfsh + tsh * td2 * rb1 * td2 * rfsh) * td2 * abd1;
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffBack(ISlatAng, 2) =
+                                thisConstruct.BlAbsDiffBack(ISlatAng, 2) =
                                     td3 * ((tsh + rbsh * rf3 * tsh) * abd2 + (tsh * td2 * rb1 * td2 + tsh * rb2) * afd2);
-                                state.dataConstruction->Construct(ConstrNum).BlAbsDiffBack(ISlatAng, 3) =
+                                thisConstruct.BlAbsDiffBack(ISlatAng, 3) =
                                     abd3 + td3 * (rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * afd3;
-                                state.dataConstruction->Construct(ConstrNum).AbsDiffBackBlind(ISlatAng) =
+                                thisConstruct.AbsDiffBackBlind(ISlatAng) =
                                     td3 * ((1 + rbsh * rf3) * absh + (tsh * td2 * rb1 * td2 + tsh * rb2) * afsh);
-                                state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack(ISlatAng) =
+                                thisConstruct.BlReflectSolDiffBack(ISlatAng) =
                                     rb3 + td3 * (rbsh + rbsh * rf3 * rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh) * td3;
-                                state.dataConstruction->Construct(ConstrNum).BlReflectVisDiffBack(ISlatAng) =
+                                thisConstruct.BlReflectVisDiffBack(ISlatAng) =
                                     rb3v + td3v * (rbshv + rbshv * rf3v * rbshv + tshv * rb2v * tshv + tshv * td2v * rb1v * td2v * tshv) * td3v;
 
                             } // End of check if NGlass = 3
@@ -1511,25 +1513,25 @@ namespace WindowManager {
                          6,
                          1,
                          TotalIPhi,
-                         state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef);
+                         thisConstruct.TransSolBeamCoef);
                 W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                          state.dataWindowManager->rfsolPhi,
                          6,
                          1,
                          TotalIPhi,
-                         state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
+                         thisConstruct.ReflSolBeamFrontCoef);
                 W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                          state.dataWindowManager->rbsolPhi,
                          6,
                          1,
                          TotalIPhi,
-                         state.dataConstruction->Construct(ConstrNum).ReflSolBeamBackCoef);
+                         thisConstruct.ReflSolBeamBackCoef);
                 W5LsqFit(state.dataWindowManager->CosPhiIndepVar,
                          state.dataWindowManager->tvisPhi,
                          6,
                          1,
                          TotalIPhi,
-                         state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef);
+                         thisConstruct.TransVisBeamCoef);
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     // Front absorptance coefficients for glass layers
                     state.dataWindowManager->DepVarCurveFit({1, TotalIPhi}) = state.dataWindowManager->solabsPhi(IGlass, {1, TotalIPhi});
@@ -1539,7 +1541,7 @@ namespace WindowManager {
                              1,
                              TotalIPhi,
                              state.dataWindowManager->CoeffsCurveFit);
-                    state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass) = state.dataWindowManager->CoeffsCurveFit;
+                    thisConstruct.AbsBeamCoef(IGlass) = state.dataWindowManager->CoeffsCurveFit;
                     // Back absorptance coefficients for glass layers
                     IGlassBack = NGlass - IGlass + 1;
                     state.dataWindowManager->DepVarCurveFit({1, TotalIPhi}) = state.dataWindowManager->solabsBackPhi(IGlassBack, {1, TotalIPhi});
@@ -1549,12 +1551,12 @@ namespace WindowManager {
                              1,
                              TotalIPhi,
                              state.dataWindowManager->CoeffsCurveFit);
-                    state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef(IGlass) = state.dataWindowManager->CoeffsCurveFit;
+                    thisConstruct.AbsBeamBackCoef(IGlass) = state.dataWindowManager->CoeffsCurveFit;
                 }
 
                 // To check goodness of fit //Tuned
-                auto const &solBeamCoef(state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef);
-                auto const &visBeamCoef(state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef);
+                auto const &solBeamCoef(thisConstruct.TransSolBeamCoef);
+                auto const &visBeamCoef(thisConstruct.TransVisBeamCoef);
                 for (IPhi = 1; IPhi <= TotalIPhi; ++IPhi) {
                     tsolPhiFit(IPhi) = 0.0;
                     tvisPhiFit(IPhi) = 0.0;
@@ -1577,7 +1579,7 @@ namespace WindowManager {
                          6,
                          1,
                          TotalIPhi,
-                         state.dataConstruction->Construct(ConstrNum).AbsBeamShadeCoef);
+                         thisConstruct.AbsBeamShadeCoef);
 
         } // End of loop over constructions
 
@@ -1712,22 +1714,23 @@ namespace WindowManager {
         int DifOverrideCount; // Count the number of SolarDiffusing material overrides
 
         for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
-            if (state.dataConstruction->Construct(ConstrNum).FromWindow5DataFile) continue;
-            if (state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) continue;
-            state.dataConstruction->Construct(ConstrNum).TransDiff = 0.0;
-            state.dataConstruction->Construct(ConstrNum).TransDiffVis = 0.0;
-            state.dataConstruction->Construct(ConstrNum).AbsDiffBackShade = 0.0;
-            state.dataConstruction->Construct(ConstrNum).ShadeAbsorpThermal = 0.0;
-            state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack = 0.0;
-            state.dataConstruction->Construct(ConstrNum).ReflectSolDiffFront = 0.0;
-            state.dataConstruction->Construct(ConstrNum).ReflectVisDiffFront = 0.0;
-            state.dataConstruction->Construct(ConstrNum).AbsBeamShadeCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNum).ReflSolBeamBackCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef = 0.0;
-            state.dataConstruction->Construct(ConstrNum).AbsDiff = 0.0;
-            state.dataConstruction->Construct(ConstrNum).AbsDiffBack = 0.0;
+            auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+            if (thisConstruct.FromWindow5DataFile) continue;
+            if (thisConstruct.WindowTypeBSDF) continue;
+            thisConstruct.TransDiff = 0.0;
+            thisConstruct.TransDiffVis = 0.0;
+            thisConstruct.AbsDiffBackShade = 0.0;
+            thisConstruct.ShadeAbsorpThermal = 0.0;
+            thisConstruct.ReflectSolDiffBack = 0.0;
+            thisConstruct.ReflectSolDiffFront = 0.0;
+            thisConstruct.ReflectVisDiffFront = 0.0;
+            thisConstruct.AbsBeamShadeCoef = 0.0;
+            thisConstruct.TransSolBeamCoef = 0.0;
+            thisConstruct.ReflSolBeamFrontCoef = 0.0;
+            thisConstruct.ReflSolBeamBackCoef = 0.0;
+            thisConstruct.TransVisBeamCoef = 0.0;
+            thisConstruct.AbsDiff = 0.0;
+            thisConstruct.AbsDiffBack = 0.0;
             for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
                 for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
                     state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamCoef(Layer)(index) = 0.0;

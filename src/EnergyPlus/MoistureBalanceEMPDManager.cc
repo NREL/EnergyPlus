@@ -261,8 +261,10 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
             continue; // Heat transfer surface only and not a window
         if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD) continue;
         ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-        MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-        if (state.dataMaterial->Material(MatNum)->EMPDmu > 0.0 && state.dataSurface->Surface(SurfNum).Zone > 0) {
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        MatNum = thisConstruct.LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
+        auto const *thisMaterial = state.dataMaterial->Material(MatNum);
+        if (thisMaterial->EMPDmu > 0.0 && state.dataSurface->Surface(SurfNum).Zone > 0) {
             EMPDzone(state.dataSurface->Surface(SurfNum).Zone) = true;
         } else {
             ++ErrCount;
@@ -274,31 +276,31 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                 ShowMessage(state,
                             "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" +
                                 state.dataSurface->Surface(SurfNum).Name);
-                ShowContinueError(state, "with Construction=" + state.dataConstruction->Construct(ConstrNum).Name);
+                ShowContinueError(state, "with Construction=" + thisConstruct.Name);
             }
         }
-        if (state.dataConstruction->Construct(ConstrNum).TotLayers == 1) { // One layer construction
+        if (thisConstruct.TotLayers == 1) { // One layer construction
             continue;
         } else { // Multiple layer construction
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->EMPDMaterialProps &&
+            if (state.dataMaterial->Material(thisConstruct.LayerPoint(1))->EMPDMaterialProps &&
                 state.dataSurface->Surface(SurfNum).ExtBoundCond <= 0) { // The external layer is not exposed to zone
                 ShowSevereError(state,
                                 "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" +
-                                    state.dataConstruction->Construct(ConstrNum).Name);
+                                    thisConstruct.Name);
                 ShowContinueError(state,
                                   "..Outside layer material with EMPD properties = " +
-                                      state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Name);
+                                      state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Name);
                 ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
                 ErrorsFound = true;
             }
-            for (Layer = 2; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers - 1; ++Layer) {
-                if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer))->EMPDMaterialProps) {
+            for (Layer = 2; Layer <= thisConstruct.TotLayers - 1; ++Layer) {
+                if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->EMPDMaterialProps) {
                     ShowSevereError(state,
                                     "GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction=" +
-                                        state.dataConstruction->Construct(ConstrNum).Name);
+                                        thisConstruct.Name);
                     ShowContinueError(state,
                                       "..Middle layer material with EMPD properties = " +
-                                          state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer))->Name);
+                                          state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Name);
                     ShowContinueError(state, "..A material with EMPD properties must be assigned to the inside layer of a construction.");
                     ErrorsFound = true;
                 }
