@@ -12682,7 +12682,9 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         if (NoCompOutput <= QZnReq) return;
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if (NoCompOutput <= QZnReq) return;
+        if (!this->SuppHeatingCoilPresent) {
+            if (NoCompOutput <= QZnReq) return;
+        }          
     } else if (VRFHeatingMode || HRHeatingMode) {
         // IF the system is in heating mode and/or the terminal unit requests heating
         if (NoCompOutput >= QZnReq) return;
