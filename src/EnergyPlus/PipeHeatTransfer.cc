@@ -652,7 +652,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         // A7,  \field Soil Material
         state.dataPipeHT->PipeHT(Item).SoilMaterial = state.dataIPShortCut->cAlphaArgs(6);
         state.dataPipeHT->PipeHT(Item).SoilMaterialNum =
-            UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material);
+            UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material);
         if (state.dataPipeHT->PipeHT(Item).SoilMaterialNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataPipeHT->PipeHT(Item).SoilMaterial);
             ShowContinueError(state, "Found in " + cCurrentModuleObject + '=' + state.dataPipeHT->PipeHT(Item).Name);

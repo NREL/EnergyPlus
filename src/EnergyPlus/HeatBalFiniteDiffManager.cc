@@ -233,7 +233,7 @@ namespace HeatBalFiniteDiffManager {
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
                 // Load the material derived type from the input data.
-                MaterNum = UtilityRoutines::FindPtrItemInList(MaterialNames(1), state.dataMaterial->Material);
+                MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
@@ -328,7 +328,7 @@ namespace HeatBalFiniteDiffManager {
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
                 // Load the material derived type from the input data.
-                MaterNum = UtilityRoutines::FindPtrItemInList(MaterialNames(1), state.dataMaterial->Material);
+                MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +

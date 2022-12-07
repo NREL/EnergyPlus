@@ -4021,7 +4021,7 @@ namespace HeatBalanceManager {
                     state.dataHeatBal->TCGlazings(Loop).LayerName(iTC) = state.dataIPShortCut->cAlphaArgs(1 + iTC);
 
                     // Find this glazing material in the material list
-                    iMat = UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(1 + iTC), state.dataMaterial->Material);
+                    iMat = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(1 + iTC), state.dataMaterial->Material);
                     if (iMat != 0) {
                         // TC glazing
                         state.dataMaterial->Material(iMat)->SpecTemp = state.dataIPShortCut->rNumericArgs(iTC);
@@ -4555,7 +4555,7 @@ namespace HeatBalanceManager {
                 // Find the material in the list of materials
 
                 thisConstruct.LayerPoint(Layer) =
-                    UtilityRoutines::FindPtrItemInList(ConstructAlphas(Layer), state.dataMaterial->Material);
+                    UtilityRoutines::FindItemInPtrList(ConstructAlphas(Layer), state.dataMaterial->Material);
 
                 // count number of glass layers
                 if (thisConstruct.LayerPoint(Layer) > 0) {
@@ -4770,7 +4770,7 @@ namespace HeatBalanceManager {
 
                 // Find the material in the list of materials
                 state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) =
-                    UtilityRoutines::FindPtrItemInList(ConstructAlphas(Layer), state.dataMaterial->Material);
+                    UtilityRoutines::FindItemInPtrList(ConstructAlphas(Layer), state.dataMaterial->Material);
 
                 if (state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) == 0) {
                     ShowSevereError(state,
@@ -7895,7 +7895,7 @@ namespace HeatBalanceManager {
         int iFCConcreteLayer; // Layer pointer to the materials array
 
         // First get the concrete layer
-        iFCConcreteLayer = UtilityRoutines::FindPtrItemInList("~FC_Concrete", state.dataMaterial->Material);
+        iFCConcreteLayer = UtilityRoutines::FindItemInPtrList("~FC_Concrete", state.dataMaterial->Material);
         Rcon = state.dataMaterial->Material(iFCConcreteLayer)->Resistance;
 
         // Count number of constructions defined with Ffactor or Cfactor method
@@ -7983,7 +7983,7 @@ namespace HeatBalanceManager {
             thisConstruct.LayerPoint(2) = iFCConcreteLayer;
 
             // The fictitious insulation is the outside layer
-            MaterNum = UtilityRoutines::FindPtrItemInList(format("~FC_Insulation_{}", Loop), state.dataMaterial->Material);
+            MaterNum = UtilityRoutines::FindItemInPtrList(format("~FC_Insulation_{}", Loop), state.dataMaterial->Material);
             thisConstruct.LayerPoint(1) = MaterNum;
 
             // Calculate the thermal resistance of the fictitious insulation layer
@@ -8073,7 +8073,7 @@ namespace HeatBalanceManager {
             thisConstruct.LayerPoint(2) = iFCConcreteLayer;
 
             // The fictitious insulation is the outside layer
-            MaterNum = UtilityRoutines::FindPtrItemInList("~FC_Insulation_" + fmt::to_string(Loop + TotFfactorConstructs), state.dataMaterial->Material);
+            MaterNum = UtilityRoutines::FindItemInPtrList("~FC_Insulation_" + fmt::to_string(Loop + TotFfactorConstructs), state.dataMaterial->Material);
             thisConstruct.LayerPoint(1) = MaterNum;
 
             // CR 8886 Rsoil should be in SI unit. From ASHRAE 90.1-2010 SI
@@ -8997,7 +8997,7 @@ namespace HeatBalanceManager {
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataMaterial->Material(MaterNum)->GasPointer =
-                    UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material);
+                    UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material);
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -9820,7 +9820,7 @@ namespace HeatBalanceManager {
                     currentOpticalLayer = int(Layer / 2) + 1;
                     // Material info is contained in the thermal construct
                     thisConstruct.LayerPoint(Layer) =
-                        UtilityRoutines::FindPtrItemInList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
+                        UtilityRoutines::FindItemInPtrList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
 
                     // Simon: Load only if optical layer
                     if (mod(Layer, 2) != 0) {
@@ -10133,7 +10133,7 @@ namespace HeatBalanceManager {
                     currentOpticalLayer = int(Layer / 2) + 1;
 
                     thisConstruct.LayerPoint(Layer) =
-                        UtilityRoutines::FindPtrItemInList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
+                        UtilityRoutines::FindItemInPtrList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
 
                     if (mod(Layer, 2) != 0) {
                         thisConstruct.BSDFInput.Layer(currentOpticalLayer).MaterialIndex =

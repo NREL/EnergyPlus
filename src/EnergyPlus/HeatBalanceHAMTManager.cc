@@ -284,7 +284,7 @@ namespace HeatBalanceHAMTManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            matid = UtilityRoutines::FindPtrItemInList(AlphaArray(1), state.dataMaterial->Material);
+            matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
 
             if (matid == 0) {
                 ShowSevereError(state, cHAMTObject1 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
@@ -318,7 +318,7 @@ namespace HeatBalanceHAMTManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            matid = UtilityRoutines::FindPtrItemInList(AlphaArray(1), state.dataMaterial->Material);
+            matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
 
             if (matid == 0) {
                 ShowSevereError(state, cHAMTObject2 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
@@ -410,7 +410,7 @@ namespace HeatBalanceHAMTManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            matid = UtilityRoutines::FindPtrItemInList(AlphaArray(1), state.dataMaterial->Material);
+            matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
 
             if (matid == 0) {
                 ShowSevereError(state, cHAMTObject3 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
@@ -457,7 +457,7 @@ namespace HeatBalanceHAMTManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            matid = UtilityRoutines::FindPtrItemInList(AlphaArray(1), state.dataMaterial->Material);
+            matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
             if (matid == 0) {
                 ShowSevereError(state, cHAMTObject4 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
@@ -502,7 +502,7 @@ namespace HeatBalanceHAMTManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            matid = UtilityRoutines::FindPtrItemInList(AlphaArray(1), state.dataMaterial->Material);
+            matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
             if (matid == 0) {
                 ShowSevereError(state, cHAMTObject5 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
@@ -550,7 +550,7 @@ namespace HeatBalanceHAMTManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            matid = UtilityRoutines::FindPtrItemInList(AlphaArray(1), state.dataMaterial->Material);
+            matid = UtilityRoutines::FindItemInPtrList(AlphaArray(1), state.dataMaterial->Material);
             if (matid == 0) {
                 ShowSevereError(state, cHAMTObject6 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");

@@ -275,7 +275,7 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs and operator[i] and elements need Name
-    inline int FindPtrItemInList(std::string_view const String, Container const &ListOfItems, int const NumItems)
+    inline int FindItemInPtrList(std::string_view const String, Container const &ListOfItems, int const NumItems)
     {
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (String == ListOfItems[i]->Name) return int(i + 1); // 1-based return index
@@ -285,9 +285,9 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs and operator[i] and elements need Name
-    inline int FindPtrItemInList(std::string_view const String, Container const &ListOfItems)
+    inline int FindItemInPtrList(std::string_view const String, Container const &ListOfItems)
     {
-        return UtilityRoutines::FindPtrItemInList(String, ListOfItems, ListOfItems.isize());
+        return UtilityRoutines::FindItemInPtrList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>

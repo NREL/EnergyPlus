@@ -9623,7 +9623,7 @@ namespace SurfaceGeometry {
             windowShadingControl.getInputShadedConstruction = UtilityRoutines::FindItemInList(
                 state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
             windowShadingControl.ShadingDevice =
-                UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(9), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(9), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             windowShadingControl.Schedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
             windowShadingControl.SetPoint = state.dataIPShortCut->rNumericArgs(2);
             windowShadingControl.SetPoint2 = state.dataIPShortCut->rNumericArgs(3);
@@ -10160,7 +10160,7 @@ namespace SurfaceGeometry {
             state.dataSurface->StormWindow(StormWinNum).BaseWindowNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum =
-                UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             state.dataSurface->StormWindow(StormWinNum).StormWinDistance = state.dataIPShortCut->rNumericArgs(1);
             state.dataSurface->StormWindow(StormWinNum).MonthOn = state.dataIPShortCut->rNumericArgs(2);
             state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn = state.dataIPShortCut->rNumericArgs(3);
@@ -10749,7 +10749,7 @@ namespace SurfaceGeometry {
 
                 // Interior horizontal insulation
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
+                    int index = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -10809,7 +10809,7 @@ namespace SurfaceGeometry {
 
                 // Interior vertical insulation
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
+                    int index = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -10857,7 +10857,7 @@ namespace SurfaceGeometry {
 
                 // Exterior horizontal insulation
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
+                    int index = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -10917,7 +10917,7 @@ namespace SurfaceGeometry {
 
                 // Exterior vertical insulation
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
+                    int index = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -11002,7 +11002,7 @@ namespace SurfaceGeometry {
 
                 // Footing
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(alpF)) {
-                    int index = UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
+                    int index = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
                     if (index == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -11062,7 +11062,7 @@ namespace SurfaceGeometry {
                     for (int blockNum = 0; blockNum < numBlocks; blockNum++) {
                         Kiva::InputBlock block;
                         if (!state.dataIPShortCut->lAlphaFieldBlanks(alpF)) {
-                            int index = UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
+                            int index = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataMaterial->Material);
                             if (index == 0) {
                                 ErrorsFound = true;
                                 ShowSevereError(state,
@@ -11593,7 +11593,7 @@ namespace SurfaceGeometry {
             SurfNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             MaterNum =
-                UtilityRoutines::FindPtrItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+                UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             InsulationType insulationType =
                 static_cast<InsulationType>(getEnumerationValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
@@ -13494,7 +13494,7 @@ namespace SurfaceGeometry {
     {
         int mmDistance = int(1000 * distance); // Thickness of air gap in mm (usually between storm window and rest of window)
         std::string MatNameStAir = namePrefix + format("{}MM", mmDistance); // Name of created air layer material
-        int newAirMaterial = UtilityRoutines::FindPtrItemInList(MatNameStAir, state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+        int newAirMaterial = UtilityRoutines::FindItemInPtrList(MatNameStAir, state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
         if (newAirMaterial == 0) {
             // Create new material
             state.dataHeatBal->TotMaterials = state.dataHeatBal->TotMaterials + 1;
