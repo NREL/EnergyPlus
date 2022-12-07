@@ -464,7 +464,7 @@ TEST_F(EnergyPlusFixture, GetCoilDesFlowT_Test)
     EXPECT_NEAR(DesCoilExitTemp, state->dataSize->FinalSysSizing(1).CoolSupTemp, 0.00001);
     EXPECT_NEAR(DesCoilExitHumRat, state->dataSize->FinalSysSizing(1).CoolSupHumRat, 0.00001);
 
-    // desing data and DataAirFlowUsedForSizing are used
+    // design data and DataAirFlowUsedForSizing are used
     state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::OnOff;
     DesCoilAirFlow = 0.0;
     DesCoilExitTemp = 0.0;
