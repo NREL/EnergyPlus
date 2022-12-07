@@ -331,12 +331,13 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             ErrorsFound = true;
 
         } else if (TotLayers == 1) {
-
-            if (BITF_TEST_ANY(BITF(state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group),
-                              BITF(DataHeatBalance::MaterialGroup::Shade) | BITF(DataHeatBalance::MaterialGroup::WindowGas) |
-                                  BITF(DataHeatBalance::MaterialGroup::WindowGasMixture) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |
-                                  BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade) |
-                                  BITF(DataHeatBalance::MaterialGroup::ComplexWindowGap))) {
+            auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
+            DataHeatBalance::MaterialGroup thisMaterialGroup = thisMaterial->Group;
+            if ((thisMaterialGroup == DataHeatBalance::MaterialGroup::Shade) || (thisMaterialGroup == DataHeatBalance::MaterialGroup::WindowGas) ||
+                (thisMaterialGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) ||
+                (thisMaterialGroup == DataHeatBalance::MaterialGroup::WindowBlind) || (thisMaterialGroup == DataHeatBalance::MaterialGroup::Screen) ||
+                (thisMaterialGroup == DataHeatBalance::MaterialGroup::ComplexWindowShade) ||
+                (thisMaterialGroup == DataHeatBalance::MaterialGroup::ComplexWindowGap)) {
                 ShowSevereError(
                     state,
                     "CheckAndSetConstructionProperties: The single-layer window construction=" + thisConstruct.Name +
@@ -352,22 +353,23 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         TotGasLayers = 0;
         for (Layer = 1; Layer <= TotLayers; ++Layer) {
             MaterNum = thisConstruct.LayerPoint(Layer);
+            auto const* thisMaterial = state.dataMaterial->Material(MaterNum);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
-            if (state.dataMaterial->Material(MaterNum)->Group == DataHeatBalance::MaterialGroup::WindowGlass) ++TotGlassLayers;
-            if (state.dataMaterial->Material(MaterNum)->Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) ++TotGlassLayers;
-            if (BITF_TEST_ANY(BITF(state.dataMaterial->Material(MaterNum)->Group),
-                              BITF(DataHeatBalance::MaterialGroup::Shade) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |
-                                  BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)))
+            if (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGlass) ++TotGlassLayers;
+            if (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) ++TotGlassLayers;
+            if (thisMaterial->Group == DataHeatBalance::MaterialGroup::Shade || thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowBlind ||
+                thisMaterial->Group == DataHeatBalance::MaterialGroup::Screen ||
+                thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowShade)
                 ++TotShadeLayers;
-            if (BITF_TEST_ANY(BITF(state.dataMaterial->Material(MaterNum)->Group),
-                              BITF(DataHeatBalance::MaterialGroup::WindowGas) | BITF(DataHeatBalance::MaterialGroup::WindowGasMixture) |
-                                  BITF(DataHeatBalance::MaterialGroup::ComplexWindowGap)))
+            if (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGas ||
+                thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGasMixture ||
+                thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowGap)
                 ++TotGasLayers;
             if (Layer < TotLayers) {
                 MaterNumNext = thisConstruct.LayerPoint(Layer + 1);
                 // Adjacent layers of same type not allowed
                 if (MaterNumNext == 0) continue;
-                if (state.dataMaterial->Material(MaterNum)->Group == state.dataMaterial->Material(MaterNumNext)->Group) WrongWindowLayering = true;
+                if (thisMaterial->Group == state.dataMaterial->Material(MaterNumNext)->Group) WrongWindowLayering = true;
             }
         }
 

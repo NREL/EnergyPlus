@@ -11646,13 +11646,12 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
                     DataHeatBalance::MaterialGroup const MaterialLayerGroup = state.dataMaterial->Material(MaterNum)->Group;
-                    if (BITF_TEST_ANY(BITF(MaterialLayerGroup),
-                                      BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing) |
-                                          BITF(DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) |
-                                          BITF(DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) |
-                                          BITF(DataHeatBalance::MaterialGroup::BlindEquivalentLayer) |
-                                          BITF(DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) |
-                                          BITF(DataHeatBalance::MaterialGroup::GapEquivalentLayer))) {
+                    if ((MaterialLayerGroup == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::GapEquivalentLayer)) {
                         ShowSevereError(state, "Invalid movable insulation material for " + cCurrentModuleObject + ":");
                         ShowSevereError(
                             state, "...Movable insulation material type specified = " + cMaterialGroupType(static_cast<int>(MaterialLayerGroup)));

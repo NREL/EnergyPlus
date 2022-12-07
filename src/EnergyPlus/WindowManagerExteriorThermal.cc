@@ -512,10 +512,9 @@ namespace WindowManager {
 
         auto matGroup = material->Group;
 
-        if (BITF_TEST_ANY(BITF(matGroup),
-                          BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing) |
-                              BITF(DataHeatBalance::MaterialGroup::WindowBlind) | BITF(DataHeatBalance::MaterialGroup::Shade) |
-                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade))) {
+        if ((matGroup == DataHeatBalance::MaterialGroup::WindowGlass) || (matGroup == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) ||
+            (matGroup == DataHeatBalance::MaterialGroup::WindowBlind) || (matGroup == DataHeatBalance::MaterialGroup::Shade) ||
+            (matGroup == DataHeatBalance::MaterialGroup::Screen) || (matGroup == DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
             aLayer = getSolidLayer(state, *material, m_SolidLayerIndex);
         } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
