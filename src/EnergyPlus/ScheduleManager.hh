@@ -68,7 +68,28 @@ struct EnergyPlusData;
 
 namespace ScheduleManager {
 
-    int constexpr MaxDayTypes(12);
+    enum class DayType
+    {
+        Invalid = -1,
+        Dummy = 0,
+        Sunday = 1,
+        Monday,
+        Tuesday,
+        Wednesday,
+        Thursday,
+        Friday,
+        Saturday,
+        Holiday,
+        SummerDesignDay,
+        WinterDesignDay,
+        CustomDay1,
+        CustomDay2,
+        Num
+    };
+
+    int constexpr maxDayTypes = static_cast<int>(DayType::Num) - 1;
+    extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNames;
+    extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNamesUC;
 
     enum class SchedType : int
     {
@@ -139,7 +160,7 @@ namespace ScheduleManager {
         Array1D_int DaySchedulePointer; // Index of Day Schedule
 
         // Default Constructor
-        WeekScheduleData() : Used(false), DaySchedulePointer(MaxDayTypes, 0)
+        WeekScheduleData() : Used(false), DaySchedulePointer(maxDayTypes, 0)
         {
         }
     };
