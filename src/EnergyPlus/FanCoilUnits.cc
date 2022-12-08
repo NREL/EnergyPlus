@@ -2566,12 +2566,19 @@ namespace FanCoilUnits {
                     // more heating than required, find reduced water flow rate to meet the load
                     if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                         // solve for the hot water flow rate with no limit set by flow rate lockdown
-                        Par(1) = double(FanCoilNum);
-                        Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                        if (FirstHVACIteration) Par(2) = 1.0;
-                        Par(3) = ControlledZoneNum;
-                        Par(4) = QZnReq;
-                        General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, HWFlow, CalcFanCoilHWLoadResidual, 0.0, MaxWaterFlow, Par);
+                        auto f = [&state, FirstHVACIteration, FanCoilNum, ControlledZoneNum, QZnReq](Real64 HWFlow) {
+                            // To calculate the part-load ratio for the FCU with electric heating coil
+                            Real64 QUnitOut;         // delivered capacity [W]
+                            state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate = HWFlow;
+                            Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
+                            // Calculate residual based on output magnitude
+                            if (std::abs(QZnReq) <= 100.0) {
+                                return (QUnitOut - QZnReq) / 100.0;
+                            } else {
+                                return (QUnitOut - QZnReq) / QZnReq;
+                            }
+                        };
+                        General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, HWFlow, f, 0.0, MaxWaterFlow);
                         if (SolFlag == -1) {
                             // tighten limits on water flow rate to see if this allows convergence
                             state.dataFanCoilUnits->CoolingLoad = false;
@@ -2587,7 +2594,7 @@ namespace FanCoilUnits {
                                                    MinWaterFlow,
                                                    MaxWaterFlow);
                             General::SolveRoot(
-                                state, 0.001, MaxIterCycl, SolFlag, HWFlow, CalcFanCoilHWLoadResidual, MinWaterFlow, MaxWaterFlow, Par);
+                                state, 0.001, MaxIterCycl, SolFlag, HWFlow, f, MinWaterFlow, MaxWaterFlow);
                             if (SolFlag == -1) {
                                 ++FanCoil(FanCoilNum).ConvgErrCountH;
                                 if (FanCoil(FanCoilNum).ConvgErrCountH < 2) {
@@ -5016,49 +5023,6 @@ namespace FanCoilUnits {
 
         // electric heating coil cycling ratio at minimum air flow for constant fan operating mode
         Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR, CyclingR);
-
-        // Calculate residual based on output magnitude
-        if (std::abs(QZnReq) <= 100.0) {
-            return (QUnitOut - QZnReq) / 100.0;
-        } else {
-            return (QUnitOut - QZnReq) / QZnReq;
-        }
-    }
-
-    Real64 CalcFanCoilHWLoadResidual(EnergyPlusData &state,
-                                     Real64 const HWFlow,       // water mass flow rate [kg/s]
-                                     Array1D<Real64> const &Par // Function parameters
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Buhl, FSEC
-        //       DATE WRITTEN   Jan 2016
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // To calculate the part-load ratio for the FCU with electric heating coil
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FanCoilNum;          // Index to this fan coil unit
-        bool FirstHVACIteration; // FirstHVACIteration flag
-        int ControlledZoneNum;   // zone index
-        Real64 QZnReq;           // Sensible load to be met [W]
-        Real64 QUnitOut;         // delivered capacity [W]
-
-        // Convert parameters to usable variables
-        FanCoilNum = int(Par(1));
-        if (Par(2) == 1.0) {
-            FirstHVACIteration = true;
-        } else {
-            FirstHVACIteration = false;
-        }
-        ControlledZoneNum = int(Par(3));
-        QZnReq = Par(4);
-
-        state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate = HWFlow;
-        Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
 
         // Calculate residual based on output magnitude
         if (std::abs(QZnReq) <= 100.0) {
