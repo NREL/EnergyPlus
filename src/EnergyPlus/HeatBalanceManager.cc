@@ -1594,7 +1594,7 @@ namespace HeatBalanceManager {
                 thisMaterial->Name = materialName;
 
                 std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
-                ValidateMaterialRoughness(state, MaterNum, roughness, ErrorsFound);
+                thisMaterial->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(getEnumerationValue(DataSurfaces::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(roughness)));
 
                 thisMaterial->Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
                 thisMaterial->Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
