@@ -3753,26 +3753,10 @@ void GetSystemSizingInput(EnergyPlusData &state)
             SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
         }
         // set the CoolCapControl input
-        SysSizInput(SysSizIndex).CoolCapControl = VAV;
-        {
-            auto const CoolCapCtrl(state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum));
-            if (CoolCapCtrl == "VAV") {
-                SysSizInput(SysSizIndex).CoolCapControl = VAV;
-            } else if (CoolCapCtrl == "BYPASS") {
-                SysSizInput(SysSizIndex).CoolCapControl = Bypass;
-            } else if (CoolCapCtrl == "VT") {
-                SysSizInput(SysSizIndex).CoolCapControl = VT;
-            } else if (CoolCapCtrl == "ONOFF") {
-                SysSizInput(SysSizIndex).CoolCapControl = OnOff;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iCoolCapControlAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are VAV, Bypass, VT, or OnOff.");
-                ErrorsFound = true;
-            }
-        }
+        constexpr std::array<std::string_view, static_cast<int>(CapacityControl::Num)> CapacityControlNamesUC{"VAV", "BYPASS", "VT", "ONOFF"};
+        SysSizInput(SysSizIndex).CoolCapControl = static_cast<CapacityControl>(
+            getEnumerationValue(CapacityControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum))));
+
         {
             auto const sizingOption(state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum));
             if (sizingOption == "COINCIDENT") {

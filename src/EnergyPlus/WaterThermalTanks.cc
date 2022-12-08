@@ -1536,12 +1536,6 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         // Minimum Inlet Air Temperature for Compressor Operation
         HPWH.MinAirTempForHPOperation = hpwhNumeric[4 + nNumericOffset];
-        if (HPWH.MinAirTempForHPOperation < -5) {
-            ShowWarningError(state,
-                             state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
-                                 "\": minimum inlet air temperature for heat pump compressor operation must be greater than or equal to -5 C.");
-            ShowContinueError(state, format("...Minimum inlet air temperature = {:.1T}", hpwhNumeric[4 + nNumericOffset]));
-        }
 
         // Maximum Inlet Air Temperature for Compressor Operation
         HPWH.MaxAirTempForHPOperation = hpwhNumeric[5 + nNumericOffset];
