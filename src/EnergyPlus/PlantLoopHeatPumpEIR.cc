@@ -772,7 +772,6 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     } else {
         // source design flow was hard-sized
         if (this->sourceSideDesignVolFlowRate > 0.0) {
-            this->sourceSideDesignVolFlowRate;
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                 if (state.dataGlobal->DoPlantSizing) {
                     BaseSizer::reportSizerOutput(state,
