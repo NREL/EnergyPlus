@@ -15223,7 +15223,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 Real64 TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp(1), wbRated, par3);
                 Real64 HighSpeedNetCoolingCap = coil.RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
-                TotCapFlowModFac = CurveManager::CurveValue(state, coil.CCapFFlow(1), AirMassFlowRatio);
+                // TotCapFlowModFac = CurveManager::CurveValue(state, coil.CCapFFlow(1), AirMassFlowRatio);
                 TotCapTempModFac = CurveManager::CurveValue(state, coil.CCapFTemp2, wbRated, par3);
                 Real64 LowSpeedNetCoolingCap = coil.RatedTotCap2 * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
@@ -15310,10 +15310,64 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             }
 
             TotCapFlowModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
+            //    Warn user if curve output goes negative
+            if (TotCapFlowModFac < 0.0) {
+                if (state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlowErrorIndex == 0) {
+                    ShowWarningMessage(
+                        state,
+                        format(
+                            "{}{} \"{}\":", RoutineName, state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+                    ShowContinueError(
+                        state,
+                        format(" Total Cooling Capacity Modifier curve (function of flow fraction) output is negative ({:.3T}).", TotCapFlowModFac));
+                    ShowContinueError(state, format(" Negative value occurs using an air flow fraction of {:.3T}.", AirMassFlowRatio));
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+                }
+                ShowRecurringWarningErrorAtEnd(
+                    state,
+                    format("{}{}\"{}\": Total Cooling Capacity Modifier curve (function of flow fraction) output is negative warning continues...",
+                           RoutineName,
+                           state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
+                           state.dataDXCoils->DXCoil(DXCoilNum).Name),
+                    state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlowErrorIndex,
+                    TotCapFlowModFac,
+                    TotCapFlowModFac);
+                TotCapFlowModFac = 0.0;
+            }
+
             TotCapTempModFac = CurveValue(state,
                                           state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1),
                                           CoolingCoilInletAirWetBulbTempRated,
                                           OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint));
+            //    Warn user if curve output goes negative
+            if (TotCapTempModFac < 0.0) {
+                if (state.dataDXCoils->DXCoil(DXCoilNum).CCapFTempErrorIndex == 0) {
+                    ShowWarningMessage(
+                        state,
+                        format(
+                            "{}{} \"{}\":", RoutineName, state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+                    ShowContinueError(
+                        state,
+                        format(" Total Cooling Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotCapTempModFac));
+                    ShowContinueError(state,
+                                      format(" Negative value occurs using a coil inlet wet-bulb temperature of {:.1T} and an outdoor unit inlet air "
+                                             "dry-bulb temperature of {:.1T}.",
+                                             CoolingCoilInletAirWetBulbTempRated,
+                                             OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint)));
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+                }
+                ShowRecurringWarningErrorAtEnd(
+                    state,
+                    format("{}{} \"{}\": Total Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
+                           RoutineName,
+                           state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
+                           state.dataDXCoils->DXCoil(DXCoilNum).Name),
+                    state.dataDXCoils->DXCoil(DXCoilNum).CCapFTempErrorIndex,
+                    TotCapTempModFac,
+                    TotCapTempModFac);
+                TotCapTempModFac = 0.0;
+            }
+
             HighSpeedTotCoolingCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac;
             HighSpeedNetCoolingCap = HighSpeedTotCoolingCap - FanHeatCorrection;
 
@@ -15329,11 +15383,40 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 EIR = 0.0;
             }
 
-            TotCapFlowModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp2, AirMassFlowRatio);
+            // TotCapFlowModFac = CurveValue(state, state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
             TotCapTempModFac = CurveValue(state,
                                           state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp2,
                                           CoolingCoilInletAirWetBulbTempRated,
                                           OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint));
+            //    Warn user if curve output goes negative
+            if (TotCapTempModFac < 0.0) {
+                if (state.dataDXCoils->DXCoil(DXCoilNum).CCapFTempErrorIndex == 0) {
+                    ShowWarningMessage(
+                        state,
+                        format(
+                            "{}{} \"{}\":", RoutineName, state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+                    ShowContinueError(
+                        state,
+                        format(" Total Cooling Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotCapTempModFac));
+                    ShowContinueError(state,
+                                      format(" Negative value occurs using a coil inlet wet-bulb temperature of {:.1T} and an outdoor unit inlet air "
+                                             "dry-bulb temperature of {:.1T}.",
+                                             CoolingCoilInletAirWetBulbTempRated,
+                                             OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint)));
+                    ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+                }
+                ShowRecurringWarningErrorAtEnd(
+                    state,
+                    format("{}{} \"{}\": Total Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
+                           RoutineName,
+                           state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
+                           state.dataDXCoils->DXCoil(DXCoilNum).Name),
+                    state.dataDXCoils->DXCoil(DXCoilNum).CCapFTempErrorIndex,
+                    TotCapTempModFac,
+                    TotCapTempModFac);
+                TotCapTempModFac = 0.0;
+            }
+
             LowSpeedTotCoolingCap = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap2 * TotCapTempModFac * TotCapFlowModFac;
             LowSpeedNetCoolingCap = LowSpeedTotCoolingCap - FanHeatCorrection;
 

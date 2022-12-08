@@ -2392,7 +2392,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 case HumControl::Humidistat: {
                     MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;
                     SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;
-                    SupplyHumRatForDehum = min(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
+                    SupplyHumRatForDehum = max(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
                     PurchAir(PurchAirNum).SupplyHumRat = min(PurchAir(PurchAirNum).MixedAirHumRat, SupplyHumRatForDehum);
                 } break;
                 case HumControl::ConstantSupplyHumidityRatio: {
