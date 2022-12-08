@@ -512,14 +512,14 @@ namespace WindowManager {
 
         auto matGroup = material->Group;
 
-        if ((matGroup == DataHeatBalance::MaterialGroup::WindowGlass) || (matGroup == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) ||
-            (matGroup == DataHeatBalance::MaterialGroup::WindowBlind) || (matGroup == DataHeatBalance::MaterialGroup::Shade) ||
-            (matGroup == DataHeatBalance::MaterialGroup::Screen) || (matGroup == DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
+        if ((matGroup == Material::MaterialGroup::WindowGlass) || (matGroup == Material::MaterialGroup::WindowSimpleGlazing) ||
+            (matGroup == Material::MaterialGroup::WindowBlind) || (matGroup == Material::MaterialGroup::Shade) ||
+            (matGroup == Material::MaterialGroup::Screen) || (matGroup == Material::MaterialGroup::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
             aLayer = getSolidLayer(state, *material, m_SolidLayerIndex);
-        } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
+        } else if (matGroup == Material::MaterialGroup::WindowGas || matGroup == Material::MaterialGroup::WindowGasMixture) {
             aLayer = getGapLayer(*material);
-        } else if (matGroup == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
+        } else if (matGroup == Material::MaterialGroup::ComplexWindowGap) {
             aLayer = getComplexGapLayer(state, *material);
         }
 
@@ -557,7 +557,7 @@ namespace WindowManager {
         auto Aright = 0.0;
         auto Afront = 0.0;
 
-        if (material.Group == DataHeatBalance::MaterialGroup::WindowGlass || material.Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) {
+        if (material.Group == Material::MaterialGroup::WindowGlass || material.Group == Material::MaterialGroup::WindowSimpleGlazing) {
             emissFront = material.AbsorpThermalFront;
             emissBack = material.AbsorpThermalBack;
             transThermalFront = material.TransThermal;
@@ -565,7 +565,7 @@ namespace WindowManager {
             thickness = material.Thickness;
             conductivity = material.Conductivity;
         }
-        if (material.Group == DataHeatBalance::MaterialGroup::WindowBlind) {
+        if (material.Group == Material::MaterialGroup::WindowBlind) {
             auto blNum = state.dataSurface->SurfWinBlindNumber(m_SurfNum);
             auto blind = state.dataHeatBal->Blind(blNum);
             thickness = blind.SlatThickness;
