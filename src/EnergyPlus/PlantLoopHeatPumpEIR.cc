@@ -132,9 +132,17 @@ Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state
     } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
         if (thisLoadComp.CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) {
             // there will be a valid set-point on outlet
-            return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
+            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) {
+                return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
+            } else {
+                return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointLo;
+            }
         } else { // use plant loop overall set-point
-            return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
+            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) {
+                return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
+            } else {
+                return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointLo;
+            }
         }
     } else {
         // there's no other enums for loop demand calcs, so I don't have a reasonable unit test for these
