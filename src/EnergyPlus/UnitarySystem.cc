@@ -15013,7 +15013,7 @@ namespace UnitarySystems {
                                         ((mdot / this->m_MaxSuppCoilFluidFlow) + 0.001)); // plant can limit flow and RegulaFalsi could hit
                                                                                           // max iteration limit (leave a little slop, 0.001)
 
-                                auto f = [&state, this, FirstHVACIteration, DesOutTemp, SuppHeatingCoilFlag](Real64 const PartLoadFrac) {
+                                auto f = [&state, this, FirstHVACIteration, DesOutTemp](Real64 const PartLoadFrac) {
                                     Real64 mdot;
 
                                     mdot = min(state.dataLoopNodes->Node(this->m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,

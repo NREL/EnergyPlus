@@ -6526,8 +6526,7 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
     T1 = 50.0;
 
     auto f = [&state, H, RH, PB](Real64 const Tprov) {
-        using Psychrometrics::PsyHFnTdbRhPb;
-        return H - PsyHFnTdbRhPb(state, Tprov, RH, PB);
+        return H - Psychrometrics::PsyHFnTdbRhPb(state, Tprov, RH, PB);
     };
 
     General::SolveRoot(state, Acc, MaxIte, SolFla, Tprov, f, T0, T1);

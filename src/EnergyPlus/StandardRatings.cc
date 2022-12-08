@@ -533,7 +533,6 @@ namespace StandardRatings {
 
                 auto f = [&state,
                           EnteringWaterTempReduced,
-                          EvapOutletTemp,
                           Cp,
                           reducedPLR,
                           CondVolFlowRate,
@@ -545,7 +544,6 @@ namespace StandardRatings {
                           RefCOP,
                           OpenMotorEff,
                           ChillerCapFT_rated](Real64 const CondenserOutletTemp) {
-                    using CurveManager::CurveValue;
 
                     Real64 AvailChillerCap(0.0);         // Chiller available capacity at current operating conditions [W]
                     Real64 CondenserInletTemp(0.0);      // Calculated condenser inlet temperature [C]
