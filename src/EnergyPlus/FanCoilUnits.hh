@@ -355,16 +355,20 @@ namespace FanCoilUnits {
     int GetFanCoilMixedAirNode(EnergyPlusData &state, int FanCoilNum);
 
     Real64 CalcFanCoilLoadResidual(EnergyPlusData &state,
-                                   int FanCoilNum,            // Index to this fan coil unit
-                                   bool FirstHVACIteration,   // FirstHVACIteration flag
-                                   int ControlledZoneNum,     // zone index
-                                   Real64 QZnReq,             // Sensible load to be met [W]
-                                   Real64 const PartLoadRatio // coil part load ratio
+                                   int FanCoilNum,          // Index to this fan coil unit
+                                   bool FirstHVACIteration, // FirstHVACIteration flag
+                                   int ControlledZoneNum,   // zone index
+                                   Real64 QZnReq,           // Sensible load to be met [W]
+                                   Real64 PartLoadRatio     // coil part load ratio
     );
 
     Real64 CalcFanCoilPLRResidual(EnergyPlusData &state,
-                                  Real64 PLR,                // part-load ratio of air and water mass flow rate
-                                  Array1D<Real64> const &Par // Function parameters
+                                  Real64 PLR,              // part-load ratio of air and water mass flow rate
+                                  int FanCoilNum,          // Index to this fan coil unit
+                                  bool FirstHVACIteration, // FirstHVACIteration flag
+                                  int ControlledZoneNum,   // zone index
+                                  int WaterControlNode,    // water node to control
+                                  Real64 QZnReq            // Sensible load to be met [W] // Function parameters
     );
 
     Real64 CalcFanCoilHeatCoilPLRResidual(EnergyPlusData &state,

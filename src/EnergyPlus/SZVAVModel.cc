@@ -329,7 +329,8 @@ namespace SZVAVModel {
                                 state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                         } else {
                             auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
-                                return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                                return FanCoilUnits::CalcFanCoilLoadResidual(
+                                    state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
                             };
                             General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                         }
@@ -359,7 +360,8 @@ namespace SZVAVModel {
                             }
                         } else {
                             auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
-                                return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                                return FanCoilUnits::CalcFanCoilLoadResidual(
+                                    state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
                             };
                             General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                             if (SolFlag < 0) {
@@ -373,7 +375,8 @@ namespace SZVAVModel {
                             state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
                         auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
-                            return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                            return FanCoilUnits::CalcFanCoilLoadResidual(
+                                state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
                         };
                         General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                     }
@@ -427,7 +430,8 @@ namespace SZVAVModel {
                         General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
                         auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
-                            return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                            return FanCoilUnits::CalcFanCoilLoadResidual(
+                                state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
                         };
                         General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                     }
@@ -440,7 +444,8 @@ namespace SZVAVModel {
                             state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
                         auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
-                            return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                            return FanCoilUnits::CalcFanCoilLoadResidual(
+                                state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
                         };
                         General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                     }

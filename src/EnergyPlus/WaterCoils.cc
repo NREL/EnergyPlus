@@ -6525,9 +6525,7 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
     T0 = 1.0;
     T1 = 50.0;
 
-    auto f = [&state, H, RH, PB](Real64 const Tprov) {
-        return H - Psychrometrics::PsyHFnTdbRhPb(state, Tprov, RH, PB);
-    };
+    auto f = [&state, H, RH, PB](Real64 const Tprov) { return H - Psychrometrics::PsyHFnTdbRhPb(state, Tprov, RH, PB); };
 
     General::SolveRoot(state, Acc, MaxIte, SolFla, Tprov, f, T0, T1);
     // if the numerical inversion failed, issue error messages.
