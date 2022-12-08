@@ -1763,6 +1763,13 @@ namespace DataPlant {
                                                                         LoadDistributionWasPerformed);
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
+                case OpScheme::WetBulbRB:
+                case OpScheme::DryBulbRB:
+                case OpScheme::DewPointRB:
+                case OpScheme::RelHumRB:
+                case OpScheme::DryBulbTDB:
+                case OpScheme::WetBulbTDB:
+                case OpScheme::DewPointTDB:
                 case OpScheme::HeatingRB:
                 case OpScheme::CoolingRB: { //~ load range based
                     EncounteredLRBObjDuringPass1 = true;
@@ -1834,6 +1841,13 @@ namespace DataPlant {
                         SimulateSinglePump(state, PumpLocation, FlowRequest);
                     }
                     break;
+                case OpScheme::WetBulbRB:
+                case OpScheme::DryBulbRB:
+                case OpScheme::DewPointRB:
+                case OpScheme::RelHumRB:
+                case OpScheme::DryBulbTDB:
+                case OpScheme::WetBulbTDB:
+                case OpScheme::DewPointTDB:
                 case OpScheme::HeatingRB:
                 case OpScheme::CoolingRB: {              //~ load range based
                     if (!LoadDistributionWasPerformed) { //~ Still need to distribute load among load range based components
