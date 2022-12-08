@@ -355,8 +355,11 @@ namespace FanCoilUnits {
     int GetFanCoilMixedAirNode(EnergyPlusData &state, int FanCoilNum);
 
     Real64 CalcFanCoilLoadResidual(EnergyPlusData &state,
-                                   Real64 PartLoadRatio,      // DX cooling coil part load ratio
-                                   Array1D<Real64> const &Par // Function parameters
+                                   int FanCoilNum,            // Index to this fan coil unit
+                                   bool FirstHVACIteration,   // FirstHVACIteration flag
+                                   int ControlledZoneNum,     // zone index
+                                   Real64 QZnReq,             // Sensible load to be met [W]
+                                   Real64 const PartLoadRatio // coil part load ratio
     );
 
     Real64 CalcFanCoilPLRResidual(EnergyPlusData &state,

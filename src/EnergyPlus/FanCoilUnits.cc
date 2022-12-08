@@ -2568,7 +2568,7 @@ namespace FanCoilUnits {
                         // solve for the hot water flow rate with no limit set by flow rate lockdown
                         auto f = [&state, FirstHVACIteration, FanCoilNum, ControlledZoneNum, QZnReq](Real64 HWFlow) {
                             // To calculate the part-load ratio for the FCU with electric heating coil
-                            Real64 QUnitOut;         // delivered capacity [W]
+                            Real64 QUnitOut; // delivered capacity [W]
                             state.dataLoopNodes->Node(state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate = HWFlow;
                             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
                             // Calculate residual based on output magnitude
@@ -2593,8 +2593,7 @@ namespace FanCoilUnits {
                                                    QZnReq,
                                                    MinWaterFlow,
                                                    MaxWaterFlow);
-                            General::SolveRoot(
-                                state, 0.001, MaxIterCycl, SolFlag, HWFlow, f, MinWaterFlow, MaxWaterFlow);
+                            General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, HWFlow, f, MinWaterFlow, MaxWaterFlow);
                             if (SolFlag == -1) {
                                 ++FanCoil(FanCoilNum).ConvgErrCountH;
                                 if (FanCoil(FanCoilNum).ConvgErrCountH < 2) {
@@ -2641,12 +2640,10 @@ namespace FanCoilUnits {
                             }
                         }
                     } else {
-                        Par(1) = double(FanCoilNum);
-                        Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                        if (FirstHVACIteration) Par(2) = 1.0;
-                        Par(3) = ControlledZoneNum;
-                        Par(4) = QZnReq;
-                        General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, PLR, CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                        auto f = [&state, FirstHVACIteration, FanCoilNum, ControlledZoneNum, QZnReq](Real64 const PartLoadRatio) {
+                            return CalcFanCoilLoadResidual(state, FanCoilNum, FirstHVACIteration, ControlledZoneNum, QZnReq, PartLoadRatio);
+                        };
+                        General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, PLR, f, 0.0, 1.0);
                     }
                 } else {
                     // demand greater than capacity
@@ -2993,12 +2990,10 @@ namespace FanCoilUnits {
                                              FanCoil(FanCoilNum).HeatCoilPlantLoc);
 
                     } else {
-                        Par(1) = double(FanCoilNum);
-                        Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                        if (FirstHVACIteration) Par(2) = 1.0;
-                        Par(3) = ControlledZoneNum;
-                        Par(4) = QZnReq;
-                        General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, PLR, CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                        auto f = [&state, FirstHVACIteration, FanCoilNum, ControlledZoneNum, QZnReq](Real64 const PartLoadRatio) {
+                            return CalcFanCoilLoadResidual(state, FanCoilNum, FirstHVACIteration, ControlledZoneNum, QZnReq, PartLoadRatio);
+                        };
+                        General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, PLR, f, 0.0, 1.0);
                     }
                 } else {
                     PLR = 1.0;
@@ -4524,7 +4519,10 @@ namespace FanCoilUnits {
                             };
                             General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, eHeatCoilPLR, f, 0.0, 1.0);
                         } else {
-                            General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, eHeatCoilPLR, CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                            auto f = [&state, FirstHVACIteration, FanCoilNum, ZoneNum, QZnReq](Real64 const PartLoadRatio) {
+                               return CalcFanCoilLoadResidual(state, FanCoilNum, FirstHVACIteration, ZoneNum, QZnReq, PartLoadRatio);
+                            };
+                            General::SolveRoot(state, 0.001, MaxIterCycl, SolFlag, eHeatCoilPLR, f, 0.0, 1.0);
                         }
                         if (SolFlag == -1) {
                             ++FanCoil(FanCoilNum).ConvgErrCountH;
@@ -4862,66 +4860,28 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilLoadResidual(EnergyPlusData &state,
-                                   Real64 const PartLoadRatio, // coil part load ratio
-                                   Array1D<Real64> const &Par  // Function parameters
+                                   int FanCoilNum,          // Index to this fan coil unit
+                                   bool FirstHVACIteration, // FirstHVACIteration flag
+                                   int ControlledZoneNum,   // zone index
+                                   Real64 QZnReq,           // Sensible load to be met [W]
+                                   Real64 const PartLoadRatio // coil part load ratio
     )
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   July 2015
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // To calculate the part-load ratio for the FCU with electric heating coil
 
-        // Return value
-        Real64 Residuum; // Result (force to 0)
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        //   Parameter description example:
-        //       Par(1)  = REAL(FanCoilNum,r64) ! Index to fan coil unit
-        //       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
-        //       Par(3)  = REAL(ControlledZoneNum,r64)     ! zone index
-        //       Par(4)  = QZnReq               ! zone load [W]
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FanCoilNum;          // Index to this fan coil unit
-        bool FirstHVACIteration; // FirstHVACIteration flag
-        int ControlledZoneNum;   // zone index
-        Real64 QZnReq;           // Sensible load to be met [W]
         Real64 QUnitOut;         // delivered capacity [W]
-
-        // Convert parameters to usable variables
-        FanCoilNum = int(Par(1));
-        if (Par(2) == 1.0) {
-            FirstHVACIteration = true;
-        } else {
-            FirstHVACIteration = false;
-        }
-        ControlledZoneNum = int(Par(3));
-        QZnReq = Par(4);
-
-        Calc4PipeFanCoil(state,
-                         FanCoilNum,
-                         ControlledZoneNum,
-                         FirstHVACIteration,
-                         QUnitOut,
-                         PartLoadRatio); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
-
+        Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut,PartLoadRatio); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
         // Calculate residual based on output magnitude
         if (std::abs(QZnReq) <= 100.0) {
-            Residuum = (QUnitOut - QZnReq) / 100.0;
+            return (QUnitOut - QZnReq) / 100.0;
         } else {
-            Residuum = (QUnitOut - QZnReq) / QZnReq;
+            return (QUnitOut - QZnReq) / QZnReq;
         }
-
-        return Residuum;
     }
 
     Real64 CalcFanCoilPLRResidual(EnergyPlusData &state,

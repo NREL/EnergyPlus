@@ -328,7 +328,10 @@ namespace SZVAVModel {
                             General::SolveRoot(
                                 state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                         } else {
-                            General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                            auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
+                                return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                            };
+                            General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                         }
                         outletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                         if ((CoolingLoad && outletTemp < maxOutletTemp) || (HeatingLoad && outletTemp > maxOutletTemp)) {
@@ -355,7 +358,10 @@ namespace SZVAVModel {
                                 MessagePrefix = "Step 2b: ";
                             }
                         } else {
-                            General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                            auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
+                                return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                            };
+                            General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                             if (SolFlag < 0) {
                                 MessagePrefix = "Step 2: ";
                             }
@@ -366,7 +372,10 @@ namespace SZVAVModel {
                         General::SolveRoot(
                             state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
-                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                        auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
+                            return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                        };
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                     }
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 2c: ";
@@ -417,7 +426,10 @@ namespace SZVAVModel {
                     if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
                         General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
-                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                        auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
+                            return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                        };
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                     }
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 3: ";
@@ -427,7 +439,10 @@ namespace SZVAVModel {
                         General::SolveRoot(
                             state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
-                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                        auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
+                            return FanCoilUnits::CalcFanCoilLoadResidual(state, SysIndex, FirstHVACIteration, SZVAVModel.ControlZoneNum, ZoneLoad, PartLoadRatio);
+                        };
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                     }
                     if (SolFlag < 0) {
                         MessagePrefix = "Step 3a: ";
