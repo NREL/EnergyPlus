@@ -531,6 +531,8 @@ namespace StandardRatings {
                 CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
                 CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
 
+                // CONST_LAMBDA_CAPTURE Issue, see PR 9670
+                Real64 tmpEvapOutletTemp = EvapOutletTemp;
                 auto f = [&state,
                           EnteringWaterTempReduced,
                           Cp,
@@ -543,6 +545,7 @@ namespace StandardRatings {
                           RefCap,
                           RefCOP,
                           OpenMotorEff,
+                          tmpEvapOutletTemp,
                           ChillerCapFT_rated](Real64 const CondenserOutletTemp) {
 
                     Real64 AvailChillerCap(0.0);         // Chiller available capacity at current operating conditions [W]
@@ -555,9 +558,9 @@ namespace StandardRatings {
                     Real64 ReformEIRChillerEIRFPLR(0.0); // Chiller EIR as a function of part-load ratio (PLR)
                     Real64 PartLoadRatio(0.0);           // Chiller part load ratio
 
-                    ReformEIRChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+                    ReformEIRChillerCapFT = CurveValue(state, CapFTempCurveIndex, tmpEvapOutletTemp, CondenserOutletTemp);
 
-                    ReformEIRChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+                    ReformEIRChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, tmpEvapOutletTemp, CondenserOutletTemp);
 
                     // Available chiller capacity as a function of temperature
                     AvailChillerCap = RefCap * ReformEIRChillerCapFT;
