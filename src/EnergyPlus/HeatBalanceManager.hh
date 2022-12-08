@@ -103,12 +103,6 @@ namespace HeatBalanceManager {
 
     void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
-    void ValidateMaterialRoughness(EnergyPlusData &state,
-                                   int const MaterNum,           // Which Material number being validated.
-                                   std::string const &Roughness, // Roughness String
-                                   bool &ErrorsFound             // If errors found
-    );
-
     void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input

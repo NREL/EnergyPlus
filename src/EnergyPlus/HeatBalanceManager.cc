@@ -1594,7 +1594,8 @@ namespace HeatBalanceManager {
                 thisMaterial->Name = materialName;
 
                 std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
-                thisMaterial->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(getEnumerationValue(DataSurfaces::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(roughness)));
+                thisMaterial->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(
+                    getEnumerationValue(DataSurfaces::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(roughness)));
 
                 thisMaterial->Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
                 thisMaterial->Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
@@ -1670,7 +1671,8 @@ namespace HeatBalanceManager {
             thisMaterial->Group = Material::MaterialGroup::RegularMaterial;
             thisMaterial->Name = MaterialNames(1);
 
-            ValidateMaterialRoughness(state, MaterNum, MaterialNames(2), ErrorsFound);
+            thisMaterial->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(
+                getEnumerationValue(DataSurfaces::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
 
             thisMaterial->Resistance = MaterialProps(1);
             thisMaterial->ROnly = true;
@@ -3930,7 +3932,8 @@ namespace HeatBalanceManager {
             thisMaterial->Name = MaterialNames(1);
             // need to treat the A2 with is just the name of the soil(it is
             // not important)
-            ValidateMaterialRoughness(state, MaterNum, MaterialNames(3), ErrorsFound);
+            thisMaterial->Roughness = static_cast<DataSurfaces::SurfaceRoughness>(
+                getEnumerationValue(DataSurfaces::SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
             if (UtilityRoutines::SameString(MaterialNames(4), "Simple")) {
                 thisMaterial->EcoRoofCalculationMethod = 1;
             } else if (UtilityRoutines::SameString(MaterialNames(4), "Advanced") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
@@ -4361,67 +4364,6 @@ namespace HeatBalanceManager {
         }
 
         if (state.dataHeatBal->TotSpectralData > 0) SpecDataProps.deallocate();
-    }
-
-    void ValidateMaterialRoughness(EnergyPlusData &state,
-                                   int const MaterNum,           // Which Material number being validated.
-                                   std::string const &Roughness, // Roughness String
-                                   bool &ErrorsFound             // If errors found
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   April 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine compares the input Roughness value against the
-        // valid values and sets the correct value in the Material Data Structure.
-
-        // METHODOLOGY EMPLOYED:
-        // Error message provided if not valid.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // Select the correct Number for the associated ascii name for the roughness type
-        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-        if (UtilityRoutines::SameString(Roughness, "VeryRough"))
-            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
-        if (UtilityRoutines::SameString(Roughness, "Rough")) thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Rough;
-        if (UtilityRoutines::SameString(Roughness, "MediumRough"))
-            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
-        if (UtilityRoutines::SameString(Roughness, "MediumSmooth"))
-            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
-        if (UtilityRoutines::SameString(Roughness, "Smooth"))
-            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::Smooth;
-        if (UtilityRoutines::SameString(Roughness, "VerySmooth"))
-            thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-
-        // Was it set?
-        if (thisMaterial->Roughness == DataSurfaces::SurfaceRoughness::Invalid) {
-            ShowSevereError(state, "Material=" + thisMaterial->Name + ",Illegal Roughness=" + Roughness);
-            ErrorsFound = true;
-        }
     }
 
     void GetConstructData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
