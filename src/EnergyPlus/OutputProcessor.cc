@@ -2587,7 +2587,7 @@ namespace OutputProcessor {
             if (PrintTimeStamp) {
                 CurDayType = state.dataEnvrn->DayOfWeek;
                 if (state.dataEnvrn->HolidayIndex > 0) {
-                    CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                    CurDayType = state.dataEnvrn->HolidayIndex;
                 }
                 WriteTimeStampFormatData(state,
                                          state.files.mtr,
@@ -2602,7 +2602,7 @@ namespace OutputProcessor {
                                          EndMinute,
                                          StartMinute,
                                          state.dataEnvrn->DSTIndicator,
-                                         DayTypes(CurDayType));
+                                         ScheduleManager::dayTypeNames[CurDayType]);
                 if (state.dataResultsFramework->resultsFramework->TSMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->TSMeters.newRow(
                         state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, EndMinute);
@@ -2614,7 +2614,7 @@ namespace OutputProcessor {
             if (PrintESOTimeStamp && !op->EnergyMeters(Loop).RptTSFO && !op->EnergyMeters(Loop).RptAccTSFO) {
                 CurDayType = state.dataEnvrn->DayOfWeek;
                 if (state.dataEnvrn->HolidayIndex > 0) {
-                    CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                    CurDayType = state.dataEnvrn->HolidayIndex;
                 }
                 WriteTimeStampFormatData(state,
                                          state.files.eso,
@@ -2629,7 +2629,7 @@ namespace OutputProcessor {
                                          EndMinute,
                                          StartMinute,
                                          state.dataEnvrn->DSTIndicator,
-                                         DayTypes(CurDayType));
+                                         ScheduleManager::dayTypeNames[CurDayType]);
                 PrintESOTimeStamp = false;
             }
 
@@ -2714,7 +2714,7 @@ namespace OutputProcessor {
             if (PrintTimeStamp) {
                 CurDayType = state.dataEnvrn->DayOfWeek;
                 if (state.dataEnvrn->HolidayIndex > 0) {
-                    CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                    CurDayType = state.dataEnvrn->HolidayIndex;
                 }
                 WriteTimeStampFormatData(state,
                                          state.files.mtr,
@@ -2729,7 +2729,7 @@ namespace OutputProcessor {
                                          _,
                                          _,
                                          state.dataEnvrn->DSTIndicator,
-                                         DayTypes(CurDayType));
+                                         ScheduleManager::dayTypeNames[CurDayType]);
                 if (state.dataResultsFramework->resultsFramework->HRMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->HRMeters.newRow(
                         state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
@@ -2816,7 +2816,7 @@ namespace OutputProcessor {
             if (PrintTimeStamp) {
                 CurDayType = state.dataEnvrn->DayOfWeek;
                 if (state.dataEnvrn->HolidayIndex > 0) {
-                    CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                    CurDayType = state.dataEnvrn->HolidayIndex;
                 }
                 WriteTimeStampFormatData(state,
                                          state.files.mtr,
@@ -2831,7 +2831,7 @@ namespace OutputProcessor {
                                          _,
                                          _,
                                          state.dataEnvrn->DSTIndicator,
-                                         DayTypes(CurDayType));
+                                         ScheduleManager::dayTypeNames[CurDayType]);
                 if (state.dataResultsFramework->resultsFramework->DYMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->DYMeters.newRow(
                         state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
@@ -5630,7 +5630,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     std::abs(op->LEndMin - op->TimeValue.at(t_TimeStepTypeKey).CurMinute) > 0.001) {
                     int CurDayType = state.dataEnvrn->DayOfWeek;
                     if (state.dataEnvrn->HolidayIndex > 0) {
-                        CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                        CurDayType = state.dataEnvrn->HolidayIndex;
                     }
                     WriteTimeStampFormatData(state,
                                              state.files.eso,
@@ -5645,7 +5645,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              op->TimeValue.at(t_TimeStepTypeKey).CurMinute,
                                              StartMinute,
                                              state.dataEnvrn->DSTIndicator,
-                                             DayTypes(CurDayType));
+                                             ScheduleManager::dayTypeNames[CurDayType]);
                     op->LHourP = state.dataGlobal->HourOfDay;
                     op->LStartMin = StartMinute;
                     op->LEndMin = op->TimeValue.at(t_TimeStepTypeKey).CurMinute;
@@ -5714,7 +5714,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     std::abs(op->LEndMin - op->TimeValue.at(t_TimeStepTypeKey).CurMinute) > 0.001) {
                     int CurDayType = state.dataEnvrn->DayOfWeek;
                     if (state.dataEnvrn->HolidayIndex > 0) {
-                        CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                        CurDayType = state.dataEnvrn->HolidayIndex;
                     }
                     WriteTimeStampFormatData(state,
                                              state.files.eso,
@@ -5729,7 +5729,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              op->TimeValue.at(t_TimeStepTypeKey).CurMinute,
                                              StartMinute,
                                              state.dataEnvrn->DSTIndicator,
-                                             DayTypes(CurDayType));
+                                             ScheduleManager::dayTypeNames[CurDayType]);
                     op->LHourP = state.dataGlobal->HourOfDay;
                     op->LStartMin = StartMinute;
                     op->LEndMin = op->TimeValue.at(t_TimeStepTypeKey).CurMinute;
@@ -5805,7 +5805,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                             std::abs(op->LEndMin - op->TimeValue.at(thisTimeStepType).CurMinute) > 0.001) {
                             int CurDayType = state.dataEnvrn->DayOfWeek;
                             if (state.dataEnvrn->HolidayIndex > 0) {
-                                CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                                CurDayType = state.dataEnvrn->HolidayIndex;
                             }
                             WriteTimeStampFormatData(state,
                                                      state.files.eso,
@@ -5820,7 +5820,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      op->TimeValue.at(thisTimeStepType).CurMinute,
                                                      StartMinute,
                                                      state.dataEnvrn->DSTIndicator,
-                                                     DayTypes(CurDayType));
+                                                     ScheduleManager::dayTypeNames[CurDayType]);
                             op->LHourP = state.dataGlobal->HourOfDay;
                             op->LStartMin = StartMinute;
                             op->LEndMin = op->TimeValue.at(thisTimeStepType).CurMinute;
@@ -5861,7 +5861,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                             std::abs(op->LEndMin - op->TimeValue.at(thisTimeStepType).CurMinute) > 0.001) {
                             int CurDayType = state.dataEnvrn->DayOfWeek;
                             if (state.dataEnvrn->HolidayIndex > 0) {
-                                CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                                CurDayType = state.dataEnvrn->HolidayIndex;
                             }
                             WriteTimeStampFormatData(state,
                                                      state.files.eso,
@@ -5876,7 +5876,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      op->TimeValue.at(thisTimeStepType).CurMinute,
                                                      StartMinute,
                                                      state.dataEnvrn->DSTIndicator,
-                                                     DayTypes(CurDayType));
+                                                     ScheduleManager::dayTypeNames[CurDayType]);
                             op->LHourP = state.dataGlobal->HourOfDay;
                             op->LStartMin = StartMinute;
                             op->LEndMin = op->TimeValue.at(thisTimeStepType).CurMinute;
@@ -5907,7 +5907,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         if (op->TrackingHourlyVariables) {
             int CurDayType = state.dataEnvrn->DayOfWeek;
             if (state.dataEnvrn->HolidayIndex > 0) {
-                CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                CurDayType = state.dataEnvrn->HolidayIndex;
             }
             WriteTimeStampFormatData(state,
                                      state.files.eso,
@@ -5922,7 +5922,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      _,
                                      _,
                                      state.dataEnvrn->DSTIndicator,
-                                     DayTypes(CurDayType));
+                                     ScheduleManager::dayTypeNames[CurDayType]);
             TimePrint = false;
         }
 
@@ -6011,7 +6011,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         if (op->TrackingDailyVariables) {
             int CurDayType = state.dataEnvrn->DayOfWeek;
             if (state.dataEnvrn->HolidayIndex > 0) {
-                CurDayType = 7 + state.dataEnvrn->HolidayIndex;
+                CurDayType = state.dataEnvrn->HolidayIndex;
             }
             WriteTimeStampFormatData(state,
                                      state.files.eso,
@@ -6026,7 +6026,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      _,
                                      _,
                                      state.dataEnvrn->DSTIndicator,
-                                     DayTypes(CurDayType));
+                                     ScheduleManager::dayTypeNames[CurDayType]);
             TimePrint = false;
         }
         if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {

@@ -96,7 +96,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,22.2;
+  Version,23.1;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
