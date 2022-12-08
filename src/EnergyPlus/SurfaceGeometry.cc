@@ -11594,6 +11594,7 @@ namespace SurfaceGeometry {
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             MaterNum =
                 UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+            auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             InsulationType insulationType =
                 static_cast<InsulationType>(getEnumerationValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
@@ -11645,7 +11646,7 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Screen:EquivalentLayer",
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
-                    DataHeatBalance::MaterialGroup const MaterialLayerGroup = state.dataMaterial->Material(MaterNum)->Group;
+                    DataHeatBalance::MaterialGroup const MaterialLayerGroup = thisMaterial->Group;
                     if ((MaterialLayerGroup == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) ||
                         (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) ||
                         (MaterialLayerGroup == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) ||
@@ -11679,39 +11680,39 @@ namespace SurfaceGeometry {
                                                           state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name +
                                                           "\".");
                                     ShowContinueError(state,
-                                                      "attempting to assign Material=\"" + state.dataMaterial->Material(MaterNum)->Name + "\".");
+                                                      "attempting to assign Material=\"" + thisMaterial->Name + "\".");
                                     ErrorsFound = true;
                                 }
                                 state.dataSurface->SurfMaterialMovInsulExt(SurfNum) = MaterNum;
                                 state.dataSurface->SurfSchedMovInsulExt(SurfNum) = SchNum;
                                 state.dataSurface->AnyMovableInsulation = true;
-                                if (state.dataMaterial->Material(MaterNum)->Resistance <= 0.0) {
-                                    if (state.dataMaterial->Material(MaterNum)->Conductivity <= 0.0 ||
-                                        state.dataMaterial->Material(MaterNum)->Thickness <= 0.0) {
+                                if (thisMaterial->Resistance <= 0.0) {
+                                    if (thisMaterial->Conductivity <= 0.0 ||
+                                        thisMaterial->Thickness <= 0.0) {
                                         ShowSevereError(state,
                                                         cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                             state.dataIPShortCut->cAlphaArgs(2) + "\", invalid material.");
                                         ShowContinueError(state, "\"Outside\", invalid material for movable insulation.");
                                         ShowContinueError(state,
                                                           format("Material=\"{}\",Resistance=[{:.3R}], must be > 0 for use in Movable Insulation.",
-                                                                 state.dataMaterial->Material(MaterNum)->Name,
-                                                                 state.dataMaterial->Material(MaterNum)->Resistance));
+                                                                 thisMaterial->Name,
+                                                                 thisMaterial->Resistance));
                                         ErrorsFound = true;
-                                    } else if (state.dataMaterial->Material(MaterNum)->Conductivity > 0.0) {
-                                        state.dataMaterial->Material(MaterNum)->Resistance =
-                                            state.dataMaterial->Material(MaterNum)->Thickness / state.dataMaterial->Material(MaterNum)->Conductivity;
+                                    } else if (thisMaterial->Conductivity > 0.0) {
+                                        thisMaterial->Resistance =
+                                            thisMaterial->Thickness / thisMaterial->Conductivity;
                                     }
                                 }
-                                if (state.dataMaterial->Material(MaterNum)->Conductivity <= 0.0) {
-                                    if (state.dataMaterial->Material(MaterNum)->Resistance <= 0.0) {
+                                if (thisMaterial->Conductivity <= 0.0) {
+                                    if (thisMaterial->Resistance <= 0.0) {
                                         ShowSevereError(state,
                                                         cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                             state.dataIPShortCut->cAlphaArgs(2) + "\", invalid material.");
                                         ShowContinueError(state, "\"Outside\", invalid material for movable insulation.");
                                         ShowContinueError(state,
                                                           format("Material=\"{}\",Conductivity=[{:.3R}], must be > 0 for use in Movable Insulation.",
-                                                                 state.dataMaterial->Material(MaterNum)->Name,
-                                                                 state.dataMaterial->Material(MaterNum)->Conductivity));
+                                                                 thisMaterial->Name,
+                                                                 thisMaterial->Conductivity));
                                         ErrorsFound = true;
                                     }
                                 }
@@ -11726,27 +11727,27 @@ namespace SurfaceGeometry {
                                                           state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name +
                                                           "\".");
                                     ShowContinueError(state,
-                                                      "attempting to assign Material=\"" + state.dataMaterial->Material(MaterNum)->Name + "\".");
+                                                      "attempting to assign Material=\"" + thisMaterial->Name + "\".");
                                     ErrorsFound = true;
                                 }
                                 state.dataSurface->SurfMaterialMovInsulInt(SurfNum) = MaterNum;
                                 state.dataSurface->SurfSchedMovInsulInt(SurfNum) = SchNum;
                                 state.dataSurface->AnyMovableInsulation = true;
-                                if (state.dataMaterial->Material(MaterNum)->Resistance <= 0.0) {
-                                    if (state.dataMaterial->Material(MaterNum)->Conductivity <= 0.0 ||
-                                        state.dataMaterial->Material(MaterNum)->Thickness <= 0.0) {
+                                if (thisMaterial->Resistance <= 0.0) {
+                                    if (thisMaterial->Conductivity <= 0.0 ||
+                                        thisMaterial->Thickness <= 0.0) {
                                         ShowSevereError(state,
                                                         cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                             state.dataIPShortCut->cAlphaArgs(2) + "\", invalid material.");
                                         ShowContinueError(state, "\"Inside\", invalid material for movable insulation.");
                                         ShowContinueError(state,
                                                           format("Material=\"{}\",Resistance=[{:.3R}], must be > 0 for use in Movable Insulation.",
-                                                                 state.dataMaterial->Material(MaterNum)->Name,
-                                                                 state.dataMaterial->Material(MaterNum)->Resistance));
+                                                                 thisMaterial->Name,
+                                                                 thisMaterial->Resistance));
                                         ErrorsFound = true;
-                                    } else if (state.dataMaterial->Material(MaterNum)->Conductivity > 0.0) {
-                                        state.dataMaterial->Material(MaterNum)->Resistance =
-                                            state.dataMaterial->Material(MaterNum)->Thickness / state.dataMaterial->Material(MaterNum)->Conductivity;
+                                    } else if (thisMaterial->Conductivity > 0.0) {
+                                        thisMaterial->Resistance =
+                                            thisMaterial->Thickness / thisMaterial->Conductivity;
                                     }
                                 }
                                 break;

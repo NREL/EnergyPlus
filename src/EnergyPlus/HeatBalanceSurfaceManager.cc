@@ -4524,23 +4524,24 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
 
     // first, loop over materials
     for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
-        if (state.dataMaterial->Material(MaterNum)->AbsorpSolarEMSOverrideOn) {
-            state.dataMaterial->Material(MaterNum)->AbsorpSolar =
-                max(min(state.dataMaterial->Material(MaterNum)->AbsorpSolarEMSOverride, 0.9999), 0.0001);
+        auto *thisMaterial = state.dataMaterial->Material(MaterNum);
+        if (thisMaterial->AbsorpSolarEMSOverrideOn) {
+            thisMaterial->AbsorpSolar =
+                max(min(thisMaterial->AbsorpSolarEMSOverride, 0.9999), 0.0001);
         } else {
-            state.dataMaterial->Material(MaterNum)->AbsorpSolar = state.dataMaterial->Material(MaterNum)->AbsorpSolarInput;
+            thisMaterial->AbsorpSolar = thisMaterial->AbsorpSolarInput;
         }
-        if (state.dataMaterial->Material(MaterNum)->AbsorpThermalEMSOverrideOn) {
-            state.dataMaterial->Material(MaterNum)->AbsorpThermal =
-                max(min(state.dataMaterial->Material(MaterNum)->AbsorpThermalEMSOverride, 0.9999), 0.0001);
+        if (thisMaterial->AbsorpThermalEMSOverrideOn) {
+            thisMaterial->AbsorpThermal =
+                max(min(thisMaterial->AbsorpThermalEMSOverride, 0.9999), 0.0001);
         } else {
-            state.dataMaterial->Material(MaterNum)->AbsorpThermal = state.dataMaterial->Material(MaterNum)->AbsorpThermalInput;
+            thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalInput;
         }
-        if (state.dataMaterial->Material(MaterNum)->AbsorpVisibleEMSOverrideOn) {
-            state.dataMaterial->Material(MaterNum)->AbsorpVisible =
-                max(min(state.dataMaterial->Material(MaterNum)->AbsorpVisibleEMSOverride, 0.9999), 0.0001);
+        if (thisMaterial->AbsorpVisibleEMSOverrideOn) {
+            thisMaterial->AbsorpVisible =
+                max(min(thisMaterial->AbsorpVisibleEMSOverride, 0.9999), 0.0001);
         } else {
-            state.dataMaterial->Material(MaterNum)->AbsorpVisible = state.dataMaterial->Material(MaterNum)->AbsorpVisibleInput;
+            thisMaterial->AbsorpVisible = thisMaterial->AbsorpVisibleInput;
         }
     } // loop over materials
 

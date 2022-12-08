@@ -1904,14 +1904,15 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint(I);
-        switch (state.dataMaterial->Material(Layer)->Group) {
+        auto const *thisMaterial = state.dataMaterial->Material(Layer);
+        switch (thisMaterial->Group) {
         case DataHeatBalance::MaterialGroup::Air: {
             static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
-            print(state.files.eio, Format_702, state.dataMaterial->Material(Layer)->Name, state.dataMaterial->Material(Layer)->Resistance);
+            print(state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
         } break;
         default: {
             static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-            Material::MaterialProperties const *mp = state.dataMaterial->Material(Layer);
+            Material::MaterialProperties const *mp = thisMaterial;
             print(state.files.eio, Format_701, mp->Name, mp->Thickness, mp->Conductivity, mp->Density, mp->SpecHeat, mp->Resistance);
         } break;
         }
@@ -1960,10 +1961,9 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
     const DataHeatBalance::MaterialGroup MaterialGroup = state.dataMaterial->Material(LayerPoint(1))->Group;
-    return BITF_TEST_ANY(BITF(MaterialGroup),
-                         BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::Shade) |
-                             BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |
-                             BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing));
+    return (MaterialGroup == DataHeatBalance::MaterialGroup::WindowGlass) || (MaterialGroup == DataHeatBalance::MaterialGroup::Shade) ||
+           (MaterialGroup == DataHeatBalance::MaterialGroup::Screen) || (MaterialGroup == DataHeatBalance::MaterialGroup::WindowBlind) ||
+           (MaterialGroup == DataHeatBalance::MaterialGroup::WindowSimpleGlazing);
 }
 
 Real64 ConstructionProps::setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue)

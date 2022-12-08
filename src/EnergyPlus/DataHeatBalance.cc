@@ -399,12 +399,13 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         // If there is a diffusing glass layer no shade, screen or blind is allowed
         for (Layer = 1; Layer <= TotLayers; ++Layer) {
             MaterNum = thisConstruct.LayerPoint(Layer);
+            auto const* thisMaterial = state.dataMaterial->Material(MaterNum);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
-            if (state.dataMaterial->Material(MaterNum)->SolarDiffusing && TotShadeLayers > 0) {
+            if (thisMaterial->SolarDiffusing && TotShadeLayers > 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, "CheckAndSetConstructionProperties: Window construction=" + thisConstruct.Name);
                 ShowContinueError(state,
-                                  "has diffusing glass=" + state.dataMaterial->Material(MaterNum)->Name + " and a shade, screen or blind layer.");
+                                  "has diffusing glass=" + thisMaterial->Name + " and a shade, screen or blind layer.");
                 break;
             }
         }
@@ -414,14 +415,15 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             GlassLayNum = 0;
             for (Layer = 1; Layer <= TotLayers; ++Layer) {
                 MaterNum = thisConstruct.LayerPoint(Layer);
+                auto const* thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                if (state.dataMaterial->Material(MaterNum)->Group == DataHeatBalance::MaterialGroup::WindowGlass) {
+                if (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGlass) {
                     ++GlassLayNum;
-                    if (GlassLayNum < TotGlassLayers && state.dataMaterial->Material(MaterNum)->SolarDiffusing) {
+                    if (GlassLayNum < TotGlassLayers && thisMaterial->SolarDiffusing) {
                         ErrorsFound = true;
                         ShowSevereError(state, "CheckAndSetConstructionProperties: Window construction=" + thisConstruct.Name);
                         ShowContinueError(
-                            state, "has diffusing glass=" + state.dataMaterial->Material(MaterNum)->Name + " that is not the innermost glass layer.");
+                            state, "has diffusing glass=" + thisMaterial->Name + " that is not the innermost glass layer.");
                     }
                 }
             }
@@ -529,13 +531,14 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 // check that none of the other layers are glazing or gas
                 for (Layer = 1; Layer <= TotLayers; ++Layer) {
                     MaterNum = thisConstruct.LayerPoint(Layer);
+                    auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                     if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                    if (state.dataMaterial->Material(MaterNum)->Group == DataHeatBalance::MaterialGroup::WindowGlass) {
+                    if (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGlass) {
                         ErrorsFound = true;
                         ShowSevereError(state, "CheckAndSetConstructionProperties: Error in window construction " + thisConstruct.Name + "--");
                         ShowContinueError(state, "For simple window constructions, no other glazing layers are allowed.");
                     }
-                    if (state.dataMaterial->Material(MaterNum)->Group == DataHeatBalance::MaterialGroup::WindowGas) {
+                    if (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGas) {
                         ErrorsFound = true;
                         ShowSevereError(state, "CheckAndSetConstructionProperties: Error in window construction " + thisConstruct.Name + "--");
                         ShowContinueError(state, "For simple window constructions, no other gas layers are allowed.");
@@ -1316,9 +1319,10 @@ void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state)
             NumLayers = thisConstruct.TotLayers;
             for (Layer = 1; Layer <= NumLayers; ++Layer) {
                 MaterNum = thisConstruct.LayerPoint(Layer);
+                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) continue;
-                if (state.dataMaterial->Material(MaterNum)->Group == DataHeatBalance::MaterialGroup::Shade ||
-                    state.dataMaterial->Material(MaterNum)->Group == DataHeatBalance::MaterialGroup::WindowBlind)
+                if (thisMaterial->Group == DataHeatBalance::MaterialGroup::Shade ||
+                    thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowBlind)
                     state.dataSurface->SurfWinHasShadeOrBlindLayer(loopSurfNum) = true;
             }
         }

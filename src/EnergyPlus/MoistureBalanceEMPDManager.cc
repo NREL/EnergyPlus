@@ -206,30 +206,30 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
             continue;
         }
 
+        auto *material(state.dataMaterial->Material(MaterNum));
         // See if Material was defined with R only.  (No density is defined then and not applicable for EMPD).
         //  What about materials other than "regular materials" (e.g. Glass, Air, etc)
-        if (state.dataMaterial->Material(MaterNum)->Group == DataHeatBalance::MaterialGroup::RegularMaterial && MaterialProps(1) > 0.0) {
-            if (state.dataMaterial->Material(MaterNum)->ROnly) {
+        if (material->Group == DataHeatBalance::MaterialGroup::RegularMaterial && MaterialProps(1) > 0.0) {
+            if (material->ROnly) {
                 //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                 //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
                 ShowContinueError(state, "..Only Material base materials are allowed to have EMPD properties.");
                 ShowSevereError(state,
                                 cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
-                                    state.dataMaterial->Material(MaterNum)->Name + ", must have regular properties (L,Cp,K,D)");
+                                    material->Name + ", must have regular properties (L,Cp,K,D)");
                 ErrorsFound = true;
             }
         }
-        if (state.dataMaterial->Material(MaterNum)->Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
+        if (material->Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
             //      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
             //                           'to have EMPD properties, material = '// TRIM(dataMaterial.Material(MaterNum)%Name))
             ShowSevereError(state,
                             cCurrentModuleObject + ": Reference Material is not appropriate type for EMPD properties, material=" +
-                                state.dataMaterial->Material(MaterNum)->Name + ", must have regular properties (L,Cp,K,D)");
+                                material->Name + ", must have regular properties (L,Cp,K,D)");
             ErrorsFound = true;
         }
 
         // Once the material derived type number is found then load the additional moisture material properties
-        auto *material(state.dataMaterial->Material(MaterNum));
         material->EMPDmu = MaterialProps(1);
         material->MoistACoeff = MaterialProps(2);
         material->MoistBCoeff = MaterialProps(3);
@@ -765,22 +765,23 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
     for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
         MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-        if (state.dataMaterial->Material(MatNum)->EMPDMaterialProps) {
+        auto const *thisMaterial = state.dataMaterial->Material(MatNum);
+        if (thisMaterial->EMPDMaterialProps) {
             static constexpr std::string_view Format_700(
                 " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
             print(state.files.eio,
                   Format_700,
                   state.dataConstruction->Construct(ConstrNum).Name,
-                  state.dataMaterial->Material(MatNum)->Name,
-                  state.dataMaterial->Material(MatNum)->EMPDmu,
-                  state.dataMaterial->Material(MatNum)->MoistACoeff,
-                  state.dataMaterial->Material(MatNum)->MoistBCoeff,
-                  state.dataMaterial->Material(MatNum)->MoistCCoeff,
-                  state.dataMaterial->Material(MatNum)->MoistDCoeff,
-                  state.dataMaterial->Material(MatNum)->EMPDSurfaceDepth,
-                  state.dataMaterial->Material(MatNum)->EMPDDeepDepth,
-                  state.dataMaterial->Material(MatNum)->EMPDmuCoating,
-                  state.dataMaterial->Material(MatNum)->EMPDCoatingThickness);
+                  thisMaterial->Name,
+                  thisMaterial->EMPDmu,
+                  thisMaterial->MoistACoeff,
+                  thisMaterial->MoistBCoeff,
+                  thisMaterial->MoistCCoeff,
+                  thisMaterial->MoistDCoeff,
+                  thisMaterial->EMPDSurfaceDepth,
+                  thisMaterial->EMPDDeepDepth,
+                  thisMaterial->EMPDmuCoating,
+                  thisMaterial->EMPDCoatingThickness);
         }
     }
 }

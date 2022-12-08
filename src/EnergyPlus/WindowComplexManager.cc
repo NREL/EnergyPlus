@@ -2880,22 +2880,23 @@ namespace WindowComplexManager {
         IGap = 0;
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
+            auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
 
-            if ((state.dataMaterial->Material(LayPtr)->Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
-                (state.dataMaterial->Material(LayPtr)->Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
+            if ((thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
+                (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
-                thick(IGlass) = state.dataMaterial->Material(LayPtr)->Thickness;
-                scon(IGlass) = state.dataMaterial->Material(LayPtr)->Conductivity;
-                emis(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr)->AbsorpThermalFront;
-                emis(2 * IGlass) = state.dataMaterial->Material(LayPtr)->AbsorpThermalBack;
-                tir(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr)->TransThermal;
-                tir(2 * IGlass) = state.dataMaterial->Material(LayPtr)->TransThermal;
-                YoungsMod(IGlass) = state.dataMaterial->Material(LayPtr)->YoungModulus;
-                PoissonsRat(IGlass) = state.dataMaterial->Material(LayPtr)->PoissonsRatio;
-            } else if (state.dataMaterial->Material(LayPtr)->Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
+                thick(IGlass) = thisMaterial->Thickness;
+                scon(IGlass) = thisMaterial->Conductivity;
+                emis(2 * IGlass - 1) = thisMaterial->AbsorpThermalFront;
+                emis(2 * IGlass) = thisMaterial->AbsorpThermalBack;
+                tir(2 * IGlass - 1) = thisMaterial->TransThermal;
+                tir(2 * IGlass) = thisMaterial->TransThermal;
+                YoungsMod(IGlass) = thisMaterial->YoungModulus;
+                PoissonsRat(IGlass) = thisMaterial->PoissonsRatio;
+            } else if (thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
                 ++IGlass;
-                TempInt = state.dataMaterial->Material(LayPtr)->ComplexShadePtr;
+                TempInt = thisMaterial->ComplexShadePtr;
                 LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
 
                 thick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Thickness;
@@ -2918,19 +2919,19 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
-            } else if (state.dataMaterial->Material(LayPtr)->Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
+            } else if (thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
                 ++IGap;
-                gap(IGap) = state.dataMaterial->Material(LayPtr)->Thickness;
-                presure(IGap) = state.dataMaterial->Material(LayPtr)->Pressure;
+                gap(IGap) = thisMaterial->Thickness;
+                presure(IGap) = thisMaterial->Pressure;
 
-                DeflectionPtr = state.dataMaterial->Material(LayPtr)->DeflectionStatePtr;
+                DeflectionPtr = thisMaterial->DeflectionStatePtr;
                 if (DeflectionPtr != 0) {
                     GapDefMax(IGap) = state.dataHeatBal->DeflectionState(DeflectionPtr).DeflectedThickness;
                 } else {
                     GapDefMax(IGap) = gap(IGap);
                 }
 
-                PillarPtr = state.dataMaterial->Material(LayPtr)->SupportPillarPtr;
+                PillarPtr = thisMaterial->SupportPillarPtr;
 
                 if (PillarPtr != 0) {
                     SupportPlr(IGap) = 1;
@@ -2938,7 +2939,7 @@ namespace WindowComplexManager {
                     PillarRadius(IGap) = state.dataHeatBal->SupportPillar(PillarPtr).Radius;
                 }
 
-                GasPointer = state.dataMaterial->Material(LayPtr)->GasPointer;
+                GasPointer = thisMaterial->GasPointer;
 
                 nmix(IGap + 1) = state.dataMaterial->Material(GasPointer)->NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {

@@ -248,8 +248,9 @@ namespace WindowManager {
                         RhoGlIR = 1 - EpsGlIR;
                     }
                     if (IntShade) {
-                        auto TauShIR = state.dataMaterial->Material(ShadeLayPtr)->TransThermal;
-                        auto EpsShIR = state.dataMaterial->Material(ShadeLayPtr)->AbsorpThermal;
+                        auto const *thisMaterialShade = state.dataMaterial->Material(ShadeLayPtr);
+                        auto TauShIR = thisMaterialShade->TransThermal;
+                        auto EpsShIR = thisMaterialShade->AbsorpThermal;
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1) =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));

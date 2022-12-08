@@ -234,6 +234,7 @@ namespace HeatBalFiniteDiffManager {
 
                 // Load the material derived type from the input data.
                 MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
+                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
@@ -242,10 +243,10 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (state.dataMaterial->Material(MaterNum)->Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
+                if (thisMaterial->Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
-                                        state.dataMaterial->Material(MaterNum)->Name + ", must have regular properties (L,Cp,K,D)");
+                                        thisMaterial->Name + ", must have regular properties (L,Cp,K,D)");
                     ErrorsFound = true;
                 }
 
@@ -329,6 +330,7 @@ namespace HeatBalFiniteDiffManager {
 
                 // Load the material derived type from the input data.
                 MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
+                auto const *thisMaterial = state.dataMaterial->Material(MaterNum);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered=" + MaterialNames(1) +
@@ -337,10 +339,10 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (state.dataMaterial->Material(MaterNum)->Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
+                if (thisMaterial->Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
-                                        state.dataMaterial->Material(MaterNum)->Name + ", must have regular properties (L,Cp,K,D)");
+                                        thisMaterial->Name + ", must have regular properties (L,Cp,K,D)");
                     ErrorsFound = true;
                 }
 
