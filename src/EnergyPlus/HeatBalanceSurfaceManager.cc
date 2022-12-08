@@ -2338,11 +2338,11 @@ void EvalOutsideMovableInsulation(EnergyPlusData &state)
             continue;
         }
         int const MaterialIndex(state.dataSurface->SurfMaterialMovInsulExt(SurfNum));
-        DataHeatBalance::MaterialGroup const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex)->Group);
+        Material::MaterialGroup const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex)->Group);
         state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex)->Resistance);
-        if (MaterialGroupNum == DataHeatBalance::MaterialGroup::WindowGlass ||
-            MaterialGroupNum == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) {
+        if (MaterialGroupNum == Material::MaterialGroup::WindowGlass ||
+            MaterialGroupNum == Material::MaterialGroup::GlassEquivalentLayer) {
             state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum) =
                 max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex)->Trans - state.dataMaterial->Material(MaterialIndex)->ReflectSolBeamFront);
         } else {
@@ -2367,11 +2367,11 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
             continue;
         }
         int const MaterialIndex(state.dataSurface->SurfMaterialMovInsulInt(SurfNum));
-        DataHeatBalance::MaterialGroup const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex)->Group);
+        Material::MaterialGroup const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex)->Group);
         state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex)->Resistance);
-        if (MaterialGroupNum == DataHeatBalance::MaterialGroup::WindowGlass ||
-            MaterialGroupNum == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) {
+        if (MaterialGroupNum == Material::MaterialGroup::WindowGlass ||
+            MaterialGroupNum == Material::MaterialGroup::GlassEquivalentLayer) {
             state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum) =
                 max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex)->Trans - state.dataMaterial->Material(MaterialIndex)->ReflectSolBeamFront);
         } else {

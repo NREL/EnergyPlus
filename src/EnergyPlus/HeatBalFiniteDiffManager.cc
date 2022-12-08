@@ -243,7 +243,7 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (thisMaterial->Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
+                if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
                                         thisMaterial->Name + ", must have regular properties (L,Cp,K,D)");
@@ -339,7 +339,7 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (thisMaterial->Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
+                if (thisMaterial->Group != Material::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
                                         thisMaterial->Name + ", must have regular properties (L,Cp,K,D)");
@@ -658,7 +658,7 @@ namespace HeatBalFiniteDiffManager {
 
                     mAlpha = 0.0;
 
-                } else if (thisMaterial->Group == DataHeatBalance::MaterialGroup::Air) { //  Group 1 = Air
+                } else if (thisMaterial->Group == Material::MaterialGroup::Air) { //  Group 1 = Air
 
                     //  Again, these values are only needed temporarily and to calculate flux,
                     //   Air layer will be handled
@@ -749,7 +749,7 @@ namespace HeatBalFiniteDiffManager {
                 //  set high conductivity layers to a single full size node thickness. (two half nodes)
                 if (Ipts1 <= 1) Ipts1 = 1;
                 if (thisMaterial->ROnly ||
-                    thisMaterial->Group == DataHeatBalance::MaterialGroup::Air) {
+                    thisMaterial->Group == Material::MaterialGroup::Air) {
 
                     Ipts1 = 1; //  single full node in R layers- surfaces of adjacent material or inside/outside layer
                 }
@@ -1615,7 +1615,7 @@ namespace HeatBalFiniteDiffManager {
 
                 // Calculate the Dry Heat Conduction Equation
 
-                if (mat->ROnly || mat->Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer  **********
+                if (mat->ROnly || mat->Group == Material::MaterialGroup::Air) { // R Layer or Air Layer  **********
                     // Use algebraic equation for TDT based on R
                     Real64 const Rlayer(mat->Resistance);
                     TDT_i = (TDT_p + (QRadSWOutFD + hgnd * Tgnd + (hconvo + hrad) * Toa + hsky * Tsky) * Rlayer) /
@@ -1924,8 +1924,8 @@ namespace HeatBalFiniteDiffManager {
             Real64 const TDT_m(TDT(i - 1));
             Real64 const TDT_p(TDT(i + 1));
 
-            bool const RLayerPresent(mat->ROnly || mat->Group == DataHeatBalance::MaterialGroup::Air);
-            bool const RLayer2Present(mat2->ROnly || mat2->Group == DataHeatBalance::MaterialGroup::Air);
+            bool const RLayerPresent(mat->ROnly || mat->Group == Material::MaterialGroup::Air);
+            bool const RLayer2Present(mat2->ROnly || mat2->Group == Material::MaterialGroup::Air);
 
             Real64 const Rlayer(mat->Resistance);   // Resistance value of R Layer
             Real64 const Rlayer2(mat2->Resistance); // Resistance value of next layer to inside
@@ -2323,7 +2323,7 @@ namespace HeatBalFiniteDiffManager {
 
             // Calculate the Dry Heat Conduction Equation
 
-            if (mat->ROnly || mat->Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer
+            if (mat->ROnly || mat->Group == Material::MaterialGroup::Air) { // R Layer or Air Layer
                 // Use algebraic equation for TDT based on R
                 Real64 constexpr IterDampConst(
                     5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls

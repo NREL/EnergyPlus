@@ -86,13 +86,13 @@ namespace WindowManager {
         // BSDF will be created in different ways that is based on material type
 
         std::shared_ptr<CWCELayerFactory> aFactory = nullptr;
-        if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowGlass) {
+        if (t_Material.Group == Material::MaterialGroup::WindowGlass) {
             aFactory = std::make_shared<CWCESpecularLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowBlind) {
+        } else if (t_Material.Group == Material::MaterialGroup::WindowBlind) {
             aFactory = std::make_shared<CWCEVenetianBlindLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::Screen) {
+        } else if (t_Material.Group == Material::MaterialGroup::Screen) {
             aFactory = std::make_shared<CWCEScreenLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::Shade) {
+        } else if (t_Material.Group == Material::MaterialGroup::Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
         return aFactory->getBSDFLayer(state);
@@ -111,14 +111,14 @@ namespace WindowManager {
         // Scattering will be created in different ways that is based on material type
 
         std::shared_ptr<CWCELayerFactory> aFactory = nullptr;
-        if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowGlass ||
-            t_Material.Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) {
+        if (t_Material.Group == Material::MaterialGroup::WindowGlass ||
+            t_Material.Group == Material::MaterialGroup::WindowSimpleGlazing) {
             aFactory = std::make_shared<CWCESpecularLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowBlind) {
+        } else if (t_Material.Group == Material::MaterialGroup::WindowBlind) {
             aFactory = std::make_shared<CWCEVenetianBlindLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::Screen) {
+        } else if (t_Material.Group == Material::MaterialGroup::Screen) {
             aFactory = std::make_shared<CWCEScreenLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::Shade) {
+        } else if (t_Material.Group == Material::MaterialGroup::Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
         return aFactory->getLayer(state);
@@ -191,9 +191,9 @@ namespace WindowManager {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
                     auto &material(*state.dataMaterial->Material(construction.LayerPoint(LayNum)));
                     if (BITF_TEST_NONE(BITF(material.Group),
-                                       BITF(DataHeatBalance::MaterialGroup::WindowGas) | BITF(DataHeatBalance::MaterialGroup::WindowGasMixture) |
-                                           BITF(DataHeatBalance::MaterialGroup::ComplexWindowGap) |
-                                           BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade))) {
+                                       BITF(Material::MaterialGroup::WindowGas) | BITF(Material::MaterialGroup::WindowGasMixture) |
+                                           BITF(Material::MaterialGroup::ComplexWindowGap) |
+                                           BITF(Material::MaterialGroup::ComplexWindowShade))) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
                         // property is >0.
@@ -228,12 +228,12 @@ namespace WindowManager {
             auto ShadeLayPtr = 0;
             auto BlNum = 0;
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
-                DataHeatBalance::MaterialGroup::Shade) {
+                Material::MaterialGroup::Shade) {
                 IntShade = true;
                 ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
             }
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
-                DataHeatBalance::MaterialGroup::WindowBlind) {
+                Material::MaterialGroup::WindowBlind) {
                 IntBlind = true;
                 BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->BlindDataPtr;
             }
@@ -249,17 +249,17 @@ namespace WindowManager {
                     }
                     if (IntShade) {
                         auto const *thisMaterialShade = state.dataMaterial->Material(ShadeLayPtr);
-                        auto TauShIR = thisMaterialShade->TransThermal;
-                        auto EpsShIR = thisMaterialShade->AbsorpThermal;
-                        auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
+                        Real64 TauShIR = thisMaterialShade->TransThermal;
+                        Real64 EpsShIR = thisMaterialShade->AbsorpThermal;
+                        Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1) =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
                         state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
-                        auto TauShIR = state.dataHeatBal->Blind(BlNum).IRFrontTrans(ISlatAng);
-                        auto EpsShIR = state.dataHeatBal->Blind(BlNum).IRBackEmiss(ISlatAng);
-                        auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
+                        Real64 TauShIR = state.dataHeatBal->Blind(BlNum).IRFrontTrans(ISlatAng);
+                        Real64 EpsShIR = state.dataHeatBal->Blind(BlNum).IRBackEmiss(ISlatAng);
+                        Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
                         state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);

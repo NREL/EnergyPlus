@@ -576,7 +576,7 @@ private:
     private:
         int const number;
         std::string const &name;
-        DataHeatBalance::MaterialGroup const &group;
+        EnergyPlus::Material::MaterialGroup const &group;
         DataSurfaces::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;

@@ -587,7 +587,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == DataHeatBalance::MaterialGroup::Shade) {
+        if (material.Group == Material::MaterialGroup::Shade) {
             emissFront = material.AbsorpThermal;
             emissBack = material.AbsorpThermal;
             transThermalFront = material.TransThermal;
@@ -603,7 +603,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == DataHeatBalance::MaterialGroup::Screen) {
+        if (material.Group == Material::MaterialGroup::Screen) {
             // Simon: Existing code already takes into account geometry of Woven and scales down
             // emissivity for openning area.
             emissFront = material.AbsorpThermal;
@@ -621,7 +621,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
+        if (material.Group == Material::MaterialGroup::ComplexWindowShade) {
             auto shdPtr = material.ComplexShadePtr;
             auto &shade(state.dataHeatBal->ComplexShade(shdPtr));
             thickness = shade.Thickness;
@@ -927,32 +927,32 @@ namespace WindowManager {
         const auto MatOutside = state.dataConstruction->Construct(ConstrNum).LayerPoint(1);
         const auto MatInside = state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLay);
 
-        if (state.dataMaterial->Material(MatOutside)->Group == DataHeatBalance::MaterialGroup::Shade) { // Exterior shade present
+        if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Shade) { // Exterior shade present
             ShadeFlag = WinShadingType::ExtShade;
-        } else if (state.dataMaterial->Material(MatOutside)->Group == DataHeatBalance::MaterialGroup::Screen) { // Exterior screen present
+        } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Screen) { // Exterior screen present
             const auto MatShade = MatOutside;
             const auto ScNum = state.dataMaterial->Material(MatShade)->ScreenDataPtr;
             // Orphaned constructs with exterior screen are ignored
             if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
-        } else if (state.dataMaterial->Material(MatOutside)->Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Exterior blind present
+        } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::WindowBlind) { // Exterior blind present
             ShadeFlag = WinShadingType::ExtBlind;
-        } else if (state.dataMaterial->Material(MatInside)->Group == DataHeatBalance::MaterialGroup::Shade) { // Interior shade present
+        } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::Shade) { // Interior shade present
             ShadeFlag = WinShadingType::IntShade;
-        } else if (state.dataMaterial->Material(MatInside)->Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Interior blind present
+        } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::WindowBlind) { // Interior blind present
             ShadeFlag = WinShadingType::IntBlind;
         } else if (TotGlassLay == 2) {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group ==
-                DataHeatBalance::MaterialGroup::Shade)
+                Material::MaterialGroup::Shade)
                 ShadeFlag = WinShadingType::BGShade;
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group ==
-                DataHeatBalance::MaterialGroup::WindowBlind)
+                Material::MaterialGroup::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         } else if (TotGlassLay == 3) {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group ==
-                DataHeatBalance::MaterialGroup::Shade)
+                Material::MaterialGroup::Shade)
                 ShadeFlag = WinShadingType::BGShade;
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group ==
-                DataHeatBalance::MaterialGroup::WindowBlind)
+                Material::MaterialGroup::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         }
 

@@ -84,33 +84,6 @@ namespace DataHeatBalance {
     using DataSurfaces::MaxSlatAngs;
     using DataVectorTypes::Vector;
 
-    // Parameters to indicate material group type for use with the Material
-    // derived type (see below):
-    enum class MaterialGroup
-    {
-        Invalid = -1,
-        RegularMaterial,
-        Air,
-        Shade,
-        WindowGlass,
-        WindowGas,
-        WindowBlind,
-        WindowGasMixture,
-        Screen,
-        EcoRoof,
-        IRTMaterial,
-        WindowSimpleGlazing,
-        ComplexWindowShade,
-        ComplexWindowGap,
-        GlassEquivalentLayer,
-        ShadeEquivalentLayer,
-        DrapeEquivalentLayer,
-        BlindEquivalentLayer,
-        ScreenEquivalentLayer,
-        GapEquivalentLayer,
-        Num
-    };
-
     // Parameters for Interior and Exterior Solar Distribution
     enum class Shadowing
     {

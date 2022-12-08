@@ -2882,8 +2882,8 @@ namespace WindowComplexManager {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
             auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
 
-            if ((thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
-                (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
+            if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
+                (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
                 thick(IGlass) = thisMaterial->Thickness;
@@ -2894,7 +2894,7 @@ namespace WindowComplexManager {
                 tir(2 * IGlass) = thisMaterial->TransThermal;
                 YoungsMod(IGlass) = thisMaterial->YoungModulus;
                 PoissonsRat(IGlass) = thisMaterial->PoissonsRatio;
-            } else if (thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
+            } else if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowShade) {
                 ++IGlass;
                 TempInt = thisMaterial->ComplexShadePtr;
                 LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
@@ -2919,7 +2919,7 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
-            } else if (thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
+            } else if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap) {
                 ++IGap;
                 gap(IGap) = thisMaterial->Thickness;
                 presure(IGap) = thisMaterial->Pressure;

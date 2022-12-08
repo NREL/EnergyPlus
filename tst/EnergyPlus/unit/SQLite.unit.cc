@@ -618,10 +618,10 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
 
     auto const &materialData0 = std::make_unique<Material::MaterialProperties>();
     materialData0->Name = "test material 1";
-    materialData0->Group = DataHeatBalance::MaterialGroup::Air;
+    materialData0->Group = Material::MaterialGroup::Air;
     auto const &materialData1 = std::make_unique<Material::MaterialProperties>();
     materialData1->Name = "test material 2";
-    materialData1->Group = DataHeatBalance::MaterialGroup::Shade;
+    materialData1->Group = Material::MaterialGroup::Shade;
     materialData1->Roughness = DataSurfaces::SurfaceRoughness::Rough; // 1
     materialData1->Conductivity = 2;
     materialData1->Density = 2;

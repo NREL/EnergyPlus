@@ -58,11 +58,38 @@ namespace EnergyPlus {
 
 namespace Material {
 
+    // Parameters to indicate material group type for use with the Material
+    // derived type (see below):
+    enum class MaterialGroup
+    {
+        Invalid = -1,
+        RegularMaterial,
+        Air,
+        Shade,
+        WindowGlass,
+        WindowGas,
+        WindowBlind,
+        WindowGasMixture,
+        Screen,
+        EcoRoof,
+        IRTMaterial,
+        WindowSimpleGlazing,
+        ComplexWindowShade,
+        ComplexWindowGap,
+        GlassEquivalentLayer,
+        ShadeEquivalentLayer,
+        DrapeEquivalentLayer,
+        BlindEquivalentLayer,
+        ScreenEquivalentLayer,
+        GapEquivalentLayer,
+        Num
+    };
+
     struct MaterialProperties
     {
         // Members
         std::string Name;                     // Name of material layer
-        DataHeatBalance::MaterialGroup Group; // Material group type (see Material Parameters above.  Currently
+        Material::MaterialGroup Group; // Material group type (see Material Parameters above.  Currently
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)
@@ -251,7 +278,7 @@ namespace Material {
 
         // Default Constructor
         MaterialProperties()
-            : Group(DataHeatBalance::MaterialGroup::Invalid), Roughness(DataSurfaces::SurfaceRoughness::Invalid), Conductivity(0.0), Density(0.0),
+            : Group(Material::MaterialGroup::Invalid), Roughness(DataSurfaces::SurfaceRoughness::Invalid), Conductivity(0.0), Density(0.0),
               IsoMoistCap(0.0), Porosity(0.0), Resistance(0.0), ROnly(false), SpecHeat(0.0), ThermGradCoef(0.0), Thickness(0.0), VaporDiffus(0.0),
               GasType(5, 0), GlassSpectralDataPtr(0), NumberOfGasesInMixture(0), GasCon(3, 5, 0.0), GasVis(3, 5, 0.0), GasCp(3, 5, 0.0),
               GasWght(5, 0.0), GasSpecHeatRatio(5, 0.0), GasFract(5, 0.0), AbsorpSolar(0.0), AbsorpSolarInput(0.0), AbsorpSolarEMSOverrideOn(false),

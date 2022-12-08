@@ -353,15 +353,15 @@ namespace WindowManager {
 
             // First layer must be glass, shade, screen or blind to be a glazing construction
             if (thisMaterial->Group !=
-                    DataHeatBalance::MaterialGroup::WindowGlass &&
+                    Material::MaterialGroup::WindowGlass &&
                 thisMaterial->Group !=
-                    DataHeatBalance::MaterialGroup::Shade &&
+                    Material::MaterialGroup::Shade &&
                 thisMaterial->Group !=
-                    DataHeatBalance::MaterialGroup::Screen &&
+                    Material::MaterialGroup::Screen &&
                 thisMaterial->Group !=
-                    DataHeatBalance::MaterialGroup::WindowBlind &&
+                    Material::MaterialGroup::WindowBlind &&
                 thisMaterial->Group !=
-                    DataHeatBalance::MaterialGroup::WindowSimpleGlazing)
+                    Material::MaterialGroup::WindowSimpleGlazing)
                 continue;
 
             ShadeLayNum = 0;
@@ -376,7 +376,7 @@ namespace WindowManager {
             state.dataWindowManager->lSimpleGlazingSystem = false;
 
             if (thisMaterial->Group ==
-                DataHeatBalance::MaterialGroup::WindowSimpleGlazing) {
+                Material::MaterialGroup::WindowSimpleGlazing) {
                 // what if outside layer is shade, blind, or screen?
                 state.dataWindowManager->lSimpleGlazingSystem = true;
                 state.dataWindowManager->SimpleGlazingSHGC =
@@ -391,47 +391,47 @@ namespace WindowManager {
 
             // Get layer number of shade/blind
             if (thisMaterial->Group ==
-                DataHeatBalance::MaterialGroup::Shade) {
+                Material::MaterialGroup::Shade) {
                 ExtShade = true;
                 ShadeLayNum = 1;
             } else if (state.dataMaterial->Material(thisConstruct.LayerPoint(TotLay))->Group ==
-                       DataHeatBalance::MaterialGroup::Shade) {
+                       Material::MaterialGroup::Shade) {
                 IntShade = true;
                 ShadeLayNum = TotLay;
             } else if (thisConstruct.TotLayers == 5) {
                 if (state.dataMaterial->Material(thisConstruct.LayerPoint(3))->Group ==
-                    DataHeatBalance::MaterialGroup::Shade) {
+                    Material::MaterialGroup::Shade) {
                     BGShade = true;
                     ShadeLayNum = 3;
                 }
             } else if (thisConstruct.TotLayers == 7) {
                 if (state.dataMaterial->Material(thisConstruct.LayerPoint(5))->Group ==
-                    DataHeatBalance::MaterialGroup::Shade) {
+                    Material::MaterialGroup::Shade) {
                     BGShade = true;
                     ShadeLayNum = 5;
                 }
             }
 
             if (thisMaterial->Group ==
-                DataHeatBalance::MaterialGroup::WindowBlind) {
+                Material::MaterialGroup::WindowBlind) {
                 ExtBlind = true;
                 ShadeLayNum = 1;
                 BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
             } else if (state.dataMaterial->Material(thisConstruct.LayerPoint(TotLay))->Group ==
-                       DataHeatBalance::MaterialGroup::WindowBlind) {
+                       Material::MaterialGroup::WindowBlind) {
                 IntBlind = true;
                 ShadeLayNum = TotLay;
                 BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
             } else if (thisConstruct.TotLayers == 5) {
                 if (state.dataMaterial->Material(thisConstruct.LayerPoint(3))->Group ==
-                    DataHeatBalance::MaterialGroup::WindowBlind) {
+                    Material::MaterialGroup::WindowBlind) {
                     BGBlind = true;
                     ShadeLayNum = 3;
                     BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
                 }
             } else if (thisConstruct.TotLayers == 7) {
                 if (state.dataMaterial->Material(thisConstruct.LayerPoint(5))->Group ==
-                    DataHeatBalance::MaterialGroup::WindowBlind) {
+                    Material::MaterialGroup::WindowBlind) {
                     BGBlind = true;
                     ShadeLayNum = 5;
                     BlNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->BlindDataPtr;
@@ -439,7 +439,7 @@ namespace WindowManager {
             }
 
             if (thisMaterial->Group ==
-                DataHeatBalance::MaterialGroup::Screen) {
+                Material::MaterialGroup::Screen) {
                 ShadeLayNum = 1;
                 ScNum = state.dataMaterial->Material(thisConstruct.LayerPoint(ShadeLayNum))->ScreenDataPtr;
                 //   Disregard orphaned constructs with exterior screen
@@ -1603,12 +1603,12 @@ namespace WindowManager {
             IntShade = false;
             IntBlind = false;
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
-                DataHeatBalance::MaterialGroup::Shade) {
+                Material::MaterialGroup::Shade) {
                 IntShade = true;
                 ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
             }
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
-                DataHeatBalance::MaterialGroup::WindowBlind) {
+                Material::MaterialGroup::WindowBlind) {
                 IntBlind = true;
                 BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->BlindDataPtr;
             }
@@ -2474,8 +2474,8 @@ namespace WindowManager {
                 LayPtr = state.dataConstruction->Construct(IConst).LayerPoint(Lay);
 
                 auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
-                if ((thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
-                    (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
+                if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
+                    (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
                     ++IGlass;
                     state.dataWindowManager->thick[IGlass - 1] = thisMaterial->Thickness;
                     state.dataWindowManager->scon[IGlass - 1] =
@@ -2486,9 +2486,9 @@ namespace WindowManager {
                     state.dataWindowManager->tir[2 * IGlass - 1] = thisMaterial->TransThermal;
                 }
 
-                if (thisMaterial->Group == DataHeatBalance::MaterialGroup::Shade ||
-                    thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowBlind ||
-                    thisMaterial->Group == DataHeatBalance::MaterialGroup::Screen) {
+                if (thisMaterial->Group == Material::MaterialGroup::Shade ||
+                    thisMaterial->Group == Material::MaterialGroup::WindowBlind ||
+                    thisMaterial->Group == Material::MaterialGroup::Screen) {
                     if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag))
                         ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(state.dataConstruction->Construct(IConst).TotLayers);
                     if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(1);
@@ -2501,7 +2501,7 @@ namespace WindowManager {
                         // Shade or screen on
                         if (state.dataGlobal
                                 ->AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
-                            if (thisMaterialShade->Group == DataHeatBalance::MaterialGroup::WindowBlind) {
+                            if (thisMaterialShade->Group == Material::MaterialGroup::WindowBlind) {
                                 ShowSevereError(state,
                                                 "CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" +
                                                     thisMaterialShade->Name + "\" is being used.");
@@ -2530,8 +2530,8 @@ namespace WindowManager {
                     } else {
                         if (state.dataGlobal
                                 ->AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
-                            if (thisMaterialShade->Group == DataHeatBalance::MaterialGroup::Shade ||
-                                thisMaterialShade->Group == DataHeatBalance::MaterialGroup::Screen) {
+                            if (thisMaterialShade->Group == Material::MaterialGroup::Shade ||
+                                thisMaterialShade->Group == Material::MaterialGroup::Screen) {
                                 ShowSevereError(state,
                                                 "CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" +
                                                     thisMaterialShade->Name + "\" is being used.");
@@ -2573,8 +2573,8 @@ namespace WindowManager {
                     }
                 }
 
-                if (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGas ||
-                    thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGasMixture) {
+                if (thisMaterial->Group == Material::MaterialGroup::WindowGas ||
+                    thisMaterial->Group == Material::MaterialGroup::WindowGasMixture) {
                     ++IGap;
                     state.dataWindowManager->gap[IGap - 1] = thisMaterial->Thickness;
                     state.dataWindowManager->gnmix[IGap - 1] = thisMaterial->NumberOfGasesInMixture;
@@ -6655,42 +6655,42 @@ namespace WindowManager {
         ShadeRes = 0.0;
         MatOutside = state.dataConstruction->Construct(ConstrNum).LayerPoint(1);
         MatInside = state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLay);
-        if (state.dataMaterial->Material(MatOutside)->Group == DataHeatBalance::MaterialGroup::Shade) { // Exterior shade present
+        if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Shade) { // Exterior shade present
             MatShade = MatOutside;
             ShadeFlag = WinShadingType::ExtShade;
             // Set glazing outside convection coefficient to Window 4 still-air value
             state.dataWindowManager->hcout = 12.25;
-        } else if (state.dataMaterial->Material(MatOutside)->Group == DataHeatBalance::MaterialGroup::Screen) { // Exterior screen present
+        } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::Screen) { // Exterior screen present
             MatShade = MatOutside;
             ScNum = state.dataMaterial->Material(MatShade)->ScreenDataPtr;
             // Orphaned constructs with exterior screen are ignored
             if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
             state.dataWindowManager->hcout = 12.25;
-        } else if (state.dataMaterial->Material(MatOutside)->Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Exterior blind present
+        } else if (state.dataMaterial->Material(MatOutside)->Group == Material::MaterialGroup::WindowBlind) { // Exterior blind present
             MatShade = MatOutside;
             ShadeFlag = WinShadingType::ExtBlind;
             BlNum = state.dataMaterial->Material(MatShade)->BlindDataPtr;
             state.dataWindowManager->hcout = 12.25;
-        } else if (state.dataMaterial->Material(MatInside)->Group == DataHeatBalance::MaterialGroup::Shade) { // Interior shade present
+        } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::Shade) { // Interior shade present
             MatShade = MatInside;
             ShadeFlag = WinShadingType::IntShade;
-        } else if (state.dataMaterial->Material(MatInside)->Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Interior blind present
+        } else if (state.dataMaterial->Material(MatInside)->Group == Material::MaterialGroup::WindowBlind) { // Interior blind present
             MatShade = MatInside;
             BlNum = state.dataMaterial->Material(MatShade)->BlindDataPtr;
             ShadeFlag = WinShadingType::IntBlind;
         } else if (TotGlassLay == 2) {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group ==
-                DataHeatBalance::MaterialGroup::Shade)
+                Material::MaterialGroup::Shade)
                 ShadeFlag = WinShadingType::BGShade;
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3))->Group ==
-                DataHeatBalance::MaterialGroup::WindowBlind)
+                Material::MaterialGroup::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         } else if (TotGlassLay == 3) {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group ==
-                DataHeatBalance::MaterialGroup::Shade)
+                Material::MaterialGroup::Shade)
                 ShadeFlag = WinShadingType::BGShade;
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5))->Group ==
-                DataHeatBalance::MaterialGroup::WindowBlind)
+                Material::MaterialGroup::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         }
 
@@ -6835,8 +6835,8 @@ namespace WindowManager {
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
             auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
-            if ((thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
-                (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
+            if ((thisMaterial->Group == Material::MaterialGroup::WindowGlass) ||
+                (thisMaterial->Group == Material::MaterialGroup::WindowSimpleGlazing)) {
                 ++IGlass;
                 state.dataWindowManager->thick[IGlass - 1] = thisMaterial->Thickness;
                 state.dataWindowManager->scon[IGlass - 1] =
@@ -6864,12 +6864,12 @@ namespace WindowManager {
                 state.dataWindowManager->AbsRadGlassFace[2 * IGlass - 2] = 0.5 * BeamSolarInc * AbsBeamNorm(IGlass);
                 state.dataWindowManager->AbsRadGlassFace[2 * IGlass - 1] = 0.5 * BeamSolarInc * AbsBeamNorm(IGlass);
             }
-            if (thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGas ||
-                thisMaterial->Group == DataHeatBalance::MaterialGroup::WindowGasMixture ||
-                thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) { // Gap layer
+            if (thisMaterial->Group == Material::MaterialGroup::WindowGas ||
+                thisMaterial->Group == Material::MaterialGroup::WindowGasMixture ||
+                thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap) { // Gap layer
                 ++IGap;
                 // Simon: Need to re-reference gas data in casee of complex fenestration gap
-                if (thisMaterial->Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
+                if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap) {
                     LayPtr = thisMaterial->GasPointer;
                 }
                 state.dataWindowManager->gap[IGap - 1] = thisMaterial->Thickness;
@@ -7533,7 +7533,7 @@ namespace WindowManager {
                         Layer = state.dataConstruction->Construct(ThisNum).LayerPoint(i);
                         auto const* thisMaterial = state.dataMaterial->Material(Layer);
                         switch (thisMaterial->Group) {
-                        case DataHeatBalance::MaterialGroup::WindowGas: {
+                        case Material::MaterialGroup::WindowGas: {
                             static constexpr std::string_view Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
                             print(state.files.eio,
                                   Format_702,
@@ -7542,7 +7542,7 @@ namespace WindowManager {
                                   thisMaterial->Thickness);
                             //! fw CASE(WindowGasMixture)
                         } break;
-                        case DataHeatBalance::MaterialGroup::Shade: {
+                        case Material::MaterialGroup::Shade: {
                             static constexpr std::string_view Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                             print(state.files.eio,
                                   Format_703,
@@ -7554,7 +7554,7 @@ namespace WindowManager {
                                   thisMaterial->TransVis,
                                   thisMaterial->ReflectShade);
                         } break;
-                        case DataHeatBalance::MaterialGroup::WindowBlind: {
+                        case Material::MaterialGroup::WindowBlind: {
                             BlNum = thisMaterial->BlindDataPtr;
                             static constexpr std::string_view Format_704(
                                 " WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
@@ -7569,7 +7569,7 @@ namespace WindowManager {
                                   state.dataHeatBal->Blind(BlNum).SlatFrontReflSolBeamDiff,
                                   state.dataHeatBal->Blind(BlNum).BlindToGlassDist);
                         } break;
-                        case DataHeatBalance::MaterialGroup::Screen: {
+                        case Material::MaterialGroup::Screen: {
                             if (thisMaterial->ScreenDataPtr > 0) {
                                 static constexpr std::string_view Format_706(
                                     " WindowMaterial:Screen,{},{:.5R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
@@ -7589,8 +7589,8 @@ namespace WindowManager {
                                     thisMaterial->WinShadeToGlassDist);
                             }
                         } break;
-                        case DataHeatBalance::MaterialGroup::WindowGlass:
-                        case DataHeatBalance::MaterialGroup::WindowSimpleGlazing: {
+                        case Material::MaterialGroup::WindowGlass:
+                        case Material::MaterialGroup::WindowSimpleGlazing: {
                             SolarDiffusing = "No";
                             if (thisMaterial->SolarDiffusing) SolarDiffusing = "Yes";
                             OpticalDataType = "SpectralAverage";
@@ -7628,7 +7628,7 @@ namespace WindowManager {
                                   thisMaterial->GlassTransDirtFactor,
                                   SolarDiffusing);
                         } break;
-                        case DataHeatBalance::MaterialGroup::GlassEquivalentLayer: {
+                        case Material::MaterialGroup::GlassEquivalentLayer: {
                             OpticalDataType = "SpectralAverage";
                             SpectralDataName = "";
                             static constexpr std::string_view Format_708(
@@ -7654,7 +7654,7 @@ namespace WindowManager {
                                   thisMaterial->EmissThermalFront,
                                   thisMaterial->EmissThermalBack);
                         } break;
-                        case DataHeatBalance::MaterialGroup::ShadeEquivalentLayer: {
+                        case Material::MaterialGroup::ShadeEquivalentLayer: {
                             static constexpr std::string_view Format_709(
                                 " WindowMaterial:Shade:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}\n");
                             print(state.files.eio,
@@ -7670,7 +7670,7 @@ namespace WindowManager {
                                   thisMaterial->EmissThermalFront,
                                   thisMaterial->EmissThermalBack);
                         } break;
-                        case DataHeatBalance::MaterialGroup::DrapeEquivalentLayer: {
+                        case Material::MaterialGroup::DrapeEquivalentLayer: {
                             static constexpr std::string_view Format_710(
                                 " WindowMaterial:Drape:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},"
                                 "{:.4R},{:.4R},{:.5R},{:.5R}\n");
@@ -7688,7 +7688,7 @@ namespace WindowManager {
                                   thisMaterial->PleatedDrapeWidth,
                                   thisMaterial->PleatedDrapeLength);
                         } break;
-                        case DataHeatBalance::MaterialGroup::ScreenEquivalentLayer: {
+                        case Material::MaterialGroup::ScreenEquivalentLayer: {
                             static constexpr std::string_view Format_711(
                                 " WindowMaterial:Screen:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}"
                                 ",{:.4R},{:.4R},{:.5R},{:.5R}\n");
@@ -7706,7 +7706,7 @@ namespace WindowManager {
                                   thisMaterial->ScreenWireSpacing,
                                   thisMaterial->ScreenWireDiameter);
                         } break;
-                        case DataHeatBalance::MaterialGroup::BlindEquivalentLayer: {
+                        case Material::MaterialGroup::BlindEquivalentLayer: {
                             SlateOrientation = "Horizontal";
                             if (thisMaterial->SlatOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
                                 SlateOrientation = "Vertical";
@@ -7734,7 +7734,7 @@ namespace WindowManager {
                                   thisMaterial->EmissThermalFront,
                                   thisMaterial->EmissThermalBack);
                         } break;
-                        case DataHeatBalance::MaterialGroup::GapEquivalentLayer: {
+                        case Material::MaterialGroup::GapEquivalentLayer: {
                             GapVentType = "Sealed";
                             if (thisMaterial->GapVentType == 2) {
                                 GapVentType = "VentedIndoor";

@@ -209,7 +209,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
         auto *material(state.dataMaterial->Material(MaterNum));
         // See if Material was defined with R only.  (No density is defined then and not applicable for EMPD).
         //  What about materials other than "regular materials" (e.g. Glass, Air, etc)
-        if (material->Group == DataHeatBalance::MaterialGroup::RegularMaterial && MaterialProps(1) > 0.0) {
+        if (material->Group == Material::MaterialGroup::RegularMaterial && MaterialProps(1) > 0.0) {
             if (material->ROnly) {
                 //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                 //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
@@ -220,7 +220,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        if (material->Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
+        if (material->Group != Material::MaterialGroup::RegularMaterial) {
             //      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
             //                           'to have EMPD properties, material = '// TRIM(dataMaterial.Material(MaterNum)%Name))
             ShowSevereError(state,
