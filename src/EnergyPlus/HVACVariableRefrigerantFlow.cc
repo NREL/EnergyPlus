@@ -10272,6 +10272,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
     state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
     state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).CoolingCoilAvailable = false;
     state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).HeatingCoilAvailable = false;
+
     // loop through all TU's to find operating mode. Be careful not to mix loop counters with current TU/Cond index
     for (NumTU = 1; NumTU <= state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).NumTUInList; ++NumTU) {
         // make sure TU's have been sized before looping through each one of them to determine operating mode
@@ -10284,6 +10285,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
             //         now check to see if coil is scheduled off
             if (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).CoolingCoilAvailSchPtr(NumTU)) > 0.0) {
                 state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).CoolingCoilAvailable(NumTU) = true;
+                state.dataHVACVarRefFlow->VRFTU(TUListNum).coolingCoilActive = true;
             }
         }
 
@@ -12682,9 +12684,10 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         if (NoCompOutput <= QZnReq) return;
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if (!this->SuppHeatingCoilPresent) {
-            if (NoCompOutput <= QZnReq) return;
-        }          
+        if (NoCompOutput <= QZnReq) {
+            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive = false;
+            if (!this->SuppHeatingCoilPresent) return;
+        }
     } else if (VRFHeatingMode || HRHeatingMode) {
         // IF the system is in heating mode and/or the terminal unit requests heating
         if (NoCompOutput >= QZnReq) return;
@@ -12968,17 +12971,21 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         if ((!state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed && state.dataHVACVarRefFlow->CoolingLoad(VRFCond)) ||
             (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed &&
              state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
-            SimDXCoil(state,
-                      "",
-                      DataHVACGlobals::CompressorOperation::On,
-                      FirstHVACIteration,
-                      this->CoolCoilIndex,
-                      OpMode,
-                      PartLoadRatio,
-                      _,
-                      _,
-                      state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
-                      state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
+            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive) {
+                SimDXCoil(state,
+                          "",
+                          DataHVACGlobals::CompressorOperation::On,
+                          FirstHVACIteration,
+                          this->CoolCoilIndex,
+                          OpMode,
+                          PartLoadRatio,
+                          _,
+                          _,
+                          state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
+                          state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
+            } else {
+                SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, _);
+            }
         } else { // cooling coil is off
             SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, _);
         }
