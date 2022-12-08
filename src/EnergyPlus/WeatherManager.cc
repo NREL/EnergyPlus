@@ -96,7 +96,6 @@ namespace WeatherManager {
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   May 1997
     //       MODIFIED       December 1998, FW; December 1999, LKL.
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This module contains all of the weather handling routines for
@@ -104,27 +103,31 @@ namespace WeatherManager {
     // weather, retrieving data from weather files, and supplying the
     // outdoor environment for each time step.
 
-    // METHODOLOGY EMPLOYED:
-    // Setting up the design days is similar to BLAST/IBLAST.  Reading the
-    // BLAST weather files is similar to that code in BLAST/IBLAST.  The EnergyPlus
-    // Weather file (EPW) is new code.
+    constexpr std::array<std::string_view, static_cast<int>(EpwHeaderType::Num)> epwHeaders({"LOCATION",
+                                                                                             "DESIGN CONDITIONS",
+                                                                                             "TYPICAL/EXTREME PERIODS",
+                                                                                             "GROUND TEMPERATURES",
+                                                                                             "HOLIDAYS/DAYLIGHT SAVING",
+                                                                                             "COMMENTS 1",
+                                                                                             "COMMENTS 2",
+                                                                                             "DATA PERIODS"});
 
-    // REFERENCES:
-    // (I)BLAST legacy code, internal Reverse Engineering documentation,
-    // and internal Evolutionary Engineering documentation.
+    static constexpr std::array<std::string_view, static_cast<int>(WaterMainsTempCalcMethod::Num)> waterMainsCalcMethodNames{
+        "Schedule", "Correlation", "CorrelationFromWeatherFile", "FixedDefault"};
 
-    // Data
+    static constexpr std::array<std::string_view, static_cast<int>(WaterMainsTempCalcMethod::Num)> waterMainsCalcMethodNamesUC{
+        "SCHEDULE", "CORRELATION", "CORRELATIONFROMWEATHERFILE", "FIXEDDEFAULT"};
 
-    Array1D_string const DaysOfWeek(7, {"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"}); // NOLINT(cert-err58-cpp)
-    std::map<std::string, WeekDay> weekDayLookUp{{"SUNDAY", WeekDay::Sunday},                                           // NOLINT(cert-err58-cpp)
-                                                 {"MONDAY", WeekDay::Monday},
-                                                 {"TUESDAY", WeekDay::Tuesday},
-                                                 {"WEDNESDAY", WeekDay::Wednesday},
-                                                 {"THURSDAY", WeekDay::Thursday},
-                                                 {"FRIDAY", WeekDay::Friday},
-                                                 {"SATURDAY", WeekDay::Saturday}};
+    static constexpr std::array<std::string_view, static_cast<int>(SkyTempCalcType::Num)> SkyTempModelInputNamesUC{
+        "CLARKALLEN", "SCHEDULEVALUE", "DIFFERENCESCHEDULEDRYBULBVALUE", "DIFFERENCESCHEDULEDEWPOINTVALUE", "BRUNT", "IDSO", "BERDAHLMARTIN"};
 
-    // Functions
+    static constexpr std::array<std::string_view, static_cast<int>(SkyTempCalcType::Num)> SkyTempModelNames{"Clark and Allen",
+                                                                                                            "Schedule Value",
+                                                                                                            "DryBulb Difference Schedule Value",
+                                                                                                            "Dewpoint Difference Schedule Value",
+                                                                                                            "Brunt",
+                                                                                                            "Idso",
+                                                                                                            "Berdahl and Martin"};
 
     void ManageWeather(EnergyPlusData &state)
     {
@@ -346,28 +349,6 @@ namespace WeatherManager {
         static constexpr std::string_view EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
         static constexpr std::string_view DateFormat("{:02}/{:02}");
         static constexpr std::string_view DateFormatWithYear("{:02}/{:02}/{:04}");
-        static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
-        static Array1D_string const ValidDayNames(12,
-                                                  {"Sunday",
-                                                   "Monday",
-                                                   "Tuesday",
-                                                   "Wednesday",
-                                                   "Thursday",
-                                                   "Friday",
-                                                   "Saturday",
-                                                   "Holiday",
-                                                   "SummerDesignDay",
-                                                   "WinterDesignDay",
-                                                   "CustomDay1",
-                                                   "CustomDay2"});
-        static std::map<EmissivityCalcType, std::string> const SkyTempModelNames{
-            {EmissivityCalcType::ClarkAllenModel, "Clark and Allen"},
-            {EmissivityCalcType::ScheduleValue, "Schedule Value"},
-            {EmissivityCalcType::DryBulbDelta, "DryBulb Difference Schedule Value"},
-            {EmissivityCalcType::DewPointDelta, "Dewpoint Difference Schedule Value"},
-            {EmissivityCalcType::BruntModel, "Brunt"},
-            {EmissivityCalcType::IdsoModel, "Idso"},
-            {EmissivityCalcType::BerdahlMartinModel, "Berdahl and Martin"}};
         std::string StDate;
         std::string EnDate;
         int DSTActStMon;
@@ -1037,7 +1018,7 @@ namespace WeatherManager {
                                   kindOfRunPeriod,
                                   StDate,
                                   EnDate,
-                                  ValidDayNames(TWeekDay),
+                                  ScheduleManager::dayTypeNames[TWeekDay],
                                   fmt::to_string(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TotalDays),
                                   "Use RunPeriod Specified Day",
                                   AlpUseDST,
@@ -1045,7 +1026,8 @@ namespace WeatherManager {
                                   ApWkRule,
                                   AlpUseRain,
                                   AlpUseSnow,
-                                  SkyTempModelNames.at(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel));
+                                  SkyTempModelNames[static_cast<int>(
+                                      state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel)]);
                         }
 
                         if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
@@ -1177,7 +1159,7 @@ namespace WeatherManager {
                                 print(state.files.eio, EnvDSTNFormat, Source);
                             }
                             for (int i = 1; i <= state.dataWeatherManager->NumSpecialDays; ++i) {
-                                static constexpr std::string_view EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
+                                static constexpr std::string_view EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}\n");
                                 if (state.dataWeatherManager->SpecialDays(i).WthrFile && state.dataWeatherManager->UseSpecialDays &&
                                     state.dataReportFlag->DoWeatherInitReporting) {
                                     StDate = format(DateFormat,
@@ -1186,7 +1168,7 @@ namespace WeatherManager {
                                     print(state.files.eio,
                                           EnvSpDyFormat,
                                           state.dataWeatherManager->SpecialDays(i).Name,
-                                          SpecialDayNames(state.dataWeatherManager->SpecialDays(i).DayType),
+                                          ScheduleManager::dayTypeNames[state.dataWeatherManager->SpecialDays(i).DayType],
                                           "WeatherFile",
                                           StDate,
                                           state.dataWeatherManager->SpecialDays(i).Duration);
@@ -1198,7 +1180,7 @@ namespace WeatherManager {
                                     print(state.files.eio,
                                           EnvSpDyFormat,
                                           state.dataWeatherManager->SpecialDays(i).Name,
-                                          SpecialDayNames(state.dataWeatherManager->SpecialDays(i).DayType),
+                                          ScheduleManager::dayTypeNames[state.dataWeatherManager->SpecialDays(i).DayType],
                                           "InputFile",
                                           StDate,
                                           state.dataWeatherManager->SpecialDays(i).Duration);
@@ -1216,28 +1198,7 @@ namespace WeatherManager {
                             state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
                                 .DayOfMonth);
                         EnDate = StDate;
-                        if (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                                    .DayType <= 7 &&
-                            state.dataReportFlag->DoWeatherInitReporting) {
-
-                            print(state.files.eio,
-                                  EnvNameFormat,
-                                  state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title,
-                                  "SizingPeriod:DesignDay",
-                                  StDate,
-                                  EnDate,
-                                  DaysOfWeek(state.dataWeatherManager
-                                                 ->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                                                 .DayType),
-                                  "1",
-                                  "N/A",
-                                  "N/A",
-                                  "N/A",
-                                  "N/A",
-                                  "N/A",
-                                  "N/A",
-                                  SkyTempModelNames.at(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel));
-                        } else if (state.dataReportFlag->DoWeatherInitReporting) {
+                        if (state.dataReportFlag->DoWeatherInitReporting) {
                             print(
                                 state.files.eio,
                                 EnvNameFormat,
@@ -1245,10 +1206,10 @@ namespace WeatherManager {
                                 "SizingPeriod:DesignDay",
                                 StDate,
                                 EnDate,
-                                SpecialDayNames(state.dataWeatherManager
-                                                    ->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
-                                                    .DayType -
-                                                7),
+                                ScheduleManager::dayTypeNames[state.dataWeatherManager
+                                                                  ->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn)
+                                                                                    .DesignDayNum)
+                                                                  .DayType],
                                 "1",
                                 "N/A",
                                 "N/A",
@@ -1256,7 +1217,8 @@ namespace WeatherManager {
                                 "N/A",
                                 "N/A",
                                 "N/A",
-                                SkyTempModelNames.at(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel));
+                                SkyTempModelNames[static_cast<int>(
+                                    state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel)]);
                         }
                         if (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum)
                                     .DSTIndicator == 0 &&
@@ -1722,11 +1684,11 @@ namespace WeatherManager {
                                            state.dataWeatherManager->LeapYearAdd);
                 if (state.dataWeatherManager->SpecialDays(i).Duration == 1 &&
                     state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ApplyWeekendRule) {
-                    if (state.dataWeatherManager->WeekDayTypes(JDay) == 1) {
+                    if (state.dataWeatherManager->WeekDayTypes(JDay) == static_cast<int>(ScheduleManager::DayType::Sunday)) {
                         // Sunday, must go to Monday
                         ++JDay;
                         if (JDay == 366 && state.dataWeatherManager->LeapYearAdd == 0) JDay = 1;
-                    } else if (state.dataWeatherManager->WeekDayTypes(JDay) == 7) {
+                    } else if (state.dataWeatherManager->WeekDayTypes(JDay) == static_cast<int>(ScheduleManager::DayType::Saturday)) {
                         ++JDay;
                         if (JDay == 366 && state.dataWeatherManager->LeapYearAdd == 0) JDay = 1;
                         ++JDay;
@@ -2139,7 +2101,7 @@ namespace WeatherManager {
         state.dataEnvrn->DayOfWeek = state.dataWeatherManager->TodayVariables.DayOfWeek;
         state.dataEnvrn->HolidayIndex = state.dataWeatherManager->TodayVariables.HolidayIndex;
         if (state.dataEnvrn->HolidayIndex > 0) {
-            state.dataWeatherManager->RptDayType = 7 + state.dataEnvrn->HolidayIndex;
+            state.dataWeatherManager->RptDayType = state.dataEnvrn->HolidayIndex;
         } else {
             state.dataWeatherManager->RptDayType = state.dataEnvrn->DayOfWeek;
         }
@@ -2280,9 +2242,9 @@ namespace WeatherManager {
                 state.dataWeatherManager->SPSiteDiffuseSolarScheduleValue(envrnDayNum) =
                     state.dataWeatherManager->DDDiffuseSolarValues(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ScheduleValue ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::DryBulbDelta ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::DewPointDelta) {
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::ScheduleValue ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::DryBulbDelta ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::DewPointDelta) {
                 state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue(envrnDayNum) =
                     state.dataWeatherManager->DDSkyTempScheduleValues(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
@@ -3321,7 +3283,7 @@ namespace WeatherManager {
 
         if (state.dataWeatherManager->Environment(Environ).WP_Type1 != 0) {
             switch (state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).CalculationType) {
-            case EmissivityCalcType::ScheduleValue:
+            case SkyTempCalcType::ScheduleValue:
                 ScheduleManager::GetScheduleValuesForDay(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).SchedulePtr,
@@ -3329,7 +3291,7 @@ namespace WeatherManager {
                     state.dataWeatherManager->TomorrowVariables.DayOfYear_Schedule,
                     state.dataWeatherManager->CurDayOfWeek);
                 break;
-            case EmissivityCalcType::DryBulbDelta:
+            case SkyTempCalcType::DryBulbDelta:
                 ScheduleManager::GetScheduleValuesForDay(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).SchedulePtr,
@@ -3343,7 +3305,7 @@ namespace WeatherManager {
                     }
                 }
                 break;
-            case EmissivityCalcType::DewPointDelta:
+            case SkyTempCalcType::DewPointDelta:
                 ScheduleManager::GetScheduleValuesForDay(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Environ).WP_Type1).SchedulePtr,
@@ -3381,7 +3343,7 @@ namespace WeatherManager {
     }
 
     Real64 CalcSkyEmissivity(EnergyPlusData &state,
-                             EmissivityCalcType const ESkyCalcType,
+                             SkyTempCalcType const ESkyCalcType,
                              Real64 const OSky,
                              Real64 const DryBulb,
                              Real64 const DewPoint,
@@ -3397,13 +3359,13 @@ namespace WeatherManager {
 
         Real64 ESky;
 
-        if (ESkyCalcType == EmissivityCalcType::BruntModel) {
+        if (ESkyCalcType == SkyTempCalcType::BruntModel) {
             double const PartialPress = RelHum * Psychrometrics::PsyPsatFnTemp(state, DryBulb) * 0.01;
             ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
-        } else if (ESkyCalcType == EmissivityCalcType::IdsoModel) {
+        } else if (ESkyCalcType == SkyTempCalcType::IdsoModel) {
             double const PartialPress = RelHum * Psychrometrics::PsyPsatFnTemp(state, DryBulb) * 0.01;
             ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + DataGlobalConstants::KelvinConv));
-        } else if (ESkyCalcType == EmissivityCalcType::BerdahlMartinModel) {
+        } else if (ESkyCalcType == SkyTempCalcType::BerdahlMartinModel) {
             double const TDewC = min(DryBulb, DewPoint);
             ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
         } else {
@@ -3866,7 +3828,7 @@ namespace WeatherManager {
         // set Holiday as indicated by user input
         state.dataWeatherManager->DesignDay(EnvrnNum).HolidayIndex = 0;
         if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayType > 7)
-            state.dataWeatherManager->DesignDay(EnvrnNum).HolidayIndex = state.dataWeatherManager->DesDayInput(EnvrnNum).DayType - 7;
+            state.dataWeatherManager->DesignDay(EnvrnNum).HolidayIndex = state.dataWeatherManager->DesDayInput(EnvrnNum).DayType;
 
         state.dataWeatherManager->DesignDay(EnvrnNum).DaylightSavingIndex = state.dataWeatherManager->DesDayInput(EnvrnNum).DSTIndicator;
 
@@ -4155,11 +4117,10 @@ namespace WeatherManager {
                 state.dataWeatherManager->TomorrowHorizIRSky(ts, hour) =
                     ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobalConstants::KelvinConv);
 
-                if (state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BruntModel ||
-                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+                if (state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::BruntModel ||
+                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::IdsoModel ||
+                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::BerdahlMartinModel ||
+                    state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::ClarkAllenModel) {
                     // Design day not scheduled
                     state.dataWeatherManager->TomorrowSkyTemp(ts, hour) =
                         (DryBulb + DataGlobalConstants::KelvinConv) * root_4(ESky) - DataGlobalConstants::KelvinConv;
@@ -4300,14 +4261,14 @@ namespace WeatherManager {
         if (state.dataWeatherManager->Environment(EnvrnNum).WP_Type1 != 0) {
 
             switch (state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).CalculationType) {
-            case EmissivityCalcType::ScheduleValue:
+            case SkyTempCalcType::ScheduleValue:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr,
                     state.dataWeatherManager->TomorrowSkyTemp);
                 state.dataWeatherManager->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeatherManager->TomorrowSkyTemp;
                 break;
-            case EmissivityCalcType::DryBulbDelta:
+            case SkyTempCalcType::DryBulbDelta:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr,
@@ -4320,7 +4281,7 @@ namespace WeatherManager {
                     }
                 }
                 break;
-            case EmissivityCalcType::DewPointDelta:
+            case SkyTempCalcType::DewPointDelta:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
                     state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(EnvrnNum).WP_Type1).SchedulePtr,
@@ -4755,8 +4716,6 @@ namespace WeatherManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   June 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine opens the EnergyPlus Weather File (in.epw) and processes
@@ -4764,16 +4723,6 @@ namespace WeatherManager {
 
         // METHODOLOGY EMPLOYED:
         // List directed reads, as possible.
-
-        static Array1D_string const Header(8,
-                                           {"LOCATION",
-                                            "DESIGN CONDITIONS",
-                                            "TYPICAL/EXTREME PERIODS",
-                                            "GROUND TEMPERATURES",
-                                            "HOLIDAYS/DAYLIGHT SAVING",
-                                            "COMMENTS 1",
-                                            "COMMENTS 2",
-                                            "DATA PERIODS"});
 
         state.files.inputWeatherFile.close();
         state.files.inputWeatherFile.filePath = state.files.inputWeatherFilePath.filePath;
@@ -4786,15 +4735,13 @@ namespace WeatherManager {
             // Read in Header Information
 
             // Headers should come in order
-            int HdLine = 1; // Look for first Header
-            bool StillLooking = true;
-            while (StillLooking) {
+            for (int typeNum = static_cast<int>(EpwHeaderType::Location); typeNum < static_cast<int>(EpwHeaderType::Num); ++typeNum) {
                 auto Line = state.files.inputWeatherFile.readLine();
                 if (Line.eof) {
                     ShowFatalError(
                         state,
-                        "OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
-                            Header(HdLine),
+                        format("OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header={}",
+                               epwHeaders[typeNum]),
                         OptionalOutputFileRef(state.files.eso));
                 }
 
@@ -4809,11 +4756,9 @@ namespace WeatherManager {
                     }
                 }
                 std::string::size_type const Pos = FindNonSpace(Line.data);
-                std::string::size_type const HdPos = index(Line.data, Header(HdLine));
+                std::string::size_type const HdPos = index(Line.data, epwHeaders[typeNum]);
                 if (Pos != HdPos) continue;
-                ProcessEPWHeader(state, Header(HdLine), Line.data, ErrorsFound);
-                ++HdLine;
-                if (HdLine == 9) StillLooking = false;
+                ProcessEPWHeader(state, static_cast<EpwHeaderType>(typeNum), Line.data, ErrorsFound);
             }
         } else { // Header already processed, just read
             SkipEPlusWFHeader(state);
@@ -5246,7 +5191,7 @@ namespace WeatherManager {
 
         GetLocationInfo(state, ErrorsFound);
 
-        GetGroundTemps(state, ErrorsFound);
+        GetGroundTemps(state);
 
         GetGroundReflectances(state, ErrorsFound);
 
@@ -5269,7 +5214,7 @@ namespace WeatherManager {
         }
     }
 
-    static int findYearForWeekday(int const month, int const day, WeekDay const weekday)
+    static int findYearForWeekday(int const month, int const day, ScheduleManager::DayType const weekday)
     {
         // Find a year that goes with a month/day and a weekday. A lookup table is used with the most recent year that includes
         // the date with the weekday specified.
@@ -5281,7 +5226,7 @@ namespace WeatherManager {
         return defaultYear[static_cast<int>(weekday) - rem + 5]; // static_cast<int>(weekday) - rem + 1 + 4
     }
 
-    static int findLeapYearForWeekday(int const month, int const day, WeekDay const weekday)
+    static int findLeapYearForWeekday(int const month, int const day, ScheduleManager::DayType const weekday)
     {
         // Find a leap year that goes with a month/day and a weekday. A lookup table is used with the most recent year that includes
         // the date with the weekday specified.
@@ -5575,19 +5520,19 @@ namespace WeatherManager {
             // A2 , \field Day of Week for Start Day
             bool inputWeekday = false;
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) { // Have input
-                auto result = weekDayLookUp.find(state.dataIPShortCut->cAlphaArgs(2));
-                if (result == weekDayLookUp.end()) {
+                int dayType = getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
+                if (dayType < 1) {
                     ShowWarningError(state,
                                      state.dataIPShortCut->cCurrentModuleObject + ": object=" + state.dataWeatherManager->RunPeriodInput(i).title +
                                          state.dataIPShortCut->cAlphaFieldNames(2) + " invalid (Day of Week) [" +
                                          state.dataIPShortCut->cAlphaArgs(2) + "] for Start is not valid, Sunday will be used.");
-                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = WeekDay::Sunday;
+                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = ScheduleManager::DayType::Sunday;
                 } else {
-                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = result->second;
+                    state.dataWeatherManager->RunPeriodInput(i).startWeekDay = static_cast<ScheduleManager::DayType>(dayType);
                     inputWeekday = true;
                 }
             } else { // No input, set the default as Sunday. This may get overriden below
-                state.dataWeatherManager->RunPeriodInput(i).startWeekDay = WeekDay::Sunday;
+                state.dataWeatherManager->RunPeriodInput(i).startWeekDay = ScheduleManager::DayType::Sunday;
             }
 
             // Validate the dates now that the weekday field has been looked at
@@ -5617,10 +5562,10 @@ namespace WeatherManager {
                                                state.dataWeatherManager->RunPeriodInput(i).startYear));
                         ErrorsFound = true;
                     } else { // Start year is a leap year
-                        WeekDay weekday = calculateDayOfWeek(state,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startMonth,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startDay);
+                        ScheduleManager::DayType weekday = calculateDayOfWeek(state,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startYear,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startMonth,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startDay);
                         if (inputWeekday) { // Check for correctness of input
                             if (weekday != state.dataWeatherManager->RunPeriodInput(i).startWeekDay) {
                                 ShowWarningError(state,
@@ -5629,7 +5574,7 @@ namespace WeatherManager {
                                                         state.dataWeatherManager->RunPeriodInput(i).title,
                                                         state.dataIPShortCut->cAlphaArgs(2),
                                                         state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                        DaysOfWeek(static_cast<int>(weekday))));
+                                                        ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday)]));
                                 state.dataWeatherManager->RunPeriodInput(i).startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
@@ -5664,10 +5609,10 @@ namespace WeatherManager {
                                                    state.dataWeatherManager->RunPeriodInput(i).startDay);
                         }
                     } else { // Have an input starting year
-                        WeekDay weekday = calculateDayOfWeek(state,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startMonth,
-                                                             state.dataWeatherManager->RunPeriodInput(i).startDay);
+                        ScheduleManager::DayType weekday = calculateDayOfWeek(state,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startYear,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startMonth,
+                                                                              state.dataWeatherManager->RunPeriodInput(i).startDay);
                         if (inputWeekday) { // Check for correctness of input
                             if (weekday != state.dataWeatherManager->RunPeriodInput(i).startWeekDay) {
                                 ShowWarningError(state,
@@ -5676,7 +5621,7 @@ namespace WeatherManager {
                                                         state.dataWeatherManager->RunPeriodInput(i).title,
                                                         state.dataIPShortCut->cAlphaArgs(2),
                                                         state.dataWeatherManager->RunPeriodInput(i).startYear,
-                                                        DaysOfWeek(static_cast<int>(weekday))));
+                                                        ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday)]));
                                 state.dataWeatherManager->RunPeriodInput(i).startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
@@ -5912,26 +5857,10 @@ namespace WeatherManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the run period design info from User input and the
         //  simulation dates
-
-        static Array1D_string const ValidNames(12,
-                                               {"SUNDAY",
-                                                "MONDAY",
-                                                "TUESDAY",
-                                                "WEDNESDAY",
-                                                "THURSDAY",
-                                                "FRIDAY",
-                                                "SATURDAY",
-                                                "HOLIDAY",
-                                                "SUMMERDESIGNDAY",
-                                                "WINTERDESIGNDAY",
-                                                "CUSTOMDAY1",
-                                                "CUSTOMDAY2"});
 
         // Call Input Get routine to retrieve annual run data
         int RPD1 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
@@ -6031,18 +5960,20 @@ namespace WeatherManager {
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
+                state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
+                    static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
             } else {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), ValidNames, 12);
-                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 0 ||
+                    getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
+                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek < 1 ||
                     state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 8) {
                     ShowWarningError(state,
                                      state.dataIPShortCut->cCurrentModuleObject +
                                          ": object=" + state.dataWeatherManager->RunPeriodDesignInput(Count).title + ' ' +
                                          state.dataIPShortCut->cAlphaFieldNames(1) + " invalid (Day of Week) [" +
                                          state.dataIPShortCut->cAlphaArgs(1) + " for Start is not Valid, Monday will be Used.");
-                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
+                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
+                        static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
                 }
             }
 
@@ -6217,18 +6148,16 @@ namespace WeatherManager {
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
+                state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
+                    static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
             } else {
                 state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), ValidNames, 12);
-                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 0 ||
-                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == 8) {
-                    ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject +
-                                         ": object=" + state.dataWeatherManager->RunPeriodDesignInput(Count).title + ' ' +
-                                         state.dataIPShortCut->cAlphaFieldNames(3) + " invalid (Day of Week) [" +
-                                         state.dataIPShortCut->cAlphaArgs(3) + " for Start is not Valid, Monday will be Used.");
-                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek = 2; // Defaults to Monday
+                    getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(3));
+                if (state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek < static_cast<int>(ScheduleManager::DayType::Sunday) ||
+                    state.dataWeatherManager->RunPeriodDesignInput(Count).dayOfWeek == static_cast<int>(ScheduleManager::DayType::Holiday)) {
+                    // Sunday-Saturday, SummerDesignDay, WinterDesignDay, CustomDay1, and CustomDay2 are all valid. Holiday is not valid.
+                    // The input processor should trap invalid key choices, so this should never trip.
+                    assert(false);
                 }
             }
 
@@ -6310,8 +6239,6 @@ namespace WeatherManager {
         //        \key CustomDay1
         //        \key CustomDay2
 
-        static Array1D_string const ValidDayTypes(5, {"HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2"});
-
         state.dataIPShortCut->cCurrentModuleObject = "RunPeriodControl:SpecialDays";
         int NumSpecDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
         int Count;
@@ -6373,7 +6300,7 @@ namespace WeatherManager {
                 ErrorsFound = true;
             }
 
-            int DayType = UtilityRoutines::FindItemInList(AlphArray(3), ValidDayTypes, 5);
+            int DayType = getEnumerationValue(ScheduleManager::dayTypeNamesUC, AlphArray(3));
             if (DayType == 0) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + ": " + AlphArray(1) + " Invalid " +
@@ -6569,27 +6496,15 @@ namespace WeatherManager {
         //   N13, \field ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
         //   N14; \field Sky Clearness
 
-        static Array1D_string const ValidNames(12,
-                                               {"SUNDAY",
-                                                "MONDAY",
-                                                "TUESDAY",
-                                                "WEDNESDAY",
-                                                "THURSDAY",
-                                                "FRIDAY",
-                                                "SATURDAY",
-                                                "HOLIDAY",
-                                                "SUMMERDESIGNDAY",
-                                                "WINTERDESIGNDAY",
-                                                "CUSTOMDAY1",
-                                                "CUSTOMDAY2"});
-        static std::map<DDHumIndType, std::string> const DDHumIndTypeStringRep{{DDHumIndType::WetBulb, "Wetbulb [C]"},
-                                                                               {DDHumIndType::DewPoint, "Dewpoint [C]"},
-                                                                               {DDHumIndType::Enthalpy, "Enthalpy [J/kg]"},
-                                                                               {DDHumIndType::HumRatio, "Humidity Ratio []"},
-                                                                               {DDHumIndType::RelHumSch, "Schedule []"},
-                                                                               {DDHumIndType::WBProfDef, "WetBulbProfileDefaultMultipliers []"},
-                                                                               {DDHumIndType::WBProfDif, "WetBulbProfileDifferenceSchedule []"},
-                                                                               {DDHumIndType::WBProfMul, "WetBulbProfileMultiplierSchedule []"}};
+        static constexpr std::array<std::string_view, static_cast<int>(DDHumIndType::Num)> DDHumIndTypeStringRep = {
+            "Wetbulb [C]",
+            "Dewpoint [C]",
+            "Enthalpy [J/kg]",
+            "Humidity Ratio []",
+            "Schedule []",
+            "WetBulbProfileDefaultMultipliers []",
+            "WetBulbProfileDifferenceSchedule []",
+            "WetBulbProfileMultiplierSchedule []"};
 
         // Below are the 2009 fractions, HOF, Chap 14, Table 6
         static constexpr std::array<Real64, 24> DefaultTempRangeMult = {0.88, 0.92, 0.95, 0.98, 1.0,  0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13,
@@ -7477,8 +7392,8 @@ namespace WeatherManager {
 
             //   A2,  \field Day Type
             state.dataWeatherManager->DesDayInput(EnvrnNum).DayType =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), ValidNames, 12);
-            if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayType == 0) {
+                getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
+            if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayType <= 0) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
                                     "\", invalid data.");
@@ -7518,10 +7433,11 @@ namespace WeatherManager {
             } else {
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDDhumid, envTitle, "N/A");
             }
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchDDhumTyp,
-                                                     envTitle,
-                                                     DDHumIndTypeStringRep.at(state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType));
+            OutputReportPredefined::PreDefTableEntry(
+                state,
+                state.dataOutRptPredefined->pdchDDhumTyp,
+                envTitle,
+                DDHumIndTypeStringRep[static_cast<int>(state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType)]);
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchDDwindSp, envTitle, state.dataWeatherManager->DesDayInput(EnvrnNum).WindSpeed);
             OutputReportPredefined::PreDefTableEntry(
@@ -7698,41 +7614,41 @@ namespace WeatherManager {
             // Validate Calculation Type.
             std::string units;
             OutputProcessor::Unit unitType;
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ScheduleValue")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::ScheduleValue;
+            state.dataWeatherManager->WPSkyTemperature(i).CalculationType =
+                static_cast<SkyTempCalcType>(getEnumerationValue(WeatherManager::SkyTempModelInputNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
+
+            switch (state.dataWeatherManager->WPSkyTemperature(i).CalculationType) {
+            case SkyTempCalcType::ScheduleValue: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = true;
                 units = "[C]";
                 unitType = OutputProcessor::Unit::C;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "DifferenceScheduleDryBulbValue")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::DryBulbDelta;
+            } break;
+            case SkyTempCalcType::DryBulbDelta: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "DifferenceScheduleDewPointValue")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::DewPointDelta;
+            } break;
+            case SkyTempCalcType::DewPointDelta: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Brunt")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::BruntModel;
+            } break;
+            case SkyTempCalcType::BruntModel: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Idso")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::IdsoModel;
+            } break;
+            case SkyTempCalcType::IdsoModel: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "BerdahlMartin")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::BerdahlMartinModel;
+            } break;
+            case SkyTempCalcType::BerdahlMartinModel: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ClarkAllen")) {
-                state.dataWeatherManager->WPSkyTemperature(i).CalculationType = EmissivityCalcType::ClarkAllenModel;
+            } break;
+            case SkyTempCalcType::ClarkAllenModel: {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
-            } else {
-                ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '.');
-                ShowContinueError(state,
-                                  "...entered value=\"" + state.dataIPShortCut->cAlphaArgs(2) +
-                                      "\", should be one of: ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue.");
-                ErrorsFound = true;
+            } break;
+            default: {
+                // Bad inputs are trapped by input processor
+                assert(false);
+            }
             }
 
             if (state.dataWeatherManager->WPSkyTemperature(i).IsSchedule) {
@@ -7816,7 +7732,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound)
+    void GetGroundTemps(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7830,32 +7746,20 @@ namespace WeatherManager {
         //  in a new variable.
 
         // Initialize Site:GroundTemperature:BuildingSurface object
-        state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr =
-            GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
-        if (state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr) {
-            ErrorsFound = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->errorsFound || ErrorsFound;
-        }
+        state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(
+            state, GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteBuildingSurfaceGroundTemp)], "");
 
         // Initialize Site:GroundTemperature:FCFactorMethod object
-        state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr =
-            GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
-        if (state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr) {
-            ErrorsFound = state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr->errorsFound || ErrorsFound;
-        }
+        state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(
+            state, GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteFCFactorMethodGroundTemp)], "");
 
         // Initialize Site:GroundTemperature:Shallow object
-        state.dataWeatherManager->siteShallowGroundTempsPtr =
-            GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:SHALLOW", "");
-        if (state.dataWeatherManager->siteShallowGroundTempsPtr) {
-            ErrorsFound = state.dataWeatherManager->siteShallowGroundTempsPtr->errorsFound || ErrorsFound;
-        }
+        state.dataWeatherManager->siteShallowGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(
+            state, GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)], "");
 
         // Initialize Site:GroundTemperature:Deep object
-        state.dataWeatherManager->siteDeepGroundTempsPtr =
-            GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:DEEP", "");
-        if (state.dataWeatherManager->siteDeepGroundTempsPtr) {
-            ErrorsFound = state.dataWeatherManager->siteDeepGroundTempsPtr->errorsFound || ErrorsFound;
-        }
+        state.dataWeatherManager->siteDeepGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(
+            state, GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteDeepGroundTemp)], "");
     }
 
     void GetGroundReflectances(EnergyPlusData &state, bool &ErrorsFound)
@@ -8016,8 +7920,9 @@ namespace WeatherManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            if (UtilityRoutines::SameString(AlphArray(1), "Schedule")) {
-                state.dataWeatherManager->WaterMainsTempsMethod = WaterMainsTempCalcMethod::Schedule;
+            state.dataWeatherManager->WaterMainsTempsMethod =
+                static_cast<WeatherManager::WaterMainsTempCalcMethod>(getEnumerationValue(waterMainsCalcMethodNamesUC, AlphArray(1)));
+            if (state.dataWeatherManager->WaterMainsTempsMethod == WaterMainsTempCalcMethod::Schedule) {
                 state.dataWeatherManager->WaterMainsTempsScheduleName = AlphArray(2);
                 state.dataWeatherManager->WaterMainsTempsSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWeatherManager->WaterMainsTempsSchedule == 0) {
@@ -8027,9 +7932,7 @@ namespace WeatherManager {
                     ErrorsFound = true;
                 }
 
-            } else if (UtilityRoutines::SameString(AlphArray(1), "Correlation")) {
-                state.dataWeatherManager->WaterMainsTempsMethod = WaterMainsTempCalcMethod::Correlation;
-
+            } else if (state.dataWeatherManager->WaterMainsTempsMethod == WaterMainsTempCalcMethod::Correlation) {
                 if (NumNums == 0) {
                     ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ": Missing Annual Average and Maximum Difference fields.");
                     ErrorsFound = true;
@@ -8040,8 +7943,8 @@ namespace WeatherManager {
                     state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp = NumArray(1);
                     state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp = NumArray(2);
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(1), "CorrelationFromWeatherFile")) {
-                state.dataWeatherManager->WaterMainsTempsMethod = WaterMainsTempCalcMethod::CorrelationFromWeatherFile;
+            } else if (state.dataWeatherManager->WaterMainsTempsMethod == WaterMainsTempCalcMethod::CorrelationFromWeatherFile) {
+                // No action
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
@@ -8397,7 +8300,7 @@ namespace WeatherManager {
         return GetSTM;
     }
 
-    void ProcessEPWHeader(EnergyPlusData &state, std::string const &HeaderString, std::string &Line, bool &ErrorsFound)
+    void ProcessEPWHeader(EnergyPlusData &state, EpwHeaderType const headerType, std::string &Line, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8418,168 +8321,139 @@ namespace WeatherManager {
 
         // Strip off Header value from Line
         std::string::size_type Pos = index(Line, ',');
-        if ((Pos == std::string::npos) && (!has_prefixi(HeaderString, "COMMENTS"))) {
+        if ((Pos == std::string::npos) && !((headerType == EpwHeaderType::Comments1) || (headerType == EpwHeaderType::Comments2))) {
             ShowSevereError(state, "Invalid Header line in in.epw -- no commas");
             ShowContinueError(state, "Line=" + Line);
             ShowFatalError(state, "Previous conditions cause termination.");
         }
         if (Pos != std::string::npos) Line.erase(0, Pos + 1);
 
-        {
-            auto const HeaderStringUppercase(UtilityRoutines::MakeUPPERCase(HeaderString));
+        switch (headerType) {
+        case WeatherManager::EpwHeaderType::Location: {
 
-            if (HeaderStringUppercase == "LOCATION") {
+            // LOCATION, A1 [City], A2 [State/Province/Region], A3 [Country],
+            // A4 [Source], N1 [WMO], N2 [Latitude],
+            // N3 [Longitude], N4 [Time Zone], N5 [Elevation {m}]
 
-                // LOCATION, A1 [City], A2 [State/Province/Region], A3 [Country],
-                // A4 [Source], N1 [WMO], N2 [Latitude],
-                // N3 [Longitude], N4 [Time Zone], N5 [Elevation {m}]
-
-                NumHdArgs = 9;
-                for (int i = 1; i <= NumHdArgs; ++i) {
-                    strip(Line);
-                    Pos = index(Line, ',');
-                    if (Pos == std::string::npos) {
-                        if (len(Line) == 0) {
-                            while (Pos == std::string::npos) {
-                                Line = state.files.inputWeatherFile.readLine().data;
-                                strip(Line);
-                                uppercase(Line);
-                                Pos = index(Line, ',');
-                            }
-                        } else {
-                            Pos = len(Line);
-                        }
-                    }
-
-                    switch (i) {
-                    case 1:
-                        state.dataWeatherManager->EPWHeaderTitle = stripped(Line.substr(0, Pos));
-                        break;
-                    case 2:
-                    case 3:
-                    case 4:
-                        state.dataWeatherManager->EPWHeaderTitle =
-                            strip(state.dataWeatherManager->EPWHeaderTitle) + ' ' + stripped(Line.substr(0, Pos));
-                        break;
-                    case 5:
-                        state.dataWeatherManager->EPWHeaderTitle += " WMO#=" + stripped(Line.substr(0, Pos));
-                        break;
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9: {
-                        bool errFlag;
-                        Real64 const Number = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
-                        if (!errFlag) {
-                            switch (i) {
-                            case 6:
-                                state.dataWeatherManager->WeatherFileLatitude = Number;
-                                break;
-                            case 7:
-                                state.dataWeatherManager->WeatherFileLongitude = Number;
-                                break;
-                            case 8:
-                                state.dataWeatherManager->WeatherFileTimeZone = Number;
-                                break;
-                            case 9:
-                                state.dataWeatherManager->WeatherFileElevation = Number;
-                                break;
-                            default:
-                                break;
-                            }
-                        }
-                    } break;
-                    default:
-                        ShowSevereError(state, "GetEPWHeader:LOCATION, invalid numeric=" + Line.substr(0, Pos));
-                        ErrorsFound = true;
-                        break;
-                    }
-                    Line.erase(0, Pos + 1);
-                }
-                state.dataEnvrn->WeatherFileLocationTitle = stripped(state.dataWeatherManager->EPWHeaderTitle);
-
-            } else if (HeaderStringUppercase == "TYPICAL/EXTREME PERIODS") {
+            NumHdArgs = 9;
+            for (int i = 1; i <= NumHdArgs; ++i) {
                 strip(Line);
                 Pos = index(Line, ',');
                 if (Pos == std::string::npos) {
                     if (len(Line) == 0) {
-                        while (Pos == std::string::npos && len(Line) == 0) {
+                        while (Pos == std::string::npos) {
                             Line = state.files.inputWeatherFile.readLine().data;
                             strip(Line);
+                            uppercase(Line);
                             Pos = index(Line, ',');
                         }
                     } else {
                         Pos = len(Line);
                     }
                 }
-                bool IOStatus;
-                state.dataWeatherManager->NumEPWTypExtSets = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                Line.erase(0, Pos + 1);
-                state.dataWeatherManager->TypicalExtremePeriods.allocate(state.dataWeatherManager->NumEPWTypExtSets);
-                int TropExtremeCount = 0;
-                for (int i = 1; i <= state.dataWeatherManager->NumEPWTypExtSets; ++i) {
-                    strip(Line);
-                    Pos = index(Line, ',');
-                    if (Pos != std::string::npos) {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).Title = Line.substr(0, Pos);
-                        Line.erase(0, Pos + 1);
-                    } else {
-                        ShowWarningError(state, "ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)=" + Line.substr(0, Pos));
-                        ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
-                        state.dataWeatherManager->NumEPWTypExtSets = i - 1;
-                        break;
+
+                switch (i) {
+                case 1:
+                    state.dataWeatherManager->EPWHeaderTitle = stripped(Line.substr(0, Pos));
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    state.dataWeatherManager->EPWHeaderTitle = strip(state.dataWeatherManager->EPWHeaderTitle) + ' ' + stripped(Line.substr(0, Pos));
+                    break;
+                case 5:
+                    state.dataWeatherManager->EPWHeaderTitle += " WMO#=" + stripped(Line.substr(0, Pos));
+                    break;
+                case 6:
+                case 7:
+                case 8:
+                case 9: {
+                    bool errFlag;
+                    Real64 const Number = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
+                    if (!errFlag) {
+                        switch (i) {
+                        case 6:
+                            state.dataWeatherManager->WeatherFileLatitude = Number;
+                            break;
+                        case 7:
+                            state.dataWeatherManager->WeatherFileLongitude = Number;
+                            break;
+                        case 8:
+                            state.dataWeatherManager->WeatherFileTimeZone = Number;
+                            break;
+                        case 9:
+                            state.dataWeatherManager->WeatherFileElevation = Number;
+                            break;
+                        default:
+                            break;
+                        }
                     }
-                    Pos = index(Line, ',');
-                    if (Pos != std::string::npos) {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).TEType = Line.substr(0, Pos);
-                        Line.erase(0, Pos + 1);
-                        if (UtilityRoutines::SameString(state.dataWeatherManager->TypicalExtremePeriods(i).TEType, "EXTREME")) {
-                            if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MAX")) {
+                } break;
+                default:
+                    ShowSevereError(state, format("GetEPWHeader:LOCATION, invalid numeric={}", Line.substr(0, Pos)));
+                    ErrorsFound = true;
+                    break;
+                }
+                Line.erase(0, Pos + 1);
+            }
+            state.dataEnvrn->WeatherFileLocationTitle = stripped(state.dataWeatherManager->EPWHeaderTitle);
+        } break;
+        case WeatherManager::EpwHeaderType::TypicalExtremePeriods: {
+            strip(Line);
+            Pos = index(Line, ',');
+            if (Pos == std::string::npos) {
+                if (len(Line) == 0) {
+                    while (Pos == std::string::npos && len(Line) == 0) {
+                        Line = state.files.inputWeatherFile.readLine().data;
+                        strip(Line);
+                        Pos = index(Line, ',');
+                    }
+                } else {
+                    Pos = len(Line);
+                }
+            }
+            bool IOStatus;
+            state.dataWeatherManager->NumEPWTypExtSets = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+            Line.erase(0, Pos + 1);
+            state.dataWeatherManager->TypicalExtremePeriods.allocate(state.dataWeatherManager->NumEPWTypExtSets);
+            int TropExtremeCount = 0;
+            for (int i = 1; i <= state.dataWeatherManager->NumEPWTypExtSets; ++i) {
+                strip(Line);
+                Pos = index(Line, ',');
+                if (Pos != std::string::npos) {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).Title = Line.substr(0, Pos);
+                    Line.erase(0, Pos + 1);
+                } else {
+                    ShowWarningError(state, format("ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)={}", Line.substr(0, Pos)));
+                    ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
+                    state.dataWeatherManager->NumEPWTypExtSets = i - 1;
+                    break;
+                }
+                Pos = index(Line, ',');
+                if (Pos != std::string::npos) {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).TEType = Line.substr(0, Pos);
+                    Line.erase(0, Pos + 1);
+                    if (UtilityRoutines::SameString(state.dataWeatherManager->TypicalExtremePeriods(i).TEType, "EXTREME")) {
+                        if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MAX")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMax";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MIN")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMin";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO WET SEASON - WEEK NEAR ANNUAL MAX")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoWetSeasonMax";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO WET SEASON - WEEK NEAR ANNUAL MIN")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoWetSeasonMin";
+                            // to account for problems earlier in weather files:
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO DRY")) {
+                            if (TropExtremeCount == 0) {
+                                state.dataWeatherManager->TypicalExtremePeriods(i).Title = "No Dry Season - Week Near Annual Max";
                                 state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMax";
-                            } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title,
-                                                   "NO DRY SEASON - WEEK NEAR ANNUAL MIN")) {
+                                ++TropExtremeCount;
+                            } else if (TropExtremeCount == 1) {
+                                state.dataWeatherManager->TypicalExtremePeriods(i).Title = "No Dry Season - Week Near Annual Min";
                                 state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMin";
-                            } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title,
-                                                   "NO WET SEASON - WEEK NEAR ANNUAL MAX")) {
-                                state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoWetSeasonMax";
-                            } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title,
-                                                   "NO WET SEASON - WEEK NEAR ANNUAL MIN")) {
-                                state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoWetSeasonMin";
-                                // to account for problems earlier in weather files:
-                            } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO DRY")) {
-                                if (TropExtremeCount == 0) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).Title = "No Dry Season - Week Near Annual Max";
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMax";
-                                    ++TropExtremeCount;
-                                } else if (TropExtremeCount == 1) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).Title = "No Dry Season - Week Near Annual Min";
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMin";
-                                    ++TropExtremeCount;
-                                }
-                            } else { // make new short titles
-                                if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "SUMMER")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Summer";
-                                } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "WINTER")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Winter";
-                                } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "TROPICAL HOT")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "TropicalHot";
-                                } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "TROPICAL COLD")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "TropicalCold";
-                                } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "AUTUMN")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Autumn";
-                                } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO DRY")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoDrySeason";
-                                } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO WET")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoWetSeason";
-                                } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "WET ")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "WetSeason";
-                                } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "DRY ")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "DrySeason";
-                                } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "SPRING")) {
-                                    state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Spring";
-                                }
+                                ++TropExtremeCount;
                             }
-                        } else { // not extreme
+                        } else { // make new short titles
                             if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "SUMMER")) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Summer";
                             } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "WINTER")) {
@@ -8602,497 +8476,522 @@ namespace WeatherManager {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Spring";
                             }
                         }
-                    } else {
-                        ShowWarningError(state,
-                                         "ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)=" +
-                                             state.dataWeatherManager->TypicalExtremePeriods(i).Title + " " + Line.substr(0, Pos));
-                        ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
-                        state.dataWeatherManager->NumEPWTypExtSets = i - 1;
-                        break;
-                    }
-                    int PMonth;
-                    int PDay;
-                    int PWeekDay;
-                    Pos = index(Line, ',');
-                    if (Pos != std::string::npos) {
-                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::Invalid) {
-                            if (PMonth != 0 && PDay != 0) {
-                                state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth = PMonth;
-                                state.dataWeatherManager->TypicalExtremePeriods(i).StartDay = PDay;
-                            }
-                        } else {
-                            ShowSevereError(state,
-                                            "ProcessEPWHeader: Invalid Typical/Extreme Periods Start Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                            ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
-                            ErrorsFound = true;
-                        }
-                        Line.erase(0, Pos + 1);
-                    }
-                    Pos = index(Line, ',');
-                    if (Pos != std::string::npos) {
-                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::Invalid) {
-                            if (PMonth != 0 && PDay != 0) {
-                                state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
-                                state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
-                            }
-                        } else {
-                            ShowSevereError(state,
-                                            "ProcessEPWHeader: Invalid Typical/Extreme Periods End Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                            ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
-                            ErrorsFound = true;
-                        }
-                        Line.erase(0, Pos + 1);
-                    } else { // Pos=0, probably last one
-                        General::ProcessDateString(state, Line, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::Invalid) {
-                            if (PMonth != 0 && PDay != 0) {
-                                state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
-                                state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
-                            }
-                        } else {
-                            ShowSevereError(state,
-                                            "ProcessEPWHeader: Invalid Typical/Extreme Periods End Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                            ErrorsFound = true;
+                    } else { // not extreme
+                        if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "SUMMER")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Summer";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "WINTER")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Winter";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "TROPICAL HOT")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "TropicalHot";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "TROPICAL COLD")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "TropicalCold";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "AUTUMN")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Autumn";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO DRY")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoDrySeason";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "NO WET")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "NoWetSeason";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "WET ")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "WetSeason";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "DRY ")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "DrySeason";
+                        } else if (has_prefixi(state.dataWeatherManager->TypicalExtremePeriods(i).Title, "SPRING")) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle = "Spring";
                         }
                     }
+                } else {
+                    ShowWarningError(state,
+                                     "ProcessEPWHeader: Invalid Typical/Extreme Periods Header(WeatherFile)=" +
+                                         state.dataWeatherManager->TypicalExtremePeriods(i).Title + " " + Line.substr(0, Pos));
+                    ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
+                    state.dataWeatherManager->NumEPWTypExtSets = i - 1;
+                    break;
                 }
-                // Process periods to set up other values.
-                for (int i = 1; i <= state.dataWeatherManager->NumEPWTypExtSets; ++i) {
-                    // JulianDay (Month,Day,LeapYearValue)
-                    auto const ExtremePeriodTitle(UtilityRoutines::MakeUPPERCase(state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle));
-                    if (ExtremePeriodTitle == "SUMMER") {
-                        if (UtilityRoutines::SameString(state.dataWeatherManager->TypicalExtremePeriods(i).TEType, "EXTREME")) {
-                            state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "SummerExtreme";
-                            state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "TropicalHot";
-                            state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMax";
-                        } else {
-                            state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "SummerTypical";
-                        }
-
-                    } else if (ExtremePeriodTitle == "WINTER") {
-                        if (UtilityRoutines::SameString(state.dataWeatherManager->TypicalExtremePeriods(i).TEType, "EXTREME")) {
-                            state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "WinterExtreme";
-                            state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "TropicalCold";
-                            state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMin";
-                        } else {
-                            state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "WinterTypical";
-                        }
-
-                    } else if (ExtremePeriodTitle == "AUTUMN") {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "AutumnTypical";
-
-                    } else if (ExtremePeriodTitle == "SPRING") {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "SpringTypical";
-
-                    } else if (ExtremePeriodTitle == "WETSEASON") {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "WetSeason";
-
-                    } else if (ExtremePeriodTitle == "DRYSEASON") {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "DrySeason";
-
-                    } else if (ExtremePeriodTitle == "NOWETSEASON") {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "NoWetSeason";
-
-                    } else if (ExtremePeriodTitle == "NODRYSEASON") {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "NoDrySeason";
-
-                    } else if ((ExtremePeriodTitle == "NODRYSEASONMAX") || (ExtremePeriodTitle == "NOWETSEASONMAX")) {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle;
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "TropicalHot";
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "SummerExtreme";
-
-                    } else if ((ExtremePeriodTitle == "NODRYSEASONMIN") || (ExtremePeriodTitle == "NOWETSEASONMIN")) {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle;
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "TropicalCold";
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "WinterExtreme";
-
-                    } else if (ExtremePeriodTitle == "TROPICALHOT") {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "TropicalHot";
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "SummerExtreme";
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMax";
-
-                    } else if (ExtremePeriodTitle == "TROPICALCOLD") {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "TropicalCold";
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "WinterExtreme";
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMin";
-
-                    } else {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "Invalid - no match";
-                    }
-                    state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay =
-                        General::OrdinalDay(state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth,
-                                            state.dataWeatherManager->TypicalExtremePeriods(i).StartDay,
-                                            0);
-                    state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay = General::OrdinalDay(
-                        state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth, state.dataWeatherManager->TypicalExtremePeriods(i).EndDay, 0);
-                    if (state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay <= state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay) {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).TotalDays = state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay -
-                                                                                       state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay +
-                                                                                       1;
-                    } else {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).TotalDays =
-                            General::OrdinalDay(12, 31, state.dataWeatherManager->LeapYearAdd) -
-                            state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay + 1 +
-                            state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay;
-                    }
-                }
-
-            } else if (HeaderStringUppercase == "GROUND TEMPERATURES") {
-                // Added for ground surfaces defined with F or c factor method. TH 7/2009
-                // Assume the 0.5 m set of ground temperatures
-                // or first set on a weather file, if any.
+                int PMonth;
+                int PDay;
+                int PWeekDay;
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
-                    bool errFlag;
-                    int NumGrndTemps = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
-                    if (!errFlag && NumGrndTemps >= 1) {
-                        Line.erase(0, Pos + 1);
-                        // skip depth, soil conductivity, soil density, soil specific heat
-                        for (int i = 1; i <= 4; ++i) {
-                            Pos = index(Line, ',');
-                            if (Pos == std::string::npos) {
-                                Line.clear();
-                                break;
-                            }
-                            Line.erase(0, Pos + 1);
+                    std::string dateStringUC = Line.substr(0, Pos);
+                    dateStringUC = uppercase(dateStringUC);
+                    General::ProcessDateString(state, dateStringUC, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                    if (dateType != DateType::Invalid) {
+                        if (PMonth != 0 && PDay != 0) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth = PMonth;
+                            state.dataWeatherManager->TypicalExtremePeriods(i).StartDay = PDay;
                         }
-                        state.dataWeatherManager->GroundTempsFCFromEPWHeader = 0.0;
-                        int actcount = 0;
-                        for (int i = 1; i <= 12; ++i) { // take the first set of ground temperatures.
-                            Pos = index(Line, ',');
-                            if (Pos != std::string::npos) {
+                    } else {
+                        ShowSevereError(state,
+                                        "ProcessEPWHeader: Invalid Typical/Extreme Periods Start Date Field(WeatherFile)=" + Line.substr(0, Pos));
+                        ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
+                        ErrorsFound = true;
+                    }
+                    Line.erase(0, Pos + 1);
+                }
+                Pos = index(Line, ',');
+                if (Pos != std::string::npos) {
+                    std::string dateStringUC = Line.substr(0, Pos);
+                    dateStringUC = uppercase(dateStringUC);
+                    General::ProcessDateString(state, dateStringUC, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                    if (dateType != DateType::Invalid) {
+                        if (PMonth != 0 && PDay != 0) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
+                            state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
+                        }
+                    } else {
+                        ShowSevereError(state,
+                                        "ProcessEPWHeader: Invalid Typical/Extreme Periods End Date Field(WeatherFile)=" + Line.substr(0, Pos));
+                        ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
+                        ErrorsFound = true;
+                    }
+                    Line.erase(0, Pos + 1);
+                } else { // Pos=0, probably last one
+                    std::string const dateStringUC = uppercase(Line);
+                    General::ProcessDateString(state, dateStringUC, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                    if (dateType != DateType::Invalid) {
+                        if (PMonth != 0 && PDay != 0) {
+                            state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
+                            state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
+                        }
+                    } else {
+                        ShowSevereError(state,
+                                        "ProcessEPWHeader: Invalid Typical/Extreme Periods End Date Field(WeatherFile)=" + Line.substr(0, Pos));
+                        ErrorsFound = true;
+                    }
+                }
+            }
+            // Process periods to set up other values.
+            for (int i = 1; i <= state.dataWeatherManager->NumEPWTypExtSets; ++i) {
+                // JulianDay (Month,Day,LeapYearValue)
+                auto const ExtremePeriodTitle(UtilityRoutines::MakeUPPERCase(state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle));
+                if (ExtremePeriodTitle == "SUMMER") {
+                    if (UtilityRoutines::SameString(state.dataWeatherManager->TypicalExtremePeriods(i).TEType, "EXTREME")) {
+                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "SummerExtreme";
+                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "TropicalHot";
+                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMax";
+                    } else {
+                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "SummerTypical";
+                    }
+
+                } else if (ExtremePeriodTitle == "WINTER") {
+                    if (UtilityRoutines::SameString(state.dataWeatherManager->TypicalExtremePeriods(i).TEType, "EXTREME")) {
+                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "WinterExtreme";
+                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "TropicalCold";
+                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMin";
+                    } else {
+                        state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "WinterTypical";
+                    }
+
+                } else if (ExtremePeriodTitle == "AUTUMN") {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "AutumnTypical";
+
+                } else if (ExtremePeriodTitle == "SPRING") {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "SpringTypical";
+
+                } else if (ExtremePeriodTitle == "WETSEASON") {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "WetSeason";
+
+                } else if (ExtremePeriodTitle == "DRYSEASON") {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "DrySeason";
+
+                } else if (ExtremePeriodTitle == "NOWETSEASON") {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "NoWetSeason";
+
+                } else if (ExtremePeriodTitle == "NODRYSEASON") {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "NoDrySeason";
+
+                } else if ((ExtremePeriodTitle == "NODRYSEASONMAX") || (ExtremePeriodTitle == "NOWETSEASONMAX")) {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle;
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "TropicalHot";
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "SummerExtreme";
+
+                } else if ((ExtremePeriodTitle == "NODRYSEASONMIN") || (ExtremePeriodTitle == "NOWETSEASONMIN")) {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle;
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "TropicalCold";
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "WinterExtreme";
+
+                } else if (ExtremePeriodTitle == "TROPICALHOT") {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "TropicalHot";
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "SummerExtreme";
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMax";
+
+                } else if (ExtremePeriodTitle == "TROPICALCOLD") {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "TropicalCold";
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue1 = "WinterExtreme";
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue2 = "NoDrySeasonMin";
+
+                } else {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "Invalid - no match";
+                }
+                state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay = General::OrdinalDay(
+                    state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth, state.dataWeatherManager->TypicalExtremePeriods(i).StartDay, 0);
+                state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay = General::OrdinalDay(
+                    state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth, state.dataWeatherManager->TypicalExtremePeriods(i).EndDay, 0);
+                if (state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay <= state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay) {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).TotalDays =
+                        state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay - state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay + 1;
+                } else {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).TotalDays =
+                        General::OrdinalDay(12, 31, state.dataWeatherManager->LeapYearAdd) -
+                        state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay + 1 + state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay;
+                }
+            }
+        } break;
+        case WeatherManager::EpwHeaderType::GroundTemperatures: {
+            // Added for ground surfaces defined with F or c factor method. TH 7/2009
+            // Assume the 0.5 m set of ground temperatures
+            // or first set on a weather file, if any.
+            Pos = index(Line, ',');
+            if (Pos != std::string::npos) {
+                bool errFlag;
+                int NumGrndTemps = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
+                if (!errFlag && NumGrndTemps >= 1) {
+                    Line.erase(0, Pos + 1);
+                    // skip depth, soil conductivity, soil density, soil specific heat
+                    for (int i = 1; i <= 4; ++i) {
+                        Pos = index(Line, ',');
+                        if (Pos == std::string::npos) {
+                            Line.clear();
+                            break;
+                        }
+                        Line.erase(0, Pos + 1);
+                    }
+                    state.dataWeatherManager->GroundTempsFCFromEPWHeader = 0.0;
+                    int actcount = 0;
+                    for (int i = 1; i <= 12; ++i) { // take the first set of ground temperatures.
+                        Pos = index(Line, ',');
+                        if (Pos != std::string::npos) {
+                            state.dataWeatherManager->GroundTempsFCFromEPWHeader(i) = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
+                            ++actcount;
+                        } else {
+                            if (len(Line) > 0) {
                                 state.dataWeatherManager->GroundTempsFCFromEPWHeader(i) =
                                     UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
                                 ++actcount;
-                            } else {
-                                if (len(Line) > 0) {
-                                    state.dataWeatherManager->GroundTempsFCFromEPWHeader(i) =
-                                        UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
-                                    ++actcount;
-                                }
-                                break;
                             }
-                            Line.erase(0, Pos + 1);
+                            break;
                         }
-                        if (actcount == 12) state.dataWeatherManager->wthFCGroundTemps = true;
+                        Line.erase(0, Pos + 1);
+                    }
+                    if (actcount == 12) state.dataWeatherManager->wthFCGroundTemps = true;
+                }
+            }
+        } break;
+        case WeatherManager::EpwHeaderType::HolidaysDST: {
+            // A1, \field LeapYear Observed
+            // \type choice
+            // \key Yes
+            // \key No
+            // \note Yes if Leap Year will be observed for this file
+            // \note No if Leap Year days (29 Feb) should be ignored in this file
+            // A2, \field Daylight Saving Start Day
+            // A3, \field Daylight Saving End Day
+            // N1, \field Number of Holidays
+            // A4, \field Holiday 1 Name
+            // A5, \field Holiday 1 Day
+            // etc.
+            // Start with Minimum number of NumHdArgs
+            uppercase(Line);
+            NumHdArgs = 4;
+            int CurCount = 0;
+            for (int i = 1; i <= NumHdArgs; ++i) {
+                strip(Line);
+                Pos = index(Line, ',');
+                if (Pos == std::string::npos) {
+                    if (len(Line) == 0) {
+                        while (Pos == std::string::npos) {
+                            Line = state.files.inputWeatherFile.readLine().data;
+                            strip(Line);
+                            uppercase(Line);
+                            Pos = index(Line, ',');
+                        }
+                    } else {
+                        Pos = len(Line);
                     }
                 }
 
-            } else if (HeaderStringUppercase == "HOLIDAYS/DAYLIGHT SAVING") {
-                // A1, \field LeapYear Observed
-                // \type choice
-                // \key Yes
-                // \key No
-                // \note Yes if Leap Year will be observed for this file
-                // \note No if Leap Year days (29 Feb) should be ignored in this file
-                // A2, \field Daylight Saving Start Day
-                // A3, \field Daylight Saving End Day
-                // N1, \field Number of Holidays
-                // A4, \field Holiday 1 Name
-                // A5, \field Holiday 1 Day
-                // etc.
-                // Start with Minimum number of NumHdArgs
-                uppercase(Line);
-                NumHdArgs = 4;
-                for (int i = 1; i <= NumHdArgs; ++i) {
-                    strip(Line);
-                    Pos = index(Line, ',');
-                    if (Pos == std::string::npos) {
-                        if (len(Line) == 0) {
-                            while (Pos == std::string::npos) {
-                                Line = state.files.inputWeatherFile.readLine().data;
-                                strip(Line);
-                                uppercase(Line);
-                                Pos = index(Line, ',');
-                            }
+                int PMonth;
+                int PDay;
+                int PWeekDay;
+                bool IOStatus;
+                if (i == 1) {
+                    state.dataWeatherManager->WFAllowsLeapYears = (Line[0] == 'Y');
+                } else if (i == 2) {
+                    // In this section, we call ProcessDateString, and if that fails, we can recover from it
+                    // by setting DST to false, so we don't affect ErrorsFound
+
+                    // call ProcessDateString with local bool (unused)
+                    bool errflag1;
+                    General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
+                    if (dateType != DateType::Invalid) {
+                        // ErrorsFound is still false after ProcessDateString
+                        if (PMonth == 0 && PDay == 0) {
+                            state.dataWeatherManager->EPWDaylightSaving = false;
                         } else {
-                            Pos = len(Line);
+                            state.dataWeatherManager->EPWDaylightSaving = true;
+                            state.dataWeatherManager->EPWDST.StDateType = dateType;
+                            state.dataWeatherManager->EPWDST.StMon = PMonth;
+                            state.dataWeatherManager->EPWDST.StDay = PDay;
+                            state.dataWeatherManager->EPWDST.StWeekDay = PWeekDay;
                         }
+                    } else {
+                        // ErrorsFound is untouched
+                        ShowContinueError(
+                            state, format("ProcessEPWHeader: Invalid Daylight Saving Period Start Date Field(WeatherFile)={}", Line.substr(0, Pos)));
+                        ShowContinueError(state, format("...invalid header={}", epwHeaders[static_cast<int>(headerType)]));
+                        ShowContinueError(state, "...Setting Weather File DST to false.");
+                        state.dataWeatherManager->EPWDaylightSaving = false;
                     }
 
-                    int PMonth;
-                    int PDay;
-                    int PWeekDay;
-                    bool IOStatus;
-                    int CurCount = 0;
-                    if (i == 1) {
-                        state.dataWeatherManager->WFAllowsLeapYears = (Line[0] == 'Y');
-                    } else if (i == 2) {
-                        // In this section, we call ProcessDateString, and if that fails, we can recover from it
-                        // by setting DST to false, so we don't affect ErrorsFound
-
-                        // call ProcessDateString with local bool (unused)
-                        bool errflag1;
-                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
+                } else if (i == 3) {
+                    General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                    if (state.dataWeatherManager->EPWDaylightSaving) {
                         if (dateType != DateType::Invalid) {
-                            // ErrorsFound is still false after ProcessDateString
-                            if (PMonth == 0 && PDay == 0) {
-                                state.dataWeatherManager->EPWDaylightSaving = false;
-                            } else {
-                                state.dataWeatherManager->EPWDaylightSaving = true;
-                                state.dataWeatherManager->EPWDST.StDateType = dateType;
-                                state.dataWeatherManager->EPWDST.StMon = PMonth;
-                                state.dataWeatherManager->EPWDST.StDay = PDay;
-                                state.dataWeatherManager->EPWDST.StWeekDay = PWeekDay;
-                            }
+                            state.dataWeatherManager->EPWDST.EnDateType = dateType;
+                            state.dataWeatherManager->EPWDST.EnMon = PMonth;
+                            state.dataWeatherManager->EPWDST.EnDay = PDay;
+                            state.dataWeatherManager->EPWDST.EnWeekDay = PWeekDay;
                         } else {
-                            // ErrorsFound is untouched
-                            ShowContinueError(
-                                state, "ProcessEPWHeader: Invalid Daylight Saving Period Start Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                            ShowContinueError(state, "...invalid header=" + HeaderString);
+                            ShowWarningError(
+                                state,
+                                format("ProcessEPWHeader: Invalid Daylight Saving Period End Date Field(WeatherFile)={}", Line.substr(0, Pos)));
                             ShowContinueError(state, "...Setting Weather File DST to false.");
                             state.dataWeatherManager->EPWDaylightSaving = false;
                         }
-
-                    } else if (i == 3) {
-                        General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (state.dataWeatherManager->EPWDaylightSaving) {
-                            if (dateType != DateType::Invalid) {
-                                state.dataWeatherManager->EPWDST.EnDateType = dateType;
-                                state.dataWeatherManager->EPWDST.EnMon = PMonth;
-                                state.dataWeatherManager->EPWDST.EnDay = PDay;
-                                state.dataWeatherManager->EPWDST.EnWeekDay = PWeekDay;
-                            } else {
-                                ShowWarningError(
-                                    state, "ProcessEPWHeader: Invalid Daylight Saving Period End Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                                ShowContinueError(state, "...Setting Weather File DST to false.");
-                                state.dataWeatherManager->EPWDaylightSaving = false;
-                            }
-                            state.dataWeatherManager->DST = state.dataWeatherManager->EPWDST;
-                        }
-
-                    } else if (i == 4) {
-                        int NumEPWHolidays = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                        state.dataWeatherManager->NumSpecialDays =
-                            NumEPWHolidays + state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriodControl:SpecialDays");
-                        state.dataWeatherManager->SpecialDays.allocate(state.dataWeatherManager->NumSpecialDays);
-                        NumHdArgs = 4 + NumEPWHolidays * 2;
-
-                    } else if ((i >= 5)) {
-                        if (mod(i, 2) != 0) {
-                            ++CurCount;
-                            if (CurCount > state.dataWeatherManager->NumSpecialDays) {
-                                ShowSevereError(state, "Too many SpecialDays");
-                                ErrorsFound = true;
-                            } else {
-                                state.dataWeatherManager->SpecialDays(CurCount).Name = Line.substr(0, Pos);
-                            }
-                            // Process name
-                        } else {
-                            if (CurCount <= state.dataWeatherManager->NumSpecialDays) {
-                                // Process date
-                                General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                                if (dateType == DateType::MonthDay) {
-                                    state.dataWeatherManager->SpecialDays(CurCount).DateType = dateType;
-                                    state.dataWeatherManager->SpecialDays(CurCount).Month = PMonth;
-                                    state.dataWeatherManager->SpecialDays(CurCount).Day = PDay;
-                                    state.dataWeatherManager->SpecialDays(CurCount).WeekDay = 0;
-                                    state.dataWeatherManager->SpecialDays(CurCount).CompDate = PMonth * 32 + PDay;
-                                    state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
-                                    state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
-                                    state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
-                                } else if (dateType != DateType::Invalid) {
-                                    state.dataWeatherManager->SpecialDays(CurCount).DateType = dateType;
-                                    state.dataWeatherManager->SpecialDays(CurCount).Month = PMonth;
-                                    state.dataWeatherManager->SpecialDays(CurCount).Day = PDay;
-                                    state.dataWeatherManager->SpecialDays(CurCount).WeekDay = PWeekDay;
-                                    state.dataWeatherManager->SpecialDays(CurCount).CompDate = 0;
-                                    state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
-                                    state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
-                                    state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
-                                } else if (dateType == DateType::Invalid) {
-                                    ShowSevereError(state, "Invalid SpecialDay Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                                    ErrorsFound = true;
-                                }
-                            }
-                        }
+                        state.dataWeatherManager->DST = state.dataWeatherManager->EPWDST;
                     }
-                    Line.erase(0, Pos + 1);
-                }
-                for (int i = 1; i <= state.dataWeatherManager->NumEPWTypExtSets; ++i) {
-                    // General::OrdinalDay (Month,Day,LeapYearValue)
-                    state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay =
-                        General::OrdinalDay(state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth,
-                                            state.dataWeatherManager->TypicalExtremePeriods(i).StartDay,
-                                            state.dataWeatherManager->LeapYearAdd);
-                    state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay =
-                        General::OrdinalDay(state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth,
-                                            state.dataWeatherManager->TypicalExtremePeriods(i).EndDay,
-                                            state.dataWeatherManager->LeapYearAdd);
-                    if (state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay <= state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay) {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).TotalDays = state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay -
-                                                                                       state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay +
-                                                                                       1;
+
+                } else if (i == 4) {
+                    int NumEPWHolidays = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                    state.dataWeatherManager->NumSpecialDays =
+                        NumEPWHolidays + state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriodControl:SpecialDays");
+                    state.dataWeatherManager->SpecialDays.allocate(state.dataWeatherManager->NumSpecialDays);
+                    NumHdArgs = 4 + NumEPWHolidays * 2;
+
+                } else if ((i >= 5)) {
+                    if (mod(i, 2) != 0) {
+                        ++CurCount;
+                        if (CurCount > state.dataWeatherManager->NumSpecialDays) {
+                            ShowSevereError(state, "Too many SpecialDays");
+                            ErrorsFound = true;
+                        } else {
+                            state.dataWeatherManager->SpecialDays(CurCount).Name = Line.substr(0, Pos);
+                        }
+                        // Process name
                     } else {
-                        state.dataWeatherManager->TypicalExtremePeriods(i).TotalDays =
-                            General::OrdinalDay(12, 31, state.dataWeatherManager->LeapYearAdd) -
-                            state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay + 1 +
-                            state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay;
-                    }
-                }
-
-            } else if ((HeaderStringUppercase == "COMMENTS 1") || (HeaderStringUppercase == "COMMENTS 2") ||
-                       (HeaderStringUppercase == "DESIGN CONDITIONS")) {
-                // no action
-            } else if (HeaderStringUppercase == "DATA PERIODS") {
-                //     N1, \field Number of Data Periods
-                //     N2, \field Number of Records per hour
-                //     A1, \field Data Period 1 Name/Description
-                //     A2, \field Data Period 1 Start Day of Week
-                //       \type choice
-                //       \key  Sunday
-                //       \key  Monday
-                //       \key  Tuesday
-                //       \key  Wednesday
-                //       \key  Thursday
-                //       \key  Friday
-                //       \key  Saturday
-                //     A3, \field Data Period 1 Start Day
-                //     A4, \field Data Period 1 End Day
-                uppercase(Line);
-                NumHdArgs = 2;
-                int CurCount = 0;
-                for (int i = 1; i <= NumHdArgs; ++i) {
-                    strip(Line);
-                    Pos = index(Line, ',');
-                    if (Pos == std::string::npos) {
-                        if (len(Line) == 0) {
-                            while (Pos == std::string::npos) {
-                                Line = state.files.inputWeatherFile.readLine().data;
-                                strip(Line);
-                                uppercase(Line);
-                                Pos = index(Line, ',');
-                            }
-                        } else {
-                            Pos = len(Line);
-                        }
-                    }
-
-                    bool IOStatus;
-                    if (i == 1) {
-                        state.dataWeatherManager->NumDataPeriods = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                        state.dataWeatherManager->DataPeriods.allocate(state.dataWeatherManager->NumDataPeriods);
-                        NumHdArgs += 4 * state.dataWeatherManager->NumDataPeriods;
-                        if (state.dataWeatherManager->NumDataPeriods > 0) {
-                            for (auto &e : state.dataWeatherManager->DataPeriods)
-                                e.NumDays = 0;
-                        }
-
-                    } else if (i == 2) {
-                        state.dataWeatherManager->NumIntervalsPerHour = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
-                    } else if (i >= 3) {
-                        int const CurOne = mod(i - 3, 4);
-                        int PMonth;
-                        int PDay;
-                        int PWeekDay;
-                        int PYear;
-                        if (CurOne == 0) {
-                            // Description of Data Period
-                            ++CurCount;
-                            if (CurCount > state.dataWeatherManager->NumDataPeriods) {
-                                ShowSevereError(state, "Too many data periods");
+                        if (CurCount <= state.dataWeatherManager->NumSpecialDays) {
+                            // Process date
+                            General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
+                            if (dateType == DateType::MonthDay) {
+                                state.dataWeatherManager->SpecialDays(CurCount).DateType = dateType;
+                                state.dataWeatherManager->SpecialDays(CurCount).Month = PMonth;
+                                state.dataWeatherManager->SpecialDays(CurCount).Day = PDay;
+                                state.dataWeatherManager->SpecialDays(CurCount).WeekDay = 0;
+                                state.dataWeatherManager->SpecialDays(CurCount).CompDate = PMonth * 32 + PDay;
+                                state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
+                                state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
+                                state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
+                            } else if (dateType != DateType::Invalid) {
+                                state.dataWeatherManager->SpecialDays(CurCount).DateType = dateType;
+                                state.dataWeatherManager->SpecialDays(CurCount).Month = PMonth;
+                                state.dataWeatherManager->SpecialDays(CurCount).Day = PDay;
+                                state.dataWeatherManager->SpecialDays(CurCount).WeekDay = PWeekDay;
+                                state.dataWeatherManager->SpecialDays(CurCount).CompDate = 0;
+                                state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
+                                state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
+                                state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
+                            } else if (dateType == DateType::Invalid) {
+                                ShowSevereError(state, format("Invalid SpecialDay Date Field(WeatherFile)={}", Line.substr(0, Pos)));
                                 ErrorsFound = true;
-                            } else {
-                                state.dataWeatherManager->DataPeriods(CurCount).Name = Line.substr(0, Pos);
-                            }
-
-                        } else if (CurOne == 1) {
-                            // Start Day of Week
-                            if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
-                                state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek = Line.substr(0, Pos);
-                                state.dataWeatherManager->DataPeriods(CurCount).WeekDay =
-                                    UtilityRoutines::FindItemInList(state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek, DaysOfWeek, 7);
-                                if (state.dataWeatherManager->DataPeriods(CurCount).WeekDay == 0) {
-                                    ShowSevereError(state,
-                                                    fmt::format("Weather File -- Invalid Start Day of Week for Data Period #{}, Invalid day={}",
-                                                                CurCount,
-                                                                state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek));
-                                    ErrorsFound = true;
-                                }
-                            }
-
-                        } else if (CurOne == 2) {
-                            // DataPeriod Start Day
-                            if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
-                                General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
-                                if (dateType == DateType::MonthDay) {
-                                    state.dataWeatherManager->DataPeriods(CurCount).StMon = PMonth;
-                                    state.dataWeatherManager->DataPeriods(CurCount).StDay = PDay;
-                                    state.dataWeatherManager->DataPeriods(CurCount).StYear = PYear;
-                                    if (PYear != 0) state.dataWeatherManager->DataPeriods(CurCount).HasYearData = true;
-                                } else {
-                                    ShowSevereError(state,
-                                                    "Data Periods must be of the form <DayOfYear> or <Month Day> (WeatherFile), found=" +
-                                                        Line.substr(0, Pos));
-                                    ErrorsFound = true;
-                                }
-                            }
-
-                        } else if (CurOne == 3) {
-                            if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
-                                General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
-                                if (dateType == DateType::MonthDay) {
-                                    state.dataWeatherManager->DataPeriods(CurCount).EnMon = PMonth;
-                                    state.dataWeatherManager->DataPeriods(CurCount).EnDay = PDay;
-                                    state.dataWeatherManager->DataPeriods(CurCount).EnYear = PYear;
-                                    if (PYear == 0 && state.dataWeatherManager->DataPeriods(CurCount).HasYearData) {
-                                        ShowWarningError(state, "Data Period (WeatherFile) - Start Date contains year. End Date does not.");
-                                        ShowContinueError(state, "...Assuming same year as Start Date for this data.");
-                                        state.dataWeatherManager->DataPeriods(CurCount).EnYear =
-                                            state.dataWeatherManager->DataPeriods(CurCount).StYear;
-                                    }
-                                } else {
-                                    ShowSevereError(state,
-                                                    "Data Periods must be of the form <DayOfYear> or <Month Day>, (WeatherFile) found=" +
-                                                        Line.substr(0, Pos));
-                                    ErrorsFound = true;
-                                }
-                            }
-                            if (state.dataWeatherManager->DataPeriods(CurCount).StYear == 0 ||
-                                state.dataWeatherManager->DataPeriods(CurCount).EnYear == 0) {
-                                state.dataWeatherManager->DataPeriods(CurCount).DataStJDay =
-                                    General::OrdinalDay(state.dataWeatherManager->DataPeriods(CurCount).StMon,
-                                                        state.dataWeatherManager->DataPeriods(CurCount).StDay,
-                                                        state.dataWeatherManager->LeapYearAdd);
-                                state.dataWeatherManager->DataPeriods(CurCount).DataEnJDay =
-                                    General::OrdinalDay(state.dataWeatherManager->DataPeriods(CurCount).EnMon,
-                                                        state.dataWeatherManager->DataPeriods(CurCount).EnDay,
-                                                        state.dataWeatherManager->LeapYearAdd);
-                                if (state.dataWeatherManager->DataPeriods(CurCount).DataStJDay <=
-                                    state.dataWeatherManager->DataPeriods(CurCount).DataEnJDay) {
-                                    state.dataWeatherManager->DataPeriods(CurCount).NumDays =
-                                        state.dataWeatherManager->DataPeriods(CurCount).DataEnJDay -
-                                        state.dataWeatherManager->DataPeriods(CurCount).DataStJDay + 1;
-                                } else {
-                                    state.dataWeatherManager->DataPeriods(CurCount).NumDays =
-                                        (365 - state.dataWeatherManager->DataPeriods(CurCount).DataStJDay + 1) +
-                                        (state.dataWeatherManager->DataPeriods(CurCount).DataEnJDay - 1 + 1);
-                                }
-                            } else { // weather file has actual year(s)
-                                auto &dataPeriod{state.dataWeatherManager->DataPeriods(CurCount)};
-                                dataPeriod.DataStJDay = computeJulianDate(dataPeriod.StYear, dataPeriod.StMon, dataPeriod.StDay);
-                                dataPeriod.DataEnJDay = computeJulianDate(dataPeriod.EnYear, dataPeriod.EnMon, dataPeriod.EnDay);
-                                dataPeriod.NumDays = dataPeriod.DataEnJDay - dataPeriod.DataStJDay + 1;
-                            }
-                            // Have processed the last item for this, can set up Weekdays for months
-                            state.dataWeatherManager->DataPeriods(CurCount).MonWeekDay = 0;
-                            if (!ErrorsFound) {
-                                SetupWeekDaysByMonth(state,
-                                                     state.dataWeatherManager->DataPeriods(CurCount).StMon,
-                                                     state.dataWeatherManager->DataPeriods(CurCount).StDay,
-                                                     state.dataWeatherManager->DataPeriods(CurCount).WeekDay,
-                                                     state.dataWeatherManager->DataPeriods(CurCount).MonWeekDay);
                             }
                         }
                     }
-                    Line.erase(0, Pos + 1);
+                }
+                Line.erase(0, Pos + 1);
+            }
+            for (int i = 1; i <= state.dataWeatherManager->NumEPWTypExtSets; ++i) {
+                // General::OrdinalDay (Month,Day,LeapYearValue)
+                state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay =
+                    General::OrdinalDay(state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth,
+                                        state.dataWeatherManager->TypicalExtremePeriods(i).StartDay,
+                                        state.dataWeatherManager->LeapYearAdd);
+                state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay =
+                    General::OrdinalDay(state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth,
+                                        state.dataWeatherManager->TypicalExtremePeriods(i).EndDay,
+                                        state.dataWeatherManager->LeapYearAdd);
+                if (state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay <= state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay) {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).TotalDays =
+                        state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay - state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay + 1;
+                } else {
+                    state.dataWeatherManager->TypicalExtremePeriods(i).TotalDays =
+                        General::OrdinalDay(12, 31, state.dataWeatherManager->LeapYearAdd) -
+                        state.dataWeatherManager->TypicalExtremePeriods(i).StartJDay + 1 + state.dataWeatherManager->TypicalExtremePeriods(i).EndJDay;
+                }
+            }
+        } break;
+        case WeatherManager::EpwHeaderType::Comments1:
+        case WeatherManager::EpwHeaderType::Comments2:
+        case WeatherManager::EpwHeaderType::DesignConditions: {
+            // no action
+        } break;
+        case WeatherManager::EpwHeaderType::DataPeriods: {
+            //     N1, \field Number of Data Periods
+            //     N2, \field Number of Records per hour
+            //     A1, \field Data Period 1 Name/Description
+            //     A2, \field Data Period 1 Start Day of Week
+            //       \type choice
+            //       \key  Sunday
+            //       \key  Monday
+            //       \key  Tuesday
+            //       \key  Wednesday
+            //       \key  Thursday
+            //       \key  Friday
+            //       \key  Saturday
+            //     A3, \field Data Period 1 Start Day
+            //     A4, \field Data Period 1 End Day
+            uppercase(Line);
+            NumHdArgs = 2;
+            int CurCount = 0;
+            for (int i = 1; i <= NumHdArgs; ++i) {
+                strip(Line);
+                Pos = index(Line, ',');
+                if (Pos == std::string::npos) {
+                    if (len(Line) == 0) {
+                        while (Pos == std::string::npos) {
+                            Line = state.files.inputWeatherFile.readLine().data;
+                            strip(Line);
+                            uppercase(Line);
+                            Pos = index(Line, ',');
+                        }
+                    } else {
+                        Pos = len(Line);
+                    }
                 }
 
-            } else {
-                ShowFatalError(state, "Invalid EPW Header designation found=" + HeaderString);
+                bool IOStatus;
+                if (i == 1) {
+                    state.dataWeatherManager->NumDataPeriods = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                    state.dataWeatherManager->DataPeriods.allocate(state.dataWeatherManager->NumDataPeriods);
+                    NumHdArgs += 4 * state.dataWeatherManager->NumDataPeriods;
+                    if (state.dataWeatherManager->NumDataPeriods > 0) {
+                        for (auto &e : state.dataWeatherManager->DataPeriods)
+                            e.NumDays = 0;
+                    }
+
+                } else if (i == 2) {
+                    state.dataWeatherManager->NumIntervalsPerHour = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                } else if (i >= 3) {
+                    int const CurOne = mod(i - 3, 4);
+                    int PMonth;
+                    int PDay;
+                    int PWeekDay;
+                    int PYear;
+                    if (CurOne == 0) {
+                        // Description of Data Period
+                        ++CurCount;
+                        if (CurCount > state.dataWeatherManager->NumDataPeriods) {
+                            ShowSevereError(state, "Too many data periods");
+                            ErrorsFound = true;
+                        } else {
+                            state.dataWeatherManager->DataPeriods(CurCount).Name = Line.substr(0, Pos);
+                        }
+
+                    } else if (CurOne == 1) {
+                        // Start Day of Week
+                        if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
+                            state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek = Line.substr(0, Pos);
+                            state.dataWeatherManager->DataPeriods(CurCount).WeekDay =
+                                getEnumerationValue(ScheduleManager::dayTypeNamesUC, state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek);
+                            if (state.dataWeatherManager->DataPeriods(CurCount).WeekDay < 1 ||
+                                state.dataWeatherManager->DataPeriods(CurCount).WeekDay > 7) {
+                                ShowSevereError(state,
+                                                fmt::format("Weather File -- Invalid Start Day of Week for Data Period #{}, Invalid day={}",
+                                                            CurCount,
+                                                            state.dataWeatherManager->DataPeriods(CurCount).DayOfWeek));
+                                ErrorsFound = true;
+                            }
+                        }
+
+                    } else if (CurOne == 2) {
+                        // DataPeriod Start Day
+                        if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
+                            General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
+                            if (dateType == DateType::MonthDay) {
+                                state.dataWeatherManager->DataPeriods(CurCount).StMon = PMonth;
+                                state.dataWeatherManager->DataPeriods(CurCount).StDay = PDay;
+                                state.dataWeatherManager->DataPeriods(CurCount).StYear = PYear;
+                                if (PYear != 0) state.dataWeatherManager->DataPeriods(CurCount).HasYearData = true;
+                            } else {
+                                ShowSevereError(state,
+                                                format("Data Periods must be of the form <DayOfYear> or <Month Day> (WeatherFile), found={}",
+                                                       Line.substr(0, Pos)));
+                                ErrorsFound = true;
+                            }
+                        }
+
+                    } else if (CurOne == 3) {
+                        if (CurCount <= state.dataWeatherManager->NumDataPeriods) {
+                            General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound, PYear);
+                            if (dateType == DateType::MonthDay) {
+                                state.dataWeatherManager->DataPeriods(CurCount).EnMon = PMonth;
+                                state.dataWeatherManager->DataPeriods(CurCount).EnDay = PDay;
+                                state.dataWeatherManager->DataPeriods(CurCount).EnYear = PYear;
+                                if (PYear == 0 && state.dataWeatherManager->DataPeriods(CurCount).HasYearData) {
+                                    ShowWarningError(state, "Data Period (WeatherFile) - Start Date contains year. End Date does not.");
+                                    ShowContinueError(state, "...Assuming same year as Start Date for this data.");
+                                    state.dataWeatherManager->DataPeriods(CurCount).EnYear = state.dataWeatherManager->DataPeriods(CurCount).StYear;
+                                }
+                            } else {
+                                ShowSevereError(state,
+                                                format("Data Periods must be of the form <DayOfYear> or <Month Day>, (WeatherFile) found={}",
+                                                       Line.substr(0, Pos)));
+                                ErrorsFound = true;
+                            }
+                        }
+                        if (state.dataWeatherManager->DataPeriods(CurCount).StYear == 0 ||
+                            state.dataWeatherManager->DataPeriods(CurCount).EnYear == 0) {
+                            state.dataWeatherManager->DataPeriods(CurCount).DataStJDay =
+                                General::OrdinalDay(state.dataWeatherManager->DataPeriods(CurCount).StMon,
+                                                    state.dataWeatherManager->DataPeriods(CurCount).StDay,
+                                                    state.dataWeatherManager->LeapYearAdd);
+                            state.dataWeatherManager->DataPeriods(CurCount).DataEnJDay =
+                                General::OrdinalDay(state.dataWeatherManager->DataPeriods(CurCount).EnMon,
+                                                    state.dataWeatherManager->DataPeriods(CurCount).EnDay,
+                                                    state.dataWeatherManager->LeapYearAdd);
+                            if (state.dataWeatherManager->DataPeriods(CurCount).DataStJDay <=
+                                state.dataWeatherManager->DataPeriods(CurCount).DataEnJDay) {
+                                state.dataWeatherManager->DataPeriods(CurCount).NumDays = state.dataWeatherManager->DataPeriods(CurCount).DataEnJDay -
+                                                                                          state.dataWeatherManager->DataPeriods(CurCount).DataStJDay +
+                                                                                          1;
+                            } else {
+                                state.dataWeatherManager->DataPeriods(CurCount).NumDays =
+                                    (365 - state.dataWeatherManager->DataPeriods(CurCount).DataStJDay + 1) +
+                                    (state.dataWeatherManager->DataPeriods(CurCount).DataEnJDay - 1 + 1);
+                            }
+                        } else { // weather file has actual year(s)
+                            auto &dataPeriod{state.dataWeatherManager->DataPeriods(CurCount)};
+                            dataPeriod.DataStJDay = computeJulianDate(dataPeriod.StYear, dataPeriod.StMon, dataPeriod.StDay);
+                            dataPeriod.DataEnJDay = computeJulianDate(dataPeriod.EnYear, dataPeriod.EnMon, dataPeriod.EnDay);
+                            dataPeriod.NumDays = dataPeriod.DataEnJDay - dataPeriod.DataStJDay + 1;
+                        }
+                        // Have processed the last item for this, can set up Weekdays for months
+                        state.dataWeatherManager->DataPeriods(CurCount).MonWeekDay = 0;
+                        if (!ErrorsFound) {
+                            SetupWeekDaysByMonth(state,
+                                                 state.dataWeatherManager->DataPeriods(CurCount).StMon,
+                                                 state.dataWeatherManager->DataPeriods(CurCount).StDay,
+                                                 state.dataWeatherManager->DataPeriods(CurCount).WeekDay,
+                                                 state.dataWeatherManager->DataPeriods(CurCount).MonWeekDay);
+                        }
+                    }
+                }
+                Line.erase(0, Pos + 1);
             }
+        } break;
+        default: {
+            // Invalid header type
+            assert(false);
+        } break;
         }
     }
 
@@ -9513,14 +9412,13 @@ namespace WeatherManager {
         return {tyyyy, tmm, tdd};
     }
 
-    WeekDay calculateDayOfWeek(EnergyPlusData &state, int const year, int const month, int const day)
+    ScheduleManager::DayType calculateDayOfWeek(EnergyPlusData &state, int const year, int const month, int const day)
     {
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2012
         //       MODIFIED       October 2017, Jason DeGraw
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // Calculate the correct day of week.
@@ -9544,7 +9442,7 @@ namespace WeatherManager {
         state.dataEnvrn->DayOfWeek = mod(day + (13 * (Gmm + 1) / 5) + Gyyyy + (Gyyyy / 4) + 6 * (Gyyyy / 100) + (Gyyyy / 400), 7);
         if (state.dataEnvrn->DayOfWeek == 0) state.dataEnvrn->DayOfWeek = 7;
 
-        return static_cast<WeekDay>(state.dataEnvrn->DayOfWeek);
+        return static_cast<ScheduleManager::DayType>(state.dataEnvrn->DayOfWeek);
     }
 
     int calculateDayOfYear(int const Month, int const Day, bool const leapYear)
@@ -9755,11 +9653,6 @@ namespace WeatherManager {
         // report site water mains temperature object user inputs and/or parameters calculated
         // from weather or stat file
 
-        std::map<WeatherManager::WaterMainsTempCalcMethod, std::string> const calcMethodMap{
-            {WeatherManager::WaterMainsTempCalcMethod::Schedule, "Schedule"},
-            {WeatherManager::WaterMainsTempCalcMethod::Correlation, "Correlation"},
-            {WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile, "CorrelationFromWeatherFile"}};
-
         if (!state.files.eio.good()) {
             return;
         }
@@ -9778,7 +9671,7 @@ namespace WeatherManager {
         switch (state.dataWeatherManager->WaterMainsTempsMethod) {
         case WaterMainsTempCalcMethod::Schedule:
             *eiostream << "Site Water Mains Temperature Information,";
-            *eiostream << calcMethodMap.at(state.dataWeatherManager->WaterMainsTempsMethod) << ","
+            *eiostream << waterMainsCalcMethodNames[static_cast<int>(state.dataWeatherManager->WaterMainsTempsMethod)] << ","
                        << state.dataWeatherManager->WaterMainsTempsScheduleName << ",";
             *eiostream << format("{:.2R}", state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp) << ","
                        << format("{:.2R}", state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp) << ",";
@@ -9786,7 +9679,7 @@ namespace WeatherManager {
             break;
         case WaterMainsTempCalcMethod::Correlation:
             *eiostream << "Site Water Mains Temperature Information,";
-            *eiostream << calcMethodMap.at(state.dataWeatherManager->WaterMainsTempsMethod) << ","
+            *eiostream << waterMainsCalcMethodNames[static_cast<int>(state.dataWeatherManager->WaterMainsTempsMethod)] << ","
                        << "NA"
                        << ",";
             *eiostream << format("{:.2R}", state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp) << ","
@@ -9796,7 +9689,7 @@ namespace WeatherManager {
         case WaterMainsTempCalcMethod::CorrelationFromWeatherFile:
             if (state.dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                 *eiostream << "Site Water Mains Temperature Information,";
-                *eiostream << calcMethodMap.at(state.dataWeatherManager->WaterMainsTempsMethod) << ","
+                *eiostream << waterMainsCalcMethodNames[static_cast<int>(state.dataWeatherManager->WaterMainsTempsMethod)] << ","
                            << "NA"
                            << ",";
                 *eiostream << format("{:.2R}", state.dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp) << ","
@@ -9852,11 +9745,10 @@ namespace WeatherManager {
                                      DewPoint,
                                      RelHum);
             HorizIRSky = ESky * state.dataWeatherManager->Sigma * pow_4(DryBulb + DataGlobalConstants::KelvinConv);
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::BruntModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::IdsoModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::BerdahlMartinModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::ClarkAllenModel) {
                 SkyTemp = (DryBulb + DataGlobalConstants::KelvinConv) * root_4(ESky) - DataGlobalConstants::KelvinConv;
             } else {
                 SkyTemp = 0.0; // dealt with later
@@ -9864,11 +9756,10 @@ namespace WeatherManager {
         } else {
             // Valid IR from weather files
             HorizIRSky = IRHoriz;
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::BruntModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::IdsoModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::BerdahlMartinModel ||
+                state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == SkyTempCalcType::ClarkAllenModel) {
                 SkyTemp = root_4(IRHoriz / state.dataWeatherManager->Sigma) - DataGlobalConstants::KelvinConv;
             } else {
                 SkyTemp = 0.0; // dealt with later

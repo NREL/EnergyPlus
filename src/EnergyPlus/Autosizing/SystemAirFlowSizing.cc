@@ -751,7 +751,10 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                 if (this->dataHRFlowSizingFlag) { // HX sizing
                     if (this->curOASysNum) {
                         // size to supply air duct flow rate
-                        if (this->finalSysSizing(this->curSysNum).DesOutAirVolFlow > 0.0) {
+                        if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                            auto &thisAirloopDOAS = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum];
+                            this->autoSizedValue = thisAirloopDOAS.SizingMassFlow / state.dataEnvrn->StdRhoAir;
+                        } else if (this->finalSysSizing(this->curSysNum).DesOutAirVolFlow > 0.0) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                         } else {
                             switch (this->curDuctType) {

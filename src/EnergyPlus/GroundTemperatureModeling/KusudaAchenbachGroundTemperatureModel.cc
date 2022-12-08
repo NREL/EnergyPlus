@@ -64,8 +64,7 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Kusuda model factory
-std::shared_ptr<KusudaGroundTempsModel>
-KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
+std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -90,7 +89,9 @@ KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjTyp
     // New shared pointer for this model object
     std::shared_ptr<KusudaGroundTempsModel> thisModel(new KusudaGroundTempsModel());
 
-    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::KusudaGroundTemp));
+    GroundTempObjType objType = GroundTempObjType::KusudaGroundTemp;
+
+    std::string_view const cCurrentModuleObject = GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(objType)];
     int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
@@ -102,7 +103,7 @@ KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjTyp
 
             // Read input into object here
             thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
-            thisModel->objectType = objectType;
+            thisModel->objectType = objType;
             thisModel->groundThermalDiffisivity =
                 state.dataIPShortCut->rNumericArgs(1) / (state.dataIPShortCut->rNumericArgs(2) * state.dataIPShortCut->rNumericArgs(3));
 
@@ -127,7 +128,10 @@ KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjTyp
                 Real64 maxSurfTemp(-100); // Set low initially but will get updated
 
                 std::shared_ptr<BaseGroundTempsModel> shallowObj = GetGroundTempModelAndInit(
-                    state, state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)), "");
+                    state,
+                    static_cast<std::string>(
+                        GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)]),
+                    "");
 
                 for (int monthIndex = 1; monthIndex <= 12; ++monthIndex) {
                     Real64 currMonthTemp = shallowObj->getGroundTempAtTimeInMonths(state, 0.0, monthIndex);
@@ -167,7 +171,9 @@ KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, GroundTempObjTyp
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");
+        ShowFatalError(state,
+                       fmt::format("{}--Errors getting input for ground temperature model",
+                                   GroundTemperatureManager::groundTempModelNames[static_cast<int>(objType)]));
         return nullptr;
     }
 }
