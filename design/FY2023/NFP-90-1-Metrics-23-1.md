@@ -3,7 +3,7 @@
 
 **Revisions**
 -   New Feature Proposal -- 25-November-2022
--   New Feature Design -- 06-December-2022
+-   New Feature Design -- (updated) 08-December-2022
 
 ## Justification for New Feature
 Many new metrics appear in the ASHRAE 90.1-2019 \[1\] standard.
@@ -141,13 +141,15 @@ This will all be done by extending the implementation in StandardRatings.hh & St
 -   For IEER
     -   SingleSpeedDXCoolingCoilStandardRatings -- used for the following E+ coils:
         -   Coil:Cooling:DX:SingleSpeed
-        -   Coil:Cooling:DX:CurveFit:Speed (for single-speed operating mode)
+        -   Coil:Cooling:WaterToAirHeatPump:EquationFit
+        -   Coil:Cooling:DX:CurveFit (single-speed operating mode)
 
     -   MultiSpeedDXCoolingCoilStandardRatings -- used for the following E+ coils:
         -   Coil:Cooling:DX:TwoSpeed
         -   Coil:Cooling:DX:MultiSpeed
         -   Coil:Cooling:DX:VariableSpeed *(Note: standard formula/test conditions are limited to 4 > speeds)*
-        -   Coil:Cooling:DX:CurveFit:Speed (for multi-speed operating mode)
+        -   Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
+        -   Coil:Cooling:DX:CurveFit (multi-speed operating mode)
 
     -   SingleSpeedDXHeatingCoilStandardRatings -- used for the
         following E+ coils:
@@ -196,12 +198,16 @@ Transition rules will be required to accommodate the new fields added to the Var
 Example files that include the VariableSpeed DX coils will need to be updated.
 
 -   For IEER: There are 225 example files that feature one or more of various DX coils listed above.  Testing will be done for some or all of these.  We will begin with one example for each of: SingleSpeed, TwoSpeed, MultiSpeed, VariableSpeed, and CurveFit:Speed.  For example:
-    -   HeatPumpAuto.idf                       – Single speed cooling & heating
-    -   5ZoneAutoDXVAV.idf					                – Two speed cooling
-    -   MultiSpeedHeatPump.idf				             – Mulitspeed cooling & heating
-    -   PackagedTerminalHeatPumpVSAS.idf	      – Variable speed cooling & heating
-    -   UnitarySystem_SingleSpeedDX.idf		      – Single speed CurveFit
-    -   UnitarySystem_MultiSpeedDX			          – Mulitspeed cooling CurveFit
+    -   HeatPump.idf								                 – Single speed cooling (Condenser:EvapCooled)
+    -   HeatPumpAuto.idf                     – Single speed cooling & heating (Condenser:AirCooled)
+    -   RetailPackagedTESCoil.idf					       – Single speed cooling/thermalStorage (Condenser:EvapCooled)
+    -   UnitarySystem_SingleSpeedDX.idf		    – Single speed CurveFit (Condenser:EvapCooled)
+    -   5ZoneAutoDXVAV.idf					              – Two speed cooling (Condenser:EvapCooled)
+    -   MultiSpeedHeatPump.idf				           – Mulitspeed cooling & heating (Condenser:AirCooled)
+    -   PackagedTerminalHeatPumpVSAS.idf	    – Variable speed cooling & heating (Condenser:AirCooled)
+    -   UnitarySystem_MultiSpeedDX			        – Mulitspeed cooling CurveFit (Condenser:AirCooled)
+    -   HeatPumpWaterToAirEquationFit.idf 			– WaterToAirHeatPump:EquationFit	 (Condenser:WaterCooled)
+    -   VSHeatPumpWaterToAirEquationFit.idf		– WaterToAirHeatPump:VariableSpeedEquationFit (Condenser:WaterCooled)
 
 -   For SEER2/HSPF2: There are 11 example files that feature one or both of the variable speed DX coils.  Testing will be done with some of all of these.  We will start files which include variable speed DX coils for both heating and cooling.  For example:
     -   PackagedTerminalAirConditionerVSAS.idf	– Variable speed cooling & heating
