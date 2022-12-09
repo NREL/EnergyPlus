@@ -246,8 +246,8 @@ double voltage_table_t::calculate_current_for_target_w(double P_watts, double q,
 
         DOD_new = fabs((-b + sqrt(b * b - 4 * a * c)) / (2 * a));
 
-        auto upper = (size_t) fmin(i, params->voltage_table.size() - 1);
-        auto lower = (size_t) fmax(0, i - 1);
+        size_t upper = (size_t) fmin(i, params->voltage_table.size() - 1);
+        size_t lower = (size_t) fmax(0, i - 1);
         auto DOD_upper = params->voltage_table[upper][0];
         auto DOD_lower = params->voltage_table[lower][0];
         if (DOD_new <= DOD_upper && DOD_new >= DOD_lower) {
