@@ -97,7 +97,7 @@ protected:
         state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).ConcurrenceOption = Coincident;
         state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).NumTimeStepsInAvg = 1;
         state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).PlantLoopName = "Test Plant Loop 1";
-        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).LoopType = HeatingLoop;
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).LoopType = DataSizing::TypeOfPlantLoop::Heating;
 
         // set up a plant loop
         state->dataPlnt->TotNumLoops = 1;

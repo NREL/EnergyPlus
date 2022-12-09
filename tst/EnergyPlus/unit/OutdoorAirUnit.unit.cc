@@ -622,7 +622,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     state->dataSize->PlantSizData(1).PlantLoopName = "ChilledWaterLoop";
     state->dataSize->PlantSizData(1).ExitTemp = 6.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
-    state->dataSize->PlantSizData(1).LoopType = DataSizing::CoolingLoop;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Cooling;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -937,7 +937,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     state->dataSize->PlantSizData(1).PlantLoopName = "SteamLoop";
     state->dataSize->PlantSizData(1).ExitTemp = 100.0;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
-    state->dataSize->PlantSizData(1).LoopType = DataSizing::SteamLoop;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Steam;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;

@@ -784,7 +784,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         if (c->waterLoopNum > 0 && c->pltSizNum > 0) {
 
             c->plantLoopName = state.dataPlnt->PlantLoop(c->waterLoopNum).Name;
-            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
+            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::TypeOfPlantLoop::Steam) {
                 c->rhoFluid = FluidProperties::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                 DataGlobalConstants::InitConvTemp,
@@ -860,14 +860,14 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         if (c->pltSizNum > 0) {
             c->plantDesSupTemp = state.dataSize->PlantSizData(c->pltSizNum).ExitTemp;
             c->plantDesDeltaTemp = state.dataSize->PlantSizData(c->pltSizNum).DeltaT;
-            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::HeatingLoop) {
+            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::TypeOfPlantLoop::Heating) {
                 c->plantDesRetTemp = c->plantDesSupTemp - c->plantDesDeltaTemp;
-            } else if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::CoolingLoop ||
-                       state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::CondenserLoop) {
+            } else if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::TypeOfPlantLoop::Cooling ||
+                       state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::TypeOfPlantLoop::Condenser) {
                 c->plantDesRetTemp = c->plantDesSupTemp + c->plantDesDeltaTemp;
             }
 
-            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
+            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::TypeOfPlantLoop::Steam) {
                 c->plantDesCapacity = c->cpFluid * c->rhoFluid * state.dataSize->PlantSizData(c->pltSizNum).DeltaT *
                                       state.dataSize->PlantSizData(c->pltSizNum).DesVolFlowRate;
             } else {
@@ -1079,7 +1079,7 @@ void ReportCoilSelection::setCoilWaterFlowPltSizNum(EnergyPlusData &state,
     }
 
     if (c->waterLoopNum > 0 && c->pltSizNum > 0) {
-        if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
+        if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::TypeOfPlantLoop::Steam) {
             c->rhoFluid = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                             DataGlobalConstants::InitConvTemp,
@@ -1500,7 +1500,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     c->zoneEqNum = curZoneEqNum;
     //    if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     if (curSysNum > 0 && c->zoneEqNum == 0 && allocated(state.dataSize->FinalSysSizing)) {
-        auto finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
+        auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
         c->desDayNameAtSensPeak = finalSysSizing.HeatDesDay;
 
         c->oaPeakTemp = finalSysSizing.HeatOutTemp;
@@ -1524,10 +1524,8 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         Real64 sumLoad(0.0);   // straight total for zone design loads
         Real64 sumVdot(0.0);   // denominator for zone-volume weighted averages
 
-        int SysPeakDDnum(0);
-        SysPeakDDnum = finalSysSizing.HeatDDNum;
-        int SysPeakTimeStepInDay(0);
-        SysPeakTimeStepInDay = finalSysSizing.SysHeatCoilTimeStepPk;
+        int SysPeakDDnum = finalSysSizing.HeatDDNum;
+        int SysPeakTimeStepInDay = finalSysSizing.SysHeatCoilTimeStepPk;
         if (SysPeakDDnum > 0 && SysPeakTimeStepInDay > 0) { // may be zero if no peak found because of zero system load
             for (auto &z : c->zoneNum) {
                 Real64 mult = state.dataHeatBal->Zone(z).Multiplier * state.dataHeatBal->Zone(z).ListMultiplier;

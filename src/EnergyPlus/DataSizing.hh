@@ -105,10 +105,15 @@ namespace DataSizing {
     };
 
     // parameters for loop fluid type
-    constexpr int HeatingLoop(1);
-    constexpr int CoolingLoop(2);
-    constexpr int CondenserLoop(3);
-    constexpr int SteamLoop(4);
+    enum class TypeOfPlantLoop
+    {
+        Invalid = -1,
+        Heating,
+        Cooling,
+        Condenser,
+        Steam,
+        Num
+    };
 
     // parameters for sizing
     constexpr int NonCoincident(1);
@@ -140,7 +145,6 @@ namespace DataSizing {
     constexpr int SupplyAirHumidityRatio(3);
     constexpr int HumidityRatioDifference(4);
 
-    // parameters for sizing
     constexpr int FromDDCalc(1);
     constexpr int InpDesAirFlow(2);
     constexpr int DesAirFlowWithLim(3);
@@ -981,24 +985,17 @@ namespace DataSizing {
     struct PlantSizingData
     {
         // Members
-        std::string PlantLoopName; // name of PLANT LOOP or CONDENSER LOOP object
-        int LoopType;              // type of loop: 1=heating, 2=cooling, 3=condenser
-        Real64 ExitTemp;           // loop design exit (supply) temperature [C]
-        Real64 DeltaT;             // loop design temperature drop (or rise) [DelK]
-        int ConcurrenceOption;     // sizing option for coincident or noncoincident
-        int NumTimeStepsInAvg;     // number of zone timesteps in the averaging window for coincident plant flow
-        int SizingFactorOption;    // option for what sizing factor to apply
+        std::string PlantLoopName;                           // name of PLANT LOOP or CONDENSER LOOP object
+        TypeOfPlantLoop LoopType = TypeOfPlantLoop::Invalid; // type of loop: 1=heating, 2=cooling, 3=condenser
+        Real64 ExitTemp = 0.0;                               // loop design exit (supply) temperature [C]
+        Real64 DeltaT = 0.0;                                 // loop design temperature drop (or rise) [DelK]
+        int ConcurrenceOption = 0;                           // sizing option for coincident or noncoincident
+        int NumTimeStepsInAvg = 0;                           // number of zone timesteps in the averaging window for coincident plant flow
+        int SizingFactorOption = 0;                          // option for what sizing factor to apply
         // Calculated
-        Real64 DesVolFlowRate;  // loop design flow rate in m3/s
-        bool VolFlowSizingDone; // flag to indicate when this loop has finished sizing flow rate
-        Real64 PlantSizFac;     // hold the loop and pump sizing factor
-
-        // Default Constructor
-        PlantSizingData()
-            : LoopType(0), ExitTemp(0.0), DeltaT(0.0), ConcurrenceOption(1), NumTimeStepsInAvg(0), SizingFactorOption(101), DesVolFlowRate(0.0),
-              VolFlowSizingDone(false), PlantSizFac(1.0)
-        {
-        }
+        Real64 DesVolFlowRate = 0.0; // loop design flow rate in m3/s
+        bool VolFlowSizingDone = 0;  // flag to indicate when this loop has finished sizing flow rate
+        Real64 PlantSizFac = 0.0;    // hold the loop and pump sizing factor
     };
 
     // based on ZoneSizingData but only have member variables that are related to the CheckSum/

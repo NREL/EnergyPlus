@@ -6581,7 +6581,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             // move the noncoincident results into the system sizing array
             if (state.dataSize->CalcSysSizing(AirLoopNum).SizingOption == NonCoincident) {
                 // But first check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
-                if (!(state.dataSize->FinalSysSizing(AirLoopNum).CoolOAOption == OAControl::AllOA && SysSensCoolCap <= 0.0)) { // CoolOAOption = Yes 100% OA
+                if (!(state.dataSize->FinalSysSizing(AirLoopNum).CoolOAOption == OAControl::AllOA &&
+                      SysSensCoolCap <= 0.0)) { // CoolOAOption = Yes 100% OA
                     state.dataSize->CalcSysSizing(AirLoopNum).SensCoolCap = SysSensCoolCap;
                     state.dataSize->CalcSysSizing(AirLoopNum).TotCoolCap = SysTotCoolCap;
                     state.dataSize->CalcSysSizing(AirLoopNum).MixTempAtCoolPeak = SysCoolMixTemp;

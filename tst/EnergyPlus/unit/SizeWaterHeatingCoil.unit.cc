@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -527,7 +527,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -778,7 +778,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -1029,7 +1029,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -1235,7 +1235,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 0;

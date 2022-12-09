@@ -3767,36 +3767,12 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        {
-            auto const coolOAOption(state.dataIPShortCut->cAlphaArgs(i100PercentOACoolingAlphaNum));
-            if (coolOAOption == "YES") {
-                SysSizInput(SysSizIndex).CoolOAOption = OAControl::AllOA;
-            } else if (coolOAOption == "NO") {
-                SysSizInput(SysSizIndex).CoolOAOption = OAControl::MinOA;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(i100PercentOACoolingAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(i100PercentOACoolingAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are Yes or No.");
-                ErrorsFound = true;
-            }
-        }
-        {
-            auto const heatOAOption(state.dataIPShortCut->cAlphaArgs(i100PercentOAHeatingAlphaNum));
-            if (heatOAOption == "YES") {
-                SysSizInput(SysSizIndex).HeatOAOption = DataSizing::OAControl::AllOA;
-            } else if (heatOAOption == "NO") {
-                SysSizInput(SysSizIndex).HeatOAOption = DataSizing::OAControl::MinOA;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(i100PercentOAHeatingAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(i100PercentOAHeatingAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are Yes or No.");
-                ErrorsFound = true;
-            }
-        }
+
+        BooleanSwitch is100PctOACooling = getYesNoValue(state.dataIPShortCut->cAlphaArgs(i100PercentOACoolingAlphaNum));
+        SysSizInput(SysSizIndex).CoolOAOption = (is100PctOACooling == BooleanSwitch::Yes) ? OAControl::AllOA : OAControl::MinOA;
+
+        BooleanSwitch is100PctOAHeating = getYesNoValue(state.dataIPShortCut->cAlphaArgs(i100PercentOAHeatingAlphaNum));
+        SysSizInput(SysSizIndex).HeatOAOption = (is100PctOAHeating == BooleanSwitch::Yes) ? OAControl::AllOA : OAControl::MinOA;
 
         //  N1, \field Design Outdoor Air Flow Rate
         //      \type real
@@ -4264,7 +4240,7 @@ void GetPlantSizingInput(EnergyPlusData &state)
             e.PlantLoopName.clear();
             e.ExitTemp = 0.0;
             e.DeltaT = 0.0;
-            e.LoopType = 0;
+            e.LoopType = DataSizing::TypeOfPlantLoop::Invalid;
             e.DesVolFlowRate = 0.0;
         }
         for (int i = 1; i <= state.dataSize->NumPltSizInput; ++i) {
@@ -4297,24 +4273,10 @@ void GetPlantSizingInput(EnergyPlusData &state)
             state.dataSize->PlantSizData(PltSizIndex).NumTimeStepsInAvg = 1.0;
         }
 
-        {
-            auto const loopType(state.dataIPShortCut->cAlphaArgs(2));
-            if (loopType == "HEATING") {
-                state.dataSize->PlantSizData(PltSizIndex).LoopType = HeatingLoop;
-            } else if (loopType == "COOLING") {
-                state.dataSize->PlantSizData(PltSizIndex).LoopType = CoolingLoop;
-            } else if (loopType == "CONDENSER") {
-                state.dataSize->PlantSizData(PltSizIndex).LoopType = CondenserLoop;
-            } else if (loopType == "STEAM") {
-                state.dataSize->PlantSizData(PltSizIndex).LoopType = SteamLoop;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "...incorrect " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
-                ShowContinueError(state, R"(...Valid values are "Heating", "Cooling", "Condenser" or "Steam".)");
-                ErrorsFound = true;
-            }
-        }
+        constexpr static std::array<std::string_view, static_cast<int>(DataSizing::TypeOfPlantLoop::Num)> TypeOfPlantLoopNamesUC = {
+            "HEATING", "COOLING", "CONDENSER", "STEAM"};
+        state.dataSize->PlantSizData(PltSizIndex).LoopType = static_cast<TypeOfPlantLoop>(
+            getEnumerationValue(TypeOfPlantLoopNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
 
         if (NumAlphas > 2) {
             {
