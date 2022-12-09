@@ -1399,8 +1399,6 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
