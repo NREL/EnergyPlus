@@ -577,10 +577,9 @@ namespace HVACDXHeatPumpSystem {
         Real64 DesOutTemp;       // Desired outlet temperature of the DX cooling coil
         Real64 OutletTempDXCoil; // Actual outlet temperature of the DX cooling coil
 
-        int SolFla;             // Flag of solver
-        Array1D<Real64> Par(5); // Parameter array passed to solver
-        bool SensibleLoad;      // True if there is a sensible cooling load on this system
-        int FanOpMode;          // Supply air fan operating mode
+        int SolFla;        // Flag of solver
+        bool SensibleLoad; // True if there is a sensible cooling load on this system
+        int FanOpMode;     // Supply air fan operating mode
         // added variables to call variable speed DX coils
         int SpeedNum;                 // speed number of variable speed DX cooling coil
         Real64 QZnReq;                // Zone load (W), input to variable-speed DX coil
@@ -1012,10 +1011,10 @@ namespace HVACDXHeatPumpSystem {
                                                               QLatReq,
                                                               OnOffAirFlowRatio);
                                     } else {
-                                        Par(1) = double(VSCoilIndex);
-                                        Par(2) = DesOutTemp;
-                                        Par(5) = double(FanOpMode);
-                                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                                        auto f = [&state, VSCoilIndex, DesOutTemp, FanOpMode](Real64 const x) {
+                                            return VSCoilCyclingResidual(state, x, VSCoilIndex, DesOutTemp, FanOpMode);
+                                        };
+                                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 1.0e-10, 1.0);
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
@@ -1100,8 +1099,9 @@ namespace HVACDXHeatPumpSystem {
 
     Real64 VSCoilCyclingResidual(EnergyPlusData &state,
                                  Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1D<Real64> const &Par  // Par(1) = DX coil number
-    )
+                                 int CoilIndex,
+                                 Real64 desiredTemp,
+                                 int FanOpMode)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
@@ -1113,9 +1113,6 @@ namespace HVACDXHeatPumpSystem {
         //  Calculates residual function, iterate part-load ratio
         //  compare the desired temperature value with exit temperature from a variable-speed heating coil
 
-        int CoilIndex = int(Par(1));
-        int FanOpMode = int(Par(5));
-        Real64 desiredTemp = Par(2);
         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                   "",
                                                   CoilIndex,

@@ -3434,12 +3434,11 @@ namespace HVACUnitaryBypassVAV {
                                                                   OnOffAirFlowRatio);
                     } else {
                         // cycling compressor at lowest speed number, find part load fraction
-                        Par(1) = double(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
-                        Par(2) = DesOutTemp;
-                        Par(4) = double(CBVAVNum);
-                        Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                        General::SolveRoot(
-                            state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, HVACDXHeatPumpSystem::VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                        int VSCoilIndex = CBVAV(CBVAVNum).DXHeatCoilIndexNum;
+                        auto f = [&state, VSCoilIndex, DesOutTemp](Real64 const x) {
+                            return HVACDXHeatPumpSystem::VSCoilCyclingResidual(state, x, VSCoilIndex, DesOutTemp, DataHVACGlobals::ContFanCycCoil);
+                        };
+                        General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, f, 1.0e-10, 1.0);
                         if (SolFla == -1) {
                             if (!state.dataGlobal->WarmupFlag) {
                                 if (CBVAV(CBVAVNum).DXHeatCyclingIterationExceeded < 4) {
