@@ -933,11 +933,6 @@ namespace HVACVariableRefrigerantFlow {
 
     void isVRFCoilPresent(EnergyPlusData &state, std::string_view VRFTUName, bool &CoolCoilPresent, bool &HeatCoilPresent);
 
-    Real64 PLRResidual(EnergyPlusData &state,
-                       Real64 PartLoadRatio,      // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                       Array1D<Real64> const &Par // par(1) = VRFTUNum
-    );
-
     void SetAverageAirFlow(EnergyPlusData &state,
                            int VRFTUNum,             // Unit index
                            Real64 PartLoadRatio,     // unit part load ratio
@@ -968,19 +963,11 @@ namespace HVACVariableRefrigerantFlow {
                            Real64 &MaxLimit                 // Maximum terminal unit capacity for coils in same operating mode [W]
     );
 
-    Real64 VRFTUAirFlowResidual_FluidTCtrl(EnergyPlusData &state,
-                                           Real64 FanSpdRatio,        // fan speed ratio of VRF VAV TU
-                                           Array1D<Real64> const &Par // par(1) = VRFTUNum
-    );
-
-    Real64 VRFOUTeResidual_FluidTCtrl(EnergyPlusData &state,
-                                      Real64 Te,                 // outdoor unit evaporating temperature
-                                      Array1D<Real64> const &Par // par(1) = VRFTUNum
-    );
-
     Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
-                                   Real64 T_suc,              // Compressor suction temperature Te' [C]
-                                   Array1D<Real64> const &Par // parameters
+                                   Real64 T_dis,
+                                   Real64 CondHeat,
+                                   int CAPFT,
+                                   Real64 const T_suc // Compressor suction temperature Te' [C]
     );
 
 } // namespace HVACVariableRefrigerantFlow

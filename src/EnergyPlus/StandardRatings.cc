@@ -527,29 +527,64 @@ namespace StandardRatings {
                                        state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex,
                                        RoutineName);
 
-                Par(1) = EnteringWaterTempReduced;
-                Par(2) = EvapOutletTemp;
-                Par(3) = Cp;
-                Par(4) = ReducedPLR[RedCapNum];
-                Par(5) = CondVolFlowRate * Rho;
-                Par(6) = CapFTempCurveIndex;
-                Par(7) = EIRFTempCurveIndex;
-                Par(8) = EIRFPLRCurveIndex;
-                Par(9) = RefCap;
-                Par(10) = RefCOP;
-                Par(11) = OpenMotorEff;
-                Par(12) = ChillerCapFT_rated;
+                Real64 reducedPLR = ReducedPLR[RedCapNum];
                 CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
                 CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
-                General::SolveRoot(state,
-                                   Acc,
-                                   IterMax,
-                                   SolFla,
-                                   CondenserOutletTemp,
-                                   ReformEIRChillerCondInletTempResidual,
-                                   CondenserOutletTemp0,
-                                   CondenserOutletTemp1,
-                                   Par);
+
+                // CONST_LAMBDA_CAPTURE Issue, see PR 9670
+                Real64 tmpEvapOutletTemp = EvapOutletTemp;
+                auto f = [&state,
+                          EnteringWaterTempReduced,
+                          Cp,
+                          reducedPLR,
+                          CondVolFlowRate,
+                          Rho,
+                          CapFTempCurveIndex,
+                          EIRFTempCurveIndex,
+                          EIRFPLRCurveIndex,
+                          RefCap,
+                          RefCOP,
+                          OpenMotorEff,
+                          tmpEvapOutletTemp,
+                          ChillerCapFT_rated](Real64 const CondenserOutletTemp) {
+                    Real64 AvailChillerCap(0.0);         // Chiller available capacity at current operating conditions [W]
+                    Real64 CondenserInletTemp(0.0);      // Calculated condenser inlet temperature [C]
+                    Real64 QEvap(0.0);                   // Rate of heat transfer to the evaporator coil [W]
+                    Real64 QCond(0.0);                   // Rate of heat transfer to the condenser coil [W]
+                    Real64 Power(0.0);                   // Power at reduced capacity test conditions (100%, 75%, 50%, and 25%)
+                    Real64 ReformEIRChillerCapFT(0.0);   // Chiller capacity fraction (evaluated as a function of temperature)
+                    Real64 ReformEIRChillerEIRFT(0.0);   // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
+                    Real64 ReformEIRChillerEIRFPLR(0.0); // Chiller EIR as a function of part-load ratio (PLR)
+                    Real64 PartLoadRatio(0.0);           // Chiller part load ratio
+
+                    ReformEIRChillerCapFT = CurveValue(state, CapFTempCurveIndex, tmpEvapOutletTemp, CondenserOutletTemp);
+
+                    ReformEIRChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, tmpEvapOutletTemp, CondenserOutletTemp);
+
+                    // Available chiller capacity as a function of temperature
+                    AvailChillerCap = RefCap * ReformEIRChillerCapFT;
+
+                    ReformEIRChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, reducedPLR);
+
+                    Power = (AvailChillerCap / RefCOP) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
+
+                    if (reducedPLR >= 1.0) {
+                        PartLoadRatio = reducedPLR;
+                    } else {
+                        PartLoadRatio = reducedPLR * ChillerCapFT_rated / ReformEIRChillerCapFT;
+                    }
+
+                    QEvap = AvailChillerCap * PartLoadRatio;
+
+                    QCond = Power * OpenMotorEff + QEvap;
+
+                    if (CapFTempCurveIndex > DataBranchAirLoopPlant::MassFlowTolerance) {
+                        CondenserInletTemp = CondenserOutletTemp - QCond / (CondVolFlowRate * Rho) / Cp;
+                    }
+                    return (EnteringWaterTempReduced - CondenserInletTemp) / EnteringWaterTempReduced;
+                };
+
+                General::SolveRoot(state, Acc, IterMax, SolFla, CondenserOutletTemp, f, CondenserOutletTemp0, CondenserOutletTemp1);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating Reform Chiller IPLV");
                     ShowContinueError(state, "Reformulated Chiller IPLV calculation failed for " + ChillerName);
@@ -639,101 +674,6 @@ namespace StandardRatings {
 
         // Writes the IPLV value to the EIO file and standard tabular output tables
         ReportChillerIPLV(state, ChillerName, ChillerType, IPLV, IPLV * ConvFromSIToIP);
-    }
-
-    Real64
-    ReformEIRChillerCondInletTempResidual(EnergyPlusData &state,
-                                          Real64 const CondenserOutletTemp, // Condenser outlet temperature (boundary condition or guess value) [C]
-                                          Array1<Real64> const &Par         // par(1)  = Condenser inlet temperature at AHRI Standard
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Chandan Sharma
-        //       DATE WRITTEN   February 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function as described below
-        // Residuum = (CondenserInletTempAtAHRIConditions - CondenserInletTemp) / CondenserInletTempAtAHRIConditions.
-        // CondenserInletTemp here depends on the CondenserOutletTemp which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Varies CondenserOutletTemp until a balance point exists where the model output corresponds to the desired
-        // independent variable (i.e. CondenserInletTemp is within tolerance of CondenserInletTempAtAHRIConditions)
-
-        // REFERENCES:
-
-        // Using/Aliasing
-        using CurveManager::CurveValue;
-
-        // Return value
-        Real64 Residuum; // Residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        //           551/591 conditons[C]
-        // par(2)  = Evaporator outlet temperature [C]
-        // par(3)  = Water specific heat [J/(kg*C)]
-        // par(4)  = Percent load per AHRI: The ratio of the part-load net capacity to the full-load rated net capacity at the full-load rating
-        // conditions par(5)  = Condenser mass flow rate [kg/s] par(6)  = Index for the total cooling capacity modifier curve par(7)  = Index for the
-        // energy input ratio modifier curve par(8)  = Index for the EIR vs part-load ratio curve par(9)  = Reference capacity of chiller [W] par(10)
-        // = Reference coefficient of performance [W/W] par(11) = Open chiller motor efficiency [fraction, 0 to 1] par(12) = CAP-f-T at
-        // reference/rated temperatures
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 AvailChillerCap(0.0);         // Chiller available capacity at current operating conditions [W]
-        Real64 CondenserInletTemp(0.0);      // Calculated condenser inlet temperature [C]
-        Real64 EvapOutletTemp(0.0);          // Evaporator outlet temperature temperature [C]
-        Real64 QEvap(0.0);                   // Rate of heat transfer to the evaporator coil [W]
-        Real64 QCond(0.0);                   // Rate of heat transfer to the condenser coil [W]
-        Real64 Power(0.0);                   // Power at reduced capacity test conditions (100%, 75%, 50%, and 25%)
-        Real64 ReformEIRChillerCapFT(0.0);   // Chiller capacity fraction (evaluated as a function of temperature)
-        Real64 ReformEIRChillerEIRFT(0.0);   // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
-        Real64 ReformEIRChillerEIRFPLR(0.0); // Chiller EIR as a function of part-load ratio (PLR)
-        Real64 PartLoadRatio(0.0);           // Chiller part load ratio
-
-        EvapOutletTemp = Par(2);
-
-        ReformEIRChillerCapFT = CurveValue(state, int(Par(6)), EvapOutletTemp, CondenserOutletTemp);
-
-        ReformEIRChillerEIRFT = CurveValue(state, int(Par(7)), EvapOutletTemp, CondenserOutletTemp);
-
-        // Available chiller capacity as a function of temperature
-        AvailChillerCap = Par(9) * ReformEIRChillerCapFT;
-
-        ReformEIRChillerEIRFPLR = CurveValue(state, int(Par(8)), CondenserOutletTemp, Par(4));
-
-        Power = (AvailChillerCap / Par(10)) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
-
-        if (Par(4) >= 1.0) {
-            PartLoadRatio = Par(4);
-        } else {
-            PartLoadRatio = Par(4) * Par(12) / ReformEIRChillerCapFT;
-        }
-
-        QEvap = AvailChillerCap * PartLoadRatio;
-
-        QCond = Power * Par(11) + QEvap;
-
-        if (Par(6) > DataBranchAirLoopPlant::MassFlowTolerance) {
-            CondenserInletTemp = CondenserOutletTemp - QCond / Par(5) / Par(3);
-        }
-
-        Residuum = (Par(1) - CondenserInletTemp) / Par(1);
-
-        return Residuum;
     }
 
     void ReportChillerIPLV(EnergyPlusData &state,
