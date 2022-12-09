@@ -273,7 +273,7 @@ protected:
 
         auto aSample = std::make_shared<CSpectralSample>(aMeasurements, aSolarRadiation);
 
-        auto thickness = 5.715e-3;   // [m]
+        Real64 thickness = 5.715e-3;   // [m]
         auto layerType = MaterialType::Monolithic;
 
         m_Sample = std::make_shared<CAngularSpectralSample>(aSample, thickness, layerType);
@@ -293,8 +293,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties0degrees)
     std::shared_ptr<CAngularSpectralSample> angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -320,8 +320,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties10degrees)
     auto angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -347,8 +347,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties20degrees)
     auto angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -374,8 +374,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties30degrees)
     auto angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -401,8 +401,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties40degrees)
     auto angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -428,8 +428,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties50degrees)
     auto angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -455,8 +455,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties60degrees)
     auto angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -482,8 +482,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties70degrees)
     auto angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -509,8 +509,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties80degrees)
     auto angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);
@@ -536,8 +536,8 @@ TEST_F(TestSampleNFRC_103_Angular, TestProperties90degrees)
     auto angularSample = getSample();
 
     // SOLAR RANGE
-    auto lowLambda = 0.3;
-    auto highLambda = 2.5;
+    Real64 lowLambda = 0.3;
+    Real64 highLambda = 2.5;
 
     auto transmittance =
       angularSample->getProperty(lowLambda, highLambda, Property::T, Side::Front, angle);

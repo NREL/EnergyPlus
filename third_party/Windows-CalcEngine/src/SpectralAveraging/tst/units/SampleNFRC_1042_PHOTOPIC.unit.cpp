@@ -1184,8 +1184,8 @@ public:
 
 TEST_F(TestSampleNFRC_1042_PHOTOPIC, TestSampleProperties)
 {
-    auto lowLambda = 0.38;
-    auto highLambda = 0.78;
+    Real64 lowLambda = 0.38;
+    Real64 highLambda = 0.78;
 
     auto aSample = getSample();
     auto transmittance = aSample->getProperty(lowLambda, highLambda, Property::T, Side::Front);

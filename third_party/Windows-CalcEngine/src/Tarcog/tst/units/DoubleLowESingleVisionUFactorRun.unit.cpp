@@ -16,10 +16,10 @@ protected:
         /////////////////////////////////////////////////////////
         /// Outdoor
         /////////////////////////////////////////////////////////
-        const auto airTemperature{255.15};   // Kelvins
-        const auto airSpeed{5.5};            // meters per second
-        const auto tSky{255.15};             // Kelvins
-        const auto solarRadiation{0.0};
+        const Real64 airTemperature{255.15};   // Kelvins
+        const Real64 airSpeed{5.5};            // meters per second
+        const Real64 tSky{255.15};             // Kelvins
+        const Real64 solarRadiation{0.0};
 
         auto Outdoor = Tarcog::ISO15099::Environments::outdoor(
           airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);

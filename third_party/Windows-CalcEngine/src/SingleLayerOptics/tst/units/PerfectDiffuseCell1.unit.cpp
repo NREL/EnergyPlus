@@ -17,11 +17,11 @@ protected:
     virtual void SetUp()
     {
         // create material
-        const auto Tmat = 0.00;
-        const auto Rfmat = 0.55;
-        const auto Rbmat = 0.55;
-        const auto minLambda = 0.3;
-        const auto maxLambda = 2.5;
+        const Real64 Tmat = 0.00;
+        const Real64 Rfmat = 0.55;
+        const Real64 Rbmat = 0.55;
+        const Real64 minLambda = 0.3;
+        const Real64 maxLambda = 2.5;
         const auto aMaterial =
           Material::singleBandMaterial(Tmat, Tmat, Rfmat, Rbmat, minLambda, maxLambda);
 

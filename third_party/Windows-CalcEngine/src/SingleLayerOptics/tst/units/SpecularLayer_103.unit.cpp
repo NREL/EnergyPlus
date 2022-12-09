@@ -116,7 +116,7 @@ private:
 protected:
     virtual void SetUp()
     {
-        const auto thickness = 5.715e-3;   // [m]
+        const Real64 thickness = 5.715e-3;   // [m]
         auto aMaterial = Material::nBandMaterial(
           loadSampleData_NFRC_103(), thickness, MaterialType::Monolithic, WavelengthRange::Solar);
 

@@ -16,10 +16,10 @@ protected:
         /////////////////////////////////////////////////////////
         /// Outdoor
         /////////////////////////////////////////////////////////
-        auto airTemperature = 300.0;   // Kelvins
-        auto airSpeed = 5.5;           // meters per second
-        auto tSky = 270.0;             // Kelvins
-        auto solarRadiation = 0.0;
+        Real64 airTemperature = 300.0;   // Kelvins
+        Real64 airSpeed = 5.5;           // meters per second
+        Real64 tSky = 270.0;             // Kelvins
+        Real64 solarRadiation = 0.0;
 
         Outdoor = Tarcog::ISO15099::Environments::outdoor(
           airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);

@@ -14,10 +14,10 @@ protected:
         /////////////////////////////////////////////////////////
         // Outdoor
         /////////////////////////////////////////////////////////
-        auto airTemperature = 255.15;   // Kelvins
-        auto airSpeed = 5.5;            // meters per second
-        auto tSky = 255.15;             // Kelvins
-        auto solarRadiation = 0.0;
+        Real64 airTemperature = 255.15;   // Kelvins
+        Real64 airSpeed = 5.5;            // meters per second
+        Real64 tSky = 255.15;             // Kelvins
+        Real64 solarRadiation = 0.0;
 
         auto Outdoor = Tarcog::ISO15099::Environments::outdoor(
           airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);
@@ -43,13 +43,13 @@ protected:
         auto layer2 = Tarcog::ISO15099::Layers::solid(solidLayerThickness, solidLayerConductance);
         ASSERT_TRUE(layer2 != nullptr);
 
-        auto shadeLayerThickness = 0.01;
-        auto shadeLayerConductance = 160.0;
-        auto Atop = 0.1;
-        auto Abot = 0.1;
-        auto Aleft = 0.1;
-        auto Aright = 0.1;
-        auto Afront = 0.2;
+        Real64 shadeLayerThickness = 0.01;
+        Real64 shadeLayerConductance = 160.0;
+        Real64 Atop = 0.1;
+        Real64 Abot = 0.1;
+        Real64 Aleft = 0.1;
+        Real64 Aright = 0.1;
+        Real64 Afront = 0.2;
 
         EffectiveLayers::ShadeOpenness openness{Afront, Aleft, Aright, Atop, Abot};
 

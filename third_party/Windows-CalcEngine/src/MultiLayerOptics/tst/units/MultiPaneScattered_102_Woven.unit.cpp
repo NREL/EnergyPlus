@@ -121,7 +121,7 @@ protected:
     void SetUp() override
     {
         // Create material from samples
-        const auto thickness = 3.048e-3;   // [m]
+        const Real64 thickness = 3.048e-3;   // [m]
         const auto aMaterial_102 = SingleLayerOptics::Material::nBandMaterial(
           loadSampleData_NFRC_102(), thickness, MaterialType::Monolithic, WavelengthRange::Solar);
 
@@ -199,10 +199,10 @@ TEST_F(MultiPaneScattered_102_Woven, TestWovenDirectBeam)
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, theta, phi);
     EXPECT_NEAR(0.22015705060035984, R_dif_dif, 1e-6);
 
-    const auto A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
+    const double A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.1008473896253089, A_dir1, 1e-6);
 
-    const auto A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
+    const double A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.37842143036663228, A_dir2, 1e-6);
 
     const auto A_dif1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Diffuse, theta, phi);
@@ -249,10 +249,10 @@ TEST_F(MultiPaneScattered_102_Woven, TestWovenAngledBeam25)
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, theta, phi);
     EXPECT_NEAR(0.22015705060035984, R_dif_dif, 1e-6);
 
-    const auto A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
+    const double A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.10269752309133209, A_dir1, 1e-6);
 
-    const auto A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
+    const double A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.38716028280323356, A_dir2, 1e-6);
 
     const auto A_dif1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Diffuse, theta, phi);
@@ -299,10 +299,10 @@ TEST_F(MultiPaneScattered_102_Woven, TestWovenAngleBeam50)
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, theta, phi);
     EXPECT_NEAR(0.22015705060035984, R_dif_dif, 1e-6);
 
-    auto A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
+    double A_dir1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.11369050445645626, A_dir1, 1e-6);
 
-    auto A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
+    double A_dir2 = aLayer.getAbsorptanceLayer(2, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.44063310775720743, A_dir2, 1e-6);
 
     auto A_dif1 = aLayer.getAbsorptanceLayer(1, aSide, ScatteringSimple::Diffuse, theta, phi);

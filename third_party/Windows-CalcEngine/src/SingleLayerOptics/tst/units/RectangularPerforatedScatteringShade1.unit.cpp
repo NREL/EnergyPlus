@@ -20,20 +20,20 @@ TEST_F(TestRectangularPerforatedScatteringShade1, TestProperties)
     SCOPED_TRACE("Begin Test: Rectangular perforated cell - properties.");
 
     // make material
-    const auto Tmat = 0.1;
-    const auto Rfmat = 0.4;
-    const auto Rbmat = 0.4;
-    const auto minLambda = 0.3;
-    const auto maxLambda = 2.5;
+    const Real64 Tmat = 0.1;
+    const Real64 Rfmat = 0.4;
+    const Real64 Rbmat = 0.4;
+    const Real64 minLambda = 0.3;
+    const Real64 maxLambda = 2.5;
     const auto aMaterial =
       Material::singleBandMaterial(Tmat, Tmat, Rfmat, Rbmat, minLambda, maxLambda);
 
     // make cell geometry
-    const auto x = 20.0;          // mm
-    const auto y = 25.0;          // mm
-    const auto thickness = 7.0;   // mm
-    const auto xHole = 5.0;       // mm
-    const auto yHole = 8.0;       // mm
+    const Real64 x = 20.0;          // mm
+    const Real64 y = 25.0;          // mm
+    const Real64 thickness = 7.0;   // mm
+    const Real64 xHole = 5.0;       // mm
+    const Real64 yHole = 8.0;       // mm
 
     auto shade =
       CScatteringLayer::createPerforatedRectangularLayer(aMaterial, x, y, thickness, xHole, yHole);
@@ -58,20 +58,20 @@ TEST_F(TestRectangularPerforatedScatteringShade1, TestHighEmissivity)
     SCOPED_TRACE("Begin Test: Rectangular perforated cell - properties.");
 
     // make material
-    const auto Tmat = 0.1;
-    const auto Rfmat = 0.01;
-    const auto Rbmat = 0.01;
-    const auto minLambda = 0.3;
-    const auto maxLambda = 2.5;
+    const Real64 Tmat = 0.1;
+    const Real64 Rfmat = 0.01;
+    const Real64 Rbmat = 0.01;
+    const Real64 minLambda = 0.3;
+    const Real64 maxLambda = 2.5;
     const auto aMaterial =
       Material::singleBandMaterial(Tmat, Tmat, Rfmat, Rbmat, minLambda, maxLambda);
 
     // make cell geometry
-    const auto x = 20.0;          // mm
+    const Real64 x = 20.0;          // mm
     const auto y = 25.0;          // mm
-    const auto thickness = 7.0;   // mm
-    const auto xHole = 0.001;       // mm
-    const auto yHole = 0.001;       // mm
+    const Real64 thickness = 7.0;   // mm
+    const Real64 xHole = 0.001;       // mm
+    const Real64 yHole = 0.001;       // mm
 
     auto shade =
       CScatteringLayer::createPerforatedRectangularLayer(aMaterial, x, y, thickness, xHole, yHole);

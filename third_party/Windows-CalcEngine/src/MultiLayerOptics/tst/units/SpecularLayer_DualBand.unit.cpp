@@ -56,14 +56,14 @@ TEST_F(TestSpecularLayer_102, TestSpecularDualBandSingleLayer1)
 {
     SCOPED_TRACE("Begin Test: Scattering Specular Layer with Dual Band Material.");
 
-    const auto TfSolar{0.6};
-    const auto TbSolar{0.6};
-    const auto RfSolar{0.074764};
-    const auto RbSolar{0.074764};
-    const auto TfVisible{0.6};
-    const auto TbVisible{0.6};
-    const auto RfVisible{0.082562};
-    const auto RbVisible{0.082562};
+    const Real64 TfSolar{0.6};
+    const Real64 TbSolar{0.6};
+    const Real64 RfSolar{0.074764};
+    const Real64 RbSolar{0.074764};
+    const Real64 TfVisible{0.6};
+    const Real64 TbVisible{0.6};
+    const Real64 RfVisible{0.082562};
+    const Real64 RbVisible{0.082562};
     const auto aMaterial = Material::dualBandMaterial(
       TfSolar, TbSolar, RfSolar, RbSolar, TfVisible, TbVisible, RfVisible, RbVisible);
 
@@ -71,8 +71,8 @@ TEST_F(TestSpecularLayer_102, TestSpecularDualBandSingleLayer1)
 
     auto igu{MultiLayerOptics::CMultiPaneSpecular::create({aLayer}, loadSolarRadiationFile())};
 
-    const auto minLambda{0.3};
-    const auto maxlambda{2.5};
+    const Real64 minLambda{0.3};
+    const Real64 maxlambda{2.5};
 
     auto test{igu->getPropertySimple(
       minLambda, maxlambda, PropertySimple::T, Side::Front, Scattering::DirectDirect)};

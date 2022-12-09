@@ -139,8 +139,8 @@ namespace SingleLayerOptics
         // Need to determine if sample is subset of allowed range in which case integration range
         // needs to be narrowed.
         auto wlRange = CWavelengthRange(range);
-        auto minLambda = wlRange.minLambda();
-        auto maxLambda = wlRange.maxLambda();
+        double minLambda = wlRange.minLambda();
+        double maxLambda = wlRange.maxLambda();
 
         const auto sampleWls = measurement->getWavelengths();
         const auto minSample = sampleWls[0];
@@ -236,8 +236,8 @@ namespace SingleLayerOptics
         // Need to determine if sample is subset of allowed range in which case integration range
         // needs to be narrowed.
         auto wlRange = CWavelengthRange(t_Range);
-        auto minLambda = wlRange.minLambda();
-        auto maxLambda = wlRange.maxLambda();
+        double minLambda = wlRange.minLambda();
+        double maxLambda = wlRange.maxLambda();
 
         const auto sampleWls = measurement->getWavelengths();
         const auto minSample = sampleWls[0];

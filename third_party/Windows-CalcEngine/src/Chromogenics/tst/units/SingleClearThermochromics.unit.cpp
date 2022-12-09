@@ -113,7 +113,7 @@ TEST_F(TestSingleClearThermochromics, Test1)
 
     auto aLayer = *aSolidLayers[0];
 
-    auto emissivity = aLayer.getSurface(Side::Back)->getEmissivity();
+    double emissivity = aLayer.getSurface(Side::Back)->getEmissivity();
     EXPECT_NEAR(emissivity, 0.610863, 1e-5);
 
     auto Temperature = aSystem->getTemperatures(Tarcog::ISO15099::System::Uvalue);
@@ -134,7 +134,7 @@ TEST_F(TestSingleClearThermochromics, Test1)
         EXPECT_NEAR(correctRadiosity[i], Radiosity[i], 1e-5);
     }
 
-    auto numOfIterations = aSystem->getNumberOfIterations(Tarcog::ISO15099::System::Uvalue);
+    size_t numOfIterations = aSystem->getNumberOfIterations(Tarcog::ISO15099::System::Uvalue);
     EXPECT_EQ(19u, numOfIterations);
 
     /////////////////////////////////////////////////////////////////////////

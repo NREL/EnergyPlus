@@ -124,6 +124,6 @@ TEST_F(DoubleClearDeflectionTPDefault, Test1)
         EXPECT_NEAR(correctMeanDeflection[i], MeanDeflection[i], 1e-5);
     }
 
-    auto numOfIter = aSystem->getNumberOfIterations();
+    size_t numOfIter = aSystem->getNumberOfIterations();
     EXPECT_EQ(20u, numOfIter);
 }

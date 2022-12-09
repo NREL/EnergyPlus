@@ -118,7 +118,7 @@ namespace SpectralAveraging
     std::shared_ptr<CSingleAngularMeasurement>
       CAngularMeasurements::getMeasurements(double const t_Angle)
     {
-        auto const angleTolerance = 1e-6;
+        double const angleTolerance = 1e-6;
 
         if(m_Measurements.size() == 1)
         {

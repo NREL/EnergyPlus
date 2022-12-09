@@ -33,10 +33,10 @@ protected:
           Material::dualBandMaterial(Tsol, Tsol, Rfsol, Rbsol, Tvis, Tvis, Rfvis, Rbvis, ratio);
 
         // make cell geometry
-        const auto x = 22.5;        // mm
+        const Real64 x = 22.5;        // mm
         const auto y = 38.1;        // mm
-        const auto thickness = 5;   // mm
-        const auto radius = 8.35;   // mm
+        const Real64 thickness = 5;   // mm
+        const Real64 radius = 8.35;   // mm
 
         const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Quarter);
 

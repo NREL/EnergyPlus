@@ -71,8 +71,8 @@ namespace SpectralAveraging
               aMeasuredData->properties(Property::R, Side::Back).interpolate(aWavelengths);
             assert(aRb.size() == aWavelengths.size());
 
-            const auto lowLambda = 0.3;
-            const auto highLambda = 2.5;
+            const double lowLambda = 0.3;
+            const double highLambda = 2.5;
 
             // TODO: Only one side is measured and it is considered that front properties are equal
             // to back properties

@@ -329,8 +329,8 @@ private:
 protected:
     virtual void SetUp()
     {
-        const auto minLambda = 0.38;
-        const auto maxLambda = 0.78;
+        const Real64 minLambda = 0.38;
+        const Real64 maxLambda = 0.78;
 
         double thickness = 3.048e-3;   // [m]
         const auto aMaterial_102 = Material::nBandMaterial(

@@ -120,7 +120,7 @@ private:
 protected:
     virtual void SetUp()
     {
-        auto thickness = 3.048e-3;   // [m]
+        Real64 thickness = 3.048e-3;   // [m]
 
         auto aMaterial_102 = SingleLayerOptics::Material::nBandMaterial(
           loadSampleData_NFRC_102(), thickness, MaterialType::Monolithic, WavelengthRange::Solar);
@@ -141,10 +141,10 @@ protected:
           Tsol, Tsol, Rfsol, Rbsol, Tvis, Tvis, Rfvis, Rbvis);
 
         // make cell geometry
-        const auto x = 0.01905;         // m
-        const auto y = 0.01905;         // m
+        const Real64 x = 0.01905;         // m
+        const Real64 y = 0.01905;         // m
         thickness = 0.005;              // m
-        const auto radius = 0.003175;   // m
+        const Real64 radius = 0.003175;   // m
 
         // Perforated layer is created here
         const auto perforated = CBSDFLayerMaker::getCircularPerforatedLayer(

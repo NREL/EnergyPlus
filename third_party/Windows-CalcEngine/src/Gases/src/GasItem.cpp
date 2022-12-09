@@ -63,16 +63,16 @@ namespace Gases
     {
         using ConstantsData::UNIVERSALGASCONSTANT;
         using ConstantsData::WCE_PI;
-        auto const alpha1 = 0.79;
-        auto const alpha2 = 0.79;
-        auto const alpha = alpha1 * alpha2 / (alpha2 + alpha1 * (1 - alpha2));
-        auto const specificHeatRatio = m_GasData->getSpecificHeatRatio();
+        double const alpha1 = 0.79;
+        double const alpha2 = 0.79;
+        double const alpha = alpha1 * alpha2 / (alpha2 + alpha1 * (1 - alpha2));
+        double const specificHeatRatio = m_GasData->getSpecificHeatRatio();
         if(specificHeatRatio == 1)
         {
             throw std::runtime_error("Specific heat ratio of a gas cannot be equal to one.");
         }
-        auto const mWght = m_GasData->getMolecularWeight();
-        auto B = alpha * (specificHeatRatio + 1) / (specificHeatRatio - 1);
+        double const mWght = m_GasData->getMolecularWeight();
+        double B = alpha * (specificHeatRatio + 1) / (specificHeatRatio - 1);
         B *= sqrt(UNIVERSALGASCONSTANT / (8 * WCE_PI * mWght * m_Temperature));
         m_GasProperties->m_ThermalConductivity = B * m_Pressure;
         m_GasProperties->m_Viscosity = 0;

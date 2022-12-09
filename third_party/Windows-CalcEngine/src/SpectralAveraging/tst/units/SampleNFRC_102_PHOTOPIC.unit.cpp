@@ -336,8 +336,8 @@ public:
 
 TEST_F(TestSampleNFRC_102_PHOTOPIC, TestSampleProperties)
 {
-    const auto lowLambda = 0.38;
-    const auto highLambda = 0.78;
+    const Real64 lowLambda = 0.38;
+    const Real64 highLambda = 0.78;
 
     auto aSample = getSample();
     const auto transmittance =

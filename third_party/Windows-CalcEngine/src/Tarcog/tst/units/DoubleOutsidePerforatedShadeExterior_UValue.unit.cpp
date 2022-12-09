@@ -44,10 +44,10 @@ protected:
         // make cell geometry
 
         // 31006 represents material properties at the time of the creation of this unit test
-        const auto thickness_31006{0.0006};
-        const auto x = 0.00169;        // m
-        const auto y = 0.00169;        // m
-        const auto radius = 0.00058;   // m
+        const Real64 thickness_31006{0.0006};
+        const Real64 x = 0.00169;        // m
+        const Real64 y = 0.00169;        // m
+        const Real64 radius = 0.00058;   // m
 
         const auto CellDimension{
           ThermalPermeability::Perforated::diameterToXYDimension(2 * radius)};

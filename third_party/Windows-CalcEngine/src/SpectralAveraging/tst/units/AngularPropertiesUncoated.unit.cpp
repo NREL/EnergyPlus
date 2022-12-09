@@ -19,11 +19,11 @@ TEST_F(TestAngularPropertiesUncoated, Test1)
 {
     SCOPED_TRACE("Begin Test: Uncoated properties - various angles.");
 
-    auto aThickness = 0.005715;   // m
-    auto lambda = 0.8e-6;         // m
-    auto T0 = 0.722;
-    auto R0 = 0.066;
-    auto angle = 0.0;
+    Real64 aThickness = 0.005715;   // m
+    Real64 lambda = 0.8e-6;         // m
+    Real64 T0 = 0.722;
+    Real64 R0 = 0.066;
+    Real64 angle = 0.0;
 
     auto aAngularFactory = CAngularPropertiesFactory(T0, R0, aThickness);
     auto aProperties = aAngularFactory.getAngularProperties(SurfaceType::Uncoated);
@@ -48,11 +48,11 @@ TEST_F(TestAngularPropertiesUncoated, Test2)
 {
     SCOPED_TRACE("Begin Test: Uncoated properties - zero normal transmittance.");
 
-    auto aThickness = 0.005715;   // m
-    auto lambda = 0.8e-6;         // m
-    auto T0 = 0.0;
-    auto R0 = 0.047;
-    auto angle = 0.0;
+    Real64 aThickness = 0.005715;   // m
+    Real64 lambda = 0.8e-6;         // m
+    Real64 T0 = 0.0;
+    Real64 R0 = 0.047;
+    Real64 angle = 0.0;
 
     auto aAngularFactory = CAngularPropertiesFactory(T0, R0, aThickness);
     auto aProperties = aAngularFactory.getAngularProperties(SurfaceType::Uncoated);

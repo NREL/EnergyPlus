@@ -121,7 +121,7 @@ protected:
     void SetUp() override
     {
         // Create material from samples
-        auto thickness = 3.048e-3;   // [m]
+        Real64 thickness = 3.048e-3;   // [m]
         auto aMaterial_102 = SingleLayerOptics::Material::nBandMaterial(
           loadSampleData_NFRC_102(), thickness, MaterialType::Monolithic, WavelengthRange::Solar);
 
@@ -208,11 +208,11 @@ TEST_F(MultiPaneScattered_102_VenetianDirectional, TestVenetianDirectionalDirect
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, theta, phi);
     EXPECT_NEAR(0.370696, R_dif_dif, 1e-6);
 
-    auto A_dir1 = aLayer.getAbsorptanceLayer(
+    double A_dir1 = aLayer.getAbsorptanceLayer(
       minLambda, maxLambda, 1, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.129125, A_dir1, 1e-6);
 
-    auto A_dir2 = aLayer.getAbsorptanceLayer(
+    double A_dir2 = aLayer.getAbsorptanceLayer(
       minLambda, maxLambda, 2, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.276558, A_dir2, 1e-6);
 
@@ -263,11 +263,11 @@ TEST_F(MultiPaneScattered_102_VenetianDirectional, TestVenetianDirectionalAngled
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, theta, phi);
     EXPECT_NEAR(0.370696, R_dif_dif, 1e-6);
 
-    auto A_dir1 = aLayer.getAbsorptanceLayer(
+    double A_dir1 = aLayer.getAbsorptanceLayer(
       minLambda, maxLambda, 1, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.130690, A_dir1, 1e-6);
 
-    auto A_dir2 = aLayer.getAbsorptanceLayer(
+    double A_dir2 = aLayer.getAbsorptanceLayer(
       minLambda, maxLambda, 2, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.275634, A_dir2, 1e-6);
 
@@ -318,11 +318,11 @@ TEST_F(MultiPaneScattered_102_VenetianDirectional, TestVenetianDirectionalAngleB
       minLambda, maxLambda, PropertySimple::R, aSide, Scattering::DiffuseDiffuse, theta, phi);
     EXPECT_NEAR(0.370696, R_dif_dif, 1e-6);
 
-    auto A_dir1 = aLayer.getAbsorptanceLayer(
+    double A_dir1 = aLayer.getAbsorptanceLayer(
       minLambda, maxLambda, 1, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.140238, A_dir1, 1e-6);
 
-    auto A_dir2 = aLayer.getAbsorptanceLayer(
+    double A_dir2 = aLayer.getAbsorptanceLayer(
       minLambda, maxLambda, 2, aSide, ScatteringSimple::Direct, theta, phi);
     EXPECT_NEAR(0.264223, A_dir2, 1e-6);
 
