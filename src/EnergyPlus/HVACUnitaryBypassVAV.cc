@@ -3369,12 +3369,12 @@ namespace HVACUnitaryBypassVAV {
                             }
                         }
                         // now find the speed ratio for the found speednum
-                        Par(1) = double(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
-                        Par(2) = DesOutTemp;
-                        Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                        Par(3) = double(SpeedNum);
-                        General::SolveRoot(
-                            state, tempAccuracy, MaxIte, SolFla, SpeedRatio, HVACDXHeatPumpSystem::VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+                        int const vsCoilIndex = CBVAV(CBVAVNum).DXHeatCoilIndexNum;
+                        auto f = [&state, vsCoilIndex, DesOutTemp, SpeedNum](Real64 const x) {
+                            return HVACDXHeatPumpSystem::VSCoilSpeedResidual(
+                                state, x, vsCoilIndex, DesOutTemp, SpeedNum, DataHVACGlobals::ContFanCycCoil);
+                        };
+                        General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, SpeedRatio, f, 1.0e-10, 1.0);
 
                         if (SolFla == -1) {
                             if (!state.dataGlobal->WarmupFlag) {

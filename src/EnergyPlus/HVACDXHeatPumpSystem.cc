@@ -933,11 +933,10 @@ namespace HVACDXHeatPumpSystem {
                                                               QLatReq,
                                                               OnOffAirFlowRatio);
                                     } else {
-                                        Par(1) = double(VSCoilIndex);
-                                        Par(2) = DesOutTemp;
-                                        Par(5) = double(FanOpMode);
-                                        Par(3) = double(SpeedNum);
-                                        General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+                                        auto f = [&state, VSCoilIndex, DesOutTemp, SpeedNum, FanOpMode](Real64 const x) {
+                                            return VSCoilSpeedResidual(state, x, VSCoilIndex, DesOutTemp, SpeedNum, FanOpMode);
+                                        };
+                                        General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, f, 1.0e-10, 1.0);
 
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag) {
@@ -1139,9 +1138,11 @@ namespace HVACDXHeatPumpSystem {
     //******************************************************************************
 
     Real64 VSCoilSpeedResidual(EnergyPlusData &state,
-                               Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1D<Real64> const &Par // Par(1) = DX coil number
-    )
+                               Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                               int CoilIndex,
+                               Real64 desiredTemp,
+                               int speedNumber,
+                               int FanOpMode)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen
@@ -1152,11 +1153,7 @@ namespace HVACDXHeatPumpSystem {
         // PURPOSE OF THIS FUNCTION:
         //  Calculates residual function, iterate speed ratio
         //  compare the desired temperature value with exit temperature from a variable-speed heating coil
-
-        int CoilIndex = int(Par(1));
-        int FanOpMode = int(Par(5));
-        Real64 desiredTemp = Par(2);
-        state.dataHVACDXHeatPumpSys->SpeedNumber = int(Par(3));
+        state.dataHVACDXHeatPumpSys->SpeedNumber = speedNumber;
         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                   "",
                                                   CoilIndex,
@@ -1171,7 +1168,6 @@ namespace HVACDXHeatPumpSystem {
                                                   state.dataHVACDXHeatPumpSys->QZoneReq,
                                                   state.dataHVACDXHeatPumpSys->QLatentReq,
                                                   state.dataHVACDXHeatPumpSys->AirFlowOnOffRatio);
-
         Real64 OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         return desiredTemp - OutletAirTemp;
     }
