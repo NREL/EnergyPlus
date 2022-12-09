@@ -547,7 +547,6 @@ namespace StandardRatings {
                           OpenMotorEff,
                           tmpEvapOutletTemp,
                           ChillerCapFT_rated](Real64 const CondenserOutletTemp) {
-
                     Real64 AvailChillerCap(0.0);         // Chiller available capacity at current operating conditions [W]
                     Real64 CondenserInletTemp(0.0);      // Calculated condenser inlet temperature [C]
                     Real64 QEvap(0.0);                   // Rate of heat transfer to the evaporator coil [W]
