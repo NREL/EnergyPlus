@@ -4157,12 +4157,10 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
 
     for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
         auto &sysSizInput = state.dataSize->SysSizInput(SysSizIndex);
-        int PrimAirIndex = UtilityRoutines::FindItemInList(sysSizInput.AirPriLoopName, state.dataAirSystemsData->PrimaryAirSystems);
-        if (PrimAirIndex == 0) {
+        sysSizInput.AirLoopNum = UtilityRoutines::FindItemInList(sysSizInput.AirPriLoopName, state.dataAirSystemsData->PrimaryAirSystems);
+        if (sysSizInput.AirLoopNum == 0) {
             ShowSevereError(state, format("Sizing:System: {} references unknown AirLoopHVAC", sysSizInput.AirPriLoopName));
             ErrorsFound = true;
-        } else {
-            sysSizInput.AirLoopNum = PrimAirIndex;
         }
     }
     if (ErrorsFound) {
@@ -4207,8 +4205,8 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
             sysSizing.HeatSupHumRat = sysSizInput.HeatSupHumRat;
             sysSizing.SizingOption = sysSizInput.SizingOption;
             if (primaryAirSystems.isAllOA) {
-                sysSizing.CoolOAOption = AllOA;
-                sysSizing.HeatOAOption = AllOA;
+                sysSizing.CoolOAOption = OAControl::AllOA;
+                sysSizing.HeatOAOption = OAControl::AllOA;
             } else {
                 sysSizing.CoolOAOption = sysSizInput.CoolOAOption;
                 sysSizing.HeatOAOption = sysSizInput.HeatOAOption;
@@ -4288,10 +4286,10 @@ void SetUpSysSizingArrays(EnergyPlusData &state)
         finalSysSizing.FlowPerHeatingCapacity = sysSizInput.FlowPerHeatingCapacity;
 
         if (primaryAirSystems.isAllOA) {
-            finalSysSizing.CoolOAOption = AllOA;
-            finalSysSizing.HeatOAOption = AllOA;
-            calcSysSizing.CoolOAOption = AllOA;
-            calcSysSizing.HeatOAOption = AllOA;
+            finalSysSizing.CoolOAOption = DataSizing::OAControl::AllOA;
+            finalSysSizing.HeatOAOption = DataSizing::OAControl::AllOA;
+            calcSysSizing.CoolOAOption = DataSizing::OAControl::AllOA;
+            calcSysSizing.HeatOAOption = DataSizing::OAControl::AllOA;
         } else {
             finalSysSizing.CoolOAOption = sysSizInput.CoolOAOption;
             finalSysSizing.HeatOAOption = sysSizInput.HeatOAOption;
@@ -5279,7 +5277,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 sysSizing.CoolZoneAvgTempSeq(TimeStepInDay) = SysCoolZoneAvgTemp;
                 // calculate the outside air fraction for this time step
                 RhoAir = state.dataEnvrn->StdRhoAir;
-                if (sysSizing.CoolOAOption == MinOA) {
+                if (sysSizing.CoolOAOption == OAControl::MinOA) {
                     OutAirFrac = RhoAir * sysSizing.DesOutAirVolFlow / sysSizing.CoolFlowSeq(TimeStepInDay);
                     OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                 } else {
@@ -5406,7 +5404,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     sysSizing.HeatZoneAvgTempSeq(TimeStepInDay) = SysHeatZoneAvgTemp;
                     // calculate the outside air fraction for this time step
                     RhoAir = state.dataEnvrn->StdRhoAir;
-                    if (sysSizing.HeatOAOption == MinOA) {
+                    if (sysSizing.HeatOAOption == DataSizing::OAControl::MinOA) {
                         OutAirFrac = RhoAir * sysSizing.DesOutAirVolFlow / sysSizing.HeatFlowSeq(TimeStepInDay);
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
@@ -5492,7 +5490,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     sysSizing.HeatZoneAvgTempSeq(TimeStepInDay) = SysHeatZoneAvgTemp;
                     // calculate the outside air fraction for this time step
                     RhoAir = state.dataEnvrn->StdRhoAir;
-                    if (sysSizing.HeatOAOption == MinOA) {
+                    if (sysSizing.HeatOAOption == DataSizing::OAControl::MinOA) {
                         OutAirFrac = RhoAir * sysSizing.DesOutAirVolFlow / sysSizing.HeatFlowSeq(TimeStepInDay);
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
@@ -6454,7 +6452,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 SysCoolOutTemp = OutAirTemp;
                 SysCoolOutHumRat = OutAirHumRat;
                 RhoAir = state.dataEnvrn->StdRhoAir;
-                if (state.dataSize->CalcSysSizing(AirLoopNum).CoolOAOption == MinOA) {
+                if (state.dataSize->CalcSysSizing(AirLoopNum).CoolOAOption == OAControl::MinOA) {
                     OutAirFrac = RhoAir * state.dataSize->CalcSysSizing(AirLoopNum).DesOutAirVolFlow /
                                  state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
                     OutAirFrac = min(1.0, max(0.0, OutAirFrac));
@@ -6518,7 +6516,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     SysHeatOutTemp = OutAirTemp;
                     SysHeatOutHumRat = OutAirHumRat;
                     RhoAir = state.dataEnvrn->StdRhoAir;
-                    if (state.dataSize->CalcSysSizing(AirLoopNum).HeatOAOption == MinOA) {
+                    if (state.dataSize->CalcSysSizing(AirLoopNum).HeatOAOption == DataSizing::OAControl::MinOA) {
                         OutAirFrac = RhoAir * state.dataSize->CalcSysSizing(AirLoopNum).DesOutAirVolFlow /
                                      state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
@@ -6565,7 +6563,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     SysHeatOutTemp = OutAirTemp;
                     SysHeatOutHumRat = OutAirHumRat;
                     RhoAir = state.dataEnvrn->StdRhoAir;
-                    if (state.dataSize->CalcSysSizing(AirLoopNum).HeatOAOption == MinOA) {
+                    if (state.dataSize->CalcSysSizing(AirLoopNum).HeatOAOption == DataSizing::OAControl::MinOA) {
                         OutAirFrac = RhoAir * state.dataSize->CalcSysSizing(AirLoopNum).DesOutAirVolFlow /
                                      state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
@@ -6583,7 +6581,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             // move the noncoincident results into the system sizing array
             if (state.dataSize->CalcSysSizing(AirLoopNum).SizingOption == NonCoincident) {
                 // But first check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
-                if (!(state.dataSize->FinalSysSizing(AirLoopNum).CoolOAOption == 1 && SysSensCoolCap <= 0.0)) { // CoolOAOption = Yes 100% OA
+                if (!(state.dataSize->FinalSysSizing(AirLoopNum).CoolOAOption == OAControl::AllOA && SysSensCoolCap <= 0.0)) { // CoolOAOption = Yes 100% OA
                     state.dataSize->CalcSysSizing(AirLoopNum).SensCoolCap = SysSensCoolCap;
                     state.dataSize->CalcSysSizing(AirLoopNum).TotCoolCap = SysTotCoolCap;
                     state.dataSize->CalcSysSizing(AirLoopNum).MixTempAtCoolPeak = SysCoolMixTemp;
@@ -6595,7 +6593,8 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                 }
                 // check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
                 // why is this < 0.0 ? SysHeatCap cannot be < 0 ?? this code will always get executed
-                if (!(state.dataSize->FinalSysSizing(AirLoopNum).HeatOAOption == 1 && SysHeatCap < 0.0)) { // HeatOAOption = Yes 100% OA
+                if (!(state.dataSize->FinalSysSizing(AirLoopNum).HeatOAOption == OAControl::AllOA &&
+                      SysHeatCap < 0.0)) { // HeatOAOption = Yes 100% OA
                     state.dataSize->CalcSysSizing(AirLoopNum).HeatCap = SysHeatCap;
                     state.dataSize->CalcSysSizing(AirLoopNum).HeatMixTemp = SysHeatMixTemp;
                     state.dataSize->CalcSysSizing(AirLoopNum).HeatRetTemp = SysHeatRetTemp;
@@ -6744,7 +6743,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                         if (calcSysSizing.CoolFlowSeq(TimeStepIndex) > 0.0) {
 
                             finalSysSizing.CoolFlowSeq(TimeStepIndex) = SysCoolSizingRat * calcSysSizing.CoolFlowSeq(TimeStepIndex);
-                            if (finalSysSizing.CoolOAOption == MinOA) {
+                            if (finalSysSizing.CoolOAOption == OAControl::MinOA) {
                                 OutAirFrac = RhoAir * finalSysSizing.DesOutAirVolFlow / finalSysSizing.CoolFlowSeq(TimeStepIndex);
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                             } else {
@@ -6766,7 +6765,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                         }
                     }
 
-                    if (finalSysSizing.CoolOAOption == MinOA) {
+                    if (finalSysSizing.CoolOAOption == OAControl::MinOA) {
                         OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesCoolVolFlow;
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
@@ -6820,7 +6819,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                         if (calcSysSizing.HeatFlowSeq(TimeStepIndex) > 0.0) {
 
                             finalSysSizing.HeatFlowSeq(TimeStepIndex) = SysHeatSizingRat * calcSysSizing.HeatFlowSeq(TimeStepIndex);
-                            if (finalSysSizing.HeatOAOption == MinOA) {
+                            if (finalSysSizing.HeatOAOption == DataSizing::OAControl::MinOA) {
                                 OutAirFrac = RhoAir * finalSysSizing.DesOutAirVolFlow / finalSysSizing.HeatFlowSeq(TimeStepIndex);
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                             } else {
@@ -6837,7 +6836,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                         }
                     }
 
-                    if (finalSysSizing.HeatOAOption == MinOA) {
+                    if (finalSysSizing.HeatOAOption == DataSizing::OAControl::MinOA) {
                         OutAirFrac = finalSysSizing.DesOutAirVolFlow / finalSysSizing.DesHeatVolFlow;
                         OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     } else {
@@ -7204,7 +7203,7 @@ void UpdateSysSizingForScalableInputs(EnergyPlusData &state, int const AirLoopNu
         case FlowPerHeatingCapacity: {
             if (FinalSysSizing(AirLoopNum).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                 FractionOfAutosize = FinalSysSizing(AirLoopNum).ScaledHeatingCapacity;
-                if (FinalSysSizing(AirLoopNum).HeatOAOption == MinOA) {
+                if (FinalSysSizing(AirLoopNum).HeatOAOption == DataSizing::OAControl::MinOA) {
                     if (FinalSysSizing(AirLoopNum).DesHeatVolFlow > 0.0) {
                         OutAirFrac = FinalSysSizing(AirLoopNum).DesOutAirVolFlow / FinalSysSizing(AirLoopNum).DesHeatVolFlow;
                     } else {
@@ -7225,7 +7224,7 @@ void UpdateSysSizingForScalableInputs(EnergyPlusData &state, int const AirLoopNu
                 TempSize = FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity * AutosizedCapacity * FractionOfAutosize;
             } else if (FinalSysSizing(AirLoopNum).HeatingCapMethod == HeatingDesignCapacity) {
                 if (FinalSysSizing(AirLoopNum).ScaledHeatingCapacity == DataSizing::AutoSize) {
-                    if (FinalSysSizing(AirLoopNum).HeatOAOption == MinOA) {
+                    if (FinalSysSizing(AirLoopNum).HeatOAOption == DataSizing::OAControl::MinOA) {
                         if (FinalSysSizing(AirLoopNum).DesHeatVolFlow > 0.0) {
                             OutAirFrac = FinalSysSizing(AirLoopNum).DesOutAirVolFlow / FinalSysSizing(AirLoopNum).DesHeatVolFlow;
                         } else {

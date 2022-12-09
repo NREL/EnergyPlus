@@ -1758,14 +1758,14 @@ void SQLite::addSQLiteZoneSizingRecord(std::string const &zoneName,   // the nam
     }
 }
 
-void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,      // the name of the system
-                                         std::string const &LoadType,     // either "Cooling" or "Heating"
-                                         std::string const &PeakLoadType, // either "Sensible" or "Total"
-                                         Real64 const &UserDesCap,        // User  Design Capacity
-                                         Real64 const &CalcDesVolFlow,    // Calculated Cooling Design Air Flow Rate
-                                         Real64 const &UserDesVolFlow,    // User Cooling Design Air Flow Rate
-                                         std::string const &DesDayName,   // the name of the design day that produced the peak
-                                         std::string const &PeakHrMin     // time stamp of the peak
+void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,    // the name of the system
+                                         std::string_view LoadType,     // either "Cooling" or "Heating"
+                                         std::string_view PeakLoadType, // either "Sensible" or "Total"
+                                         Real64 const &UserDesCap,      // User  Design Capacity
+                                         Real64 const &CalcDesVolFlow,  // Calculated Cooling Design Air Flow Rate
+                                         Real64 const &UserDesVolFlow,  // User Cooling Design Air Flow Rate
+                                         std::string const &DesDayName, // the name of the design day that produced the peak
+                                         std::string const &PeakHrMin   // time stamp of the peak
 )
 {
     if (m_writeOutputToSQLite) {

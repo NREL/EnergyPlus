@@ -368,7 +368,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilLoadUsedForUASizingGauntlet)
     eiooutput = "";
 
     // Test 15 - Airloop Equipment, 50% OA, MinOA option
-    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOAOption = DataSizing::MinOA;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOAOption = DataSizing::OAControl::MinOA;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = state->dataSize->DataAirFlowUsedForSizing / 2.0;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).PreheatTemp = 19.0;
     // start with an auto-sized value as the user input

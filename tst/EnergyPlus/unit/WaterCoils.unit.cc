@@ -435,7 +435,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
     state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
     state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
-    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = DataSizing::OAControl::AllOA;
 
     // set up water coil
     int CoilNum = 1;
@@ -591,7 +591,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
     state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
     state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
-    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = DataSizing::OAControl::AllOA;
 
     // set up water coil
     int CoilNum = 1;
@@ -750,7 +750,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
     state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
     state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
-    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = DataSizing::OAControl::AllOA;
 
     // set up water coil
     int CoilNum = 1;
@@ -1267,7 +1267,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
     state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
     state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
-    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = DataSizing::OAControl::AllOA;
 
     // set up water coil
     int CoilNum = 1;
@@ -1365,7 +1365,7 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
     state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
     state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
-    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = DataSizing::OAControl::AllOA;
 
     // set up water coil
     int CoilNum = 1;

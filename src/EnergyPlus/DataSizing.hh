@@ -96,8 +96,13 @@ namespace DataSizing {
         "ProportionalControlBasedOnDesignOccupancy"};
 
     // parameters for outside air
-    constexpr int AllOA(1);
-    constexpr int MinOA(2);
+    enum class OAControl
+    {
+        Invalid = -1,
+        AllOA,
+        MinOA,
+        Num
+    };
 
     // parameters for loop fluid type
     constexpr int HeatingLoop(1);
@@ -747,136 +752,122 @@ namespace DataSizing {
     struct SystemSizingInputData
     {
         // Members
-        std::string AirPriLoopName;        // name of an AirLoopHVAC object
-        int AirLoopNum;                    // index number of air loop
-        LoadSizing loadSizingType;         // type of load to size on sensible, latent, total, ventilation
-        int SizingOption;                  // 1 = noncoincident, 2 = coincident
-        int CoolOAOption;                  // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
-        int HeatOAOption;                  // 1 = use 100% outside air; 2 = use min OA; for heating sizing
-        Real64 DesOutAirVolFlow;           // design (minimum) outside air flow rate [m3/s]
-        Real64 SysAirMinFlowRat;           // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
-        bool SysAirMinFlowRatWasAutoSized; // true if central heating maximum system air flow ratio was autosize on input
-        Real64 PreheatTemp;                // preheat design set temperature [C]
-        Real64 PrecoolTemp;                // precool design set temperature [C]
-        Real64 PreheatHumRat;              // preheat design humidity ratio [kg water/kg dry air]
-        Real64 PrecoolHumRat;              // precool design humidity ratio [kg water/kg dry air]
-        Real64 CoolSupTemp;                // cooling design supply air temperature [C]
-        Real64 HeatSupTemp;                // heating design supply air temperature [C]
-        Real64 CoolSupHumRat;              // cooling design supply air humidity ratio [kg water/kg dry air]
-        Real64 HeatSupHumRat;              // heating design supply air humidity ratio [kg water/kg dry air]
-        int CoolAirDesMethod;              // choice of how to get system cooling design air flow rates;
+        std::string AirPriLoopName;                      // name of an AirLoopHVAC object
+        int AirLoopNum = 0;                              // index number of air loop
+        LoadSizing loadSizingType = LoadSizing::Invalid; // type of load to size on sensible, latent, total, ventilation
+        int SizingOption = 0;                            // 1 = noncoincident, 2 = coincident
+        OAControl CoolOAOption = OAControl::Invalid;     // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
+        OAControl HeatOAOption = OAControl::Invalid;     // 1 = use 100% outside air; 2 = use min OA; for heating sizing
+        Real64 DesOutAirVolFlow = 0.0;                   // design (minimum) outside air flow rate [m3/s]
+        Real64 SysAirMinFlowRat = 0.0;                   // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
+        bool SysAirMinFlowRatWasAutoSized = false;       // true if central heating maximum system air flow ratio was autosize on input
+        Real64 PreheatTemp = 0.0;                        // preheat design set temperature [C]
+        Real64 PrecoolTemp = 0.0;                        // precool design set temperature [C]
+        Real64 PreheatHumRat = 0.0;                      // preheat design humidity ratio [kg water/kg dry air]
+        Real64 PrecoolHumRat = 0.0;                      // precool design humidity ratio [kg water/kg dry air]
+        Real64 CoolSupTemp = 0.0;                        // cooling design supply air temperature [C]
+        Real64 HeatSupTemp = 0.0;                        // heating design supply air temperature [C]
+        Real64 CoolSupHumRat = 0.0;                      // cooling design supply air humidity ratio [kg water/kg dry air]
+        Real64 HeatSupHumRat = 0.0;                      // heating design supply air humidity ratio [kg water/kg dry air]
+        int CoolAirDesMethod = 0;                        // choice of how to get system cooling design air flow rates;
         //  1 = calc from des day simulation; 2=m3/s per system, user input
-        Real64 DesCoolAirFlow; // design system supply air flow rate for cooling[m3/s]
-        int HeatAirDesMethod;  // choice of how to get system heating design air flow rates;
+        Real64 DesCoolAirFlow = 0.0; // design system supply air flow rate for cooling[m3/s]
+        int HeatAirDesMethod = 0;    // choice of how to get system heating design air flow rates;
         //  1 = calc from des day simulation; 2=m3/s per zone, user input
-        Real64 DesHeatAirFlow;           // design system heating supply air flow rate [m3/s]
-        int ScaleCoolSAFMethod;          // choice of how to get system cooling scalable air flow rates; // (FlowPerFloorArea,
-                                         // FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
-        int ScaleHeatSAFMethod;          // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea,
-                                         // FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
-        SysOAMethod SystemOAMethod;      // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
-        Real64 MaxZoneOAFraction;        // maximum value of min OA for zones served by system
-        bool OAAutoSized;                // Set to true if design OA vol flow is set to 'autosize' in Sizing:System
-        int CoolingCapMethod;            // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea,
-                                         // FractionOfAutosizedCoolingCapacity)
-        int HeatingCapMethod;            // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
-                                         // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledCoolingCapacity;    // - scaled maximum cooling capacity of cooling coil in an air loop
-        Real64 ScaledHeatingCapacity;    // - scaled maximum heating capacity of cooling coil in an air loop
-        Real64 FloorAreaOnAirLoopCooled; // total floor of cooled zones served by an airloop
-        Real64 FloorAreaOnAirLoopHeated; // total floor of heated zones served by an airloop
-        Real64 FlowPerFloorAreaCooled;   // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-        Real64 FlowPerFloorAreaHeated;   // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-        Real64 FractionOfAutosizedCoolingAirflow; // fraction of of cooling supply air flow rate an airloop
-        Real64 FractionOfAutosizedHeatingAirflow; // fraction of of heating supply air flow rate an airloop
-        Real64 FlowPerCoolingCapacity;            // ratio of cooling supply air flow rate to cooling capacity of an airloop
-        Real64 FlowPerHeatingCapacity;            // ratio of heating supply air flow rate to heating capacity of an airloop
-        PeakLoad coolingPeakLoad;                 // Type of peak to size cooling coils on SensibleCooling or TotalCooling
-        CapacityControl CoolCapControl;           // type of control of cooling coil  VAV, Bypass, VT, OnOff
-        Real64 OccupantDiversity;                 // occupant diversity
-
-        // Default Constructor
-        SystemSizingInputData()
-            : AirLoopNum(0), loadSizingType(LoadSizing::Invalid), SizingOption(0), CoolOAOption(0), HeatOAOption(0), DesOutAirVolFlow(0.0),
-              SysAirMinFlowRat(0.0), SysAirMinFlowRatWasAutoSized(false), PreheatTemp(0.0), PrecoolTemp(0.0), PreheatHumRat(0.0), PrecoolHumRat(0.0),
-              CoolSupTemp(0.0), HeatSupTemp(0.0), CoolSupHumRat(0.0), HeatSupHumRat(0.0), CoolAirDesMethod(0), DesCoolAirFlow(0.0),
-              HeatAirDesMethod(0), DesHeatAirFlow(0.0), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), SystemOAMethod(SysOAMethod::Invalid),
-              MaxZoneOAFraction(0.0), OAAutoSized(false), CoolingCapMethod(0), HeatingCapMethod(0), ScaledCoolingCapacity(0.0),
-              ScaledHeatingCapacity(0.0), FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0), FlowPerFloorAreaCooled(0.0),
-              FlowPerFloorAreaHeated(0.0), FractionOfAutosizedCoolingAirflow(1.0), FractionOfAutosizedHeatingAirflow(1.0),
-              FlowPerCoolingCapacity(0.0), FlowPerHeatingCapacity(0.0), coolingPeakLoad(PeakLoad::Invalid), CoolCapControl(CapacityControl::Invalid),
-              OccupantDiversity(0.0)
-        {
-        }
+        Real64 DesHeatAirFlow = 0.0; // design system heating supply air flow rate [m3/s]
+        int ScaleCoolSAFMethod = 0;  // choice of how to get system cooling scalable air flow rates; // (FlowPerFloorArea,
+                                     // FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
+        int ScaleHeatSAFMethod = 0;  // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea,
+                                     // FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
+        SysOAMethod SystemOAMethod = SysOAMethod::Invalid; // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
+        Real64 MaxZoneOAFraction = 0.0;                    // maximum value of min OA for zones served by system
+        bool OAAutoSized = false;                          // Set to true if design OA vol flow is set to 'autosize' in Sizing:System
+        int CoolingCapMethod = 0;           // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea,
+                                            // FractionOfAutosizedCoolingCapacity)
+        int HeatingCapMethod = 0;           // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+                                            // FracOfAutosizedHeatingCapacity)
+        Real64 ScaledCoolingCapacity = 0.0; // - scaled maximum cooling capacity of cooling coil in an air loop
+        Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity of cooling coil in an air loop
+        Real64 FloorAreaOnAirLoopCooled = 0.0; // total floor of cooled zones served by an airloop
+        Real64 FloorAreaOnAirLoopHeated = 0.0; // total floor of heated zones served by an airloop
+        Real64 FlowPerFloorAreaCooled = 0.0;   // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+        Real64 FlowPerFloorAreaHeated = 0.0;   // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+        Real64 FractionOfAutosizedCoolingAirflow = 1.0;            // fraction of of cooling supply air flow rate an airloop
+        Real64 FractionOfAutosizedHeatingAirflow = 1.0;            // fraction of of heating supply air flow rate an airloop
+        Real64 FlowPerCoolingCapacity = 0.0;                       // ratio of cooling supply air flow rate to cooling capacity of an airloop
+        Real64 FlowPerHeatingCapacity = 0.0;                       // ratio of heating supply air flow rate to heating capacity of an airloop
+        PeakLoad coolingPeakLoad = PeakLoad::Invalid;              // Type of peak to size cooling coils on SensibleCooling or TotalCooling
+        CapacityControl CoolCapControl = CapacityControl::Invalid; // type of control of cooling coil  VAV, Bypass, VT, OnOff
+        Real64 OccupantDiversity = 0.0;                            // occupant diversity
     };
 
     struct SystemSizingData // Contains data for system sizing
     {
         // Members
-        std::string AirPriLoopName;        // name of an AirLoopHVAC object
-        std::string CoolDesDay;            // name of a cooling design day
-        std::string HeatDesDay;            // name of a heating design day
-        LoadSizing loadSizingType;         // type of load to size on Sensible, Latent, Total, Ventilation
-        int SizingOption;                  // 1 = noncoincident, 2 = coincident.
-        int CoolOAOption;                  // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
-        int HeatOAOption;                  // 1 = use 100% outside air; 2 = use min OA; for heating sizing
-        Real64 DesOutAirVolFlow;           // design (minimum) outside air flow rate [m3/s]
-        Real64 SysAirMinFlowRat;           // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
-        bool SysAirMinFlowRatWasAutoSized; // true if central heating maximum system air flow ratio was autosize on input
-        Real64 PreheatTemp;                // preheat design set temperature
-        Real64 PrecoolTemp;                // precool design set temperature [C]
-        Real64 PreheatHumRat;              // preheat design humidity ratio [kg water/kg dry air]
-        Real64 PrecoolHumRat;              // precool design humidity ratio [kg water/kg dry air]
-        Real64 CoolSupTemp;                // cooling design supply air temperature [C]
-        Real64 HeatSupTemp;                // heating design supply air temperature[C]
-        Real64 CoolSupHumRat;              // cooling design supply air humidity ratio [kg water/kg dry air]
-        Real64 HeatSupHumRat;              // heating design supply air humidity ratio [kg water/kg dry air]
-        int CoolAirDesMethod;              // choice of how to get system design cooling air flow rates;
+        std::string AirPriLoopName;                      // name of an AirLoopHVAC object
+        std::string CoolDesDay;                          // name of a cooling design day
+        std::string HeatDesDay;                          // name of a heating design day
+        LoadSizing loadSizingType = LoadSizing::Invalid; // type of load to size on Sensible, Latent, Total, Ventilation
+        int SizingOption = 0;                            // 1 = noncoincident, 2 = coincident.
+        OAControl CoolOAOption = OAControl::Invalid;     // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
+        OAControl HeatOAOption = OAControl::Invalid;     // 1 = use 100% outside air; 2 = use min OA; for heating sizing
+        Real64 DesOutAirVolFlow = 0.0;                   // design (minimum) outside air flow rate [m3/s]
+        Real64 SysAirMinFlowRat = 0.0;                   // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
+        bool SysAirMinFlowRatWasAutoSized = false;       // true if central heating maximum system air flow ratio was autosize on input
+        Real64 PreheatTemp = 0.0;                        // preheat design set temperature
+        Real64 PrecoolTemp = 0.0;                        // precool design set temperature [C]
+        Real64 PreheatHumRat = 0.0;                      // preheat design humidity ratio [kg water/kg dry air]
+        Real64 PrecoolHumRat = 0.0;                      // precool design humidity ratio [kg water/kg dry air]
+        Real64 CoolSupTemp = 0.0;                        // cooling design supply air temperature [C]
+        Real64 HeatSupTemp = 0.0;                        // heating design supply air temperature[C]
+        Real64 CoolSupHumRat = 0.0;                      // cooling design supply air humidity ratio [kg water/kg dry air]
+        Real64 HeatSupHumRat = 0.0;                      // heating design supply air humidity ratio [kg water/kg dry air]
+        int CoolAirDesMethod = 0;                        // choice of how to get system design cooling air flow rates;
         //  1 = calc from des day simulation; 2=m3/s per system, user input
-        int HeatAirDesMethod; // choice of how to get system design heating air flow rates;
+        int HeatAirDesMethod = 0; // choice of how to get system design heating air flow rates;
         //  1 = calc from des day simulation; 2=m3/s per system, user input
-        Real64 InpDesCoolAirFlow;              // input design system supply air flow rate [m3/s]
-        Real64 InpDesHeatAirFlow;              // input design system heating supply air flow rate [m3/s]
-        Real64 CoinCoolMassFlow;               // coincident peak cooling mass flow rate [kg/s]
-        bool EMSOverrideCoinCoolMassFlowOn;    // If true, EMS to change coincident peak cooling mass flow rate
-        Real64 EMSValueCoinCoolMassFlow;       // Value EMS wants for coincident peak cooling mass flow rate [kg/s]
-        Real64 CoinHeatMassFlow;               // coincident peak heating mass flow rate [kg/s]
-        bool EMSOverrideCoinHeatMassFlowOn;    // If true, EMS to set coincident peak heating mass flow rate
-        Real64 EMSValueCoinHeatMassFlow;       // Value EMS wants for coincident peak heating mass flow rate [kg/s]
-        Real64 NonCoinCoolMassFlow;            // noncoincident peak cooling mass flow rate [kg/s]
-        bool EMSOverrideNonCoinCoolMassFlowOn; // true, EMS to set noncoincident peak cooling mass flow rate
-        Real64 EMSValueNonCoinCoolMassFlow;    // Value EMS for noncoincident peak cooling mass flow rate [kg/s]
-        Real64 NonCoinHeatMassFlow;            // noncoincident peak heating mass flow rate [kg/s]
-        bool EMSOverrideNonCoinHeatMassFlowOn; // true, EMS to set noncoincident peak heating mass flow rate
-        Real64 EMSValueNonCoinHeatMassFlow;    // Value EMS for noncoincident peak heating mass flow rate [kg/s]
-        Real64 DesMainVolFlow;                 // design main supply duct volume flow [m3/s]
-        bool EMSOverrideDesMainVolFlowOn;      // If true, EMS is acting to change DesMainVolFlow
-        Real64 EMSValueDesMainVolFlow;         // Value EMS providing for design main supply duct volume flow [m3/s]
-        Real64 DesHeatVolFlow;                 // design heat supply duct volume flow [m3/s]
-        bool EMSOverrideDesHeatVolFlowOn;      // If true, EMS is acting to change DesCoolVolFlow
-        Real64 EMSValueDesHeatVolFlow;         // Value EMS providing for design cool  supply duct volume flow [m3/s]
-        Real64 DesCoolVolFlow;                 // design cool  supply duct volume flow [m3/s]
-        bool EMSOverrideDesCoolVolFlowOn;      // If true, EMS is acting to change DesCoolVolFlow
-        Real64 EMSValueDesCoolVolFlow;         // Value EMS providing for design cool  supply duct volume flow [m3/s]
-        Real64 SensCoolCap;                    // design sensible cooling capacity [W]
-        Real64 TotCoolCap;                     // design total cooling capacity [W]
-        Real64 HeatCap;                        // design heating capacity [W]
-        Real64 PreheatCap;                     // design preheat capacity [W]
-        Real64 MixTempAtCoolPeak;              // design mixed air temperature for cooling [C]
-        Real64 MixHumRatAtCoolPeak;            // design mixed air hum ratio for cooling [kg water/kg dry air]
-        Real64 RetTempAtCoolPeak;              // design return air temperature for cooling [C]
-        Real64 RetHumRatAtCoolPeak;            // design return air hum ratio for cooling [kg water/kg dry air]
-        Real64 OutTempAtCoolPeak;              // design outside air temperature for cooling [C]
-        Real64 OutHumRatAtCoolPeak;            // design outside air hum ratio for cooling [kg water/kg dry air]
-        Real64 MassFlowAtCoolPeak;             // air mass flow rate at the cooling peak [kg/s]
-        Real64 HeatMixTemp;                    // design mixed air temperature for heating [C]
-        Real64 HeatMixHumRat;                  // design mixed air hum ratio for heating [kg water/kg dry air]
-        Real64 HeatRetTemp;                    // design return air temperature for heating [C]
-        Real64 HeatRetHumRat;                  // design return air hum ratio for heating [kg water/kg dry air]
-        Real64 HeatOutTemp;                    // design outside air temperature for heating [C]
-        Real64 HeatOutHumRat;                  // design outside air hum ratio for Heating [kg water/kg dry air]
-        Real64 DesCoolVolFlowMin;              // design minimum system cooling flow rate [m3/s]
-        Array1D<Real64> HeatFlowSeq;           // daily sequence of system heating air mass flow rate
+        Real64 InpDesCoolAirFlow = 0.0;                // input design system supply air flow rate [m3/s]
+        Real64 InpDesHeatAirFlow = 0.0;                // input design system heating supply air flow rate [m3/s]
+        Real64 CoinCoolMassFlow = 0.0;                 // coincident peak cooling mass flow rate [kg/s]
+        bool EMSOverrideCoinCoolMassFlowOn = false;    // If true, EMS to change coincident peak cooling mass flow rate
+        Real64 EMSValueCoinCoolMassFlow = 0.0;         // Value EMS wants for coincident peak cooling mass flow rate [kg/s]
+        Real64 CoinHeatMassFlow = 0.0;                 // coincident peak heating mass flow rate [kg/s]
+        bool EMSOverrideCoinHeatMassFlowOn = false;    // If true, EMS to set coincident peak heating mass flow rate
+        Real64 EMSValueCoinHeatMassFlow = 0.0;         // Value EMS wants for coincident peak heating mass flow rate [kg/s]
+        Real64 NonCoinCoolMassFlow = 0.0;              // noncoincident peak cooling mass flow rate [kg/s]
+        bool EMSOverrideNonCoinCoolMassFlowOn = false; // true, EMS to set noncoincident peak cooling mass flow rate
+        Real64 EMSValueNonCoinCoolMassFlow = 0.0;      // Value EMS for noncoincident peak cooling mass flow rate [kg/s]
+        Real64 NonCoinHeatMassFlow = 0.0;              // noncoincident peak heating mass flow rate [kg/s]
+        bool EMSOverrideNonCoinHeatMassFlowOn = false; // true, EMS to set noncoincident peak heating mass flow rate
+        Real64 EMSValueNonCoinHeatMassFlow = 0.0;      // Value EMS for noncoincident peak heating mass flow rate [kg/s]
+        Real64 DesMainVolFlow = 0.0;                   // design main supply duct volume flow [m3/s]
+        bool EMSOverrideDesMainVolFlowOn = false;      // If true, EMS is acting to change DesMainVolFlow
+        Real64 EMSValueDesMainVolFlow = 0.0;           // Value EMS providing for design main supply duct volume flow [m3/s]
+        Real64 DesHeatVolFlow = 0.0;                   // design heat supply duct volume flow [m3/s]
+        bool EMSOverrideDesHeatVolFlowOn = false;      // If true, EMS is acting to change DesCoolVolFlow
+        Real64 EMSValueDesHeatVolFlow = 0.0;           // Value EMS providing for design cool  supply duct volume flow [m3/s]
+        Real64 DesCoolVolFlow = 0.0;                   // design cool  supply duct volume flow [m3/s]
+        bool EMSOverrideDesCoolVolFlowOn = false;      // If true, EMS is acting to change DesCoolVolFlow
+        Real64 EMSValueDesCoolVolFlow = 0.0;           // Value EMS providing for design cool  supply duct volume flow [m3/s]
+        Real64 SensCoolCap = 0.0;                      // design sensible cooling capacity [W]
+        Real64 TotCoolCap = 0.0;                       // design total cooling capacity [W]
+        Real64 HeatCap = 0.0;                          // design heating capacity [W]
+        Real64 PreheatCap = 0.0;                       // design preheat capacity [W]
+        Real64 MixTempAtCoolPeak = 0.0;                // design mixed air temperature for cooling [C]
+        Real64 MixHumRatAtCoolPeak = 0.0;              // design mixed air hum ratio for cooling [kg water/kg dry air]
+        Real64 RetTempAtCoolPeak = 0.0;                // design return air temperature for cooling [C]
+        Real64 RetHumRatAtCoolPeak = 0.0;              // design return air hum ratio for cooling [kg water/kg dry air]
+        Real64 OutTempAtCoolPeak = 0.0;                // design outside air temperature for cooling [C]
+        Real64 OutHumRatAtCoolPeak = 0.0;              // design outside air hum ratio for cooling [kg water/kg dry air]
+        Real64 MassFlowAtCoolPeak = 0.0;               // air mass flow rate at the cooling peak [kg/s]
+        Real64 HeatMixTemp = 0.0;                      // design mixed air temperature for heating [C]
+        Real64 HeatMixHumRat = 0.0;                    // design mixed air hum ratio for heating [kg water/kg dry air]
+        Real64 HeatRetTemp = 0.0;                      // design return air temperature for heating [C]
+        Real64 HeatRetHumRat = 0.0;                    // design return air hum ratio for heating [kg water/kg dry air]
+        Real64 HeatOutTemp = 0.0;                      // design outside air temperature for heating [C]
+        Real64 HeatOutHumRat = 0.0;                    // design outside air hum ratio for Heating [kg water/kg dry air]
+        Real64 DesCoolVolFlowMin = 0.0;                // design minimum system cooling flow rate [m3/s]
+        Array1D<Real64> HeatFlowSeq;                   // daily sequence of system heating air mass flow rate
         //  (zone time step)
         Array1D<Real64> SumZoneHeatLoadSeq; // daily sequence of zones summed heating load [W]
         //  (zone time step)
@@ -910,82 +901,59 @@ namespace DataSizing {
         //  [zone time step]
         Array1D<Real64> SysHeatOutHumRatSeq; // daily sequence of system heating outside humidity ratios
         //   [kg water/kg dry air] [zone time step]
-        Array1D<Real64> SysDOASHeatAddSeq; // daily sequence of heat addition rate from DOAS supply air [W]
-        Array1D<Real64> SysDOASLatAddSeq;  // daily sequence of latent heat addition rate from DOAS supply air [W]
-        SysOAMethod SystemOAMethod;        // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
-        Real64 MaxZoneOAFraction;          // maximum value of min OA for zones served by system
-        Real64 SysUncOA;                   // uncorrected system outdoor air flow based on zone people and zone area
-        bool OAAutoSized;                  // Set to true if design OA vol flow is set to 'autosize'
-        int ScaleCoolSAFMethod; // choice of how to get system cooling scalable air flow rates; (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                                // FlowPerCoolingCapacity)
-        int ScaleHeatSAFMethod; // choice of how to get system heating scalable air flow rates; (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                                // FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
-        int CoolingCapMethod;   // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea,
-                                // FractionOfAutosizedCoolingCapacity)
-        int HeatingCapMethod;   // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
-                                // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledCoolingCapacity;              // - scaled maximum cooling capacity of cooling coil in an air loop
-        Real64 ScaledHeatingCapacity;              // - scaled maximum heating capacity of cooling coil in an air loop
-        Real64 FloorAreaOnAirLoopCooled;           // total floor of cooled zones served by an airloop
-        Real64 FloorAreaOnAirLoopHeated;           // total floor of heated zones served by an airloop
-        Real64 FlowPerFloorAreaCooled;             // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-        Real64 FlowPerFloorAreaHeated;             // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-        Real64 FractionOfAutosizedCoolingAirflow;  // fraction of of cooling supply air flow rate an airloop
-        Real64 FractionOfAutosizedHeatingAirflow;  // fraction of of heating supply air flow rate an airloop
-        Real64 FlowPerCoolingCapacity;             // ratio of cooling supply air flow rate to cooling capacity of an airloop
-        Real64 FlowPerHeatingCapacity;             // ratio of heating supply air flow rate to heating capacity of an airloop
-        Real64 FractionOfAutosizedCoolingCapacity; // fraction of of cooling total capacity
-        Real64 FractionOfAutosizedHeatingCapacity; // fraction of of heating total capacity
-        Real64 CoolingTotalCapacity;               // system total cooling capacity
-        Real64 HeatingTotalCapacity;               // system total heating capacity
-        PeakLoad coolingPeakLoad;                  // Type of peak to size cooling coils on SensibleCooling or TotalCooling
-        CapacityControl CoolCapControl;            // type of control of cooling coil  VAV, Bypass, VT, OnOff
-        bool sysSizeHeatingDominant;
-        bool sysSizeCoolingDominant;
+        Array1D<Real64> SysDOASHeatAddSeq;                 // daily sequence of heat addition rate from DOAS supply air [W]
+        Array1D<Real64> SysDOASLatAddSeq;                  // daily sequence of latent heat addition rate from DOAS supply air [W]
+        SysOAMethod SystemOAMethod = SysOAMethod::Invalid; // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
+        Real64 MaxZoneOAFraction = 0.0;                    // maximum value of min OA for zones served by system
+        Real64 SysUncOA = 0.0;                             // uncorrected system outdoor air flow based on zone people and zone area
+        bool OAAutoSized = false;                          // Set to true if design OA vol flow is set to 'autosize'
+        int ScaleCoolSAFMethod = 0;                        // choice of how to get system cooling scalable air flow rates; (FlowPerFloorArea,
+                                                           // FractionOfAutosizedCoolingAirflow,
+                                                           // FlowPerCoolingCapacity)
+        int ScaleHeatSAFMethod = 0;                        // choice of how to get system heating scalable air flow rates; (FlowPerFloorArea,
+                                                           // FractionOfAutosizedCoolingAirflow,
+                                                           // FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
+        int CoolingCapMethod = 0;           // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea,
+                                            // FractionOfAutosizedCoolingCapacity)
+        int HeatingCapMethod = 0;           // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+                                            // FracOfAutosizedHeatingCapacity)
+        Real64 ScaledCoolingCapacity = 0.0; // - scaled maximum cooling capacity of cooling coil in an air loop
+        Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity of cooling coil in an air loop
+        Real64 FloorAreaOnAirLoopCooled = 0.0; // total floor of cooled zones served by an airloop
+        Real64 FloorAreaOnAirLoopHeated = 0.0; // total floor of heated zones served by an airloop
+        Real64 FlowPerFloorAreaCooled = 0.0;   // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+        Real64 FlowPerFloorAreaHeated = 0.0;   // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+        Real64 FractionOfAutosizedCoolingAirflow = 0.0;            // fraction of of cooling supply air flow rate an airloop
+        Real64 FractionOfAutosizedHeatingAirflow = 0.0;            // fraction of of heating supply air flow rate an airloop
+        Real64 FlowPerCoolingCapacity = 0.0;                       // ratio of cooling supply air flow rate to cooling capacity of an airloop
+        Real64 FlowPerHeatingCapacity = 0.0;                       // ratio of heating supply air flow rate to heating capacity of an airloop
+        Real64 FractionOfAutosizedCoolingCapacity = 0.0;           // fraction of of cooling total capacity
+        Real64 FractionOfAutosizedHeatingCapacity = 0.0;           // fraction of of heating total capacity
+        Real64 CoolingTotalCapacity = 0.0;                         // system total cooling capacity
+        Real64 HeatingTotalCapacity = 0.0;                         // system total heating capacity
+        PeakLoad coolingPeakLoad = PeakLoad::Invalid;              // Type of peak to size cooling coils on SensibleCooling or TotalCooling
+        CapacityControl CoolCapControl = CapacityControl::Invalid; // type of control of cooling coil  VAV, Bypass, VT, OnOff
+        bool sysSizeHeatingDominant = false;
+        bool sysSizeCoolingDominant = false;
 
-        Real64 CoinCoolCoilMassFlow; // coincident volume flow at time of cooling coil sensible+latent peak [m3/s]
-        Real64 CoinHeatCoilMassFlow; // coincident volume flow at time of heating coil sensible peak [m3/s]
-        Real64 DesCoolCoilVolFlow;   // design cooling air volume flow rate at time of coil sens+latent peak [m3/s]
-        Real64 DesHeatCoilVolFlow;   // design heating air volume flow rate at time of coil sens peak [m3/s]
-        Real64 DesMainCoilVolFlow;   // design main supply duct volume flow at time of coil peak [m3/s]
+        Real64 CoinCoolCoilMassFlow = 0.0; // coincident volume flow at time of cooling coil sensible+latent peak [m3/s]
+        Real64 CoinHeatCoilMassFlow = 0.0; // coincident volume flow at time of heating coil sensible peak [m3/s]
+        Real64 DesCoolCoilVolFlow = 0.0;   // design cooling air volume flow rate at time of coil sens+latent peak [m3/s]
+        Real64 DesHeatCoilVolFlow = 0.0;   // design heating air volume flow rate at time of coil sens peak [m3/s]
+        Real64 DesMainCoilVolFlow = 0.0;   // design main supply duct volume flow at time of coil peak [m3/s]
         // These are for reporting purposes
 
-        int SysHeatCoilTimeStepPk; // timestep in day of heating coil peak
-        int SysHeatAirTimeStepPk;  // timestep in day of heating airflow peak
-        int HeatDDNum;             // index of design day for heating
-        int CoolDDNum;             // index of design day for cooling
+        int SysHeatCoilTimeStepPk = 0; // timestep in day of heating coil peak
+        int SysHeatAirTimeStepPk = 0;  // timestep in day of heating airflow peak
+        int HeatDDNum = 0;             // index of design day for heating
+        int CoolDDNum = 0;             // index of design day for cooling
 
-        Real64 SysCoolCoinSpaceSens; // sum of zone space sensible cooling loads at coincident peak
-        Real64 SysHeatCoinSpaceSens; //  sum of zone space sensible heating loads at coincident peak
-        Real64 SysDesCoolLoad;       // system peak load with coincident
-        int SysCoolLoadTimeStepPk;   // timestep in day of cooling load peak
-        Real64 SysDesHeatLoad;       // system peak load with coincident
-        int SysHeatLoadTimeStepPk;   // timestep in day of cooling load peak
-        // Default Constructor
-        SystemSizingData()
-            : loadSizingType(LoadSizing::Invalid), SizingOption(0), CoolOAOption(0), HeatOAOption(0), DesOutAirVolFlow(0.0), SysAirMinFlowRat(0.0),
-              SysAirMinFlowRatWasAutoSized(false), PreheatTemp(0.0), PrecoolTemp(0.0), PreheatHumRat(0.0), PrecoolHumRat(0.0), CoolSupTemp(0.0),
-              HeatSupTemp(0.0), CoolSupHumRat(0.0), HeatSupHumRat(0.0), CoolAirDesMethod(0), HeatAirDesMethod(0), InpDesCoolAirFlow(0.0),
-              InpDesHeatAirFlow(0.0), CoinCoolMassFlow(0.0), EMSOverrideCoinCoolMassFlowOn(false), EMSValueCoinCoolMassFlow(0.0),
-              CoinHeatMassFlow(0.0), EMSOverrideCoinHeatMassFlowOn(false), EMSValueCoinHeatMassFlow(0.0), NonCoinCoolMassFlow(0.0),
-              EMSOverrideNonCoinCoolMassFlowOn(false), EMSValueNonCoinCoolMassFlow(0.0), NonCoinHeatMassFlow(0.0),
-              EMSOverrideNonCoinHeatMassFlowOn(false), EMSValueNonCoinHeatMassFlow(0.0), DesMainVolFlow(0.0), EMSOverrideDesMainVolFlowOn(false),
-              EMSValueDesMainVolFlow(0.0), DesHeatVolFlow(0.0), EMSOverrideDesHeatVolFlowOn(false), EMSValueDesHeatVolFlow(0.0), DesCoolVolFlow(0.0),
-              EMSOverrideDesCoolVolFlowOn(false), EMSValueDesCoolVolFlow(0.0), SensCoolCap(0.0), TotCoolCap(0.0), HeatCap(0.0), PreheatCap(0.0),
-              MixTempAtCoolPeak(0.0), MixHumRatAtCoolPeak(0.0), RetTempAtCoolPeak(0.0), RetHumRatAtCoolPeak(0.0), OutTempAtCoolPeak(0.0),
-              OutHumRatAtCoolPeak(0.0), MassFlowAtCoolPeak(0.0), HeatMixTemp(0.0), HeatMixHumRat(0.0), HeatRetTemp(0.0), HeatRetHumRat(0.0),
-              HeatOutTemp(0.0), HeatOutHumRat(0.0), DesCoolVolFlowMin(0.0), SystemOAMethod(SysOAMethod::Invalid), MaxZoneOAFraction(0.0),
-              SysUncOA(0.0), OAAutoSized(false), ScaleCoolSAFMethod(0), ScaleHeatSAFMethod(0), CoolingCapMethod(0), HeatingCapMethod(0),
-              ScaledCoolingCapacity(0.0), ScaledHeatingCapacity(0.0), FloorAreaOnAirLoopCooled(0.0), FloorAreaOnAirLoopHeated(0.0),
-              FlowPerFloorAreaCooled(0.0), FlowPerFloorAreaHeated(0.0), FractionOfAutosizedCoolingAirflow(1.0),
-              FractionOfAutosizedHeatingAirflow(1.0), FlowPerCoolingCapacity(0.0), FlowPerHeatingCapacity(0.0),
-              FractionOfAutosizedCoolingCapacity(1.0), FractionOfAutosizedHeatingCapacity(1.0), CoolingTotalCapacity(0.0), HeatingTotalCapacity(0.0),
-              coolingPeakLoad(PeakLoad::Invalid), CoolCapControl(CapacityControl::Invalid), sysSizeHeatingDominant(false),
-              sysSizeCoolingDominant(false), CoinCoolCoilMassFlow(0.0), CoinHeatCoilMassFlow(0.0), DesCoolCoilVolFlow(0.0), DesHeatCoilVolFlow(0.0),
-              DesMainCoilVolFlow(0.0), SysHeatCoilTimeStepPk(0), SysHeatAirTimeStepPk(0), HeatDDNum(0), CoolDDNum(0), SysCoolCoinSpaceSens(0.0),
-              SysHeatCoinSpaceSens(0.0), SysDesCoolLoad(0.0), SysCoolLoadTimeStepPk(0), SysDesHeatLoad(0.0), SysHeatLoadTimeStepPk(0)
-        {
-        }
+        Real64 SysCoolCoinSpaceSens = 0.0; // sum of zone space sensible cooling loads at coincident peak
+        Real64 SysHeatCoinSpaceSens = 0.0; //  sum of zone space sensible heating loads at coincident peak
+        Real64 SysDesCoolLoad = 0.0;       // system peak load with coincident
+        int SysCoolLoadTimeStepPk = 0;     // timestep in day of cooling load peak
+        Real64 SysDesHeatLoad = 0.0;       // system peak load with coincident
+        int SysHeatLoadTimeStepPk = 0;     // timestep in day of cooling load peak
     };
 
     struct SysSizPeakDDNumData

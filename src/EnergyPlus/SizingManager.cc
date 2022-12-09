@@ -786,7 +786,7 @@ void ManageSizing(EnergyPlusData &state)
                                      "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName + " is zero.");
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
-            std::string coolPeakLoadKind;
+            std::string_view coolPeakLoadKind;
             std::string coolPeakDDDate;
             int coolPeakDD = 0;
             Real64 coolCap = 0.;
@@ -3729,7 +3729,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum), cCurrentModuleObject, ErrorsFound);
+        assert(!state.dataIPShortCut->cAlphaArgs(iNameAlphaNum).empty());
 
         SysSizInput(SysSizIndex).AirPriLoopName = state.dataIPShortCut->cAlphaArgs(iNameAlphaNum);
 
@@ -3770,9 +3770,9 @@ void GetSystemSizingInput(EnergyPlusData &state)
         {
             auto const coolOAOption(state.dataIPShortCut->cAlphaArgs(i100PercentOACoolingAlphaNum));
             if (coolOAOption == "YES") {
-                SysSizInput(SysSizIndex).CoolOAOption = AllOA;
+                SysSizInput(SysSizIndex).CoolOAOption = OAControl::AllOA;
             } else if (coolOAOption == "NO") {
-                SysSizInput(SysSizIndex).CoolOAOption = MinOA;
+                SysSizInput(SysSizIndex).CoolOAOption = OAControl::MinOA;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
                 ShowContinueError(state,
@@ -3785,9 +3785,9 @@ void GetSystemSizingInput(EnergyPlusData &state)
         {
             auto const heatOAOption(state.dataIPShortCut->cAlphaArgs(i100PercentOAHeatingAlphaNum));
             if (heatOAOption == "YES") {
-                SysSizInput(SysSizIndex).HeatOAOption = 1;
+                SysSizInput(SysSizIndex).HeatOAOption = DataSizing::OAControl::AllOA;
             } else if (heatOAOption == "NO") {
-                SysSizInput(SysSizIndex).HeatOAOption = 2;
+                SysSizInput(SysSizIndex).HeatOAOption = DataSizing::OAControl::MinOA;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
                 ShowContinueError(state,
@@ -4516,15 +4516,15 @@ void ReportZoneSizing(EnergyPlusData &state,
 
 // Writes system sizing data to EIO file using one row per system
 void ReportSysSizing(EnergyPlusData &state,
-                     std::string const &SysName,      // the name of the zone
-                     std::string const &LoadType,     // either "Cooling" or "Heating"
-                     std::string const &PeakLoadKind, // either "Sensible" or "Total"
-                     Real64 const UserDesCap,         // User  Design Capacity
-                     Real64 const CalcDesVolFlow,     // Calculated  Design Air Flow Rate
-                     Real64 const UserDesVolFlow,     // User Design Air Flow Rate
-                     std::string const &DesDayName,   // the name of the design day that produced the peak
-                     std::string const &DesDayDate,   // the date that produced the peak
-                     int const TimeStepIndex          // time step of the peak
+                     std::string const &SysName,    // the name of the zone
+                     std::string_view LoadType,     // either "Cooling" or "Heating"
+                     std::string_view PeakLoadKind, // either "Sensible" or "Total"
+                     Real64 const UserDesCap,       // User  Design Capacity
+                     Real64 const CalcDesVolFlow,   // Calculated  Design Air Flow Rate
+                     Real64 const UserDesVolFlow,   // User Design Air Flow Rate
+                     std::string const &DesDayName, // the name of the design day that produced the peak
+                     std::string const &DesDayDate, // the date that produced the peak
+                     int const TimeStepIndex        // time step of the peak
 )
 {
 

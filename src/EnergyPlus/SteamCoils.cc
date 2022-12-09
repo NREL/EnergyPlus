@@ -802,7 +802,7 @@ namespace SteamCoils {
                     }
                     DesMassFlow = RhoAirStd * DesVolFlow;
                     // get the outside air fraction
-                    if (finalSysSizing.HeatOAOption == MinOA) {
+                    if (finalSysSizing.HeatOAOption == DataSizing::OAControl::MinOA) {
                         if (DesVolFlow > 0.0) {
                             OutAirFrac = finalSysSizing.DesOutAirVolFlow / DesVolFlow;
                         } else {

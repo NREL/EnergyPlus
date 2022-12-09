@@ -374,7 +374,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
 
     // Test 16 - Airloop Equipment - 1 OA coil use mixture of outdoor and return hum rat since DataFlowUsedForSizing > 0
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.01;
-    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOAOption = DataSizing::MinOA;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOAOption = DataSizing::OAControl::MinOA;
     state->dataSize->DataFlowUsedForSizing = 0.1; // system volume flow
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
