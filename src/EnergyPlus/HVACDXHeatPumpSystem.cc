@@ -711,11 +711,13 @@ namespace HVACDXHeatPumpSystem {
                                               FanOpMode,
                                               PartLoadFrac);
                                 } else {
-                                    Par(1) = double(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
-                                    Par(2) = DesOutTemp;
-                                    Par(3) = 1.0; // OnOffAirFlowFrac assume = 1.0 for continuous fan dx system
-                                    Par(5) = double(FanOpMode);
-                                    SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
+                                    int coilIndex = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex;
+                                    auto f = [&state, coilIndex, DesOutTemp](Real64 const PartLoadFrac) {
+                                        DXCoils::CalcDXHeatingCoil(state, coilIndex, PartLoadFrac, ContFanCycCoil, 1.0);
+                                        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(coilIndex);
+                                        return DesOutTemp - OutletAirTemp;
+                                    };
+                                    SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
                                             if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
@@ -1093,34 +1095,6 @@ namespace HVACDXHeatPumpSystem {
         DXHeatPumpSystem(DXSystemNum).PartLoadFrac = PartLoadFrac;
         DXHeatPumpSystem(DXSystemNum).SpeedRatio = SpeedRatio;
         DXHeatPumpSystem(DXSystemNum).SpeedNum = SpeedNum;
-    }
-
-    Real64 DXHeatingCoilResidual(EnergyPlusData &state,
-                                 Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1D<Real64> const &Par // Par(1) = DX coil number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   June 2006
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcDoe2DXCoil to get outlet temperature at the given cycling ratio
-        // and calculates the residual as defined above
-
-        int CoilIndex = int(Par(1));
-        Real64 OnOffAirFlowFrac = Par(3);
-        Real64 desiredTemp = Par(2);
-
-        DXCoils::CalcDXHeatingCoil(state, CoilIndex, PartLoadFrac, ContFanCycCoil, OnOffAirFlowFrac);
-        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
-        return desiredTemp - OutletAirTemp;
     }
 
     //******************************************************************************

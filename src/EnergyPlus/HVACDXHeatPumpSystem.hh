@@ -150,13 +150,6 @@ namespace HVACDXHeatPumpSystem {
                                 bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    Real64 DXHeatingCoilResidual(EnergyPlusData &state,
-                                 Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1D<Real64> const &Par // par(1) = DX coil number
-    );
-
-    //******************************************************************************
-
     Real64 VSCoilCyclingResidual(EnergyPlusData &state,
                                  Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1D<Real64> const &Par  // par(1) = DX coil number
