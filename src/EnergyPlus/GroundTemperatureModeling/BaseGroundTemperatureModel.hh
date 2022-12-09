@@ -51,7 +51,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
@@ -78,7 +77,6 @@ public:
     // Public Members
     GroundTempObjType objectType;
     std::string objectName;
-    bool errorsFound;
 
     virtual ~BaseGroundTempsModel() = default;
     BaseGroundTempsModel(const BaseGroundTempsModel &) = delete;
@@ -87,7 +85,7 @@ public:
     BaseGroundTempsModel &operator=(BaseGroundTempsModel &&) = delete;
 
     // Default Constructor
-    BaseGroundTempsModel() : objectType(GroundTempObjType::Invalid), errorsFound(false)
+    BaseGroundTempsModel() : objectType(GroundTempObjType::Invalid)
     {
     }
 

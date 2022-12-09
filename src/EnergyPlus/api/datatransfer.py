@@ -1025,7 +1025,10 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer indicator for current day holiday type.
         """
-        return self.api.holidayIndex(state)
+        if self.api.holidayIndex(state) == 0:
+            return 0
+        else:
+            return self.api.holidayIndex(state) - 7
 
     def sun_is_up(self, state: c_void_p) -> bool:
         """

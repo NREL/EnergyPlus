@@ -1264,7 +1264,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                                               SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
         }
 
-        if (state.dataSize->FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::TotalCoolingLoad) {
+        if (state.dataSize->FinalSysSizing(curSysNum).coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
             c->isCoilSizingForTotalLoad = true;
         } else {
             c->isCoilSizingForTotalLoad = false;
@@ -1290,10 +1290,10 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         // Decide what day and time to use for zone/room averages
         int SysPeakDDnum(0);
         int SysPeakTimeStepInDay(0);
-        if (state.dataSize->FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::TotalCoolingLoad) {
+        if (state.dataSize->FinalSysSizing(curSysNum).coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
             SysPeakDDnum = SysSizPeakDDNum(curSysNum).TotCoolPeakDD;
             if (SysPeakDDnum > 0) SysPeakTimeStepInDay = SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(SysSizPeakDDNum(curSysNum).TotCoolPeakDD);
-        } else if (state.dataSize->FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
+        } else if (state.dataSize->FinalSysSizing(curSysNum).coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
             SysPeakDDnum = SysSizPeakDDNum(curSysNum).SensCoolPeakDD;
             if (SysPeakDDnum > 0) SysPeakTimeStepInDay = SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(SysSizPeakDDNum(curSysNum).SensCoolPeakDD);
         }
