@@ -385,14 +385,24 @@ namespace SZVAVModel {
                                                                                       minAirMassFlow);
                                 };
                             General::SolveRoot(state, 0.001, MaxIter, SolFlag, lowWaterMdot, f, 0.0, 1.0);
-                            Par(9) = lowWaterMdot;
+                            Real64 minFlow = lowWaterMdot;
                             if (SolFlag < 0) {
                                 MessagePrefix = "Step 2a: ";
                             } else {
-                                Par(9) = 0.0;
+                                minFlow = 0.0;
                             }
-                            General::SolveRoot(
-                                state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
+                            auto f2 = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad, coilFluidInletNode, minFlow](Real64 const PLR) {
+                                return FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual(state,
+                                                                                        PLR,
+                                                                                        SysIndex,
+                                                                                        FirstHVACIteration,
+                                                                                        SZVAVModel.ControlZoneNum,
+                                                                                        ZoneLoad,
+                                                                                        SZVAVModel.AirInNode,
+                                                                                        coilFluidInletNode,
+                                                                                        minFlow);
+                            };
+                            General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f2, 0.0, 1.0);
                             if (SolFlag < 0) {
                                 MessagePrefix = "Step 2b: ";
                             }
@@ -409,8 +419,18 @@ namespace SZVAVModel {
                     }
                 } else { // too much capacity when coil off, could lower air flow rate here to meet load if air flow is above minimum
                     if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
-                        General::SolveRoot(
-                            state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
+                        auto f2 = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad, coilFluidInletNode](Real64 const PLR) {
+                            return FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual(state,
+                                                                                    PLR,
+                                                                                    SysIndex,
+                                                                                    FirstHVACIteration,
+                                                                                    SZVAVModel.ControlZoneNum,
+                                                                                    ZoneLoad,
+                                                                                    SZVAVModel.AirInNode,
+                                                                                    coilFluidInletNode,
+                                                                                    0.0);
+                        };
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f2, 0.0, 1.0);
                     } else {
                         auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
                             return FanCoilUnits::CalcFanCoilLoadResidual(
@@ -491,8 +511,18 @@ namespace SZVAVModel {
                     }
                 } else { // too much capacity at full air flow with coil off, operate coil and fan in unison
                     if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
-                        General::SolveRoot(
-                            state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par);
+                        auto f2 = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad, coilFluidInletNode](Real64 const PLR) {
+                            return FanCoilUnits::CalcFanCoilAirAndWaterFlowResidual(state,
+                                                                                    PLR,
+                                                                                    SysIndex,
+                                                                                    FirstHVACIteration,
+                                                                                    SZVAVModel.ControlZoneNum,
+                                                                                    ZoneLoad,
+                                                                                    SZVAVModel.AirInNode,
+                                                                                    coilFluidInletNode,
+                                                                                    0.0);
+                        };
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f2, 0.0, 1.0);
                     } else {
                         auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad](Real64 const PartLoadRatio) {
                             return FanCoilUnits::CalcFanCoilLoadResidual(

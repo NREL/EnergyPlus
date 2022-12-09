@@ -2295,7 +2295,6 @@ namespace FanCoilUnits {
         // Real64 Low_mdot;
         Real64 QSensUnitOutNoATM;     // unit output not including air added by supply side air terminal mixer
         int SolFlag;                  // return flag from RegulaFalsi for sensible load
-        Array1D<Real64> Par(10);      // parameters passed to RegulaFalsi function
         Real64 ElectricHeaterControl; // 1 or 0, enables or disables heating coil
         Real64 OAVolumeFlowRate;      // OA volume flow rate based on design specifications object [m3/s]
         Real64 OAMassFlow;            // OA mass flow rate based on design specifications object [kg/s]
@@ -4286,11 +4285,10 @@ namespace FanCoilUnits {
         Real64 AbsError;        // Absolute error between QZnReq and QUnitOut [W]   !FB
         Real64 Relax;
         Real64 DelPLR;
-        int OutletNode;          // unit air outlet node
-        int InletNode;           // unit air inlet node
-        int Iter;                // iteration counter
-        int SolFlag;             // return flag from RegulaFalsi for sensible load
-        Array1D<Real64> Par(10); // parameters passed to RegulaFalsi function
+        int OutletNode; // unit air outlet node
+        int InletNode;  // unit air inlet node
+        int Iter;       // iteration counter
+        int SolFlag;    // return flag from RegulaFalsi for sensible load
 
         auto &FanCoil(state.dataFanCoilUnits->FanCoil);
 
@@ -4503,11 +4501,6 @@ namespace FanCoilUnits {
                     if (QUnitOutMax > QZnReq) {
                         // heating coil output is larger than required, mudulate the electric heating coil output to meet the load
                         Node(InletNode).MassFlowRateMinAvail = Node(InletNode).MassFlowRate;
-                        Par(1) = double(FanCoilNum);
-                        Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                        if (FirstHVACIteration) Par(2) = 1.0;
-                        Par(3) = ZoneNum;
-                        Par(4) = QZnReq;
 
                         if (FanCoil(FanCoilNum).FanOpMode == ContFanCycCoil) {
                             auto f = [&state, FanCoilNum, FirstHVACIteration, ZoneNum, QZnReq](Real64 const CyclingR) {
@@ -5007,27 +5000,6 @@ namespace FanCoilUnits {
         // PURPOSE OF THIS SUBROUTINE:
         // To calculate the part-load ratio for the FCU with varying water flow rate
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //        int FanCoilNum;          // Index to this fan coil unit
-        //        bool FirstHVACIteration; // FirstHVACIteration flag
-        //        int ControlledZoneNum;   // zone index
-        //        int WaterControlNode;    // water node to control
-        //        Real64 QZnReq;           // Sensible load to be met [W]
-        // delivered capacity [W]
-        // Convert parameters to usable variables
-        //        FanCoilNum = int(Par(1));
-        //        if (Par(2) == 1.0) {
-        //            FirstHVACIteration = true;
-        //        } else {
-        //            FirstHVACIteration = false;
-        //        }
-        //        ControlledZoneNum = int(Par(3));
-        //        QZnReq = Par(4);
-        //        int AirInNode = int(Par(5));
-        //        WaterControlNode = int(Par(8));
-        //        Real64 maxCoilFluidFlow = Par(10);
-        //        Real64 AirMassFlowRate = Par(12);
-
         Real64 const mDot = PLR * maxCoilFluidFlow;
         if (WaterControlNode > 0) state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = mDot;
         state.dataLoopNodes->Node(AirInNode).MassFlowRate = AirMassFlowRate;
@@ -5057,9 +5029,14 @@ namespace FanCoilUnits {
     }
 
     Real64 CalcFanCoilAirAndWaterFlowResidual(EnergyPlusData &state,
-                                              Real64 const PLR,          // water and air part load ratio
-                                              Array1D<Real64> const &Par // Function parameters
-    )
+                                              Real64 const PLR, // water and air part load ratio
+                                              int FanCoilNum,
+                                              bool FirstHVACIteration,
+                                              int ControlledZoneNum,
+                                              Real64 QZnReq,
+                                              int AirInNode,
+                                              int WaterControlNode,
+                                              Real64 MinWaterFlow)
     {
 
         // FUNCTION INFORMATION:
@@ -5073,39 +5050,6 @@ namespace FanCoilUnits {
 
         // METHODOLOGY EMPLOYED:
         // Use SolveRoot to CALL this Function to converge on a solution
-
-        // Return value
-        Real64 Residuum; // Result (forces solution to be within tolerance)
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        //   Parameter description example:
-        //       Par(1)  = REAL(FanCoilNum,r64) ! Index to fan coil unit
-        //       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
-        //       Par(3)  = REAL(ControlledZoneNum,r64)     ! zone index
-        //       Par(4)  = QZnReq               ! zone load [W]
-        //       Par(5)  = AirInNode            ! cooling or heating coil inlet air node
-        //       Par(8)  = WaterControlNode     ! CW or HW control node number
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool FirstHVACIteration; // FirstHVACIteration flag
-        Real64 QUnitOut;         // delivered capacity [W]
-
-        // Convert parameters to usable variables
-        int FanCoilNum = int(Par(1));
-        if (Par(2) == 1.0) {
-            FirstHVACIteration = true;
-        } else {
-            FirstHVACIteration = false;
-        }
-        int ControlledZoneNum = int(Par(3));
-        Real64 QZnReq = Par(4);
-        int WaterControlNode = int(Par(8));
-        int AirInNode = Par(5);
-        Real64 MinWaterFlow = Par(9); // min water flow at low air flow rate of 0 if that calculation failed
 
         // set air flow rate
         state.dataLoopNodes->Node(AirInNode).MassFlowRate =
@@ -5124,6 +5068,7 @@ namespace FanCoilUnits {
                            "Developer Error - CalcFanCoilAirAndWaterFlowResidual: Water control node not found for " +
                                state.dataFanCoilUnits->FanCoil(FanCoilNum).Name);
         }
+        Real64 QUnitOut; // delivered capacity [W]
         Calc4PipeFanCoil(state,
                          FanCoilNum,
                          ControlledZoneNum,
@@ -5133,12 +5078,10 @@ namespace FanCoilUnits {
 
         // Calculate residual based on output magnitude
         if (std::abs(QZnReq) <= 100.0) {
-            Residuum = (QUnitOut - QZnReq) / 100.0;
+            return (QUnitOut - QZnReq) / 100.0;
         } else {
-            Residuum = (QUnitOut - QZnReq) / QZnReq;
+            return (QUnitOut - QZnReq) / QZnReq;
         }
-
-        return Residuum;
     }
 
 } // namespace FanCoilUnits
