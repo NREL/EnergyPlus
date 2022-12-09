@@ -4646,7 +4646,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                 // Calc maximum zone OA fraction and supply air adjustment factor based on
                 // user entered max allowed OA fraction
                 if (finalSysSizing.MaxZoneOAFraction > 0 && ZoneOAFracCooling > finalSysSizing.MaxZoneOAFraction) {
-                    if (finalSysSizing.CoolAirDesMethod == FromDDCalc) { // DesignDay Method
+                    if (finalSysSizing.CoolAirDesMethod == DataSizing::AirflowSizingMethod::FromDDCalc) { // DesignDay Method
                         ClgSupplyAirAdjustFactor = ZoneOAFracCooling / finalSysSizing.MaxZoneOAFraction;
                         if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0 || termUnitFinalZoneSizing.DesCoolVolFlowMin <= 0) {
                             // multi-path system or VAV Minimum not defined
@@ -4819,7 +4819,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                     // Calc maximum zone OA fraction and supply air adjustment factor based
                     // on user entered max allowed OA fraction
                     if (finalSysSizing.MaxZoneOAFraction > 0 && ZoneOAFracHeating > finalSysSizing.MaxZoneOAFraction) {
-                        if (finalSysSizing.CoolAirDesMethod == FromDDCalc) { // DesignDay Method
+                        if (finalSysSizing.CoolAirDesMethod == AirflowSizingMethod::FromDDCalc) { // DesignDay Method
                             HtgSupplyAirAdjustFactor = ZoneOAFracHeating / finalSysSizing.MaxZoneOAFraction;
                             if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0 || termUnitFinalZoneSizing.DesCoolVolFlowMin <= 0) {
                                 // multi-path system or VAV Heating airflow max not defined
@@ -4925,7 +4925,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
                     // Calc maximum zone OA fraction and supply air adjustment factor based
                     // on user entered max allowed OA fraction - a TRACE feature
                     if (finalSysSizing.MaxZoneOAFraction > 0 && ZoneOAFracHeating > finalSysSizing.MaxZoneOAFraction) {
-                        if (finalSysSizing.HeatAirDesMethod == FromDDCalc) { // DesignDay Method
+                        if (finalSysSizing.HeatAirDesMethod == AirflowSizingMethod::FromDDCalc) { // DesignDay Method
                             HtgSupplyAirAdjustFactor = ZoneOAFracHeating / finalSysSizing.MaxZoneOAFraction;
                             if (termUnitFinalZoneSizing.ZoneSecondaryRecirculation > 0.0 || termUnitFinalZoneSizing.DesCoolVolFlowMin <= 0) {
                                 // multi-path system or VAV Heating airflow max not defined
@@ -5699,7 +5699,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
                     // This is a bit of a cludge. If the design zone heating airflows were increased due to
                     // the MaxZoneOaFraction, then the SysSizing(AirLoopNum,state.dataSize->CurOverallSimDay)%DesHeatVolFlow
                     // variable will be out of sync with the
-                    if (finalSysSizing.MaxZoneOAFraction > 0 && finalSysSizing.HeatAirDesMethod == FromDDCalc) {
+                    if (finalSysSizing.MaxZoneOAFraction > 0 && finalSysSizing.HeatAirDesMethod == AirflowSizingMethod::FromDDCalc) {
                         SysHtgPeakAirflow = 0.0;
                         if (NumZonesHeated > 0) {
                             for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) {
@@ -6693,7 +6693,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             RhoAir = state.dataEnvrn->StdRhoAir;
             SysCoolSizingRat = 0.0;
             if (calcSysSizing.InpDesCoolAirFlow > 0.0 && calcSysSizing.DesCoolVolFlow > 0.0 &&
-                (calcSysSizing.CoolAirDesMethod == InpDesAirFlow || calcSysSizing.ScaleCoolSAFMethod == FlowPerFloorArea ||
+                (calcSysSizing.CoolAirDesMethod == AirflowSizingMethod::InpDesAirFlow || calcSysSizing.ScaleCoolSAFMethod == FlowPerFloorArea ||
                  calcSysSizing.ScaleCoolSAFMethod == FractionOfAutosizedCoolingAirflow ||
                  calcSysSizing.ScaleCoolSAFMethod == FlowPerCoolingCapacity)) {
                 SysCoolSizingRat = calcSysSizing.InpDesCoolAirFlow / calcSysSizing.DesCoolVolFlow;
@@ -6703,7 +6703,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
             SysHeatSizingRat = 0.0;
             if (calcSysSizing.InpDesHeatAirFlow > 0.0 && calcSysSizing.DesHeatVolFlow > 0.0 &&
-                (calcSysSizing.HeatAirDesMethod == InpDesAirFlow || calcSysSizing.ScaleHeatSAFMethod == FlowPerFloorArea ||
+                (calcSysSizing.HeatAirDesMethod == AirflowSizingMethod::InpDesAirFlow || calcSysSizing.ScaleHeatSAFMethod == FlowPerFloorArea ||
                  calcSysSizing.ScaleHeatSAFMethod == FractionOfAutosizedHeatingAirflow ||
                  calcSysSizing.ScaleHeatSAFMethod == FractionOfAutosizedCoolingAirflow ||
                  calcSysSizing.ScaleHeatSAFMethod == FlowPerHeatingCapacity)) {

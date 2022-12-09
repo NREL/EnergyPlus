@@ -815,8 +815,8 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             } else {
                 state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneNum = ZoneIndex;
             }
-            if (state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == FromDDCalc ||
-                state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == FromDDCalc) {
+            if (state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod == AirflowSizingMethod::FromDDCalc ||
+                state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod == AirflowSizingMethod::FromDDCalc) {
                 if (!ZoneTempPredictorCorrector::VerifyThermostatInZone(state, state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName)) {
                     if (!state.dataGlobal->isPulseZoneSizing) {
                         ShowWarningError(state,
@@ -2747,7 +2747,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             // Now take into account the user specified sizing factor and user specified cooling design air flow rate
             TotCoolSizMult = 0.0;
             // Calculate a sizing factor from the user specified cooling design air flow rate
-            if (finalZoneSizing.InpDesCoolAirFlow > 0.0 && finalZoneSizing.CoolAirDesMethod == InpDesAirFlow &&
+            if (finalZoneSizing.InpDesCoolAirFlow > 0.0 && finalZoneSizing.CoolAirDesMethod == AirflowSizingMethod::InpDesAirFlow &&
                 finalZoneSizing.DesCoolVolFlow > 0.0) {
                 TotCoolSizMult = (finalZoneSizing.InpDesCoolAirFlow / finalZoneSizing.DesCoolVolFlow) * finalZoneSizing.CoolSizingFactor;
                 // If no user specified cooling design air flow rate input, use the user specified szing factor
@@ -2803,7 +2803,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             // Save a set of design cooling air flow rates greater than or equal to the specified minimums without MinOA
             {
                 Real64 MaxOfMinCoolVolFlowNoOA = 0.0; // max of the user specified design cooling minimum flows without min OA flow [m3/s]
-                if (finalZoneSizing.CoolAirDesMethod == DesAirFlowWithLim) {
+                if (finalZoneSizing.CoolAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim) {
                     MaxOfMinCoolVolFlowNoOA = max(finalZoneSizing.DesCoolMinAirFlow, finalZoneSizing.DesCoolMinAirFlow2);
                 }
                 Real64 MaxOfMinCoolMassFlowNoOA =
@@ -2843,7 +2843,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             // Now make sure that the design cooling air flow rates are greater than or equal to the specified minimums including MinOA
             {
                 Real64 MaxOfMinCoolVolFlow = 0.0; // max of the user specified design cooling minimum flows and min OA flow [m3/s]
-                if (finalZoneSizing.CoolAirDesMethod == DesAirFlowWithLim) {
+                if (finalZoneSizing.CoolAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim) {
                     MaxOfMinCoolVolFlow = max(finalZoneSizing.DesCoolMinAirFlow, finalZoneSizing.DesCoolMinAirFlow2, finalZoneSizing.MinOA);
                 } else {
                     MaxOfMinCoolVolFlow = finalZoneSizing.MinOA;
@@ -2918,11 +2918,11 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             // sizing factor)
             TotHeatSizMult = 0.0;
             // Calculate a sizing factor from the user specified heating design air flow rate
-            if (finalZoneSizing.InpDesHeatAirFlow > 0.0 && finalZoneSizing.HeatAirDesMethod == InpDesAirFlow &&
+            if (finalZoneSizing.InpDesHeatAirFlow > 0.0 && finalZoneSizing.HeatAirDesMethod == AirflowSizingMethod::InpDesAirFlow &&
                 finalZoneSizing.DesHeatVolFlow > 0.0) {
                 TotHeatSizMult = (finalZoneSizing.InpDesHeatAirFlow / finalZoneSizing.DesHeatVolFlow) * finalZoneSizing.HeatSizingFactor;
                 // Calculate a sizing factor from the user specified max heating design air flow rates
-            } else if (finalZoneSizing.HeatAirDesMethod == DesAirFlowWithLim && finalZoneSizing.DesHeatVolFlow > 0.0) {
+            } else if (finalZoneSizing.HeatAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim && finalZoneSizing.DesHeatVolFlow > 0.0) {
                 MaxHeatVolFlow = max(finalZoneSizing.DesHeatMaxAirFlow,
                                      finalZoneSizing.DesHeatMaxAirFlow2,
                                      finalZoneSizing.DesCoolVolFlow * finalZoneSizing.DesHeatMaxAirFlowFrac);
