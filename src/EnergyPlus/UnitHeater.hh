@@ -203,11 +203,6 @@ namespace UnitHeater {
 
     void ReportUnitHeater(EnergyPlusData &state, int const UnitHeatNum); // Unit index in unit heater array
 
-    Real64 CalcUnitHeaterResidual(EnergyPlusData &state,
-                                  Real64 const PartLoadRatio, // heating coil part load ratio
-                                  Array1D<Real64> const &Par  // Function parameters
-    );
-
 } // namespace UnitHeater
 
 struct UnitHeatersData : BaseGlobalStruct

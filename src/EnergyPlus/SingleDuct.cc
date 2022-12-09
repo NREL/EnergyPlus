@@ -4800,31 +4800,17 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         // check that it can meet the load
         FanOp = 1;
         if (QCoolFanOnMax < QTotLoad - SmallLoad) {
-            Par(1) = double(this->SysNum);
-            if (FirstHVACIteration) {
-                Par(2) = 1.0;
-            } else {
-                Par(2) = 0.0;
-            }
-            Par(3) = double(ZoneNodeNum);
-            Par(4) = double(HCType);
-            if (HCType == HeatingCoilType::SteamAirHeating) {
-                Par(5) = MinFlowSteam;
-            } else {
-                Par(5) = MinFlowWater;
-            }
-            Par(6) = double(FanType);
-            Par(7) = double(FanOp);
-            Par(8) = QTotLoad;
-            SolveRoot(state,
-                      UnitFlowToler,
-                      50,
-                      SolFlag,
-                      MassFlow,
-                      EnergyPlus::SingleDuct::SingleDuctAirTerminal::VAVVSCoolingResidual,
-                      MinMassFlow,
-                      MaxCoolMassFlow,
-                      Par);
+            Real64 MinHWFlow = (HCType == HeatingCoilType::SteamAirHeating) ? MinFlowSteam : MinFlowWater;
+
+            auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MinHWFlow, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
+                Real64 UnitOutput = 0.0; // cooling output [W] (cooling is negative)
+
+                state.dataSingleDuct->sd_airterminal(this->SysNum)
+                    .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+                return (QTotLoad - UnitOutput) / QTotLoad;
+            };
+
+            SolveRoot(state, UnitFlowToler, 50, SolFlag, MassFlow, f, MinMassFlow, MaxCoolMassFlow);
             if (SolFlag == -1) {
                 if (this->IterationLimit == 0) {
                     ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
@@ -4871,30 +4857,21 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         if (HCType == HeatingCoilType::SimpleHeating) {
             if (QTotLoad < QHeatFanOffMax - SmallLoad) {
                 // vary HW flow, leave air flow at minimum
+                ErrTolerance = this->ControllerOffset;
                 MassFlow = MinMassFlow;
                 FanOp = 0;
-                Par(1) = double(this->SysNum);
-                if (FirstHVACIteration) {
-                    Par(2) = 1.0;
-                } else {
-                    Par(2) = 0.0;
-                }
-                Par(3) = double(ZoneNodeNum);
-                Par(4) = double(static_cast<int>(HCType));
-                Par(5) = MassFlow;
-                Par(6) = double(FanType);
-                Par(7) = double(FanOp);
-                Par(8) = QTotLoad;
-                ErrTolerance = this->ControllerOffset;
-                SolveRoot(state,
-                          ErrTolerance,
-                          500,
-                          SolFlag,
-                          HWFlow,
-                          EnergyPlus::SingleDuct::SingleDuctAirTerminal::VAVVSHWNoFanResidual,
-                          MinFlowWater,
-                          MaxFlowWater,
-                          Par);
+
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MassFlow, FanType, FanOp, QTotLoad](Real64 const HWMassFlow) {
+                    Real64 UnitOutput = 0.0; // heating output [W]
+                    Real64 QSteamLoad = 0.0; // proportional load to calculate steam flow [W]
+
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, FanType, MassFlow, FanOp, UnitOutput);
+
+                    return (QTotLoad - UnitOutput) / QTotLoad;
+                };
+
+                SolveRoot(state, ErrTolerance, 500, SolFlag, HWFlow, f, MinFlowWater, MaxFlowWater);
                 if (SolFlag == -1) {
                     ShowRecurringWarningErrorAtEnd(state, "Hot Water flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
                     ShowRecurringContinueErrorAtEnd(
@@ -4911,27 +4888,14 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
             } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                 // set hot water flow to max and vary the supply air flow rate
                 FanOp = 1;
-                Par(1) = double(this->SysNum);
-                if (FirstHVACIteration) {
-                    Par(2) = 1.0;
-                } else {
-                    Par(2) = 0.0;
-                }
-                Par(3) = double(ZoneNodeNum);
-                Par(4) = double(HCType);
-                Par(5) = MaxFlowWater;
-                Par(6) = double(FanType);
-                Par(7) = double(FanOp);
-                Par(8) = QTotLoad;
-                SolveRoot(state,
-                          UnitFlowToler,
-                          50,
-                          SolFlag,
-                          MassFlow,
-                          EnergyPlus::SingleDuct::SingleDuctAirTerminal::VAVVSHWFanOnResidual,
-                          MinMassFlow,
-                          MaxHeatMassFlow,
-                          Par);
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
+                    Real64 UnitOutput = 0.0; // heating output [W]
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+
+                    return (QTotLoad - UnitOutput) / QTotLoad;
+                };
+                SolveRoot(state, UnitFlowToler, 50, SolFlag, MassFlow, f, MinMassFlow, MaxHeatMassFlow);
                 if (SolFlag == -1) {
                     if (this->IterationLimit == 0) {
                         ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
@@ -4955,34 +4919,27 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         } else if (HCType == HeatingCoilType::SteamAirHeating) {
             //      IF (QTotLoad > QNoHeatFanOff + SmallLoad .AND. QTotLoad < QHeatFanOffMax - SmallLoad) THEN
             if (QTotLoad < QHeatFanOffMax - SmallLoad) {
-                // vary steam flow, leave air flow at minimum
+                ErrTolerance = this->ControllerOffset;
                 MassFlow = MinMassFlow;
                 FanOp = 0;
-                Par(1) = double(this->SysNum);
-                if (FirstHVACIteration) {
-                    Par(2) = 1.0;
-                } else {
-                    Par(2) = 0.0;
-                }
-                Par(3) = double(ZoneNodeNum);
-                Par(4) = double(static_cast<int>(HCType));
-                Par(5) = MassFlow;
-                Par(6) = double(FanType);
-                Par(7) = double(FanOp);
-                Par(8) = QTotLoad;
-                Par(9) = MinFlowSteam;
-                Par(10) = MaxFlowSteam;
-                Par(11) = MaxSteamCap;
-                ErrTolerance = this->ControllerOffset;
-                SolveRoot(state,
-                          ErrTolerance,
-                          500,
-                          SolFlag,
-                          HWFlow,
-                          EnergyPlus::SingleDuct::SingleDuctAirTerminal::VAVVSHWNoFanResidual,
-                          MinFlowSteam,
-                          MaxFlowSteam,
-                          Par);
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MassFlow, FanType, FanOp, QTotLoad, MinFlowSteam, MaxFlowSteam, MaxSteamCap](
+                             Real64 const HWMassFlow) {
+                    Real64 UnitOutput = 0.0; // heating output [W]
+                    Real64 QSteamLoad = 0.0; // proportional load to calculate steam flow [W]
+
+                    // vary the load to be met by the steam coil to converge on a steam flow rate to meet the load
+                    //   backwards way of varying steam flow rate. Steam coil calculates a flow rate to meet a load.
+                    if ((MaxFlowSteam - MinFlowSteam) == 0.0) {
+                        QSteamLoad = QTotLoad; // Use QTotLoad, bad starting value error for RegulaFalsi will occur
+                    } else {
+                        QSteamLoad = MaxSteamCap * HWMassFlow / (MaxFlowSteam - MinFlowSteam);
+                    }
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, FanType, MassFlow, FanOp, UnitOutput);
+
+                    return (QTotLoad - UnitOutput) / QTotLoad;
+                };
+                SolveRoot(state, ErrTolerance, 500, SolFlag, HWFlow, f, MinFlowSteam, MaxFlowSteam);
                 if (SolFlag == -1) {
                     ShowRecurringWarningErrorAtEnd(state, "Steam flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
                     ShowRecurringContinueErrorAtEnd(
@@ -4998,27 +4955,17 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
             } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                 FanOp = 1;
-                Par(1) = double(this->SysNum);
-                if (FirstHVACIteration) {
-                    Par(2) = 1.0;
-                } else {
-                    Par(2) = 0.0;
-                }
-                Par(3) = double(ZoneNodeNum);
-                Par(4) = double(HCType);
-                Par(5) = MaxFlowSteam;
-                Par(6) = double(FanType);
-                Par(7) = double(FanOp);
-                Par(8) = QTotLoad;
-                SolveRoot(state,
-                          UnitFlowToler,
-                          50,
-                          SolFlag,
-                          MassFlow,
-                          EnergyPlus::SingleDuct::SingleDuctAirTerminal::VAVVSHWFanOnResidual,
-                          MinMassFlow,
-                          MaxHeatMassFlow,
-                          Par);
+
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
+                    Real64 UnitOutput = 0.0; // heating output [W]
+
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+
+                    return (QTotLoad - UnitOutput) / QTotLoad;
+                };
+
+                SolveRoot(state, UnitFlowToler, 50, SolFlag, MassFlow, f, MinMassFlow, MaxHeatMassFlow);
                 if (SolFlag == -1) {
                     if (this->IterationLimit == 0) {
                         ShowWarningError(state, "Steam heating coil control failed in VS VAV terminal unit " + this->SysName);
@@ -5047,27 +4994,25 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
             } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                 FanOp = 1;
-                Par(1) = double(this->SysNum);
-                if (FirstHVACIteration) {
-                    Par(2) = 1.0;
-                } else {
-                    Par(2) = 0.0;
-                }
-                Par(3) = double(ZoneNodeNum);
-                Par(4) = double(HCType);
-                Par(5) = this->ReheatCoilMaxCapacity;
-                Par(6) = double(FanType);
-                Par(7) = double(FanOp);
-                Par(8) = QTotLoad;
-                SolveRoot(state,
-                          UnitFlowToler,
-                          50,
-                          SolFlag,
-                          FracDelivered,
-                          EnergyPlus::SingleDuct::SingleDuctAirTerminal::VAVVSHCFanOnResidual,
-                          0.0,
-                          1.0,
-                          Par);
+
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, FanType, FanOp, QTotLoad](Real64 const HeatingFrac) {
+                    Real64 MaxHeatOut{this->ReheatCoilMaxCapacity}; // maximum heating output [W]
+                    Real64 UnitOutput;                              // heating output [W]
+                    Real64 AirMassFlowRate;                         // [kg/s]
+                    Real64 HeatOut;                                 // heating coil output [W]
+
+                    HeatOut = HeatingFrac * MaxHeatOut;
+                    AirMassFlowRate = max(HeatingFrac * state.dataSingleDuct->sd_airterminal(this->SysNum).HeatAirMassFlowRateMax,
+                                          state.dataSingleDuct->sd_airterminal(this->SysNum).sd_airterminalInlet.AirMassFlowRateMaxAvail *
+                                              state.dataSingleDuct->sd_airterminal(this->SysNum).ZoneMinAirFrac);
+
+                    state.dataSingleDuct->sd_airterminal(this->SysNum)
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
+
+                    return (QTotLoad - UnitOutput) / QTotLoad;
+                };
+
+                SolveRoot(state, UnitFlowToler, 50, SolFlag, FracDelivered, f, 0.0, 1.0);
                 MassFlow = state.dataLoopNodes->Node(SysInletNode).MassFlowRate;
                 if (SolFlag == -1) {
                     if (this->IterationLimit == 0) {
@@ -5424,326 +5369,6 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     }
 
     LoadMet = AirMassFlow * CpAirZn * (state.dataLoopNodes->Node(HCOutNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
-}
-
-Real64 SingleDuctAirTerminal::VAVVSCoolingResidual(EnergyPlusData &state,
-                                                   Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                                   Array1D<Real64> const &Par      // Par(1) = REAL(SysNum)
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   July 2004
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Requested Zone Load - Unit Output) / Requested Zone Load
-    // Unit Output depends on the supply air flow rate which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls CalcVAVVS, and calculates
-    // the residual as defined above.
-
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // Par(2) = FirstHVACIteration (1. or 0.)
-    // Par(3) = REAL(ZoneNodeNum)
-    // Par(4) = REAL(HCType)
-    // Par(5) = minimum HW flow rate [kg/s]
-    // Par(6) = REAL(FanType)
-    // Par(7) = REAL(FanOp)
-    // Par(8) = cooling demand [W] (negative)
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int UnitIndex;
-    bool FirstHVACSoln;
-    int ZoneNodeIndex;
-    Real64 MinHWFlow;  // min hot water flow rate
-    int FanType;       // fan type (as an integer)
-    int FanOp;         // fan operation; 0=off, 1=on.
-    Real64 UnitOutput; // cooling output [W] (cooling is negative)
-
-    UnitIndex = int(Par(1));
-    FirstHVACSoln = (Par(2) > 0.0);
-    ZoneNodeIndex = int(Par(3));
-    MinHWFlow = Par(5);
-    FanType = int(Par(6));
-    FanOp = int(Par(7));
-    state.dataSingleDuct->sd_airterminal(UnitIndex).CalcVAVVS(
-        state, FirstHVACSoln, ZoneNodeIndex, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
-
-    Residuum = (Par(8) - UnitOutput) / Par(8);
-
-    return Residuum;
-}
-
-Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(EnergyPlusData &state,
-                                                   Real64 const HWMassFlow,   // hot water mass flow rate [kg/s]
-                                                   Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   July 2004
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Requested Zone Load - Unit Output) / Requested Zone Load
-    // Unit Output depends on the hot water flow rate which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls CalcVAVVS, and calculates
-    // the residual as defined above.
-
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // Par(2) = FirstHVACIteration (1. or 0.)
-    // Par(3) = REAL(ZoneNodeNum)
-    // Par(4) = REAL(HCType)
-    // Par(5) = air mass flow flow rate [kg/s]
-    // Par(6) = REAL(FanType)
-    // Par(7) = REAL(FanOp)
-    // Par(8) = heating demand [W]
-    // Par(9) = min steam flow rate [m3/s] - steam only
-    // Par(10 = max steam flow rate [m3/s] - steam only
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int UnitIndex;
-    bool FirstHVACSoln;
-    int ZoneNodeIndex;
-    Real64 AirMassFlow;     // supply air mass flow rate [kg/s]
-    HeatingCoilType HCType; // heating coil type (integer)
-    int FanType;            // fan type (as an integer)
-    int FanOp;              // fan operation; 0=off, 1=on.
-    Real64 UnitOutput;      // heating output [W]
-    Real64 QSteamLoad;      // proportional load to calculate steam flow [W]
-    Real64 MinSteamFlow;
-    Real64 MaxSteamFlow;
-    Real64 MaxSteamCoilCapacity;
-
-    UnitIndex = int(Par(1));
-    FirstHVACSoln = (Par(2) > 0.0);
-    ZoneNodeIndex = int(Par(3));
-    HCType = static_cast<HeatingCoilType>(int(Par(4)));
-    AirMassFlow = Par(5);
-    FanType = int(Par(6));
-    FanOp = int(Par(7));
-    QSteamLoad = 0.0;
-    // vary the load to be met by the steam coil to converge on a steam flow rate to meet the load
-    if (HCType == HeatingCoilType::SteamAirHeating) {
-        //   backwards way of varying steam flow rate. Steam coil calculates a flow rate to meet a load.
-        MinSteamFlow = Par(9);
-        MaxSteamFlow = Par(10);
-        MaxSteamCoilCapacity = Par(11);
-        if ((MaxSteamFlow - MinSteamFlow) == 0.0) {
-            QSteamLoad = Par(8); // Use QTotLoad, bad starting value error for RegulaFalsi will occur
-        } else {
-            QSteamLoad = MaxSteamCoilCapacity * HWMassFlow / (MaxSteamFlow - MinSteamFlow);
-        }
-    }
-    state.dataSingleDuct->sd_airterminal(UnitIndex).CalcVAVVS(
-        state, FirstHVACSoln, ZoneNodeIndex, HWMassFlow, QSteamLoad, FanType, AirMassFlow, FanOp, UnitOutput);
-
-    Residuum = (Par(8) - UnitOutput) / Par(8);
-
-    return Residuum;
-}
-
-Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(EnergyPlusData &state,
-                                                   Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                                   Array1D<Real64> const &Par      // Par(1) = REAL(SysNum)
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   July 2004
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Requested Zone Load - Unit Output) / Requested Zone Load
-    // Unit Output depends on the supply air flow rate which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls CalcVAVVS, and calculates
-    // the residual as defined above.
-
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // Par(2) = FirstHVACIteration (1. or 0.)
-    // Par(3) = REAL(ZoneNodeNum)
-    // Par(4) = REAL(HCType)
-    // Par(5) = hot water mass flow rate [kg/s]
-    // Par(6) = REAL(FanType)
-    // Par(7) = REAL(FanOp)
-    // Par(8) = heating demand [W]
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int UnitIndex;
-    bool FirstHVACSoln;
-    int ZoneNodeIndex;
-    Real64 HWMassFlow; // hot water mass flow rate [kg/s]
-    int HCType;        // heating coil type (integer)
-    int FanType;       // fan type (as an integer)
-    int FanOp;         // fan operation; 0=off, 1=on.
-    Real64 UnitOutput; // heating output [W]
-
-    UnitIndex = int(Par(1));
-    FirstHVACSoln = (Par(2) > 0.0);
-    ZoneNodeIndex = int(Par(3));
-    HCType = int(Par(4));
-    HWMassFlow = Par(5);
-    FanType = int(Par(6));
-    FanOp = int(Par(7));
-    state.dataSingleDuct->sd_airterminal(UnitIndex).CalcVAVVS(
-        state, FirstHVACSoln, ZoneNodeIndex, HWMassFlow, Par(8), FanType, SupplyAirMassFlow, FanOp, UnitOutput);
-
-    Residuum = (Par(8) - UnitOutput) / Par(8);
-
-    return Residuum;
-}
-
-Real64 SingleDuctAirTerminal::VAVVSHCFanOnResidual(EnergyPlusData &state,
-                                                   Real64 const HeatingFrac,  // fraction of maximum heating output
-                                                   Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   July 2004
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Requested Zone Load - Unit Output) / Requested Zone Load
-    // Unit Output depends on the heating coil output which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls CalcVAVVS, and calculates
-    // the residual as defined above.
-
-    // REFERENCES:
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    Real64 Residuum; // residual to be minimized to zero
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // Par(2) = FirstHVACIteration (1. or 0.)
-    // Par(3) = REAL(ZoneNodeNum)
-    // Par(4) = REAL(HCType)
-    // Par(5) = max heating coil output [W]
-    // Par(6) = REAL(FanType)
-    // Par(7) = REAL(FanOp)
-    // Par(8) = heating demand [W]
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int UnitIndex;
-    bool FirstHVACSoln;
-    int ZoneNodeIndex;
-    Real64 MaxHeatOut;      // maximum heating output [W]
-    int HCType;             // heating coil type (integer)
-    int FanType;            // fan type (as an integer)
-    int FanOp;              // fan operation; 0=off, 1=on.
-    Real64 UnitOutput;      // heating output [W]
-    Real64 AirMassFlowRate; // [kg/s]
-    Real64 HeatOut;         // heating coil output [W]
-
-    UnitIndex = int(Par(1));
-    FirstHVACSoln = (Par(2) > 0.0);
-    ZoneNodeIndex = int(Par(3));
-    HCType = int(Par(4));
-    MaxHeatOut = Par(5);
-    FanType = int(Par(6));
-    FanOp = int(Par(7));
-    HeatOut = HeatingFrac * MaxHeatOut;
-    AirMassFlowRate = max(HeatingFrac * state.dataSingleDuct->sd_airterminal(UnitIndex).HeatAirMassFlowRateMax,
-                          state.dataSingleDuct->sd_airterminal(UnitIndex).sd_airterminalInlet.AirMassFlowRateMaxAvail *
-                              state.dataSingleDuct->sd_airterminal(UnitIndex).ZoneMinAirFrac);
-
-    state.dataSingleDuct->sd_airterminal(UnitIndex).CalcVAVVS(
-        state, FirstHVACSoln, ZoneNodeIndex, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
-
-    Residuum = (Par(8) - UnitOutput) / Par(8);
-
-    return Residuum;
 }
 
 // End Algorithm Section of the Module
