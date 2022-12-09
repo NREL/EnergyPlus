@@ -154,8 +154,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     Real64 designExitTemp;
     Real64 designExitHumRat;
 
-    state->dataSize->SysSizInput(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
-    state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
+    state->dataSize->FinalSysSizing(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
 
     // Single path for VAV
     state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
@@ -204,8 +204,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
 
     // Oh and the sensible cases
-    state->dataSize->SysSizInput(1).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
-    state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
+    state->dataSize->FinalSysSizing(1).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
     // Repeat a VT case
     state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VT;
     state->dataSize->CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 10;
@@ -256,8 +256,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     Real64 designExitTemp;
     Real64 designExitHumRat;
 
-    state->dataSize->SysSizInput(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
-    state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
+    state->dataSize->FinalSysSizing(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
 
     // Single path for VAV
     state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;

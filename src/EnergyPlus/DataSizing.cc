@@ -459,7 +459,7 @@ void GetCoilDesFlowT(EnergyPlusData &state,
     auto &sysSizInput = state.dataSize->SysSizInput(sysSizIndex);
 
     if (sysSizPeakDDNum.SensCoolPeakDD > 0) {
-        if (sysSizInput.CoolingPeakLoadType == TotalCoolingLoad) {
+        if (sysSizInput.coolingPeakLoad == PeakLoad::TotalCooling) {
             TimeStepAtPeak = sysSizPeakDDNum.TimeStepAtTotCoolPk(sysSizPeakDDNum.TotCoolPeakDD);
         } else {
             TimeStepAtPeak = sysSizPeakDDNum.TimeStepAtSensCoolPk(sysSizPeakDDNum.SensCoolPeakDD);
