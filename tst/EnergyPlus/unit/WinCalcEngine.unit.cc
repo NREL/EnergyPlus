@@ -103,8 +103,8 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEClear)
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
-    const auto minLambda{0.3};
-    const auto maxLambda{2.5};
+    const Real64 minLambda{0.3};
+    const Real64 maxLambda{2.5};
 
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(
@@ -199,8 +199,8 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEVenetian)
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
-    const auto minLambda{0.3};
-    const auto maxLambda{2.5};
+    const Real64 minLambda{0.3};
+    const Real64 maxLambda{2.5};
 
     // Transmittance Front
     const auto Tfront = solarLayer->getPropertySimple(
@@ -278,8 +278,8 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEShade)
     auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance();
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
-    const auto minLambda{0.3};
-    const auto maxLambda{2.5};
+    const Real64 minLambda{0.3};
+    const Real64 maxLambda{2.5};
 
     // Transmittance Front
     const auto Tfront_dir_dir = solarLayer->getPropertySimple(
