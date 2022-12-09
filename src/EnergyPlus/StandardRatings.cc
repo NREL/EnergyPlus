@@ -531,6 +531,7 @@ namespace StandardRatings {
                 CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
                 CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
 
+                // CONST_LAMBDA_CAPTURE Issue, see PR 9670
                 Real64 tmpEvapOutletTemp = EvapOutletTemp;
                 auto f = [&state,
                           EnteringWaterTempReduced,

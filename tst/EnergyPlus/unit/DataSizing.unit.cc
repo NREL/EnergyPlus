@@ -457,7 +457,7 @@ TEST_F(EnergyPlusFixture, GetCoilDesFlowT_Test)
     Real64 DesCoilExitHumRat = 0.0;
 
     // design data are used
-    state->dataSize->SysSizInput(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
     state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
     DataSizing::GetCoilDesFlowT(*state, curSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
     EXPECT_NEAR(DesCoilAirFlow, state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak / state->dataEnvrn->StdRhoAir, 0.00001);
@@ -508,7 +508,7 @@ TEST_F(EnergyPlusFixture, GetCoilDesFlowT_Test)
 
     // design data used, humrat is calculated.
     // VT and Bypass used sequenced cooling load and zone cooling temp using DD timestep
-    state->dataSize->SysSizInput(1).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
     state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VT;
     DesCoilAirFlow = 0.0;
     DesCoilExitTemp = 0.0;
