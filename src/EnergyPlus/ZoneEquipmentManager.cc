@@ -691,11 +691,11 @@ void SizeZoneEquipment(EnergyPlusData &state)
 }
 
 void CalcDOASSupCondsForSizing(EnergyPlusData &state,
-                               Real64 OutDB,        // outside air temperature [C]
-                               Real64 OutHR,        // outside humidity ratio [kg Water / kg Dry Air]
-                               int DOASControl,     // dedicated outside air control strategy
-                               Real64 DOASLowTemp,  // DOAS low setpoint [C]
-                               Real64 DOASHighTemp, // DOAS high setpoint [C]
+                               Real64 OutDB,                        // outside air temperature [C]
+                               Real64 OutHR,                        // outside humidity ratio [kg Water / kg Dry Air]
+                               DataSizing::DOASControl DOASControl, // dedicated outside air control strategy
+                               Real64 DOASLowTemp,                  // DOAS low setpoint [C]
+                               Real64 DOASHighTemp,                 // DOAS high setpoint [C]
                                Real64 W90H, // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
                                Real64 W90L, // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
                                Real64 &DOASSupTemp, // DOAS supply temperature [C]
@@ -723,7 +723,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     DOASSupTemp = 0.0;
     DOASSupHR = 0.0;
     // neutral supply air
-    if (DOASControl == 1) {
+    if (DOASControl == DataSizing::DOASControl::DOANeutralSup) {
         if (OutDB < DOASLowTemp) {
             DOASSupTemp = DOASLowTemp;
             DOASSupHR = OutHR;
@@ -737,7 +737,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     }
 
     // neutral dehumidified supply air
-    else if (DOASControl == 2) { //
+    else if (DOASControl == DataSizing::DOASControl::DOANeutralDehumSup) { //
         if (OutDB < DOASLowTemp) {
             DOASSupTemp = DOASHighTemp;
             DOASSupHR = OutHR;
@@ -748,7 +748,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     }
 
     // cold supply air
-    else if (DOASControl == 3) {
+    else if (DOASControl == DataSizing::DOASControl::DOACoolSup) {
         if (OutDB < DOASLowTemp) {
             DOASSupTemp = DOASHighTemp;
             DOASSupHR = OutHR;
@@ -6247,7 +6247,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
     for (int ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         if (state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS) {
             auto &zoneSizingInput = state.dataSize->ZoneSizingInput(ZoneSizIndex);
-            if (zoneSizingInput.DOASControlStrategy == DOANeutralSup) {
+            if (zoneSizingInput.DOASControlStrategy == DOASControl::DOANeutralSup) {
                 if (zoneSizingInput.DOASLowSetpoint == AutoSize && zoneSizingInput.DOASHighSetpoint == AutoSize) {
                     zoneSizingInput.DOASLowSetpoint = 21.1;
                     zoneSizingInput.DOASHighSetpoint = 23.9;
@@ -6262,7 +6262,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            zoneSizingInput.DOASLowSetpoint,
                                            zoneSizingInput.DOASHighSetpoint,
                                            headerAlreadyPrinted);
-            } else if (zoneSizingInput.DOASControlStrategy == DOANeutralDehumSup) {
+            } else if (zoneSizingInput.DOASControlStrategy == DataSizing::DOASControl::DOANeutralDehumSup) {
                 if (zoneSizingInput.DOASLowSetpoint == AutoSize && zoneSizingInput.DOASHighSetpoint == AutoSize) {
                     zoneSizingInput.DOASLowSetpoint = 14.4;
                     zoneSizingInput.DOASHighSetpoint = 22.2;
@@ -6277,7 +6277,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            zoneSizingInput.DOASLowSetpoint,
                                            zoneSizingInput.DOASHighSetpoint,
                                            headerAlreadyPrinted);
-            } else if (zoneSizingInput.DOASControlStrategy == DOACoolSup) {
+            } else if (zoneSizingInput.DOASControlStrategy == DOASControl::DOACoolSup) {
                 if (zoneSizingInput.DOASLowSetpoint == AutoSize && zoneSizingInput.DOASHighSetpoint == AutoSize) {
                     zoneSizingInput.DOASLowSetpoint = 12.2;
                     zoneSizingInput.DOASHighSetpoint = 14.4;

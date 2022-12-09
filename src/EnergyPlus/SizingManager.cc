@@ -3406,11 +3406,11 @@ void GetZoneSizingInput(EnergyPlusData &state)
                     {
                         auto const DOASControlMethod(state.dataIPShortCut->cAlphaArgs(9));
                         if (DOASControlMethod == "NEUTRALSUPPLYAIR") {
-                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = DOANeutralSup;
+                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = DOASControl::DOANeutralSup;
                         } else if (DOASControlMethod == "NEUTRALDEHUMIDIFIEDSUPPLYAIR") {
-                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = DOANeutralDehumSup;
+                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = DOASControl::DOANeutralDehumSup;
                         } else if (DOASControlMethod == "COLDSUPPLYAIR") {
-                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = DOACoolSup;
+                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = DOASControl::DOACoolSup;
                         } else {
                             ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
                             ShowContinueError(state,

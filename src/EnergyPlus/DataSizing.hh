@@ -154,13 +154,15 @@ namespace DataSizing {
         DesAirFlowWithLim,
         Num
     };
-    // constexpr int FromDDCalc(1);
-    // constexpr int InpDesAirFlow(2);
-    // constexpr int DesAirFlowWithLim(3);
 
-    constexpr int DOANeutralSup(1);
-    constexpr int DOANeutralDehumSup(2);
-    constexpr int DOACoolSup(3);
+    enum class DOASControl
+    {
+        Invalid = -1,
+        DOANeutralSup,
+        DOANeutralDehumSup,
+        DOACoolSup,
+        Num
+    };
 
     // parameters for Type of Load to Size On
     enum class LoadSizing
@@ -289,7 +291,7 @@ namespace DataSizing {
         Real64 ZoneSecondaryRecirculation = 0.0; // the zone secondary air recirculation fraction
         Real64 ZoneVentilationEff = 0.0;         // zone ventilation efficiency
         bool AccountForDOAS = false;             // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
-        int DOASControlStrategy;                 // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
+        DOASControl DOASControlStrategy = DOASControl:: Invalid; // 0=neutral ventilation air; 1=neutral dehumidified ventilation air, 2 = cooled air;
         // 3=supply cold ventilation  = 0
         Real64 DOASLowSetpoint = 0.0;  // Dedicated Outside Air Low Setpoint for Design [C]
         Real64 DOASHighSetpoint = 0.0; // Dedicated Outside Air High Setpoint for Design [C]
@@ -351,7 +353,7 @@ namespace DataSizing {
         Real64 HeatSizingFactor = 0.0; // the zone heating sizing ratio
         Real64 CoolSizingFactor = 0.0; // the zone cooling sizing ratio
         bool AccountForDOAS = false;   // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
-        int DOASControlStrategy = 0;   // 1=supply neutral ventilation air; 2=supply neutral dehumidified ventilation air;
+        DOASControl DOASControlStrategy = DOASControl::Invalid; // 0=neutral ventilation air; 1=neutral dehumidified ventilation air, 2 = cooled air;
         // 3=supply cold ventilation air
         Real64 DOASLowSetpoint = 0.0;          // Dedicated Outside Air Low Setpoint for Design [C]
         Real64 DOASHighSetpoint = 0.0;         // Dedicated Outside Air High Setpoint for Design [C]
