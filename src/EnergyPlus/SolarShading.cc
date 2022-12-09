@@ -3474,11 +3474,11 @@ void HTRANS(EnergyPlusData &state,
     assert(equal_dimensions(state.dataSolarShading->HCX, state.dataSolarShading->HCA));
     assert(equal_dimensions(state.dataSolarShading->HCX, state.dataSolarShading->HCB));
     assert(equal_dimensions(state.dataSolarShading->HCX, state.dataSolarShading->HCC));
-    auto const l1(state.dataSolarShading->HCX.index(NS, 1));
+    int const l1(state.dataSolarShading->HCX.index(NS, 1));
     if (I != 0) { // Transform vertices of figure ns.
 
         // See comment at top of module regarding HCMULT
-        auto l(l1);
+        int l(l1);
         for (int N = 1; N <= NumVertices; ++N, ++l) { // [ l ] == ( NS, N )
             state.dataSolarShading->HCX[l] = nint64(state.dataSolarShading->XVS(N) * HCMULT);
             state.dataSolarShading->HCY[l] = nint64(state.dataSolarShading->YVS(N) * HCMULT);
@@ -3766,8 +3766,8 @@ void INTCPT(EnergyPlusData &state,
             // Eliminate near-duplicate points.
 
             if (KK != 0) {
-                auto const x(state.dataSolarShading->XTEMP(NV3));
-                auto const y(state.dataSolarShading->YTEMP(NV3));
+                Real64 const x(state.dataSolarShading->XTEMP(NV3));
+                Real64 const y(state.dataSolarShading->YTEMP(NV3));
                 for (K = 1; K <= KK; ++K) {
                     if (std::abs(x - state.dataSolarShading->XTEMP(K)) > 2.0) continue;
                     if (std::abs(y - state.dataSolarShading->YTEMP(K)) > 2.0) continue;
@@ -4301,8 +4301,8 @@ void CLIPPOLY(EnergyPlusData &state,
 
                     if (E == NV2) { // Remove near-duplicates on last edge
                         if (KK != 0) {
-                            auto const x(state.dataSolarShading->XTEMP(NVTEMP));
-                            auto const y(state.dataSolarShading->YTEMP(NVTEMP));
+                            Real64 const x(state.dataSolarShading->XTEMP(NVTEMP));
+                            Real64 const y(state.dataSolarShading->YTEMP(NVTEMP));
                             for (int K = 1; K <= KK; ++K) {
                                 if (std::abs(x - state.dataSolarShading->XTEMP(K)) > 2.0) continue;
                                 if (std::abs(y - state.dataSolarShading->YTEMP(K)) > 2.0) continue;
@@ -4332,8 +4332,8 @@ void CLIPPOLY(EnergyPlusData &state,
 
                 if (E == NV2) { // Remove near-duplicates on last edge
                     if (KK != 0) {
-                        auto const x(state.dataSolarShading->XTEMP(NVTEMP));
-                        auto const y(state.dataSolarShading->YTEMP(NVTEMP));
+                        Real64 const x(state.dataSolarShading->XTEMP(NVTEMP));
+                        Real64 const y(state.dataSolarShading->YTEMP(NVTEMP));
                         for (int K = 1; K <= KK; ++K) {
                             if (std::abs(x - state.dataSolarShading->XTEMP(K)) > 2.0) continue;
                             if (std::abs(y - state.dataSolarShading->YTEMP(K)) > 2.0) continue;
@@ -4365,8 +4365,8 @@ void CLIPPOLY(EnergyPlusData &state,
 
                         if (E == NV2) { // Remove near-duplicates on last edge
                             if (KK != 0) {
-                                auto const x(state.dataSolarShading->XTEMP(NVTEMP));
-                                auto const y(state.dataSolarShading->YTEMP(NVTEMP));
+                                Real64 const x(state.dataSolarShading->XTEMP(NVTEMP));
+                                Real64 const y(state.dataSolarShading->YTEMP(NVTEMP));
                                 for (int K = 1; K <= KK; ++K) {
                                     if (std::abs(x - state.dataSolarShading->XTEMP(K)) > 2.0) continue;
                                     if (std::abs(y - state.dataSolarShading->YTEMP(K)) > 2.0) continue;
@@ -5832,8 +5832,8 @@ void SHDBKS(EnergyPlusData &state,
         NVR = state.dataSolarShading->HCNV(1);
         auto l3(state.dataSolarShading->HCX.index(NS3, 1));
         for (N = 1; N <= NVT; ++N, ++l3) {
-            auto const x3(state.dataSolarShading->HCX[l3]); // [ l3 ] == ( NS3, N )
-            auto const y3(state.dataSolarShading->HCY[l3]);
+            Real64 const x3(state.dataSolarShading->HCX[l3]); // [ l3 ] == ( NS3, N )
+            Real64 const y3(state.dataSolarShading->HCY[l3]);
             size_type l1(0);
             for (M = 1; M <= NVR; ++M, ++l1) {
                 if (std::abs(state.dataSolarShading->HCX[l1] - x3) > 6) continue; // [ l1 ] == ( 1, M )
@@ -6020,8 +6020,8 @@ void SHDGSS(EnergyPlusData &state,
             size_type NVR(state.dataSolarShading->HCNV(1));
             for (int N = 1; N <= state.dataSolarShading->NumVertInShadowOrClippedSurface;
                  ++N, ++j) {                                      // Tuned Logic change: break after 1st "close" point found
-                auto const HCX_N(state.dataSolarShading->HCX[j]); // [ j ] == ( NS3, N )
-                auto const HCY_N(state.dataSolarShading->HCY[j]);
+                Int64 const HCX_N(state.dataSolarShading->HCX[j]); // [ j ] == ( NS3, N )
+                Int64 const HCY_N(state.dataSolarShading->HCY[j]);
                 for (size_type l = 0; l < NVR; ++l) { // [ l ] == ( 1, l+1 )
                     auto const delX(std::abs(state.dataSolarShading->HCX[l] - HCX_N));
                     if (delX > 6) continue;
@@ -6871,7 +6871,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                      .ComplexFen.State(state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.CurrentState)
                                                      .NLayers;
                              ++Lay) {
-                            auto absBeamWin = state.dataSurface->SurfaceWindow(SurfNum)
+                            Real64 absBeamWin = state.dataSurface->SurfaceWindow(SurfNum)
                                                   .ComplexFen.State(state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.CurrentState)
                                                   .WinBmFtAbs(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, Lay);
                             Real64 AbWin = absBeamWin * CosInc * SunLitFract *
@@ -8641,7 +8641,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             // Solar absorbed in window layers
             ///////////////////////////////////////////////
             if (state.dataHeatBal->SurfSunlitFracWithoutReveal(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2) > 0.0) {
-                auto numOfLayers = aLayer->getNumOfLayers();
+                size_t numOfLayers = aLayer->getNumOfLayers();
                 if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) {
                     auto CurrentState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.CurrentState;
                     auto &cplxState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(CurrentState);
@@ -8661,10 +8661,10 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                     }
                 } else {
                     for (size_t Lay = 1; Lay <= numOfLayers; ++Lay) {
-                        auto AbWinBeam = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Direct, Theta, Phi) *
+                        Real64 AbWinBeam = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Direct, Theta, Phi) *
                                          window.OutProjSLFracMult(state.dataGlobal->HourOfDay);
-                        auto AbWinDiffFront = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi);
-                        //                        auto AbWinDiffBack = aLayer->getAbsorptanceLayer(Lay, Side::Back, ScatteringSimple::Diffuse, Theta,
+                        Real64 AbWinDiffFront = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi);
+                        //                        Real64 AbWinDiffBack = aLayer->getAbsorptanceLayer(Lay, Side::Back, ScatteringSimple::Diffuse, Theta,
                         //                        Phi);
 
                         // Simon: This should not be multiplied with cosine of incident angle. This however gives same
@@ -8676,8 +8676,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
 
                         // Simon: Same not as for BSDF. Normal solar radiation should be taken here because angle of
                         // incidence is already taken into account
-                        auto absBeam = state.dataSurface->SurfWinA(SurfNum, Lay) * state.dataEnvrn->BeamSolarRad;
-                        auto absDiff = state.dataSurface->SurfWinADiffFront(SurfNum, Lay) *
+                        Real64 absBeam = state.dataSurface->SurfWinA(SurfNum, Lay) * state.dataEnvrn->BeamSolarRad;
+                        Real64 absDiff = state.dataSurface->SurfWinADiffFront(SurfNum, Lay) *
                                        (state.dataSurface->SurfSkySolarInc(SurfNum2) + state.dataSurface->SurfGndSolarInc(SurfNum2));
                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) = (absBeam + absDiff);
                         state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
@@ -8689,8 +8689,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             ////////////////////////////////////////////////////////////////////
             // SKY AND GROUND DIFFUSE SOLAR GAIN INTO ZONE FROM EXTERIOR WINDOW
             ////////////////////////////////////////////////////////////////////
-            const auto minLambda{0.3};
-            const auto maxLambda{2.5};
+            const Real64 minLambda{0.3};
+            const Real64 maxLambda{2.5};
             const Real64 Tdiff =
                 aLayer->getPropertySimple(minLambda, maxLambda, PropertySimple::T, Side::Front, Scattering::DiffuseDiffuse, Theta, Phi);
             state.dataConstruction->Construct(ConstrNum).TransDiff = Tdiff;
@@ -9541,17 +9541,17 @@ void WindowShadingManager(EnergyPlusData &state)
                     int ShadingLayerPtr = construction.LayerPoint(TotLay);
                     ShadingLayerPtr = state.dataMaterial->Material(ShadingLayerPtr)->ComplexShadePtr;
                     auto &complexShade = state.dataHeatBal->ComplexShade(ShadingLayerPtr);
-                    auto TauShadeIR = complexShade.IRTransmittance;
-                    auto EpsShadeIR = complexShade.BackEmissivity;
-                    auto RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
+                    Real64 TauShadeIR = complexShade.IRTransmittance;
+                    Real64 EpsShadeIR = complexShade.BackEmissivity;
+                    Real64 RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
                     // Get properties of glass next to inside shading layer
                     int GlassLayPtr = construction.LayerPoint(TotLay - 2);
-                    auto EpsGlassIR = state.dataMaterial->Material(GlassLayPtr)->AbsorpThermalBack;
-                    auto RhoGlassIR = 1 - EpsGlassIR;
+                    Real64 EpsGlassIR = state.dataMaterial->Material(GlassLayPtr)->AbsorpThermalBack;
+                    Real64 RhoGlassIR = 1 - EpsGlassIR;
 
-                    auto EffShBlEmiss = EpsShadeIR * (1.0 + RhoGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR));
+                    Real64 EffShBlEmiss = EpsShadeIR * (1.0 + RhoGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR));
                     surface_window.EffShBlindEmiss[0] = EffShBlEmiss;
-                    auto EffGlEmiss = EpsGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR);
+                    Real64 EffGlEmiss = EpsGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR);
                     surface_window.EffGlassEmiss[0] = EffGlEmiss;
                 }
             }

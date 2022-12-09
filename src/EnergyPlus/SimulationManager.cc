@@ -1952,7 +1952,7 @@ namespace SimulationManager {
             if (state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
             ++NumNonParents;
         }
-        const auto NumParents = state.dataBranchNodeConnections->NumOfNodeConnections - NumNonParents;
+        const int NumParents = state.dataBranchNodeConnections->NumOfNodeConnections - NumNonParents;
         state.dataBranchNodeConnections->ParentNodeList.allocate(NumParents);
 
         //  Do Parent Objects

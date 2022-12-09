@@ -2293,7 +2293,7 @@ namespace SystemAvailabilityManager {
         for (int Index = 1; Index <= NumZones; ++Index) { // loop over zones in list
             int ZoneNum = ZonePtrList(Index);
             {
-                auto const tstatType(state.dataHeatBalFanSys->TempControlType(ZoneNum));
+                DataHVACGlobals::ThermostatType const tstatType(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
                 if ((tstatType == DataHVACGlobals::ThermostatType::SingleHeating) || (tstatType == DataHVACGlobals::ThermostatType::SingleHeatCool)) {
                     if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <

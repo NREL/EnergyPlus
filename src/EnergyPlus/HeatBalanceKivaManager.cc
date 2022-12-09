@@ -789,7 +789,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 for (auto &wl : wallSurfaces) {
 
                     auto &v = Surfaces(wl).Vertex;
-                    auto numVs = v.size();
+                    size_t numVs = v.size();
                     // Enforce quadrilateralism
                     if (numVs > 4) {
                         ShowWarningError(state,

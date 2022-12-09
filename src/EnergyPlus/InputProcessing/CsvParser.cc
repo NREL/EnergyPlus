@@ -298,7 +298,7 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
         ++save_i;
     }
 
-    auto diff = save_i - index;
+    size_t diff = save_i - index;
     auto value = csv.substr(index, diff);
     index_into_cur_line += diff;
     index = save_i;

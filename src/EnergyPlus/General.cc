@@ -1055,7 +1055,7 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
         ActualTimeMinS = 0;
     }
     const auto TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
-    auto minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
+    Real64 minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
 
     auto TimeStmpE = format("{:02}:{:2.0F}", static_cast<int>(ActualTimeE), minutes);
 

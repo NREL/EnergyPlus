@@ -2634,9 +2634,9 @@ namespace CurveManager {
         } break;
         case CurveType::TriQuadratic: {
             auto const &Tri2ndOrder(Curve.Tri2ndOrder(1));
-            auto const V1s(V1 * V1);
-            auto const V2s(V2 * V2);
-            auto const V3s(V3 * V3);
+            Real64 const V1s(V1 * V1);
+            Real64 const V2s(V2 * V2);
+            Real64 const V3s(V3 * V3);
             CurveValue = Tri2ndOrder.CoeffA0 + Tri2ndOrder.CoeffA1 * V1s + Tri2ndOrder.CoeffA2 * V1 + Tri2ndOrder.CoeffA3 * V2s +
                          Tri2ndOrder.CoeffA4 * V2 + Tri2ndOrder.CoeffA5 * V3s + Tri2ndOrder.CoeffA6 * V3 + Tri2ndOrder.CoeffA7 * V1s * V2s +
                          Tri2ndOrder.CoeffA8 * V1 * V2 + Tri2ndOrder.CoeffA9 * V1 * V2s + Tri2ndOrder.CoeffA10 * V1s * V2 +

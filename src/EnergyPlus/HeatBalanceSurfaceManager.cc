@@ -1167,7 +1167,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     // go through all the surfaces again and this time insert the net area results
     for (int iSurf : state.dataSurface->AllSurfaceListReportOrder) {
         zonePt = Surface(iSurf).Zone;
-        auto const SurfaceClass(Surface(iSurf).Class);
+        DataSurfaces::SurfaceClass const SurfaceClass(Surface(iSurf).Class);
         // exterior surfaces including underground
         if ((Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == Ground) ||
             (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) || (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
@@ -2794,7 +2794,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
             for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
                 if (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(enclNum)) {
                     Real64 EnclSolQSDifSol_sum(0.0); // Accumulator
-                    auto lZone(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.index(enclNum,
+                    int lZone(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.index(enclNum,
                                                                                   1)); // Tuned Linear indexing
                     for (int otherEnclNum = 1; otherEnclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++otherEnclNum, ++lZone) {
                         if ((otherEnclNum != enclNum) && (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(otherEnclNum))) {
@@ -4956,7 +4956,7 @@ void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_c
             int repSurfNum = surface.RepresentativeCalcSurfNum;
 
             if (surfNum != repSurfNum) {
-                auto areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
+                Real64 areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
 
                 // Glazing
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) = state.dataSurface->SurfWinGainConvGlazToZoneRep(repSurfNum) * areaRatio;
@@ -4976,7 +4976,7 @@ void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_c
                 // Divider
                 Real64 dividerHeatGain = 0.0;
                 if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0) {
-                    auto dividerAreaRatio = state.dataSurface->SurfWinDividerArea(surfNum) / state.dataSurface->SurfWinDividerArea(repSurfNum);
+                    Real64 dividerAreaRatio = state.dataSurface->SurfWinDividerArea(surfNum) / state.dataSurface->SurfWinDividerArea(repSurfNum);
                     state.dataSurface->SurfWinDividerHeatGain(surfNum) = state.dataSurface->SurfWinDividerHeatGain(repSurfNum) * dividerAreaRatio;
                     state.dataSurface->SurfWinDividerHeatLoss(surfNum) = state.dataSurface->SurfWinDividerHeatLoss(repSurfNum) * dividerAreaRatio;
                     state.dataSurface->SurfWinDividerTempIn(surfNum) = state.dataSurface->SurfWinDividerTempIn(repSurfNum);
@@ -5327,8 +5327,8 @@ void UpdateThermalHistories(EnergyPlusData &state)
                 if (state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) == 0) { // First time step in a block for a surface, update arrays
                     if (construct.NumCTFTerms > 1) {
                         int const numCTFTerms(construct.NumCTFTerms);
-                        auto m(state.dataHeatBalSurf->SurfTsrcHistM.index(SurfNum, numCTFTerms));
-                        auto m1(m + 1);
+                        int m(state.dataHeatBalSurf->SurfTsrcHistM.index(SurfNum, numCTFTerms));
+                        int m1(m + 1);
                         for (int HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing
                             // SurfTsrcHist( SurfNum, HistTerm ) = SurfTsrcHistM( SurfNum, HHistTerm ) = SurfTsrcHistM( SurfNum, HistTermNum - 1 );
                             // SurfQsrcHist( SurfNum, HistTerm ) = SurfQsrcHistM( SurfNum, HHistTerm ) = SurfQsrcHistM( SurfNum, HistTermNum - 1 );
@@ -5351,8 +5351,8 @@ void UpdateThermalHistories(EnergyPlusData &state)
 
                     if (construct.NumCTFTerms > 1) {
                         int const numCTFTerms(construct.NumCTFTerms);
-                        auto m(state.dataHeatBalSurf->SurfTsrcHistM.index(SurfNum, numCTFTerms));
-                        auto m1(m + 1);
+                        int m(state.dataHeatBalSurf->SurfTsrcHistM.index(SurfNum, numCTFTerms));
+                        int m1(m + 1);
                         for (int HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing [ l ] == ()
                             // Real64 const SurfTsrcHistM_elem( SurfTsrcHistM( SurfNum, HistTermNum ) );
                             // SurfTsrcHist( SurfNum, HistTermNum ) = SurfTsrcHistM_elem - ( SurfTsrcHistM_elem - SurfTsrcHistM( SurfNum, HistTermNum
@@ -6630,7 +6630,7 @@ void ReportNonRepresentativeSurfaceResults(EnergyPlusData &state)
                 auto &surface(state.dataSurface->Surface(surfNum));
                 int repSurfNum = surface.RepresentativeCalcSurfNum;
                 if (surfNum != repSurfNum) {
-                    auto areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
+                    Real64 areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
                     state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) =
                         state.dataSurface->SurfWinGainConvGlazToZoneRep(repSurfNum) * areaRatio;
                     state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) = state.dataSurface->SurfWinGainIRGlazToZoneRep(repSurfNum) * areaRatio;
@@ -7397,7 +7397,7 @@ void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
         for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             auto const &zone(state.dataHeatBal->Zone(iZone));
             for (int iSurf = zone.HTSurfaceFirst, eSurf = zone.HTSurfaceLast; iSurf <= eSurf; ++iSurf) {
-                auto const alg(Surface(iSurf).HeatTransferAlgorithm);
+                DataSurfaces::HeatTransferModel const alg(Surface(iSurf).HeatTransferAlgorithm);
                 if ((alg == DataSurfaces::HeatTransferModel::CondFD) || (alg == DataSurfaces::HeatTransferModel::HAMT) ||
                     (alg == DataSurfaces::HeatTransferModel::Kiva)) {
                     state.dataHeatBalSurf->Zone_has_mixed_HT_models[iZone] = true;
@@ -8006,7 +8006,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             state.dataMaterial->Material(construct.LayerPoint(1))->Roughness; // Outside surface roughness
                         Real64 EmisOut =
                             state.dataMaterial->Material(construct.LayerPoint(1))->AbsorpThermalFront; // Glass outside surface emissivity
-                        auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
+                        DataSurfaces::WinShadingType const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
                         if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
                             // Exterior shade in place
                             int const ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
@@ -8676,7 +8676,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                 state.dataMaterial->Material(construct.LayerPoint(1))->Roughness; // Outside surface roughness
                             Real64 EmisOut =
                                 state.dataMaterial->Material(construct.LayerPoint(1))->AbsorpThermalFront; // Glass outside surface emissivity
-                            auto const shading_flag(state.dataSurface->SurfWinShadingFlag(surfNum));
+                            DataSurfaces::WinShadingType const shading_flag(state.dataSurface->SurfWinShadingFlag(surfNum));
                             if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
                                 // Exterior shade in place
                                 int const ConstrNumSh = Surface(surfNum).activeShadedConstruction;

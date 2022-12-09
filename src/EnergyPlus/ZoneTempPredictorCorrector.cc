@@ -6293,7 +6293,7 @@ void CalcZoneSums(EnergyPlusData &state,
         Real64 Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
 
         if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-            auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
+            DataSurfaces::WinShadingType const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
 
             // Add to the convective internal gains
             if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) {

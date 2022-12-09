@@ -222,11 +222,11 @@ namespace WindowManager {
             if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) continue; // not required
             auto ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
-            auto TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
-            auto IntShade = false;
-            auto IntBlind = false;
-            auto ShadeLayPtr = 0;
-            auto BlNum = 0;
+            int TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
+            bool IntShade = false;
+            bool IntBlind = false;
+            int ShadeLayPtr = 0;
+            int BlNum = 0;
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay))->Group ==
                 Material::MaterialGroup::Shade) {
                 IntShade = true;
@@ -240,8 +240,8 @@ namespace WindowManager {
 
             if (IntShade || IntBlind) {
                 for (auto ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
-                    auto EpsGlIR = 0.0;
-                    auto RhoGlIR = 0.0;
+                    Real64 EpsGlIR = 0.0;
+                    Real64 RhoGlIR = 0.0;
                     if (IntShade || IntBlind) {
                         EpsGlIR =
                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay - 1))->AbsorpThermalBack;
@@ -324,10 +324,10 @@ namespace WindowManager {
 
             auto aSample = std::make_shared<CSpectralSample>(aSampleData, aSolarSpectrum);
 
-            auto aType = MaterialType::Monolithic;
+            FenestrationCommon::MaterialType aType = MaterialType::Monolithic;
             auto aRange = CWavelengthRange(m_Range);
-            auto lowLambda = aRange.minLambda();
-            auto highLambda = aRange.maxLambda();
+            Real64 lowLambda = aRange.minLambda();
+            Real64 highLambda = aRange.maxLambda();
 
             // Do not apply detector data if we do not have spectral data. This will only cause more inaccurate results at the end. (Simon)
             if (m_Range == WavelengthRange::Visible && m_MaterialProperties.GlassSpectralDataPtr != 0) {
@@ -335,7 +335,7 @@ namespace WindowManager {
                 aSample->setDetectorData(aPhotopicResponse);
             }
 
-            auto thickness = m_MaterialProperties.Thickness;
+            Real64 thickness = m_MaterialProperties.Thickness;
             m_Material = std::make_shared<CMaterialSample>(aSample, thickness, aType, lowLambda, highLambda);
         } else {
             if (m_Range == WavelengthRange::Solar) {
@@ -387,36 +387,36 @@ namespace WindowManager {
 
     std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial(EnergyPlusData &state)
     {
-        auto blindDataPtr = m_MaterialProperties.BlindDataPtr;
+        int blindDataPtr = m_MaterialProperties.BlindDataPtr;
         auto &blind(state.dataHeatBal->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
-        auto lowLambda = aRange.minLambda();
-        auto highLambda = aRange.maxLambda();
+        Real64 lowLambda = aRange.minLambda();
+        Real64 highLambda = aRange.maxLambda();
 
-        auto Tf = blind.SlatTransVisDiffDiff;
-        auto Tb = blind.SlatTransVisDiffDiff;
-        auto Rf = blind.SlatFrontReflVisDiffDiff;
-        auto Rb = blind.SlatBackReflVisDiffDiff;
+        Real64 Tf = blind.SlatTransVisDiffDiff;
+        Real64 Tb = blind.SlatTransVisDiffDiff;
+        Real64 Rf = blind.SlatFrontReflVisDiffDiff;
+        Real64 Rb = blind.SlatBackReflVisDiffDiff;
 
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
 
     std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
-        auto blindDataPtr = m_MaterialProperties.BlindDataPtr;
+        int blindDataPtr = m_MaterialProperties.BlindDataPtr;
         auto &blind(state.dataHeatBal->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
-        auto lowLambda = aRange.minLambda();
-        auto highLambda = aRange.maxLambda();
+        Real64 lowLambda = aRange.minLambda();
+        Real64 highLambda = aRange.maxLambda();
 
-        auto Tf = blind.SlatTransSolDiffDiff;
-        auto Tb = blind.SlatTransSolDiffDiff;
-        auto Rf = blind.SlatFrontReflSolDiffDiff;
-        auto Rb = blind.SlatBackReflSolDiffDiff;
+        Real64 Tf = blind.SlatTransSolDiffDiff;
+        Real64 Tb = blind.SlatTransSolDiffDiff;
+        Real64 Rf = blind.SlatFrontReflSolDiffDiff;
+        Real64 Rb = blind.SlatBackReflSolDiffDiff;
 
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
@@ -434,13 +434,13 @@ namespace WindowManager {
     std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createVisibleRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
-        auto lowLambda = aRange.minLambda();
-        auto highLambda = aRange.maxLambda();
+        Real64 lowLambda = aRange.minLambda();
+        Real64 highLambda = aRange.maxLambda();
 
-        auto Tf = 0.0;
-        auto Tb = 0.0;
-        auto Rf = m_MaterialProperties.ReflectShadeVis;
-        auto Rb = m_MaterialProperties.ReflectShadeVis;
+        Real64 Tf = 0.0;
+        Real64 Tb = 0.0;
+        Real64 Rf = m_MaterialProperties.ReflectShadeVis;
+        Real64 Rb = m_MaterialProperties.ReflectShadeVis;
 
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
@@ -448,13 +448,13 @@ namespace WindowManager {
     std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
-        auto lowLambda = aRange.minLambda();
-        auto highLambda = aRange.maxLambda();
+        Real64 lowLambda = aRange.minLambda();
+        Real64 highLambda = aRange.maxLambda();
 
-        auto Tf = 0.0;
-        auto Tb = 0.0;
-        auto Rf = m_MaterialProperties.ReflectShade;
-        auto Rb = m_MaterialProperties.ReflectShade;
+        Real64 Tf = 0.0;
+        Real64 Tb = 0.0;
+        Real64 Rf = m_MaterialProperties.ReflectShade;
+        Real64 Rb = m_MaterialProperties.ReflectShade;
 
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
@@ -470,13 +470,13 @@ namespace WindowManager {
     std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createVisibleRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
-        auto lowLambda = aRange.minLambda();
-        auto highLambda = aRange.maxLambda();
+        Real64 lowLambda = aRange.minLambda();
+        Real64 highLambda = aRange.maxLambda();
 
-        auto Tf = m_MaterialProperties.TransVis;
-        auto Tb = m_MaterialProperties.TransVis;
-        auto Rf = m_MaterialProperties.ReflectShadeVis;
-        auto Rb = m_MaterialProperties.ReflectShadeVis;
+        Real64 Tf = m_MaterialProperties.TransVis;
+        Real64 Tb = m_MaterialProperties.TransVis;
+        Real64 Rf = m_MaterialProperties.ReflectShadeVis;
+        Real64 Rb = m_MaterialProperties.ReflectShadeVis;
 
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
@@ -484,13 +484,13 @@ namespace WindowManager {
     std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
-        auto lowLambda = aRange.minLambda();
-        auto highLambda = aRange.maxLambda();
+        Real64 lowLambda = aRange.minLambda();
+        Real64 highLambda = aRange.maxLambda();
 
-        auto Tf = m_MaterialProperties.Trans;
-        auto Tb = m_MaterialProperties.Trans;
-        auto Rf = m_MaterialProperties.ReflectShade;
-        auto Rb = m_MaterialProperties.ReflectShade;
+        Real64 Tf = m_MaterialProperties.Trans;
+        Real64 Tb = m_MaterialProperties.Trans;
+        Real64 Rf = m_MaterialProperties.ReflectShade;
+        Real64 Rb = m_MaterialProperties.ReflectShade;
 
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
@@ -525,14 +525,14 @@ namespace WindowManager {
 
     std::shared_ptr<ICellDescription> CWCEVenetianBlindCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
-        const auto blindDataPtr = m_Material.BlindDataPtr;
+        const int blindDataPtr = m_Material.BlindDataPtr;
         auto &blind(state.dataHeatBal->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
-        auto slatWidth = blind.SlatWidth;
-        auto slatSpacing = blind.SlatSeparation;
-        auto slatTiltAngle = 90 - blind.SlatAngle; // Need to convert to WCE system
-        auto curvatureRadius = 0.0;                // No curvature radius in current IDF definition
+        Real64 slatWidth = blind.SlatWidth;
+        Real64 slatSpacing = blind.SlatSeparation;
+        Real64 slatTiltAngle = 90.0 - blind.SlatAngle; // Need to convert to WCE system
+        Real64 curvatureRadius = 0.0;                // No curvature radius in current IDF definition
         size_t numOfSlatSegments = 5;              // Number of segments to use in venetian calculations
         return std::make_shared<CVenetianCellDescription>(slatWidth, slatSpacing, slatTiltAngle, curvatureRadius, numOfSlatSegments);
     }
@@ -546,10 +546,10 @@ namespace WindowManager {
 
     std::shared_ptr<ICellDescription> CWCEScreenCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
-        auto diameter = m_Material.Thickness; // Thickness in this case is diameter
+        Real64 diameter = m_Material.Thickness; // Thickness in this case is diameter
         // ratio is not saved withing material but rather calculated from transmittance
-        const auto ratio = 1.0 - sqrt(m_Material.Trans);
-        auto spacing = diameter / ratio;
+        const Real64 ratio = 1.0 - sqrt(m_Material.Trans);
+        Real64 spacing = diameter / ratio;
         return std::make_shared<CWovenCellDescription>(diameter, spacing);
     }
 

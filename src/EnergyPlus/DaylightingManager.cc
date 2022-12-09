@@ -3289,8 +3289,8 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, iHour, NearestHitSurfNumX) / DataGlobalConstants::Pi;
             }
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
-            auto l2(state.dataDaylightingManager->GILSK.index(iHour, 1));
-            auto l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
+            int l2(state.dataDaylightingManager->GILSK.index(iHour, 1));
+            int l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
             for (ISky = 1; ISky <= 4; ++ISky, ++l2, ++l3) { // [ l2 ] == ( ISky, iHour ) // [ l3 ] == ( ISky, 1, iHour )
                 XAVWLSK(ISky) = state.dataDaylightingManager->GILSK[l2] * SkyReflVisLum;
                 state.dataDaylightingManager->AVWLSK[l3] += XAVWLSK(ISky) * TVISB;
@@ -3309,7 +3309,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             // Make all transmitted light diffuse for a TDD with a bare diffuser
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->WLUMSK));
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
-            auto l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
+            int l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
             for (ISky = 1; ISky <= 4; ++ISky, ++l3) { // [ l3 ] == ( ISky, 1, iHour )
                 state.dataDaylightingManager->AVWLSK[l3] += state.dataDaylightingManager->WLUMSK[l3];
                 if (ISky == 1) {
@@ -3351,7 +3351,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                     (state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi));
             Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SurfSunCosHourly(iHour));
             assert(equal_dimensions(state.dataDaylightingManager->EDIRSK, state.dataDaylightingManager->AVWLSK));
-            auto l(state.dataDaylightingManager->EDIRSK.index(iHour, 1, 1));
+            int l(state.dataDaylightingManager->EDIRSK.index(iHour, 1, 1));
             for (ISky = 1; ISky <= 4; ++ISky, ++l) { // [ l ] == ( iHour, 1, ISky )
                 if (PHRAY > 0.0) {                   // Ray heads upward to sky
                     ELUM = DayltgSkyLuminance(state, ISky, THRAY, PHRAY);
@@ -5762,7 +5762,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
         // Lambda function for the octree to test for surface hit and update transmittance if hit
         auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
             if (!surface.IsShadowPossibleObstruction) return false; // Do Consider separate octree without filtered surfaces
-            auto const sClass(surface.Class);
+            DataSurfaces::SurfaceClass const sClass(surface.Class);
             if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
                 PierceSurface(surface, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);
                 if (hit) { // Building element is hit (assumed opaque)
@@ -5852,7 +5852,7 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
-            auto const sClass(surface.Class);
+            DataSurfaces::SurfaceClass const sClass(surface.Class);
             if ((surface.IsShadowing) ||                         // Shadowing surface
                 ((surface.SolarEnclIndex == window_Enclosure) && // Surface is in same zone as window
                  (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
@@ -5951,7 +5951,7 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
-            auto const sClass(surface.Class);
+            DataSurfaces::SurfaceClass const sClass(surface.Class);
             if ((surface.IsShadowing) ||                          // Shadowing surface
                 ((surface.SolarEnclIndex == window2_Enclosure) && // Surface is in same zone as window
                  (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor

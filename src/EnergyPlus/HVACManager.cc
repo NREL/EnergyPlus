@@ -1136,7 +1136,7 @@ void SimHVAC(EnergyPlusData &state)
                             }
                             if (!FoundOscillationByDuplicate) {
 
-                                auto humRatInletNodDotProd = std::inner_product(
+                                Real64 humRatInletNodDotProd = std::inner_product(
                                     std::begin(ConvergLogStackARR), std::end(ConvergLogStackARR), std::begin(humRatInletNode), 0.0);
                                 Real64 summation2 = 0.0;
                                 summation2 = std::accumulate(humRatInletNode.begin(), humRatInletNode.end(), 0.0);
@@ -1223,7 +1223,7 @@ void SimHVAC(EnergyPlusData &state)
                             }
                             if (!FoundOscillationByDuplicate) {
 
-                                auto humRatInletNodDotProd =
+                                Real64 humRatInletNodDotProd =
                                     std::inner_product(std::begin(ConvergLogStackARR), std::end(ConvergLogStackARR), std::begin(mdotInletNode), 0.0);
                                 Real64 summation3 = 0.0;
                                 summation3 = std::accumulate(mdotInletNode.begin(), mdotInletNode.end(), 0.0);

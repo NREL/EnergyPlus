@@ -1643,7 +1643,7 @@ namespace HeatBalFiniteDiffManager {
                     Real64 Cp(Cpo);                 // Specific heat modified if PCM, otherwise equal to Cpo // Will be changed if PCM
                     auto const &matFD_TempEnth(matFD.TempEnth);
                     assert(matFD_TempEnth.u2() >= 3);
-                    auto const lTE(matFD_TempEnth.index(2, 1));
+                    Real64 const lTE(matFD_TempEnth.index(2, 1));
                     Real64 RhoS(mat->Density);
                     if (mat->phaseChange) {
                         adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
@@ -1814,7 +1814,7 @@ namespace HeatBalFiniteDiffManager {
         Real64 kt(0.0);
         auto const &matFD_TempEnth(matFD.TempEnth);
         assert(matFD_TempEnth.u2() >= 3);
-        auto const lTE(matFD_TempEnth.index(2, 1));
+        Real64 const lTE(matFD_TempEnth.index(2, 1));
         Real64 RhoS(mat->Density);
         if (mat->phaseChange) {
             adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
@@ -1960,7 +1960,7 @@ namespace HeatBalFiniteDiffManager {
                 if (!RLayer2Present) {
                     auto const &matFD2_TempCond(matFD2.TempCond);
                     assert(matFD2_TempCond.u2() >= 3);
-                    auto const lTC2(matFD2_TempCond.index(2, 1));
+                    Real64 const lTC2(matFD2_TempCond.index(2, 1));
                     if (matFD2_TempCond[lTC2] + matFD2_TempCond[lTC2 + 1] + matFD2_TempCond[lTC2 + 2] >= 0.0) { // Multiple Linear Segment Function
                         kt2 = terpld(matFD2_TempCond, (TDT_i + TDT_p) / 2.0, 1, 2); // 1: Temperature, 2: Thermal conductivity
                     } else {
@@ -2021,12 +2021,12 @@ namespace HeatBalFiniteDiffManager {
 
                 auto const &matFD_TempEnth(matFD.TempEnth);
                 assert(matFD_TempEnth.u2() >= 3);
-                auto const lTE(matFD_TempEnth.index(2, 1));
+                Real64 const lTE(matFD_TempEnth.index(2, 1));
                 Real64 const matFD_sum(matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2]);
 
                 auto const &matFD2_TempEnth(matFD2.TempEnth);
                 assert(matFD2_TempEnth.u2() >= 3);
-                auto const lTE2(matFD2_TempEnth.index(2, 1));
+                Real64 const lTE2(matFD2_TempEnth.index(2, 1));
                 Real64 const matFD2_sum(matFD2_TempEnth[lTE2] + matFD2_TempEnth[lTE2 + 1] + matFD2_TempEnth[lTE2 + 2]);
 
                 if (RLayerPresent && !RLayer2Present) { // R-layer first
@@ -2360,7 +2360,7 @@ namespace HeatBalFiniteDiffManager {
                 Real64 Cp(Cpo); // Will be changed if PCM
                 auto const &matFD_TempEnth(matFD.TempEnth);
                 assert(matFD_TempEnth.u2() >= 3);
-                auto const lTE(matFD_TempEnth.index(2, 1));
+                Real64 const lTE(matFD_TempEnth.index(2, 1));
                 if (mat->phaseChange) {
                     adjustPropertiesForPhaseChange(state, i, Surf, mat, TD_i, TDT_i, Cp, RhoS, kt);
                 } else if (matFD_TempEnth[lTE] + matFD_TempEnth[lTE + 1] + matFD_TempEnth[lTE + 2] >=

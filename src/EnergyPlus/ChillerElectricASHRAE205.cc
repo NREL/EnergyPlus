@@ -1487,7 +1487,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
                                                                                         this->InterpolationType);
     this->QEvaporator = lookupVariablesCooling.net_evaporator_capacity * this->ChillerCyclingRatio;
 
-    auto evapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpEvap;
+    Real64 evapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpEvap;
     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp - evapDeltaTemp;
 
     // TODO: Revisit fault

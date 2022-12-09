@@ -684,7 +684,7 @@ namespace SurfaceGeometry {
 
             // populate the predefined report related to u-values with films
             // only exterior surfaces including underground
-            auto const SurfaceClass(thisSurface.Class);
+            DataSurfaces::SurfaceClass const SurfaceClass(thisSurface.Class);
             if ((thisSurface.ExtBoundCond == ExternalEnvironment) || (thisSurface.ExtBoundCond == Ground) ||
                 (thisSurface.ExtBoundCond == KivaFoundation) || (thisSurface.ExtBoundCond == GroundFCfactorMethod)) {
                 if ((SurfaceClass == SurfaceClass::Wall) || (SurfaceClass == SurfaceClass::Floor) || (SurfaceClass == SurfaceClass::Roof)) {
@@ -7713,7 +7713,7 @@ namespace SurfaceGeometry {
         int NumAlphas;
         int NumNumbers;
 
-        auto const tolerance = 1e-6;
+        Real64 const tolerance = 1e-6;
 
         std::string cCurrentModuleObject = "SurfaceProperty:ExposedFoundationPerimeter";
         int numObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
