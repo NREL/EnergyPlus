@@ -1473,20 +1473,16 @@ namespace WaterToAirHeatPump {
                         CompSuctionTemp2 = CompSuctionSatTemp + DegreeofSuperheat;
                     }
 
-                    //  Do not need the name of the refrigerant if we already have the index (from above CALLs)
-                    Par(1) = SuctionPr;
-                    Par(2) = double(state.dataWaterToAirHeatPump->RefrigIndex);
-                    Par(3) = SuperHeatEnth;
+                    auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp) {
+                        static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
+                        std::string Refrigerant; // Name of refrigerant
+                        int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
+                        Real64 compSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
+                        return (compSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
+                    };
 
-                    General::SolveRoot(state,
-                                       ERR,
-                                       STOP1,
-                                       SolFlag,
-                                       state.dataWaterToAirHeatPump->CompSuctionTemp,
-                                       CalcCompSuctionTempResidual,
-                                       CompSuctionTemp1,
-                                       CompSuctionTemp2,
-                                       Par);
+                    General::SolveRoot(
+                        state, ERR, STOP1, SolFlag, state.dataWaterToAirHeatPump->CompSuctionTemp, f, CompSuctionTemp1, CompSuctionTemp2);
                     if (SolFlag == -1) {
                         heatPump.SimFlag = false;
                         return;
@@ -1637,66 +1633,6 @@ namespace WaterToAirHeatPump {
         heatPump.OutletWaterTemp = SourceSideOutletTemp;
         heatPump.OutletWaterMassFlowRate = heatPump.InletWaterMassFlowRate;
         heatPump.OutletWaterEnthalpy = heatPump.InletWaterEnthalpy + QSource / heatPump.InletWaterMassFlowRate;
-    }
-
-    Real64 CalcCompSuctionTempResidual(EnergyPlusData &state,
-                                       Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-                                       Array1D<Real64> const &Par    // Function parameters
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad
-        //       DATE WRITTEN   October 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // To calculate the compressor suction temperature for water to air HP's
-
-        // METHODOLOGY EMPLOYED:
-        // Use SolveRoot to call this Function to converge on a solution
-
-        // Using/Aliasing
-        using FluidProperties::GetSupHeatDensityRefrig;
-        using FluidProperties::GetSupHeatEnthalpyRefrig;
-
-        // Return value
-        Real64 Residuum; // Result (force to 0)
-
-        // Argument array dimensioning
-
-        // Locals
-        int RefrigIndex;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string Refrigerant; // Name of refrigerant
-        Real64 SuctionPr;
-        Real64 CompSuctionEnth;
-        Real64 SuperHeatEnth;
-
-        // Convert parameters to usable variables
-        SuctionPr = Par(1);
-        RefrigIndex = int(Par(2));
-        SuperHeatEnth = Par(3);
-
-        CompSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, RefrigIndex, RoutineName);
-
-        // Calculate residual based on output calculation flag
-        Residuum = (CompSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
-
-        return Residuum;
     }
 
     void CalcWatertoAirHPHeating(EnergyPlusData &state,
@@ -2011,11 +1947,16 @@ namespace WaterToAirHeatPump {
                 //        END DO LOOP
 
                 //       Do not need the name of the refrigerant if we already have the index (from above CALLs)
-                Par(1) = SuctionPr;
-                Par(2) = double(state.dataWaterToAirHeatPump->RefrigIndex);
-                Par(3) = SuperHeatEnth;
 
-                General::SolveRoot(state, ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par);
+                auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp) {
+                    static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
+                    std::string Refrigerant; // Name of refrigerant
+                    int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
+                    Real64 compSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
+                    return (compSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
+                };
+
+                General::SolveRoot(state, ERR, STOP1, SolFlag, CompSuctionTemp, f, CompSuctionTemp1, CompSuctionTemp2);
                 if (SolFlag == -1) {
                     heatPump.SimFlag = false;
                     return;
