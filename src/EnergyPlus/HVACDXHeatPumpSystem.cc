@@ -1114,43 +1114,13 @@ namespace HVACDXHeatPumpSystem {
         // Calls CalcDoe2DXCoil to get outlet temperature at the given cycling ratio
         // and calculates the residual as defined above
 
-        // REFERENCES:
+        int CoilIndex = int(Par(1));
+        Real64 OnOffAirFlowFrac = Par(3);
+        Real64 desiredTemp = Par(2);
 
-        // Using/Aliasing
-        using DXCoils::CalcDXHeatingCoil;
-
-        // Return value
-        Real64 Residuum; // Residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // Par(2) = desired air outlet temperature [C]
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CoilIndex;           // Index of this coil
-        Real64 OutletAirTemp;    // Outlet air temperature [C]
-        Real64 OnOffAirFlowFrac; // Ratio of compressor ON to compressor OFF air mass flow rate
-
-        CoilIndex = int(Par(1));
-        OnOffAirFlowFrac = Par(3);
-
-        CalcDXHeatingCoil(state, CoilIndex, PartLoadFrac, ContFanCycCoil, OnOffAirFlowFrac);
-
-        OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
-        Residuum = Par(2) - OutletAirTemp;
-
-        return Residuum;
+        DXCoils::CalcDXHeatingCoil(state, CoilIndex, PartLoadFrac, ContFanCycCoil, OnOffAirFlowFrac);
+        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
+        return desiredTemp - OutletAirTemp;
     }
 
     //******************************************************************************
@@ -1170,43 +1140,26 @@ namespace HVACDXHeatPumpSystem {
         //  Calculates residual function, iterate part-load ratio
         //  compare the desired temperature value with exit temperature from a variable-speed heating coil
 
-        // REFERENCES:
+        int CoilIndex = int(Par(1));
+        int FanOpMode = int(Par(5));
+        Real64 desiredTemp = Par(2);
+        VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                  "",
+                                                  CoilIndex,
+                                                  FanOpMode,
+                                                  state.dataHVACDXHeatPumpSys->MaximumONOFFCyclesperHour,
+                                                  state.dataHVACDXHeatPumpSys->TimeConstant,
+                                                  state.dataHVACDXHeatPumpSys->HeatPumpFanDelayTime,
+                                                  CompressorOperation::On,
+                                                  PartLoadRatio,
+                                                  state.dataHVACDXHeatPumpSys->SpeedNum,
+                                                  state.dataHVACDXHeatPumpSys->SpeedRatio,
+                                                  state.dataHVACDXHeatPumpSys->QZnReqr,
+                                                  state.dataHVACDXHeatPumpSys->QLatReqr,
+                                                  state.dataHVACDXHeatPumpSys->OnandOffAirFlowRatio);
 
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using VariableSpeedCoils::SimVariableSpeedCoils;
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CoilIndex;        // index of this coil
-        Real64 OutletAirTemp; // outlet air temperature [C]
-        int FanOpMode;        // Supply air fan operating mode
-
-        CoilIndex = int(Par(1));
-        FanOpMode = int(Par(5));
-
-        SimVariableSpeedCoils(state,
-                              "",
-                              CoilIndex,
-                              FanOpMode,
-                              state.dataHVACDXHeatPumpSys->MaximumONOFFCyclesperHour,
-                              state.dataHVACDXHeatPumpSys->TimeConstant,
-                              state.dataHVACDXHeatPumpSys->HeatPumpFanDelayTime,
-                              CompressorOperation::On,
-                              PartLoadRatio,
-                              state.dataHVACDXHeatPumpSys->SpeedNum,
-                              state.dataHVACDXHeatPumpSys->SpeedRatio,
-                              state.dataHVACDXHeatPumpSys->QZnReqr,
-                              state.dataHVACDXHeatPumpSys->QLatReqr,
-                              state.dataHVACDXHeatPumpSys->OnandOffAirFlowRatio);
-
-        OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
-        Residuum = Par(2) - OutletAirTemp;
-
-        return Residuum;
+        Real64 OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
+        return desiredTemp - OutletAirTemp;
     }
 
     //******************************************************************************
@@ -1226,44 +1179,27 @@ namespace HVACDXHeatPumpSystem {
         //  Calculates residual function, iterate speed ratio
         //  compare the desired temperature value with exit temperature from a variable-speed heating coil
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using VariableSpeedCoils::SimVariableSpeedCoils;
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CoilIndex;        // index of this coil
-        Real64 OutletAirTemp; // outlet air temperature [C]
-        int FanOpMode;        // Supply air fan operating mode
-
-        CoilIndex = int(Par(1));
-        FanOpMode = int(Par(5));
+        int CoilIndex = int(Par(1));
+        int FanOpMode = int(Par(5));
+        Real64 desiredTemp = Par(2);
         state.dataHVACDXHeatPumpSys->SpeedNumber = int(Par(3));
+        VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                  "",
+                                                  CoilIndex,
+                                                  FanOpMode,
+                                                  state.dataHVACDXHeatPumpSys->MaxONOFFCyclesperHr,
+                                                  state.dataHVACDXHeatPumpSys->HPTimeConst,
+                                                  state.dataHVACDXHeatPumpSys->HPFanDelayTime,
+                                                  CompressorOperation::On,
+                                                  state.dataHVACDXHeatPumpSys->SpeedPartLoadRatio,
+                                                  state.dataHVACDXHeatPumpSys->SpeedNumber,
+                                                  SpeedRatio,
+                                                  state.dataHVACDXHeatPumpSys->QZoneReq,
+                                                  state.dataHVACDXHeatPumpSys->QLatentReq,
+                                                  state.dataHVACDXHeatPumpSys->AirFlowOnOffRatio);
 
-        SimVariableSpeedCoils(state,
-                              "",
-                              CoilIndex,
-                              FanOpMode,
-                              state.dataHVACDXHeatPumpSys->MaxONOFFCyclesperHr,
-                              state.dataHVACDXHeatPumpSys->HPTimeConst,
-                              state.dataHVACDXHeatPumpSys->HPFanDelayTime,
-                              CompressorOperation::On,
-                              state.dataHVACDXHeatPumpSys->SpeedPartLoadRatio,
-                              state.dataHVACDXHeatPumpSys->SpeedNumber,
-                              SpeedRatio,
-                              state.dataHVACDXHeatPumpSys->QZoneReq,
-                              state.dataHVACDXHeatPumpSys->QLatentReq,
-                              state.dataHVACDXHeatPumpSys->AirFlowOnOffRatio);
-
-        OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
-        Residuum = Par(2) - OutletAirTemp;
-
-        return Residuum;
+        Real64 OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
+        return desiredTemp - OutletAirTemp;
     }
 
     int GetHeatingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXHeatCoilSysName, bool &InletNodeErrFlag)
