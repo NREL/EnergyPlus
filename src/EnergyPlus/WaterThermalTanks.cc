@@ -8329,8 +8329,6 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
 
     int constexpr MaxIte(500); // Maximum number of iterations for RegulaFalsi
 
-    Array1D<Real64> Par(5); // Parameters passed to RegulaFalsi
-
     auto &DesupHtr = state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum);
 
     int WaterInletNode = DesupHtr.WaterInletNode;
@@ -8527,12 +8525,6 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
             int max_count = 200;
             int count = 0;
             bool firstThrough = true;
-            auto boundPLRFunc = std::bind(&WaterThermalTanks::WaterThermalTankData::PLRResidualWaterThermalTank,
-                                          this,
-                                          std::placeholders::_1,
-                                          std::placeholders::_2,
-                                          std::placeholders::_3);
-
             switch (DesupHtr.Mode) {
             case TankOperatingMode::Heating:
                 // Calculate until consistency of desuperheater and tank source side energy transfer achieved
@@ -8565,17 +8557,17 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                         if (NewTankTemp > DesupHtr.SetPointTemp) {
                             DesupHtr.Mode = TankOperatingMode::Floating;
                         }
-                        Par(1) = desupHtrSetPointTemp;
-                        Par(2) = static_cast<int>(DesupHtr.SaveWHMode);
-                        if (FirstHVACIteration) {
-                            Par(4) = 1.0;
-                        } else {
-                            Par(4) = 0.0;
-                        }
-                        Par(5) = MdotWater;
                         int SolFla;
                         std::string IterNum;
-                        General::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
+                        auto f = [&state, this, desupHtrSetPointTemp, &DesupHtr, MdotWater](Real64 const HPPartLoadRatio) {
+                            this->Mode = DesupHtr.SaveWHMode;
+                            this->SourceMassFlowRate = MdotWater * HPPartLoadRatio;
+                            this->CalcWaterThermalTank(state);
+                            Real64 NewTankTemp = this->TankTemp;
+                            Real64 PLRResidualWaterThermalTank = desupHtrSetPointTemp - NewTankTemp;
+                            return PLRResidualWaterThermalTank;
+                        };
+                        General::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, f, 0.0, DesupHtr.DXSysPLR);
                         if (SolFla == -1) {
                             IterNum = fmt::to_string(MaxIte);
                             if (!state.dataGlobal->WarmupFlag) {
@@ -8691,17 +8683,17 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                             if (NewTankTemp > DesupHtr.SetPointTemp) {
                                 DesupHtr.Mode = TankOperatingMode::Floating;
                             }
-                            Par(1) = desupHtrSetPointTemp;
-                            Par(2) = static_cast<int>(DesupHtr.SaveWHMode);
-                            if (FirstHVACIteration) {
-                                Par(4) = 1.0;
-                            } else {
-                                Par(4) = 0.0;
-                            }
-                            Par(5) = MdotWater;
                             int SolFla;
                             std::string IterNum;
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
+                            auto f = [&state, this, desupHtrSetPointTemp, &DesupHtr, MdotWater](Real64 const HPPartLoadRatio) {
+                                this->Mode = DesupHtr.SaveWHMode;
+                                this->SourceMassFlowRate = MdotWater * HPPartLoadRatio;
+                                this->CalcWaterThermalTank(state);
+                                Real64 NewTankTemp = this->TankTemp;
+                                Real64 PLRResidualWaterThermalTank = desupHtrSetPointTemp - NewTankTemp;
+                                return PLRResidualWaterThermalTank;
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, f, 0.0, DesupHtr.DXSysPLR);
                             if (SolFla == -1) {
                                 IterNum = fmt::to_string(MaxIte);
                                 if (!state.dataGlobal->WarmupFlag) {
@@ -10315,43 +10307,6 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
     }
 
     return Par(7) - NewTankTemp;
-}
-
-Real64 WaterThermalTankData::PLRResidualWaterThermalTank(EnergyPlusData &state,
-                                                         Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                         Array1D<Real64> const &Par    // par(1) = HP set point temperature [C]
-
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Richard Raustad
-    //       DATE WRITTEN   May 2005
-    //       MODIFIED       Yueyue Zhou
-    //       DATE MODIFIED  May 2019
-    //       MODIFICATION   Combined the PLR functions for both mixed and stratified tank
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    //  Calculates residual function (desired tank temp - actual tank temp)
-    //  HP water heater output depends on the part load ratio which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    //  Calls CalcWaterThermalTank to get tank temperature at the given part load ratio (source water mass flow rate)
-    //  and calculates the residual as defined above
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // par(2) = tank mode
-    // par(3) = water heater num
-    // par(4) = FirstHVACIteration
-    // par(5) = MdotWater
-
-    this->Mode = static_cast<TankOperatingMode>(Par(2));
-    this->SourceMassFlowRate = Par(5) * HPPartLoadRatio;
-    this->CalcWaterThermalTank(state);
-    Real64 NewTankTemp = this->TankTemp;
-    Real64 PLRResidualWaterThermalTank = Par(1) - NewTankTemp;
-    return PLRResidualWaterThermalTank;
 }
 
 Real64 WaterThermalTankData::PLRResidualHPWH(EnergyPlusData &state, Real64 const HPPartLoadRatio, Array1D<Real64> const &Par)
