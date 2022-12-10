@@ -361,18 +361,7 @@ namespace HVACMultiSpeedHeatPump {
                         Real64 &SupHeaterLoad                              // supplemental heater load (W)
     );
 
-    //******************************************************************************
-
-    Real64 MSHPVarSpeedResidual(EnergyPlusData &state,
-                                Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                Array1D<Real64> const &Par // par(1) = MSHPNum
-    );
-
-    //******************************************************************************
-
     void UpdateMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
-
-    //******************************************************************************
 
     void ReportMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
 
