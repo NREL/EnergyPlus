@@ -4690,14 +4690,25 @@ namespace HVACMultiSpeedHeatPump {
                         // control water flow to obtain output matching HeatingLoad
                         SolFlag = 0;
                         MinWaterFlow = 0.0;
-                        Par(1) = double(MSHeatPumpNum);
-                        if (FirstHVACIteration) {
-                            Par(2) = 1.0;
-                        } else {
-                            Par(2) = 0.0;
-                        }
-                        Par(3) = HeatingLoad;
-                        SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                        auto f = [&state, MSHeatPumpNum, FirstHVACIteration, HeatingLoad](Real64 const HWFlow) {
+                            // Calculates residual function (QCoilActual - SupHeatCoilLoad) / SupHeatCoilLoad
+                            // coil actual output depends on the hot water flow rate which is varied to minimize the residual.
+                            Real64 targetHeatingCoilLoad = HeatingLoad;
+                            Real64 calcHeatingCoilLoad = targetHeatingCoilLoad;
+                            Real64 mdot = HWFlow;
+                            auto &hp = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum);
+                            PlantUtilities::SetComponentFlowRate(
+                                state, mdot, hp.HotWaterCoilControlNode, hp.HotWaterCoilOutletNode, hp.HotWaterPlantLoc);
+                            // simulate the hot water supplemental heating coil
+                            WaterCoils::SimulateWaterCoilComponents(
+                                state, hp.HotWaterCoilName, FirstHVACIteration, hp.HotWaterCoilNum, calcHeatingCoilLoad, hp.OpMode);
+                            if (targetHeatingCoilLoad != 0.0) {
+                                return (calcHeatingCoilLoad - targetHeatingCoilLoad) / targetHeatingCoilLoad;
+                            } else { // Autodesk:Return Condition added to assure return value is set
+                                return 0.0;
+                            }
+                        };
+                        SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, f, MinWaterFlow, MaxHotWaterFlow);
                         if (SolFlag == -1) {
                             if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex == 0) {
                                 ShowWarningMessage(state,
@@ -4782,81 +4793,6 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
         HeatCoilLoadmet = QCoilActual;
-    }
-
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,       // hot water flow rate in kg/s
-                                Array1D<Real64> const &Par // Par(5) is the requested coil load
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Bereket Nigusse, FSEC/UCF
-        //       DATE WRITTEN   November 2011
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (QCoilActual - SupHeatCoilLoad) / SupHeatCoilLoad
-        // coil actual output depends on the hot water flow rate which is varied to minimize the
-        // residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls HotWaterCoilResidual, and calculates the residual as defined above.
-
-        // REFERENCES:
-
-        // Using/Aliasing
-        using PlantUtilities::SetComponentFlowRate;
-        using WaterCoils::SimulateWaterCoilComponents;
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int MSHeatPumpNum;
-        bool FirstHVACSoln;
-        Real64 QCoilActual;  // delivered coild load, W
-        Real64 HeatCoilLoad; // requested coild load, W
-        Real64 mdot;
-
-        MSHeatPumpNum = int(Par(1));
-        FirstHVACSoln = (Par(2) > 0.0);
-        HeatCoilLoad = Par(3);
-        QCoilActual = HeatCoilLoad;
-        mdot = HWFlow;
-        SetComponentFlowRate(state,
-                             mdot,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilControlNode,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilOutletNode,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc);
-        // simulate the hot water supplemental heating coil
-        SimulateWaterCoilComponents(state,
-                                    state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilName,
-                                    FirstHVACSoln,
-                                    state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilNum,
-                                    QCoilActual,
-                                    state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).OpMode);
-        if (HeatCoilLoad != 0.0) {
-            Residuum = (QCoilActual - HeatCoilLoad) / HeatCoilLoad;
-        } else { // Autodesk:Return Condition added to assure return value is set
-            Residuum = 0.0;
-        }
-        return Residuum;
     }
 
 } // namespace HVACMultiSpeedHeatPump

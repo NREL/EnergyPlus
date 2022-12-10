@@ -402,11 +402,6 @@ namespace HVACMultiSpeedHeatPump {
                                Real64 &HeatCoilLoadmet,       // Heating Load Met
                                Optional<Real64 const> PartLoadFrac = _);
 
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,       // hot water flow rate in kg/s
-                                Array1D<Real64> const &Par // Par(5) is the requested coil load
-    );
-
 } // namespace HVACMultiSpeedHeatPump
 
 struct HVACMultiSpeedHeatPumpData : BaseGlobalStruct
