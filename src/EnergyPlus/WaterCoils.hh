@@ -401,11 +401,6 @@ namespace WaterCoils {
 
     void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef);
 
-    Real64 SimpleHeatingCoilUAResidual(EnergyPlusData &state,
-                                       Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
     // Iterate Routine for Cooling Coil
 
     void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable

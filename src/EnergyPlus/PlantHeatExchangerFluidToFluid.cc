@@ -1723,8 +1723,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
     int constexpr MaxIte(500);   // Maximum number of iterations for solver
     Real64 constexpr Acc(1.e-3); // Accuracy of solver result
 
-    int SolFla;             // Flag of solver
-    Array1D<Real64> Par(2); // Parameter array passed to solver
+    int SolFla; // Flag of solver
 
     // mass flow rate of fluid entering from supply side loop
     Real64 SupSideMdot = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
