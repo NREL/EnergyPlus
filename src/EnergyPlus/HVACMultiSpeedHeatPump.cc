@@ -3412,7 +3412,27 @@ namespace HVACMultiSpeedHeatPump {
                 if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
                     SpeedRatio = 0.0;
                     SpeedNum = 1;
-                    SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
+                    auto f = [&state, MSHeatPumpNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](
+                                 Real64 const PartLoadFrac) {
+                        //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq); MSHP output depends on PLR which is being varied to zero
+                        //  the residual.
+                        Real64 ActualOutput; // delivered capacity of MSHP
+                        Real64 tmpAirFlowRatio = OnOffAirFlowRatio;
+                        Real64 tmpHeaterLoad = SupHeaterLoad;
+                        CalcMSHeatPump(state,
+                                       MSHeatPumpNum,
+                                       FirstHVACIteration,
+                                       CompressorOp,
+                                       1,
+                                       0.0,
+                                       PartLoadFrac,
+                                       ActualOutput,
+                                       QZnReq,
+                                       tmpAirFlowRatio,
+                                       tmpHeaterLoad);
+                        return (ActualOutput - QZnReq) / QZnReq;
+                    };
+                    SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (state.dataHVACMultiSpdHP->ErrCountCyc == 0) {
@@ -3525,7 +3545,27 @@ namespace HVACMultiSpeedHeatPump {
                             state, MSHeatPumpNum, FirstHVACIteration, CompressorOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                         SpeedRatio = 0.0;
                         if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
-                            SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
+                            auto f = [&state, MSHeatPumpNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](
+                                         Real64 const PartLoadFrac) {
+                                //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq); MSHP output depends on PLR which is being varied to
+                                //  zero the residual.
+                                Real64 ActualOutput; // delivered capacity of MSHP
+                                Real64 tmpAirFlowRatio = OnOffAirFlowRatio;
+                                Real64 tmpHeaterLoad = SupHeaterLoad;
+                                CalcMSHeatPump(state,
+                                               MSHeatPumpNum,
+                                               FirstHVACIteration,
+                                               CompressorOp,
+                                               1,
+                                               0.0,
+                                               PartLoadFrac,
+                                               ActualOutput,
+                                               QZnReq,
+                                               tmpAirFlowRatio,
+                                               tmpHeaterLoad);
+                                return (ActualOutput - QZnReq) / QZnReq;
+                            };
+                            SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             if (SolFla == -1) {
                                 if (!state.dataGlobal->WarmupFlag) {
                                     if (state.dataHVACMultiSpdHP->ErrCountCyc == 0) {
@@ -4099,85 +4139,6 @@ namespace HVACMultiSpeedHeatPump {
         LoadMet = SensibleOutput - MSHeatPump(MSHeatPumpNum).LoadLoss;
 
         MSHeatPump(MSHeatPumpNum).LoadMet = LoadMet;
-    }
-
-    //******************************************************************************
-
-    Real64 MSHPCyclingResidual(EnergyPlusData &state,
-                               Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1D<Real64> const &Par // par(1) = MSHPNum
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Lixing Gu
-        //       DATE WRITTEN   June 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  Revised for multispeed heat pump use based on DXCoilCyclingResidual
-
-        // PURPOSE OF THIS FUNCTION:
-        //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq)
-        //  MSHP output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        //  Calls CalcMSHeatPump to get ActualOutput at the given part load ratio
-        //  and calculates the residual as defined above
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 MSHPCyclingResidual;
-
-        // Argument array dimensioning
-
-        // Locals
-        Real64 SupHeaterLoad; // Supplemental heater load
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = Zone Num
-        // par(3) = FirstHVACIteration
-        // par(4) = OpMode
-        // par(5) = QZnReq
-        // par(6) = OnOffAirFlowRatio
-        // par(7) = SupHeaterLoad
-        // par(9) = CompressorOp
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int MSHeatPumpNum;                                 // MSHP index
-        int ZoneNum;                                       // Zone index
-        bool FirstHVACIteration;                           // FirstHVACIteration flag
-        int OpMode;                                        // Compressor operating mode
-        Real64 QZnReq;                                     // zone load (W)
-        Real64 OnOffAirFlowRatio;                          // ratio of compressor ON airflow to average airflow over timestep
-        Real64 ActualOutput;                               // delivered capacity of MSHP
-        DataHVACGlobals::CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
-
-        MSHeatPumpNum = int(Par(1));
-        ZoneNum = int(Par(2));
-        // FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-        FirstHVACIteration = (Par(3) == 1.0);
-        OpMode = int(Par(4));
-        QZnReq = Par(5);
-        OnOffAirFlowRatio = Par(6);
-        SupHeaterLoad = Par(7);
-        CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par(9));
-
-        CalcMSHeatPump(
-            state, MSHeatPumpNum, FirstHVACIteration, CompressorOp, 1, 0.0, PartLoadFrac, ActualOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
-
-        MSHPCyclingResidual = (ActualOutput - QZnReq) / QZnReq;
-        return MSHPCyclingResidual;
     }
 
     //******************************************************************************
