@@ -305,7 +305,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
     ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
-    ASSERT_TRUE(compare_enums(DOASControl::DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy));
+    ASSERT_TRUE(compare_enums(DOASControl::NeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy));
     ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
@@ -374,7 +374,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
     ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
-    ASSERT_TRUE(compare_enums(DOASControl::DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy));
+    ASSERT_TRUE(compare_enums(DOASControl::NeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy));
     ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values

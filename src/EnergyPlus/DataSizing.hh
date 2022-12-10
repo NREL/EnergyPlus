@@ -158,9 +158,9 @@ namespace DataSizing {
     enum class DOASControl
     {
         Invalid = -1,
-        DOANeutralSup,
-        DOANeutralDehumSup,
-        DOACoolSup,
+        NeutralSup,
+        NeutralDehumSup,
+        CoolSup,
         Num
     };
 
@@ -253,11 +253,9 @@ namespace DataSizing {
         std::string ZoneName;      // name of a zone
         int ZoneNum = 0;           // index of the zone
         int ZnCoolDgnSAMethod = 0; // choice of how to get zone cooling design air temperature;
-        //  1 = specify supply air temperature,
-        //  2 = calculate from the temperature difference
+        //  1 = specify supply air temperature, 2 = calculate from the temperature difference
         int ZnHeatDgnSAMethod = 0; // choice of how to get zone heating design air temperature;
-        //  1 = specify supply air temperature,
-        //  2 = calculate from the temperature difference
+        //  1 = specify supply air temperature, 2 = calculate from the temperature difference
         Real64 CoolDesTemp = 0.0;        // zone design cooling supply air temperature [C]
         Real64 HeatDesTemp = 0.0;        // zone design heating supply air temperature [C]
         Real64 CoolDesTempDiff = 0.0;    // zone design cooling supply air temperature difference [deltaC]
@@ -266,23 +264,20 @@ namespace DataSizing {
         Real64 HeatDesHumRat = 0.0;      // zone design heating supply air humidity ratio [kgWater/kgDryAir]
         std::string DesignSpecOAObjName; // name of the DesignSpecification:OutdoorAir or DesignSpecification:OutdoorAir:SpaceList object
         AirflowSizingMethod CoolAirDesMethod = AirflowSizingMethod::Invalid; // choice of how to get zone cooling design air flow rates;
-        //  1 = calc from des day simulation; 2 = m3/s per zone, user input
-        //  3 = apply limits to air flow rate from DD calc
+        //  0 = calc from des day simulation; 1 = m3/s per zone, user input' 2 = apply limits to air flow rate from DD calc
         Real64 DesCoolAirFlow = 0.0;           // design zone supply air flow rate [m3/s]
         Real64 DesCoolMinAirFlowPerArea = 0.0; // design cooling minimum air flow rate per zone area [m3/s / m2]
         Real64 DesCoolMinAirFlow = 0.0;        // design cooling minimum air flow rate [m3/s]
         Real64 DesCoolMinAirFlowFrac = 0.0;    // design cooling minimum air flow rate fraction
         //  (of the cooling design air flow rate)
         AirflowSizingMethod HeatAirDesMethod = AirflowSizingMethod::Invalid; // choice of how to get zone heating design air flow rates;
-        //  1 = calc from des day simulation; 2 = m3/s per zone, user input
-        //  3 = apply limits to air flow rate from DD calc
+        //  0 = calc from des day simulation; 1 = m3/s per zone, user input; 2 = apply limits to air flow rate from DD calc
         Real64 DesHeatAirFlow = 0.0;           // design zone heating supply air flow rate [m3/s]
         Real64 DesHeatMaxAirFlowPerArea = 0.0; // design heating maximum air flow rate per zone area [m3/s / m2]
         Real64 DesHeatMaxAirFlow = 0.0;        // design heating maximum air flow rate [m3/s]
-        Real64 DesHeatMaxAirFlowFrac = 0.0;    // design heating maximum air flow rate fraction
-        //  (of the cooling design air flow rate)
-        Real64 HeatSizingFactor = 0.0; // the zone heating sizing ratio
-        Real64 CoolSizingFactor = 0.0; // the zone cooling sizing ratio
+        Real64 DesHeatMaxAirFlowFrac = 0.0;    // design heating maximum air flow rate fraction (of the cooling design air flow rate)
+        Real64 HeatSizingFactor = 0.0;         // the zone heating sizing ratio
+        Real64 CoolSizingFactor = 0.0;         // the zone cooling sizing ratio
         Real64 ZoneADEffCooling = 0.0;
         Real64 ZoneADEffHeating = 0.0;
         std::string ZoneAirDistEffObjName;       // name of the zone air distribution effectiveness object name
@@ -291,10 +286,9 @@ namespace DataSizing {
         Real64 ZoneSecondaryRecirculation = 0.0; // the zone secondary air recirculation fraction
         Real64 ZoneVentilationEff = 0.0;         // zone ventilation efficiency
         bool AccountForDOAS = false;             // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
-        DOASControl DOASControlStrategy = DOASControl:: Invalid; // 0=neutral ventilation air; 1=neutral dehumidified ventilation air, 2 = cooled air;
-        // 3=supply cold ventilation  = 0
-        Real64 DOASLowSetpoint = 0.0;  // Dedicated Outside Air Low Setpoint for Design [C]
-        Real64 DOASHighSetpoint = 0.0; // Dedicated Outside Air High Setpoint for Design [C]
+        DOASControl DOASControlStrategy = DOASControl::Invalid; // 0=neutral ventilation air; 1=neutral dehumidified ventilation air, 2 = cooled air;
+        Real64 DOASLowSetpoint = 0.0;                           // Dedicated Outside Air Low Setpoint for Design [C]
+        Real64 DOASHighSetpoint = 0.0;                          // Dedicated Outside Air High Setpoint for Design [C]
 
         // zone latent sizing inputs
         bool zoneLatentSizing = false;
@@ -319,11 +313,9 @@ namespace DataSizing {
         std::string CoolDesDay;    // name of a cooling design day
         std::string HeatDesDay;    // name of a heating design day
         int ZnCoolDgnSAMethod = 0; // choice of how to get zone cooling design air temperature;
-        //  1 = specify supply air temperature,
-        //  2 = calculate from the temperature difference
+        //  1 = specify supply air temperature, 2 = calculate from the temperature difference
         int ZnHeatDgnSAMethod = 0; // choice of how to get zone heating design air temperature;
-        //  1 = specify supply air temperature,
-        //  2 = calculate from the temperature difference
+        //  1 = specify supply air temperature, 2 = calculate from the temperature difference
         Real64 CoolDesTemp = 0.0;         // zone design cooling supply air temperature [C]
         Real64 HeatDesTemp = 0.0;         // zone design heating supply air temperature [C]
         Real64 CoolDesTempDiff = 0.0;     // zone design cooling supply air temperature difference [deltaC]
@@ -335,8 +327,7 @@ namespace DataSizing {
         Real64 DesOAFlowPPer = 0.0;       // design outside air flow per person in zone [m3/s] (average for zone across spaces)
         Real64 DesOAFlowPerArea = 0.0;    // design outside air flow per zone area [m3/s / m2] (average for zone across spaces)
         AirflowSizingMethod CoolAirDesMethod = AirflowSizingMethod::Invalid; // choice of how to get zone cooling design air flow rates;
-        //  1 = calc from des day simulation; 2 = m3/s per zone, user input
-        //  3 = apply limits to air flow rate from DD calc
+        //  0 = calc from des day simulation; 1 = m3/s per zone, user input; 2 = apply limits to air flow rate from DD calc
         Real64 InpDesCoolAirFlow = 0.0;        // design zone supply air flow rate [m3/s]
         Real64 DesCoolMinAirFlowPerArea = 0.0; // design cooling minimum air flow rate per zone area [m3/s / m2]
         Real64 DesCoolMinAirFlow = 0.0;        // design cooling minimum air flow rate [m3/s]

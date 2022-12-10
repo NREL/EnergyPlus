@@ -723,7 +723,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     DOASSupTemp = 0.0;
     DOASSupHR = 0.0;
     // neutral supply air
-    if (DOASControl == DataSizing::DOASControl::DOANeutralSup) {
+    if (DOASControl == DataSizing::DOASControl::NeutralSup) {
         if (OutDB < DOASLowTemp) {
             DOASSupTemp = DOASLowTemp;
             DOASSupHR = OutHR;
@@ -737,7 +737,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     }
 
     // neutral dehumidified supply air
-    else if (DOASControl == DataSizing::DOASControl::DOANeutralDehumSup) { //
+    else if (DOASControl == DataSizing::DOASControl::NeutralDehumSup) { //
         if (OutDB < DOASLowTemp) {
             DOASSupTemp = DOASHighTemp;
             DOASSupHR = OutHR;
@@ -748,7 +748,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     }
 
     // cold supply air
-    else if (DOASControl == DataSizing::DOASControl::DOACoolSup) {
+    else if (DOASControl == DataSizing::DOASControl::CoolSup) {
         if (OutDB < DOASLowTemp) {
             DOASSupTemp = DOASHighTemp;
             DOASSupHR = OutHR;
@@ -6247,7 +6247,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
     for (int ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         if (state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS) {
             auto &zoneSizingInput = state.dataSize->ZoneSizingInput(ZoneSizIndex);
-            if (zoneSizingInput.DOASControlStrategy == DOASControl::DOANeutralSup) {
+            if (zoneSizingInput.DOASControlStrategy == DOASControl::NeutralSup) {
                 if (zoneSizingInput.DOASLowSetpoint == AutoSize && zoneSizingInput.DOASHighSetpoint == AutoSize) {
                     zoneSizingInput.DOASLowSetpoint = 21.1;
                     zoneSizingInput.DOASHighSetpoint = 23.9;
@@ -6262,7 +6262,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            zoneSizingInput.DOASLowSetpoint,
                                            zoneSizingInput.DOASHighSetpoint,
                                            headerAlreadyPrinted);
-            } else if (zoneSizingInput.DOASControlStrategy == DataSizing::DOASControl::DOANeutralDehumSup) {
+            } else if (zoneSizingInput.DOASControlStrategy == DataSizing::DOASControl::NeutralDehumSup) {
                 if (zoneSizingInput.DOASLowSetpoint == AutoSize && zoneSizingInput.DOASHighSetpoint == AutoSize) {
                     zoneSizingInput.DOASLowSetpoint = 14.4;
                     zoneSizingInput.DOASHighSetpoint = 22.2;
@@ -6277,7 +6277,7 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            zoneSizingInput.DOASLowSetpoint,
                                            zoneSizingInput.DOASHighSetpoint,
                                            headerAlreadyPrinted);
-            } else if (zoneSizingInput.DOASControlStrategy == DOASControl::DOACoolSup) {
+            } else if (zoneSizingInput.DOASControlStrategy == DOASControl::CoolSup) {
                 if (zoneSizingInput.DOASLowSetpoint == AutoSize && zoneSizingInput.DOASHighSetpoint == AutoSize) {
                     zoneSizingInput.DOASLowSetpoint = 12.2;
                     zoneSizingInput.DOASHighSetpoint = 14.4;

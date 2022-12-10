@@ -2208,7 +2208,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType.ZoneDesignSpecOAIndex = 1;
             thisSizingType.CoolAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
             thisSizingType.HeatAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
-            thisSizingType.DOASControlStrategy = DataSizing::DOASControl::DOANeutralSup;
+            thisSizingType.DOASControlStrategy = DataSizing::DOASControl::NeutralSup;
             thisSizingType.ZoneNum = 1;
             thisSizingType.TimeStepNumAtHeatMax = 1;
             thisSizingType.TimeStepNumAtCoolMax = 1;
@@ -2403,7 +2403,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
             thisSizingType2.ZoneDesignSpecOAIndex = 1;
             thisSizingType2.CoolAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
             thisSizingType2.HeatAirDesMethod = DataSizing::AirflowSizingMethod::FromDDCalc;
-            thisSizingType2.DOASControlStrategy = DataSizing::DOASControl::DOANeutralSup;
+            thisSizingType2.DOASControlStrategy = DataSizing::DOASControl::NeutralSup;
             thisSizingType2.ZoneNum = 1;
             thisSizingType2.TimeStepNumAtHeatMax = 1;
             thisSizingType2.TimeStepNumAtCoolMax = 1;

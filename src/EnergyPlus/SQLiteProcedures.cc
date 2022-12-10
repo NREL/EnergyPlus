@@ -1720,18 +1720,18 @@ void SQLite::createYearlyTimeIndexRecord(int const simulationYear, int const cur
     }
 }
 
-void SQLite::addSQLiteZoneSizingRecord(std::string const zoneName,   // the name of the zone
-                                       std::string const loadType,   // the description of the input variable
-                                       Real64 const calcDesLoad,     // the value from the sizing calculation [W]
-                                       Real64 const userDesLoad,     // the value from the sizing calculation modified by user input [W]
-                                       Real64 const calcDesFlow,     // calculated design air flow rate [m3/s]
-                                       Real64 const userDesFlow,     // user input or modified design air flow rate [m3/s]
-                                       std::string const desDayName, // the name of the design day that produced the peak
-                                       std::string const peakHrMin,  // time stamp of the peak
-                                       Real64 const peakTemp,        // temperature at peak [C]
-                                       Real64 const peakHumRat,      // humidity ratio at peak [kg water/kg dry air]
-                                       Real64 const minOAVolFlow,    // zone design minimum outside air flow rate [m3/s]
-                                       Real64 const DOASHeatAddRate  // zone design heat addition rate from the DOAS [W]
+void SQLite::addSQLiteZoneSizingRecord(std::string const &zoneName,   // the name of the zone
+                                       std::string const &loadType,   // the description of the input variable
+                                       Real64 const calcDesLoad,      // the value from the sizing calculation [W]
+                                       Real64 const userDesLoad,      // the value from the sizing calculation modified by user input [W]
+                                       Real64 const calcDesFlow,      // calculated design air flow rate [m3/s]
+                                       Real64 const userDesFlow,      // user input or modified design air flow rate [m3/s]
+                                       std::string const &desDayName, // the name of the design day that produced the peak
+                                       std::string const &peakHrMin,  // time stamp of the peak
+                                       Real64 const peakTemp,         // temperature at peak [C]
+                                       Real64 const peakHumRat,       // humidity ratio at peak [kg water/kg dry air]
+                                       Real64 const minOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
+                                       Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
 )
 {
     if (m_writeOutputToSQLite) {
@@ -1758,14 +1758,14 @@ void SQLite::addSQLiteZoneSizingRecord(std::string const zoneName,   // the name
     }
 }
 
-void SQLite::addSQLiteSystemSizingRecord(std::string const SysName,     // the name of the system
+void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,    // the name of the system
                                          std::string_view LoadType,     // either "Cooling" or "Heating"
                                          std::string_view PeakLoadType, // either "Sensible" or "Total"
                                          Real64 const UserDesCap,       // User  Design Capacity
                                          Real64 const CalcDesVolFlow,   // Calculated Cooling Design Air Flow Rate
                                          Real64 const UserDesVolFlow,   // User Cooling Design Air Flow Rate
-                                         std::string const DesDayName,  // the name of the design day that produced the peak
-                                         std::string const PeakHrMin    // time stamp of the peak
+                                         std::string const &DesDayName, // the name of the design day that produced the peak
+                                         std::string const &PeakHrMin   // time stamp of the peak
 )
 {
     if (m_writeOutputToSQLite) {
