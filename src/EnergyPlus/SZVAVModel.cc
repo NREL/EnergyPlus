@@ -806,7 +806,37 @@ namespace SZVAVModel {
                                           // air flow
                 Par[13] = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
 
-                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
+                auto f = [&state,
+                          &thisSys,
+                          SysIndex,
+                          FirstHVACIteration,
+                          ZoneLoad,
+                          &SZVAVModel,
+                          OnOffAirFlowRatio,
+                          AirLoopNum,
+                          coilFluidInletNode,
+                          lowSpeedFanRatio,
+                          minAirMassFlow,
+                          maxAirMassFlow,
+                          CoolingLoad](Real64 const PartLoadRatio) {
+                    return UnitarySystems::UnitarySys::calcUnitarySystemWaterFlowResidual(state,
+                                                                                          PartLoadRatio, // coil part load ratio
+                                                                                          SysIndex,
+                                                                                          FirstHVACIteration,
+                                                                                          ZoneLoad,
+                                                                                          SZVAVModel.AirInNode,
+                                                                                          OnOffAirFlowRatio,
+                                                                                          AirLoopNum,
+                                                                                          coilFluidInletNode,
+                                                                                          0.0,
+                                                                                          lowSpeedFanRatio,
+                                                                                          minAirMassFlow,
+                                                                                          maxAirMassFlow,
+                                                                                          CoolingLoad,
+                                                                                          0.0,
+                                                                                          1.0);
+                };
+                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 1: ";
                 }
@@ -838,8 +868,38 @@ namespace SZVAVModel {
                 Par[10] = maxCoilFluidFlow; // max water flow rate
                 Par[12] = AirMassFlow;      // sets air flow rate used when iterating on coil capacity
                 Par[13] = 0.0;              // other than 0 means to iterate on SA temperature
-
-                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
+                auto f = [&state,
+                          &thisSys,
+                          SysIndex,
+                          FirstHVACIteration,
+                          ZoneLoad,
+                          &SZVAVModel,
+                          OnOffAirFlowRatio,
+                          AirLoopNum,
+                          coilFluidInletNode,
+                          lowSpeedFanRatio,
+                          AirMassFlow,
+                          maxAirMassFlow,
+                          CoolingLoad,
+                          maxCoilFluidFlow](Real64 const PartLoadRatio) {
+                    return UnitarySystems::UnitarySys::calcUnitarySystemWaterFlowResidual(state,
+                                                                                          PartLoadRatio, // coil part load ratio
+                                                                                          SysIndex,
+                                                                                          FirstHVACIteration,
+                                                                                          ZoneLoad,
+                                                                                          SZVAVModel.AirInNode,
+                                                                                          OnOffAirFlowRatio,
+                                                                                          AirLoopNum,
+                                                                                          coilFluidInletNode,
+                                                                                          maxCoilFluidFlow,
+                                                                                          lowSpeedFanRatio,
+                                                                                          AirMassFlow,
+                                                                                          maxAirMassFlow,
+                                                                                          CoolingLoad,
+                                                                                          0.0,
+                                                                                          1.0);
+                };
+                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 2: ";
                 }
@@ -902,7 +962,37 @@ namespace SZVAVModel {
                 Par[12] = maxAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed air flow rate, maxAirMassFlow indicates full
                                           // air flow
                 Par[13] = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
-                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual, 0.0, 1.0, Par);
+                auto f = [&state,
+                          &thisSys,
+                          SysIndex,
+                          FirstHVACIteration,
+                          ZoneLoad,
+                          &SZVAVModel,
+                          OnOffAirFlowRatio,
+                          AirLoopNum,
+                          coilFluidInletNode,
+                          lowSpeedFanRatio,
+                          minAirMassFlow,
+                          maxAirMassFlow,
+                          CoolingLoad](Real64 const PartLoadRatio) {
+                    return UnitarySystems::UnitarySys::calcUnitarySystemWaterFlowResidual(state,
+                                                                                          PartLoadRatio, // coil part load ratio
+                                                                                          SysIndex,
+                                                                                          FirstHVACIteration,
+                                                                                          ZoneLoad,
+                                                                                          SZVAVModel.AirInNode,
+                                                                                          OnOffAirFlowRatio,
+                                                                                          AirLoopNum,
+                                                                                          coilFluidInletNode,
+                                                                                          0.0,
+                                                                                          lowSpeedFanRatio,
+                                                                                          minAirMassFlow,
+                                                                                          maxAirMassFlow,
+                                                                                          CoolingLoad,
+                                                                                          0.0,
+                                                                                          1.0);
+                };
+                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 3: ";
                 }

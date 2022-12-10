@@ -898,8 +898,22 @@ namespace UnitarySystems {
         );
 
         static Real64 calcUnitarySystemWaterFlowResidual(EnergyPlusData &state,
-                                                         Real64 const PartLoadRatio,    // water mass flow rate [kg/s]
-                                                         std::vector<Real64> const &Par // Function parameters
+                                                         Real64 PartLoadRatio, // coil part load ratio
+                                                         int UnitarySysNum,
+                                                         bool FirstHVACIteration,
+                                                         Real64 QZnReq,
+                                                         int AirControlNode,
+                                                         Real64 OnOffAirFlowRat,
+                                                         int AirLoopNum,
+                                                         int WaterControlNode,
+                                                         Real64 highWaterMdot,
+                                                         Real64 lowSpeedRatio,
+                                                         Real64 airMdot,
+                                                         Real64 systemMaxAirFlowRate,
+                                                         bool coolingLoad,
+                                                         Real64 par13,
+                                                         Real64 par16
+
         );
 
         void simulate(EnergyPlusData &state,
