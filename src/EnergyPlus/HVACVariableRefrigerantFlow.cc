@@ -11333,7 +11333,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     Real64 Tfs;                      // Temperature of the air at the coil surface [C]
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
-    Array1D<Real64> Par(3);                // Array for the parameters [-]
 
     // variable initializations
     TUListNum = this->ZoneTUListPtr;
@@ -12570,17 +12569,16 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     Real64 constexpr MinPLF(0.0);     // minimum part load factor allowed
     Real64 constexpr ErrorTol(0.001); // tolerance for RegulaFalsi iterations
 
-    Real64 FullOutput;      // unit full output when compressor is operating [W]
-    Real64 TempOutput;      // unit output when iteration limit exceeded [W]
-    Real64 NoCompOutput;    // output when no active compressor [W]
-    int SolFla;             // Flag of RegulaFalsi solver
-    Array1D<Real64> Par(6); // Parameters passed to RegulaFalsi
-    Real64 TempMinPLR;      // min PLR used in Regula Falsi call
-    Real64 TempMaxPLR;      // max PLR used in Regula Falsi call
-    bool ContinueIter;      // used when convergence is an issue
-    int VRFCond;            // index to VRF condenser
-    int IndexToTUInTUList;  // index to TU in specific list for the VRF system
-    int TUListIndex;        // index to TU list for this VRF system
+    Real64 FullOutput;     // unit full output when compressor is operating [W]
+    Real64 TempOutput;     // unit output when iteration limit exceeded [W]
+    Real64 NoCompOutput;   // output when no active compressor [W]
+    int SolFla;            // Flag of RegulaFalsi solver
+    Real64 TempMinPLR;     // min PLR used in Regula Falsi call
+    Real64 TempMaxPLR;     // max PLR used in Regula Falsi call
+    bool ContinueIter;     // used when convergence is an issue
+    int VRFCond;           // index to VRF condenser
+    int IndexToTUInTUList; // index to TU in specific list for the VRF system
+    int TUListIndex;       // index to TU list for this VRF system
     bool VRFCoolingMode;
     bool VRFHeatingMode;
     bool HRCoolingMode;
@@ -13067,7 +13065,6 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
 
     Real64 AirMassFlowRate; // air mass flow rate of the coil (kg/s)
 
-    Array1D<Real64> Par(7);          // Parameters passed to RegulaFalsi
     int constexpr Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
     int constexpr MaxIte(500);       // maximum number of iterations
     int DXCoilNum;                   // index to DX Coil
@@ -13122,12 +13119,6 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
         QCoilAct = 0.0;
         AirMassFlowRate = max(state.dataHVACVarRefFlow->OACompOnMassFlow, 0.0);
         return AirMassFlowRate;
-    }
-
-    if (FirstHVACIteration) {
-        Par(1) = 1.0;
-    } else {
-        Par(1) = 0.0;
     }
 
     FanSpdRatioMax = 1.0;
@@ -14159,7 +14150,6 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C}
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
-    Array1D<Real64> Par(3);                // Array for the parameters [-]
 
     static constexpr std::string_view RoutineName("VRFOU_CalcCompC");
 
@@ -14491,7 +14481,6 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C}
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
-    Array1D<Real64> Par(3);                // Array for the parameters [-]
 
     static constexpr std::string_view RoutineName("VRFOU_CalcCompH");
 
@@ -14672,7 +14661,6 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
     using FluidProperties::GetSupHeatEnthalpyRefrig;
     using General::SolveRoot;
 
-    Array1D<Real64> Par(7);         // Parameters passed to RegulaFalsi
     Real64 constexpr ErrorTol(0.1); // tolerance for RegulaFalsi iterations
     int constexpr MaxIte(100);      // maximum number of iterations
     int HRMode(0);                  // HR operational mode [W]
