@@ -2040,14 +2040,15 @@ namespace HeatBalanceManager {
 
             if (MaterialNames(4) == "") {
                 thisMaterial->SolarDiffusing = false;
-            } else if (MaterialNames(4) == "YES") {
-                thisMaterial->SolarDiffusing = true;
-            } else if (MaterialNames(4) == "NO") {
-                thisMaterial->SolarDiffusing = false;
             } else {
-                ErrorsFound = true;
-                ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(4) + " must be Yes or No, entered value=" + MaterialNames(4));
+                BooleanSwitch answer = getYesNoValue(MaterialNames(4));
+                if (answer == BooleanSwitch::Invalid) {
+                    ErrorsFound = true;
+                    ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
+                    ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(4) + " must be Yes or No, entered value=" + MaterialNames(4));
+                } else {
+                    thisMaterial->SolarDiffusing = (answer == BooleanSwitch::Yes);
+                }
             }
             // Get SpectralAndAngle table names
             if (thisMaterial->GlassSpectralAndAngle) {
