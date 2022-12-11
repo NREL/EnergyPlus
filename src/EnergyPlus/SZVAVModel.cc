@@ -90,11 +90,11 @@ namespace SZVAVModel {
                         bool const CoolingLoad,
                         bool const HeatingLoad,
                         Real64 const ZoneLoad,
-                        Real64 &OnOffAirFlowRatio,
+                        [[maybe_unused]] Real64 &OnOffAirFlowRatio,
                         [[maybe_unused]] bool const HXUnitOn,
-                        int const AirLoopNum,
+                        [[maybe_unused]] int const AirLoopNum,
                         Real64 &PartLoadRatio,
-                        DataHVACGlobals::CompressorOperation const CompressorONFlag)
+                        [[maybe_unused]] DataHVACGlobals::CompressorOperation const CompressorONFlag)
     {
 
         int constexpr MaxIter(100); // maximum number of iterations
