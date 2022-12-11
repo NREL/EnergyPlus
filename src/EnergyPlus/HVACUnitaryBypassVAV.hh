@@ -341,11 +341,6 @@ namespace HVACUnitaryBypassVAV {
 
     Real64 CalcSetPointTempTarget(EnergyPlusData &state, int CBVAVNumber); // Index to changeover-bypass VAV system
 
-    Real64 DXHeatingCoilResidual(EnergyPlusData &state,
-                                 Real64 PartLoadFrac,       // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1D<Real64> const &Par // Par(1) = DX coil number
-    );
-
     Real64 MultiModeDXCoilResidual(EnergyPlusData &state,
                                    Real64 PartLoadRatio,      // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1D<Real64> const &Par // Par(1) = DX coil number
