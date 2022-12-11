@@ -101,7 +101,6 @@ namespace SZVAVModel {
         int SolFlag(0);             // return flag from RegulaFalsi for sensible load
         std::string MessagePrefix;  // label for warning reporting
 
-        Array1D<Real64> Par(17); // parameters passed to RegulaFalsi function
         Real64 lowBoundaryLoad(0.0);
         Real64 highBoundaryLoad(0.0);
         Real64 minHumRat(0.0);
@@ -158,30 +157,6 @@ namespace SZVAVModel {
             coilAirInletNode = 0;
             coilAirOutletNode = 0;
         }
-        // set up RegulaFalsi variables
-        Par(1) = double(SysIndex);
-        Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-        if (FirstHVACIteration) Par(2) = 1.0;
-        Par(3) = double(SZVAVModel.ControlZoneNum);
-        Par(4) = ZoneLoad; // load to be met
-        Par(5) = double(SZVAVModel.AirInNode);
-        Par(6) = OnOffAirFlowRatio;
-        Par(7) = double(AirLoopNum);
-        Par(8) = double(coilFluidInletNode);
-        // initialize other RegulaFalsi variables to most common state
-        Par(9) = 0.0;               // minCoilFluidFlow - low fan speed water flow rate
-                                    //            Par( 10 ) = maxCoilFluidFlow; // max water flow rate used by RegulaFalsi
-        Par(11) = lowSpeedFanRatio; // ratio of low speed fan flow to max flow
-        Par(12) = minAirMassFlow;   // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
-        Par(14) = maxAirMassFlow;   // constant, denotes system maximum air flow rate
-        if (CoolingLoad) {
-            Par(15) = 1.0;
-        } else {
-            Par(15) = 0.0;
-        }
-        Par(16) = 1.0;                      // iteration method, 1 = modulate coil capacity, 2 = modulate air flow rate
-        Par(17) = double(CompressorONFlag); // ** not used, gets rid of warning (unused variable) in PTUnit version of SZVAV
-
         int InletNode = SZVAVModel.AirInNode;
         Real64 InletTemp = state.dataLoopNodes->Node(InletNode).Temp;
         int OutletNode = SZVAVModel.AirOutNode;
@@ -256,7 +231,6 @@ namespace SZVAVModel {
             // set max water flow rate and check to see if plant limits flow
             if (coilPlantLoc.loopNum > 0)
                 PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
-            Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
             if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                 // set the water flow ratio so water coil gets proper flow
@@ -276,8 +250,6 @@ namespace SZVAVModel {
 
             if ((CoolingLoad && TempSensOutput < ZoneLoad) || (HeatingLoad && TempSensOutput > ZoneLoad)) { // low speed fan can meet load
 
-                Par(12) = minAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
-                Par(13) = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
                 auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad, coilFluidInletNode, maxCoilFluidFlow, minAirMassFlow](
                              Real64 const PLR) {
                     return FanCoilUnits::CalcFanCoilWaterFlowResidual(state,
@@ -331,12 +303,8 @@ namespace SZVAVModel {
                     // set max water flow rate and check to see if plant limits flow
                     if (coilPlantLoc.loopNum > 0)
                         PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
-                    Par(10) = maxCoilFluidFlow; // max water flow rate
 
                     if ((CoolingLoad && (TempSensOutput < ZoneLoad)) || (HeatingLoad && (TempSensOutput > ZoneLoad))) {
-                        Par(9) = lowWaterMdot; // minCoilFluidFlow - low fan speed water flow rate > 0 if SAT limited
-                        Par(12) = AirMassFlow; // sets air flow rate used when iterating on coil capacity
-                        Par(13) = 0.0;         // other than 0 means to iterate on SA temperature
                         if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
                             auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad, coilFluidInletNode, maxCoilFluidFlow, AirMassFlow](
                                          Real64 const PLR) {
@@ -452,7 +420,6 @@ namespace SZVAVModel {
                 // set max water flow rate and check to see if plant limits flow
                 if (coilPlantLoc.loopNum > 0)
                     PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
-                Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
                 if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                     // set the water flow ratio so water coil gets proper flow
@@ -482,8 +449,6 @@ namespace SZVAVModel {
                 FanCoilUnits::Calc4PipeFanCoil(state, SysIndex, SZVAVModel.ControlZoneNum, FirstHVACIteration, TempSensOutput, PartLoadRatio);
                 if ((CoolingLoad && ZoneLoad < TempSensOutput) || (HeatingLoad && ZoneLoad > TempSensOutput)) {
                     // otherwise iterate on load
-                    Par(12) = maxAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
-                    Par(13) = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
                     if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
                         auto f = [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad, coilFluidInletNode, maxCoilFluidFlow, maxAirMassFlow](
                                      Real64 const PLR) {
