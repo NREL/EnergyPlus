@@ -2638,12 +2638,35 @@ namespace HVACUnitaryBypassVAV {
                                     }
                                 }
                                 // now find the speed ratio for the found speednum
-                                Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                                Par(2) = DesOutTemp;
-                                Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                                Par(3) = double(SpeedNum);
-                                Par(4) = double(CBVAVNum);
-                                General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+                                auto f = [&state, CBVAVNum, SpeedNum, DesOutTemp](Real64 const SpeedRatio){
+                                    auto & thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
+                                    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+                                    Real64 OutletAirTemp; // outlet air temperature [C]
+                                    Real64 QZnReqCycling = 0.001;
+                                    Real64 QLatReqCycling = 0.0;
+                                    Real64 OnOffAirFlowRatioCycling = 1.0;
+                                    Real64 partLoadRatio = 1.0;
+                                    int CoilIndex = thisCBVAV.CoolCoilCompIndex;
+                                    int FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                          "",
+                                                          CoilIndex,
+                                                          FanOpMode,
+                                                          thisCBVAV.MaxONOFFCyclesperHourCycling,
+                                                          thisCBVAV.HPTimeConstantCycling,
+                                                          thisCBVAV.FanDelayTimeCycling,
+                                                          DataHVACGlobals::CompressorOperation::On,
+                                                          partLoadRatio,
+                                                          SpeedNum,
+                                                          SpeedRatio,
+                                                          QZnReqCycling,
+                                                          QLatReqCycling,
+                                                          OnOffAirFlowRatioCycling);
+
+                                    OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
+                                    return DesOutTemp - OutletAirTemp;
+                                };
+                                General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, SpeedRatio, f, 1.0e-10, 1.0);
 
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
@@ -4297,85 +4320,6 @@ namespace HVACUnitaryBypassVAV {
                               PartLoadRatio,
                               speedNum,
                               speedRatio,
-                              QZnReqCycling,
-                              QLatReqCycling,
-                              OnOffAirFlowRatioCycling);
-
-        OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
-        Residuum = Par(2) - OutletAirTemp;
-
-        return Residuum;
-    }
-
-    //******************************************************************************
-
-    Real64 VSCoilSpeedResidual(EnergyPlusData &state,
-                               Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1D<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Bo Shen
-        //       DATE WRITTEN   Feb, 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        //  Calculates residual function (Temperature) by comparing with the output of variable-speed DX coil
-        // interate speed ratio between two neighboring speeds
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using VariableSpeedCoils::SimVariableSpeedCoils;
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = desired air outlet temperature [C]
-        // par(5) = supply air fan operating mode (ContFanCycCoil)
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CoilIndex;        // index of this coil
-        Real64 OutletAirTemp; // outlet air temperature [C]
-        int FanOpMode;        // Supply air fan operating mode
-        Real64 QZnReqCycling = 0.001;
-        Real64 QLatReqCycling = 0.0;
-        Real64 OnOffAirFlowRatioCycling = 1.0;
-        Real64 partLoadRatio = 1.0;
-
-        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
-
-        CoilIndex = int(Par(1));
-        int CBVAVNum = int(Par(4));
-        FanOpMode = int(Par(5));
-        Real64 speedNum = int(Par(3));
-
-        SimVariableSpeedCoils(state,
-                              "",
-                              CoilIndex,
-                              FanOpMode,
-                              CBVAV(CBVAVNum).MaxONOFFCyclesperHourCycling,
-                              CBVAV(CBVAVNum).HPTimeConstantCycling,
-                              CBVAV(CBVAVNum).FanDelayTimeCycling,
-                              DataHVACGlobals::CompressorOperation::On,
-                              partLoadRatio,
-                              speedNum,
-                              SpeedRatio,
                               QZnReqCycling,
                               QLatReqCycling,
                               OnOffAirFlowRatioCycling);

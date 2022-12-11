@@ -376,11 +376,6 @@ namespace HVACUnitaryBypassVAV {
                                  Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
-    Real64 VSCoilSpeedResidual(EnergyPlusData &state,
-                               Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1D<Real64> const &Par // par(1) = DX coil number
-    );
-
 } // namespace HVACUnitaryBypassVAV
 
 struct HVACUnitaryBypassVAVData : BaseGlobalStruct
