@@ -2406,10 +2406,13 @@ namespace HVACUnitaryBypassVAV {
                                            PartLoadFrac,
                                            OnOffAirFlowRatio);
                     } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
-                        Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                        Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
-                        Par(3) = OnOffAirFlowRatio;
-                        General::SolveRoot(state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par);
+                        auto f = [&state, CBVAVNum, OnOffAirFlowRatio](Real64 const PartLoadFrac){
+                            auto &thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
+                            DXCoils::CalcDoe2DXCoil(state, thisCBVAV.CoolCoilCompIndex, DataHVACGlobals::CompressorOperation::On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, _, OnOffAirFlowRatio);
+                            Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(thisCBVAV.CoolCoilCompIndex);
+                            return thisCBVAV.CoilTempSetPoint - OutletAirTemp;
+                        };
+                        General::SolveRoot(state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         DXCoils::SimDXCoil(state,
                                            CBVAV(CBVAVNum).DXCoolCoilName,
                                            DataHVACGlobals::CompressorOperation::On,
@@ -3848,38 +3851,6 @@ namespace HVACUnitaryBypassVAV {
         if (CalcSetPointTempTarget > CBVAV(CBVAVNumber).MaxLATHeating) CalcSetPointTempTarget = CBVAV(CBVAVNumber).MaxLATHeating;
 
         return CalcSetPointTempTarget;
-    }
-
-    Real64 DOE2DXCoilResidual(EnergyPlusData &state,
-                              Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                              Array1D<Real64> const &Par // Par(1) = DX coil number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   June 2006
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcDoe2DXCoil to get outlet temperature at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // Par(2) = desired air outlet temperature [C]
-
-        int CoilIndex = int(Par(1));
-        Real64 OnOffAirFlowFrac = Par(3); // Ratio of compressor ON to compressor OFF air mass flow rate
-
-        DXCoils::CalcDoe2DXCoil(
-            state, CoilIndex, DataHVACGlobals::CompressorOperation::On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, _, OnOffAirFlowFrac);
-
-        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
-        Real64 Residuum = Par(2) - OutletAirTemp;
-
-        return Residuum;
     }
 
     Real64 DXHeatingCoilResidual(EnergyPlusData &state,
