@@ -361,16 +361,6 @@ namespace HVACUnitaryBypassVAV {
                                Real64 &HeatCoilLoadmet  // coil heating load met
     );
 
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 HWFlow,             // hot water flow rate in kg/s
-                                Array1D<Real64> const &Par // Par(5) is the requested coil load
-    );
-
-    Real64 VSCoilCyclingResidual(EnergyPlusData &state,
-                                 Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1D<Real64> const &Par  // par(1) = DX coil number
-    );
-
 } // namespace HVACUnitaryBypassVAV
 
 struct HVACUnitaryBypassVAVData : BaseGlobalStruct

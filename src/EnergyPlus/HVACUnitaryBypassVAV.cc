@@ -2713,11 +2713,32 @@ namespace HVACUnitaryBypassVAV {
                                 }
                             } else {
                                 // cycling compressor at lowest speed number, find part load fraction
-                                Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                                Par(2) = DesOutTemp;
-                                Par(4) = double(CBVAVNum);
-                                Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                                General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                                auto f = [&state, CBVAVNum, DesOutTemp](Real64 const PartLoadRatio){
+                                    auto &thisCBVAV(state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum));
+                                    int speedNum = 1;
+                                    Real64 speedRatio = 0.0;
+                                    Real64 QZnReqCycling = 0.001;
+                                    Real64 QLatReqCycling = 0.0;
+                                    Real64 OnOffAirFlowRatioCycling = 1.0;
+                                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                          "",
+                                                                              thisCBVAV.CoolCoilCompIndex,
+                                                                              DataHVACGlobals::ContFanCycCoil,
+                                                                              thisCBVAV.MaxONOFFCyclesperHourCycling,
+                                                                              thisCBVAV.HPTimeConstantCycling,
+                                                                              thisCBVAV.FanDelayTimeCycling,
+                                                          DataHVACGlobals::CompressorOperation::On,
+                                                          PartLoadRatio,
+                                                          speedNum,
+                                                          speedRatio,
+                                                          QZnReqCycling,
+                                                          QLatReqCycling,
+                                                          OnOffAirFlowRatioCycling);
+
+                                    Real64 OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(thisCBVAV.CoolCoilCompIndex).OutletAirDBTemp;
+                                    return DesOutTemp - OutletAirTemp;
+                                };
+                                General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, f, 1.0e-10, 1.0);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (CBVAV(CBVAVNum).DXCyclingIterationExceeded < 4) {
@@ -2813,12 +2834,14 @@ namespace HVACUnitaryBypassVAV {
                     } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp > CBVAV(CBVAVNum).CoilTempSetPoint) {
                         PartLoadFrac = 1.0;
                     } else {
-                        Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                        Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
-                        // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                        Par(3) = double(DehumidMode);
+                        auto f = [&state, CBVAVNum, DehumidMode](Real64 const PartLoadRatio){
+                            auto &thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
+                            int FanOpMode = 2;
+                            DXCoils::SimDXCoilMultiMode(state, "", DataHVACGlobals::CompressorOperation::On, false, PartLoadRatio, DehumidMode, thisCBVAV.CoolCoilCompIndex, FanOpMode);
+                            return thisCBVAV.CoilTempSetPoint - state.dataDXCoils->DXCoilOutletTemp(thisCBVAV.CoolCoilCompIndex);
+                        };
                         General::SolveRoot(
-                            state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
+                            state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         if (SolFla == -1) {
                             if (CBVAV(CBVAVNum).MMDXIterationExceeded < 1) {
                                 ++CBVAV(CBVAVNum).MMDXIterationExceeded;
@@ -3903,13 +3926,11 @@ namespace HVACUnitaryBypassVAV {
         // par(3) = dehumidification mode (0=normal, 1=enhanced)
 
         int CoilIndex = int(Par(1));
+        Real64 desOutTemp = Par(2);
         int DehumidMode = int(Par(3));
         int FanOpMode = 2;
         DXCoils::SimDXCoilMultiMode(state, "", DataHVACGlobals::CompressorOperation::On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
-        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
-        Real64 Residuum = Par(2) - OutletAirTemp;
-
-        return Residuum;
+        return desOutTemp - state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
     }
 
     void SetAverageAirFlow(EnergyPlusData &state,
@@ -4094,15 +4115,20 @@ namespace HVACUnitaryBypassVAV {
                     // control water flow to obtain output matching HeatCoilLoad
                     SolFlag = 0;
                     MinWaterFlow = 0.0;
-                    Par(1) = double(CBVAVNum);
-                    if (FirstHVACIteration) {
-                        Par(2) = 1.0;
-                    } else {
-                        Par(2) = 0.0;
-                    }
-                    Par(3) = HeatCoilLoad;
-                    General::SolveRoot(
-                        state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                    auto f = [&state, CBVAVNum, FirstHVACIteration, HeatCoilLoad](Real64 const HWFlow){
+                        auto &thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
+                        Real64 QCoilActual = HeatCoilLoad;
+                        Real64 mdot = HWFlow;
+                        PlantUtilities::SetComponentFlowRate(state, mdot, thisCBVAV.CoilControlNode, thisCBVAV.CoilOutletNode, thisCBVAV.plantLoc);
+                        // simulate the hot water supplemental heating coil
+                        WaterCoils::SimulateWaterCoilComponents(state,thisCBVAV.HeatCoilName, FirstHVACIteration,thisCBVAV.HeatCoilIndex, QCoilActual,thisCBVAV.OpMode);
+                        if (HeatCoilLoad != 0.0) {
+                            return (QCoilActual - HeatCoilLoad) / HeatCoilLoad;
+                        } else { // Autodesk:Return Condition added to assure return value is set
+                            return 0.0;
+                        }
+                    };
+                    General::SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, f, MinWaterFlow, MaxHotWaterFlow);
                     if (SolFlag == -1) {
                         if (CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex == 0) {
                             ShowWarningMessage(state,
@@ -4192,115 +4218,6 @@ namespace HVACUnitaryBypassVAV {
             }
         }
         HeatCoilLoadmet = QCoilActual;
-    }
-
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,       // hot water flow rate in kg/s
-                                Array1D<Real64> const &Par // Par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Bereket Nigusse, FSEC/UCF
-        //       DATE WRITTEN   January 2012
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (Actual Coil Output - Requested Coil Load) / Requested Coil Load
-        // the actual coil output depends on the hot water flow rate which is varied to minimize the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls HotWaterCoilResidual, and calculates the residual as defined above.
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
-
-        int CBVAVNum = int(Par(1));
-        bool FirstHVACSoln = (Par(2) > 0.0);
-        Real64 HeatCoilLoad = Par(3);
-        Real64 QCoilActual = HeatCoilLoad;
-        Real64 mdot = HWFlow;
-        PlantUtilities::SetComponentFlowRate(state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
-
-        // simulate the hot water supplemental heating coil
-        WaterCoils::SimulateWaterCoilComponents(
-            state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACSoln, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, CBVAV(CBVAVNum).OpMode);
-        if (HeatCoilLoad != 0.0) {
-            Residuum = (QCoilActual - HeatCoilLoad) / HeatCoilLoad;
-        } else { // Autodesk:Return Condition added to assure return value is set
-            Residuum = 0.0;
-        }
-        return Residuum;
-    }
-
-    Real64 VSCoilCyclingResidual(EnergyPlusData &state,
-                                 Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1D<Real64> const &Par  // par(1) = DX coil number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Bo Shen
-        //       DATE WRITTEN   Feb, 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        //  Calculates residual function (Temperature) by comparing with the output of variable-speed DX coil
-        // interate part-load ratio
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using VariableSpeedCoils::SimVariableSpeedCoils;
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = desired air outlet temperature [C]
-        // par(5) = supply air fan operating mode (ContFanCycCoil)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CoilIndex;        // index of this coil
-        Real64 OutletAirTemp; // outlet air temperature [C]
-        int FanOpMode;        // Supply air fan operating mode
-
-        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
-
-        CoilIndex = int(Par(1));
-        int CBVAVNum = int(Par(4));
-        FanOpMode = int(Par(5));
-        int speedNum = 1;
-        Real64 speedRatio = 0.0;
-        Real64 QZnReqCycling = 0.001;
-        Real64 QLatReqCycling = 0.0;
-        Real64 OnOffAirFlowRatioCycling = 1.0;
-
-        SimVariableSpeedCoils(state,
-                              "",
-                              CoilIndex,
-                              FanOpMode,
-                              CBVAV(CBVAVNum).MaxONOFFCyclesperHourCycling,
-                              CBVAV(CBVAVNum).HPTimeConstantCycling,
-                              CBVAV(CBVAVNum).FanDelayTimeCycling,
-                              DataHVACGlobals::CompressorOperation::On,
-                              PartLoadRatio,
-                              speedNum,
-                              speedRatio,
-                              QZnReqCycling,
-                              QLatReqCycling,
-                              OnOffAirFlowRatioCycling);
-
-        OutletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).OutletAirDBTemp;
-        Residuum = Par(2) - OutletAirTemp;
-
-        return Residuum;
     }
 
 } // namespace HVACUnitaryBypassVAV
