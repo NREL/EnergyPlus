@@ -346,11 +346,6 @@ namespace HVACUnitaryBypassVAV {
                               Array1D<Real64> const &Par // Par(1) = DX coil number
     );
 
-    Real64 HXAssistDXCoilResidual(EnergyPlusData &state,
-                                  Real64 PartLoadFrac,       // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                  Array1D<Real64> const &Par // Par(1) = DX coil number
-    );
-
     Real64 DXHeatingCoilResidual(EnergyPlusData &state,
                                  Real64 PartLoadFrac,       // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1D<Real64> const &Par // Par(1) = DX coil number

@@ -2316,22 +2316,22 @@ namespace HVACUnitaryBypassVAV {
                                                                             DataHVACGlobals::ContFanCycCoil,
                                                                             HXUnitOn);
                     } else if (state.dataLoopNodes->Node(CBVAV(CBVAVNum).DXCoilOutletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
-                        Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
-                        Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
-                        Par(3) = OnOffAirFlowRatio;
-                        Par(4) = double(CBVAVNum);
-                        if (FirstHVACIteration) {
-                            Par(5) = 1.0;
-                        } else {
-                            Par(5) = 0.0;
-                        }
-                        if (HXUnitOn) {
-                            Par(6) = 1.0;
-                        } else {
-                            Par(6) = 0.0;
-                        }
+                        auto f = [&state, CBVAVNum, FirstHVACIteration, HXUnitOn](Real64 const PartLoadFrac){
+                            auto &thisCBVAV(state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum));
+                            HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
+                                                                                thisCBVAV.DXCoolCoilName,
+                                                                                FirstHVACIteration,
+                                                                                DataHVACGlobals::CompressorOperation::On,
+                                                                                PartLoadFrac,
+                                                                                thisCBVAV.CoolCoilCompIndex,
+                                                                                DataHVACGlobals::ContFanCycCoil,
+                                                                                HXUnitOn);
+
+                            Real64 OutletAirTemp = state.dataLoopNodes->Node(thisCBVAV.DXCoilOutletNode).Temp;
+                            return thisCBVAV.CoilTempSetPoint - OutletAirTemp;
+                        };
                         General::SolveRoot(
-                            state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, HXAssistDXCoilResidual, 0.0, 1.0, Par);
+                            state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                             CBVAV(CBVAVNum).DXCoolCoilName,
                                                                             FirstHVACIteration,
@@ -3877,49 +3877,6 @@ namespace HVACUnitaryBypassVAV {
             state, CoilIndex, DataHVACGlobals::CompressorOperation::On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, _, OnOffAirFlowFrac);
 
         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
-        Real64 Residuum = Par(2) - OutletAirTemp;
-
-        return Residuum;
-    }
-
-    Real64 HXAssistDXCoilResidual(EnergyPlusData &state,
-                                  Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                  Array1D<Real64> const &Par // Par(1) = DX coil number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   June 2006
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired DX coil outlet temp - actual DX coil outlet temp)
-        // HX Assisted DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcDoe2DXCoil to get outlet temperature at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // Par(2) = desired air outlet temperature [C]
-
-        int CoilIndex = int(Par(1));
-        // Real64 OnOffAirFlowFrac = Par(3); // not used
-        int CBVAVNumTemp = int(Par(4));
-        bool FirstHVACIter = (Par(5) == 1.0);
-        bool HXUnitOn = (Par(6) == 1.0); // flag to enable heat exchanger
-
-        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
-
-        HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
-                                                            CBVAV(CBVAVNumTemp).DXCoolCoilName,
-                                                            FirstHVACIter,
-                                                            DataHVACGlobals::CompressorOperation::On,
-                                                            PartLoadFrac,
-                                                            CoilIndex,
-                                                            DataHVACGlobals::ContFanCycCoil,
-                                                            HXUnitOn);
-
-        Real64 OutletAirTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNumTemp).DXCoilOutletNode).Temp;
         Real64 Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
