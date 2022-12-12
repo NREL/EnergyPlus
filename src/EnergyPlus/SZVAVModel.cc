@@ -631,6 +631,7 @@ namespace SZVAVModel {
         int OutletNode = SZVAVModel.AirOutNode;
         Real64 ZoneTemp = state.dataLoopNodes->Node(SZVAVModel.NodeNumOfControlledZone).Temp;
         Real64 ZoneHumRat = state.dataLoopNodes->Node(SZVAVModel.NodeNumOfControlledZone).HumRat;
+        Real64 lowWaterMdot = 0.0;
 
         // model attempts to control air flow rate and coil capacity in specific operating regions:
         // Region 1 (R1) - minimum air flow rate at modulated coil capacity (up to min/max temperature limits)
@@ -749,6 +750,7 @@ namespace SZVAVModel {
                           AirLoopNum,
                           coilFluidInletNode,
                           lowSpeedFanRatio,
+                          maxCoilFluidFlow,
                           minAirMassFlow,
                           maxAirMassFlow,
                           CoolingLoad](Real64 const PartLoadRatio) {
@@ -756,17 +758,19 @@ namespace SZVAVModel {
                                                                                           PartLoadRatio, // coil part load ratio
                                                                                           SysIndex,
                                                                                           FirstHVACIteration,
+                                                                                          SZVAVModel.ControlZoneNum,
                                                                                           ZoneLoad,
                                                                                           SZVAVModel.AirInNode,
                                                                                           OnOffAirFlowRatio,
                                                                                           AirLoopNum,
                                                                                           coilFluidInletNode,
                                                                                           0.0,
+                                                                                          maxCoilFluidFlow,
                                                                                           lowSpeedFanRatio,
                                                                                           minAirMassFlow,
+                                                                                          0.0,
                                                                                           maxAirMassFlow,
                                                                                           CoolingLoad,
-                                                                                          0.0,
                                                                                           1.0);
                 };
                 General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
@@ -807,6 +811,7 @@ namespace SZVAVModel {
                           coilFluidInletNode,
                           lowSpeedFanRatio,
                           AirMassFlow,
+                          lowWaterMdot,
                           maxAirMassFlow,
                           CoolingLoad,
                           maxCoilFluidFlow](Real64 const PartLoadRatio) {
@@ -814,17 +819,19 @@ namespace SZVAVModel {
                                                                                           PartLoadRatio, // coil part load ratio
                                                                                           SysIndex,
                                                                                           FirstHVACIteration,
+                                                                                          SZVAVModel.ControlZoneNum,
                                                                                           ZoneLoad,
                                                                                           SZVAVModel.AirInNode,
                                                                                           OnOffAirFlowRatio,
                                                                                           AirLoopNum,
                                                                                           coilFluidInletNode,
+                                                                                          lowWaterMdot,
                                                                                           maxCoilFluidFlow,
                                                                                           lowSpeedFanRatio,
                                                                                           AirMassFlow,
+                                                                                          0.0,
                                                                                           maxAirMassFlow,
                                                                                           CoolingLoad,
-                                                                                          0.0,
                                                                                           1.0);
                 };
                 General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
@@ -895,27 +902,36 @@ namespace SZVAVModel {
                           AirLoopNum,
                           coilFluidInletNode,
                           lowSpeedFanRatio,
-                          minAirMassFlow,
+                          maxCoilFluidFlow,
+                          lowWaterMdot,
                           maxAirMassFlow,
                           CoolingLoad](Real64 const PartLoadRatio) {
                     return UnitarySystems::UnitarySys::calcUnitarySystemWaterFlowResidual(state,
                                                                                           PartLoadRatio, // coil part load ratio
                                                                                           SysIndex,
                                                                                           FirstHVACIteration,
+                                                                                          SZVAVModel.ControlZoneNum,
                                                                                           ZoneLoad,
                                                                                           SZVAVModel.AirInNode,
                                                                                           OnOffAirFlowRatio,
                                                                                           AirLoopNum,
                                                                                           coilFluidInletNode,
-                                                                                          0.0,
+                                                                                          lowWaterMdot,
+                                                                                          maxCoilFluidFlow,
                                                                                           lowSpeedFanRatio,
-                                                                                          minAirMassFlow,
+                                                                                          maxAirMassFlow,
+                                                                                          0.0,
                                                                                           maxAirMassFlow,
                                                                                           CoolingLoad,
-                                                                                          0.0,
                                                                                           1.0);
                 };
                 General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
+                //                Par[12] = maxAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed air flow rate,
+                //                maxAirMassFlow indicates full
+                //                                          // air flow
+                //                Par[13] = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
+                //                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual,
+                //                0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 3: ";
                 }
