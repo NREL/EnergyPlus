@@ -13524,13 +13524,13 @@ namespace UnitarySystems {
                 } else {
 
                     if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-
-                        Par[1] = double(this->m_CoolingCoilIndex);
-                        Par[2] = DesOutHumRat;
-                        Par[5] = double(FanOpMode);
-                        General::SolveRoot(state, HumRatAcc, MaxIte, SolFlaLat, PartLoadFrac, this->DOE2DXCoilHumRatResidual, 0.0, 1.0, Par);
+                        auto f = [&state, this, DesOutHumRat, FanOpMode](Real64 const PartLoadRatio){
+                            DXCoils::CalcDoe2DXCoil(state, this->m_CoolingCoilIndex, DataHVACGlobals::CompressorOperation::On, true, PartLoadRatio, FanOpMode);
+                            Real64 OutletAirHumRat = state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
+                            return DesOutHumRat - OutletAirHumRat;
+                        };
+                        General::SolveRoot(state, HumRatAcc, MaxIte, SolFlaLat, PartLoadFrac, f, 0.0, 1.0);
                         this->m_CompPartLoadRatio = PartLoadFrac;
-
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
 
                         //               IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
@@ -16175,40 +16175,6 @@ namespace UnitarySystems {
         if (RuntimeFrac > 1.0) {
             RuntimeFrac = 1.0;
         }
-    }
-
-    Real64 UnitarySys::DOE2DXCoilHumRatResidual(EnergyPlusData &state,
-                                                Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   January 2008
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet humrat - actual outlet humrat)
-        // DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcDOe2DXCoil to get outlet humidity ratio at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet humidity ratio [kg/kg]
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        int CoilIndex = int(Par[1]);
-        int FanOpMode = int(Par[5]);
-        DXCoils::CalcDoe2DXCoil(state, CoilIndex, DataHVACGlobals::CompressorOperation::On, true, PartLoadRatio, FanOpMode);
-        Real64 OutletAirHumRat = state.dataDXCoils->DXCoilOutletHumRat(CoilIndex);
-        Residuum = Par[2] - OutletAirHumRat;
-
-        return Residuum;
     }
 
     Real64 UnitarySys::calcUnitarySystemLoadResidual(EnergyPlusData &state,
