@@ -17153,18 +17153,18 @@ namespace UnitarySystems {
 
     Real64 UnitarySys::calcUnitarySystemWaterFlowResidual(EnergyPlusData &state,
                                                           Real64 const PartLoadRatio, // coil part load ratio
-                                                          int par1_UnitarySysNum,
-                                                          bool par2_FirstHVACIteration,
-                                                          Real64 par4_QZnReq,
-                                                          int par5_AirControlNode,
-                                                          Real64 par6_OnOffAirFlowRatio,
-                                                          int par7_AirLoopNum,
-                                                          int par8_WaterControlNode,
-                                                          Real64 par10_highWaterMdot,
-                                                          Real64 par11_lowSpeedRatio,
-                                                          Real64 par12_airMdot,
+                                                          int UnitarySysNum,
+                                                          bool FirstHVACIteration,
+                                                          Real64 QZnReq,
+                                                          int AirControlNode,
+                                                          Real64 OnOffAirFlowRat,
+                                                          int AirLoopNum,
+                                                          int WaterControlNode,
+                                                          Real64 highWaterMdot,
+                                                          Real64 lowSpeedRatio,
+                                                          Real64 airMdot,
                                                           Real64 par13_SATempTarget,
-                                                          Real64 par14_systemMaxAirFlowRate,
+                                                          Real64 systemMaxAirFlowRate,
                                                           Real64 par15_LoadType,
                                                           Real64 par16_IterationMethod)
     {
@@ -17202,20 +17202,7 @@ namespace UnitarySystems {
         //       Par(16) = iteration method         ! 1 = iteration on coil capacity, 2 = iterate on air flow rate at constant coil capacity
 
         // Convert parameters to usable variables
-        int UnitarySysNum = par1_UnitarySysNum;
         UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        bool FirstHVACIteration = par2_FirstHVACIteration;
-        // int ControlledZoneNum = int(Par[3]);
-        Real64 QZnReq = par4_QZnReq;
-        int AirControlNode = par5_AirControlNode;
-        Real64 OnOffAirFlowRat = par6_OnOffAirFlowRatio;
-        int AirLoopNum = par7_AirLoopNum;
-        int WaterControlNode = par8_WaterControlNode;
-        // Real64 lowWaterMdot = Par[9];
-        Real64 highWaterMdot = par10_highWaterMdot;
-        Real64 lowSpeedRatio = par11_lowSpeedRatio;
-        Real64 airMdot = par12_airMdot;
         Real64 SATempTarget = 0.0;
         bool LoadIsTarget = false;
         if (par13_SATempTarget == 0.0) {
@@ -17224,8 +17211,6 @@ namespace UnitarySystems {
             SATempTarget = par13_SATempTarget;
         }
         bool iterateOnAirOnly = (par16_IterationMethod > 1.0);
-
-        Real64 systemMaxAirFlowRate = par14_systemMaxAirFlowRate;
         bool coolingLoad = (par15_LoadType > 0.0);
 
         bool HXUnitOn = true;
