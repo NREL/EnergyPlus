@@ -625,11 +625,6 @@ namespace UnitarySystems {
                                                     // par 10 not used
                                                     int AirLoopNum);
 
-        static Real64 HXAssistedCoolCoilHRResidual(EnergyPlusData &state,
-                                                   Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                   std::vector<Real64> const &Par // par(1) = DX coil number
-        );
-
         static Real64 DXCoilVarSpeedResidual(EnergyPlusData &state,
                                              Real64 const SpeedRatio,       // compressor speed ratio (1.0 is max, 0.0 is min)
                                              std::vector<Real64> const &Par // par(1) = DX coil number

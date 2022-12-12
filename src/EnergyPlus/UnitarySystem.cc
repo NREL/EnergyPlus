@@ -13527,7 +13527,7 @@ namespace UnitarySystems {
                             PartLoadFrac = 1.0;
                             //               ELSE find the PLR to meet the load
                         } else {
-                            Par[1] = double(this->m_CoolingCoilIndex);
+                            Par[1] = double();
                             Par[2] = DesOutHumRat;
                             // FirstHVACIteration is a logical, Par is REAL(r64), so make TRUE = 1 and FALSE = 0
                             if (FirstHVACIteration) {
@@ -13543,7 +13543,21 @@ namespace UnitarySystems {
                             Par[5] = double(FanOpMode);
                             Par[6] = 0.0; // double(this->m_DehumidificationMode);
                             Par[7] = 0.0; // this->CoilSHR;
-                            General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
+                            auto f = [&state, this, FirstHVACIteration, HXUnitOn, FanOpMode, DesOutHumRat](Real64 const PartLoadRatio) {
+                                HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
+                                                                                     this->m_CoolingCoilIndex,
+                                                                                     FirstHVACIteration,
+                                                                                     DataHVACGlobals::CompressorOperation::On,
+                                                                                     PartLoadRatio,
+                                                                                     HXUnitOn,
+                                                                                     FanOpMode,
+                                                                                     _,
+                                                                                     state.dataUnitarySystems->economizerFlag,
+                                                                                     0.0,
+                                                                                     0.0); // CoilSHR_par);
+                                return DesOutHumRat - state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
+                            };
+                            General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             if (SolFla == -1) {
 
                                 //                   RegulaFalsi may not find latent PLR when the latent degradation model is used.
@@ -13591,8 +13605,7 @@ namespace UnitarySystems {
                                 }
                                 TempMinPLR = max(0.0, TempMinPLR - 0.1);
                                 //                   tighter boundary of solution has been found, CALL RegulaFalsi a second time
-                                General::SolveRoot(
-                                    state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par);
+                                General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, f, TempMinPLR, TempMaxPLR);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (this->warnIndex.m_HXAssistedCRLatPLRIter < 1) {
@@ -16210,52 +16223,6 @@ namespace UnitarySystems {
         Real64 baselineLoad = SensibleLoad == 1.0 ? SensOutput : LatOutput;
         Real64 divisor = std::abs(LoadToBeMet) == 0.0 ? 100.0 : LoadToBeMet;
         return (baselineLoad - LoadToBeMet) / divisor;
-    }
-
-    Real64 UnitarySys::HXAssistedCoolCoilHRResidual(EnergyPlusData &state,
-                                                    Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                    std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   January 2008
-
-        // PURPOSE OF THIS FUNCTION:
-        //  Calculates residual function (desired outlet humrat - actual outlet humrat)
-        //  DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        //  Calls CalcHXAssistedCoolingCoil to get outlet humidity ratio at the given part load ratio
-        //  and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet humidity ratio [kg/kg]
-        // par(3) = FirstHVACIteration logical converted to numeric (1=TRUE,0=FALSE)
-        // par(4) = HX control (On/Off)
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        int CoilIndex = int(Par[1]);
-        // FirstHVACIteration is a logical, Par is REAL(r64), so make 1=TRUE and 0=FALSE
-        bool FirstHVACIteration = (Par[3] > 0.0);
-        bool HXUnitOn = (Par[4] == 1.0);
-        int FanOpMode = int(Par[5]);
-        int DehumidificationMode_par = int(Par[6]);
-
-        HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
-                                                             CoilIndex,
-                                                             FirstHVACIteration,
-                                                             DataHVACGlobals::CompressorOperation::On,
-                                                             PartLoadRatio,
-                                                             HXUnitOn,
-                                                             FanOpMode,
-                                                             _,
-                                                             state.dataUnitarySystems->economizerFlag,
-                                                             DehumidificationMode_par,
-                                                             0.0); // CoilSHR_par);
-        Real64 OutletAirHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(CoilIndex);
-        return Par[2] - OutletAirHumRat;
     }
 
     Real64 UnitarySys::DXCoilVarSpeedResidual(EnergyPlusData &state,
