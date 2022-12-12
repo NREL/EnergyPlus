@@ -14526,11 +14526,11 @@ namespace UnitarySystems {
 
                         switch (this->m_HeatingCoilType_Num) {
                         case DataHVACGlobals::CoilDX_HeatingEmpirical: { // Coil:Heating:DX:SingleSpeed
-                            Par[1] = double(CompIndex);
-                            Par[2] = DesOutTemp;
-                            Par[3] = 1.0;               // OnOffAirFlowFrac assume = 1.0 for continuous fan dx system
-                            Par[5] = double(FanOpMode); // this does nothing since set point based control requires constant fan
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->DXHeatingCoilResidual, 0.0, 1.0, Par);
+                            auto f = [&state, CompIndex, DesOutTemp, FanOpMode](Real64 const PartLoadFrac) {
+                                DXCoils::CalcDXHeatingCoil(state, CompIndex, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, 1.0);
+                                return DesOutTemp - state.dataDXCoils->DXCoilOutletTemp(CompIndex);
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             this->m_CompPartLoadRatio = PartLoadFrac;
                         } break;
                         case DataHVACGlobals::CoilDX_MultiSpeedHeating:
@@ -17069,32 +17069,6 @@ namespace UnitarySystems {
 
         Real64 OutletAirTemp = state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).Temp;
         return Par[3] - OutletAirTemp;
-    }
-
-    Real64 UnitarySys::DXHeatingCoilResidual(EnergyPlusData &state,
-                                             Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                             std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   June 2006
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcDOe2DXCoil to get outlet temperature at the given cycling ratio
-        // and calculates the residual as defined above
-
-        int CoilIndex = int(Par[1]);
-        Real64 OnOffAirFlowFrac = Par[3];
-
-        DXCoils::CalcDXHeatingCoil(state, CoilIndex, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, OnOffAirFlowFrac);
-
-        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
-        return Par[2] - OutletAirTemp;
     }
 
     Real64 UnitarySys::calcUnitarySystemWaterFlowResidual(EnergyPlusData &state,
