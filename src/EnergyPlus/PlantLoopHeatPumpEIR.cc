@@ -1320,13 +1320,11 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     // Determine which air variable to use for GAHP:
     // Source (air) side variable to use
-    Real64 oaTempforCurve = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+    auto &thisloadsideinletnode = state.dataLoopNodes->Node(this->loadSideNodes.inlet);
+    Real64 oaTempforCurve = thisloadsideinletnode.Temp; // state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
     if (this->oaTempCurveInputVar == OATempCurveVar::DryBulb) {
-        oaTempforCurve = Psychrometrics::PsyTwbFnTdbWPb(state,
-                                                        state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
-                                                        state.dataLoopNodes->Node(this->loadSideNodes.inlet).HumRat,
-                                                        state.dataLoopNodes->Node(this->loadSideNodes.inlet).Press,
-                                                        "PLFFHPEIR::simulate()");
+        oaTempforCurve = Psychrometrics::PsyTwbFnTdbWPb(
+            state, thisloadsideinletnode.Temp, thisloadsideinletnode.HumRat, thisloadsideinletnode.Press, "PLFFHPEIR::simulate()");
     } else {
         //
     }
@@ -1375,11 +1373,8 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     // evaluate the actual current operating load side heat transfer rate
     auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
-    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           thisLoadPlantLoop.FluidName,
-                                                           state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
-                                                           thisLoadPlantLoop.FluidIndex,
-                                                           "PLFFHPEIR::simulate()");
+    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(
+        state, thisLoadPlantLoop.FluidName, thisloadsideinletnode.Temp, thisLoadPlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
     // this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
     this->loadSideHeatTransfer = availableCapacity * (partLoadRatio >= this->minPLR ? partLoadRatio : 0.0);
     this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
