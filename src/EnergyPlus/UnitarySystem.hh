@@ -672,9 +672,13 @@ namespace UnitarySystems {
         );
 
         static Real64 gasElecHeatingCoilResidual(EnergyPlusData &state,
-                                                 Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                 std::vector<Real64> const &Par // par(1) = DX coil number
-        );
+                                                 Real64 PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                                 int UnitarySysNum,
+                                                 bool FirstHVACIteration,
+                                                 Real64 desTemp,
+                                                 bool SuppHeatingCoilFlag,
+                                                 bool FanOpMode,
+                                                 Real64 HeatingLoadArg);
 
         static Real64 coolWatertoAirHPHumRatResidual(EnergyPlusData &state,
                                                      Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)

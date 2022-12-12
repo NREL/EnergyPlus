@@ -14476,21 +14476,17 @@ namespace UnitarySystems {
                         } break;
                         case DataHVACGlobals::Coil_HeatingElectric:
                         case DataHVACGlobals::Coil_HeatingDesuperheater: {
-                            Par[1] = double(this->m_UnitarySysNum);
-                            if (FirstHVACIteration) {
-                                Par[2] = 1.0;
-                            } else {
-                                Par[2] = 0.0;
-                            }
-                            Par[3] = DesOutTemp;
-                            if (SuppHeatingCoilFlag) {
-                                Par[4] = 1.0;
-                            } else {
-                                Par[4] = 0.0;
-                            }
-                            Par[5] = double(FanOpMode);
-                            Par[6] = this->m_DesignHeatingCapacity;
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->gasElecHeatingCoilResidual, 0.0, 1.0, Par);
+                            auto f = [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode](Real64 const PartLoadFrac) {
+                                return this->gasElecHeatingCoilResidual(state,
+                                                                        PartLoadFrac,
+                                                                        this->m_UnitarySysNum,
+                                                                        FirstHVACIteration,
+                                                                        DesOutTemp,
+                                                                        SuppHeatingCoilFlag,
+                                                                        FanOpMode,
+                                                                        this->m_DesignHeatingCapacity);
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         } break;
                         case DataHVACGlobals::Coil_HeatingWater: {
 
@@ -14939,21 +14935,17 @@ namespace UnitarySystems {
                             case DataHVACGlobals::Coil_HeatingGasOrOtherFuel:
                             case DataHVACGlobals::Coil_HeatingElectric:
                             case DataHVACGlobals::Coil_HeatingDesuperheater: {
-                                Par[1] = double(this->m_UnitarySysNum);
-                                if (FirstHVACIteration) {
-                                    Par[2] = 1.0;
-                                } else {
-                                    Par[2] = 0.0;
-                                }
-                                Par[3] = DesOutTemp;
-                                if (SuppHeatingCoilFlag) {
-                                    Par[4] = 1.0;
-                                } else {
-                                    Par[4] = 0.0;
-                                }
-                                Par[5] = double(FanOpMode);
-                                Par[6] = this->m_DesignSuppHeatingCapacity;
-                                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->gasElecHeatingCoilResidual, 0.0, 1.0, Par);
+                                auto f = [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode](Real64 const PartLoadFrac) {
+                                    return this->gasElecHeatingCoilResidual(state,
+                                                                            PartLoadFrac,
+                                                                            this->m_UnitarySysNum,
+                                                                            FirstHVACIteration,
+                                                                            DesOutTemp,
+                                                                            SuppHeatingCoilFlag,
+                                                                            FanOpMode,
+                                                                            this->m_DesignSuppHeatingCapacity);
+                                };
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             } break;
                             case DataHVACGlobals::Coil_HeatingElectric_MultiStage: {
                                 Par[1] = double(this->m_SuppHeatCoilIndex);
@@ -16930,9 +16922,13 @@ namespace UnitarySystems {
     }
 
     Real64 UnitarySys::gasElecHeatingCoilResidual(EnergyPlusData &state,
-                                                  Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                  std::vector<Real64> const &Par // par(1) = DX coil number
-    )
+                                                  Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                                  int UnitarySysNum,
+                                                  bool FirstHVACIteration,
+                                                  Real64 desTemp,
+                                                  bool SuppHeatingCoilFlag,
+                                                  bool FanOpMode,
+                                                  Real64 HeatingLoadArg)
     {
 
         // FUNCTION INFORMATION:
@@ -16947,30 +16943,19 @@ namespace UnitarySystems {
         // Calls SimulateHeatingCoilComponents to get outlet temperature at the given part load ratio
         // and calculates the residual as defined above
 
-        // Argument array dimensioning
-        // Par(2) = desired air outlet temperature [C]
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 OutletAirTemp; // Outlet air temperature [C]
-
-        int UnitarySysNum = int(Par[1]);
         UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        bool FirstHVACIteration = (Par[2] > 0.0);
-        bool SuppHeatingCoilFlag = (Par[4] > 0.0);
-        bool FanOpMode = Par[5]; // RR this was a 4
-        Real64 HeatingLoad = Par[6] * PartLoadFrac;
+        Real64 HeatingLoad = HeatingLoadArg * PartLoadFrac;
         // heating coils using set point control pass DataLoopNode::SensedLoadFlagValue as QCoilReq to indicate temperature control
         if (!SuppHeatingCoilFlag) {
             HeatingCoils::SimulateHeatingCoilComponents(
                 state, thisSys.m_HeatingCoilName, FirstHVACIteration, HeatingLoad, thisSys.m_HeatingCoilIndex, _, _, FanOpMode, PartLoadFrac);
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
+            return desTemp - state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
         } else {
             HeatingCoils::SimulateHeatingCoilComponents(
                 state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, HeatingLoad, thisSys.m_SuppHeatCoilIndex, _, true, FanOpMode, PartLoadFrac);
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.SuppCoilOutletNodeNum).Temp;
+            return desTemp - state.dataLoopNodes->Node(thisSys.SuppCoilOutletNodeNum).Temp;
         }
-        return Par[3] - OutletAirTemp;
     }
 
     Real64 UnitarySys::coolWatertoAirHPHumRatResidual(EnergyPlusData &state,
