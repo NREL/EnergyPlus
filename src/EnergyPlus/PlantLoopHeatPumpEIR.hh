@@ -243,7 +243,7 @@ namespace EIRPlantLoopHeatPumps {
         PlantLocation plantLoc;
         Real64 TempUpLimitFFPLHPOut = 80.0;
         bool ModulatedFlowSetToLoop = false;
-
+        
         DataPlant::FlowMode flowMode = DataPlant::FlowMode::Invalid;
         Real64 desSupplyTemp = 60.0;
         Real64 desTempLift = 11.1;
