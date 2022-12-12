@@ -13913,15 +13913,23 @@ namespace UnitarySystems {
                     } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWater) ||
                                (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed)) { // COIL:COOLING:WATER
 
-                        Par[1] = double(this->m_UnitarySysNum);
                         if (FirstHVACIteration) {
                             Par[2] = 1.0;
                         } else {
                             Par[2] = 0.0;
                         }
                         Par[3] = DesOutHumRat;
+                        auto f = [&state, this, FirstHVACIteration, DesOutHumRat](Real64 const PartLoadRatio) {
+                            UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[this->m_UnitarySysNum];
+                            Real64 mdot = min(state.dataLoopNodes->Node(thisSys.CoolCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
+                                              thisSys.MaxCoolCoilFluidFlow * PartLoadRatio);
+                            state.dataLoopNodes->Node(thisSys.CoolCoilFluidInletNode).MassFlowRate = mdot;
+                            WaterCoils::SimulateWaterCoilComponents(
+                                state, thisSys.m_CoolingCoilName, FirstHVACIteration, thisSys.m_CoolingCoilIndex, _, _, PartLoadRatio);
+                            return DesOutHumRat - state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).HumRat;
+                        };
 
-                        General::SolveRoot(state, HumRatAcc, MaxIte, SolFlaLat, PartLoadFrac, this->coolWaterHumRatResidual, 0.0, 1.0, Par);
+                        General::SolveRoot(state, HumRatAcc, MaxIte, SolFlaLat, PartLoadFrac, f, 0.0, 1.0);
 
                     } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) ||
                                (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP)) {
@@ -16785,42 +16793,6 @@ namespace UnitarySystems {
         }
 
         return DesOutTemp - OutletAirTemp;
-    }
-
-    Real64 UnitarySys::coolWaterHumRatResidual(EnergyPlusData &state,
-                                               Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                               std::vector<Real64> const &Par // par(1) = CoolWater coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Chandan Sharma, FSEC
-        //       DATE WRITTEN   January 2013
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet humrat - actual outlet humrat)
-        // Cool water coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls SimulateWaterCoilComponents to get outlet temp at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet humidity ratio [kg/kg]
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        int UnitarySysNum = int(Par[1]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-        bool FirstHVACIteration = (Par[2] > 0.0);
-
-        Real64 mdot =
-            min(state.dataLoopNodes->Node(thisSys.CoolCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxCoolCoilFluidFlow * PartLoadRatio);
-        state.dataLoopNodes->Node(thisSys.CoolCoilFluidInletNode).MassFlowRate = mdot;
-        WaterCoils::SimulateWaterCoilComponents(
-            state, thisSys.m_CoolingCoilName, FirstHVACIteration, thisSys.m_CoolingCoilIndex, _, _, PartLoadRatio);
-
-        Real64 OutletAirHumRat = state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).HumRat;
-        return Par[3] - OutletAirHumRat;
     }
 
     Real64 UnitarySys::gasElecHeatingCoilResidual(EnergyPlusData &state,
