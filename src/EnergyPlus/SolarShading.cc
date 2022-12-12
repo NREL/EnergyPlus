@@ -6405,7 +6405,6 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
             int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
             auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-            auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
             int BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
             int ScNum = state.dataSurface->SurfWinScreenNumber(SurfNum);
             WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum); // Set in subr. WindowShadingManager
@@ -6600,6 +6599,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) FracSunLit = SunLitFract;
 
                         if (ANY_SHADE(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
+                            auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
                             // Shade or switchable glazing on
                             for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                 AbWinSh(Lay) = POLYF(CosInc, thisConstructSh.AbsBeamCoef(Lay)) * CosInc * FracSunLit;
@@ -6843,6 +6843,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         ADiffWinSh(Lay) * state.dataSurface->SurfWinOutsRevealDiffOntoGlazing(SurfNum);
                             }
                         } else {
+                            auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
                             // Switchable glazing
                             for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                 Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum);
@@ -6986,6 +6987,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::Detailed) {
                 if (IS_SHADED_NO_GLARE_CTRL(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
+                    auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
                     if (ShadeFlag != WinShadingType::SwitchableGlazing) {
                         // Shade or blind
                         if (ANY_SHADE_SCREEN(ShadeFlag)) {
@@ -7113,6 +7115,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             // BLOCK 3 - SCREEN, BLINDS AND GLAZING SYSTEM BEAM SOLAR TRANSMITTANCE
             //-----------------------------------------------------------------
             if (ConstrNumSh != 0 && SunLitFract > 0.0) {
+                auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
                 if (state.dataSurface->SurfWinWindowModelType(SurfNum) != WindowModel::EQL) {
                     if (IS_SHADED_NO_GLARE_CTRL(ShadeFlag)) {
                         // Shade or screen or blind on, or switchable glazing
@@ -11026,7 +11029,6 @@ void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state)
             ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
             ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
             auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-            auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
 
             SolTransGlass = POLYF(state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum),
                                   thisConstruct.TransSolBeamCoef);
@@ -11255,6 +11257,7 @@ void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state)
 
                     if (A2ill > 1.0e-6) {
 
+                        auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
                         DiffReflGlass = thisConstruct.ReflectSolDiffBack;
                         if (ShadeFlag == WinShadingType::SwitchableGlazing) {
                             SolTransGlassSh =
