@@ -9928,38 +9928,17 @@ namespace UnitarySystems {
                                               CompressorONFlag);
             }
             // Now solve again with tighter PLR limits
-            // save heating PLR
-//            HeatPLR = this->m_HeatingPartLoadFrac;
-//            Par[1] = double(this->m_UnitarySysNum);
-//            Par[2] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-//            if (FirstHVACIteration) Par[2] = 1.0;
-//            Par[3] = double(this->m_FanOpMode);
-//            Par[4] = static_cast<int>(CompressorONFlag); // CompressorOp
-//            Real64 par5;
-//            Real64 par7;
-//            if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
-//                par5 = ZoneLoad;
-//                par7 = 1.0;
-//                Par[5] = ZoneLoad;
-//                Par[7] = 1.0; // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
-//            } else {
-//                par5 = state.dataUnitarySystems->MoistureLoad;
-//                par7 = 0.0;
-//                Par[5] = state.dataUnitarySystems->MoistureLoad;
-//                Par[7] = 0.0; // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
-//            }
-//            Par[6] = 1.0; // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-//            //      IF(HeatingLoad)Par(6)  = 0.0d0
-//            Par[8] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
-//            if (HXUnitOn) {
-//                Par[9] = 1.0;
-//            } else {
-//                Par[9] = 0.0;
-//            }
-//            Par[10] = this->m_HeatingPartLoadFrac;
-//            Par[11] = double(AirLoopNum);
+            Real64 par5;
+            Real64 par7;
+            if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
+                par5 = ZoneLoad;
+                par7 = 1.0;
+            } else {
+                par5 = state.dataUnitarySystems->MoistureLoad;
+                par7 = 0.0;
+            }
 //            // Tolerance is fraction of load, M
-            auto f = [&state, this, FirstHVACIteration, CompressorONFlag, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](Real64 const PartLoadRatio) {
+            auto f = [&state, this, FirstHVACIteration, CompressorONFlag, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, par5, par7](Real64 const PartLoadRatio) {
                 // TODO: The actual Par array being used here may have been altered through any of the sections above, and this line is not covered by
                 // a unit or integration test
                 // TODO: So I made some assumptions about the arguments.  I'm not sure if ultimately this is even accessible, so maybe it doesn't
@@ -9970,9 +9949,9 @@ namespace UnitarySystems {
                                                                  FirstHVACIteration,
                                                                  // par 3 not used?
                                                                  CompressorONFlag,
-                                                                 state.dataUnitarySystems->MoistureLoad,
+                                                                 par5,
                                                                  1.0,
-                                                                 0.0,
+                                                                 par7,
                                                                  OnOffAirFlowRatio,
                                                                  HXUnitOn,
                                                                  // par 10 not used
