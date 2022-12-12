@@ -13366,7 +13366,7 @@ namespace UnitarySystems {
                                                                                  _,
                                                                                  _,
                                                                                  this->m_DehumidificationMode, // double(this->m_DehumidificationMode)
-                                                                                 0.0);                         // CoilSHR_par);
+                                                                                 0.0);
                             Real64 OutletAirTemp = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                             return DesOutTemp - OutletAirTemp;
                         };
@@ -13415,12 +13415,18 @@ namespace UnitarySystems {
                             //                       OutletHumRatDXCoil < DesOutHumRat)) THEN
                         } else if (!SensibleLoad && (OutletHumRatDXCoil < DesOutHumRat && LatentLoad && this->m_RunOnLatentLoad)) {
                             PartLoadFrac = ReqOutput / FullOutput;
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutHumRat;
-                            // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                            Par[3] = double(DehumidMode);
-                            Par[4] = double(FanOpMode);
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->multiModeDXCoilHumRatResidual, 0.0, 1.0, Par);
+                            auto f = [&state, this, DesOutHumRat, DehumidMode, FanOpMode](Real64 const PartLoadRatio) {
+                                DXCoils::SimDXCoilMultiMode(state,
+                                                            "",
+                                                            DataHVACGlobals::CompressorOperation::On,
+                                                            false,
+                                                            PartLoadRatio,
+                                                            DehumidMode,
+                                                            this->m_CoolingCoilIndex,
+                                                            FanOpMode);
+                                return DesOutHumRat - state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         } else { // must be a sensible load so find PLR
                             PartLoadFrac = ReqOutput / FullOutput;
                             auto f = [&state, this, DesOutTemp, DehumidMode, FanOpMode](Real64 const PartLoadRatio) {
@@ -13837,15 +13843,19 @@ namespace UnitarySystems {
                             General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, CycRatio, this->DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par);
                         }
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-
-                        Par[1] = double(this->m_CoolingCoilIndex);
-                        Par[2] = DesOutHumRat;
-                        // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                        Par[3] = double(DehumidMode);
-                        Par[4] = double(FanOpMode);
-                        General::SolveRoot(state, Acc, MaxIte, SolFlaLat, PartLoadFrac, this->multiModeDXCoilHumRatResidual, 0.0, 1.0, Par);
+                        auto f = [&state, this, DesOutHumRat, DehumidMode, FanOpMode](Real64 const PartLoadRatio) {
+                            DXCoils::SimDXCoilMultiMode(state,
+                                                        "",
+                                                        DataHVACGlobals::CompressorOperation::On,
+                                                        false,
+                                                        PartLoadRatio,
+                                                        DehumidMode,
+                                                        this->m_CoolingCoilIndex,
+                                                        FanOpMode);
+                            return DesOutHumRat - state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
+                        };
+                        General::SolveRoot(state, Acc, MaxIte, SolFlaLat, PartLoadFrac, f, 0.0, 1.0);
                         this->m_CompPartLoadRatio = PartLoadFrac;
-
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
                         int OperationMode = DataHVACGlobals::coilNormalMode;
                         if (this->m_CoolingSpeedNum == 0) this->m_CoolingSpeedNum = 1;
@@ -16775,37 +16785,6 @@ namespace UnitarySystems {
         }
 
         return DesOutTemp - OutletAirTemp;
-    }
-
-    Real64 UnitarySys::multiModeDXCoilHumRatResidual(EnergyPlusData &state,
-                                                     Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                     std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   January 2008
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet humrat - actual outlet humrat)
-        // DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls SimDXCoilMultiMode to get outlet humidity ratio at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet humidity ratio [kg/kg]
-        // par(3) = dehumidification mode (0=normal, 1=enhanced)
-        // par(4) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        int CoilIndex = int(Par[1]);
-        int DehumidMode = int(Par[3]);
-        int FanOpMode = int(Par[4]);
-        DXCoils::SimDXCoilMultiMode(state, "", DataHVACGlobals::CompressorOperation::On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
-        Real64 OutletAirHumRat = state.dataDXCoils->DXCoilOutletHumRat(CoilIndex);
-        return Par[2] - OutletAirHumRat;
     }
 
     Real64 UnitarySys::coolWaterHumRatResidual(EnergyPlusData &state,

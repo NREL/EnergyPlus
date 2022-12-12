@@ -667,11 +667,6 @@ namespace UnitarySystems {
                                                      DataHVACGlobals::CompressorOperation CompressorOp,
                                                      bool SuppHeat);
 
-        static Real64 multiModeDXCoilHumRatResidual(EnergyPlusData &state,
-                                                    Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                    std::vector<Real64> const &Par // par(1) = DX coil number
-        );
-
         static Real64 coolWaterHumRatResidual(EnergyPlusData &state,
                                               Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                               std::vector<Real64> const &Par // par(1) = CoolWater coil number
