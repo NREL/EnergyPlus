@@ -9588,7 +9588,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                     }
                 }
 
-                Array1D<Real64> ParVS(10); // Parameters passed to RegulaFalsi, for variable-speed HPWH
                 if (NewTankTemp > HPSetPointTemp) {
                     int SolFla;
                     std::string IterNum;

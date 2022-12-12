@@ -578,7 +578,6 @@ struct WaterCoilsData : BaseGlobalStruct
     Array1D_bool MyCoilReportFlag;
     Array1D_bool PlantLoopScanFlag;
     Array1D<Real64> CoefSeries = Array1D<Real64>(5); // Tuned Changed to static: High call count: Set before use
-    Array1D<Real64> Par = Array1D<Real64>(4);        // Tuned Changed to static: High call count: Set before use
     bool NoSatCurveIntersect = false;                // TRUE if failed to find apparatus dew-point
     bool BelowInletWaterTemp = false;                // TRUE if apparatus dew-point below design inlet water temperature
     bool CBFTooLarge = false;                        // TRUE if the coil bypass factor is unrealistically large
@@ -618,7 +617,6 @@ struct WaterCoilsData : BaseGlobalStruct
         this->MyCoilReportFlag.deallocate();
         this->PlantLoopScanFlag.deallocate();
         this->CoefSeries = Array1D<Real64>(5);
-        this->Par = Array1D<Real64>(4);
         this->NoSatCurveIntersect = false;
         this->BelowInletWaterTemp = false;
         this->CBFTooLarge = false;
