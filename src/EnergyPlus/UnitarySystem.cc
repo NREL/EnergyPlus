@@ -14032,8 +14032,48 @@ namespace UnitarySystems {
                         }
                         Par[3] = DesOutHumRat;
                         Par[4] = ReqOutput;
-
-                        General::SolveRoot(state, HumRatAcc, MaxIte, SolFlaLat, PartLoadFrac, this->coolWatertoAirHPHumRatResidual, 0.0, 1.0, Par);
+                        auto f = [&state, this, FirstHVACIteration, DesOutHumRat, ReqOutput](Real64 const PartLoadRatio){
+                            UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[this->m_UnitarySysNum];
+                            bool errFlag = false;
+                            Real64 RuntimeFrac = 0.0; // heat pump runtime fraction
+                            thisSys.heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
+                            thisSys.m_CompPartLoadRatio = PartLoadRatio;
+                            thisSys.m_WSHPRuntimeFrac = RuntimeFrac;
+                            Real64 dummy = 0.0;
+                            if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
+                                WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
+                                                                                blankString,
+                                                                                thisSys.m_CoolingCoilIndex,
+                                                                                ReqOutput,
+                                                                                dummy,
+                                                                                thisSys.m_FanOpMode,
+                                                                                RuntimeFrac,
+                                                                                thisSys.m_MaxONOFFCyclesperHour,
+                                                                                thisSys.m_HPTimeConstant,
+                                                                                thisSys.m_FanDelayTime,
+                                                                                DataHVACGlobals::CompressorOperation::Off,
+                                                                                PartLoadRatio,
+                                                                                FirstHVACIteration);
+                            } else {
+                                WaterToAirHeatPump::SimWatertoAirHP(state,
+                                                                    blankString,
+                                                                    thisSys.m_CoolingCoilIndex,
+                                                                    thisSys.MaxCoolAirMassFlow,
+                                                                    thisSys.m_FanOpMode,
+                                                                    FirstHVACIteration,
+                                                                    RuntimeFrac,
+                                                                    thisSys.m_MaxONOFFCyclesperHour,
+                                                                    thisSys.m_HPTimeConstant,
+                                                                    thisSys.m_FanDelayTime,
+                                                                    thisSys.m_InitHeatPump,
+                                                                    ReqOutput,
+                                                                    dummy,
+                                                                    DataHVACGlobals::CompressorOperation::Off,
+                                                                    PartLoadRatio);
+                            }
+                            return DesOutHumRat - state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).HumRat;
+                        };
+                        General::SolveRoot(state, HumRatAcc, MaxIte, SolFlaLat, PartLoadFrac, f, 0.0, 1.0);
 
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
 
@@ -16850,78 +16890,6 @@ namespace UnitarySystems {
         }
     }
 
-    Real64 UnitarySys::coolWatertoAirHPHumRatResidual(EnergyPlusData &state,
-                                                      Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                      std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Chandan Sharma, FSEC
-        //       DATE WRITTEN   January 2013
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet humrat - actual outlet humrat)
-        // Cool water coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls SimWatertoAirHP or SimWatertoAirHPSimple to get outlet humidity ratio at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet humidity ratio [kg/kg]
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        int UnitarySysNum = int(Par[1]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        bool FirstHVACIteration = (Par[2] > 0.0);
-        Real64 ReqOutput = Par[4];
-        bool errFlag = false;
-        Real64 RuntimeFrac = 0.0; // heat pump runtime fraction
-
-        thisSys.heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
-
-        thisSys.m_CompPartLoadRatio = PartLoadRatio;
-        thisSys.m_WSHPRuntimeFrac = RuntimeFrac;
-
-        Real64 dummy = 0.0;
-        if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
-            WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
-                                                            blankString,
-                                                            thisSys.m_CoolingCoilIndex,
-                                                            ReqOutput,
-                                                            dummy,
-                                                            thisSys.m_FanOpMode,
-                                                            RuntimeFrac,
-                                                            thisSys.m_MaxONOFFCyclesperHour,
-                                                            thisSys.m_HPTimeConstant,
-                                                            thisSys.m_FanDelayTime,
-                                                            DataHVACGlobals::CompressorOperation::Off,
-                                                            PartLoadRatio,
-                                                            FirstHVACIteration);
-        } else {
-            WaterToAirHeatPump::SimWatertoAirHP(state,
-                                                blankString,
-                                                thisSys.m_CoolingCoilIndex,
-                                                thisSys.MaxCoolAirMassFlow,
-                                                thisSys.m_FanOpMode,
-                                                FirstHVACIteration,
-                                                RuntimeFrac,
-                                                thisSys.m_MaxONOFFCyclesperHour,
-                                                thisSys.m_HPTimeConstant,
-                                                thisSys.m_FanDelayTime,
-                                                thisSys.m_InitHeatPump,
-                                                ReqOutput,
-                                                dummy,
-                                                DataHVACGlobals::CompressorOperation::Off,
-                                                PartLoadRatio);
-        }
-
-        Real64 OutletAirHumRat = state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).HumRat;
-        return Par[3] - OutletAirHumRat;
-    }
-
     Real64 UnitarySys::coolWatertoAirHPTempResidual(EnergyPlusData &state,
                                                     Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                     int UnitarySysNum,
@@ -17423,7 +17391,7 @@ namespace UnitarySystems {
         return false;
     }
 
-    void UnitarySys::setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName)
+    void UnitarySys::setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string &thisObjectName)
     {
         this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
         TotalFloorAreaOnAirLoop = state.dataHeatBal->Zone(this->ControlZoneNum).FloorArea;

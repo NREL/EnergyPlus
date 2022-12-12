@@ -604,7 +604,7 @@ namespace UnitarySystems {
                               bool const ZoneEquipment,
                               int const ZoneOAUnitNum);
 
-        void setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
+        void setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string &thisObjectName);
 
         static Real64 calcUnitarySystemLoadResidual(EnergyPlusData &state,
                                                     Real64 const PartLoadRatio, // DX cooling coil part load ratio
@@ -682,11 +682,6 @@ namespace UnitarySystems {
                                                  bool SuppHeatingCoilFlag,
                                                  bool FanOpMode,
                                                  Real64 HeatingLoadArg);
-
-        static Real64 coolWatertoAirHPHumRatResidual(EnergyPlusData &state,
-                                                     Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                     std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
-        );
 
         static Real64 coolWatertoAirHPTempResidual(EnergyPlusData &state,
                                                    Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
