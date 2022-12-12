@@ -567,7 +567,6 @@ namespace SZVAVModel {
         int SolFlag(0);             // return flag from RegulaFalsi for sensible load
         std::string MessagePrefix;  // label for warning reporting
 
-        //        std::vector<Real64> Par(18); // parameters passed to RegulaFalsi function
         Real64 boundaryLoadMet(0.0);
         Real64 minHumRat(0.0);
         Real64 outletTemp(0.0);

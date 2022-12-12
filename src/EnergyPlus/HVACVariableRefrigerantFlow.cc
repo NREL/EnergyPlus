@@ -15384,13 +15384,11 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
     Real64 constexpr Acc(1.e-3); // Accuracy of solver result
 
     // local variable declaration:
-    std::vector<Real64> Par; // Parameter array passed to solver
     int SolFla;              // Flag of solver, num iterations if >0, else error index
     Real64 SuppHeatCoilLoad; // load passed to supplemental heating coil (W)
     Real64 QActual;          // actual coil output (W)
     Real64 PartLoadFrac;     // temporary PLR variable
 
-    Par.resize(4);
     QActual = 0.0;
     PartLoadFrac = 0.0;
     SuppHeatCoilLoad = 0.0;
@@ -15418,14 +15416,6 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
             WaterCoils::SimulateWaterCoilComponents(
                 state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
             if (QActual > SuppHeatCoilLoad) {
-                Par[1] = double(VRFTUNum);
-                if (FirstHVACIteration) {
-                    Par[2] = 1.0;
-                } else {
-                    Par[2] = 0.0;
-                }
-                Par[3] = SuppHeatCoilLoad;
-
                 auto f = [&state, VRFTUNum, FirstHVACIteration, SuppHeatCoilLoad](Real64 const PartLoadFrac) {
                     Real64 QActual = 0.0; // actual heating load deleivered [W]
                     Real64 mdot = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
@@ -15443,7 +15433,6 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                         return (QActual - SuppHeatCoilLoad) / SuppHeatCoilLoad;
                     }
                 };
-
                 General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                 this->SuppHeatPartLoadRatio = PartLoadFrac;
             } else {
