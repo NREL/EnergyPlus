@@ -144,7 +144,7 @@ namespace UserDefinedComponents {
             // throw warning
             ShowFatalError(
                 state,
-                format("SimUserDefinedPlantComponent: did not find where called from loop number called from ={} , loop side called from ={}",
+                format("SimUserDefinedPlantComponent: did not find where called from. Loop number called from ={}, loop side called from ={}.",
                        calledFromLocation.loopNum,
                        calledFromLocation.loopSideNum));
         }

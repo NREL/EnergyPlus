@@ -790,13 +790,13 @@ void ManageSizing(EnergyPlusData &state)
             std::string coolPeakDDDate;
             int coolPeakDD = 0;
             Real64 coolCap = 0.;
-            if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == SensibleCoolingLoad) {
+            if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
                 coolPeakLoadKind = "Sensible";
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
-            } else if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == TotalCoolingLoad) {
-                if (FinalSysSizing(AirLoopNum).LoadSizeType == DataSizing::Latent && state.dataHeatBal->DoLatentSizing) {
+            } else if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
+                if (FinalSysSizing(AirLoopNum).loadSizingType == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing) {
                     coolPeakLoadKind = "Total Based on Latent";
                 } else {
                     coolPeakLoadKind = "Total";
@@ -1348,7 +1348,8 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
         if (FinalSysSizing(AirLoopNum).OAAutoSized &&
             (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::VRP ||
              state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) &&
-            state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != Ventilation) {
+            state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 &&
+            FinalSysSizing(AirLoopNum).loadSizingType != DataSizing::LoadSizing::Ventilation) {
 
             // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
             // each zone
@@ -3731,48 +3732,26 @@ void GetSystemSizingInput(EnergyPlusData &state)
         UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum), cCurrentModuleObject, ErrorsFound);
 
         SysSizInput(SysSizIndex).AirPriLoopName = state.dataIPShortCut->cAlphaArgs(iNameAlphaNum);
-        {
-            auto const loadSizeType(state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum));
-            if (loadSizeType == "SENSIBLE") {
-                SysSizInput(SysSizIndex).LoadSizeType = Sensible;
-            } else if (loadSizeType == "LATENT") {
-                SysSizInput(SysSizIndex).LoadSizeType = Latent;
-            } else if (loadSizeType == "TOTAL") {
-                SysSizInput(SysSizIndex).LoadSizeType = Total;
-            } else if (loadSizeType == "VENTILATIONREQUIREMENT") {
-                SysSizInput(SysSizIndex).LoadSizeType = Ventilation;
-            }
-        }
-        // assign CoolingPeakLoadType based on LoadSizeType for now
-        if (SysSizInput(SysSizIndex).LoadSizeType == Sensible) {
-            SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
-        } else if (SysSizInput(SysSizIndex).LoadSizeType == Total ||
-                   (SysSizInput(SysSizIndex).LoadSizeType == Latent && state.dataHeatBal->DoLatentSizing)) {
-            SysSizInput(SysSizIndex).CoolingPeakLoadType = TotalCoolingLoad;
+
+        constexpr std::array<std::string_view, static_cast<int>(DataSizing::LoadSizing::Num)> LoadSizingNamesUC{
+            "SENSIBLE", "LATENT", "TOTAL", "VENTILATIONREQUIREMENT"};
+        SysSizInput(SysSizIndex).loadSizingType = static_cast<DataSizing::LoadSizing>(
+            getEnumerationValue(LoadSizingNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum))));
+
+        // assign PeakLoad based on LoadSizing for now
+        if (SysSizInput(SysSizIndex).loadSizingType == DataSizing::LoadSizing::Sensible) {
+            SysSizInput(SysSizIndex).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
+        } else if (SysSizInput(SysSizIndex).loadSizingType == DataSizing::LoadSizing::Total ||
+                   (SysSizInput(SysSizIndex).loadSizingType == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing)) {
+            SysSizInput(SysSizIndex).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
         } else {
-            SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
+            SysSizInput(SysSizIndex).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
         }
         // set the CoolCapControl input
-        SysSizInput(SysSizIndex).CoolCapControl = VAV;
-        {
-            auto const CoolCapCtrl(state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum));
-            if (CoolCapCtrl == "VAV") {
-                SysSizInput(SysSizIndex).CoolCapControl = VAV;
-            } else if (CoolCapCtrl == "BYPASS") {
-                SysSizInput(SysSizIndex).CoolCapControl = Bypass;
-            } else if (CoolCapCtrl == "VT") {
-                SysSizInput(SysSizIndex).CoolCapControl = VT;
-            } else if (CoolCapCtrl == "ONOFF") {
-                SysSizInput(SysSizIndex).CoolCapControl = OnOff;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iCoolCapControlAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are VAV, Bypass, VT, or OnOff.");
-                ErrorsFound = true;
-            }
-        }
+        constexpr std::array<std::string_view, static_cast<int>(CapacityControl::Num)> CapacityControlNamesUC{"VAV", "BYPASS", "VT", "ONOFF"};
+        SysSizInput(SysSizIndex).CoolCapControl = static_cast<CapacityControl>(
+            getEnumerationValue(CapacityControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum))));
+
         {
             auto const sizingOption(state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum));
             if (sizingOption == "COINCIDENT") {
@@ -4022,7 +4001,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::ZoneSum;
             } else if (systemOAMethod == "STANDARD62.1VENTILATIONRATEPROCEDURE") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::VRP;
-                if (SysSizInput(SysSizIndex).LoadSizeType == Ventilation) {
+                if (SysSizInput(SysSizIndex).loadSizingType == DataSizing::LoadSizing::Ventilation) {
                     ShowWarningError(
                         state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid combination of inputs.");
                     ShowContinueError(state,

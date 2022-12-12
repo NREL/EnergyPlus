@@ -7300,9 +7300,14 @@ void GetComfortSetPoints(EnergyPlusData &state,
     ThermalComfort::CalcThermalComfortFanger(state, PeopleNum, Tmax, PMVResult);
     Real64 PMVMax = PMVResult;
     if (PMVSet > PMVMin && PMVSet < PMVMax) {
-        Par(1) = PMVSet;
-        Par(2) = double(PeopleNum);
-        General::SolveRoot(state, Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
+
+        auto f = [&state, PMVSet, PeopleNum](Real64 Tset) {
+            Real64 PMVresult = 0.0; // resulting PMV values
+            ThermalComfort::CalcThermalComfortFanger(state, PeopleNum, Tset, PMVresult);
+            return (PMVSet - PMVresult);
+        };
+
+        General::SolveRoot(state, Acc, MaxIter, SolFla, Tset, f, Tmin, Tmax);
         if (SolFla == -1) {
             if (!state.dataGlobal->WarmupFlag) {
                 ++state.dataZoneTempPredictorCorrector->IterLimitExceededNum1;
@@ -7341,25 +7346,6 @@ void GetComfortSetPoints(EnergyPlusData &state,
     } else if (PMVSet > PMVMax) {
         Tset = Tmax;
     }
-}
-
-Real64 PMVResidual(EnergyPlusData &state,
-                   Real64 const Tset,
-                   Array1D<Real64> const &Par // par(1) = PMV set point
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Richard Raustad
-    //       DATE WRITTEN   May 2006
-    //       MODIFIED       L.Gu, May 2006
-
-    // PURPOSE OF THIS FUNCTION:
-    //  Calculates residual function (desired PMV value - actual PMV value) for thermal comfort control.
-    //  Calls CalcThermalComfortFanger to get PMV value at the given zone and people conditions and calculates the residual as defined above
-
-    Real64 PMVresult = 0.0; // resulting PMV values
-    ThermalComfort::CalcThermalComfortFanger(state, int(Par(2)), Tset, PMVresult);
-    return (Par(1) - PMVresult);
 }
 
 void AdjustCoolingSetPointforTempAndHumidityControl(EnergyPlusData &state,

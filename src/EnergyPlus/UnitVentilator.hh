@@ -261,11 +261,6 @@ namespace UnitVentilator {
 
     int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum);
 
-    Real64 CalcUnitVentilatorResidual(EnergyPlusData &state,
-                                      Real64 const PartLoadRatio, // Coil Part Load Ratio
-                                      Array1D<Real64> const &Par  // Function parameters
-    );
-
     Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,
                                                       int const UnitVentNum,     // Unit Ventilator index number
                                                       Real64 const MinOAFrac,    // Minimum Outside Air Fraction

@@ -154,18 +154,18 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     Real64 designExitTemp;
     Real64 designExitHumRat;
 
-    state->dataSize->SysSizInput(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
-    state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
+    state->dataSize->FinalSysSizing(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
 
     // Single path for VAV
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.002, designFlowValue);
 
     // Single path for OnOff
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::OnOff;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::OnOff;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).CoolSupTemp, designExitTemp);
@@ -173,14 +173,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
 
     // Two paths for VT:
     // CoolSupTemp > calculated value
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::VT;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VT;
     state->dataSize->CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 10;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
     // CoolSupTemp < calculated value
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::VT;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VT;
     state->dataSize->CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 15;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
 
     // Two paths for bypass:
     // MixTemp > DesExitTemp
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::Bypass;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::Bypass;
     state->dataSize->CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 13;
     state->dataSize->CalcSysSizing(1).MixTempAtCoolPeak = 15;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
@@ -204,17 +204,17 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
 
     // Oh and the sensible cases
-    state->dataSize->SysSizInput(1).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
-    state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
+    state->dataSize->FinalSysSizing(1).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
     // Repeat a VT case
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::VT;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VT;
     state->dataSize->CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 10;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
     // And a bypass case
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::Bypass;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::Bypass;
     state->dataSize->CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 13;
     state->dataSize->CalcSysSizing(1).MixTempAtCoolPeak = 15;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
@@ -256,18 +256,18 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     Real64 designExitTemp;
     Real64 designExitHumRat;
 
-    state->dataSize->SysSizInput(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
-    state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
+    state->dataSize->FinalSysSizing(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
 
     // Single path for VAV
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).CoolSupTemp, designExitTemp);
     EXPECT_DOUBLE_EQ(0.002, designFlowValue);
 
     // Single path for OnOff
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::OnOff;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::OnOff;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(state->dataSize->FinalSysSizing(1).CoolSupTemp, designExitTemp);
@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
 
     // VT
     // CoolSupTemp > calculated value
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::VT;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VT;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     // Expect warning and same result as VAV
     EXPECT_TRUE(has_err_output(true));
@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     EXPECT_DOUBLE_EQ(0.002, designFlowValue);
 
     // Bypass
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::Bypass;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::Bypass;
     DataSizing::GetCoilDesFlowT(*state, sysNum, CpAir, designFlowValue, designExitTemp, designExitHumRat);
     // Expect warning and same result as VAV
     EXPECT_TRUE(has_err_output(true));

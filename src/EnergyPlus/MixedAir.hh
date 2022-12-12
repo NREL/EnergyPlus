@@ -493,16 +493,6 @@ namespace MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(EnergyPlusData &state,
-                                       Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
-                                       Array1D<Real64> const &Par // par(1) = mixed node number
-    );
-
-    Real64 MultiCompControlTempResidual(EnergyPlusData &state,
-                                        Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
-                                        Array1D<Real64> const &Par // par(1) = mixed node number
-    );
-
     Array1D_int GetOAMixerNodeNumbers(EnergyPlusData &state,
                                       std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
                                       bool &ErrorsFound               // set to true if problem

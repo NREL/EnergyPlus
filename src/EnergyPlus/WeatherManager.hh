@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -70,6 +71,20 @@ class BaseGroundTempsModel;
 struct EnergyPlusData;
 
 namespace WeatherManager {
+
+    enum class EpwHeaderType
+    {
+        Invalid = -1,
+        Location = 0, // epw Headers are assumed to be in this order
+        DesignConditions,
+        TypicalExtremePeriods,
+        GroundTemperatures,
+        HolidaysDST,
+        Comments1,
+        Comments2,
+        DataPeriods,
+        Num
+    };
 
     // Following are Date Types read in from EPW file or IDF
     enum class DateType
@@ -85,10 +100,10 @@ namespace WeatherManager {
     enum class WaterMainsTempCalcMethod
     {
         Invalid = -1,
-        FixedDefault,
         Schedule,
         Correlation,
         CorrelationFromWeatherFile,
+        FixedDefault,
         Num
     };
 
@@ -129,7 +144,7 @@ namespace WeatherManager {
         Num
     };
 
-    enum class EmissivityCalcType
+    enum class SkyTempCalcType
     {
         Invalid = -1,
         ClarkAllenModel,    // Use Clark & Allen model for sky emissivity calculation
@@ -139,20 +154,6 @@ namespace WeatherManager {
         BruntModel,         // Use Brunt model for sky emissivity calculation
         IdsoModel,          // Use Isdo model for sky emissivity calculation
         BerdahlMartinModel, // Use Martin & Berdahl model for sky emissivity calculation
-        SkyTAlgorithmA,     // place holder
-        Num
-    };
-
-    enum class WeekDay
-    {
-        Invalid = -1,
-        Sunday = 1,
-        Monday,
-        Tuesday,
-        Wednesday,
-        Thursday,
-        Friday,
-        Saturday,
         Num
     };
 
@@ -188,7 +189,7 @@ namespace WeatherManager {
         int NumSimYears;                 // Total Number of times this period to be performed
         int CurrentCycle;                // Current cycle through weather file in NumSimYears repeats
         int WP_Type1;                    // WeatherProperties SkyTemperature Pointer
-        EmissivityCalcType SkyTempModel; // WeatherProperties SkyTemperature CalculationType
+        SkyTempCalcType SkyTempModel;    // WeatherProperties SkyTemperature CalculationType
         bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
         int CurrentYear;                 // Current year
         bool IsLeapYear;                 // True if current year is leap year.
@@ -210,7 +211,7 @@ namespace WeatherManager {
               HVACSizingIterationNum(0), TotalDays(0), StartJDay(0), StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0),
               EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0), UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true),
               UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false), NumSimYears(1), CurrentCycle(0), WP_Type1(0),
-              SkyTempModel(EmissivityCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
+              SkyTempModel(SkyTempCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
               RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0),
               firstHrInterpUseHr1(false)
         {
@@ -291,38 +292,29 @@ namespace WeatherManager {
         // Members
         std::string title;
         std::string periodType;
-        int totalDays; // total number of days in requested period
-        int startMonth;
-        int startDay;
-        int startJulianDate; // Calculated start date (Julian or ordinal) for a weather file run period
-        int startYear;       // entered in "consecutive"/real runperiod object
-        int endMonth;
-        int endDay;
-        int endJulianDate;     // Calculated end date (Julian or ordinal) for a weather file run period
-        int endYear;           // entered in "consecutive"/real runperiod object
-        int dayOfWeek;         // Day of Week that the RunPeriod will start on (User Input)
-        WeekDay startWeekDay;  // Day of the week that the RunPeriod will start on (User Input)
-        bool useDST;           // True if DaylightSavingTime is used for this RunPeriod
-        bool useHolidays;      // True if Holidays are used for this RunPeriod (from WeatherFile)
-        bool applyWeekendRule; // True if "Weekend Rule" is to be applied to RunPeriod
-        bool useRain;          // True if Rain from weather file should be used (set rain to true)
-        bool useSnow;          // True if Snow from weather file should be used (set Snow to true)
-        Array1D_int monWeekDay;
-        int numSimYears;              // Total Number of years of simulation to be performed
-        bool isLeapYear;              // True if Begin Year is leap year.
-        bool RollDayTypeOnRepeat;     // If repeating run period, increment day type on repeat.
-        bool TreatYearsAsConsecutive; // When year rolls over, increment year and recalculate Leap Year
-        bool actualWeather;           // true when using actual weather data
-        bool firstHrInterpUsingHr1;   // true for using Hour 1 for first hour interpolate; fals for using Hour 24
-
-        // Default Constructor
-        RunPeriodData()
-            : totalDays(365), startMonth(1), startDay(1), startJulianDate(2457755), startYear(2017), endMonth(12), endDay(31), endJulianDate(2458119),
-              endYear(2017), dayOfWeek(1), startWeekDay(WeekDay::Sunday), useDST(false), useHolidays(false), applyWeekendRule(false), useRain(true),
-              useSnow(true), monWeekDay{{1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6}}, numSimYears(1), isLeapYear(false), RollDayTypeOnRepeat(true),
-              TreatYearsAsConsecutive(true), actualWeather(false), firstHrInterpUsingHr1(false)
-        {
-        }
+        int totalDays = 365; // total number of days in requested period
+        int startMonth = 1;
+        int startDay = 1;
+        int startJulianDate = 2457755; // Calculated start date (Julian or ordinal) for a weather file run period
+        int startYear = 2017;          // entered in "consecutive"/real runperiod object
+        int endMonth = 12;
+        int endDay = 31;
+        int endJulianDate = 2458119; // Calculated end date (Julian or ordinal) for a weather file run period
+        int endYear = 2017;          // entered in "consecutive"/real runperiod object
+        int dayOfWeek = 1;           // Day of Week that the RunPeriod will start on (User Input)
+        ScheduleManager::DayType startWeekDay = ScheduleManager::DayType::Sunday; // Day of the week that the RunPeriod will start on (User Input)
+        bool useDST = false;                                                      // True if DaylightSavingTime is used for this RunPeriod
+        bool useHolidays = false;                                                 // True if Holidays are used for this RunPeriod (from WeatherFile)
+        bool applyWeekendRule = false;                                            // True if "Weekend Rule" is to be applied to RunPeriod
+        bool useRain = true;                                                      // True if Rain from weather file should be used (set rain to true)
+        bool useSnow = true;                                                      // True if Snow from weather file should be used (set Snow to true)
+        Array1D_int monWeekDay = {1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6};            // Weekday for first day of each month
+        int numSimYears = 1;                                                      // Total Number of years of simulation to be performed
+        bool isLeapYear = false;                                                  // True if Begin Year is leap year.
+        bool RollDayTypeOnRepeat = true;                                          // If repeating run period, increment day type on repeat.
+        bool TreatYearsAsConsecutive = true;                                      // When year rolls over, increment year and recalculate Leap Year
+        bool actualWeather = false;                                               // true when using actual weather data
+        bool firstHrInterpUsingHr1 = false; // true for using Hour 1 for first hour interpolate; false for using Hour 24
     };
 
     struct DayWeatherVariables // Derived Type for Storing Weather "Header" Data
@@ -532,14 +524,14 @@ namespace WeatherManager {
         std::string Name;         // Reference Name
         std::string ScheduleName; // Schedule Name or Algorithm Name
         bool IsSchedule;          // Default is using Schedule
-        EmissivityCalcType CalculationType;
+        SkyTempCalcType CalculationType;
         int SchedulePtr; // pointer to schedule when used
         bool UsedForEnvrn;
         bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
 
         // Default Constructor
         WeatherProperties()
-            : IsSchedule(true), CalculationType(EmissivityCalcType::ClarkAllenModel), SchedulePtr(0), UsedForEnvrn(false),
+            : IsSchedule(true), CalculationType(SkyTempCalcType::ClarkAllenModel), SchedulePtr(0), UsedForEnvrn(false),
               UseWeatherFileHorizontalIR(true)
         {
         }
@@ -670,7 +662,7 @@ namespace WeatherManager {
     Real64 AirMass(Real64 CosZen); // COS( solar zenith), 0 - 1
 
     // Calculate sky temperature from weather data
-    Real64 CalcSkyEmissivity(EnergyPlusData &state, EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
+    Real64 CalcSkyEmissivity(EnergyPlusData &state, SkyTempCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
     void ASHRAETauModel([[maybe_unused]] EnergyPlusData &state,
                         DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
@@ -759,7 +751,7 @@ namespace WeatherManager {
 
     void GetWeatherProperties(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound);
+    void GetGroundTemps(EnergyPlusData &state);
 
     void GetGroundReflectances(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -785,7 +777,7 @@ namespace WeatherManager {
 
     Real64 GetSTM(Real64 Longitude); // Longitude from user input
 
-    void ProcessEPWHeader(EnergyPlusData &state, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
+    void ProcessEPWHeader(EnergyPlusData &state, EpwHeaderType const headerType, std::string &Line, bool &ErrorsFound);
 
     void SkipEPlusWFHeader(EnergyPlusData &state);
 
@@ -814,7 +806,7 @@ namespace WeatherManager {
 
     GregorianDate computeGregorianDate(int jdate);
 
-    WeekDay calculateDayOfWeek(EnergyPlusData &state, int year, int month, int day);
+    ScheduleManager::DayType calculateDayOfWeek(EnergyPlusData &state, int year, int month, int day);
 
     int calculateDayOfYear(int Month, int Day, bool leapYear = false);
 

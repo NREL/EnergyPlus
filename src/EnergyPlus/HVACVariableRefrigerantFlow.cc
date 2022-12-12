@@ -9315,7 +9315,6 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
     Real64 FullOutput = 0.0;   // unit full output when compressor is operating [W]
     Real64 TempOutput = 0.0;   // unit output when iteration limit exceeded [W]
     int SolFla = 0;            // Flag of RegulaFalsi solver
-    Array1D<Real64> Par(6);    // Parameters passed to RegulaFalsi
     Real64 TempMinPLR = 0.0;   // min PLR used in Regula Falsi call
     Real64 TempMaxPLR = 0.0;   // max PLR used in Regula Falsi call
     bool ContinueIter;         // used when convergence is an issue
@@ -9459,19 +9458,32 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
 
     if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
 
-        Par(1) = VRFTUNum;
-        Par(2) = 0.0;
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled) Par(2) = 1.0;
-        Par(4) = 0.0; // fan OpMode
-        if (FirstHVACIteration) {
-            Par(3) = 1.0;
-        } else {
-            Par(3) = 0.0;
-        }
-        //    Par(4) = OpMode
-        Par(5) = QZnReq;
-        Par(6) = OnOffAirFlowRatio;
-        General::SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par);
+        auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
+            Real64 QZnReqTemp = QZnReq; // denominator representing zone load (W)
+            Real64 ActualOutput;        // delivered capacity of VRF terminal unit
+            Real64 SuppHeatCoilLoad = 0.0;
+            bool setPointControlled = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled;
+            Real64 nonConstOnOffAirFlowRatio = OnOffAirFlowRatio;
+
+            if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
+                    state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, nonConstOnOffAirFlowRatio, SuppHeatCoilLoad);
+            } else {
+                // Algorithm Type: VRF model based on system curve
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF(
+                    state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, nonConstOnOffAirFlowRatio, SuppHeatCoilLoad);
+            }
+
+            if (setPointControlled) {
+                Real64 outletNodeT = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
+                return (outletNodeT - state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilTempSetPoint);
+            } else {
+                if (std::abs(QZnReq) < 100.0) QZnReqTemp = sign(100.0, QZnReq);
+                return (ActualOutput - QZnReq) / QZnReqTemp;
+            }
+        };
+        General::SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
             //     Very low loads may not converge quickly. Tighten PLR boundary and try again.
             TempMaxPLR = -0.1;
@@ -9507,7 +9519,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 if (VRFHeatingMode && TempOutput < QZnReq) ContinueIter = false;
                 if (VRFCoolingMode && TempOutput > QZnReq) ContinueIter = false;
             }
-            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par);
+            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, f, TempMinPLR, TempMaxPLR);
             if (SolFla == -1) {
                 if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                     if (this->IterLimitExceeded == 0) {
@@ -10067,74 +10079,6 @@ void isVRFCoilPresent(EnergyPlusData &state, std::string_view VRFTUName, bool &C
 // *****************************************************************************
 
 // Utility subroutines for the Module
-
-Real64 PLRResidual(EnergyPlusData &state,
-                   Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                   Array1D<Real64> const &Par  // par(1) = VRFTUNum
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Richard Raustad, FSEC
-    //       DATE WRITTEN   August 2010
-    //       MODIFIED
-    //       RE-ENGINEERED
-
-    // PURPOSE OF THIS FUNCTION:
-    //  Calculates residual function ((ActualOutput - QZnReq) /QZnReq)
-    //  VRF TU output depends on the part load ratio which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    //  Calls CalcVRF to get ActualOutput at the given part load ratio
-    //  and calculates the residual as defined above
-
-    Real64 PLRResidual;
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // par(2) = indicates load (0) or set point (1) control
-    // par(3) = FirstHVACIteration
-    // par(4) = OpMode
-    // par(5) = QZnReq
-    // par(6) = OnOffAirFlowRatio
-
-    int VRFTUNum;             // TU index
-    bool FirstHVACIteration;  // FirstHVACIteration flag
-    int OpMode;               // Compressor operating mode
-    Real64 QZnReq;            // zone load (W)
-    Real64 QZnReqTemp;        // denominator representing zone load (W)
-    Real64 OnOffAirFlowRatio; // ratio of compressor ON airflow to average airflow over timestep
-    Real64 ActualOutput;      // delivered capacity of VRF terminal unit
-    Real64 SuppHeatCoilLoad;  // supplemetal heating coil load (W)
-
-    VRFTUNum = int(Par(1));
-    bool setPointControlled = (Par(2) == 1.0);
-    // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
-    FirstHVACIteration = (Par(3) == 1.0);
-    OpMode = int(Par(4));
-    QZnReq = Par(5);
-    QZnReqTemp = QZnReq;
-    OnOffAirFlowRatio = Par(6);
-    SuppHeatCoilLoad = 0.0;
-
-    if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
-        // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
-            state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
-    } else {
-        // Algorithm Type: VRF model based on system curve
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF(
-            state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
-    }
-
-    if (setPointControlled) {
-        Real64 outletNodeT = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
-        PLRResidual = (outletNodeT - state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilTempSetPoint);
-    } else {
-        if (std::abs(QZnReq) < 100.0) QZnReqTemp = sign(100.0, QZnReq);
-        PLRResidual = (ActualOutput - QZnReq) / QZnReqTemp;
-    }
-
-    return PLRResidual;
-}
 
 void SetAverageAirFlow(EnergyPlusData &state,
                        int const VRFTUNum,         // Unit index
@@ -12786,20 +12730,32 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     // The coil will not operate at PLR=0 or PLR=1, calculate the operating part-load ratio
 
     if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
+        auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
+            Real64 QZnReqTemp = QZnReq;    // denominator representing zone load (W)
+            Real64 ActualOutput;           // delivered capacity of VRF terminal unit
+            Real64 SuppHeatCoilLoad = 0.0; // supplemetal heating coil load (W)
+            bool setPointControlled = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled;
+            Real64 nonConstOnOffAirFlowRatio = OnOffAirFlowRatio;
 
-        Par(1) = VRFTUNum;
-        Par(2) = 0.0;
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled) Par(2) = 1.0;
-        Par(4) = 0.0;
-        if (FirstHVACIteration) {
-            Par(3) = 1.0;
-        } else {
-            Par(3) = 0.0;
-        }
-        //    Par(4) = OpMode
-        Par(5) = QZnReq;
-        Par(6) = OnOffAirFlowRatio;
-        SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par);
+            if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
+                    state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, nonConstOnOffAirFlowRatio, SuppHeatCoilLoad);
+            } else {
+                // Algorithm Type: VRF model based on system curve
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CalcVRF(
+                    state, VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, nonConstOnOffAirFlowRatio, SuppHeatCoilLoad);
+            }
+
+            if (setPointControlled) {
+                Real64 outletNodeT = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
+                return (outletNodeT - state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coilTempSetPoint);
+            } else {
+                if (std::abs(QZnReq) < 100.0) QZnReqTemp = sign(100.0, QZnReq);
+                return (ActualOutput - QZnReq) / QZnReqTemp;
+            }
+        };
+        SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
             //     Very low loads may not converge quickly. Tighten PLR boundary and try again.
             TempMaxPLR = -0.1;
@@ -12823,7 +12779,8 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
                 if (VRFHeatingMode && TempOutput < QZnReq) ContinueIter = false;
                 if (VRFCoolingMode && TempOutput > QZnReq) ContinueIter = false;
             }
-            SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par);
+
+            SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, f, TempMinPLR, TempMaxPLR);
             if (SolFla == -1) {
                 if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                     if (this->IterLimitExceeded == 0) {
@@ -13172,15 +13129,92 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
     } else {
         Par(1) = 0.0;
     }
-    Par(2) = VRFTUNum;
-    Par(3) = DXCoilNum;
-    Par(4) = QCoilReq;
-    Par(5) = TeTc;
-    Par(6) = PartLoadRatio;
-    Par(7) = state.dataHVACVarRefFlow->OACompOnMassFlow;
 
     FanSpdRatioMax = 1.0;
-    SolveRoot(state, ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par);
+
+    auto f = [&state, FirstHVACIteration, VRFTUNum, DXCoilNum, QCoilReq, TeTc, PartLoadRatio](Real64 const FanSpdRatio) {
+        using DXCoils::ControlVRFIUCoil;
+        using Fans::SimulateFanComponents;
+        using MixedAir::SimOAMixer;
+        using Psychrometrics::PsyHFnTdbW;
+        using SingleDuct::SimATMixer;
+
+        int constexpr Mode(1);  // Performance mode for MultiMode DX coil. Always 1 for other coil types
+        int OAMixNode;          // index to the mix node of OA mixer
+        int VRFCond;            // index to VRF condenser
+        int VRFInletNode;       // VRF inlet node number
+        Real64 FanSpdRatioBase; // baseline FanSpdRatio for VRFTUAirFlowResidual
+        Real64 FanSpdRatioAct;  // calculated FanSpdRatio for VRFTUAirFlowResidual
+        Real64 QCoilAct;        // actual coil load [W]
+        Real64 temp;            // for temporary use
+        Real64 Tin;             // coil inlet air temperature [C]
+        Real64 Win;             // coil inlet air humidity ratio [kg/kg]
+        Real64 Hin;             // coil inlet air enthalpy
+        Real64 Wout;            // coil outlet air humidity ratio
+        Real64 Tout;            // coil outlet air temperature
+        Real64 Hout;            // coil outlet air enthalpy
+        Real64 SHact;           // coil actual SH
+        Real64 SCact;           // coil actual SC
+
+        VRFCond = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
+        VRFInletNode = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum;
+
+        if (std::abs(FanSpdRatio) < 0.01)
+            FanSpdRatioBase = sign(0.01, FanSpdRatio);
+        else
+            FanSpdRatioBase = FanSpdRatio;
+
+        // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
+        state.dataHVACVarRefFlow->CompOnMassFlow = FanSpdRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
+        SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, temp);
+        Tin = state.dataLoopNodes->Node(VRFInletNode).Temp;
+        Win = state.dataLoopNodes->Node(VRFInletNode).HumRat;
+
+        // Simulation the OAMixer if there is any
+        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
+            SimOAMixer(state,
+                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName,
+                       FirstHVACIteration,
+                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
+            OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
+            Tin = state.dataLoopNodes->Node(OAMixNode).Temp;
+            Win = state.dataLoopNodes->Node(OAMixNode).HumRat;
+        }
+        // Simulate the blow-through fan if there is any
+        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
+            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                if (temp > 0) {
+                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
+                        state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                } else {
+                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
+                        state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                }
+            } else {
+                Fans::SimulateFanComponents(state,
+                                            "",
+                                            false,
+                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex,
+                                            state.dataHVACVarRefFlow->FanSpeedRatio,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOn,
+                                            state.dataHVACGlobal->ZoneCompTurnFansOff);
+            }
+            Tin = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).Temp;
+            Win = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).HumRat;
+        }
+
+        // Call the coil control logic to determine the air flow rate to match the given coil load
+        ControlVRFIUCoil(
+            state, DXCoilNum, QCoilReq, Tin, Win, TeTc, state.dataHVACVarRefFlow->OACompOnMassFlow, FanSpdRatioAct, Wout, Tout, Hout, SHact, SCact);
+
+        Hin = PsyHFnTdbW(Tin, Win);
+        QCoilAct = FanSpdRatioAct * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) *
+                   (Hout - Hin); // positive for heating, negative for cooling
+
+        return (FanSpdRatioAct - FanSpdRatio);
+    };
+
+    SolveRoot(state, ErrorTol, MaxIte, SolFla, FanSpdRatio, f, FanSpdRatioMin, FanSpdRatioMax);
     if (SolFla < 0) FanSpdRatio = FanSpdRatioMax; // over capacity
 
     AirMassFlowRate = FanSpdRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
@@ -13188,194 +13222,11 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
     return AirMassFlowRate;
 }
 
-Real64 VRFTUAirFlowResidual_FluidTCtrl(EnergyPlusData &state,
-                                       Real64 const FanSpdRatio,  // fan speed ratio of VRF VAV TU
-                                       Array1D<Real64> const &Par // par(1) = VRFTUNum
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Rongpeng Zhang, LBNL
-    //       DATE WRITTEN   Nov 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //         Calculates residual function ( FanSpdRatioAct - FanSpdRatio ) / FanSpdRatio
-    //         This is used to address the coupling between OA mixer simulation and VRF-FluidTCtrl coil simulation.
-
-    // METHODOLOGY EMPLOYED:
-    //         VRF-FluidTCtrl TU airflow rate is determined by the control logic of VRF-FluidTCtrl coil to match the
-    //         coil load. This is affected by the coil inlet conditions. However, the airflow rate will affect the
-    //         OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
-
-    using DXCoils::ControlVRFIUCoil;
-    using Fans::SimulateFanComponents;
-    using MixedAir::SimOAMixer;
-    using Psychrometrics::PsyHFnTdbW;
-    using SingleDuct::SimATMixer;
-
-    Real64 AirFlowRateResidual;
-
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    //     Par( 1 ) = FirstHVACIteration;
-    //     Par( 2 ) = VRFTUNum;
-    //     Par( 3 ) = DXCoilNum;
-    //     Par( 4 ) = QCoilReq;
-    //     Par( 5 ) = TeTc;
-    //     Par( 6 ) = PartLoadRatio;
-    //     Par( 7 ) = OACompOnMassFlow;
-
-    int constexpr Mode(1);   // Performance mode for MultiMode DX coil. Always 1 for other coil types
-    int CoilIndex;           // index to coil
-    int OAMixNode;           // index to the mix node of OA mixer
-    int VRFCond;             // index to VRF condenser
-    int VRFTUNum;            // Unit index in VRF terminal unit array
-    int VRFInletNode;        // VRF inlet node number
-    bool FirstHVACIteration; // flag for 1st HVAC iteration in the time step
-    Real64 FanSpdRatioBase;  // baseline FanSpdRatio for VRFTUAirFlowResidual
-    Real64 FanSpdRatioAct;   // calculated FanSpdRatio for VRFTUAirFlowResidual
-    Real64 PartLoadRatio;    // Part load ratio
-    Real64 QCoilReq;         // required coil load [W]
-    Real64 QCoilAct;         // actual coil load [W]
-    Real64 temp;             // for temporary use
-    Real64 TeTc;             // evaporating/condensing temperature [C]
-    Real64 Tin;              // coil inlet air temperature [C]
-    Real64 Win;              // coil inlet air humidity ratio [kg/kg]
-    Real64 Hin;              // coil inlet air enthalpy
-    Real64 Wout;             // coil outlet air humidity ratio
-    Real64 Tout;             // coil outlet air temperature
-    Real64 Hout;             // coil outlet air enthalpy
-    Real64 SHact;            // coil actual SH
-    Real64 SCact;            // coil actual SC
-
-    // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
-    FirstHVACIteration = (Par(1) == 1.0);
-    VRFTUNum = int(Par(2));
-    CoilIndex = int(Par(3));
-    QCoilReq = Par(4);
-    TeTc = Par(5);
-    PartLoadRatio = Par(6);
-    state.dataHVACVarRefFlow->OACompOnMassFlow = Par(7);
-
-    VRFCond = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
-    VRFInletNode = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum;
-
-    if (std::abs(FanSpdRatio) < 0.01)
-        FanSpdRatioBase = sign(0.01, FanSpdRatio);
-    else
-        FanSpdRatioBase = FanSpdRatio;
-
-    // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
-    state.dataHVACVarRefFlow->CompOnMassFlow = FanSpdRatio * state.dataDXCoils->DXCoil(CoilIndex).RatedAirMassFlowRate(Mode);
-    SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, temp);
-    Tin = state.dataLoopNodes->Node(VRFInletNode).Temp;
-    Win = state.dataLoopNodes->Node(VRFInletNode).HumRat;
-
-    // Simulation the OAMixer if there is any
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
-        SimOAMixer(
-            state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
-        OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
-        Tin = state.dataLoopNodes->Node(OAMixNode).Temp;
-        Win = state.dataLoopNodes->Node(OAMixNode).HumRat;
-    }
-    // Simulate the blow-through fan if there is any
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            if (temp > 0) {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
-            } else {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
-            }
-        } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        false,
-                                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOff);
-        }
-        Tin = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).Temp;
-        Win = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).HumRat;
-    }
-
-    // Call the coil control logic to determine the air flow rate to match the given coil load
-    ControlVRFIUCoil(
-        state, CoilIndex, QCoilReq, Tin, Win, TeTc, state.dataHVACVarRefFlow->OACompOnMassFlow, FanSpdRatioAct, Wout, Tout, Hout, SHact, SCact);
-
-    Hin = PsyHFnTdbW(Tin, Win);
-    QCoilAct =
-        FanSpdRatioAct * state.dataDXCoils->DXCoil(CoilIndex).RatedAirMassFlowRate(Mode) * (Hout - Hin); // positive for heating, negative for cooling
-
-    AirFlowRateResidual = (FanSpdRatioAct - FanSpdRatio);
-
-    return AirFlowRateResidual;
-}
-
-Real64 VRFOUTeResidual_FluidTCtrl(EnergyPlusData &state,
-                                  Real64 const Te,           // outdoor unit evaporating temperature
-                                  Array1D<Real64> const &Par // par(1) = VRFTUNum
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Rongpeng Zhang, LBNL
-    //       DATE WRITTEN   Mar 2016
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    //         Calculates residual function ( Tsuction - Tsuction_new )
-    //         This is used to calculate the VRF OU evaporating temperature at the given compressor speed and operational conditions.
-
-    // METHODOLOGY EMPLOYED:
-    //         Call VRFOU_CompCap to calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational
-    //         conditions, and then call VRFOU_TeTc to obtain Tsuction_new based on OU evaporator air-side calculations
-
-    // Return value
-    Real64 TeResidual;
-
-    int VRFCond = int(Par(1));        // Index to VRF outdoor unit
-    Real64 CompSpdActual = Par(2);    // Actual compressor running speed [rps]
-    Real64 Tdischarge = Par(3);       // VRF Compressor discharge refrigerant temperature [C]
-    Real64 h_IU_evap_in = Par(4);     // enthalpy of refrigerant at IU evaporator inlet [kJ/kg]
-    Real64 h_comp_in = Par(5);        // enthalpy of refrigerant at compressor inlet [kJ/kg]
-    Real64 Q_c_TU_PL = Par(6);        // IU evaporator load, including piping loss [W]
-    Real64 m_air_evap_rated = Par(7); // Rated OU evaporator air mass flow rate [kg/s]
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 Ncomp_temp;   // compressor power [W]
-    Real64 Q_c_tot_temp; // total evaporator load, including piping loss [W]
-    Real64 Q_c_OU_temp;  // OU evaporator load, including piping loss [W]
-    Real64 Te_new;       // newly calculated OU evaporating temperature
-    Real64 Tfs;          // OU evaporator coil surface temperature [C]
-
-    // calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational conditions
-    state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(state, CompSpdActual, Te, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_temp);
-    Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
-
-    // Tsuction_new calculated based on OU evaporator air-side calculations (Tsuction_new < To)
-    state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(state,
-                                                      HXOpMode::EvapMode,
-                                                      Q_c_OU_temp,
-                                                      state.dataHVACVarRefFlow->VRF(VRFCond).SH,
-                                                      m_air_evap_rated,
-                                                      state.dataEnvrn->OutDryBulbTemp,
-                                                      state.dataEnvrn->OutHumRat,
-                                                      state.dataEnvrn->OutBaroPress,
-                                                      Tfs,
-                                                      Te_new);
-
-    TeResidual = Te_new - Te;
-
-    return TeResidual;
-}
-
 Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
-                               Real64 const T_suc,        // Compressor suction temperature Te' [C]
-                               Array1D<Real64> const &Par // parameters
+                               Real64 T_dis,
+                               Real64 CondHeat,
+                               int CAPFT,
+                               Real64 const T_suc // Compressor suction temperature Te' [C]
 )
 {
     // FUNCTION INFORMATION:
@@ -13389,15 +13240,8 @@ Real64 CompResidual_FluidTCtrl(EnergyPlusData &state,
     //
     using CurveManager::CurveValue;
 
-    Real64 T_dis;    // Compressor discharge temperature Tc' [C]
-    Real64 CondHeat; // Evaporative capacity to be met [W]
-    Real64 CAPSpd;   // Evaporative capacity of the compressor at a given spd[W]
+    Real64 CAPSpd; // Evaporative capacity of the compressor at a given spd[W]
     Real64 CompResidual;
-    int CAPFT;
-
-    T_dis = Par(1);
-    CondHeat = Par(2);
-    CAPFT = Par(3);
 
     CAPSpd = CurveValue(state, CAPFT, T_dis, T_suc);
     CompResidual = (CondHeat - CAPSpd) / CAPSpd;
@@ -14384,9 +14228,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 Q_evap_req = TU_load + Pipe_Q0; // Pipe_Q0 is updated during the iteration
                 Pipe_h_IU_in = GetSatEnthalpyRefrig(state, this->RefrigerantName, T_discharge_new - this->SC, 0.0, RefrigerantIndex, RoutineName);
                 CompSpdActual = this->CompressorSpeed(1);
-                Par(1) = T_discharge_new;
-                Par(2) = Q_evap_req * C_cap_operation0 / this->RatedEvapCapacity; // 150130 To be confirmed
-                Par(3) = this->OUCoolingCAPFT(CounterCompSpdTemp);
+                Real64 CondHeat = Q_evap_req * C_cap_operation0 / this->RatedEvapCapacity; // 150130 To be confirmed
+                int CAPFT = this->OUCoolingCAPFT(CounterCompSpdTemp);
 
                 // Update Te' (SmallLoadTe) to meet the required evaporator capacity
                 MinOutdoorUnitTe = 6;
@@ -14397,15 +14240,12 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 MinOutdoorUnitTe = GetSatTemperatureRefrig(
                     state, this->RefrigerantName, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
-                General::SolveRoot(state,
-                                   1.0e-3,
-                                   MaxIter,
-                                   SolFla,
-                                   SmallLoadTe,
-                                   CompResidual_FluidTCtrl,
-                                   MinOutdoorUnitTe,
-                                   T_suction,
-                                   Par);         // SmallLoadTe is the updated Te'
+                auto f = [&state, T_discharge_new, CondHeat, CAPFT](Real64 const T_suc) {
+                    return CompResidual_FluidTCtrl(state, T_discharge_new, CondHeat, CAPFT, T_suc);
+                };
+
+                General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe,
+                                   T_suction);   // SmallLoadTe is the updated Te'
                 if (SolFla < 0) SmallLoadTe = 6; // MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
 
                 // Get an updated Te corresponding to the updated Te'
@@ -14715,11 +14555,14 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
 
                 // Update Te'( SmallLoadTe ) to meet the required evaporator capacity
                 CompSpdActual = this->CompressorSpeed(1);
-                Par(1) = T_discharge;
-                Par(2) = Q_evap_req * C_cap_operation / this->RatedEvapCapacity;
-                Par(3) = this->OUCoolingCAPFT(CounterCompSpdTemp);
+                Real64 CondHeat = Q_evap_req * C_cap_operation / this->RatedEvapCapacity;
+                int CAPFT = this->OUCoolingCAPFT(CounterCompSpdTemp);
 
-                General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par);
+                auto f = [&state, T_discharge, CondHeat, CAPFT](Real64 const T_suc) {
+                    return CompResidual_FluidTCtrl(state, T_discharge, CondHeat, CAPFT, T_suc);
+                };
+
+                General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe, T_suction);
                 if (SolFla < 0) SmallLoadTe = MinOutdoorUnitTe;
 
                 T_suction = SmallLoadTe;
@@ -15066,16 +14909,37 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
 
         // perform iterations to calculate Te at the given compressor speed and operational conditions
         {
-            Par(1) =
-                state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->TerminalUnitList(this->ZoneTUListPtr).ZoneTUPtr(1)).VRFSysNum; // VRFCond;
-            Par(2) = CompSpdActual;
-            Par(3) = Tdischarge;
-            Par(4) = h_IU_evap_in;
-            Par(5) = h_comp_in;
-            Par(6) = Q_c_TU_PL;
-            Par(7) = m_air_evap_rated;
 
-            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Tsuction_new, VRFOUTeResidual_FluidTCtrl, Tsuction_LB, Tsuction_HB, Par);
+            auto f = [&state, this, CompSpdActual, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_TU_PL, m_air_evap_rated](Real64 const Te) {
+                int VRFCond = state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->TerminalUnitList(this->ZoneTUListPtr).ZoneTUPtr(1))
+                                  .VRFSysNum; // VRFCond;
+
+                Real64 Ncomp_temp;   // compressor power [W]
+                Real64 Q_c_tot_temp; // total evaporator load, including piping loss [W]
+                Real64 Q_c_OU_temp;  // OU evaporator load, including piping loss [W]
+                Real64 Te_new;       // newly calculated OU evaporating temperature
+                Real64 Tfs;          // OU evaporator coil surface temperature [C]
+
+                state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(
+                    state, CompSpdActual, Te, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_temp);
+                Q_c_OU_temp = Q_c_tot_temp - Q_c_TU_PL;
+
+                // Tsuction_new calculated based on OU evaporator air-side calculations (Tsuction_new < To)
+                state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(state,
+                                                                  HXOpMode::EvapMode,
+                                                                  Q_c_OU_temp,
+                                                                  state.dataHVACVarRefFlow->VRF(VRFCond).SH,
+                                                                  m_air_evap_rated,
+                                                                  state.dataEnvrn->OutDryBulbTemp,
+                                                                  state.dataEnvrn->OutHumRat,
+                                                                  state.dataEnvrn->OutBaroPress,
+                                                                  Tfs,
+                                                                  Te_new);
+
+                return Te_new - Te;
+            };
+
+            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Tsuction_new, f, Tsuction_LB, Tsuction_HB);
             if (SolFla < 0) Tsuction_new = Tsuction_LB;
 
             // Update Q_c_tot_temp using updated Tsuction_new
@@ -15574,7 +15438,25 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                 }
                 Par[3] = SuppHeatCoilLoad;
 
-                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HotWaterHeatingCoilResidual, 0.0, 1.0, Par);
+                auto f = [&state, VRFTUNum, FirstHVACIteration, SuppHeatCoilLoad](Real64 const PartLoadFrac) {
+                    Real64 QActual = 0.0; // actual heating load deleivered [W]
+                    Real64 mdot = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
+                    state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
+                    WaterCoils::SimulateWaterCoilComponents(state,
+                                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
+                                                            FirstHVACIteration,
+                                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilIndex,
+                                                            QActual,
+                                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode,
+                                                            PartLoadFrac);
+                    if (std::abs(SuppHeatCoilLoad) == 0.0) {
+                        return (QActual - SuppHeatCoilLoad) / 100.0;
+                    } else {
+                        return (QActual - SuppHeatCoilLoad) / SuppHeatCoilLoad;
+                    }
+                };
+
+                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                 this->SuppHeatPartLoadRatio = PartLoadFrac;
             } else {
                 this->SuppHeatPartLoadRatio = 1.0;
