@@ -13001,7 +13001,7 @@ namespace UnitarySystems {
                                     _,
                                     _,
                                     this->m_DehumidificationMode, // double(this->m_DehumidificationMode)
-                                    0.0);                         // CoilSHR_par);
+                                    0.0);
                                 return DesOutTemp - state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                             };
 
@@ -13263,27 +13263,27 @@ namespace UnitarySystems {
 
                         } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) ||
                                    (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP)) {
-                            Par[1] = double(this->m_UnitarySysNum);
-                            if (FirstHVACIteration) {
-                                Par[2] = 1.0;
-                            } else {
-                                Par[2] = 0.0;
-                            }
-                            Par[3] = DesOutTemp;
-                            Par[4] = ReqOutput;
                             this->m_CoolingCoilSensDemand = ReqOutput;
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->coolWatertoAirHPTempResidual, 0.0, 1.0, Par);
-
+                            auto f = [&state, this, FirstHVACIteration, DesOutTemp, ReqOutput](Real64 const PartLoadRatio) {
+                                return UnitarySys::coolWatertoAirHPTempResidual(
+                                    state, PartLoadRatio, this->m_UnitarySysNum, FirstHVACIteration, DesOutTemp, ReqOutput);
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         } else if (CoilType_Num == DataHVACGlobals::Coil_UserDefined) {
                             // do nothing, user defined coil cannot be controlled
 
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
-
-                            Par[1] = double(this->m_UnitarySysNum);
-                            Par[2] = DesOutTemp;
-                            Par[3] = 0.0; // DesOutHumRat; set to 0 if temp controlled
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->TESIceStorageCoilOutletResidual, 0.0, 1.0, Par);
-
+                            auto f = [&state, this, DesOutTemp](Real64 const PartLoadRatio) {
+                                UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[this->m_UnitarySysNum];
+                                PackagedThermalStorageCoil::SimTESCoil(state,
+                                                                       thisSys.m_CoolingCoilName,
+                                                                       thisSys.m_CoolingCoilIndex,
+                                                                       thisSys.m_FanOpMode,
+                                                                       thisSys.m_TESOpMode,
+                                                                       PartLoadRatio);
+                                return state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).Temp - DesOutTemp;
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         } else {
                             ShowMessage(state, " For :" + this->UnitType + "=\"" + this->Name + "\"");
                             ShowFatalError(state,
@@ -13932,10 +13932,17 @@ namespace UnitarySystems {
                         if (CoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling &&
                             (this->m_TESOpMode != PackagedThermalStorageCoil::PTSCOperatingMode::Off &&
                              this->m_TESOpMode != PackagedThermalStorageCoil::PTSCOperatingMode::ChargeOnly)) {
-                            Par[1] = double(this->m_UnitarySysNum);
-                            Par[2] = 0.0; // DesOutTemp; set to 0 if humrat controlled
-                            Par[3] = DesOutHumRat;
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->TESIceStorageCoilOutletResidual, 0.0, 1.0, Par);
+                            auto f = [&state, this, DesOutHumRat](Real64 const PartLoadRatio) {
+                                UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[this->m_UnitarySysNum];
+                                PackagedThermalStorageCoil::SimTESCoil(state,
+                                                                       thisSys.m_CoolingCoilName,
+                                                                       thisSys.m_CoolingCoilIndex,
+                                                                       thisSys.m_FanOpMode,
+                                                                       thisSys.m_TESOpMode,
+                                                                       PartLoadRatio);
+                                return state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).HumRat - DesOutHumRat;
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         }
 
                     } else {
@@ -16770,51 +16777,6 @@ namespace UnitarySystems {
         return DesOutTemp - OutletAirTemp;
     }
 
-    Real64 UnitarySys::TESIceStorageCoilOutletResidual(EnergyPlusData &state,
-                                                       Real64 PartLoadRatio,          // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                       std::vector<Real64> const &Par // data array
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR        Richard Raustad, FSEC
-        //       DATE WRITTEN   August 2015
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls SimWatertoAirHP or SimWatertoAirHPSimple to get outlet humidity ratio at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // Par( 1 ) = double( UnitarySysNum );
-        // Par( 2 ) = DesOutTemp;
-        // Par( 3 ) = 0.0; // DesOutHumRat; set to 0 if temp controlled
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 OutletAirTemp;   // outlet air temperature [C]
-        Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
-
-        int UnitarySysNum = int(Par[1]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        Real64 DesiredOutletTemp = Par[2];
-        Real64 DesiredOutletHumRat = Par[3];
-
-        PackagedThermalStorageCoil::SimTESCoil(
-            state, thisSys.m_CoolingCoilName, thisSys.m_CoolingCoilIndex, thisSys.m_FanOpMode, thisSys.m_TESOpMode, PartLoadRatio);
-
-        if (DesiredOutletHumRat > 0.0) {
-            OutletAirHumRat = state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).HumRat;
-            return OutletAirHumRat - DesiredOutletHumRat;
-        } else {
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).Temp;
-            return OutletAirTemp - DesiredOutletTemp;
-        }
-    }
-
     Real64 UnitarySys::multiModeDXCoilHumRatResidual(EnergyPlusData &state,
                                                      Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                      std::vector<Real64> const &Par // par(1) = DX coil number
@@ -16992,9 +16954,11 @@ namespace UnitarySystems {
     }
 
     Real64 UnitarySys::coolWatertoAirHPTempResidual(EnergyPlusData &state,
-                                                    Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                    std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
-    )
+                                                    Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                                    int UnitarySysNum,
+                                                    bool FirstHVACIteration,
+                                                    Real64 DesOutTemp,
+                                                    Real64 ReqOutput)
     {
 
         // FUNCTION INFORMATION:
@@ -17013,16 +16977,9 @@ namespace UnitarySystems {
         // par(2) = desired air outlet humidity ratio [kg/kg]
         // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
         bool errFlag = false;
         Real64 RuntimeFrac = 0.0;
-
-        int UnitarySysNum = int(Par[1]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        bool FirstHVACIteration = (Par[2] > 0.0);
-        Real64 ReqOutput = Par[4];
-
         thisSys.heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
 
         if (RuntimeFrac > 0.0 && thisSys.m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
@@ -17066,9 +17023,7 @@ namespace UnitarySystems {
                                                 DataHVACGlobals::CompressorOperation::Off,
                                                 PartLoadRatio);
         }
-
-        Real64 OutletAirTemp = state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).Temp;
-        return Par[3] - OutletAirTemp;
+        return DesOutTemp - state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).Temp;
     }
 
     Real64 UnitarySys::calcUnitarySystemWaterFlowResidual(EnergyPlusData &state,

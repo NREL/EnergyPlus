@@ -667,11 +667,6 @@ namespace UnitarySystems {
                                                      DataHVACGlobals::CompressorOperation CompressorOp,
                                                      bool SuppHeat);
 
-        static Real64 TESIceStorageCoilOutletResidual(EnergyPlusData &state,
-                                                      Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                      std::vector<Real64> const &Par // par( 1 ) = double( UnitarySysNum );
-        );
-
         static Real64 multiModeDXCoilHumRatResidual(EnergyPlusData &state,
                                                     Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                     std::vector<Real64> const &Par // par(1) = DX coil number
@@ -697,9 +692,11 @@ namespace UnitarySystems {
         );
 
         static Real64 coolWatertoAirHPTempResidual(EnergyPlusData &state,
-                                                   Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                   std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
-        );
+                                                   Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                                   int UnitarySysNum,
+                                                   bool FirstHVACIteration,
+                                                   Real64 DesOutTemp,
+                                                   Real64 ReqOutput);
 
         void initUnitarySystems(EnergyPlusData &state, int AirLoopNum, bool FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
 
