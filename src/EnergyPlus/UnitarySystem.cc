@@ -9326,6 +9326,7 @@ namespace UnitarySystems {
                         Par[3] = double(this->m_FanOpMode);
                         Par[4] = static_cast<int>(CompressorONFlag); // CompressorOp
                         Par[5] = ZoneLoad;
+                        Real64 par6 = state.dataUnitarySystems->CoolingLoad ? 1.0 : 0.0;
                         Par[6] = 0.0; // FLAG, 0.0 if heating load, 1.0 IF cooling or moisture load
                         if (state.dataUnitarySystems->CoolingLoad) Par[6] = 1.0;
                         Par[7] = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
@@ -9334,9 +9335,24 @@ namespace UnitarySystems {
                         Par[10] = this->m_HeatingPartLoadFrac;
                         Par[11] = double(AirLoopNum);
 
+                        auto f = [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
+                                     Real64 const PartLoadRatio) {
+                            return UnitarySys::calcUnitarySystemLoadResidual(state,
+                                                                             PartLoadRatio,
+                                                                             this->m_UnitarySysNum,
+                                                                             FirstHVACIteration,
+                                                                             // par 3 not used?
+                                                                             CompressorONFlag,
+                                                                             ZoneLoad,
+                                                                             par6,
+                                                                             1.0,
+                                                                             OnOffAirFlowRatio,
+                                                                             HXUnitOn,
+                                                                             // par 10 not used
+                                                                             AirLoopNum);
+                        };
                         //     Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                        General::SolveRoot(
-                            state, this->m_CoolConvTol, MaxIter, SolFlag, PartLoadRatio, &this->calcUnitarySystemLoadResidual, 0.0, 1.0, Par);
+                        General::SolveRoot(state, this->m_CoolConvTol, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
 
                         if (SolFlag == -1) {
                             if (state.dataUnitarySystems->HeatingLoad) {
@@ -9385,15 +9401,24 @@ namespace UnitarySystems {
                                                                   CompressorONFlag);
                                 }
                                 // Now solve again with tighter PLR limits
-                                General::SolveRoot(state,
-                                                   this->m_HeatConvTol,
-                                                   MaxIter,
-                                                   SolFlag,
-                                                   HeatPLR,
-                                                   &this->calcUnitarySystemLoadResidual,
-                                                   TempMinPLR,
-                                                   TempMaxPLR,
-                                                   Par);
+                                auto f2 =
+                                    [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
+                                        Real64 const PartLoadRatio) {
+                                        return UnitarySys::calcUnitarySystemLoadResidual(state,
+                                                                                         PartLoadRatio,
+                                                                                         this->m_UnitarySysNum,
+                                                                                         FirstHVACIteration,
+                                                                                         // par 3 not used?
+                                                                                         CompressorONFlag,
+                                                                                         ZoneLoad,
+                                                                                         par6,
+                                                                                         1.0,
+                                                                                         OnOffAirFlowRatio,
+                                                                                         HXUnitOn,
+                                                                                         // par 10 not used
+                                                                                         AirLoopNum);
+                                    };
+                                General::SolveRoot(state, this->m_HeatConvTol, MaxIter, SolFlag, HeatPLR, f2, TempMinPLR, TempMaxPLR);
                                 this->calcUnitarySystemToLoad(state,
                                                               AirLoopNum,
                                                               FirstHVACIteration,
@@ -9456,15 +9481,24 @@ namespace UnitarySystems {
                                     TempSysOutput = TempSensOutput;
                                 }
                                 // Now solve again with tighter PLR limits
-                                General::SolveRoot(state,
-                                                   this->m_CoolConvTol,
-                                                   MaxIter,
-                                                   SolFlag,
-                                                   CoolPLR,
-                                                   &this->calcUnitarySystemLoadResidual,
-                                                   TempMinPLR,
-                                                   TempMaxPLR,
-                                                   Par);
+                                auto f2 =
+                                    [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
+                                        Real64 const PartLoadRatio) {
+                                        return UnitarySys::calcUnitarySystemLoadResidual(state,
+                                                                                         PartLoadRatio,
+                                                                                         this->m_UnitarySysNum,
+                                                                                         FirstHVACIteration,
+                                                                                         // par 3 not used?
+                                                                                         CompressorONFlag,
+                                                                                         ZoneLoad,
+                                                                                         par6,
+                                                                                         1.0,
+                                                                                         OnOffAirFlowRatio,
+                                                                                         HXUnitOn,
+                                                                                         // par 10 not used
+                                                                                         AirLoopNum);
+                                    };
+                                General::SolveRoot(state, this->m_CoolConvTol, MaxIter, SolFlag, CoolPLR, f2, TempMinPLR, TempMaxPLR);
                                 this->calcUnitarySystemToLoad(state,
                                                               AirLoopNum,
                                                               FirstHVACIteration,
@@ -9784,10 +9818,16 @@ namespace UnitarySystems {
                 if (FirstHVACIteration) Par[2] = 1.0;
                 Par[3] = double(this->m_FanOpMode);
                 Par[4] = static_cast<int>(CompressorONFlag); // CompressorOp
+                Real64 par5;
+                Real64 par7;
                 if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
+                    par5 = ZoneLoad;
+                    par7 = 1.0;
                     Par[5] = ZoneLoad;
                     Par[7] = 1.0; // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
                 } else {
+                    par5 = state.dataUnitarySystems->MoistureLoad;
+                    par7 = 0.0;
                     Par[5] = state.dataUnitarySystems->MoistureLoad;
                     Par[7] = 0.0; // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
                 }
@@ -9802,7 +9842,23 @@ namespace UnitarySystems {
                 Par[10] = this->m_HeatingPartLoadFrac;
                 Par[11] = double(AirLoopNum);
                 // Tolerance is fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                General::SolveRoot(state, 0.001, MaxIter, SolFlagLat, PartLoadRatio, this->calcUnitarySystemLoadResidual, 0.0, 1.0, Par);
+                auto f = [&state, this, FirstHVACIteration, CompressorONFlag, par5, par7, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
+                             Real64 const PartLoadRatio) {
+                    return UnitarySys::calcUnitarySystemLoadResidual(state,
+                                                                     PartLoadRatio,
+                                                                     this->m_UnitarySysNum,
+                                                                     FirstHVACIteration,
+                                                                     // par 3 not used?
+                                                                     CompressorONFlag,
+                                                                     par5,
+                                                                     1.0,
+                                                                     par7,
+                                                                     OnOffAirFlowRatio,
+                                                                     HXUnitOn,
+                                                                     // par 10 not used
+                                                                     AirLoopNum);
+                };
+                General::SolveRoot(state, 0.001, MaxIter, SolFlagLat, PartLoadRatio, f, 0.0, 1.0);
                 this->m_CoolingPartLoadFrac = PartLoadRatio;
                 this->m_HeatingPartLoadFrac = HeatPLR;
             } else if (state.dataUnitarySystems->MoistureLoad < LatOutputOn && state.dataUnitarySystems->CoolingLoad) {
@@ -9872,7 +9928,26 @@ namespace UnitarySystems {
                                               CompressorONFlag);
             }
             // Now solve again with tighter PLR limits
-            General::SolveRoot(state, 0.001, MaxIter, SolFlagLat, CoolPLR, &this->calcUnitarySystemLoadResidual, TempMinPLR, TempMaxPLR, Par);
+            auto f = [&state, this, FirstHVACIteration, CompressorONFlag, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](Real64 const PartLoadRatio) {
+                // TODO: The actual Par array being used here may have been altered through any of the sections above, and this line is not covered by
+                // a unit or integration test
+                // TODO: So I made some assumptions about the arguments.  I'm not sure if ultimately this is even accessible, so maybe it doesn't
+                // matter.
+                return UnitarySys::calcUnitarySystemLoadResidual(state,
+                                                                 PartLoadRatio,
+                                                                 this->m_UnitarySysNum,
+                                                                 FirstHVACIteration,
+                                                                 // par 3 not used?
+                                                                 CompressorONFlag,
+                                                                 state.dataUnitarySystems->MoistureLoad,
+                                                                 1.0,
+                                                                 0.0,
+                                                                 OnOffAirFlowRatio,
+                                                                 HXUnitOn,
+                                                                 // par 10 not used
+                                                                 AirLoopNum);
+            };
+            General::SolveRoot(state, 0.001, MaxIter, SolFlagLat, CoolPLR, f, TempMinPLR, TempMaxPLR);
             this->calcUnitarySystemToLoad(state,
                                           AirLoopNum,
                                           FirstHVACIteration,
@@ -14451,7 +14526,7 @@ namespace UnitarySystems {
                             Par[9] = false; // not a supp heater
                             if (this->m_HeatingSpeedNum > 1.0) {
                                 Par[4] = CycRatio;
-                                auto f = [&state, this, DesOutTemp, CycRatio, FanOpMode, ReqOutput](Real64 const SpeedRatio) {
+                                auto f = [&state, this, DesOutTemp, CycRatio, FanOpMode](Real64 const SpeedRatio) {
                                     return UnitarySys::heatingCoilVarSpeedResidual(state,
                                                                                    SpeedRatio,
                                                                                    this->m_HeatingCoilIndex,
@@ -14461,7 +14536,6 @@ namespace UnitarySystems {
                                                                                    this->m_HeatingSpeedNum,
                                                                                    FanOpMode,
                                                                                    DataHVACGlobals::CompressorOperation::On,
-                                                                                   ReqOutput,
                                                                                    false);
                                 };
                                 General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
@@ -14474,7 +14548,7 @@ namespace UnitarySystems {
                                 SpeedRatio = 0.0;
                                 this->m_HeatingSpeedRatio = SpeedRatio;
                                 Par[4] = SpeedRatio;
-                                auto f = [&state, this, DesOutTemp, SpeedRatio, FanOpMode, ReqOutput](Real64 const CycRatio) {
+                                auto f = [&state, this, DesOutTemp, SpeedRatio, FanOpMode](Real64 const CycRatio) {
                                     return UnitarySys::heatingCoilVarSpeedCycResidual(state,
                                                                                       CycRatio,
                                                                                       this->m_HeatingCoilIndex,
@@ -14484,7 +14558,6 @@ namespace UnitarySystems {
                                                                                       this->m_HeatingSpeedNum,
                                                                                       FanOpMode,
                                                                                       DataHVACGlobals::CompressorOperation::On,
-                                                                                      ReqOutput,
                                                                                       false);
                                 };
                                 General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, f, 0.0, 1.0);
@@ -14985,7 +15058,7 @@ namespace UnitarySystems {
                                 Par[9] = true; // is supplemental coil
                                 if (this->m_SuppHeatingSpeedNum > 1) {
                                     Par[4] = CycRatio;
-                                    auto f = [&state, this, DesOutTemp, CycRatio, FanOpMode, ReqOutput](Real64 const SpeedRatio) {
+                                    auto f = [&state, this, DesOutTemp, CycRatio, FanOpMode](Real64 const SpeedRatio) {
                                         return UnitarySys::heatingCoilVarSpeedResidual(state,
                                                                                        SpeedRatio,
                                                                                        this->m_SuppHeatCoilIndex,
@@ -14995,7 +15068,6 @@ namespace UnitarySystems {
                                                                                        this->m_SuppHeatingSpeedNum,
                                                                                        FanOpMode,
                                                                                        DataHVACGlobals::CompressorOperation::On,
-                                                                                       ReqOutput,
                                                                                        true);
                                     };
                                     General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
@@ -15007,7 +15079,7 @@ namespace UnitarySystems {
                                     SpeedRatio = 0.0;
                                     this->m_SuppHeatingSpeedRatio = SpeedRatio;
                                     Par[4] = SpeedRatio;
-                                    auto f = [&state, this, DesOutTemp, SpeedRatio, FanOpMode, ReqOutput](Real64 const CycRatio) {
+                                    auto f = [&state, this, DesOutTemp, SpeedRatio, FanOpMode](Real64 const CycRatio) {
                                         return UnitarySys::heatingCoilVarSpeedCycResidual(state,
                                                                                           CycRatio,
                                                                                           this->m_SuppHeatCoilIndex,
@@ -15017,7 +15089,6 @@ namespace UnitarySystems {
                                                                                           this->m_SuppHeatingSpeedNum,
                                                                                           FanOpMode,
                                                                                           DataHVACGlobals::CompressorOperation::On,
-                                                                                          ReqOutput,
                                                                                           true);
                                     };
                                     General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, f, 0.0, 1.0);
@@ -16093,9 +16164,18 @@ namespace UnitarySystems {
     }
 
     Real64 UnitarySys::calcUnitarySystemLoadResidual(EnergyPlusData &state,
-                                                     Real64 const PartLoadRatio,    // DX cooling coil part load ratio
-                                                     std::vector<Real64> const &Par // Function parameters
-    )
+                                                     Real64 const PartLoadRatio, // DX cooling coil part load ratio
+                                                     int UnitarySysNum,
+                                                     bool FirstHVACIteration,
+                                                     // par 3 not used?
+                                                     DataHVACGlobals::CompressorOperation CompressorOp,
+                                                     Real64 LoadToBeMet,
+                                                     Real64 coolHeatFlag, // make bool?
+                                                     Real64 SensibleLoad,
+                                                     Real64 OnOffAirFlowRatio,
+                                                     bool HXUnitOn,
+                                                     // par 10 not used
+                                                     int AirLoopNum)
     {
 
         // FUNCTION INFORMATION:
@@ -16105,56 +16185,15 @@ namespace UnitarySystems {
         // PURPOSE OF THIS SUBROUTINE:
         // To calculate the part-load ratio for the unitary system
 
-        // METHODOLOGY EMPLOYED:
-        // Use SolveRoot to CALL this Function to converge on a solution
-
-        // Return value
-        Real64 Residuum; // Result (force to 0)
-
-        // Argument array dimensioning
-        //   Parameter description example:
-        //       Par(1)  = REAL(UnitarySysNum,r64) ! Index to Unitary System
-        //       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
-        //       Par(3)  = REAL(OpMode,r64)     ! Fan control, IF 1.0 then cycling fan, if 0.0 then continuous fan
-        //       Par(4)  = REAL(CompressorOp,r64)     ! Compressor control, IF 1.0 then compressor ON, if 0.0 then compressor OFF
-        //       Par(5)  = SensLoad or MoistureLoad   ! Sensible or Latent load to be met by unitary system
-        //       Par(6)  = HeatingLoad or CoolingLoad ! Type of load FLAG, 0.0 IF heating load, 1.0 IF cooling or moisture load
-        //       Par(7)  = 1.0                  ! Output calculation FLAG, 0.0 for latent capacity, 1.0 for sensible capacity
-        //       Par(8)  = OnOffAirFlowRatio    ! Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
-        //       Par(9)  = HXUnitOn             ! flag to enable HX, 1=ON and 2=OFF
-        //       Par(10) = HeatingCoilPLR       ! used to calculate latent degradation for cycling fan RH control
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 HeatPLR;    // heating coil part load ratio
-        Real64 CoolPLR;    // cooling coil part load ratio
         Real64 SensOutput; // sensible output of system
         Real64 LatOutput;  // latent output of system
         Real64 HeatCoilLoad = 0.0;
         Real64 SupHeaterLoad = 0.0;
-
-        // Convert parameters to usable variables
-        int UnitarySysNum = int(Par[1]);
         UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        bool FirstHVACIteration = (Par[2] > 0.0);
-        // int FanOpMode = int(Par[3]);
-        DataHVACGlobals::CompressorOperation CompressorOp = static_cast<DataHVACGlobals::CompressorOperation>(Par[4]);
-        Real64 LoadToBeMet = Par[5];
-        Real64 OnOffAirFlowRatio = Par[8];
-
-        if (Par[6] == 1.0) {
-            CoolPLR = PartLoadRatio;
-            HeatPLR = 0.0;
-        } else {
-            CoolPLR = 0.0;
-            HeatPLR = PartLoadRatio;
-        }
-        bool SensibleLoad = (Par[7] > 0.0);
-        bool HXUnitOn = (Par[9] > 0.0);
-        int AirLoopNum = int(Par[11]);
-
+        Real64 CoolPLR = coolHeatFlag == 1.0 ? PartLoadRatio : 0.0;
+        Real64 HeatPLR = coolHeatFlag == 1.0 ? 0.0 : PartLoadRatio;
         thisSys.setSpeedVariables(state, SensibleLoad, PartLoadRatio);
-
         thisSys.calcUnitarySystemToLoad(state,
                                         AirLoopNum,
                                         FirstHVACIteration,
@@ -16167,23 +16206,10 @@ namespace UnitarySystems {
                                         HeatCoilLoad,
                                         SupHeaterLoad,
                                         CompressorOp);
-
         // Calculate residual based on output calculation flag
-        if (SensibleLoad) {
-            if (std::abs(LoadToBeMet) == 0.0) {
-                Residuum = (SensOutput - LoadToBeMet) / 100.0;
-            } else {
-                Residuum = (SensOutput - LoadToBeMet) / LoadToBeMet;
-            }
-        } else {
-            if (std::abs(LoadToBeMet) == 0.0) {
-                Residuum = (LatOutput - LoadToBeMet) / 100.0;
-            } else {
-                Residuum = (LatOutput - LoadToBeMet) / LoadToBeMet;
-            }
-        }
-
-        return Residuum;
+        Real64 baselineLoad = SensibleLoad == 1.0 ? SensOutput : LatOutput;
+        Real64 divisor = std::abs(LoadToBeMet) == 0.0 ? 100.0 : LoadToBeMet;
+        return (baselineLoad - LoadToBeMet) / divisor;
     }
 
     Real64 UnitarySys::HXAssistedCoolCoilHRResidual(EnergyPlusData &state,
@@ -16327,7 +16353,6 @@ namespace UnitarySystems {
                                                    int SpeedNum,
                                                    int FanOpMode,
                                                    DataHVACGlobals::CompressorOperation CompressorOp,
-                                                   Real64 ReqOutput,
                                                    bool SuppHeat
 
     )
@@ -16692,7 +16717,6 @@ namespace UnitarySystems {
                                                       int SpeedNum,
                                                       int FanOpMode,
                                                       DataHVACGlobals::CompressorOperation CompressorOp,
-                                                      Real64 ReqOutput,
                                                       bool SuppHeat)
     {
 

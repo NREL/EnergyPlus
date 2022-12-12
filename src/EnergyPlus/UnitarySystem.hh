@@ -612,9 +612,18 @@ namespace UnitarySystems {
         );
 
         static Real64 calcUnitarySystemLoadResidual(EnergyPlusData &state,
-                                                    Real64 const PartLoadRatio,    // DX cooling coil part load ratio
-                                                    std::vector<Real64> const &Par // Function parameters
-        );
+                                                    Real64 const PartLoadRatio, // DX cooling coil part load ratio
+                                                    int UnitarySysNum,
+                                                    bool FirstHVACIteration,
+                                                    // par 3 not used?
+                                                    DataHVACGlobals::CompressorOperation CompressorOp,
+                                                    Real64 LoadToBeMet,
+                                                    Real64 coolHeatFlag, // make bool?
+                                                    Real64 SensibleLoad,
+                                                    Real64 OnOffAirFlowRatio,
+                                                    bool HXUnitOn,
+                                                    // par 10 not used
+                                                    int AirLoopNum);
 
         static Real64 HXAssistedCoolCoilHRResidual(EnergyPlusData &state,
                                                    Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
@@ -635,7 +644,6 @@ namespace UnitarySystems {
                                                   int SpeedNum,
                                                   int FanOpMode,
                                                   DataHVACGlobals::CompressorOperation CompressorOp,
-                                                  Real64 ReqOutput,
                                                   bool SuppHeat);
 
         static Real64 DXCoilVarSpeedHumRatResidual(EnergyPlusData &state,
@@ -654,7 +662,7 @@ namespace UnitarySystems {
         );
 
         static Real64 heatingCoilVarSpeedCycResidual(EnergyPlusData &state,
-                                                     Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                                     Real64 CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                      int CoilIndex,
                                                      Real64 DesOutTemp,
                                                      int UnitarySysNum,
@@ -662,7 +670,6 @@ namespace UnitarySystems {
                                                      int SpeedNum,
                                                      int FanOpMode,
                                                      DataHVACGlobals::CompressorOperation CompressorOp,
-                                                     Real64 ReqOutput,
                                                      bool SuppHeat);
 
         static Real64 TESIceStorageCoilOutletResidual(EnergyPlusData &state,
