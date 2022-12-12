@@ -2443,34 +2443,6 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
             // nothing to do here ?
         }
 
-        // 2022-11: Implement plant loop flow mode control
-        //      
-        // Locate the fuel fired heat pump on the plant loops for later usage
-        bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(
-            state, this->name, DataPlant::PlantEquipmentType::Boiler_Simple, this->plantLoc, errFlag, _, this->TempUpLimitFFPLHPOut, _, _, _);
-        if (errFlag) {
-            ShowFatalError(state, "InitBoiler: Program terminated due to previous condition(s).");
-        }
-
-        if ((this->flowMode == DataPlant::FlowMode::LeavingSetpointModulated) || (this->flowMode == DataPlant::FlowMode::Constant)) {
-            // reset flow priority
-            DataPlant::CompData::getPlantComponent(state, this->plantLoc).FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
-        }
-
-        // 2022-11: another part of flow control init
-        if ((this->flowMode == DataPlant::FlowMode::LeavingSetpointModulated) && this->ModulatedFlowSetToLoop) {
-            // fix for clumsy old input that worked because loop setpoint was spread.
-            //  could be removed with transition, testing , model change, period of being obsolete.
-            if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint =
-                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
-            } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
-                state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointLo =
-                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum).TempSetPointLo;
-            }
-        }
-
         if (errFlag) {
             ShowFatalError(state, fmt::format("{}: Program terminated due to previous condition(s).", routineName));
         }
