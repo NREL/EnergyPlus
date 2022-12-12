@@ -631,7 +631,6 @@ namespace SZVAVModel {
         int OutletNode = SZVAVModel.AirOutNode;
         Real64 ZoneTemp = state.dataLoopNodes->Node(SZVAVModel.NodeNumOfControlledZone).Temp;
         Real64 ZoneHumRat = state.dataLoopNodes->Node(SZVAVModel.NodeNumOfControlledZone).HumRat;
-        Real64 lowWaterMdot = 0.0;
 
         // model attempts to control air flow rate and coil capacity in specific operating regions:
         // Region 1 (R1) - minimum air flow rate at modulated coil capacity (up to min/max temperature limits)
@@ -758,13 +757,11 @@ namespace SZVAVModel {
                                                                                           PartLoadRatio, // coil part load ratio
                                                                                           SysIndex,
                                                                                           FirstHVACIteration,
-                                                                                          SZVAVModel.ControlZoneNum,
                                                                                           ZoneLoad,
                                                                                           SZVAVModel.AirInNode,
                                                                                           OnOffAirFlowRatio,
                                                                                           AirLoopNum,
                                                                                           coilFluidInletNode,
-                                                                                          0.0,
                                                                                           maxCoilFluidFlow,
                                                                                           lowSpeedFanRatio,
                                                                                           minAirMassFlow,
@@ -811,7 +808,6 @@ namespace SZVAVModel {
                           coilFluidInletNode,
                           lowSpeedFanRatio,
                           AirMassFlow,
-                          lowWaterMdot,
                           maxAirMassFlow,
                           CoolingLoad,
                           maxCoilFluidFlow](Real64 const PartLoadRatio) {
@@ -819,13 +815,11 @@ namespace SZVAVModel {
                                                                                           PartLoadRatio, // coil part load ratio
                                                                                           SysIndex,
                                                                                           FirstHVACIteration,
-                                                                                          SZVAVModel.ControlZoneNum,
                                                                                           ZoneLoad,
                                                                                           SZVAVModel.AirInNode,
                                                                                           OnOffAirFlowRatio,
                                                                                           AirLoopNum,
                                                                                           coilFluidInletNode,
-                                                                                          lowWaterMdot,
                                                                                           maxCoilFluidFlow,
                                                                                           lowSpeedFanRatio,
                                                                                           AirMassFlow,
@@ -903,20 +897,17 @@ namespace SZVAVModel {
                           coilFluidInletNode,
                           lowSpeedFanRatio,
                           maxCoilFluidFlow,
-                          lowWaterMdot,
                           maxAirMassFlow,
                           CoolingLoad](Real64 const PartLoadRatio) {
                     return UnitarySystems::UnitarySys::calcUnitarySystemWaterFlowResidual(state,
                                                                                           PartLoadRatio, // coil part load ratio
                                                                                           SysIndex,
                                                                                           FirstHVACIteration,
-                                                                                          SZVAVModel.ControlZoneNum,
                                                                                           ZoneLoad,
                                                                                           SZVAVModel.AirInNode,
                                                                                           OnOffAirFlowRatio,
                                                                                           AirLoopNum,
                                                                                           coilFluidInletNode,
-                                                                                          lowWaterMdot,
                                                                                           maxCoilFluidFlow,
                                                                                           lowSpeedFanRatio,
                                                                                           maxAirMassFlow,

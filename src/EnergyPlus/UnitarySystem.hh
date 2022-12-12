@@ -898,16 +898,14 @@ namespace UnitarySystems {
         );
 
         static Real64 calcUnitarySystemWaterFlowResidual(EnergyPlusData &state,
-                                                         Real64 const PartLoadRatio, // coil part load ratio
+                                                         Real64 PartLoadRatio, // coil part load ratio
                                                          int par1_UnitarySysNum,
                                                          bool par2_FirstHVACIteration,
-                                                         int par3_ControlledZoneNum,
                                                          Real64 par4_QZnReq,
                                                          int par5_AirControlNode,
                                                          Real64 par6_OnOffAirFlowRatio,
                                                          int par7_AirLoopNum,
                                                          int par8_WaterControlNode,
-                                                         Real64 par9_lowWaterMdot,
                                                          Real64 par10_highWaterMdot,
                                                          Real64 par11_lowSpeedRatio,
                                                          Real64 par12_airMdot,
