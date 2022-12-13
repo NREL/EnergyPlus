@@ -1281,7 +1281,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                                                         CalledFrom);
             DesFluidCoolerLoad = this->FluidCoolerNominalCapacity;
             Par[0] = DesFluidCoolerLoad;
-            Par[1] = double(this->indexInArray);
+            Par[1] = double();
             Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
             Real64 par2_WaterFlow = rho * tmpDesignWaterFlowRate;
             Par[3] = tmpHighSpeedAirFlowRate; // design air volume flow rate
@@ -1293,12 +1293,12 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             this->AirWetBulb = this->DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
             this->AirPress = state.dataEnvrn->StdBaroPress;
             this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-            auto f = [&state, Par](Real64 const UA) {
-                Real64 DesFluidCoolerLoad = Par[0];
-                int FluidCoolerIndex = int(Par[1]);
-                Real64 DesignWaterMassFlowRate = Par[2];
-                Real64 DesignAirVolumeFlowRate = Par[3];
-                Real64 Cp = Par[4];
+            auto f = [&state, this, DesFluidCoolerLoad, par2_WaterFlow, tmpHighSpeedAirFlowRate, Cp](Real64 const UA) {
+//                Real64 DesFluidCoolerLoad = DesFluidCoolerLoad;
+                int FluidCoolerIndex = this->indexInArray;
+                Real64 DesignWaterMassFlowRate = par2_WaterFlow;
+                Real64 DesignAirVolumeFlowRate = tmpHighSpeedAirFlowRate;
+//                Real64 Cp = Par[4];
                 Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
                 CalcFluidCoolerOutlet(state, FluidCoolerIndex, DesignWaterMassFlowRate, DesignAirVolumeFlowRate, UA, OutWaterTemp);
                 Real64 const Output =
