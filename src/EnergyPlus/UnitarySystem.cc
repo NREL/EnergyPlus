@@ -14311,7 +14311,6 @@ namespace UnitarySystems {
         Real64 FullOutput; // Sensible capacity (outlet - inlet) when the compressor is on
         Real64 ReqOutput;  // Sensible capacity (outlet - inlet) required to meet load or set point temperature
 
-        std::vector<Real64> Par(11);    // Parameter array passed to solver
         Real64 m_WSHPRuntimeFrac = 0.0; // Run time fraction of water to air hp
         Real64 OutdoorDryBulb = 0.0;    // local variable for OutDryBulbTemp
         Real64 OutdoorHumRat = 0.0;     // local variable for OutHumRat
@@ -14773,17 +14772,7 @@ namespace UnitarySystems {
                         case DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit:
                         case DataHVACGlobals::Coil_HeatingElectric_MultiStage:
                         case DataHVACGlobals::Coil_HeatingGas_MultiStage: {
-                            Par[1] = double(this->m_HeatingCoilIndex);
-                            Par[2] = DesOutTemp;
-                            Par[3] = double(this->m_UnitarySysNum);
-                            // Par(4) = CycRatio or SpeedRatio
-                            Par[5] = this->m_HeatingSpeedNum;
-                            Par[6] = double(FanOpMode);
-                            Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // UnitarySystem(UnitarySysNum)%CompressorOp
-                            Par[8] = ReqOutput;
-                            Par[9] = false; // not a supp heater
                             if (this->m_HeatingSpeedNum > 1.0) {
-                                Par[4] = CycRatio;
                                 auto f = [&state, this, DesOutTemp, CycRatio, FanOpMode](Real64 const SpeedRatio) {
                                     return UnitarySys::heatingCoilVarSpeedResidual(state,
                                                                                    SpeedRatio,
@@ -14805,7 +14794,6 @@ namespace UnitarySystems {
                             } else {
                                 SpeedRatio = 0.0;
                                 this->m_HeatingSpeedRatio = SpeedRatio;
-                                Par[4] = SpeedRatio;
                                 auto f = [&state, this, DesOutTemp, SpeedRatio, FanOpMode](Real64 const CycRatio) {
                                     return UnitarySys::heatingCoilVarSpeedCycResidual(state,
                                                                                       CycRatio,
@@ -15294,7 +15282,7 @@ namespace UnitarySystems {
                             case DataHVACGlobals::Coil_HeatingElectric:
                             case DataHVACGlobals::Coil_HeatingDesuperheater: {
                                 bool tmpSuppHeatingCoilFlag = SuppHeatingCoilFlag; // CONST_LAMBDA_CAPTURE
-                                auto f = [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode](Real64 const PartLoadFrac) {
+                                auto f = [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode, tmpSuppHeatingCoilFlag](Real64 const PartLoadFrac) {
                                     return this->gasElecHeatingCoilResidual(state,
                                                                             PartLoadFrac,
                                                                             this->m_UnitarySysNum,
