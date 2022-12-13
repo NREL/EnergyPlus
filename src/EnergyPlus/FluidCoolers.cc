@@ -1295,14 +1295,12 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
             auto f = [&state, this, DesFluidCoolerLoad, par2_WaterFlow, tmpHighSpeedAirFlowRate, Cp](Real64 const UA) {
 //                Real64 DesFluidCoolerLoad = DesFluidCoolerLoad;
-                int FluidCoolerIndex = this->indexInArray;
-                Real64 DesignWaterMassFlowRate = par2_WaterFlow;
                 Real64 DesignAirVolumeFlowRate = tmpHighSpeedAirFlowRate;
 //                Real64 Cp = Par[4];
                 Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
-                CalcFluidCoolerOutlet(state, FluidCoolerIndex, DesignWaterMassFlowRate, DesignAirVolumeFlowRate, UA, OutWaterTemp);
+                CalcFluidCoolerOutlet(state, this->indexInArray, par2_WaterFlow, DesignAirVolumeFlowRate, UA, OutWaterTemp);
                 Real64 const Output =
-                    Cp * DesignWaterMassFlowRate * (state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerIndex).WaterTemp - OutWaterTemp);
+                    Cp * par2_WaterFlow * (state.dataFluidCoolers->SimpleFluidCooler(this->indexInArray).WaterTemp - OutWaterTemp);
                 return (DesFluidCoolerLoad - Output) / DesFluidCoolerLoad;
                 //                return SimpleFluidCoolerUAResidual(state, UA, Par[0], int(Par[1]), Par[2], Par[3], Par[4]);
             };
