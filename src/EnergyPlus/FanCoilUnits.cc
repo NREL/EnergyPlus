@@ -3163,7 +3163,7 @@ namespace FanCoilUnits {
                     int AirLoopNum = 0;
                     DataHVACGlobals::CompressorOperation CompressorOnFlag = DataHVACGlobals::CompressorOperation::Off;
                     auto &SZVAVModel(FanCoil(FanCoilNum));
-                    // seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different
+                    // seems like passing these (arguments 2-n) as an array would make this more uniform across different
                     // models
                     SZVAVModel::calcSZVAVModel(state,
                                                SZVAVModel,
