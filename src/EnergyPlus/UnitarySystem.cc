@@ -8427,7 +8427,6 @@ namespace UnitarySystems {
         int constexpr MaxIter(100); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::vector<Real64> Par(17);      // parameters passed to RegulaFalsi function
         int SpeedNum;                     // multi-speed coil speed number
         Real64 SensOutputOn;              // sensible output at PLR = 1 [W]
         Real64 LatOutputOn;               // latent output at PLR = 1 [W]
@@ -9320,21 +9319,7 @@ namespace UnitarySystems {
                         PartLoadRatio = CoolPLR;
                     } else {
 
-                        Par[1] = double(this->m_UnitarySysNum);
-                        Par[2] = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                        if (FirstHVACIteration) Par[2] = 1.0;
-                        Par[3] = double(this->m_FanOpMode);
-                        Par[4] = static_cast<int>(CompressorONFlag); // CompressorOp
-                        Par[5] = ZoneLoad;
                         Real64 par6 = state.dataUnitarySystems->CoolingLoad ? 1.0 : 0.0;
-                        Par[6] = 0.0; // FLAG, 0.0 if heating load, 1.0 IF cooling or moisture load
-                        if (state.dataUnitarySystems->CoolingLoad) Par[6] = 1.0;
-                        Par[7] = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
-                        Par[8] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
-                        Par[9] = HXUnitOn;          // HXUnitOn turns on or off HX in coil system
-                        Par[10] = this->m_HeatingPartLoadFrac;
-                        Par[11] = double(AirLoopNum);
-
                         auto f = [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
                                      Real64 const PartLoadRatio) {
                             return UnitarySys::calcUnitarySystemLoadResidual(state,
@@ -9813,34 +9798,15 @@ namespace UnitarySystems {
 
                 // save heating PLR
                 HeatPLR = this->m_HeatingPartLoadFrac;
-                Par[1] = double(this->m_UnitarySysNum);
-                Par[2] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                if (FirstHVACIteration) Par[2] = 1.0;
-                Par[3] = double(this->m_FanOpMode);
-                Par[4] = static_cast<int>(CompressorONFlag); // CompressorOp
                 Real64 par5;
                 Real64 par7;
                 if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
                     par5 = ZoneLoad;
                     par7 = 1.0;
-                    Par[5] = ZoneLoad;
-                    Par[7] = 1.0; // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
                 } else {
                     par5 = state.dataUnitarySystems->MoistureLoad;
                     par7 = 0.0;
-                    Par[5] = state.dataUnitarySystems->MoistureLoad;
-                    Par[7] = 0.0; // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
                 }
-                Par[6] = 1.0; // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-                //      IF(HeatingLoad)Par(6)  = 0.0d0
-                Par[8] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
-                if (HXUnitOn) {
-                    Par[9] = 1.0;
-                } else {
-                    Par[9] = 0.0;
-                }
-                Par[10] = this->m_HeatingPartLoadFrac;
-                Par[11] = double(AirLoopNum);
                 // Tolerance is fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
                 auto f = [&state, this, FirstHVACIteration, CompressorONFlag, par5, par7, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
                              Real64 const PartLoadRatio) {
@@ -12300,7 +12266,6 @@ namespace UnitarySystems {
         Real64 OutletHumRatLS;       // Actual outlet humrat of the variable speed DX cooling coil at low speed
         Real64 OutletHumRatHS;       // Actual outlet humrat of the variable speed DX cooling coil at high speed
         Real64 OutletHumRatDXCoil;   // Actual outlet humidity ratio of the DX cooling coil
-        std::vector<Real64> Par(14); // Parameter array passed to solver
         Real64 TempMinPLR;           // Used to find latent PLR when max iterations exceeded
         Real64 TempMaxPLR;           // Used to find latent PLR when max iterations exceeded
         Real64 TempOutletTempDXCoil; // Used to find latent PLR when max iterations exceeded
@@ -12978,12 +12943,7 @@ namespace UnitarySystems {
                         PartLoadFrac = 0.0;
                     } else if (SensibleLoad) {
 
-                        Par[9] = double(AirLoopNum);
-                        Par[10] = 0.0;
-                        if (FirstHVACIteration) Par[10] = 1.0;
-
                         if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-
                             auto f = [&state, this, DesOutTemp, FanOpMode](Real64 const PartLoadRatio) {
                                 int CoilIndex = this->m_CoolingCoilIndex;
                                 DXCoils::CalcDoe2DXCoil(state, CoilIndex, DataHVACGlobals::CompressorOperation::On, true, PartLoadRatio, FanOpMode);
@@ -13142,10 +13102,6 @@ namespace UnitarySystems {
                             if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) this->m_CompPartLoadRatio = PartLoadFrac;
 
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutTemp;
-                            // Par(3) is only needed for variable speed coils (see DXCoilVarSpeedResidual and DXCoilCyclingResidual)
-                            Par[3] = double(this->m_UnitarySysNum);
                             this->m_CoolingSpeedRatio = SpeedRatio;
                             if (SpeedRatio == 1.0) {
                                 auto f = [&state, this, DesOutTemp](Real64 const SpeedRatio) {
@@ -13187,17 +13143,7 @@ namespace UnitarySystems {
 
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
 
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutTemp;
-                            Par[3] = double(this->m_UnitarySysNum);
-                            // Par[4] = CycRatio or SpeedRatio
-                            Par[5] = this->m_CoolingSpeedNum;
-                            Par[6] = 1.0;                                                        // UnitarySystem(UnitarySysNum)%FanOpMode
-                            Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // CompressorOp
-                            Par[8] = ReqOutput;
-
                             if (this->m_CoolingSpeedNum > 1.0) {
-                                Par[4] = CycRatio;
                                 auto f = [&state, this, DesOutTemp, CycRatio](Real64 const SpeedRatio) {
                                     int par1 = this->m_CoolingCoilIndex;
                                     Real64 par2 = DesOutTemp;
@@ -13214,7 +13160,6 @@ namespace UnitarySystems {
                             } else {
                                 SpeedRatio = 0.0;
                                 this->m_CoolingSpeedRatio = SpeedRatio;
-                                Par[4] = SpeedRatio;
                                 auto f = [&state, this, DesOutTemp, SpeedRatio, AirLoopNum, FirstHVACIteration](Real64 const CycRatio) {
                                     return UnitarySys::DXCoilCyclingResidual(state,
                                                                              CycRatio,
@@ -13237,17 +13182,8 @@ namespace UnitarySystems {
 
                             CycRatio = 1.0;
                             SpeedRatio = 1.0;
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutTemp;
-                            Par[3] = double(this->m_UnitarySysNum);
-                            // Par[4] = CycRatio or SpeedRatio
-                            Par[5] = this->m_CoolingSpeedNum;
-                            Par[6] = double(m_FanOpMode);
-                            Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // CompressorOp
-                            Par[8] = ReqOutput;
 
                             if (this->m_CoolingSpeedNum > 1.0) {
-                                Par[4] = CycRatio;
                                 auto f = [&state, this, DesOutTemp, CycRatio](Real64 const SpeedRatio) {
                                     int par1 = this->m_CoolingCoilIndex;
                                     Real64 par2 = DesOutTemp;
@@ -13267,7 +13203,6 @@ namespace UnitarySystems {
                                 PartLoadFrac = SpeedRatio;
                             } else {
                                 this->m_CoolingSpeedRatio = SpeedRatio;
-                                Par[4] = SpeedRatio;
                                 auto f = [&state, this, DesOutTemp, SpeedRatio, AirLoopNum, FirstHVACIteration](Real64 const CycRatio) {
                                     return UnitarySys::DXCoilCyclingResidual(state,
                                                                              CycRatio,
@@ -13633,22 +13568,6 @@ namespace UnitarySystems {
                             PartLoadFrac = 1.0;
                             //               ELSE find the PLR to meet the load
                         } else {
-                            Par[1] = double();
-                            Par[2] = DesOutHumRat;
-                            // FirstHVACIteration is a logical, Par is REAL(r64), so make TRUE = 1 and FALSE = 0
-                            if (FirstHVACIteration) {
-                                Par[3] = 1.0;
-                            } else {
-                                Par[3] = 0.0;
-                            }
-                            if (HXUnitOn) {
-                                Par[4] = 1.0;
-                            } else {
-                                Par[4] = 0.0;
-                            }
-                            Par[5] = double(FanOpMode);
-                            Par[6] = 0.0; // double(this->m_DehumidificationMode);
-                            Par[7] = 0.0; // this->CoilSHR;
                             auto f = [&state, this, FirstHVACIteration, HXUnitOn, FanOpMode, DesOutHumRat](Real64 const PartLoadRatio) {
                                 HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
                                                                                      this->m_CoolingCoilIndex,
@@ -13810,8 +13729,6 @@ namespace UnitarySystems {
                                 DXCoils::SimDXCoilMultiSpeed(state, CompName, 1.0, 1.0, this->m_CoolingCoilIndex);
                                 OutletHumRatHS = state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
                                 if (OutletHumRatHS < DesOutHumRat) {
-                                    Par[1] = double(this->m_CoolingCoilIndex);
-                                    Par[2] = DesOutHumRat;
                                     auto f = [&state, this, DesOutHumRat](Real64 const SpeedRatio) {
                                         return UnitarySys::DXCoilVarSpeedHumRatResidual(state,
                                                                                         SpeedRatio,
@@ -13830,8 +13747,6 @@ namespace UnitarySystems {
                                 PartLoadFrac = SpeedRatio;
                             } else {
                                 SpeedRatio = 0.0;
-                                Par[1] = double(this->m_CoolingCoilIndex);
-                                Par[2] = DesOutHumRat;
                                 auto f = [&state, this, DesOutHumRat](Real64 const CycRatio) {
                                     return UnitarySys::DXCoilCyclingHumRatResidual(
                                         state,
@@ -13869,9 +13784,6 @@ namespace UnitarySystems {
                                 DXCoils::SimDXCoilMultiSpeed(state, CompName, 1.0, 1.0, this->m_CoolingCoilIndex);
                                 OutletHumRatHS = state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
                                 if (OutletHumRatHS < DesOutHumRat) {
-                                    Par[1] = double(this->m_CoolingCoilIndex);
-                                    Par[2] = DesOutHumRat;
-                                    Par[3] = ReqOutput; // wrong and wasn't even used
                                     auto f = [&state, this, DesOutHumRat](Real64 const SpeedRatio) {
                                         return UnitarySys::DXCoilVarSpeedHumRatResidual(state,
                                                                                         SpeedRatio,
@@ -13889,9 +13801,6 @@ namespace UnitarySystems {
                                 }
                             } else {
                                 SpeedRatio = 0.0;
-                                Par[1] = double(this->m_CoolingCoilIndex);
-                                Par[2] = DesOutHumRat;
-                                Par[3] = ReqOutput;
                                 auto f = [&state, this, DesOutHumRat](Real64 const CycRatio) {
                                     return UnitarySys::DXCoilCyclingHumRatResidual(
                                         state,
@@ -13952,13 +13861,6 @@ namespace UnitarySystems {
                             }
 
                             if (OutletHumRatHS < DesOutHumRat) {
-                                Par[1] = double(this->m_CoolingCoilIndex);
-                                Par[2] = DesOutHumRat;
-                                Par[3] = double(this->m_UnitarySysNum);
-                                Par[5] = SpeedNum;
-                                //                                Par[6] = double(m_FanOpMode);
-                                //                                Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // CompressorOp
-                                //                                Par[8] = ReqOutput;
                                 if (SpeedNum == 1) {
                                     auto f = [&state, this, DesOutHumRat](Real64 const CycRatio) {
                                         return UnitarySys::DXCoilCyclingHumRatResidual(
@@ -13996,9 +13898,6 @@ namespace UnitarySystems {
                             }
                         } else {
                             SpeedRatio = 0.0;
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutHumRat;
-                            Par[3] = double(this->m_UnitarySysNum);
                             auto f = [&state, this, DesOutHumRat](Real64 const SpeedRatio) {
                                 return UnitarySys::DXCoilVarSpeedHumRatResidual(state,
                                                                                 SpeedRatio,
@@ -14083,12 +13982,6 @@ namespace UnitarySystems {
                     } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWater) ||
                                (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed)) { // COIL:COOLING:WATER
 
-                        if (FirstHVACIteration) {
-                            Par[2] = 1.0;
-                        } else {
-                            Par[2] = 0.0;
-                        }
-                        Par[3] = DesOutHumRat;
                         auto f = [&state, this, FirstHVACIteration, DesOutHumRat](Real64 const PartLoadRatio) {
                             UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[this->m_UnitarySysNum];
                             Real64 mdot = min(state.dataLoopNodes->Node(thisSys.CoolCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
@@ -14104,14 +13997,6 @@ namespace UnitarySystems {
                     } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) ||
                                (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP)) {
 
-                        Par[1] = double(this->m_UnitarySysNum);
-                        if (FirstHVACIteration) {
-                            Par[2] = 1.0;
-                        } else {
-                            Par[2] = 0.0;
-                        }
-                        Par[3] = DesOutHumRat;
-                        Par[4] = ReqOutput;
                         auto f = [&state, this, FirstHVACIteration, DesOutHumRat, ReqOutput](Real64 const PartLoadRatio) {
                             UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[this->m_UnitarySysNum];
                             bool errFlag = false;
@@ -14821,7 +14706,7 @@ namespace UnitarySystems {
                         } break;
                         case DataHVACGlobals::Coil_HeatingElectric:
                         case DataHVACGlobals::Coil_HeatingDesuperheater: {
-                            bool tmpSuppHeatingCoilFlag = SuppHeatingCoilFlag;  // CONST_LAMBDA_CAPTURE
+                            bool tmpSuppHeatingCoilFlag = SuppHeatingCoilFlag; // CONST_LAMBDA_CAPTURE
                             auto f = [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode, tmpSuppHeatingCoilFlag](Real64 const PartLoadFrac) {
                                 return this->gasElecHeatingCoilResidual(state,
                                                                         PartLoadFrac,
@@ -15060,7 +14945,6 @@ namespace UnitarySystems {
         Real64 FullOutput = 0.0;      // Sensible capacity (outlet - inlet) when the compressor is on
         Real64 ReqOutput = 0.0;       // Sensible capacity (outlet - inlet) required to meet load or set point temperature
         Real64 QCoilActual = 0.0;     // Heating coil operating capacity [W]
-        std::vector<Real64> Par(10);  // Parameter array passed to solver
         Real64 NoLoadTempOut = 0.0;   // save outlet temp when coil is off (C)
         bool HeatingActive = false;   // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
         bool CoolingActive = false;   // dummy variable for UserDefined coil which are passed back indicating if coil is on or off.
@@ -15282,30 +15166,21 @@ namespace UnitarySystems {
                             case DataHVACGlobals::Coil_HeatingElectric:
                             case DataHVACGlobals::Coil_HeatingDesuperheater: {
                                 bool tmpSuppHeatingCoilFlag = SuppHeatingCoilFlag; // CONST_LAMBDA_CAPTURE
-                                auto f = [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode, tmpSuppHeatingCoilFlag](Real64 const PartLoadFrac) {
-                                    return this->gasElecHeatingCoilResidual(state,
-                                                                            PartLoadFrac,
-                                                                            this->m_UnitarySysNum,
-                                                                            FirstHVACIteration,
-                                                                            DesOutTemp,
-                                                                            tmpSuppHeatingCoilFlag,
-                                                                            FanOpMode,
-                                                                            this->m_DesignSuppHeatingCapacity);
-                                };
+                                auto f =
+                                    [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode, tmpSuppHeatingCoilFlag](Real64 const PartLoadFrac) {
+                                        return this->gasElecHeatingCoilResidual(state,
+                                                                                PartLoadFrac,
+                                                                                this->m_UnitarySysNum,
+                                                                                FirstHVACIteration,
+                                                                                DesOutTemp,
+                                                                                tmpSuppHeatingCoilFlag,
+                                                                                FanOpMode,
+                                                                                this->m_DesignSuppHeatingCapacity);
+                                    };
                                 General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             } break;
                             case DataHVACGlobals::Coil_HeatingElectric_MultiStage: {
-                                Par[1] = double(this->m_SuppHeatCoilIndex);
-                                Par[2] = DesOutTemp;
-                                Par[3] = double(this->m_UnitarySysNum);
-                                // Par(4) = CycRatio or SpeedRatio
-                                Par[5] = this->m_SuppHeatingSpeedNum;
-                                Par[6] = double(FanOpMode);
-                                Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // UnitarySystem(UnitarySysNum)%CompressorOp
-                                Par[8] = ReqOutput;
-                                Par[9] = true; // is supplemental coil
                                 if (this->m_SuppHeatingSpeedNum > 1) {
-                                    Par[4] = CycRatio;
                                     auto f = [&state, this, DesOutTemp, CycRatio, FanOpMode](Real64 const SpeedRatio) {
                                         return UnitarySys::heatingCoilVarSpeedResidual(state,
                                                                                        SpeedRatio,
@@ -15326,7 +15201,6 @@ namespace UnitarySystems {
                                 } else {
                                     SpeedRatio = 0.0;
                                     this->m_SuppHeatingSpeedRatio = SpeedRatio;
-                                    Par[4] = SpeedRatio;
                                     auto f = [&state, this, DesOutTemp, SpeedRatio, FanOpMode](Real64 const CycRatio) {
                                         return UnitarySys::heatingCoilVarSpeedCycResidual(state,
                                                                                           CycRatio,
@@ -16946,10 +16820,6 @@ namespace UnitarySystems {
         // Calls SimWatertoAirHP or SimWatertoAirHPSimple to get outlet humidity ratio at the given cycling ratio
         // and calculates the residual as defined above
 
-        // Argument array dimensioning
-        // par(2) = desired air outlet humidity ratio [kg/kg]
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
         UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
         bool errFlag = false;
         Real64 RuntimeFrac = 0.0;
@@ -17029,25 +16899,6 @@ namespace UnitarySystems {
 
         Real64 HeatCoilLoad = 0.0;
         Real64 SupHeaterLoad = 0.0;
-
-        // Argument array dimensioning
-        //   Parameter description example:
-        //       Par(1)  = double(UnitarySysNum)    ! Index to unitary system
-        //       Par(2)  = 0.0                      ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
-        //       Par(3)  = double(ControlledZoneNum) ! zone index
-        //       Par(4)  = QZnReq                   ! zone load [W]
-        //       Par(5)  = double(AirControlNode)   ! UnitarySystem air inlet node number
-        //       Par(6)  = OnOffAirFlowRatio        ! ratio of coil on air flow rate to coil off air flow rate
-        //       Par(7)  = double(AirLoopNum)       ! index to air loop
-        //       Par(8)  = double(WaterControlNode) ! CW or HW control node number
-        //       Par(9)  = lowWaterMdot             ! water flow rate at low speed fan that meets outlet air set point temperature
-        //       Par(10) = highWaterMdot            ! water flow rate at high speed fan that meets outlet air set point temperature
-        //       Par(11) = lowSpeedRatio            ! ratio of low speed fan flow rate to high speed fan flow rate
-        //       Par(12) = airMdot                  ! air flow rate used for function calculations
-        //       Par(13) = SATempTarget             ! SA temperature target [C], 0 if target is load [W]
-        //       Par(14) = systemMaxAirFlowRate     ! UnitarySystem maximum air flow rate [kg/s]
-        //       Par(15) = LoadType                 ! 1.0 for CoolingLoad otherwise don't care
-        //       Par(16) = iteration method         ! 1 = iteration on coil capacity, 2 = iterate on air flow rate at constant coil capacity
 
         // Convert parameters to usable variables
         UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
