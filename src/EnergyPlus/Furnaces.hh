@@ -385,9 +385,16 @@ namespace Furnaces {
     );
 
     Real64 CalcWaterToAirResidual(EnergyPlusData &state,
-                                  Real64 const PartLoadRatio,      // DX cooling coil part load ratio
-                                  std::array<Real64, 9> const &Par // Function parameters
-    );
+                                  Real64 PartLoadRatio, // DX cooling coil part load ratio
+                                  int FurnaceNum,
+                                  bool FirstHVACIteration,
+                                  int FanOpMode,
+                                  DataHVACGlobals::CompressorOperation CompressorOp,
+                                  Real64 LoadToBeMet,
+                                  Real64 par6_loadTypeFlag,
+                                  Real64 par7_latentOrSensible,
+                                  Real64 ZoneSensLoadMetFanONCompOFF,
+                                  Real64 par9_HXUnitOne);
 
     void SetAverageAirFlow(EnergyPlusData &state,
                            int const FurnaceNum,       // Unit index

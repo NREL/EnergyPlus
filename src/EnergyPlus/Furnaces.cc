@@ -8880,7 +8880,21 @@ namespace Furnaces {
                 Par[7] = ZoneSensLoadMetFanONCompOFF; // Output with fan ON compressor OFF
                 Par[8] = 0.0;                         // HX is off for water-to-air HP
                 //         CoolErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
-                General::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, CoolPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par);
+                auto f = [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, TotalZoneSensLoad, ZoneSensLoadMetFanONCompOFF](
+                             Real64 const PartLoadRatio) {
+                    return CalcWaterToAirResidual(state,
+                                                  PartLoadRatio,
+                                                  FurnaceNum,
+                                                  FirstHVACIteration,
+                                                  OpMode,
+                                                  CompressorOp,
+                                                  TotalZoneSensLoad,
+                                                  1.0,
+                                                  1.0,
+                                                  ZoneSensLoadMetFanONCompOFF,
+                                                  0.0);
+                };
+                General::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, CoolPartLoadRatio, f, 0.0, 1.0);
                 if (SolFlag == -1 && !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = state.dataFurnaces->OnOffFanPartLoadFractionSave;
                     CalcFurnaceOutput(state,
@@ -9082,7 +9096,21 @@ namespace Furnaces {
                 Par[7] = ZoneSensLoadMetFanONCompOFF; // Output with fan ON compressor OFF
                 Par[8] = 0.0;                         // HX is OFF for water-to-air HP
                 //         HeatErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
-                General::SolveRoot(state, HeatErrorToler, MaxIter, SolFlag, HeatPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par);
+                auto f = [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, TotalZoneSensLoad, ZoneSensLoadMetFanONCompOFF](
+                             Real64 const PartLoadRatio) {
+                    return CalcWaterToAirResidual(state,
+                                                  PartLoadRatio,
+                                                  FurnaceNum,
+                                                  FirstHVACIteration,
+                                                  OpMode,
+                                                  CompressorOp,
+                                                  TotalZoneSensLoad,
+                                                  0.0,
+                                                  1.0,
+                                                  ZoneSensLoadMetFanONCompOFF,
+                                                  0.0);
+                };
+                General::SolveRoot(state, HeatErrorToler, MaxIter, SolFlag, HeatPartLoadRatio, f, 0.0, 1.0);
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = state.dataFurnaces->OnOffFanPartLoadFractionSave;
                 CalcFurnaceOutput(state,
                                   FurnaceNum,
@@ -9879,9 +9907,16 @@ namespace Furnaces {
     }
 
     Real64 CalcWaterToAirResidual(EnergyPlusData &state,
-                                  Real64 const PartLoadRatio,      // DX cooling coil part load ratio
-                                  std::array<Real64, 9> const &Par // Function parameters
-    )
+                                  Real64 const PartLoadRatio, // DX cooling coil part load ratio
+                                  int FurnaceNum,
+                                  bool FirstHVACIteration,
+                                  int FanOpMode,
+                                  CompressorOperation CompressorOp,
+                                  Real64 LoadToBeMet,
+                                  Real64 par6_loadTypeFlag,
+                                  Real64 par7_latentOrSensible,
+                                  Real64 ZoneSensLoadMetFanONCompOFF,
+                                  Real64 par9_HXUnitOne)
     {
 
         // FUNCTION INFORMATION:
@@ -9894,23 +9929,6 @@ namespace Furnaces {
         // To calculate the part-load ratio for water to air HP's
         // this is used for parameter estimation WAHPs but not equation fit WAHPs
 
-        // METHODOLOGY EMPLOYED:
-        // Use SolveRoot to call this Function to converge on a solution
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Residuum; // Result (force to 0)
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         //   Parameter description example:
         //     Par(1)  = REAL(FurnaceNum,r64) ! Index to furnace
         //     Par(2)  = 0.0                  ! FirstHVACIteration FLAG, if 1.0 then TRUE, if 0.0 then FALSE
@@ -9921,46 +9939,31 @@ namespace Furnaces {
         //     Par(7)  = 1.0                  ! Output calculation FLAG, 0.0 for latent capacity, 1.0 for sensible capacity
         //     Par(8)  = ZoneSensLoadMetFanONCompOFF  ! Output with fan ON compressor OFF
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FurnaceNum;                   // Index to furnace
-        bool FirstHVACIteration;          // FirstHVACIteration flag
-        int FanOpMode;                    // Cycling fan or constant fan
-        CompressorOperation CompressorOp; // Compressor on/off; 1=on, 0=off
-        Real64 CoolPartLoadRatio;         // DX cooling coil part load ratio
-        Real64 HeatPartLoadRatio;         // DX heating coil part load ratio (0 for other heating coil types)
-        Real64 HeatCoilLoad;              // Heating coil load for gas heater
-        Real64 ZoneSensLoadMet;           // Sensible cooling load met (furnace outlet with respect to control zone temp)
-        Real64 ZoneLatLoadMet;            // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-        Real64 LoadToBeMet;               // Sensible or Latent load to be met by furnace
+        Real64 CoolPartLoadRatio; // DX cooling coil part load ratio
+        Real64 HeatPartLoadRatio; // DX heating coil part load ratio (0 for other heating coil types)
+        Real64 HeatCoilLoad;      // Heating coil load for gas heater
+        Real64 ZoneSensLoadMet;   // Sensible cooling load met (furnace outlet with respect to control zone temp)
+        Real64 ZoneLatLoadMet;    // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
         bool errFlag;
         Real64 RuntimeFrac;
         Real64 Dummy;
         Real64 HPCoilSensDemand;
-        Real64 ZoneSensLoadMetFanONCompOFF;
         Real64 OnOffAirFlowRatio;
         bool HXUnitOn; // flag to enable HX based on zone moisture load (not valid for water-to-air HP's
 
         // Convert parameters to usable variables
-        FurnaceNum = int(Par[0]);
-        if (Par[1] == 1.0) {
-            FirstHVACIteration = true;
-        } else {
-            FirstHVACIteration = false;
-        }
-        FanOpMode = int(Par[2]);
-        CompressorOp = static_cast<CompressorOperation>(Par[3]);
-        LoadToBeMet = Par[4];
+        //        int FurnaceNum = int(Par[0]);
+        //        bool FirstHVACIteration = Par[1] == 1.0;
+        //        int FanOpMode = int(Par[2]);
+        //        CompressorOperation CompressorOp = static_cast<CompressorOperation>(Par[3]);
+        //        Real64 LoadToBeMet = Par[4];
+        //        Real64 par6_loadTypeFlag = Par[5];
+        //        Real64 par7_latentOrSensible = Par[6];
+        //        Real64 ZoneSensLoadMetFanONCompOFF = Par[7];
+        //        Real64 par9_HXUnitOne = Par[8];
 
-        if (Par[5] == 1.0) {
+        if (par6_loadTypeFlag == 1.0) {
             CoolPartLoadRatio = PartLoadRatio;
             HeatPartLoadRatio = 0.0;
             HeatCoilLoad = 0.0;
@@ -9968,13 +9971,13 @@ namespace Furnaces {
             CoolPartLoadRatio = 0.0;
             HeatPartLoadRatio = PartLoadRatio;
         }
-        ZoneSensLoadMetFanONCompOFF = Par[7];
+
         // calculate the run time fraction
         HeatPumpRunFrac(state, FurnaceNum, PartLoadRatio, errFlag, RuntimeFrac);
 
         // update the fan part load factor
         // see 'Note' under INITIAL CALCULATIONS
-        if (Par[5] == 1.0) {
+        if (par6_loadTypeFlag == 1.0) {
             if (RuntimeFrac > 0.0) {
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = CoolPartLoadRatio / RuntimeFrac;
             } else {
@@ -10005,7 +10008,7 @@ namespace Furnaces {
         // Set input parameters for heat pump coil model
         HPCoilSensDemand = LoadToBeMet - RuntimeFrac * ZoneSensLoadMetFanONCompOFF;
         //  HPCoilSensDemand = LoadToBeMet  - PartLoadRatio*ZoneSensLoadMetFanONCompOFF
-        if (Par[5] == 1.0) {
+        if (par6_loadTypeFlag == 1.0) {
             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand = 0.0;
             state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand = std::abs(HPCoilSensDemand);
         } else {
@@ -10017,7 +10020,7 @@ namespace Furnaces {
         // Calculate the zone loads met and the new part load ratio and for the specified run time
         Dummy = 0.0;
         OnOffAirFlowRatio = 1.0;
-        if (Par[8] == 1.0) {
+        if (par9_HXUnitOne == 1.0) {
             HXUnitOn = true;
         } else {
             HXUnitOn = false;
@@ -10041,13 +10044,11 @@ namespace Furnaces {
                           HXUnitOn);
 
         // Calculate residual based on output calculation flag
-        if (Par[6] == 1.0) {
-            Residuum = (ZoneSensLoadMet - LoadToBeMet) / LoadToBeMet;
+        if (par7_latentOrSensible == 1.0) {
+            return (ZoneSensLoadMet - LoadToBeMet) / LoadToBeMet;
         } else {
-            Residuum = (ZoneLatLoadMet - LoadToBeMet) / LoadToBeMet;
+            return (ZoneLatLoadMet - LoadToBeMet) / LoadToBeMet;
         }
-
-        return Residuum;
     }
 
     void SetAverageAirFlow(EnergyPlusData &state,
