@@ -3811,7 +3811,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
                                 state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) *
                                 state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass);
-                        } else if (BITF_TEST_ANY(BITF(ShadeFlag), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind))) {
+                        } else if ((ShadeFlag == WinShadingType::IntBlind) || (ShadeFlag == WinShadingType::ExtBlind)) {
                             Real64 BlAbsDiffBk; // Glass layer back diffuse solar absorptance when blind in place
                             if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                 BlAbsDiffBk = General::InterpGeneral(

@@ -404,9 +404,9 @@ namespace UnitVentilator {
                     Fans::GetFanType(state, unitVent.FanName, unitVent.FanType_Num, errFlag, CurrentModuleObject, unitVent.Name);
 
                     {
-                        if ((BITF_TEST_ANY(BITF(unitVent.FanType_Num),
-                                           BITF(DataHVACGlobals::FanType_SimpleConstVolume) | BITF(DataHVACGlobals::FanType_SimpleVAV) |
-                                               BITF(DataHVACGlobals::FanType_SimpleOnOff)))) {
+                        if ((unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) ||
+                            (unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleVAV) ||
+                            (unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff)) {
 
                             if (errFlag) {
                                 ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, unitVent.Name));

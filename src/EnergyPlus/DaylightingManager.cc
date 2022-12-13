@@ -7223,10 +7223,11 @@ void DayltgInteriorIllum(EnergyPlusData &state,
          IWin <= state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).WindowSurfaceLast;
          ++IWin) {
         if (state.dataSurface->Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
-        bool anyGlareControl = BITF_TEST_ANY(BITF(state.dataSurface->SurfWinShadingFlag(IWin)),
-                                             BITF(WinShadingType::IntShadeConditionallyOff) | BITF(WinShadingType::GlassConditionallyLightened) |
-                                                 BITF(WinShadingType::ExtShadeConditionallyOff) | BITF(WinShadingType::IntBlindConditionallyOff) |
-                                                 BITF(WinShadingType::ExtBlindConditionallyOff));
+        bool anyGlareControl = (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::IntShadeConditionallyOff) ||
+                               (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::GlassConditionallyLightened) ||
+                               (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::ExtShadeConditionallyOff) ||
+                               (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::IntBlindConditionallyOff) ||
+                               (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::ExtBlindConditionallyOff);
         if (anyGlareControl) {
             state.dataSurface->SurfWinShadingFlag(IWin) = WinShadingType::ShadeOff;
         }

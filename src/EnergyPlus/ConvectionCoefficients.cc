@@ -8133,11 +8133,10 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(EnergyPlusData &state,
     if (ZoneExtPerimLength > 0.0) {
         if (WindWallRatio <= 0.5) {
 
-            if (!BITF_TEST_ANY(BITF(WindowLocationType),
-                               BITF(ConvectionConstants::InConvWinLoc::UpperPartOfExteriorWall) |
-                                   BITF(ConvectionConstants::InConvWinLoc::LowerPartOfExteriorWall) |
-                                   BITF(ConvectionConstants::InConvWinLoc::LargePartOfExteriorWall) |
-                                   BITF(ConvectionConstants::InConvWinLoc::NotSet))) {
+            if (!((WindowLocationType == ConvectionConstants::InConvWinLoc::UpperPartOfExteriorWall) ||
+                  (WindowLocationType == ConvectionConstants::InConvWinLoc::LowerPartOfExteriorWall) ||
+                  (WindowLocationType == ConvectionConstants::InConvWinLoc::LargePartOfExteriorWall) ||
+                  (WindowLocationType == ConvectionConstants::InConvWinLoc::NotSet))) {
                 if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 == 0) {
                     ShowSevereMessage(state,
                                       "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (bad relative window location)");
@@ -8217,9 +8216,10 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(EnergyPlusData &state,
     Real64 AirSystemFlowRate = CalcZoneSystemVolFlowRate(state, ZoneNum);
 
     if (ZoneExtPerimLength > 0.0) {
-        if (!BITF_TEST_ANY(BITF(WindowLocationType),
-                           BITF(ConvectionConstants::InConvWinLoc::WindowAboveThis) | BITF(ConvectionConstants::InConvWinLoc::WindowBelowThis) |
-                               BITF(ConvectionConstants::InConvWinLoc::NotSet))) {
+        if (!((WindowLocationType == ConvectionConstants::InConvWinLoc::WindowAboveThis) ||
+              (WindowLocationType == ConvectionConstants::InConvWinLoc::WindowBelowThis) ||
+              (WindowLocationType == ConvectionConstants::InConvWinLoc::NotSet))) {
+
             if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 == 0) {
                 ShowSevereMessage(state, "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (bad relative window location)");
                 ShowContinueError(state, format("Value for window location = {}", WindowLocationType));
