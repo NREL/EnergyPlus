@@ -1470,7 +1470,7 @@ namespace HeatBalanceManager {
         int EcoRoofMat; // Materials for ecoRoof
         int NumGas;     // Index for loop over gap gases in a mixture
         int NumGases;   // Number of gasses in a mixture
-        int GasType;    // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
+        Material::GasTypeEnum GasType = Material::GasTypeEnum::Invalid;    // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
         int Loop;
         int ICoeff;            // Gas property coefficient index
         std::string TypeOfGas; // Type of window gas fill (Air, Argon, Krypton, &
@@ -2495,7 +2495,7 @@ namespace HeatBalanceManager {
             ++MaterNum;
             auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             thisMaterial->Group = Material::MaterialGroup::WindowGas;
-            thisMaterial->GasType(1) = -1;
+            thisMaterial->GasType(1) = Material::GasTypeEnum::Invalid;
             thisMaterial->NumberOfGasesInMixture = 1;
             thisMaterial->GasFract(1) = 1.0;
 
@@ -2504,13 +2504,10 @@ namespace HeatBalanceManager {
             thisMaterial->Name = MaterialNames(1);
             thisMaterial->NumberOfGasesInMixture = 1;
             TypeOfGas = MaterialNames(2);
-            if (TypeOfGas == "AIR") thisMaterial->GasType(1) = 1;
-            if (TypeOfGas == "ARGON") thisMaterial->GasType(1) = 2;
-            if (TypeOfGas == "KRYPTON") thisMaterial->GasType(1) = 3;
-            if (TypeOfGas == "XENON") thisMaterial->GasType(1) = 4;
-            if (TypeOfGas == "CUSTOM") thisMaterial->GasType(1) = 0;
+            thisMaterial->GasType(1) =
+                static_cast<Material::GasTypeEnum>(getEnumerationValue(Material::GasTypeEnumUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
 
-            if (thisMaterial->GasType(1) == -1) {
+            if (thisMaterial->GasType(1) == Material::GasTypeEnum::Invalid) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
@@ -2524,19 +2521,20 @@ namespace HeatBalanceManager {
             thisMaterial->ROnly = true;
 
             GasType = thisMaterial->GasType(1);
-            if (GasType >= 1 && GasType <= 4) {
-                thisMaterial->GasWght(1) = GasWght[GasType - 1];
-                thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[GasType - 1];
+            int GasTypeInt = static_cast<int>(GasType);
+            if (GasTypeInt >= 1 && GasTypeInt <= 4) {
+                thisMaterial->GasWght(1) = GasWght[GasTypeInt - 1];
+                thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[GasTypeInt - 1];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][GasType - 1];
-                    thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][GasType - 1];
-                    thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][GasType - 1];
+                    thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][GasTypeInt - 1];
+                    thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][GasTypeInt - 1];
+                    thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][GasTypeInt - 1];
                 }
             }
 
             // Custom gas
 
-            if (GasType == 0) {
+            if (GasType == Material::GasTypeEnum::Custom) {
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
                     thisMaterial->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
                     thisMaterial->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
@@ -2615,7 +2613,7 @@ namespace HeatBalanceManager {
             ++MaterNum;
             auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             thisMaterial->Group = Material::MaterialGroup::GapEquivalentLayer;
-            thisMaterial->GasType(1) = -1;
+            thisMaterial->GasType(1) = Material::GasTypeEnum::Invalid;
             thisMaterial->NumberOfGasesInMixture = 1;
             thisMaterial->GasFract(1) = 1.0;
 
@@ -2625,13 +2623,9 @@ namespace HeatBalanceManager {
             thisMaterial->NumberOfGasesInMixture = 1;
             TypeOfGas = MaterialNames(2);
             thisMaterial->GasName = TypeOfGas;
-            if (TypeOfGas == "AIR") thisMaterial->GasType(1) = 1;
-            if (TypeOfGas == "ARGON") thisMaterial->GasType(1) = 2;
-            if (TypeOfGas == "KRYPTON") thisMaterial->GasType(1) = 3;
-            if (TypeOfGas == "XENON") thisMaterial->GasType(1) = 4;
-            if (TypeOfGas == "CUSTOM") thisMaterial->GasType(1) = 0;
+            thisMaterial->GasType(1) = static_cast<Material::GasTypeEnum>(getEnumerationValue(Material::GasTypeEnumUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
 
-            if (thisMaterial->GasType(1) == -1) {
+            if (thisMaterial->GasType(1) == Material::GasTypeEnum::Invalid) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(
@@ -2644,13 +2638,14 @@ namespace HeatBalanceManager {
             thisMaterial->ROnly = true;
 
             GasType = thisMaterial->GasType(1);
-            if (GasType >= 1 && GasType <= 4) {
-                thisMaterial->GasWght(1) = GasWght[GasType - 1];
-                thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[GasType - 1];
+            int GasTypeInt = static_cast<int>(GasType);
+            if (GasTypeInt >= 1 && GasTypeInt <= 4) {
+                thisMaterial->GasWght(1) = GasWght[GasTypeInt - 1];
+                thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[GasTypeInt - 1];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][GasType - 1];
-                    thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][GasType - 1];
-                    thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][GasType - 1];
+                    thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][GasTypeInt - 1];
+                    thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][GasTypeInt - 1];
+                    thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][GasTypeInt - 1];
                 }
             }
 
@@ -2672,7 +2667,7 @@ namespace HeatBalanceManager {
                 }
             }
 
-            if (GasType == 0) {
+            if (GasType == Material::GasTypeEnum::Custom) {
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
                     thisMaterial->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
                     thisMaterial->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
@@ -2744,7 +2739,7 @@ namespace HeatBalanceManager {
             ++MaterNum;
             auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             thisMaterial->Group = Material::MaterialGroup::WindowGasMixture;
-            thisMaterial->GasType = -1;
+            thisMaterial->GasType = Material::GasTypeEnum::Invalid;
 
             // Load the material derived type from the input data.
 
@@ -2753,11 +2748,9 @@ namespace HeatBalanceManager {
             thisMaterial->NumberOfGasesInMixture = NumGases;
             for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
                 TypeOfGas = state.dataIPShortCut->cAlphaArgs(1 + NumGas);
-                if (TypeOfGas == "AIR") thisMaterial->GasType(NumGas) = 1;
-                if (TypeOfGas == "ARGON") thisMaterial->GasType(NumGas) = 2;
-                if (TypeOfGas == "KRYPTON") thisMaterial->GasType(NumGas) = 3;
-                if (TypeOfGas == "XENON") thisMaterial->GasType(NumGas) = 4;
-                if (thisMaterial->GasType(NumGas) == -1) {
+                thisMaterial->GasType(NumGas) =
+                    static_cast<Material::GasTypeEnum>(getEnumerationValue(Material::GasTypeEnumUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
+                if (thisMaterial->GasType(NumGas) == Material::GasTypeEnum::Invalid) {
                     ErrorsFound = true;
                     ShowSevereError(state,
                                     state.dataHeatBalMgr->CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", Illegal value.");
@@ -2779,14 +2772,15 @@ namespace HeatBalanceManager {
 
             for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
                 GasType = thisMaterial->GasType(NumGas);
-                if (GasType >= 1 && GasType <= 4) {
-                    thisMaterial->GasWght(NumGas) = GasWght[GasType - 1];
-                    thisMaterial->GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[GasType - 1];
+                int GasTypeInt = static_cast<int>(GasType);
+                if (GasTypeInt >= 1 && GasTypeInt <= 4) {
+                    thisMaterial->GasWght(NumGas) = GasWght[GasTypeInt - 1];
+                    thisMaterial->GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[GasTypeInt - 1];
                     thisMaterial->GasFract(NumGas) = MaterialProps(2 + NumGas);
                     for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                        thisMaterial->GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][GasType - 1];
-                        thisMaterial->GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][GasType - 1];
-                        thisMaterial->GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][GasType - 1];
+                        thisMaterial->GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][GasTypeInt - 1];
+                        thisMaterial->GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][GasTypeInt - 1];
+                        thisMaterial->GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][GasTypeInt - 1];
                     }
                 }
             }
@@ -7281,7 +7275,7 @@ namespace HeatBalanceManager {
                 state.dataMaterial->Material(loop)->GasCon = 0.0;
                 state.dataMaterial->Material(loop)->GasVis = 0.0;
                 state.dataMaterial->Material(loop)->GasCp = 0.0;
-                state.dataMaterial->Material(loop)->GasType = 0;
+                state.dataMaterial->Material(loop)->GasType = Material::GasTypeEnum::Custom;
                 state.dataMaterial->Material(loop)->GasWght = 0.0;
                 state.dataMaterial->Material(loop)->GasSpecHeatRatio = 0.0;
                 state.dataMaterial->Material(loop)->GasFract = 0.0;

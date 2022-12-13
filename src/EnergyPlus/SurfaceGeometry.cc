@@ -10537,7 +10537,7 @@ namespace SurfaceGeometry {
                     MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(2);
                     if (state.dataConstruction->Construct(ConstrNum).TotGlassLayers == 3)
                         MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(4);
-                    if (state.dataMaterial->Material(MatGapFlow)->GasType(1) != 1) {
+                    if (state.dataMaterial->Material(MatGapFlow)->GasType(1) != Material::GasTypeEnum::Air) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -10558,8 +10558,8 @@ namespace SurfaceGeometry {
                                     MatGapFlow1 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(4);
                                     MatGapFlow2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(6);
                                 }
-                                if (state.dataMaterial->Material(MatGapFlow1)->GasType(1) != 1 ||
-                                    state.dataMaterial->Material(MatGapFlow2)->GasType(1) != 1) {
+                                if (state.dataMaterial->Material(MatGapFlow1)->GasType(1) != Material::GasTypeEnum::Air ||
+                                    state.dataMaterial->Material(MatGapFlow2)->GasType(1) != Material::GasTypeEnum::Air) {
                                     ErrorsFound = true;
                                     ShowSevereError(state,
                                                     cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -13516,13 +13516,13 @@ namespace SurfaceGeometry {
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->ThermGradCoef = 0.0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->Thickness = distance;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->VaporDiffus = 0.0;
-            state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasType = 0;
+            state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasType = Material::GasTypeEnum::Custom;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasCon = 0.0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasVis = 0.0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasCp = 0.0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasWght = 0.0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasFract = 0.0;
-            state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasType(1) = 1;
+            state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasType(1) = Material::GasTypeEnum::Air;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GlassSpectralDataPtr = 0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->NumberOfGasesInMixture = 1;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials)->GasCon(1, 1) = 2.873e-3;

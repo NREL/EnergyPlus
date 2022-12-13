@@ -2706,7 +2706,7 @@ namespace WindowComplexManager {
         int CalcSHGC(0);              // SHGC calculations are not necessary for E+ run
         int NumOfIterations(0);
 
-        int GasType; // locally used coefficient to point at correct gas type
+        int GasTypeInt; // locally used coefficient to point at correct gas type
         int ICoeff;
 
         std::string tarcogErrorMessage; // store error text from tarcog
@@ -2866,13 +2866,13 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = static_cast<int>(GasCoeffs::Air);
-        wght(iprop(1, 1)) = GasWght[GasType - 1];
-        gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
+        GasTypeInt = static_cast<int>(GasCoeffs::Air);
+        wght(iprop(1, 1)) = GasWght[GasTypeInt - 1];
+        gama(iprop(1, 1)) = GasSpecificHeatRatio[GasTypeInt - 1];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon[ICoeff - 1][GasType - 1];
-            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis[ICoeff - 1][GasType - 1];
-            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp[ICoeff - 1][GasType - 1];
+            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon[ICoeff - 1][GasTypeInt - 1];
+            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis[ICoeff - 1][GasTypeInt - 1];
+            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp[ICoeff - 1][GasTypeInt - 1];
         }
 
         // Fill window layer properties needed for window layer heat balance calculation
