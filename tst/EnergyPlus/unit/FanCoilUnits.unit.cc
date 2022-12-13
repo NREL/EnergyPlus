@@ -2253,27 +2253,6 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     state->dataHeatBal->Zone.deallocate();
 }
 
-Real64 ResidualFancoil(EnergyPlusData &state,
-                       Real64 const mdot,
-                       Array1<Real64> const &Par // Function parameters
-)
-{
-    int FanCoilNum = 1;
-    int ControlledZoneNum = 1;
-    bool FirstHVACIteration = false;
-    Real64 QUnitOut;
-    Real64 QZnReq = Par(1);
-    Real64 Residual;
-
-    state.dataLoopNodes->Node(12).MassFlowRate = mdot;
-
-    Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
-
-    Residual = (QUnitOut - QZnReq) / QZnReq;
-
-    return Residual;
-}
-
 TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
 {
 
@@ -2549,18 +2528,27 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
     int MaxIte = 4;
     int SolFla;
     Real64 mdot;
-    Array1D<Real64> Par(2); // Function parameters
-    Par(1) = -1000.0;
-    Par(2) = 0.0;
+    Real64 const QZnReq2 = -1000.0;
+
+    auto f = [this, QZnReq2](Real64 const mdot){
+        int FanCoilNum = 1;
+        int ControlledZoneNum = 1;
+        bool FirstHVACIteration = false;
+        Real64 QUnitOut;
+        this->state->dataLoopNodes->Node(12).MassFlowRate = mdot;
+        Calc4PipeFanCoil(*this->state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
+        return (QUnitOut - QZnReq2) / QZnReq2;
+    };
 
     state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
-    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par);
+    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, f, MinWaterFlow, MaxWaterFlow);
     EXPECT_EQ(-1, SolFla);
+
     MaxIte = 20;
     MinWaterFlow = 0.0;
     MaxWaterFlow = 0.09375;
     state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
-    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par);
+    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, f, MinWaterFlow, MaxWaterFlow);
     EXPECT_EQ(3, SolFla);
 }
 
