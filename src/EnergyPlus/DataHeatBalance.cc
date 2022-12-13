@@ -239,19 +239,20 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
 
     thisConstruct.DayltPropPtr = 0;
     InsideMaterNum = thisConstruct.LayerPoint(InsideLayer);
-    auto const *thisMaterial = state.dataMaterial->Material(InsideMaterNum);
+    auto const *thisMaterialInside = state.dataMaterial->Material(InsideMaterNum);
     if (InsideMaterNum != 0) {
-        thisConstruct.InsideAbsorpVis = thisMaterial->AbsorpVisible;
-        thisConstruct.InsideAbsorpSolar = thisMaterial->AbsorpSolar;
+        thisConstruct.InsideAbsorpVis = thisMaterialInside->AbsorpVisible;
+        thisConstruct.InsideAbsorpSolar = thisMaterialInside->AbsorpSolar;
 
         // Following line applies only to opaque surfaces; it is recalculated later for windows.
-        thisConstruct.ReflectVisDiffBack = 1.0 - thisMaterial->AbsorpVisible;
+        thisConstruct.ReflectVisDiffBack = 1.0 - thisMaterialInside->AbsorpVisible;
     }
 
     OutsideMaterNum = thisConstruct.LayerPoint(1);
+    auto const *thisMaterialOutside = state.dataMaterial->Material(OutsideMaterNum);
     if (OutsideMaterNum != 0) {
-        thisConstruct.OutsideAbsorpVis = state.dataMaterial->Material(OutsideMaterNum)->AbsorpVisible;
-        thisConstruct.OutsideAbsorpSolar = state.dataMaterial->Material(OutsideMaterNum)->AbsorpSolar;
+        thisConstruct.OutsideAbsorpVis = thisMaterialOutside->AbsorpVisible;
+        thisConstruct.OutsideAbsorpSolar = thisMaterialOutside->AbsorpSolar;
     }
 
     thisConstruct.TotSolidLayers = 0;
@@ -583,8 +584,9 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             thisConstruct.InsideAbsorpThermal = state.dataMaterial->Material(thisConstruct.LayerPoint(InsideLayer))->AbsorpThermalBack;
         }
         if (InsideMaterNum != 0) {
-            thisConstruct.InsideAbsorpVis = thisMaterial->AbsorpVisible;
-            thisConstruct.InsideAbsorpSolar = thisMaterial->AbsorpSolar;
+            auto const *thisMaterialInside = state.dataMaterial->Material(InsideMaterNum);
+            thisConstruct.InsideAbsorpVis = thisMaterialInside->AbsorpVisible;
+            thisConstruct.InsideAbsorpSolar = thisMaterialInside->AbsorpSolar;
         }
 
         if ((state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Group == Material::MaterialGroup::WindowGlass) ||

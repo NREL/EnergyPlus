@@ -4552,18 +4552,19 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
         TotLayers = thisConstruct.TotLayers;
         if (TotLayers == 0) continue; // error condition
         InsideMaterNum = thisConstruct.LayerPoint(TotLayers);
-        auto const *thisMaterial = state.dataMaterial->Material(InsideMaterNum);
+        auto const *thisMaterialInside = state.dataMaterial->Material(InsideMaterNum);
         if (InsideMaterNum != 0) {
-            thisConstruct.InsideAbsorpVis = thisMaterial->AbsorpVisible;
-            thisConstruct.InsideAbsorpSolar = thisMaterial->AbsorpSolar;
-            thisConstruct.InsideAbsorpThermal = thisMaterial->AbsorpThermal;
+            thisConstruct.InsideAbsorpVis = thisMaterialInside->AbsorpVisible;
+            thisConstruct.InsideAbsorpSolar = thisMaterialInside->AbsorpSolar;
+            thisConstruct.InsideAbsorpThermal = thisMaterialInside->AbsorpThermal;
         }
 
         OutsideMaterNum = thisConstruct.LayerPoint(1);
+        auto const *thisMaterialOutside = state.dataMaterial->Material(OutsideMaterNum);
         if (OutsideMaterNum != 0) {
-            thisConstruct.OutsideAbsorpVis = state.dataMaterial->Material(OutsideMaterNum)->AbsorpVisible;
-            thisConstruct.OutsideAbsorpSolar = state.dataMaterial->Material(OutsideMaterNum)->AbsorpSolar;
-            thisConstruct.OutsideAbsorpThermal = state.dataMaterial->Material(OutsideMaterNum)->AbsorpThermal;
+            thisConstruct.OutsideAbsorpVis = thisMaterialOutside->AbsorpVisible;
+            thisConstruct.OutsideAbsorpSolar = thisMaterialOutside->AbsorpSolar;
+            thisConstruct.OutsideAbsorpThermal = thisMaterialOutside->AbsorpThermal;
         }
     }
 }
