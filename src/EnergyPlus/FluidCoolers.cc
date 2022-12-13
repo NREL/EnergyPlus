@@ -1173,7 +1173,6 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 this->AirWetBulb = this->DesignEnteringAirWetBulbTemp;
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress, CalledFrom);
-                //                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
                 auto f = [&state, this, DesFluidCoolerLoad, rho, tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, Cp](Real64 const UA) {
                     Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
                     CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, UA, OutWaterTemp);
@@ -1484,16 +1483,14 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             this->AirWetBulb = this->DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
             this->AirPress = state.dataEnvrn->StdBaroPress;
             this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress, CalledFrom);
-            General::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
-            //            auto f = [&state, this, DesFluidCoolerLoad, rho, tmpDesignWaterFlowRate, Cp](Real64 const UA) {
-            //                Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
-            //                CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, this->LowSpeedAirFlowRate, UA,
-            //                OutWaterTemp); Real64 const Output =
-            //                    Cp * rho * tmpDesignWaterFlowRate * (state.dataFluidCoolers->SimpleFluidCooler(this->indexInArray).WaterTemp -
-            //                    OutWaterTemp);
-            //                return (DesFluidCoolerLoad - Output) / DesFluidCoolerLoad;
-            //            };
-            //            General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
+            auto f = [&state, this, DesFluidCoolerLoad, rho, tmpDesignWaterFlowRate, Cp](Real64 const UA) {
+                Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
+                CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, this->LowSpeedAirFlowRate, UA, OutWaterTemp);
+                Real64 const Output =
+                    Cp * rho * tmpDesignWaterFlowRate * (state.dataFluidCoolers->SimpleFluidCooler(this->indexInArray).WaterTemp - OutWaterTemp);
+                return (DesFluidCoolerLoad - Output) / DesFluidCoolerLoad;
+            };
+            General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
             if (SolFla == -1) {
                 ShowWarningError(state, "Iteration limit exceeded in calculating fluid cooler UA.");
                 ShowContinueError(state, "Autosizing of fluid cooler UA failed for fluid cooler = " + this->Name);
