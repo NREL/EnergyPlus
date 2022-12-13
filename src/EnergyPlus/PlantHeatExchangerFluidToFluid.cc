@@ -1873,7 +1873,7 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, Real64 My
         } break;
 
         case ControlType::OperationSchemeModulated: {
-            if (MyLoad >= DataHVACGlobals::SmallLoad) { // If the load is significant (grater than 1) and positive, it will attempt to provide heating
+            if (MyLoad > DataHVACGlobals::SmallLoad) { // If the load is significant (grater than 1) and positive, it will attempt to provide heating
                 Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
                 if (DeltaTHeating > this->TempControlTol) { // can do heating so turn on
                     mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
@@ -1918,7 +1918,7 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, Real64 My
         } break;
 
         case ControlType::OperationSchemeOnOff: {
-            if (MyLoad >= DataHVACGlobals::SmallLoad) { // If the load is significant (grater than 1) and positive, it will attempt to provide heating
+            if (MyLoad > DataHVACGlobals::SmallLoad) { // If the load is significant (grater than 1) and positive, it will attempt to provide heating
                 Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
                 if (DeltaTHeating > this->TempControlTol) { // can do heating so turn on
                     mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
@@ -2346,6 +2346,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
                                                                       state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                       RoutineName);
     Real64 SteamMdot = std::abs(this->HeatTransferRate / (LatentHeatSteam + CpWaterSubcool * this->DegOfSubcooling));
+
     PlantUtilities::SetComponentFlowRate(
         state, SteamMdot, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
 
