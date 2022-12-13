@@ -642,9 +642,14 @@ namespace UnitarySystems {
                                                   bool SuppHeat);
 
         static Real64 DXCoilVarSpeedHumRatResidual(EnergyPlusData &state,
-                                                   Real64 const SpeedRatio,       // compressor speed ratio (1.0 is max, 0.0 is min)
-                                                   std::vector<Real64> const &Par // par(1) = DX coil number
-        );
+                                                   Real64 SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
+                                                   int CoilIndex,
+                                                   Real64 DesOutHumRat,
+                                                   int UnitarySysNum,
+                                                   Real64 CycRatio,
+                                                   int SpeedNum,
+                                                   int FanOpMode,
+                                                   DataHVACGlobals::CompressorOperation CompressorOp);
 
         static Real64 DXCoilCyclingResidual(EnergyPlusData &state,
                                             Real64 CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
