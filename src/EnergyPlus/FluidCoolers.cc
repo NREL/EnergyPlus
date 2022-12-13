@@ -866,7 +866,6 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     Real64 UA;                         // Calculated UA value
     Real64 OutWaterTempAtUA0;          // Water outlet temperature at UA0
     Real64 OutWaterTempAtUA1;          // Water outlet temperature at UA1
-    std::array<Real64, 5> Par = {0.0}; // Parameter array need for RegulaFalsi routine
     std::string equipName;
     Real64 Cp;                            // local specific heat for fluid
     Real64 rho;                           // local density for fluid
@@ -1161,11 +1160,6 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             CalledFrom);
                 DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * state.dataSize->PlantSizData(PltSizCondNum).DeltaT;
-                Par[0] = DesFluidCoolerLoad;
-                Par[1] = double(this->indexInArray);
-                Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
-                Par[3] = tmpHighSpeedAirFlowRate;      // design air volume flow rate
-                Par[4] = Cp;
                 UA0 = 0.0001 * DesFluidCoolerLoad; // Assume deltaT = 10000K (limit)
                 UA1 = DesFluidCoolerLoad;          // Assume deltaT = 1K
                 this->WaterTemp = state.dataSize->PlantSizData(PltSizCondNum).ExitTemp + state.dataSize->PlantSizData(PltSizCondNum).DeltaT;
@@ -1280,12 +1274,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                         CalledFrom);
             DesFluidCoolerLoad = this->FluidCoolerNominalCapacity;
-            Par[0] = DesFluidCoolerLoad;
-            Par[1] = double();
-            Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
             Real64 par2_WaterFlow = rho * tmpDesignWaterFlowRate;
-            Par[3] = tmpHighSpeedAirFlowRate; // design air volume flow rate
-            Par[4] = Cp;
             UA0 = 0.0001 * DesFluidCoolerLoad;                     // Assume deltaT = 10000K (limit)
             UA1 = DesFluidCoolerLoad;                              // Assume deltaT = 1K
             this->WaterTemp = this->DesignEnteringWaterTemp;       // design inlet water temperature
@@ -1469,11 +1458,6 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                         CalledFrom);
             DesFluidCoolerLoad = this->FluidCoolerLowSpeedNomCap;
-            Par[0] = DesFluidCoolerLoad;
-            Par[1] = double(this->indexInArray);
-            Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
-            Par[3] = this->LowSpeedAirFlowRate;    // Air volume flow rate at low fan speed
-            Par[4] = Cp;
             UA0 = 0.0001 * DesFluidCoolerLoad;                     // Assume deltaT = 10000K (limit)
             UA1 = DesFluidCoolerLoad;                              // Assume deltaT = 1K
             this->WaterTemp = this->DesignEnteringWaterTemp;       // design inlet water temperature
