@@ -916,6 +916,12 @@ namespace SZVAVModel {
                                                                                           1.0);
                 };
                 General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
+                //                Par[12] = maxAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed air flow rate,
+                //                maxAirMassFlow indicates full
+                //                                          // air flow
+                //                Par[13] = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
+                //                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, thisSys.calcUnitarySystemWaterFlowResidual,
+                //                0.0, 1.0, Par);
                 if (SolFlag < 0) {
                     MessagePrefix = "Step 3: ";
                 }

@@ -160,7 +160,7 @@ void SolveRoot(EnergyPlusData &state,
                Real64 Eps,   // required absolute accuracy
                int MaxIte,   // maximum number of allowed iterations
                int &Flag,    // integer storing exit status
-               Real64 &XRes, // value of x that solves f(x) = 0
+               Real64 &XRes, // value of x that solves f(x,Par) = 0
                const std::function<Real64(Real64)> &f,
                Real64 X_0, // 1st bound of interval that contains the solution
                Real64 X_1) // 2nd bound of interval that contains the solution
@@ -172,7 +172,7 @@ void SolveRoot(EnergyPlusData &state,
     //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Find the value of x between x0 and x1 such that f(x)
+    // Find the value of x between x0 and x1 such that f(x,Par)
     // is equal to zero.
 
     // METHODOLOGY EMPLOYED:

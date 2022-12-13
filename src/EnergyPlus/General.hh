@@ -257,7 +257,7 @@ namespace General {
                    Real64 Eps,   // required absolute accuracy
                    int MaxIte,   // maximum number of allowed iterations
                    int &Flag,    // integer storing exit status
-                   Real64 &XRes, // value of x that solves f(x) = 0
+                   Real64 &XRes, // value of x that solves f(x,Par) = 0
                    const std::function<Real64(Real64)> &f,
                    Real64 X_0,  // 1st bound of interval that contains the solution
                    Real64 X_1); // 2nd bound of interval that contains the solution
