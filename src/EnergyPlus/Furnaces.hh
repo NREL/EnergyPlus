@@ -483,9 +483,15 @@ namespace Furnaces {
     //******************************************************************************
 
     Real64 VSHPSpeedResidual(EnergyPlusData &state,
-                             Real64 const SpeedRatio,          // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                             std::array<Real64, 10> const &Par // par(1) = MSHPNum
-    );
+                             Real64 SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                             int FurnaceNum,
+                             bool FirstHVACIteration,
+                             Real64 LoadToBeMet,
+                             Real64 OnOffAirFlowRatio,
+                             Real64 SupHeaterLoad,
+                             int SpeedNum,
+                             DataHVACGlobals::CompressorOperation CompressorOp,
+                             Real64 par9_SensLatFlag);
 
     void SetVSHPAirFlow(EnergyPlusData &state,
                         int const FurnaceNum,                 // Unit index
