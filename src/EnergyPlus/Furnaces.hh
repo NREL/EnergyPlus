@@ -380,9 +380,16 @@ namespace Furnaces {
     // *****************************************************************************
 
     Real64 CalcFurnaceResidual(EnergyPlusData &state,
-                               Real64 const PartLoadRatio, // DX cooling coil part load ratio
-                               Array1D<Real64> const &Par  // Function parameters
-    );
+                               Real64 PartLoadRatio, // DX cooling coil part load ratio
+                               int FurnaceNum,
+                               bool FirstHVACIteration,
+                               int FanOpMode,
+                               DataHVACGlobals::CompressorOperation CompressorOp,
+                               Real64 LoadToBeMet,
+                               Real64 par6_loadFlag,
+                               Real64 par7_sensLatentFlag,
+                               Real64 par9_HXOnFlag,
+                               Real64 par10_HeatingCoilPLR);
 
     Real64 CalcWaterToAirResidual(EnergyPlusData &state,
                                   Real64 PartLoadRatio, // DX cooling coil part load ratio
