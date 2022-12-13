@@ -203,11 +203,6 @@ namespace WaterToAirHeatPump {
                                  DataHVACGlobals::CompressorOperation CompressorOp,
                                  Real64 const PartLoadRatio);
 
-    Real64 CalcCompSuctionTempResidual(EnergyPlusData &state,
-                                       Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-                                       Array1D<Real64> const &Par    // Function parameters
-    );
-
     void CalcWatertoAirHPHeating(EnergyPlusData &state,
                                  int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator

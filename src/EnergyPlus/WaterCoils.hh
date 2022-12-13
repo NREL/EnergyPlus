@@ -406,11 +406,6 @@ namespace WaterCoils {
                                        Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
-    Real64 SimpleCoolingCoilUAResidual(EnergyPlusData &state,
-                                       Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
     // Iterate Routine for Cooling Coil
 
     void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
@@ -485,11 +480,6 @@ namespace WaterCoils {
                       Real64 const H,  // specific enthalpy {J/kg}
                       Real64 const RH, // relative humidity value (0.0-1.0)
                       Real64 const PB  // barometric pressure {Pascals}
-    );
-
-    Real64 EnthalpyResidual(EnergyPlusData &state,
-                            Real64 const Tprov,        // test value of Tdb [C]
-                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     );
 
     Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum); // coil number, [-]
