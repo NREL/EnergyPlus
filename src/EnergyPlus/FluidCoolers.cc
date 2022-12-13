@@ -1876,44 +1876,6 @@ void CalcFluidCoolerOutlet(
     }
 }
 
-Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
-                                   Real64 const UA, // UA of fluid cooler
-                                   Real64 DesFluidCoolerLoad,
-                                   int FluidCoolerIndex,
-                                   Real64 DesignWaterMassFlowRate,
-                                   Real64 DesignAirVolumeFlowRate,
-                                   Real64 Cp)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Chandan Sharma
-    //       DATE WRITTEN   August 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates residual function (Design fluid cooler load - fluid cooler Output) / Design fluid cooler load.
-    // Fluid cooler output depends on the UA which is being varied to zero the residual.
-
-    // METHODOLOGY EMPLOYED:
-    // Puts UA into the fluid cooler data structure, calls CalcFluidCoolerOutlet, and calculates
-    // the residual as defined above.
-
-    // REFERENCES:
-    // Based on SimpleTowerUAResidual by Fred Buhl, May 2002
-
-    // par(2) = Fluid cooler number
-    // par(3) = design water mass flow rate [kg/s]
-    // par(4) = design air volume flow rate [m3/s]
-    // par(5) = water specific heat [J/(kg*C)]
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
-    CalcFluidCoolerOutlet(state, FluidCoolerIndex, DesignWaterMassFlowRate, DesignAirVolumeFlowRate, UA, OutWaterTemp);
-    Real64 const Output = Cp * DesignWaterMassFlowRate * (state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerIndex).WaterTemp - OutWaterTemp);
-    return (DesFluidCoolerLoad - Output) / DesFluidCoolerLoad;
-}
-
 void FluidCoolerspecs::update(EnergyPlusData &state)
 {
 

@@ -214,15 +214,6 @@ namespace FluidCoolers {
     void CalcFluidCoolerOutlet(
         EnergyPlusData &state, int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 
-    Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
-                                       Real64 UA,                       // UA of fluid cooler
-                                       Real64 DesFluidCoolerLoad,
-                                       int FluidCoolerIndex,
-                                       Real64 DesignWaterMassFlowRate,
-                                       Real64 DesignAirVolumeFlowRate,
-                                       Real64 Cp
-    );
-
 } // namespace FluidCoolers
 
 struct FluidCoolersData : BaseGlobalStruct
