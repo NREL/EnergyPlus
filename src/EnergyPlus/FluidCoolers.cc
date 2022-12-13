@@ -1906,13 +1906,17 @@ Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
     // par(4) = design air volume flow rate [m3/s]
     // par(5) = water specific heat [J/(kg*C)]
 
+    Real64 DesFluidCoolerLoad = Par[0];
+    int FluidCoolerIndex = int(Par[1]);
+    Real64 DesignWaterMassFlowRate = Par[2];
+    Real64 DesignAirVolumeFlowRate = Par[3];
+    Real64 Cp = Par[4];
+
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
-
-    int FluidCoolerIndex = int(Par[1]);
-    CalcFluidCoolerOutlet(state, FluidCoolerIndex, Par[2], Par[3], UA, OutWaterTemp);
-    Real64 const Output = Par[4] * Par[2] * (state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerIndex).WaterTemp - OutWaterTemp);
-    return (Par[0] - Output) / Par[0];
+    CalcFluidCoolerOutlet(state, FluidCoolerIndex, DesignWaterMassFlowRate, DesignAirVolumeFlowRate, UA, OutWaterTemp);
+    Real64 const Output = Cp * DesignWaterMassFlowRate * (state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerIndex).WaterTemp - OutWaterTemp);
+    return (DesFluidCoolerLoad - Output) / DesFluidCoolerLoad;
 }
 
 void FluidCoolerspecs::update(EnergyPlusData &state)
