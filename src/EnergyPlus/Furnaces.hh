@@ -419,11 +419,6 @@ namespace Furnaces {
                                Real64 &HeatCoilLoadmet         // Heating Load Met
     );
 
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,             // hot water flow rate in kg/s
-                                std::array<Real64, 4> const &Par // Par(5) is the requested coil load
-    );
-
     //        End of Reporting subroutines for the Furnace Module
 
     //******************************************************************************

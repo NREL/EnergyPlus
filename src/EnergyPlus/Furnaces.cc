@@ -10418,8 +10418,43 @@ namespace Furnaces {
                     } else {
                         Par[3] = 0.0;
                     }
-                    General::SolveRoot(
-                        state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                    auto f = [&state, FurnaceNum, FirstHVACIteration, QCoilLoad, SuppHeatingCoilFlag](Real64 const HWFlow) {
+                        Real64 QCoilRequested = QCoilLoad;
+
+                        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+                        Real64 QCoilActual;   // delivered coil load, W
+                        Real64 mdot = HWFlow; // to get non-const argument
+                        QCoilActual = QCoilRequested;
+                        if (!SuppHeatingCoilFlag) {
+                            PlantUtilities::SetComponentFlowRate(state,
+                                                                 mdot,
+                                                                 state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
+                                                                 state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
+                                                                 state.dataFurnaces->Furnace(FurnaceNum).plantLoc);
+                            WaterCoils::SimulateWaterCoilComponents(state,
+                                                                    state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
+                                                                    FirstHVACIteration,
+                                                                    state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
+                                                                    QCoilActual,
+                                                                    state.dataFurnaces->Furnace(FurnaceNum).OpMode);
+                        } else {
+                            // supplemental coil
+                            PlantUtilities::SetComponentFlowRate(state,
+                                                                 mdot,
+                                                                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
+                                                                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
+                                                                 state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc);
+                            // simulate the hot water supplemental heating coil
+                            WaterCoils::SimulateWaterCoilComponents(state,
+                                                                    state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
+                                                                    FirstHVACIteration,
+                                                                    state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex,
+                                                                    QCoilActual,
+                                                                    state.dataFurnaces->Furnace(FurnaceNum).OpMode);
+                        }
+                        return QCoilRequested != 0.0 ? (QCoilActual - QCoilRequested) / QCoilRequested : 0.0;
+                    };
+                    General::SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, f, MinWaterFlow, MaxHotWaterFlow);
                     if (SolFlag == -1) {
                         if (state.dataFurnaces->Furnace(FurnaceNum).HotWaterCoilMaxIterIndex == 0) {
                             ShowWarningMessage(state,
@@ -10483,82 +10518,6 @@ namespace Furnaces {
         }
 
         HeatCoilLoadmet = QActual;
-    }
-
-    Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,             // hot water flow rate in kg/s
-                                std::array<Real64, 4> const &Par // Par(5) is the requested coil load
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Bereket Nigusse, FSEC/UCF
-        //       DATE WRITTEN   January 2011
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (QCoilActual - QCoilRequested) / QCoilRequested
-        // the coil actual output depends on the hot water flow rate which is being varied
-        // to minimize the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls HotWaterCoilResidual, and calculates the residual as defined above.
-
-        // Using/Aliasing
-        using PlantUtilities::SetComponentFlowRate;
-        using WaterCoils::SimulateWaterCoilComponents;
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int FurnaceNum;
-        bool FirstHVACIteration;
-        Real64 QCoilActual;    // delivered coild load, W
-        Real64 QCoilRequested; // requested coild load, W
-        Real64 mdot;
-        bool SuppHeatingCoilFlag; // .TRUE. if supplemental heating coil
-
-        FurnaceNum = int(Par[0]);
-        FirstHVACIteration = (Par[1] > 0.0);
-        QCoilRequested = Par[2];
-        SuppHeatingCoilFlag = (Par[3] > 0.0);
-        QCoilActual = QCoilRequested;
-        mdot = HWFlow;
-        if (!SuppHeatingCoilFlag) {
-            SetComponentFlowRate(state,
-                                 mdot,
-                                 state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
-                                 state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                 state.dataFurnaces->Furnace(FurnaceNum).plantLoc);
-            SimulateWaterCoilComponents(state,
-                                        state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
-                                        FirstHVACIteration,
-                                        state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                        QCoilActual,
-                                        state.dataFurnaces->Furnace(FurnaceNum).OpMode);
-        } else {
-            // supplemental coil
-            SetComponentFlowRate(state,
-                                 mdot,
-                                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
-                                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                 state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc);
-            // simulate the hot water supplemental heating coil
-            SimulateWaterCoilComponents(state,
-                                        state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
-                                        FirstHVACIteration,
-                                        state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex,
-                                        QCoilActual,
-                                        state.dataFurnaces->Furnace(FurnaceNum).OpMode);
-        }
-        if (QCoilRequested != 0.0) {
-            Residuum = (QCoilActual - QCoilRequested) / QCoilRequested;
-        } else { // Autodesk:Return ELSE added to assure return value is set
-            Residuum = 0.0;
-        }
-        return Residuum;
     }
 
     //        End of Reporting subroutines for the Furnace Module
