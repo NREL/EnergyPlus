@@ -1129,9 +1129,17 @@ namespace FourPipeBeam {
                 // can overcool, modulate chilled water flow rate to meet load
                 this->qDotBeamCoolingMax = this->qDotBeamCooling;
                 ErrTolerance = 0.01;
-                bool dummyParameter = false;
-                auto f = std::bind(&HVACFourPipeBeam::residualCooling, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotCW, f, 0.0, this->mDotDesignCW, dummyParameter);
+                auto f = [&state, this](Real64 const cWFlow){
+                    this->mDotHW = 0.0;
+                    this->mDotCW = cWFlow;
+                    this->calc(state);
+                    if (this->qDotBeamCoolingMax != 0.0) {
+                        return (((this->qDotZoneToCoolSetPt - this->qDotSystemAir) - this->qDotBeamCooling) / this->qDotBeamCoolingMax);
+                    } else {
+                        return 1.0;
+                    }
+                };
+                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotCW, f, 0.0, this->mDotDesignCW);
                 if (SolFlag == -1) {
                     // ShowWarningError( "Cold water control failed in four pipe beam unit called " + this->name );
                     // ShowContinueError(state,  "  Iteration limit exceeded in calculating cold water mass flow rate" );
@@ -1160,9 +1168,17 @@ namespace FourPipeBeam {
                 this->qDotBeamHeatingMax = this->qDotBeamHeating;
                 // can overheat, modulate hot water flow to meet load
                 ErrTolerance = 0.01;
-                bool dummyParameter = false;
-                auto f = std::bind(&HVACFourPipeBeam::residualHeating, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotHW, f, 0.0, this->mDotDesignHW, dummyParameter);
+                auto f = [&state, this](Real64 const hWFlow){
+                    this->mDotHW = hWFlow;
+                    this->mDotCW = 0.0;
+                    this->calc(state);
+                    if (this->qDotBeamHeatingMax != 0.0) {
+                        return (((this->qDotZoneToHeatSetPt - this->qDotSystemAir) - this->qDotBeamHeating) / this->qDotBeamHeatingMax);
+                    } else {
+                        return 1.0;
+                    }
+                };
+                General::SolveRoot(state, ErrTolerance, 50, SolFlag, this->mDotHW, f, 0.0, this->mDotDesignHW);
                 if (SolFlag == -1) {
                     // ShowWarningError( "Hot water control failed in four pipe beam unit called " + this->name );
                     // ShowContinueError(state,  "  Iteration limit exceeded in calculating hot water mass flow rate" );
@@ -1316,41 +1332,6 @@ namespace FourPipeBeam {
         this->qDotTotalDelivered = this->qDotSystemAir + this->qDotBeamCooling + this->qDotBeamHeating;
     }
 
-    Real64 HVACFourPipeBeam::residualCooling(EnergyPlusData &state,
-                                             Real64 const cWFlow,
-                                             [[maybe_unused]] bool const dummyParameter // cold water flow rate in kg/s
-    )
-    {
-
-        Real64 Residuum; // residual to be minimized to zero
-        this->mDotHW = 0.0;
-        this->mDotCW = cWFlow;
-        this->calc(state);
-        if (this->qDotBeamCoolingMax != 0.0) {
-            Residuum = (((this->qDotZoneToCoolSetPt - this->qDotSystemAir) - this->qDotBeamCooling) / this->qDotBeamCoolingMax);
-        } else {
-            Residuum = 1.0;
-        }
-        return Residuum;
-    }
-    Real64 HVACFourPipeBeam::residualHeating(EnergyPlusData &state,
-                                             Real64 const hWFlow,
-                                             [[maybe_unused]] bool const dummyParameter // hot water flow rate in kg/s
-    )
-    {
-
-        Real64 Residuum; // residual to be minimized to zero
-        this->mDotHW = hWFlow;
-        this->mDotCW = 0.0;
-        this->calc(state);
-        if (this->qDotBeamHeatingMax != 0.0) {
-            Residuum = (((this->qDotZoneToHeatSetPt - this->qDotSystemAir) - this->qDotBeamHeating) / this->qDotBeamHeatingMax);
-        } else {
-            Residuum = 1.0;
-        }
-
-        return Residuum;
-    }
     void HVACFourPipeBeam::update(EnergyPlusData &state) const // update node date elsewhere in EnergyPlus, does not change state of this
     {
         auto &Node(state.dataLoopNodes->Node);

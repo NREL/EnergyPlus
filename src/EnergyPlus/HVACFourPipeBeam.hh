@@ -130,10 +130,6 @@ namespace FourPipeBeam {
 
         void calc(EnergyPlusData &state);
 
-        Real64 residualCooling(EnergyPlusData &state, Real64 const cWaterFlow, bool dummyParameter);
-
-        Real64 residualHeating(EnergyPlusData &state, Real64 const hWaterFlow, bool dummyParameter);
-
         void update(EnergyPlusData &state) const;
 
         void report(EnergyPlusData &state);
