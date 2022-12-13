@@ -2086,17 +2086,16 @@ namespace FuelCellElectricGenerator {
 
             // solve for a new TprodGasLeavingFCPM using regula falsi method
 
-            Real64 Acc = 0.01;         // guessing need to refine
-            int MaxIter = 150;         // guessing need to refine
-            SolverFlag = 0;            // init
-            std::array<Real64, 2> Par; // parameters passed in to SolveRoot
-            Par[0] = tmpTotProdGasEnthalpy;
-            Par[1] = this->FCPM.NdotProdGas;
+            Real64 Acc = 0.01; // guessing need to refine
+            int MaxIter = 150; // guessing need to refine
+            SolverFlag = 0;    // init
             Real64 tmpTprodGas = this->FCPM.TprodGasLeavingFCPM;
-            auto boundFunc =
-                std::bind(&FCDataStruct::FuelCellProductGasEnthResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            General::SolveRoot(
-                state, Acc, MaxIter, SolverFlag, tmpTprodGas, boundFunc, DataGenerators::MinProductGasTemp, DataGenerators::MaxProductGasTemp, Par);
+            auto f = [&state, this, tmpTotProdGasEnthalpy](Real64 const TprodGas) {
+                Real64 thisHmolalProdGases;
+                this->FigureProductGasesEnthalpy(state, TprodGas, thisHmolalProdGases);
+                return (thisHmolalProdGases * this->FCPM.NdotProdGas * 1000000.0) - tmpTotProdGasEnthalpy;
+            };
+            General::SolveRoot(state, Acc, MaxIter, SolverFlag, tmpTprodGas, f, DataGenerators::MinProductGasTemp, DataGenerators::MaxProductGasTemp);
 
             if (SolverFlag == -2) {
                 ++this->SolverErr_Type2_Iter;
@@ -2330,40 +2329,6 @@ namespace FuelCellElectricGenerator {
             this->ElecStorage.PelIntoStorage = 0.0;
             this->ElecStorage.PelFromStorage = -Pstorage;
         }
-    }
-
-    Real64 FCDataStruct::FuelCellProductGasEnthResidual(EnergyPlusData &state,
-                                                        Real64 const TprodGas,           // temperature, this is "x" being searched
-                                                        std::array<Real64, 2> const &Par // par(1) = Generator Number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Brent Griffith NREL
-        //       DATE WRITTEN   Aug 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Provide function for call to regula falsi search
-        // Search for an product gas stream temperature that provides a
-        // certain enthaply. (enthalpy is based on Shomate and can't be inverted)
-
-        // METHODOLOGY EMPLOYED:
-        // Calculates residual function for product gas enthalpy
-        // calls procedure FigureProductGasesEnthalpy
-
-        Real64 Residuum; // F(x)
-
-        Real64 thisHmolalProdGases;
-        Real64 desiredHprodGases = Par[0];
-        Real64 NdotProdGases = Par[1];
-
-        this->FigureProductGasesEnthalpy(state, TprodGas, thisHmolalProdGases);
-
-        Residuum = (thisHmolalProdGases * NdotProdGases * 1000000.0) - desiredHprodGases;
-
-        return Residuum;
     }
 
     void FCDataStruct::FigureAirHeatCap(EnergyPlusData &state, Real64 const FluidTemp, Real64 &Cp)

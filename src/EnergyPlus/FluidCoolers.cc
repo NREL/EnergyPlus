@@ -866,7 +866,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     Real64 UA;                      // Calculated UA value
     Real64 OutWaterTempAtUA0;       // Water outlet temperature at UA0
     Real64 OutWaterTempAtUA1;       // Water outlet temperature at UA1
-    std::array<Real64, 5> Par;      // Parameter array need for RegulaFalsi routine
+    std::array<Real64, 5> Par = {0.0};      // Parameter array need for RegulaFalsi routine
     std::string equipName;
     Real64 Cp;                            // local specific heat for fluid
     Real64 rho;                           // local density for fluid
@@ -1174,13 +1174,21 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress, CalledFrom);
                 General::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
+//                auto f = [&state, this, DesFluidCoolerLoad, rho, tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, Cp](Real64 const UA) {
+//                    Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
+//                    CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, UA, OutWaterTemp);
+//                    Real64 const Output =
+//                        Cp * rho * tmpDesignWaterFlowRate * (state.dataFluidCoolers->SimpleFluidCooler(this->indexInArray).WaterTemp - OutWaterTemp);
+//                    return (DesFluidCoolerLoad - Output) / DesFluidCoolerLoad;
+//                };
+//                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating fluid cooler UA.");
                     ShowContinueError(state, "Autosizing of fluid cooler UA failed for fluid cooler = " + this->Name);
                     ShowContinueError(state, format("The final UA value ={:.2R} W/K, and the simulation continues...", UA));
                 } else if (SolFla == -2) {
-                    CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA0, OutWaterTempAtUA0);
-                    CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA1, OutWaterTempAtUA1);
+                    CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, UA0, OutWaterTempAtUA0);
+                    CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, UA1, OutWaterTempAtUA1);
                     ShowSevereError(state, std::string{CalledFrom} + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(state, R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be )");
@@ -1194,9 +1202,9 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                     ShowContinueError(state, "on the autosized values shown below or to adjust design fluid cooler air inlet dry-bulb temperature.");
                     ShowContinueError(state, "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp).");
                     ShowContinueError(state, "Inputs to the fluid cooler object:");
-                    ShowContinueError(state, format("Design Fluid Cooler Load [W]                       = {:.2R}", Par[0]));
+                    ShowContinueError(state, format("Design Fluid Cooler Load [W]                       = {:.2R}", DesFluidCoolerLoad));
                     ShowContinueError(state, format("Design Fluid Cooler Water Volume Flow Rate [m3/s]  = {:.6R}", this->DesignWaterFlowRate));
-                    ShowContinueError(state, format("Design Fluid Cooler Air Volume Flow Rate [m3/s]    = {:.2R}", Par[3]));
+                    ShowContinueError(state, format("Design Fluid Cooler Air Volume Flow Rate [m3/s]    = {:.2R}", tmpHighSpeedAirFlowRate));
                     ShowContinueError(state, format("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]    = {:.2R}", this->AirTemp));
                     ShowContinueError(state, "Inputs to the plant sizing object:");
                     ShowContinueError(
@@ -1286,6 +1294,14 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             this->AirPress = state.dataEnvrn->StdBaroPress;
             this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
             General::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
+//            auto f = [&state, this, DesFluidCoolerLoad, rho, tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, Cp](Real64 const UA) {
+//                Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
+//                CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, UA, OutWaterTemp);
+//                Real64 const Output =
+//                    Cp * rho * tmpDesignWaterFlowRate * (state.dataFluidCoolers->SimpleFluidCooler(this->indexInArray).WaterTemp - OutWaterTemp);
+//                return (DesFluidCoolerLoad - Output) / DesFluidCoolerLoad;
+//            };
+//            General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
             if (SolFla == -1) {
                 ShowWarningError(state, "Iteration limit exceeded in calculating fluid cooler UA.");
                 if (PltSizCondNum > 0) {
@@ -1293,8 +1309,8 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 }
                 ShowContinueError(state, format("The final UA value ={:.2R} W/K, and the simulation continues...", UA));
             } else if (SolFla == -2) {
-                CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA0, OutWaterTempAtUA0);
-                CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA1, OutWaterTempAtUA1);
+                CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, UA0, OutWaterTempAtUA0);
+                CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, UA1, OutWaterTempAtUA1);
                 ShowSevereError(state, std::string{CalledFrom} + ": The combination of design input values did not allow the calculation of a ");
                 ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                 ShowContinueError(state, R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be )");
@@ -1308,9 +1324,9 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 ShowContinueError(state, "on the autosized values shown below or to adjust design fluid cooler air inlet dry-bulb temperature.");
                 ShowContinueError(state, "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp).");
                 ShowContinueError(state, "Inputs to the fluid cooler object:");
-                ShowContinueError(state, format("Design Fluid Cooler Load [W]                       = {:.2R}", Par[0]));
+                ShowContinueError(state, format("Design Fluid Cooler Load [W]                       = {:.2R}", DesFluidCoolerLoad));
                 ShowContinueError(state, format("Design Fluid Cooler Water Volume Flow Rate [m3/s]  = {:.6R}", this->DesignWaterFlowRate));
-                ShowContinueError(state, format("Design Fluid Cooler Air Volume Flow Rate [m3/s]    = {:.2R}", Par[3]));
+                ShowContinueError(state, format("Design Fluid Cooler Air Volume Flow Rate [m3/s]    = {:.2R}", tmpHighSpeedAirFlowRate));
                 ShowContinueError(state, format("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]    = {:.2R}", this->AirTemp));
                 if (PltSizCondNum > 0) {
                     ShowContinueError(state, "Inputs to the plant sizing object:");
@@ -1320,7 +1336,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                     ShowContinueError(
                         state,
                         format("Loop Design Temperature Difference [C]             = {:.2R}", state.dataSize->PlantSizData(PltSizCondNum).DeltaT));
-                };
+                }
                 ShowContinueError(state, format("Design Fluid Cooler Water Inlet Temp [C]           = {:.2R}", this->WaterTemp));
                 ShowContinueError(state, format("Calculated water outlet temp at low UA [C] (UA = {:.2R} W/K) = {:.2R}", UA0, OutWaterTempAtUA0));
                 ShowContinueError(state, format("Calculated water outlet temp at high UA [C] (UA = {:.2R} W/K) = {:.2R}", UA1, OutWaterTempAtUA1));
@@ -1468,13 +1484,21 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             this->AirPress = state.dataEnvrn->StdBaroPress;
             this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress, CalledFrom);
             General::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
+//            auto f = [&state, this, DesFluidCoolerLoad, rho, tmpDesignWaterFlowRate, Cp](Real64 const UA) {
+//                Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
+//                CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, this->LowSpeedAirFlowRate, UA, OutWaterTemp);
+//                Real64 const Output =
+//                    Cp * rho * tmpDesignWaterFlowRate * (state.dataFluidCoolers->SimpleFluidCooler(this->indexInArray).WaterTemp - OutWaterTemp);
+//                return (DesFluidCoolerLoad - Output) / DesFluidCoolerLoad;
+//            };
+//            General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
             if (SolFla == -1) {
                 ShowWarningError(state, "Iteration limit exceeded in calculating fluid cooler UA.");
                 ShowContinueError(state, "Autosizing of fluid cooler UA failed for fluid cooler = " + this->Name);
                 ShowContinueError(state, format("The final UA value at low fan speed ={:.2R} W/C, and the simulation continues...", UA));
             } else if (SolFla == -2) {
-                CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA0, OutWaterTempAtUA0);
-                CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA1, OutWaterTempAtUA1);
+                CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, this->LowSpeedAirFlowRate, UA0, OutWaterTempAtUA0);
+                CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, this->LowSpeedAirFlowRate, UA1, OutWaterTempAtUA1);
                 ShowSevereError(state, std::string{CalledFrom} + ": The combination of design input values did not allow the calculation of a ");
                 ShowContinueError(state, "reasonable low-speed UA value. Review and revise design input values as appropriate. ");
                 ShowContinueError(state, R"(Specifying hard sizes for some "autosizable" fields while autosizing other "autosizable" )");
@@ -1488,9 +1512,9 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 ShowContinueError(state, "on the autosized values shown below or to adjust design fluid cooler air inlet dry-bulb temperature.");
                 ShowContinueError(state, "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp).");
                 ShowContinueError(state, "Inputs to the fluid cooler object:");
-                ShowContinueError(state, format("Design Fluid Cooler Load [W]                         = {:.2R}", Par[0]));
+                ShowContinueError(state, format("Design Fluid Cooler Load [W]                         = {:.2R}", DesFluidCoolerLoad));
                 ShowContinueError(state, format("Design Fluid Cooler Water Volume Flow Rate [m3/s]    = {:.6R}", this->DesignWaterFlowRate));
-                ShowContinueError(state, format("Design Fluid Cooler Air Volume Flow Rate [m3/s]      = {:.2R}", Par[3]));
+                ShowContinueError(state, format("Design Fluid Cooler Air Volume Flow Rate [m3/s]      = {:.2R}", this->LowSpeedAirFlowRate));
                 ShowContinueError(state, format("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]      = {:.2R}", this->AirTemp));
                 ShowContinueError(state, "Inputs to the plant sizing object:");
                 ShowContinueError(

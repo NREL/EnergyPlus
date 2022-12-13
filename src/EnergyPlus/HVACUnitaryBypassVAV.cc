@@ -3226,7 +3226,7 @@ namespace HVACUnitaryBypassVAV {
                         state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp < CBVAV(CBVAVNum).CoilTempSetPoint) {
                         // iterate to find PLR at CoilTempSetPoint
                         auto f = [&state, CBVAVNum, OnOffAirFlowRatio](Real64 const PartLoadFrac) {
-                            auto thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
+                            auto &thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
                             DXCoils::CalcDXHeatingCoil(
                                 state, thisCBVAV.HeatCoilIndex, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, OnOffAirFlowRatio);
                             Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(thisCBVAV.HeatCoilIndex);
