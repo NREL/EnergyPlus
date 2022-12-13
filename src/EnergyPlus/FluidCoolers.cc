@@ -1283,6 +1283,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             Par[0] = DesFluidCoolerLoad;
             Par[1] = double(this->indexInArray);
             Par[2] = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+            Real64 par2_WaterFlow = rho * tmpDesignWaterFlowRate;
             Par[3] = tmpHighSpeedAirFlowRate;      // design air volume flow rate
             Par[4] = Cp;
             UA0 = 0.0001 * DesFluidCoolerLoad;                     // Assume deltaT = 10000K (limit)
@@ -1292,7 +1293,10 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             this->AirWetBulb = this->DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
             this->AirPress = state.dataEnvrn->StdBaroPress;
             this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-            General::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
+            auto f = [&state, Par](Real64 const UA){
+                return SimpleFluidCoolerUAResidual(state, UA, Par[0], int(Par[1]), Par[2], Par[3], Par[4]);
+            };
+//            General::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
             //            auto f = [&state, this, DesFluidCoolerLoad, rho, tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, Cp](Real64 const UA) {
             //                Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
             //                CalcFluidCoolerOutlet(state, this->indexInArray, rho * tmpDesignWaterFlowRate, tmpHighSpeedAirFlowRate, UA,
@@ -1301,7 +1305,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             //                    OutWaterTemp);
             //                return (DesFluidCoolerLoad - Output) / DesFluidCoolerLoad;
             //            };
-            //            General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
+            General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
             if (SolFla == -1) {
                 ShowWarningError(state, "Iteration limit exceeded in calculating fluid cooler UA.");
                 if (PltSizCondNum > 0) {
@@ -1880,7 +1884,11 @@ void CalcFluidCoolerOutlet(
 
 Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
                                    Real64 const UA,                 // UA of fluid cooler
-                                   std::array<Real64, 5> const &Par // par(1) = design fluid cooler load [W]
+                                   Real64 DesFluidCoolerLoad,
+                                   int FluidCoolerIndex,
+                                   Real64 DesignWaterMassFlowRate,
+                                   Real64 DesignAirVolumeFlowRate,
+                                   Real64 Cp
 )
 {
 
@@ -1905,12 +1913,6 @@ Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
     // par(3) = design water mass flow rate [kg/s]
     // par(4) = design air volume flow rate [m3/s]
     // par(5) = water specific heat [J/(kg*C)]
-
-    Real64 DesFluidCoolerLoad = Par[0];
-    int FluidCoolerIndex = int(Par[1]);
-    Real64 DesignWaterMassFlowRate = Par[2];
-    Real64 DesignAirVolumeFlowRate = Par[3];
-    Real64 Cp = Par[4];
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
