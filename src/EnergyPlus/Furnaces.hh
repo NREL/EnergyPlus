@@ -469,9 +469,16 @@ namespace Furnaces {
     //******************************************************************************
 
     Real64 VSHPCyclingResidual(EnergyPlusData &state,
-                               Real64 const PartLoadFrac,        // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               std::array<Real64, 10> const &Par // par(1) = FurnaceNum
-    );
+                               Real64 PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                               int FurnaceNum,
+                               // int ZoneNum,
+                               bool FirstHVACIteration,
+                               // int OpMode,
+                               Real64 LoadToBeMet,
+                               Real64 OnOffAirFlowRatio,
+                               Real64 SupHeaterLoad,
+                               DataHVACGlobals::CompressorOperation CompressorOp,
+                               Real64 par9_SensLatFlag);
 
     //******************************************************************************
 

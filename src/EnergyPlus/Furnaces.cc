@@ -11063,7 +11063,12 @@ namespace Furnaces {
                     // Calculate the part load fraction
                     SpeedRatio = 0.0;
                     SpeedNum = 1;
-                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
+                    auto f =
+                        [&state, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
+                            return VSHPCyclingResidual(
+                                state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp, 1.0);
+                        };
+                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountCyc == 0) {
@@ -11209,7 +11214,12 @@ namespace Furnaces {
                 Par[8] = static_cast<int>(CompressorOp);
                 Par[9] = 0.0;
                 if (SpeedNum < 2) {
-                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
+                    auto f =
+                        [&state, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
+                            return VSHPCyclingResidual(
+                                state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp, 0.0);
+                        };
+                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                 } else {
                     General::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                 }
@@ -11977,9 +11987,16 @@ namespace Furnaces {
     //******************************************************************************
 
     Real64 VSHPCyclingResidual(EnergyPlusData &state,
-                               Real64 const PartLoadFrac,        // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               std::array<Real64, 10> const &Par // par(1) = FurnaceNum
-    )
+                               Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                               int FurnaceNum,
+                               // int ZoneNum,
+                               bool FirstHVACIteration,
+                               // int OpMode,
+                               Real64 LoadToBeMet,
+                               Real64 OnOffAirFlowRatio,
+                               Real64 SupHeaterLoad,
+                               CompressorOperation CompressorOp,
+                               Real64 par9_SensLatFlag)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:MSHPCyclingResidual
@@ -11995,71 +12012,42 @@ namespace Furnaces {
         //  Calls CalcMSHeatPump to get ActualOutput at the given part load ratio
         //  and calculates the residual as defined above
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 VSHPCyclingResidual;
-
-        // Argument array dimensioning
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = Zone Num
-        // par(3) = FirstHVACIteration
-        // par(4) = OpMode
-        // par(5) = QZnReq, load to be met
-        // par(6) = OnOffAirFlowRatio
-        // par(7) = SupHeaterLoad
-
-        // par(9) = CompressorOp
-        // par(10) = 1.0 to meet sensible load
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
+        // par[0] = FurnaceNum
+        // par[1] = Zone Num
+        // par[2] = FirstHVACIteration
+        // par[3] = OpMode
+        // par[4] = QZnReq, load to be met
+        // par[5] = OnOffAirFlowRatio
+        // par[6] = SupHeaterLoad
+        // par[7] = NOT USED
+        // par[8] = CompressorOp
+        // par[9] = 1.0 to meet sensible load
+        //        int FurnaceNum = int(Par[0]);
+        //        int ZoneNum = int(Par[1]);
+        //        bool FirstHVACIteration = (Par[2] == 1.0);
+        //        int OpMode = int(Par[3]);
+        //        Real64 LoadToBeMet = Par[4];
+        //        Real64 OnOffAirFlowRatio = Par[5];
+        //        Real64 SupHeaterLoad = Par[6];
+        //        CompressorOperation CompressorOp = static_cast<CompressorOperation>(Par[8]);
+        //        Real64 par9_SensLatFlag = Par[9];
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int FurnaceNum;                   // MSHP index
-        int ZoneNum;                      // Zone index
-        bool FirstHVACIteration;          // FirstHVACIteration flag
-        int OpMode;                       // Compressor operating mode
-        Real64 QZnReq;                    // zone sensible load (W)
-        Real64 QZnLat;                    // zone latent load (W)
-        Real64 OnOffAirFlowRatio;         // ratio of compressor ON airflow to average airflow over timestep
-        Real64 ZoneSensLoadMet;           // delivered sensible capacity of MSHP
-        Real64 ZoneLatLoadMet;            // delivered latent capacity of MSHP
-        Real64 LoadToBeMet;               // sensible or latent load to be met
-        Real64 SupHeaterLoad;             // Supplemental heater load
-        Real64 ResScale;                  // Residual scale
-        CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
-
-        FurnaceNum = int(Par[0]);
-        ZoneNum = int(Par[1]);
-        // FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-        FirstHVACIteration = (Par[2] == 1.0);
-        OpMode = int(Par[3]);
+        Real64 QZnReq;          // zone sensible load (W)
+        Real64 QZnLat;          // zone latent load (W)
+        Real64 ZoneSensLoadMet; // delivered sensible capacity of MSHP
+        Real64 ZoneLatLoadMet;  // delivered latent capacity of MSHP
+        Real64 ResScale;        // Residual scale
 
         QZnReq = 0.0;
         QZnLat = 0.0;
-
-        LoadToBeMet = Par[4];
-        if (Par[9] == 1.0) {
-            QZnReq = Par[4];
+        if (par9_SensLatFlag == 1.0) {
+            QZnReq = LoadToBeMet;
         } else {
-            QZnLat = Par[4];
+            QZnLat = LoadToBeMet;
         }
-
-        OnOffAirFlowRatio = Par[5];
-        SupHeaterLoad = Par[6];
-        CompressorOp = static_cast<CompressorOperation>(Par[8]);
 
         CalcVarSpeedHeatPump(state,
                              FurnaceNum,
@@ -12083,13 +12071,11 @@ namespace Furnaces {
         }
 
         // Calculate residual based on output calculation flag
-        if (Par[9] == 1.0) {
-            VSHPCyclingResidual = (ZoneSensLoadMet - LoadToBeMet) / ResScale;
+        if (par9_SensLatFlag == 1.0) {
+            return (ZoneSensLoadMet - LoadToBeMet) / ResScale;
         } else {
-            VSHPCyclingResidual = (ZoneLatLoadMet - LoadToBeMet) / ResScale;
+            return (ZoneLatLoadMet - LoadToBeMet) / ResScale;
         }
-
-        return VSHPCyclingResidual;
     }
 
     //******************************************************************************
