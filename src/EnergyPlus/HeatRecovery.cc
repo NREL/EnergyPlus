@@ -3246,7 +3246,7 @@ namespace HeatRecovery {
         int SolFla;                  // Flag of solver
         Real64 constexpr NTU0(0.0);  // lower bound for NTU
         Real64 constexpr NTU1(50.0); // upper bound for NTU
-        auto f = [&state, Eps, Z](Real64 const NTU){
+        auto f = [&state, Eps, Z](Real64 const NTU) {
             return 1.0 - std::exp((std::exp(-std::pow(NTU, 0.78) * Z) - 1.0) / Z * std::pow(NTU, 0.22)) - Eps;
         };
         General::SolveRoot(state, Acc, MaxIte, SolFla, NTU, f, NTU0, NTU1);
