@@ -14761,7 +14761,7 @@ namespace UnitarySystems {
 
                         switch (this->m_HeatingCoilType_Num) {
                         case DataHVACGlobals::CoilDX_HeatingEmpirical: { // Coil:Heating:DX:SingleSpeed
-                            auto f = [&state, CompIndex, DesOutTemp, FanOpMode](Real64 const PartLoadFrac) {
+                            auto f = [&state, CompIndex, DesOutTemp](Real64 const PartLoadFrac) {
                                 DXCoils::CalcDXHeatingCoil(state, CompIndex, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, 1.0);
                                 return DesOutTemp - state.dataDXCoils->DXCoilOutletTemp(CompIndex);
                             };
@@ -14833,13 +14833,14 @@ namespace UnitarySystems {
                         } break;
                         case DataHVACGlobals::Coil_HeatingElectric:
                         case DataHVACGlobals::Coil_HeatingDesuperheater: {
-                            auto f = [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode](Real64 const PartLoadFrac) {
+                            bool tmpSuppHeatingCoilFlag = SuppHeatingCoilFlag;  // CONST_LAMBDA_CAPTURE
+                            auto f = [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode, tmpSuppHeatingCoilFlag](Real64 const PartLoadFrac) {
                                 return this->gasElecHeatingCoilResidual(state,
                                                                         PartLoadFrac,
                                                                         this->m_UnitarySysNum,
                                                                         FirstHVACIteration,
                                                                         DesOutTemp,
-                                                                        SuppHeatingCoilFlag,
+                                                                        tmpSuppHeatingCoilFlag,
                                                                         FanOpMode,
                                                                         this->m_DesignHeatingCapacity);
                             };
@@ -15292,13 +15293,14 @@ namespace UnitarySystems {
                             case DataHVACGlobals::Coil_HeatingGasOrOtherFuel:
                             case DataHVACGlobals::Coil_HeatingElectric:
                             case DataHVACGlobals::Coil_HeatingDesuperheater: {
+                                bool tmpSuppHeatingCoilFlag = SuppHeatingCoilFlag; // CONST_LAMBDA_CAPTURE
                                 auto f = [&state, this, FirstHVACIteration, DesOutTemp, FanOpMode](Real64 const PartLoadFrac) {
                                     return this->gasElecHeatingCoilResidual(state,
                                                                             PartLoadFrac,
                                                                             this->m_UnitarySysNum,
                                                                             FirstHVACIteration,
                                                                             DesOutTemp,
-                                                                            SuppHeatingCoilFlag,
+                                                                            tmpSuppHeatingCoilFlag,
                                                                             FanOpMode,
                                                                             this->m_DesignSuppHeatingCapacity);
                                 };
