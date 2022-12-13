@@ -2530,7 +2530,7 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
     Real64 mdot;
     Real64 const QZnReq2 = -1000.0;
 
-    auto f = [this, QZnReq2](Real64 const mdot){
+    auto f = [this, QZnReq2](Real64 const mdot) {
         int FanCoilNum = 1;
         int ControlledZoneNum = 1;
         bool FirstHVACIteration = false;

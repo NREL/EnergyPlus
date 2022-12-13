@@ -859,13 +859,13 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     static constexpr std::string_view CalledFrom("SizeFluidCooler");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int SolFla;                        // Flag of solver
-    Real64 DesFluidCoolerLoad(0.0);    // Design fluid cooler load [W]
-    Real64 UA0;                        // Lower bound for UA [W/C]
-    Real64 UA1;                        // Upper bound for UA [W/C]
-    Real64 UA;                         // Calculated UA value
-    Real64 OutWaterTempAtUA0;          // Water outlet temperature at UA0
-    Real64 OutWaterTempAtUA1;          // Water outlet temperature at UA1
+    int SolFla;                     // Flag of solver
+    Real64 DesFluidCoolerLoad(0.0); // Design fluid cooler load [W]
+    Real64 UA0;                     // Lower bound for UA [W/C]
+    Real64 UA1;                     // Upper bound for UA [W/C]
+    Real64 UA;                      // Calculated UA value
+    Real64 OutWaterTempAtUA0;       // Water outlet temperature at UA0
+    Real64 OutWaterTempAtUA1;       // Water outlet temperature at UA1
     std::string equipName;
     Real64 Cp;                            // local specific heat for fluid
     Real64 rho;                           // local density for fluid
@@ -1907,7 +1907,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
 
     // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
     LoopMinTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
-    if (this->OutletWaterTemp<LoopMinTemp &&this->WaterMassFlowRate> 0.0) {
+    if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
         ++this->OutletWaterTempErrorCount;
 
         if (this->OutletWaterTempErrorCount < 2) {
