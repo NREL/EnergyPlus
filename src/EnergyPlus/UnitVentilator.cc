@@ -2698,12 +2698,16 @@ namespace UnitVentilator {
                             CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
                             if ((FullOutput - state.dataUnitVentilators->QZnReq) > DataHVACGlobals::SmallLoad) {
                                 // Unit ventilator full load capacity is able to meet the load, Find PLR
-                                Par(1) = double(UnitVentNum);
-                                Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                                if (FirstHVACIteration) Par(2) = 1.0;
-                                Par(3) = double(OpMode);
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
+                                auto f = [&state, UnitVentNum, FirstHVACIteration, OpMode](Real64 const PartLoadRatio) {
+                                    Real64 QUnitOut = 0.0; // heating/Cooling provided by unit ventilator [watts]
+                                    CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadRatio);
+                                    if (state.dataUnitVentilators->QZnReq) {
+                                        return (QUnitOut - state.dataUnitVentilators->QZnReq) / state.dataUnitVentilators->QZnReq;
+                                    } else
+                                        return 0.0;
+                                };
+                                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, f, 0.0, 1.0);
                             }
                         }
 
@@ -2934,12 +2938,18 @@ namespace UnitVentilator {
                             CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
                             if ((FullOutput - state.dataUnitVentilators->QZnReq) < DataHVACGlobals::SmallLoad) {
                                 // Unit ventilator full load capacity is able to meet the load, Find PLR
-                                Par(1) = double(UnitVentNum);
-                                Par(2) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                                if (FirstHVACIteration) Par(2) = 1.0;
-                                Par(3) = double(OpMode);
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
+                                auto f = [&state, UnitVentNum, FirstHVACIteration, OpMode](Real64 const PartLoadRatio) {
+                                    Real64 QUnitOut = 0.0; // heating/Cooling provided by unit ventilator [watts]
+
+                                    // Convert parameters to usable variables
+                                    CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadRatio);
+                                    if (state.dataUnitVentilators->QZnReq) {
+                                        return (QUnitOut - state.dataUnitVentilators->QZnReq) / state.dataUnitVentilators->QZnReq;
+                                    }
+                                    return 0.0;
+                                };
+                                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, f, 0.0, 1.0);
                             }
                         }
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
@@ -3443,37 +3453,6 @@ namespace UnitVentilator {
         }
 
         return GetUnitVentilatorReturnAirNode;
-    }
-
-    Real64 CalcUnitVentilatorResidual(EnergyPlusData &state,
-                                      Real64 const PartLoadRatio, // Coil Part Load Ratio
-                                      Array1D<Real64> const &Par  // Function parameters
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Bereket Nigusse, FSEC
-        //       DATE WRITTEN   October 2013
-
-        // Return value
-        Real64 Residuum(0.0); // Result (force to 0)
-
-        //  Parameter description:
-        //  Par(1)  = REAL(UnitVentNum,r64)   ! Index to Unit Ventilator
-        //  Par(2)  = 0.0                     ! FirstHVACIteration FLAG, IF 1.0 then TRUE, if 0.0 then FALSE
-        //  Par(3)  = REAL(OpMode,r64)        ! Fan control, IF 1.0 then cycling fan, if 0.0 then continuous fan
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 QUnitOut = 0.0; // heating/Cooling provided by unit ventilator [watts]
-
-        // Convert parameters to usable variables
-        int UnitVentNum = int(Par(1));
-        bool FirstHVACIteration = (Par(2) == 1.0);
-        int OpMode = int(Par(3));
-        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadRatio);
-        if (state.dataUnitVentilators->QZnReq != 0.0) {
-            Residuum = (QUnitOut - state.dataUnitVentilators->QZnReq) / state.dataUnitVentilators->QZnReq;
-        }
-        return Residuum;
     }
 
     Real64 SetOAMassFlowRateForCoolingVariablePercent(EnergyPlusData &state,

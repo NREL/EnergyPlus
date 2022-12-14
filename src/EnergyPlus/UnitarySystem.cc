@@ -11378,7 +11378,6 @@ namespace UnitarySystems {
         SpeedRatio = 1.0;
         int SolFla = 0.0;
 
-        std::vector<Real64> Par(8); // Parameter array passed to solver
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIte(500);    // Maximum number of iterations for solver
         Real64 constexpr Acc(1.0e-3); // Accuracy of solver result
@@ -11406,16 +11405,16 @@ namespace UnitarySystems {
             return;
         } else {
 
-            Par[1] = double(this->m_SuppHeatCoilIndex);
-            Par[2] = SuppHeatLoad;
-            Par[3] = double(this->m_UnitarySysNum);
-            // Par(4) = CycRatio or SpeedRatio
-            Par[5] = this->m_SuppHeatingSpeedNum;
-            Par[6] = double(FanOpMode);
-            Par[7] = static_cast<int>(DataHVACGlobals::CompressorOperation::On); // UnitarySystem(UnitarySysNum)%CompressorOp
             if (this->m_SuppHeatingSpeedNum > 1.0) {
-                Par[4] = CycRatio;
-                General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, this->calcMultiStageSuppCoilLoadResidual, 0.0, 1.0, Par);
+                auto f = [&state, this, CycRatio, FanOpMode, SuppHeatLoad](Real64 const SpeedRatio) {
+                    Real64 QActual;
+                    int CoilIndex = this->m_SuppHeatCoilIndex;
+                    int SpeedNum = this->m_SuppHeatingSpeedNum;
+                    HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
+                    return SuppHeatLoad - QActual;
+                };
+
+                General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
                 this->m_SuppHeatingCycRatio = CycRatio;
                 this->m_SuppHeatingSpeedRatio = SpeedRatio;
                 this->m_SuppHeatPartLoadFrac = SpeedRatio;
@@ -11423,8 +11422,15 @@ namespace UnitarySystems {
             } else {
                 SpeedRatio = 0.0;
                 this->m_SuppHeatingSpeedRatio = SpeedRatio;
-                Par[4] = SpeedRatio;
-                General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, this->calcMultiStageSuppCoilLoadCycResidual, 0.0, 1.0, Par);
+                auto f = [&state, this, SpeedRatio, FanOpMode, SuppHeatLoad](Real64 const CycRatio) {
+                    Real64 QActual;
+                    int CoilIndex = this->m_SuppHeatCoilIndex;
+                    int SpeedNum = this->m_SuppHeatingSpeedNum;
+                    HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
+                    return SuppHeatLoad - QActual;
+                };
+
+                General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, f, 0.0, 1.0);
                 this->m_SuppHeatingCycRatio = CycRatio;
                 this->m_SuppHeatPartLoadFrac = CycRatio;
                 PartLoadFrac = CycRatio;
@@ -12110,16 +12116,16 @@ namespace UnitarySystems {
                                                         this->m_FanOpMode,
                                                         this->m_SuppHeatPartLoadFrac);
                 if (QActual > SuppHeatCoilLoad) {
-                    Par[1] = double(this->m_UnitarySysNum);
-                    if (FirstHVACIteration) {
-                        Par[2] = 1.0;
-                    } else {
-                        Par[2] = 0.0;
-                    }
-                    Par[3] = SuppHeatCoilLoad;
-                    Par[4] = 1.0; // SuppHeatingCoilFlag
-                    Par[5] = 1.0; // Load based control
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->hotWaterHeatingCoilResidual, 0.0, 1.0, Par);
+                    auto f = [&state, this, FirstHVACIteration, SuppHeatCoilLoad](Real64 const PartLoadFrac) {
+                        Real64 mdot = min(state.dataLoopNodes->Node(this->m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
+                                          this->m_MaxSuppCoilFluidFlow * PartLoadFrac);
+                        state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
+                        WaterCoils::SimulateWaterCoilComponents(
+                            state, this->m_SuppHeatCoilName, FirstHVACIteration, this->m_SuppHeatCoilIndex, 0.0, this->m_FanOpMode, PartLoadFrac);
+                        return SuppHeatCoilLoad;
+                    };
+
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     this->m_SuppHeatPartLoadFrac = PartLoadFrac;
                 } else {
                     this->m_SuppHeatPartLoadFrac = 1.0;
@@ -12892,33 +12898,39 @@ namespace UnitarySystems {
 
                         if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
 
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutTemp;
-                            Par[5] = double(FanOpMode);
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->DOE2DXCoilResidual, 0.0, 1.0, Par);
+                            auto f = [&state, this, DesOutTemp, FanOpMode](Real64 const PartLoadRatio) {
+                                int CoilIndex = this->m_CoolingCoilIndex;
+                                DXCoils::CalcDoe2DXCoil(state, CoilIndex, DataHVACGlobals::CompressorOperation::On, true, PartLoadRatio, FanOpMode);
+                                Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
+
+                                return DesOutTemp - OutletAirTemp;
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             this->m_CompPartLoadRatio = PartLoadFrac;
 
                         } else if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
                                    (CoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted)) {
 
-                            Par[1] = double(this->m_CoolingCoilIndex);
-                            Par[2] = DesOutTemp;
-                            // FirstHVACIteration is a logical, Par is REAL(r64), so make TRUE = 1 and FALSE = 0
-                            if (FirstHVACIteration) {
-                                Par[3] = 1.0;
-                            } else {
-                                Par[3] = 0.0;
-                            }
-                            if (HXUnitOn) {
-                                Par[4] = 1.0;
-                            } else {
-                                Par[4] = 0.0;
-                            }
-                            Par[5] = double(FanOpMode);
-                            Par[6] = double(this->m_UnitarySysNum);
-                            Par[7] = 0.0; // double(this->m_DehumidificationMode);
-                            Par[8] = 0.0; // this->CoilSHR;
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par);
+                            auto f = [&state, this, DesOutTemp, FirstHVACIteration, HXUnitOn, FanOpMode](Real64 const PartLoadFrac) {
+                                if (this->CoolCoilFluidInletNode > 0) {
+                                    state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).MassFlowRate = this->MaxCoolCoilFluidFlow * PartLoadFrac;
+                                }
+                                HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(
+                                    state,
+                                    this->m_CoolingCoilIndex,
+                                    FirstHVACIteration,
+                                    DataHVACGlobals::CompressorOperation::On,
+                                    PartLoadFrac,
+                                    HXUnitOn,
+                                    FanOpMode,
+                                    _,
+                                    _,
+                                    this->m_DehumidificationMode, // double(this->m_DehumidificationMode)
+                                    0.0);                         // CoilSHR_par);
+                                return DesOutTemp - state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
+                            };
+
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             if (SolFla == -1) {
 
                                 //                 RegulaFalsi may not find sensible PLR when the latent degradation model is used.
@@ -12969,8 +12981,7 @@ namespace UnitarySystems {
                                 TempMinPLR = max(0.0, (TempMinPLR - 0.01));
                                 TempMaxPLR = min(1.0, (TempMaxPLR + 0.01));
                                 //                 tighter boundary of solution has been found, CALL RegulaFalsi a second time
-                                General::SolveRoot(
-                                    state, Acc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par);
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, TempMinPLR, TempMaxPLR);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (this->warnIndex.m_HXAssistedSensPLRIter < 1) {
@@ -13125,18 +13136,24 @@ namespace UnitarySystems {
                             this->m_CompPartLoadRatio = PartLoadFrac;
 
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
-                            std::array<Real64, 8> Par2 = {
-                                double(this->m_CoolingCoilIndex),
-                                DesOutTemp,
-                                double(DehumidMode), // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                                double(FanOpMode),
-                                double(this->m_CoolingSpeedNum),
-                                this->m_CoolingSpeedRatio,
-                                0.0,
-                                0.0,
+                            auto f = [&state, this, DesOutTemp, DehumidMode, FanOpMode](Real64 const PartLoadRatio) {
+                                int CoilIndex = this->m_CoolingCoilIndex;
+                                int CoolingSpeedNum = this->m_CoolingSpeedNum;
+                                Real64 CoolingSpeedRatio = this->m_CoolingSpeedRatio;
+                                bool const singleMode = this->m_SingleMode;
+                                if (CoolingSpeedNum == 1) {
+                                    state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                        state, DehumidMode, PartLoadRatio, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode, singleMode);
+                                } else {
+                                    state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                        state, DehumidMode, CoolingSpeedRatio, CoolingSpeedNum, PartLoadRatio, FanOpMode, singleMode);
+                                }
+                                Real64 outletCondition =
+                                    state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).Temp;
+                                return DesOutTemp - outletCondition;
                             };
-                            if (this->m_SingleMode == 1) Par[7] = 1.0;
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             if (this->m_CoolingSpeedNum == 1) {
                                 this->m_CompPartLoadRatio = PartLoadFrac;
                                 SpeedRatio = 0.0;
@@ -13148,20 +13165,22 @@ namespace UnitarySystems {
                         } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWater) ||
                                    (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed)) {
 
-                            Par[1] = double(this->m_UnitarySysNum);
-                            if (FirstHVACIteration) {
-                                Par[2] = 1.0;
-                            } else {
-                                Par[2] = 0.0;
-                            }
-                            Par[3] = DesOutTemp;
-
                             // calculate max waterside PLR from mdot request above in case plant chokes water flow
                             maxPartLoadFrac =
                                 min(1.0,
                                     ((mdot / this->MaxCoolCoilFluidFlow) +
                                      0.001)); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->coolWaterTempResidual, 0.0, maxPartLoadFrac, Par);
+
+                            auto f = [&state, this, FirstHVACIteration, DesOutTemp](Real64 const PartLoadRatio) {
+                                Real64 mdot = min(state.dataLoopNodes->Node(this->CoolCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
+                                                  this->MaxCoolCoilFluidFlow * PartLoadRatio);
+                                state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).MassFlowRate = mdot;
+                                WaterCoils::SimulateWaterCoilComponents(
+                                    state, this->m_CoolingCoilName, FirstHVACIteration, this->m_CoolingCoilIndex, _, _, PartLoadRatio);
+                                return DesOutTemp - state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).Temp;
+                            };
+
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, maxPartLoadFrac);
 
                         } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) ||
                                    (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP)) {
@@ -13252,21 +13271,28 @@ namespace UnitarySystems {
                     } else if (OutletTempDXCoil > DesOutTemp - (tempAcc * 2.0)) {
                         PartLoadFrac = 1.0;
                     } else {
-                        Par[1] = double(this->m_CoolingCoilIndex);
-                        Par[2] = DesOutTemp;
-                        // FirstHVACIteration is a logical, Par is REAL(r64), so make TRUE = 1.0 and FALSE = 0.0
-                        if (FirstHVACIteration) {
-                            Par[3] = 1.0;
-                        } else {
-                            Par[3] = 0.0;
-                        }
-                        if (HXUnitOn) {
-                            Par[4] = 1.0;
-                        } else {
-                            Par[4] = 0.0;
-                        }
-                        Par[5] = double(FanOpMode);
-                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par);
+                        auto f = [&state, this, DesOutTemp, FirstHVACIteration, HXUnitOn, FanOpMode](Real64 const PartLoadRatio) {
+                            UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[this->m_UnitarySysNum];
+
+                            if (thisSys.CoolCoilFluidInletNode > 0) {
+                                state.dataLoopNodes->Node(thisSys.CoolCoilFluidInletNode).MassFlowRate = thisSys.MaxCoolCoilFluidFlow * PartLoadRatio;
+                            }
+                            HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
+                                                                                 this->m_CoolingCoilIndex,
+                                                                                 FirstHVACIteration,
+                                                                                 DataHVACGlobals::CompressorOperation::On,
+                                                                                 PartLoadRatio,
+                                                                                 HXUnitOn,
+                                                                                 FanOpMode,
+                                                                                 _,
+                                                                                 _,
+                                                                                 this->m_DehumidificationMode, // double(this->m_DehumidificationMode)
+                                                                                 0.0);                         // CoilSHR_par);
+                            Real64 OutletAirTemp = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
+                            return DesOutTemp - OutletAirTemp;
+                        };
+
+                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     }
                     this->m_CompPartLoadRatio = PartLoadFrac;
 
@@ -13347,18 +13373,27 @@ namespace UnitarySystems {
                     // make sure outlet temp is below set point before calling SolveRoot
                     // Cooling: iterate only when outlet temp is below DesOutTemp by at least Acc
                     if ((DesOutTemp - state.dataLoopNodes->Node(OutletNode).Temp) > Acc) {
-                        std::array<Real64, 8> Par2 = {double(this->m_CoolingCoilIndex),
-                                                      DesOutTemp,
-                                                      // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                                                      // need to test what happens when Alt mode doesn't exist, or somehow test for it,
-                                                      // or fatal out in GetInput
-                                                      1.0, // DehumidMode
-                                                      double(FanOpMode),
-                                                      double(this->m_CoolingSpeedNum),
-                                                      1.0, //  this->m_CoolingSpeedRatio;
-                                                      0.0,
-                                                      0.0};
-                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+
+                        auto f = [&state, this, DesOutTemp, FanOpMode](Real64 const PartLoadFrac) {
+                            int CoilIndex = this->m_CoolingCoilIndex;
+                            bool useDehumMode = true;
+                            int CoolingSpeedNum = this->m_CoolingSpeedNum;
+                            Real64 CoolingSpeedRatio = 1.0;
+                            bool const singleMode = false;
+                            if (CoolingSpeedNum == 1) {
+                                state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                    state, useDehumMode, PartLoadFrac, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode, singleMode);
+                            } else {
+                                state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                    state, useDehumMode, CoolingSpeedRatio, CoolingSpeedNum, PartLoadFrac, FanOpMode, singleMode);
+                            }
+                            Real64 outletCondition =
+                                state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).Temp;
+
+                            return DesOutTemp - outletCondition;
+                        };
+
+                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     }
                     if (this->m_CoolingSpeedNum == 1) {
                         this->m_CompPartLoadRatio = PartLoadFrac;
@@ -13733,21 +13768,30 @@ namespace UnitarySystems {
                         // make sure outlet HumRat is below set point before calling SolveRoot
                         // Cooling: iterate only when outlet humrat is below DesOutHumRat by at least HumRatAcc
                         if ((DesOutHumRat - state.dataLoopNodes->Node(OutletNode).HumRat) > HumRatAcc) {
-                            std::array<Real64, 8> Par2 = {
-                                double(this->m_CoolingCoilIndex),
-                                DesOutHumRat,
-                                // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                                // need to test what happens when Alt mode doesn't exist, or somehow test for it,
-                                // or fatal out in GetInput
-                                0.0, // DehumidMode
-                                double(FanOpMode),
-                                double(this->m_CoolingSpeedNum),
-                                1.0, //  this->m_CoolingSpeedRatio;
-                                1.0, // run on latent, check coil outlet node HumRat
-                                0.0  // dummy because genericDXCoilResidual takes 8 parameters
+
+                            auto f = [&state,
+                                      this,         // 0
+                                      DesOutHumRat, // 1
+                                      FanOpMode     // 3
+                            ](Real64 const PartLoadFrac) {
+                                int CoilIndex = this->m_CoolingCoilIndex;
+                                bool useDehumMode = false;
+                                int CoolingSpeedNum = this->m_CoolingSpeedNum;
+                                Real64 CoolingSpeedRatio = 1.0;
+                                bool const singleMode = false;
+                                if (CoolingSpeedNum == 1) {
+                                    state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                        state, useDehumMode, PartLoadFrac, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode, singleMode);
+                                } else {
+                                    state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
+                                        state, useDehumMode, CoolingSpeedRatio, CoolingSpeedNum, PartLoadFrac, FanOpMode, singleMode);
+                                }
+                                Real64 outletCondition =
+                                    state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).HumRat;
+                                return DesOutHumRat - outletCondition;
                             };
 
-                            General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                            General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         }
                         if (this->m_CoolingSpeedNum == 1) {
                             this->m_CompPartLoadRatio = PartLoadFrac;
@@ -14449,62 +14493,119 @@ namespace UnitarySystems {
                             General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->gasElecHeatingCoilResidual, 0.0, 1.0, Par);
                         } break;
                         case DataHVACGlobals::Coil_HeatingWater: {
-                            Par[1] = double(this->m_UnitarySysNum);
-                            if (FirstHVACIteration) {
-                                Par[2] = 1.0;
-                            } else {
-                                Par[2] = 0.0;
-                            }
-                            Par[3] = DesOutTemp;
-                            if (SuppHeatingCoilFlag) {
-                                Par[4] = 1.0;
-                            } else {
-                                Par[4] = 0.0;
-                            }
-                            Par[5] = 0.0;
 
                             // calculate max waterside PLR from mdot request above in case plant chokes water flow
                             maxPartLoadFrac =
                                 min(1.0,
                                     ((mdot / this->MaxHeatCoilFluidFlow) +
                                      0.001)); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
-                            General::SolveRoot(
-                                state, Acc, MaxIte, SolFla, PartLoadFrac, this->hotWaterHeatingCoilResidual, 0.0, maxPartLoadFrac, Par);
+
+                            auto f = [&state, this, FirstHVACIteration, DesOutTemp](Real64 const maxPartLoadFrac) {
+                                Real64 OutletAirTemp; // Outlet air temperature [C]
+
+                                Real64 mdot = min(state.dataLoopNodes->Node(this->HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
+                                                  this->MaxHeatCoilFluidFlow * maxPartLoadFrac);
+                                state.dataLoopNodes->Node(this->HeatCoilFluidInletNode).MassFlowRate = mdot;
+                                WaterCoils::SimulateWaterCoilComponents(state,
+                                                                        this->m_HeatingCoilName,
+                                                                        FirstHVACIteration,
+                                                                        this->m_HeatingCoilIndex,
+                                                                        0.0, // QActual
+                                                                        this->m_FanOpMode,
+                                                                        maxPartLoadFrac);
+                                OutletAirTemp = state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp;
+                                return DesOutTemp - OutletAirTemp;
+                            };
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, maxPartLoadFrac);
                         } break;
                         case DataHVACGlobals::Coil_HeatingSteam: {
-                            Par[1] = double(this->m_UnitarySysNum);
-                            if (FirstHVACIteration) {
-                                Par[2] = 1.0;
-                            } else {
-                                Par[2] = 0.0;
-                            }
-                            Par[3] = DesOutTemp;
-                            if (SuppHeatingCoilFlag) {
-                                Par[4] = 1.0;
-                            } else {
-                                Par[4] = 0.0;
-                            }
 
                             // calculate max waterside PLR from mdot request above in case plant chokes water flow
                             maxPartLoadFrac =
                                 min(1.0,
                                     ((mdot / this->MaxHeatCoilFluidFlow) +
                                      0.001)); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->steamHeatingCoilResidual, 0.0, maxPartLoadFrac, Par);
+
+                            auto f = [&state, this, FirstHVACIteration, DesOutTemp](Real64 const PartLoadFrac) {
+                                Real64 OutletAirTemp; // Outlet air temperature [C]
+                                Real64 mdot;
+
+                                mdot = min(state.dataLoopNodes->Node(this->HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
+                                           this->MaxHeatCoilFluidFlow * PartLoadFrac);
+                                state.dataLoopNodes->Node(this->HeatCoilFluidInletNode).MassFlowRate = mdot;
+                                SteamCoils::SimulateSteamCoilComponents(state,
+                                                                        this->m_HeatingCoilName,
+                                                                        FirstHVACIteration,
+                                                                        this->m_HeatingCoilIndex,
+                                                                        1.0,
+                                                                        _,
+                                                                        this->m_FanOpMode,
+                                                                        PartLoadFrac);
+                                OutletAirTemp = state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp; // RR this should be supp coil
+                                return DesOutTemp - OutletAirTemp;
+                            };
+
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, maxPartLoadFrac);
                         } break;
                         case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple:
                         case DataHVACGlobals::Coil_HeatingWaterToAirHP: {
-                            Par[1] = double(this->m_UnitarySysNum);
-                            if (FirstHVACIteration) {
-                                Par[2] = 1.0;
-                            } else {
-                                Par[2] = 0.0;
-                            }
-                            Par[3] = DesOutTemp;
-                            Par[4] = ReqOutput;
                             this->m_HeatingCoilSensDemand = ReqOutput;
 
-                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->heatWatertoAirHPTempResidual, 0.0, 1.0, Par);
+                            auto f = [&state, this, FirstHVACIteration, DesOutTemp, ReqOutput](Real64 const PartLoadRatio) {
+                                Real64 OutletAirTemp; // outlet air humidity ratio [kg/kg]
+                                bool errFlag;
+                                Real64 RuntimeFrac;
+                                Real64 dummy;
+
+                                this->heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
+
+                                if (RuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
+                                    state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
+                                } else {
+                                    state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
+                                }
+
+                                this->m_CompPartLoadRatio = PartLoadRatio;
+                                this->m_WSHPRuntimeFrac = RuntimeFrac;
+
+                                dummy = 0.0;
+                                if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
+                                    WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
+                                                                                    blankString,
+                                                                                    this->m_HeatingCoilIndex,
+                                                                                    ReqOutput,
+                                                                                    dummy,
+                                                                                    this->m_FanOpMode,
+                                                                                    RuntimeFrac,
+                                                                                    this->m_MaxONOFFCyclesperHour,
+                                                                                    this->m_HPTimeConstant,
+                                                                                    this->m_FanDelayTime,
+                                                                                    DataHVACGlobals::CompressorOperation::On,
+                                                                                    PartLoadRatio,
+                                                                                    FirstHVACIteration);
+                                } else {
+                                    WaterToAirHeatPump::SimWatertoAirHP(state,
+                                                                        blankString,
+                                                                        this->m_HeatingCoilIndex,
+                                                                        this->MaxHeatAirMassFlow,
+                                                                        this->m_FanOpMode,
+                                                                        FirstHVACIteration,
+                                                                        RuntimeFrac,
+                                                                        this->m_MaxONOFFCyclesperHour,
+                                                                        this->m_HPTimeConstant,
+                                                                        this->m_FanDelayTime,
+                                                                        this->m_InitHeatPump,
+                                                                        ReqOutput,
+                                                                        dummy,
+                                                                        DataHVACGlobals::CompressorOperation::Off,
+                                                                        PartLoadRatio);
+                                }
+
+                                OutletAirTemp = state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp;
+                                return DesOutTemp - OutletAirTemp;
+                            };
+
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                         } break;
                         case DataHVACGlobals::Coil_UserDefined: {
                             // should never get here, user defined coil cannot be controlled and has already been simulated
@@ -14882,49 +14983,54 @@ namespace UnitarySystems {
                                 }
                             } break;
                             case DataHVACGlobals::Coil_HeatingWater: {
-                                Par[1] = double(this->m_UnitarySysNum);
-                                if (FirstHVACIteration) {
-                                    Par[2] = 1.0;
-                                } else {
-                                    Par[2] = 0.0;
-                                }
-                                Par[3] = DesOutTemp;
-                                if (SuppHeatingCoilFlag) {
-                                    Par[4] = 1.0;
-                                } else {
-                                    Par[4] = 0.0;
-                                }
-                                Par[5] = 0.0;
-
                                 // calculate max waterside PLR from mdot request above in case plant chokes water flow
                                 maxPartLoadFrac =
                                     min(1.0,
                                         ((mdot / this->m_MaxSuppCoilFluidFlow) + 0.001)); // plant can limit flow and RegulaFalsi could hit
                                                                                           // max iteration limit (leave a little slop, 0.001)
-                                General::SolveRoot(
-                                    state, Acc, SolveMaxIter, SolFla, PartLoadFrac, this->hotWaterHeatingCoilResidual, 0.0, maxPartLoadFrac, Par);
+                                auto f = [&state, this, FirstHVACIteration, DesOutTemp](Real64 const PartLoadFrac) {
+                                    Real64 mdot = min(state.dataLoopNodes->Node(this->m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
+                                                      this->m_MaxSuppCoilFluidFlow * PartLoadFrac);
+                                    state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
+                                    WaterCoils::SimulateWaterCoilComponents(state,
+                                                                            this->m_SuppHeatCoilName,
+                                                                            FirstHVACIteration,
+                                                                            this->m_SuppHeatCoilIndex,
+                                                                            0.0, // QActual
+                                                                            this->m_FanOpMode,
+                                                                            PartLoadFrac);
+
+                                    return DesOutTemp - state.dataLoopNodes->Node(this->SuppCoilOutletNodeNum).Temp;
+                                };
+
+                                General::SolveRoot(state, Acc, SolveMaxIter, SolFla, PartLoadFrac, f, 0.0, maxPartLoadFrac);
                             } break;
                             case DataHVACGlobals::Coil_HeatingSteam: {
-                                Par[1] = double(this->m_UnitarySysNum);
-                                if (FirstHVACIteration) {
-                                    Par[2] = 1.0;
-                                } else {
-                                    Par[2] = 0.0;
-                                }
-                                Par[3] = DesOutTemp;
-                                if (SuppHeatingCoilFlag) {
-                                    Par[4] = 1.0;
-                                } else {
-                                    Par[4] = 0.0;
-                                }
 
                                 // calculate max waterside PLR from mdot request above in case plant chokes water flow
                                 maxPartLoadFrac =
                                     min(1.0,
                                         ((mdot / this->m_MaxSuppCoilFluidFlow) + 0.001)); // plant can limit flow and RegulaFalsi could hit
                                                                                           // max iteration limit (leave a little slop, 0.001)
-                                General::SolveRoot(
-                                    state, Acc, MaxIte, SolFla, PartLoadFrac, this->steamHeatingCoilResidual, 0.0, maxPartLoadFrac, Par);
+
+                                auto f = [&state, this, FirstHVACIteration, DesOutTemp](Real64 const PartLoadFrac) {
+                                    Real64 mdot;
+
+                                    mdot = min(state.dataLoopNodes->Node(this->m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
+                                               this->m_MaxSuppCoilFluidFlow * PartLoadFrac);
+                                    state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
+                                    SteamCoils::SimulateSteamCoilComponents(state,
+                                                                            this->m_SuppHeatCoilName,
+                                                                            FirstHVACIteration,
+                                                                            this->m_SuppHeatCoilIndex,
+                                                                            1.0,
+                                                                            _,
+                                                                            this->m_FanOpMode,
+                                                                            PartLoadFrac);
+                                    return DesOutTemp - state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp; // RR this should be supp coil
+                                };
+
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, maxPartLoadFrac);
                             } break;
                             case DataHVACGlobals::Coil_UserDefined: {
                                 //  do nothing, coil has already been simulated
@@ -15908,135 +16014,6 @@ namespace UnitarySystems {
         }
     }
 
-    Real64 UnitarySys::hotWaterHeatingCoilResidual(EnergyPlusData &state,
-                                                   Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                   std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Chandan Sharma, FSEC
-        //       DATE WRITTEN   February 2013
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // hot water Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls SimulateWaterCoilComponents to get outlet temperature at the given part load ratio
-        // and calculates the residual as defined above
-
-        // Return value
-        Real64 Residuum; // Residual to be minimized to zero
-
-        // Argument array dimensioning
-        // Par(2) = desired air outlet temperature [C]
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 OutletAirTemp; // Outlet air temperature [C]
-
-        int UnitarySysNum = int(Par[1]);
-        bool FirstHVACIteration = (Par[2] > 0.0);
-        bool SuppHeatingCoilFlag = (Par[4] > 0.0);
-        bool LoadBased = (Par[5] > 0.0);
-        Real64 QActual = 0.0;
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        if (!SuppHeatingCoilFlag) {
-            Real64 mdot =
-                min(state.dataLoopNodes->Node(thisSys.HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxHeatCoilFluidFlow * PartLoadFrac);
-            state.dataLoopNodes->Node(thisSys.HeatCoilFluidInletNode).MassFlowRate = mdot;
-            WaterCoils::SimulateWaterCoilComponents(
-                state, thisSys.m_HeatingCoilName, FirstHVACIteration, thisSys.m_HeatingCoilIndex, QActual, thisSys.m_FanOpMode, PartLoadFrac);
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
-        } else {
-            Real64 mdot = min(state.dataLoopNodes->Node(thisSys.m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
-                              thisSys.m_MaxSuppCoilFluidFlow * PartLoadFrac);
-            state.dataLoopNodes->Node(thisSys.m_SuppCoilFluidInletNode).MassFlowRate = mdot;
-            WaterCoils::SimulateWaterCoilComponents(
-                state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, thisSys.m_SuppHeatCoilIndex, QActual, thisSys.m_FanOpMode, PartLoadFrac);
-            OutletAirTemp = state.dataLoopNodes->Node(thisSys.SuppCoilOutletNodeNum).Temp;
-        }
-        if (LoadBased) {
-            Residuum = Par[3] - QActual;
-        } else {
-            Residuum = Par[3] - OutletAirTemp;
-        }
-
-        return Residuum;
-    }
-
-    Real64 UnitarySys::DOE2DXCoilResidual(EnergyPlusData &state,
-                                          Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   November 2003
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcDOe2DXCoil to get outlet temperature at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet temperature [C]
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        int CoilIndex = int(Par[1]);
-        int FanOpMode = int(Par[5]);
-        DXCoils::CalcDoe2DXCoil(state, CoilIndex, DataHVACGlobals::CompressorOperation::On, true, PartLoadRatio, FanOpMode);
-        Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
-        Residuum = Par[2] - OutletAirTemp;
-
-        return Residuum;
-    }
-
-    Real64 UnitarySys::genericDXCoilResidual(EnergyPlusData &state,
-                                             Real64 const PartLoadRatio,      // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                             std::array<Real64, 8> const &Par // par(1) = DX coil number
-    )
-    {
-
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   February 2020
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        int CoilIndex = int(Par[0]);
-        bool useDehumMode = int(Par[2]) > 0;
-        int FanOpMode = int(Par[3]);
-        int CoolingSpeedNum = int(Par[4]);
-        Real64 CoolingSpeedRatio = Par[5];
-        bool RunOnSensible = (Par[6] == 0.0);
-        bool const singleMode = (Par[7] == 1.0);
-        if (CoolingSpeedNum == 1) {
-            state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
-                state, useDehumMode, PartLoadRatio, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode, singleMode);
-        } else {
-            state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].simulate(
-                state, useDehumMode, CoolingSpeedRatio, CoolingSpeedNum, PartLoadRatio, FanOpMode, singleMode);
-        }
-        Real64 outletCondition = 0.0;
-        if (RunOnSensible) {
-            outletCondition = state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).Temp;
-        } else {
-            outletCondition = state.dataLoopNodes->Node(state.dataCoilCooingDX->coilCoolingDXs[CoilIndex].evapOutletNodeIndex).HumRat;
-        }
-        Residuum = Par[1] - outletCondition;
-
-        return Residuum;
-    }
-
     Real64 UnitarySys::DOE2DXCoilHumRatResidual(EnergyPlusData &state,
                                                 Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                 std::vector<Real64> const &Par // par(1) = DX coil number
@@ -16163,85 +16140,6 @@ namespace UnitarySystems {
         }
 
         return Residuum;
-    }
-
-    Real64 UnitarySys::calcMultiStageSuppCoilLoadResidual(EnergyPlusData &state,
-                                                          Real64 const SpeedRatio,
-                                                          std::vector<Real64> const &Par // Function parameters
-    )
-    {
-        Real64 QActual;
-        int CoilIndex = int(Par[1]);
-        Real64 CycRatio = Par[4];
-        int SpeedNum = int(Par[5]);
-        int FanOpMode = int(Par[6]);
-        HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
-        return Par[2] - QActual;
-    }
-
-    Real64 UnitarySys::calcMultiStageSuppCoilLoadCycResidual(EnergyPlusData &state,
-                                                             Real64 const CycRatio,
-                                                             std::vector<Real64> const &Par // Function parameters
-    )
-    {
-        Real64 QActual;
-        int CoilIndex = int(Par[1]);
-        Real64 SpeedRatio = Par[4];
-        int SpeedNum = int(Par[5]);
-        int FanOpMode = int(Par[6]);
-        HeatingCoils::CalcMultiStageElectricHeatingCoil(state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, QActual, true);
-        return Par[2] - QActual;
-    }
-
-    Real64 UnitarySys::HXAssistedCoolCoilTempResidual(EnergyPlusData &state,
-                                                      Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                      std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad, FSEC
-        //       DATE WRITTEN   November 2003
-
-        // PURPOSE OF THIS FUNCTION:
-        //  Calculates residual function (desired outlet temp - actual outlet temp)
-        //  DX Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        //  Calls CalcHXAssistedCoolingCoil to get outlet temperature at the given part load ratio
-        //  and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet temperature [C]
-        // par(3) = FirstHVACIteration logical converted to numeric (1=TRUE,0=FALSE)
-        // par(4) = HX control (On/Off)
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        int CoilIndex = int(Par[1]);
-        // FirstHVACIteration is a logical, Par is REAL(r64), so make 1=TRUE and 0=FALSE
-        bool FirstHVACIteration = (Par[3] > 0.0);
-        bool HXUnitOn = (Par[4] == 1.0);
-        int FanOpMode = int(Par[5]);
-        int UnitarySysNum = int(Par[6]);
-        int DehumidificationMode_par = int(Par[7]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        if (thisSys.CoolCoilFluidInletNode > 0) {
-            state.dataLoopNodes->Node(thisSys.CoolCoilFluidInletNode).MassFlowRate = thisSys.MaxCoolCoilFluidFlow * PartLoadRatio;
-        }
-        HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
-                                                             CoilIndex,
-                                                             FirstHVACIteration,
-                                                             DataHVACGlobals::CompressorOperation::On,
-                                                             PartLoadRatio,
-                                                             HXUnitOn,
-                                                             FanOpMode,
-                                                             _,
-                                                             _,
-                                                             DehumidificationMode_par,
-                                                             0.0); // CoilSHR_par);
-        Real64 OutletAirTemp = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(CoilIndex);
-        return Par[2] - OutletAirTemp;
     }
 
     Real64 UnitarySys::HXAssistedCoolCoilHRResidual(EnergyPlusData &state,
@@ -17031,44 +16929,6 @@ namespace UnitarySystems {
         return Par[3] - OutletAirHumRat;
     }
 
-    Real64 UnitarySys::coolWaterTempResidual(EnergyPlusData &state,
-                                             Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                             std::vector<Real64> const &Par // par(1) = CoolWater coil number
-    )
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Chandan Sharma, FSEC
-        //       DATE WRITTEN   January 2013
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // Cool water coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls SimulateWaterCoilComponents to get outlet temp at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet humidity ratio [kg/kg]
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 OutletAirTemp; // outlet air humidity ratio [kg/kg]
-
-        int UnitarySysNum = int(Par[1]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-        bool FirstHVACIteration = (Par[2] > 0.0);
-
-        Real64 mdot =
-            min(state.dataLoopNodes->Node(thisSys.CoolCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxCoolCoilFluidFlow * PartLoadRatio);
-        state.dataLoopNodes->Node(thisSys.CoolCoilFluidInletNode).MassFlowRate = mdot;
-        WaterCoils::SimulateWaterCoilComponents(
-            state, thisSys.m_CoolingCoilName, FirstHVACIteration, thisSys.m_CoolingCoilIndex, _, _, PartLoadRatio);
-
-        OutletAirTemp = state.dataLoopNodes->Node(thisSys.CoolCoilOutletNodeNum).Temp;
-        return Par[3] - OutletAirTemp;
-    }
-
     Real64 UnitarySys::gasElecHeatingCoilResidual(EnergyPlusData &state,
                                                   Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                   std::vector<Real64> const &Par // par(1) = DX coil number
@@ -17110,136 +16970,6 @@ namespace UnitarySystems {
                 state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, HeatingLoad, thisSys.m_SuppHeatCoilIndex, _, true, FanOpMode, PartLoadFrac);
             OutletAirTemp = state.dataLoopNodes->Node(thisSys.SuppCoilOutletNodeNum).Temp;
         }
-        return Par[3] - OutletAirTemp;
-    }
-
-    Real64 UnitarySys::steamHeatingCoilResidual(EnergyPlusData &state,
-                                                Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Chandan Sharma, FSEC
-        //       DATE WRITTEN   February 2013
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // hot Steam Coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls SimulateSteamCoilComponents to get outlet temperature at the given part load ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // Par(2) = desired air outlet temperature [C]
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 OutletAirTemp; // Outlet air temperature [C]
-        Real64 mdot;
-
-        int UnitarySysNum = int(Par[1]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        bool FirstHVACIteration = (Par[2] > 0.0);
-        bool SuppHeatingCoilFlag = (Par[4] > 0.0);
-
-        if (!SuppHeatingCoilFlag) {
-            mdot =
-                min(state.dataLoopNodes->Node(thisSys.HeatCoilFluidOutletNodeNum).MassFlowRateMaxAvail, thisSys.MaxHeatCoilFluidFlow * PartLoadFrac);
-            state.dataLoopNodes->Node(thisSys.HeatCoilFluidInletNode).MassFlowRate = mdot;
-            SteamCoils::SimulateSteamCoilComponents(
-                state, thisSys.m_HeatingCoilName, FirstHVACIteration, thisSys.m_HeatingCoilIndex, 1.0, _, thisSys.m_FanOpMode, PartLoadFrac);
-        } else {
-            mdot = min(state.dataLoopNodes->Node(thisSys.m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
-                       thisSys.m_MaxSuppCoilFluidFlow * PartLoadFrac);
-            state.dataLoopNodes->Node(thisSys.m_SuppCoilFluidInletNode).MassFlowRate = mdot;
-            SteamCoils::SimulateSteamCoilComponents(
-                state, thisSys.m_SuppHeatCoilName, FirstHVACIteration, thisSys.m_SuppHeatCoilIndex, 1.0, _, thisSys.m_FanOpMode, PartLoadFrac);
-        }
-        OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp; // RR this should be supp coil
-        return Par[3] - OutletAirTemp;
-    }
-
-    Real64 UnitarySys::heatWatertoAirHPTempResidual(EnergyPlusData &state,
-                                                    Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                    std::vector<Real64> const &Par // par(1) = DX coil number
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Chandan Sharma, FSEC
-        //       DATE WRITTEN   January 2013
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (desired outlet temp - actual outlet temp)
-        // Heat water coil output depends on the part load ratio which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls SimWatertoAirHP or SimWatertoAirHPSimple to get outlet humidity ratio at the given cycling ratio
-        // and calculates the residual as defined above
-
-        // Argument array dimensioning
-        // par(2) = desired air outlet humidity ratio [kg/kg]
-        // par(5) = supply air fan operating mode (DataHVACGlobals::ContFanCycCoil)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 OutletAirTemp; // outlet air humidity ratio [kg/kg]
-        bool errFlag;
-        Real64 RuntimeFrac;
-        Real64 dummy;
-
-        int UnitarySysNum = int(Par[1]);
-        UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
-
-        bool FirstHVACIteration = (Par[2] > 0.0);
-        Real64 ReqOutput = Par[4]; // RR this was a 1
-
-        thisSys.heatPumpRunFrac(PartLoadRatio, errFlag, RuntimeFrac);
-
-        if (RuntimeFrac > 0.0 && thisSys.m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-            state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
-        } else {
-            state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-        }
-
-        thisSys.m_CompPartLoadRatio = PartLoadRatio;
-        thisSys.m_WSHPRuntimeFrac = RuntimeFrac;
-
-        dummy = 0.0;
-        if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
-            WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
-                                                            blankString,
-                                                            thisSys.m_HeatingCoilIndex,
-                                                            ReqOutput,
-                                                            dummy,
-                                                            thisSys.m_FanOpMode,
-                                                            RuntimeFrac,
-                                                            thisSys.m_MaxONOFFCyclesperHour,
-                                                            thisSys.m_HPTimeConstant,
-                                                            thisSys.m_FanDelayTime,
-                                                            DataHVACGlobals::CompressorOperation::On,
-                                                            PartLoadRatio,
-                                                            FirstHVACIteration);
-        } else {
-            WaterToAirHeatPump::SimWatertoAirHP(state,
-                                                blankString,
-                                                thisSys.m_HeatingCoilIndex,
-                                                thisSys.MaxHeatAirMassFlow,
-                                                thisSys.m_FanOpMode,
-                                                FirstHVACIteration,
-                                                RuntimeFrac,
-                                                thisSys.m_MaxONOFFCyclesperHour,
-                                                thisSys.m_HPTimeConstant,
-                                                thisSys.m_FanDelayTime,
-                                                thisSys.m_InitHeatPump,
-                                                ReqOutput,
-                                                dummy,
-                                                DataHVACGlobals::CompressorOperation::Off,
-                                                PartLoadRatio);
-        }
-
-        OutletAirTemp = state.dataLoopNodes->Node(thisSys.HeatCoilOutletNodeNum).Temp;
         return Par[3] - OutletAirTemp;
     }
 

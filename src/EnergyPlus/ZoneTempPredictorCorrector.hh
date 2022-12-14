@@ -253,11 +253,6 @@ namespace ZoneTempPredictorCorrector {
                              Real64 &Tset // drybulb setpoint temperature for a given PMV value
     );
 
-    Real64 PMVResidual(EnergyPlusData &state,
-                       Real64 Tset,
-                       Array1D<Real64> const &Par // par(1) = PMV set point
-    );
-
     void AdjustCoolingSetPointforTempAndHumidityControl(EnergyPlusData &state,
                                                         int TempControlledZoneID,
                                                         int ActualZoneNum // controlled zone actual zone number

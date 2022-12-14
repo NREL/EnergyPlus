@@ -275,6 +275,7 @@ public:
         state->dataSize->SysSizPeakDDNum(1).CoolFlowPeakDD = 1;
         state->dataSize->SysSizPeakDDNum(1).TotCoolPeakDD = 1;
         state->dataSize->FinalSysSizing.allocate(1);
+        state->dataSize->CalcSysSizing.allocate(1);
         state->dataSize->FinalZoneSizing.allocate(1);
         state->dataHVACGlobal->NumPrimaryAirSys = 1;
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -370,7 +371,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataSize->CurOASysNum = 0;
     state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.3;
     Real64 heatFlowRat = 0.3;
-    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
