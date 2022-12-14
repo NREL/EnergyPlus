@@ -749,6 +749,8 @@ namespace HVACVariableRefrigerantFlow {
         int coolCoilAirOutNode;             // cooling coil air outlet node number
         int heatCoilAirInNode;              // heating coil air inlet node number
         int heatCoilAirOutNode;             // heating coil air outlet node number
+        bool coolingCoilActive;             // turns ON or OFF the cooling coil in the TU depending zone load when parent HP is in cooling mode
+
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), ZoneAirNode(0), VRFTUInletNodeNum(0),
@@ -773,7 +775,7 @@ namespace HVACVariableRefrigerantFlow {
               MySuppCoilPlantScanFlag(true), airLoopNum(0), isInOASys(false), isInAirLoop(false), isInZone(false), isSetPointControlled(false),
               coolSPActive(false), heatSPActive(false), coolLoadToSP(0.0), heatLoadToSP(0.0), coilTempSetPoint(0.0), suppTempSetPoint(0.0),
               controlZoneMassFlowFrac(1.0), zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0), coolCoilAirInNode(0), coolCoilAirOutNode(0),
-              heatCoilAirInNode(0), heatCoilAirOutNode(0)
+              heatCoilAirInNode(0), heatCoilAirOutNode(0), coolingCoilActive(false)
         {
         }
 
