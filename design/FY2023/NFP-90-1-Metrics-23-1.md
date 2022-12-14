@@ -3,7 +3,7 @@
 
 **Revisions**
 -   New Feature Proposal -- 25-November-2022
--   New Feature Design -- (updated) 08-December-2022
+-   New Feature Design -- (original) 06-December-22 (updated) 08-December-2022, 14-December-2022
 
 ## Justification for New Feature
 Many new metrics appear in the ASHRAE 90.1-2019 \[1\] standard.
