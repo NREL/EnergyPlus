@@ -393,7 +393,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     int SurfNum;
 
     state->dataConstruction->Construct.allocate(1);
-    Material::MaterialProperties* mat = new Material::MaterialProperties;
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
     state->dataMaterial->Material.push_back(mat);
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->SurfMaterialMovInsulInt.allocate(1);

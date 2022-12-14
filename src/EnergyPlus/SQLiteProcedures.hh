@@ -565,9 +565,9 @@ private:
                  EnergyPlus::Material::MaterialProperties const *materialData)
             : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->Group),
               roughness(materialData->Roughness), conductivity(materialData->Conductivity), density(materialData->Density),
-              isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance), rOnly(materialData->ROnly),
-              specHeat(materialData->SpecHeat), thermGradCoef(materialData->ThermGradCoef), thickness(materialData->Thickness),
-              vaporDiffus(materialData->VaporDiffus)
+              isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance),
+              rOnly(materialData->ROnly), specHeat(materialData->SpecHeat), thermGradCoef(materialData->ThermGradCoef),
+              thickness(materialData->Thickness), vaporDiffus(materialData->VaporDiffus)
         {
         }
 

@@ -235,7 +235,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofFirstTimeTest)
     Real64 allowableTolerance = 0.000001;
 
     state->dataConstruction->Construct.allocate(constrNum);
-    Material::MaterialProperties* mat = new Material::MaterialProperties;
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
     state->dataMaterial->Material.push_back(mat);
     state->dataSurface->Surface.allocate(surfNum);
 
@@ -272,7 +272,7 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_initEcoRoofTest)
     Real64 allowableTolerance = 0.000001;
 
     state->dataConstruction->Construct.allocate(constrNum);
-    Material::MaterialProperties* mat = new Material::MaterialProperties;
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
     state->dataMaterial->Material.push_back(mat);
     state->dataSurface->Surface.allocate(surfNum);
 
