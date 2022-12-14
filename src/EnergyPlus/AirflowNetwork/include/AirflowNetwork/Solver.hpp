@@ -114,7 +114,7 @@ namespace AirflowNetwork {
     };
 
     Real64 AFNPressureResidual(EnergyPlusData &state, Real64 ExFanMassFlowRate,
-                               Array1D<Real64> const &Par); // Residual function using Regula Falsi
+                               Real64 PressureSet); // Residual function using Regula Falsi
 
     Real64 DuctDResidual(EnergyPlusData &state,
                          Real64 D, // duct diameter

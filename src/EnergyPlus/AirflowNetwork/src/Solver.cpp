@@ -6642,16 +6642,16 @@ namespace AirflowNetwork {
                     }
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
-                    Par(1) = PressureSet;
+                    auto & thisState = m_state;  // can't use m_state directly in the capture list, just create a reference
+                    auto f = [&thisState, PressureSet](Real64 const ControllerMassFlowRate){return AFNPressureResidual(thisState, ControllerMassFlowRate, PressureSet);};
                     General::SolveRoot(m_state,
                                        ErrorToler,
                                        MaxIte,
                                        SolFla,
                                        ExhaustFanMassFlowRate,
-                                       AFNPressureResidual,
+                                       f,
                                        MinExhaustMassFlowrate,
-                                       MaxExhaustMassFlowrate,
-                                       Par);
+                                       MaxExhaustMassFlowrate);
                     if (SolFla == -1) {
                         if (!m_state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
@@ -6736,16 +6736,16 @@ namespace AirflowNetwork {
                     }
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
-                    Par(1) = PressureSet;
+                    auto & thisState = m_state;  // can't use m_state directly in the capture list, just create a reference
+                    auto f = [&thisState, PressureSet](Real64 const ControllerMassFlowRate){return AFNPressureResidual(thisState, ControllerMassFlowRate, PressureSet);};
                     General::SolveRoot(m_state,
                                        ErrorToler,
                                        MaxIte,
                                        SolFla,
                                        ReliefMassFlowRate,
-                                       AFNPressureResidual,
+                                       f,
                                        MinReliefMassFlowrate,
-                                       MaxReliefMassFlowrate,
-                                       Par);
+                                       MaxReliefMassFlowrate);
                     if (SolFla == -1) {
                         if (!m_state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
@@ -6773,7 +6773,7 @@ namespace AirflowNetwork {
 
     Real64 AFNPressureResidual(EnergyPlusData &state,
                                Real64 const ControllerMassFlowRate, // Pressure setpoint
-                               Array1D<Real64> const &Par           // par(1) = PressureSet
+                               Real64 PressureSet
     )
     {
         // FUNCTION INFORMATION:
@@ -6792,10 +6792,7 @@ namespace AirflowNetwork {
         Real64 AFNPressureResidual;
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 PressureSet;
         Real64 ZonePressure;
-
-        PressureSet = Par(1);
 
         if (state.afn->PressureSetFlag == PressureCtrlExhaust) {
             state.afn->ExhaustFanMassFlowRate = ControllerMassFlowRate;
