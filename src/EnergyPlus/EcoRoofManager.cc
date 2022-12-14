@@ -274,8 +274,7 @@ namespace EcoRoofManager {
 
             if (thisConstruct.CTFCross(0) > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
-                F1temp = thisConstruct.CTFCross(0) /
-                         (thisConstruct.CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
+                F1temp = thisConstruct.CTFCross(0) / (thisConstruct.CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
                 Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
                              F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                                        state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
@@ -283,13 +282,12 @@ namespace EcoRoofManager {
                                        state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
                                        state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
             } else {
-                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
-                             thisConstruct.CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                Qsoilpart1 =
+                    -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + thisConstruct.CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
                 F1temp = 0.0;
             }
 
-            Qsoilpart2 =
-                thisConstruct.CTFOutside(0) - F1temp * thisConstruct.CTFCross(0);
+            Qsoilpart2 = thisConstruct.CTFOutside(0) - F1temp * thisConstruct.CTFCross(0);
 
             state.dataEcoRoofMgr->Pa = state.dataEnvrn->StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
             Tgk = state.dataEcoRoofMgr->Tg + DataGlobalConstants::KelvinConv;
@@ -565,7 +563,7 @@ namespace EcoRoofManager {
         thisEcoRoof->MoistureMax = thisMat->Porosity;           // Max moisture content in soil
         thisEcoRoof->MoistureResidual = thisMat->MinMoisture;   // Min moisture content in soil
         thisEcoRoof->Moisture = thisMat->InitMoisture;          // Initial moisture content in soil
-        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture; // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
+        thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture;  // DJS Oct 2007 Release --> all soil at same initial moisture for Reverse DD fix
 
         thisEcoRoof->SoilThickness = thisMat->Thickness; // Total thickness of soil layer (m)
 
@@ -714,9 +712,9 @@ namespace EcoRoofManager {
         // Make sure the ecoroof module resets its conditions at start of EVERY warmup day and every new design day
         // for Reverse DD testing
         if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
-            thisEcoRoof->Moisture = thisMat->InitMoisture;          // Initial moisture content in soil
+            thisEcoRoof->Moisture = thisMat->InitMoisture;         // Initial moisture content in soil
             thisEcoRoof->MeanRootMoisture = thisEcoRoof->Moisture; // Start the root zone moisture at the same value as the surface.
-            thisEcoRoof->Alphag = 1.0 - thisMat->AbsorpSolar;       // albedo rather than absorptivity
+            thisEcoRoof->Alphag = 1.0 - thisMat->AbsorpSolar;      // albedo rather than absorptivity
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && thisEcoRoof->CalcEcoRoofMyEnvrnFlag) {

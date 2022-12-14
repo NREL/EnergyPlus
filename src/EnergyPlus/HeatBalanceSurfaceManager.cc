@@ -2341,8 +2341,7 @@ void EvalOutsideMovableInsulation(EnergyPlusData &state)
         Material::MaterialGroup const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex)->Group);
         state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex)->Resistance);
-        if (MaterialGroupNum == Material::MaterialGroup::WindowGlass ||
-            MaterialGroupNum == Material::MaterialGroup::GlassEquivalentLayer) {
+        if (MaterialGroupNum == Material::MaterialGroup::WindowGlass || MaterialGroupNum == Material::MaterialGroup::GlassEquivalentLayer) {
             state.dataHeatBalSurf->SurfAbsSolarExt(SurfNum) =
                 max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex)->Trans - state.dataMaterial->Material(MaterialIndex)->ReflectSolBeamFront);
         } else {
@@ -2370,8 +2369,7 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
         Material::MaterialGroup const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex)->Group);
         state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex)->Resistance);
-        if (MaterialGroupNum == Material::MaterialGroup::WindowGlass ||
-            MaterialGroupNum == Material::MaterialGroup::GlassEquivalentLayer) {
+        if (MaterialGroupNum == Material::MaterialGroup::WindowGlass || MaterialGroupNum == Material::MaterialGroup::GlassEquivalentLayer) {
             state.dataHeatBalSurf->SurfAbsSolarInt(SurfNum) =
                 max(0.0, 1.0 - state.dataMaterial->Material(MaterialIndex)->Trans - state.dataMaterial->Material(MaterialIndex)->ReflectSolBeamFront);
         } else {
@@ -2795,7 +2793,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 if (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(enclNum)) {
                     Real64 EnclSolQSDifSol_sum(0.0); // Accumulator
                     int lZone(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.index(enclNum,
-                                                                                  1)); // Tuned Linear indexing
+                                                                                 1)); // Tuned Linear indexing
                     for (int otherEnclNum = 1; otherEnclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++otherEnclNum, ++lZone) {
                         if ((otherEnclNum != enclNum) && (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(otherEnclNum))) {
                             EnclSolQSDifSol_sum += state.dataHeatBalSurf->ZoneFractDifShortZtoZ[lZone] *
@@ -4526,20 +4524,17 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
         auto *thisMaterial = state.dataMaterial->Material(MaterNum);
         if (thisMaterial->AbsorpSolarEMSOverrideOn) {
-            thisMaterial->AbsorpSolar =
-                max(min(thisMaterial->AbsorpSolarEMSOverride, 0.9999), 0.0001);
+            thisMaterial->AbsorpSolar = max(min(thisMaterial->AbsorpSolarEMSOverride, 0.9999), 0.0001);
         } else {
             thisMaterial->AbsorpSolar = thisMaterial->AbsorpSolarInput;
         }
         if (thisMaterial->AbsorpThermalEMSOverrideOn) {
-            thisMaterial->AbsorpThermal =
-                max(min(thisMaterial->AbsorpThermalEMSOverride, 0.9999), 0.0001);
+            thisMaterial->AbsorpThermal = max(min(thisMaterial->AbsorpThermalEMSOverride, 0.9999), 0.0001);
         } else {
             thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalInput;
         }
         if (thisMaterial->AbsorpVisibleEMSOverrideOn) {
-            thisMaterial->AbsorpVisible =
-                max(min(thisMaterial->AbsorpVisibleEMSOverride, 0.9999), 0.0001);
+            thisMaterial->AbsorpVisible = max(min(thisMaterial->AbsorpVisibleEMSOverride, 0.9999), 0.0001);
         } else {
             thisMaterial->AbsorpVisible = thisMaterial->AbsorpVisibleInput;
         }
@@ -7277,8 +7272,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                 }
             } break;
             case KivaFoundation: {
-                DataSurfaces::SurfaceRoughness RoughSurf =
-                    state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Roughness;
+                DataSurfaces::SurfaceRoughness RoughSurf = state.dataMaterial->Material(thisConstruct.LayerPoint(1))->Roughness;
                 Real64 AbsThermSurf = state.dataMaterial->Material(thisConstruct.LayerPoint(1))->AbsorpThermal;
 
                 // Set Kiva exterior convection algorithms

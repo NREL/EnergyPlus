@@ -111,8 +111,7 @@ namespace WindowManager {
         // Scattering will be created in different ways that is based on material type
 
         std::shared_ptr<CWCELayerFactory> aFactory = nullptr;
-        if (t_Material.Group == Material::MaterialGroup::WindowGlass ||
-            t_Material.Group == Material::MaterialGroup::WindowSimpleGlazing) {
+        if (t_Material.Group == Material::MaterialGroup::WindowGlass || t_Material.Group == Material::MaterialGroup::WindowSimpleGlazing) {
             aFactory = std::make_shared<CWCESpecularLayerFactory>(t_Material, t_Range);
         } else if (t_Material.Group == Material::MaterialGroup::WindowBlind) {
             aFactory = std::make_shared<CWCEVenetianBlindLayerFactory>(t_Material, t_Range);
@@ -192,8 +191,7 @@ namespace WindowManager {
                     auto &material(*state.dataMaterial->Material(construction.LayerPoint(LayNum)));
                     if (BITF_TEST_NONE(BITF(material.Group),
                                        BITF(Material::MaterialGroup::WindowGas) | BITF(Material::MaterialGroup::WindowGasMixture) |
-                                           BITF(Material::MaterialGroup::ComplexWindowGap) |
-                                           BITF(Material::MaterialGroup::ComplexWindowShade))) {
+                                           BITF(Material::MaterialGroup::ComplexWindowGap) | BITF(Material::MaterialGroup::ComplexWindowShade))) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
                         // property is >0.
@@ -532,8 +530,8 @@ namespace WindowManager {
         Real64 slatWidth = blind.SlatWidth;
         Real64 slatSpacing = blind.SlatSeparation;
         Real64 slatTiltAngle = 90.0 - blind.SlatAngle; // Need to convert to WCE system
-        Real64 curvatureRadius = 0.0;                // No curvature radius in current IDF definition
-        size_t numOfSlatSegments = 5;              // Number of segments to use in venetian calculations
+        Real64 curvatureRadius = 0.0;                  // No curvature radius in current IDF definition
+        size_t numOfSlatSegments = 5;                  // Number of segments to use in venetian calculations
         return std::make_shared<CVenetianCellDescription>(slatWidth, slatSpacing, slatTiltAngle, curvatureRadius, numOfSlatSegments);
     }
 

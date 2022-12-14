@@ -243,8 +243,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                                           format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
                         if (thisMaterial->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
                             ShowContinueError(state,
-                                              format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
-                                                     thisMaterial->Thickness));
+                                              format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", thisMaterial->Thickness));
                             ShowContinueError(state,
                                               format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                      DataHeatBalance::ThinMaterialLayerThreshold));
@@ -271,16 +270,14 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
         // If not a resistive layer, nothing further is required
         // for this layer.
 
-        if (ResLayer(Layer)) {                                                 // Resistive layer-check for R-value, etc.
-            ++NumResLayers;                                                    // Increment number of resistive layers
+        if (ResLayer(Layer)) {                    // Resistive layer-check for R-value, etc.
+            ++NumResLayers;                       // Increment number of resistive layers
             lr(Layer) = thisMaterial->Resistance; // User defined thermal resistivity
-            if (lr(Layer) < RValueLowLimit) {                                  // User didn't define enough
+            if (lr(Layer) < RValueLowLimit) {     // User didn't define enough
                 // parameters to calculate CTFs for a building element
                 // containing this layer.
 
-                ShowSevereError(state,
-                                "InitConductionTransferFunctions: Material=" + thisMaterial->Name +
-                                    "R Value below lowest allowed value");
+                ShowSevereError(state, "InitConductionTransferFunctions: Material=" + thisMaterial->Name + "R Value below lowest allowed value");
                 ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                 ErrorsFound = true;
 

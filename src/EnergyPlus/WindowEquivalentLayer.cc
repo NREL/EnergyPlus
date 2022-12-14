@@ -212,8 +212,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
         if (BITF_TEST_NONE(BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->Group),
                            BITF(Material::MaterialGroup::GlassEquivalentLayer) | BITF(Material::MaterialGroup::ShadeEquivalentLayer) |
-                               BITF(Material::MaterialGroup::DrapeEquivalentLayer) |
-                               BITF(Material::MaterialGroup::ScreenEquivalentLayer) |
+                               BITF(Material::MaterialGroup::DrapeEquivalentLayer) | BITF(Material::MaterialGroup::ScreenEquivalentLayer) |
                                BITF(Material::MaterialGroup::BlindEquivalentLayer) | BITF(Material::MaterialGroup::GapEquivalentLayer)))
             continue;
 

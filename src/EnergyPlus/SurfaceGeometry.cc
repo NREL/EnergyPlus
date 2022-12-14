@@ -5782,8 +5782,9 @@ namespace SurfaceGeometry {
                         MatGap2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
                         MatSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
                         if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::BGBlind) {
-                            MatGapCalc = std::abs(state.dataMaterial->Material(MatGap)->Thickness - (state.dataMaterial->Material(MatGap1)->Thickness +
-                                                                                                    state.dataMaterial->Material(MatGap2)->Thickness));
+                            MatGapCalc =
+                                std::abs(state.dataMaterial->Material(MatGap)->Thickness -
+                                         (state.dataMaterial->Material(MatGap1)->Thickness + state.dataMaterial->Material(MatGap2)->Thickness));
                             if (MatGapCalc > 0.001) {
                                 ShowSevereError(state,
                                                 std::string{cRoutineName} + ": The gap width(s) for the unshaded window construction " +
@@ -5810,9 +5811,10 @@ namespace SurfaceGeometry {
                                 ErrorsFound = true;
                             }
                         } else { // Between-glass shade
-                            MatGapCalc = std::abs(state.dataMaterial->Material(MatGap)->Thickness -
-                                                  (state.dataMaterial->Material(MatGap1)->Thickness + state.dataMaterial->Material(MatGap2)->Thickness +
-                                                   state.dataMaterial->Material(MatSh)->Thickness));
+                            MatGapCalc =
+                                std::abs(state.dataMaterial->Material(MatGap)->Thickness -
+                                         (state.dataMaterial->Material(MatGap1)->Thickness + state.dataMaterial->Material(MatGap2)->Thickness +
+                                          state.dataMaterial->Material(MatSh)->Thickness));
                             if (MatGapCalc > 0.001) {
                                 ShowSevereError(state,
                                                 std::string{cRoutineName} + ": The gap width(s) for the unshaded window construction " +
@@ -9622,8 +9624,8 @@ namespace SurfaceGeometry {
             // Surface().shadedConstructionList
             windowShadingControl.getInputShadedConstruction = UtilityRoutines::FindItemInList(
                 state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
-            windowShadingControl.ShadingDevice =
-                UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(9), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+            windowShadingControl.ShadingDevice = UtilityRoutines::FindItemInPtrList(
+                state.dataIPShortCut->cAlphaArgs(9), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             windowShadingControl.Schedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
             windowShadingControl.SetPoint = state.dataIPShortCut->rNumericArgs(2);
             windowShadingControl.SetPoint2 = state.dataIPShortCut->rNumericArgs(3);
@@ -9807,18 +9809,17 @@ namespace SurfaceGeometry {
                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " + state.dataIPShortCut->cAlphaArgs(3) +
                                         "= InteriorShade or ExteriorShade but matching shading device is not a window shade");
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(8) + " in error=\"" + state.dataMaterial->Material(IShadingDevice)->Name +
-                                          "\".");
+                                      state.dataIPShortCut->cAlphaFieldNames(8) + " in error=\"" +
+                                          state.dataMaterial->Material(IShadingDevice)->Name + "\".");
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WinShadingType::ExtScreen) &&
-                    state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Screen) {
+                if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice)->Group != Material::MaterialGroup::Screen) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " + state.dataIPShortCut->cAlphaArgs(3) +
                                         "= ExteriorScreen but matching shading device is not a window screen");
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(8) + " in error=\"" + state.dataMaterial->Material(IShadingDevice)->Name +
-                                          "\".");
+                                      state.dataIPShortCut->cAlphaFieldNames(8) + " in error=\"" +
+                                          state.dataMaterial->Material(IShadingDevice)->Name + "\".");
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
@@ -9827,8 +9828,8 @@ namespace SurfaceGeometry {
                                     cCurrentModuleObject + "=\"" + windowShadingControl.Name + "\" has " + state.dataIPShortCut->cAlphaArgs(3) +
                                         "= InteriorBlind or ExteriorBlind but matching shading device is not a window blind");
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(8) + " in error=\"" + state.dataMaterial->Material(IShadingDevice)->Name +
-                                          "\".");
+                                      state.dataIPShortCut->cAlphaFieldNames(8) + " in error=\"" +
+                                          state.dataMaterial->Material(IShadingDevice)->Name + "\".");
                     ErrorsFound = true;
                 }
                 if (ShTyp == WinShadingType::BGShade || ShTyp == WinShadingType::BGBlind) {
@@ -10159,8 +10160,8 @@ namespace SurfaceGeometry {
             ++StormWinNum;
             state.dataSurface->StormWindow(StormWinNum).BaseWindowNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
-            state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum =
-                UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+            state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum = UtilityRoutines::FindItemInPtrList(
+                state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             state.dataSurface->StormWindow(StormWinNum).StormWinDistance = state.dataIPShortCut->rNumericArgs(1);
             state.dataSurface->StormWindow(StormWinNum).MonthOn = state.dataIPShortCut->rNumericArgs(2);
             state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn = state.dataIPShortCut->rNumericArgs(3);
@@ -11592,8 +11593,8 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             SurfNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
-            MaterNum =
-                UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+            MaterNum = UtilityRoutines::FindItemInPtrList(
+                state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             InsulationType insulationType =
@@ -11679,16 +11680,14 @@ namespace SurfaceGeometry {
                                                       "\"Outside\", was already assigned Material=\"" +
                                                           state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name +
                                                           "\".");
-                                    ShowContinueError(state,
-                                                      "attempting to assign Material=\"" + thisMaterial->Name + "\".");
+                                    ShowContinueError(state, "attempting to assign Material=\"" + thisMaterial->Name + "\".");
                                     ErrorsFound = true;
                                 }
                                 state.dataSurface->SurfMaterialMovInsulExt(SurfNum) = MaterNum;
                                 state.dataSurface->SurfSchedMovInsulExt(SurfNum) = SchNum;
                                 state.dataSurface->AnyMovableInsulation = true;
                                 if (thisMaterial->Resistance <= 0.0) {
-                                    if (thisMaterial->Conductivity <= 0.0 ||
-                                        thisMaterial->Thickness <= 0.0) {
+                                    if (thisMaterial->Conductivity <= 0.0 || thisMaterial->Thickness <= 0.0) {
                                         ShowSevereError(state,
                                                         cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                             state.dataIPShortCut->cAlphaArgs(2) + "\", invalid material.");
@@ -11699,8 +11698,7 @@ namespace SurfaceGeometry {
                                                                  thisMaterial->Resistance));
                                         ErrorsFound = true;
                                     } else if (thisMaterial->Conductivity > 0.0) {
-                                        thisMaterial->Resistance =
-                                            thisMaterial->Thickness / thisMaterial->Conductivity;
+                                        thisMaterial->Resistance = thisMaterial->Thickness / thisMaterial->Conductivity;
                                     }
                                 }
                                 if (thisMaterial->Conductivity <= 0.0) {
@@ -11726,16 +11724,14 @@ namespace SurfaceGeometry {
                                                       "\"Inside\", was already assigned Material=\"" +
                                                           state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum))->Name +
                                                           "\".");
-                                    ShowContinueError(state,
-                                                      "attempting to assign Material=\"" + thisMaterial->Name + "\".");
+                                    ShowContinueError(state, "attempting to assign Material=\"" + thisMaterial->Name + "\".");
                                     ErrorsFound = true;
                                 }
                                 state.dataSurface->SurfMaterialMovInsulInt(SurfNum) = MaterNum;
                                 state.dataSurface->SurfSchedMovInsulInt(SurfNum) = SchNum;
                                 state.dataSurface->AnyMovableInsulation = true;
                                 if (thisMaterial->Resistance <= 0.0) {
-                                    if (thisMaterial->Conductivity <= 0.0 ||
-                                        thisMaterial->Thickness <= 0.0) {
+                                    if (thisMaterial->Conductivity <= 0.0 || thisMaterial->Thickness <= 0.0) {
                                         ShowSevereError(state,
                                                         cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                             state.dataIPShortCut->cAlphaArgs(2) + "\", invalid material.");
@@ -11746,8 +11742,7 @@ namespace SurfaceGeometry {
                                                                  thisMaterial->Resistance));
                                         ErrorsFound = true;
                                     } else if (thisMaterial->Conductivity > 0.0) {
-                                        thisMaterial->Resistance =
-                                            thisMaterial->Thickness / thisMaterial->Conductivity;
+                                        thisMaterial->Resistance = thisMaterial->Thickness / thisMaterial->Conductivity;
                                     }
                                 }
                                 break;
@@ -15430,7 +15425,7 @@ namespace SurfaceGeometry {
             auto &revConstLayer(state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
             auto *thisMatLay(state.dataMaterial->Material(thisConstLayer));
             auto *revMatLay(state.dataMaterial->Material(revConstLayer));
-            if ((thisConstLayer != revConstLayer) ||                                 // Not pointing to the same layer
+            if ((thisConstLayer != revConstLayer) ||                           // Not pointing to the same layer
                 (thisMatLay->Group == Material::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
                 (revMatLay->Group == Material::MaterialGroup::WindowGlass) ||  // to have certain properties flipped from front to back
                 (thisMatLay->Group == Material::MaterialGroup::GlassEquivalentLayer) ||
@@ -15438,8 +15433,7 @@ namespace SurfaceGeometry {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
                 Real64 constexpr SmallDiff = 0.0001;
-                if ((thisMatLay->Group == Material::MaterialGroup::WindowGlass) &&
-                    (revMatLay->Group == Material::MaterialGroup::WindowGlass)) {
+                if ((thisMatLay->Group == Material::MaterialGroup::WindowGlass) && (revMatLay->Group == Material::MaterialGroup::WindowGlass)) {
                     // Both layers are window glass, so need to check to see if the properties are reversed
                     if ((abs(thisMatLay->Thickness - revMatLay->Thickness) > SmallDiff) ||
                         (abs(thisMatLay->ReflectSolBeamBack - revMatLay->ReflectSolBeamFront) > SmallDiff) ||

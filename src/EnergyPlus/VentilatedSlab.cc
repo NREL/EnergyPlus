@@ -436,11 +436,8 @@ namespace VentilatedSlab {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid surface=\"" +
                                             state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Name + "\".");
-                        ShowContinueError(
-                            state,
-                            "Surface Construction does not have a source/sink, Construction name= \"" +
-                                thisConstruct.Name +
-                                "\".");
+                        ShowContinueError(state,
+                                          "Surface Construction does not have a source/sink, Construction name= \"" + thisConstruct.Name + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -466,11 +463,8 @@ namespace VentilatedSlab {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + ventSlab.Name + "\" invalid surface=\"" +
                                             state.dataSurface->Surface(ventSlab.SurfacePtr(SurfNum)).Name + "\".");
-                        ShowContinueError(
-                            state,
-                            "Surface Construction does not have a source/sink, Construction name= \"" +
-                                thisConstruct.Name +
-                                "\".");
+                        ShowContinueError(state,
+                                          "Surface Construction does not have a source/sink, Construction name= \"" + thisConstruct.Name + "\".");
                         ErrorsFound = true;
                     }
                 }

@@ -86,7 +86,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     state->dataHeatBalSurf->SurfMovInsulExtPresent(1) = true;
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
-    Material::MaterialProperties* mat = new Material::MaterialProperties;
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
     state->dataMaterial->Material.push_back(mat);
     state->dataMaterial->Material(1)->Resistance = 1.25;
     state->dataMaterial->Material(1)->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
@@ -136,7 +136,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
-    Material::MaterialProperties* mat = new Material::MaterialProperties;
+    Material::MaterialProperties *mat = new Material::MaterialProperties;
     state->dataMaterial->Material.push_back(mat);
     state->dataMaterial->Material(1)->Resistance = 1.25;
     state->dataMaterial->Material(1)->Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
@@ -306,9 +306,8 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // check movable insulation material
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001"); // base surface name
     EXPECT_EQ(state->dataSurface->SurfMaterialMovInsulExt(1), 4);                       // index to movable insulation material
-    EXPECT_EQ(state->dataMaterial->Material(4)->Name, "SIMPLEGLAZINGSYSTEM");            // name of movable insulation material
-    EXPECT_TRUE(
-        compare_enums(state->dataMaterial->Material(4)->Group, Material::MaterialGroup::WindowSimpleGlazing)); // invalid material group type
+    EXPECT_EQ(state->dataMaterial->Material(4)->Name, "SIMPLEGLAZINGSYSTEM");           // name of movable insulation material
+    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(4)->Group, Material::MaterialGroup::WindowSimpleGlazing)); // invalid material group type
     EXPECT_TRUE(ErrorsFound); // error found due to invalid material
 }
 } // namespace EnergyPlus

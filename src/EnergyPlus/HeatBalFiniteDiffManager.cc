@@ -646,13 +646,12 @@ namespace HeatBalFiniteDiffManager {
                     thisMaterial->SpecHeat = 0.0001;
                     thisMaterial->Density = 1.0;
                     thisMaterial->Thickness = 0.1; //  arbitrary thickness for R layer
-                    thisMaterial->Conductivity =
-                        thisMaterial->Thickness / thisMaterial->Resistance;
+                    thisMaterial->Conductivity = thisMaterial->Thickness / thisMaterial->Resistance;
                     kt = thisMaterial->Conductivity;
                     thisConstructFD.Thickness(Layer) = thisMaterial->Thickness;
 
                     SigmaR(ConstrNum) += thisMaterial->Resistance; // add resistance of R layer
-                    SigmaC(ConstrNum) += 0.0;                                                   //  no capacitance for R layer
+                    SigmaC(ConstrNum) += 0.0;                      //  no capacitance for R layer
 
                     Alpha = kt / (thisMaterial->Density * thisMaterial->SpecHeat);
 
@@ -669,13 +668,12 @@ namespace HeatBalFiniteDiffManager {
                     thisMaterial->SpecHeat = 0.0001;
                     thisMaterial->Density = 1.0;
                     thisMaterial->Thickness = 0.1; //  arbitrary thickness for R layer
-                    thisMaterial->Conductivity =
-                        thisMaterial->Thickness / thisMaterial->Resistance;
+                    thisMaterial->Conductivity = thisMaterial->Thickness / thisMaterial->Resistance;
                     kt = thisMaterial->Conductivity;
                     thisConstructFD.Thickness(Layer) = thisMaterial->Thickness;
 
                     SigmaR(ConstrNum) += thisMaterial->Resistance; // add resistance of R layer
-                    SigmaC(ConstrNum) += 0.0;                                                   //  no capacitance for R layer
+                    SigmaC(ConstrNum) += 0.0;                      //  no capacitance for R layer
 
                     Alpha = kt / (thisMaterial->Density * thisMaterial->SpecHeat);
                     mAlpha = 0.0;
@@ -701,12 +699,10 @@ namespace HeatBalFiniteDiffManager {
                     Por = thisMaterial->Porosity;
                     Cp = thisMaterial->SpecHeat;
                     // Need Resistance for reg layer
-                    thisMaterial->Resistance =
-                        thisMaterial->Thickness / thisMaterial->Conductivity;
+                    thisMaterial->Resistance = thisMaterial->Thickness / thisMaterial->Conductivity;
                     Dv = thisMaterial->VaporDiffus;
                     SigmaR(ConstrNum) += thisMaterial->Resistance; // add resistance
-                    SigmaC(ConstrNum) += thisMaterial->Density * thisMaterial->SpecHeat *
-                                         thisMaterial->Thickness;
+                    SigmaC(ConstrNum) += thisMaterial->Density * thisMaterial->SpecHeat * thisMaterial->Thickness;
                     Alpha = kt / (RhoS * Cp);
                     mAlpha = 0.0;
 
@@ -727,9 +723,8 @@ namespace HeatBalFiniteDiffManager {
                             ShowContinueError(
                                 state, format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
                             if (thisMaterial->Thickness < ThinMaterialLayerThreshold) {
-                                ShowContinueError(state,
-                                                  format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
-                                                         thisMaterial->Thickness));
+                                ShowContinueError(
+                                    state, format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", thisMaterial->Thickness));
                                 ShowContinueError(
                                     state,
                                     format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThinMaterialLayerThreshold));
@@ -748,8 +743,7 @@ namespace HeatBalFiniteDiffManager {
                 Ipts1 = int(thisMaterial->Thickness / dxn);
                 //  set high conductivity layers to a single full size node thickness. (two half nodes)
                 if (Ipts1 <= 1) Ipts1 = 1;
-                if (thisMaterial->ROnly ||
-                    thisMaterial->Group == Material::MaterialGroup::Air) {
+                if (thisMaterial->ROnly || thisMaterial->Group == Material::MaterialGroup::Air) {
 
                     Ipts1 = 1; //  single full node in R layers- surfaces of adjacent material or inside/outside layer
                 }
@@ -762,9 +756,9 @@ namespace HeatBalFiniteDiffManager {
                 thisConstructFD.MoistStability(Layer) = StabilityMoist;
                 thisConstructFD.DelX(Layer) = dxn;
 
-                TotNodes += Ipts1;                                  //  number of full size nodes
+                TotNodes += Ipts1;                           //  number of full size nodes
                 thisConstructFD.NodeNumPoint(Layer) = Ipts1; //  number of full size nodes
-            }                                                       //  end of layer loop.
+            }                                                //  end of layer loop.
 
             thisConstructFD.TotNodes = TotNodes;
             thisConstructFD.DeltaTime = Delt;
@@ -778,7 +772,7 @@ namespace HeatBalFiniteDiffManager {
             if (thisConstructFD.TotNodes > 0) {
                 thisConstructFD.NodeXlocation.allocate(thisConstructFD.TotNodes + 1);
                 thisConstructFD.NodeXlocation = 0.0; // init them all
-                Ipts1 = 0;                                  // init counter
+                Ipts1 = 0;                           // init counter
                 for (Layer = 1; Layer <= thisConstruct.TotLayers; ++Layer) {
                     OutwardMatLayerNum = Layer - 1;
                     for (LayerNode = 1; LayerNode <= thisConstructFD.NodeNumPoint(Layer); ++LayerNode) {
@@ -794,8 +788,7 @@ namespace HeatBalFiniteDiffManager {
                             }
                         } else {
                             // later nodes are Delx away from previous
-                            thisConstructFD.NodeXlocation(Ipts1) =
-                                thisConstructFD.NodeXlocation(Ipts1 - 1) + thisConstructFD.DelX(Layer);
+                            thisConstructFD.NodeXlocation(Ipts1) = thisConstructFD.NodeXlocation(Ipts1 - 1) + thisConstructFD.DelX(Layer);
                         }
                     }
                 }
@@ -1632,7 +1625,7 @@ namespace HeatBalFiniteDiffManager {
                         // Use average temp of surface and first node for k
                         kt = terpld(matFD_TempCond, (TDT_i + TDT_p) / 2.0, 1, 2); // 1: Temperature, 2: Thermal conductivity
                     } else {
-                        kt = mat->Conductivity;       // 20C base conductivity
+                        kt = mat->Conductivity;      // 20C base conductivity
                         Real64 const kt1(matFD.tk1); // linear coefficient (normally zero)
                         if (kt1 != 0.0) kt = +kt1 * ((TDT_i + TDT_p) / 2.0 - 20.0);
                     }
@@ -1640,7 +1633,7 @@ namespace HeatBalFiniteDiffManager {
                     // Check for phase change material
                     Real64 const TD_i(TD(i));
                     Real64 const Cpo(mat->SpecHeat); // Specific heat from idf
-                    Real64 Cp(Cpo);                 // Specific heat modified if PCM, otherwise equal to Cpo // Will be changed if PCM
+                    Real64 Cp(Cpo);                  // Specific heat modified if PCM, otherwise equal to Cpo // Will be changed if PCM
                     auto const &matFD_TempEnth(matFD.TempEnth);
                     assert(matFD_TempEnth.u2() >= 3);
                     Real64 const lTE(matFD_TempEnth.index(2, 1));
@@ -1802,7 +1795,7 @@ namespace HeatBalFiniteDiffManager {
             ktA2 = terpld(matFD.TempCond, TDT_mi, 1, 2);                                      // 1: Temperature, 2: Thermal conductivity
         } else {
             ktA1 = ktA2 = mat->Conductivity; // 20C base conductivity
-            Real64 const kt1(matFD.tk1);    // temperature coefficient for simple temp dep k. // linear coefficient (normally zero)
+            Real64 const kt1(matFD.tk1);     // temperature coefficient for simple temp dep k. // linear coefficient (normally zero)
             if (kt1 != 0.0) {
                 ktA1 += kt1 * (TDT_ip - 20.0);
                 ktA2 += kt1 * (TDT_mi - 20.0);
@@ -1810,7 +1803,7 @@ namespace HeatBalFiniteDiffManager {
         }
 
         Real64 const Cpo(mat->SpecHeat); // Const Cp from input
-        Real64 Cp(Cpo);                 // Cp used // Will be changed if PCM
+        Real64 Cp(Cpo);                  // Cp used // Will be changed if PCM
         Real64 kt(0.0);
         auto const &matFD_TempEnth(matFD.TempEnth);
         assert(matFD_TempEnth.u2() >= 3);
@@ -1950,7 +1943,7 @@ namespace HeatBalFiniteDiffManager {
                     if (matFD_TempCond[lTC] + matFD_TempCond[lTC + 1] + matFD_TempCond[lTC + 2] >= 0.0) { // Multiple Linear Segment Function
                         kt1 = terpld(matFD.TempCond, (TDT_i + TDT_m) / 2.0, 1, 2);                        // 1: Temperature, 2: Thermal conductivity
                     } else {
-                        kt1 = mat->Conductivity;       // 20C base conductivity
+                        kt1 = mat->Conductivity;      // 20C base conductivity
                         Real64 const kt11(matFD.tk1); // temperature coefficient for simple temp dep k. // linear coefficient (normally zero)
                         if (kt11 != 0.0) kt1 += kt11 * ((TDT_i + TDT_m) / 2.0 - 20.0);
                     }
@@ -1964,7 +1957,7 @@ namespace HeatBalFiniteDiffManager {
                     if (matFD2_TempCond[lTC2] + matFD2_TempCond[lTC2 + 1] + matFD2_TempCond[lTC2 + 2] >= 0.0) { // Multiple Linear Segment Function
                         kt2 = terpld(matFD2_TempCond, (TDT_i + TDT_p) / 2.0, 1, 2); // 1: Temperature, 2: Thermal conductivity
                     } else {
-                        kt2 = mat2->Conductivity;       // 20C base conductivity
+                        kt2 = mat2->Conductivity;      // 20C base conductivity
                         Real64 const kt21(matFD2.tk1); // temperature coefficient for simple temp dep k. // linear coefficient (normally zero)
                         if (kt21 != 0.0) kt2 += kt21 * ((TDT_i + TDT_p) / 2.0 - 20.0);
                     }
@@ -1972,7 +1965,7 @@ namespace HeatBalFiniteDiffManager {
 
                 Real64 RhoS1(mat->Density);
                 Real64 const Cpo1(mat->SpecHeat); // constant Cp from input file
-                Real64 Cp1(Cpo1);                // Will be reset if PCM
+                Real64 Cp1(Cpo1);                 // Will be reset if PCM
                 Real64 const Delx1(state.dataHeatBalFiniteDiffMgr->ConstructFD(ConstrNum).DelX(Lay));
 
                 Real64 RhoS2(mat2->Density);
@@ -2349,7 +2342,7 @@ namespace HeatBalFiniteDiffManager {
                     // Use average of surface and first node temp for determining k
                     kt = terpld(matFD_TempCond, (TDT_i + TDT_m) / 2.0, 1, 2); // 1: Temperature, 2: Thermal conductivity
                 } else {
-                    kt = mat->Conductivity;       // 20C base conductivity
+                    kt = mat->Conductivity;      // 20C base conductivity
                     Real64 const kt1(matFD.tk1); // linear coefficient (normally zero)
                     if (kt1 != 0.0) kt = +kt1 * ((TDT_i + TDT_m) / 2.0 - 20.0);
                 }

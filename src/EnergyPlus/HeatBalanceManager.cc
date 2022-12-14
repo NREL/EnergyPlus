@@ -1467,10 +1467,10 @@ namespace HeatBalanceManager {
         int AirMat;                        // Air space materials in opaque constructions
         int IRTMat;                        // Infrared Transmitting Materials -- R only property definition
 
-        int EcoRoofMat; // Materials for ecoRoof
-        int NumGas;     // Index for loop over gap gases in a mixture
-        int NumGases;   // Number of gasses in a mixture
-        Material::GasTypeEnum GasType = Material::GasTypeEnum::Invalid;    // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
+        int EcoRoofMat;                                                 // Materials for ecoRoof
+        int NumGas;                                                     // Index for loop over gap gases in a mixture
+        int NumGases;                                                   // Number of gasses in a mixture
+        Material::GasTypeEnum GasType = Material::GasTypeEnum::Invalid; // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
         int Loop;
         int ICoeff;            // Gas property coefficient index
         std::string TypeOfGas; // Type of window gas fill (Air, Argon, Krypton, &
@@ -1633,8 +1633,7 @@ namespace HeatBalanceManager {
             thisMaterial->AbsorpSolar = 0.7;
             thisMaterial->AbsorpThermal = 0.9;
             thisMaterial->AbsorpVisible = 0.7;
-            state.dataHeatBal->NominalR(MaterNum) =
-                thisMaterial->Thickness / thisMaterial->Conductivity;
+            state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
             thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
 
             ++RegMat;
@@ -1862,26 +1861,21 @@ namespace HeatBalanceManager {
             thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
 
             if (thisMaterial->Conductivity > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) =
-                    thisMaterial->Thickness / thisMaterial->Conductivity;
+                state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
                 thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
             } else {
                 ErrorsFound = true;
-                ShowSevereError(state,
-                                "Window glass material " + thisMaterial->Name +
-                                    " has Conductivity = 0.0, must be >0.0, default = .9");
+                ShowSevereError(state, "Window glass material " + thisMaterial->Name + " has Conductivity = 0.0, must be >0.0, default = .9");
             }
 
             thisMaterial->GlassSpectralDataPtr = 0;
             if (state.dataHeatBal->TotSpectralData > 0 && !state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                thisMaterial->GlassSpectralDataPtr =
-                    UtilityRoutines::FindItemInList(MaterialNames(3), state.dataHeatBal->SpectralData);
+                thisMaterial->GlassSpectralDataPtr = UtilityRoutines::FindItemInList(MaterialNames(3), state.dataHeatBal->SpectralData);
             }
             if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) thisMaterial->GlassSpectralDataPtr = 0;
             // No need for spectral data for BSDF either
             if (UtilityRoutines::SameString(MaterialNames(2), "BSDF")) thisMaterial->GlassSpectralDataPtr = 0;
-            if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle"))
-                thisMaterial->GlassSpectralAndAngle = true;
+            if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) thisMaterial->GlassSpectralAndAngle = true;
 
             if (thisMaterial->GlassSpectralDataPtr == 0 && UtilityRoutines::SameString(MaterialNames(2), "Spectral")) {
                 ErrorsFound = true;
@@ -1901,9 +1895,7 @@ namespace HeatBalanceManager {
             if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage") && !UtilityRoutines::SameString(MaterialNames(2), "Spectral") &&
                 !UtilityRoutines::SameString(MaterialNames(2), "BSDF") && !UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) {
                 ErrorsFound = true;
-                ShowSevereError(state,
-                                state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterial->Name +
-                                    "\", invalid specification.");
+                ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterial->Name + "\", invalid specification.");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cAlphaFieldNames(2) +
                                       " must be SpectralAverage, Spectral, BSDF or SpectralAndAngle, value=" + MaterialNames(2));
@@ -2067,19 +2059,14 @@ namespace HeatBalanceManager {
                                               " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
                         ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                                    thisMaterial->GlassSpecAngTransDataPtr, // Curve index
-                                                                    {2},                                         // Valid dimensions
-                                                                    RoutineName,                                 // Routine name
-                                                                    state.dataHeatBalMgr->CurrentModuleObject,   // Object Type
-                                                                    thisMaterial->Name, // Object Name
-                                                                    state.dataIPShortCut->cAlphaFieldNames(5));  // Field Name
+                                                                    thisMaterial->GlassSpecAngTransDataPtr,     // Curve index
+                                                                    {2},                                        // Valid dimensions
+                                                                    RoutineName,                                // Routine name
+                                                                    state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
+                                                                    thisMaterial->Name,                         // Object Name
+                                                                    state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
 
-                        GetCurveMinMaxValues(state,
-                                             thisMaterial->GlassSpecAngTransDataPtr,
-                                             minAngValue,
-                                             maxAngValue,
-                                             minLamValue,
-                                             maxLamValue);
+                        GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(state,
@@ -2140,19 +2127,14 @@ namespace HeatBalanceManager {
                                               " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
                         ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                                    thisMaterial->GlassSpecAngFRefleDataPtr, // Curve index
-                                                                    {2},                                         // Valid dimensions
-                                                                    RoutineName,                                 // Routine name
-                                                                    state.dataHeatBalMgr->CurrentModuleObject,   // Object Type
-                                                                    thisMaterial->Name, // Object Name
-                                                                    state.dataIPShortCut->cAlphaFieldNames(6));  // Field Name
+                                                                    thisMaterial->GlassSpecAngFRefleDataPtr,    // Curve index
+                                                                    {2},                                        // Valid dimensions
+                                                                    RoutineName,                                // Routine name
+                                                                    state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
+                                                                    thisMaterial->Name,                         // Object Name
+                                                                    state.dataIPShortCut->cAlphaFieldNames(6)); // Field Name
 
-                        GetCurveMinMaxValues(state,
-                                             thisMaterial->GlassSpecAngFRefleDataPtr,
-                                             minAngValue,
-                                             maxAngValue,
-                                             minLamValue,
-                                             maxLamValue);
+                        GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(state,
@@ -2213,19 +2195,14 @@ namespace HeatBalanceManager {
                                               " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
                         ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                                    thisMaterial->GlassSpecAngBRefleDataPtr, // Curve index
-                                                                    {2},                                         // Valid dimensions
-                                                                    RoutineName,                                 // Routine name
-                                                                    state.dataHeatBalMgr->CurrentModuleObject,   // Object Type
-                                                                    thisMaterial->Name, // Object Name
-                                                                    state.dataIPShortCut->cAlphaFieldNames(7));  // Field Name
+                                                                    thisMaterial->GlassSpecAngBRefleDataPtr,    // Curve index
+                                                                    {2},                                        // Valid dimensions
+                                                                    RoutineName,                                // Routine name
+                                                                    state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
+                                                                    thisMaterial->Name,                         // Object Name
+                                                                    state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
 
-                        GetCurveMinMaxValues(state,
-                                             thisMaterial->GlassSpecAngBRefleDataPtr,
-                                             minAngValue,
-                                             maxAngValue,
-                                             minLamValue,
-                                             maxLamValue);
+                        GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(state,
@@ -2322,18 +2299,14 @@ namespace HeatBalanceManager {
             ReflectivityVis = pow_2((MaterialProps(4) - 1.0) / (MaterialProps(4) + 1.0));
             TransmittivitySol = std::exp(-MaterialProps(3) * MaterialProps(1));
             TransmittivityVis = std::exp(-MaterialProps(5) * MaterialProps(1));
-            thisMaterial->Trans =
-                TransmittivitySol * pow_2(1.0 - ReflectivitySol) / (1.0 - pow_2(ReflectivitySol * TransmittivitySol));
-            thisMaterial->ReflectSolBeamFront =
-                ReflectivitySol *
-                (1.0 + pow_2(1.0 - ReflectivitySol) * pow_2(TransmittivitySol) / (1.0 - pow_2(ReflectivitySol * TransmittivitySol)));
+            thisMaterial->Trans = TransmittivitySol * pow_2(1.0 - ReflectivitySol) / (1.0 - pow_2(ReflectivitySol * TransmittivitySol));
+            thisMaterial->ReflectSolBeamFront = ReflectivitySol * (1.0 + pow_2(1.0 - ReflectivitySol) * pow_2(TransmittivitySol) /
+                                                                             (1.0 - pow_2(ReflectivitySol * TransmittivitySol)));
             thisMaterial->ReflectSolBeamBack = thisMaterial->ReflectSolBeamFront;
-            thisMaterial->TransVis =
-                TransmittivityVis * pow_2(1.0 - ReflectivityVis) / (1.0 - pow_2(ReflectivityVis * TransmittivityVis));
+            thisMaterial->TransVis = TransmittivityVis * pow_2(1.0 - ReflectivityVis) / (1.0 - pow_2(ReflectivityVis * TransmittivityVis));
 
-            thisMaterial->ReflectVisBeamFront =
-                ReflectivityVis *
-                (1.0 + pow_2(1.0 - ReflectivityVis) * pow_2(TransmittivityVis) / (1.0 - pow_2(ReflectivityVis * TransmittivityVis)));
+            thisMaterial->ReflectVisBeamFront = ReflectivityVis * (1.0 + pow_2(1.0 - ReflectivityVis) * pow_2(TransmittivityVis) /
+                                                                             (1.0 - pow_2(ReflectivityVis * TransmittivityVis)));
             thisMaterial->ReflectVisBeamBack = thisMaterial->ReflectSolBeamFront;
             thisMaterial->TransThermal = MaterialProps(6);
             thisMaterial->AbsorpThermalFront = MaterialProps(7);
@@ -2344,8 +2317,7 @@ namespace HeatBalanceManager {
             thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
 
             if (thisMaterial->Conductivity > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) =
-                    thisMaterial->Thickness / thisMaterial->Conductivity;
+                state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
                 thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
             }
 
@@ -2433,8 +2405,7 @@ namespace HeatBalanceManager {
             thisMaterial->EmissThermalFront = MaterialProps(24);
             thisMaterial->EmissThermalBack = MaterialProps(25);
             thisMaterial->Resistance = MaterialProps(26);
-            if (thisMaterial->Resistance <= 0.0)
-                thisMaterial->Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
+            if (thisMaterial->Resistance <= 0.0) thisMaterial->Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
             // Assumes thermal emissivity is the same as thermal absorptance
             thisMaterial->AbsorpThermalFront = thisMaterial->EmissThermalFront;
             thisMaterial->AbsorpThermalBack = thisMaterial->EmissThermalBack;
@@ -2456,9 +2427,7 @@ namespace HeatBalanceManager {
 
             if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) {
                 ErrorsFound = true;
-                ShowSevereError(state,
-                                state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterial->Name +
-                                    "\", invalid specification.");
+                ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterial->Name + "\", invalid specification.");
                 ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(2) + " must be SpectralAverage, value=" + MaterialNames(2));
             }
 
@@ -2569,8 +2538,7 @@ namespace HeatBalanceManager {
 
             // Nominal resistance of gap at room temperature
             if (!ErrorsFound) {
-                DenomRGas = (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 +
-                             thisMaterial->GasCon(3, 1) * 90000.0);
+                DenomRGas = (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
                 if (DenomRGas > 0.0) {
                     state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / DenomRGas;
                 } else {
@@ -2623,7 +2591,8 @@ namespace HeatBalanceManager {
             thisMaterial->NumberOfGasesInMixture = 1;
             TypeOfGas = MaterialNames(2);
             thisMaterial->GasName = TypeOfGas;
-            thisMaterial->GasType(1) = static_cast<Material::GasTypeEnum>(getEnumerationValue(Material::GasTypeEnumUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
+            thisMaterial->GasType(1) =
+                static_cast<Material::GasTypeEnum>(getEnumerationValue(Material::GasTypeEnumUC, UtilityRoutines::MakeUPPERCase(TypeOfGas)));
 
             if (thisMaterial->GasType(1) == Material::GasTypeEnum::Invalid) {
                 ErrorsFound = true;
@@ -2691,8 +2660,7 @@ namespace HeatBalanceManager {
 
             // Nominal resistance of gap at room temperature
             if (!ErrorsFound) {
-                DenomRGas = (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 +
-                             thisMaterial->GasCon(3, 1) * 90000.0);
+                DenomRGas = (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
                 if (DenomRGas > 0.0) {
                     state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / DenomRGas;
                 } else {
@@ -2783,9 +2751,7 @@ namespace HeatBalanceManager {
 
             // Nominal resistance of gap at room temperature (based on first gas in mixture)
             state.dataHeatBal->NominalR(MaterNum) =
-                thisMaterial->Thickness /
-                (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 +
-                 thisMaterial->GasCon(3, 1) * 90000.0);
+                thisMaterial->Thickness / (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
         }
 
         // Window Shade Materials
@@ -2833,8 +2799,7 @@ namespace HeatBalanceManager {
             thisMaterial->TransThermal = MaterialProps(6);
             thisMaterial->Thickness = MaterialProps(7);
             thisMaterial->Conductivity = MaterialProps(8);
-            thisMaterial->AbsorpSolar =
-                max(0.0, 1.0 - thisMaterial->Trans - thisMaterial->ReflectShade);
+            thisMaterial->AbsorpSolar = max(0.0, 1.0 - thisMaterial->Trans - thisMaterial->ReflectShade);
             thisMaterial->AbsorpSolarInput = thisMaterial->AbsorpSolar;
             thisMaterial->WinShadeToGlassDist = MaterialProps(9);
             thisMaterial->WinShadeTopOpeningMult = MaterialProps(10);
@@ -2845,8 +2810,7 @@ namespace HeatBalanceManager {
             thisMaterial->ROnly = true;
 
             if (thisMaterial->Conductivity > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) =
-                    thisMaterial->Thickness / thisMaterial->Conductivity;
+                state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
             } else {
                 state.dataHeatBal->NominalR(MaterNum) = 1.0;
             }
@@ -3111,8 +3075,7 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
-                                  state.dataIPShortCut->cNumericFieldNames(2) + " must be >= 0 and <= 1 for material " +
-                                      thisMaterial->Name + '.');
+                                  state.dataIPShortCut->cNumericFieldNames(2) + " must be >= 0 and <= 1 for material " + thisMaterial->Name + '.');
             }
             thisMaterial->AbsorpThermal = MaterialProps(3);
             thisMaterial->AbsorpThermalInput = MaterialProps(3);
@@ -3154,48 +3117,42 @@ namespace HeatBalanceManager {
             thisMaterial->ReflectShadeVis *= (1.0 - thisMaterial->Trans);
 
             thisMaterial->WinShadeToGlassDist = MaterialProps(7);
-            if (thisMaterial->WinShadeToGlassDist < 0.001 ||
-                thisMaterial->WinShadeToGlassDist > 1.0) {
+            if (thisMaterial->WinShadeToGlassDist < 0.001 || thisMaterial->WinShadeToGlassDist > 1.0) {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(
                     state, state.dataIPShortCut->cNumericFieldNames(7) + " must be greater than or equal to 0.001 and less than or equal to 1.");
             }
 
             thisMaterial->WinShadeTopOpeningMult = MaterialProps(8);
-            if (thisMaterial->WinShadeTopOpeningMult < 0.0 ||
-                thisMaterial->WinShadeTopOpeningMult > 1.0) {
+            if (thisMaterial->WinShadeTopOpeningMult < 0.0 || thisMaterial->WinShadeTopOpeningMult > 1.0) {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cNumericFieldNames(8) + " must be greater than or equal to 0 and less than or equal to 1.");
             }
 
             thisMaterial->WinShadeBottomOpeningMult = MaterialProps(9);
-            if (thisMaterial->WinShadeBottomOpeningMult < 0.0 ||
-                thisMaterial->WinShadeBottomOpeningMult > 1.0) {
+            if (thisMaterial->WinShadeBottomOpeningMult < 0.0 || thisMaterial->WinShadeBottomOpeningMult > 1.0) {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cNumericFieldNames(9) + " must be greater than or equal to 0 and less than or equal to 1.");
             }
 
             thisMaterial->WinShadeLeftOpeningMult = MaterialProps(10);
-            if (thisMaterial->WinShadeLeftOpeningMult < 0.0 ||
-                thisMaterial->WinShadeLeftOpeningMult > 1.0) {
+            if (thisMaterial->WinShadeLeftOpeningMult < 0.0 || thisMaterial->WinShadeLeftOpeningMult > 1.0) {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cNumericFieldNames(10) + " must be greater than or equal to 0 and less than or equal to 1.");
             }
 
             thisMaterial->WinShadeRightOpeningMult = MaterialProps(11);
-            if (thisMaterial->WinShadeRightOpeningMult < 0.0 ||
-                thisMaterial->WinShadeRightOpeningMult > 1.0) {
+            if (thisMaterial->WinShadeRightOpeningMult < 0.0 || thisMaterial->WinShadeRightOpeningMult > 1.0) {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cNumericFieldNames(11) + " must be greater than or equal to 0 and less than or equal to 1.");
             }
 
             thisMaterial->ScreenMapResolution = MaterialProps(12);
-            if (thisMaterial->ScreenMapResolution < 0 || thisMaterial->ScreenMapResolution > 5 ||
-                thisMaterial->ScreenMapResolution == 4) {
+            if (thisMaterial->ScreenMapResolution < 0 || thisMaterial->ScreenMapResolution > 5 || thisMaterial->ScreenMapResolution == 4) {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(12) + " must be 0, 1, 2, 3, or 5.");
                 ErrorsFound = true;
@@ -3209,19 +3166,15 @@ namespace HeatBalanceManager {
             thisMaterial->ROnly = true;
 
             //   Calculate absorptance accounting for the open area in the screen assembly (used only in CreateShadedWindowConstruction)
-            thisMaterial->AbsorpSolar =
-                max(0.0, 1.0 - thisMaterial->Trans - thisMaterial->ReflectShade);
+            thisMaterial->AbsorpSolar = max(0.0, 1.0 - thisMaterial->Trans - thisMaterial->ReflectShade);
             thisMaterial->AbsorpSolarInput = thisMaterial->AbsorpSolar;
-            thisMaterial->AbsorpVisible =
-                max(0.0, 1.0 - thisMaterial->TransVis - thisMaterial->ReflectShadeVis);
+            thisMaterial->AbsorpVisible = max(0.0, 1.0 - thisMaterial->TransVis - thisMaterial->ReflectShadeVis);
             thisMaterial->AbsorpVisibleInput = thisMaterial->AbsorpVisible;
             thisMaterial->AbsorpThermal *= (1.0 - thisMaterial->Trans);
             thisMaterial->AbsorpThermalInput = thisMaterial->AbsorpThermal;
 
             if (thisMaterial->Conductivity > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) = (1.0 - thisMaterial->Trans) *
-                                                        thisMaterial->Thickness /
-                                                        thisMaterial->Conductivity;
+                state.dataHeatBal->NominalR(MaterNum) = (1.0 - thisMaterial->Trans) * thisMaterial->Thickness / thisMaterial->Conductivity;
             } else {
                 state.dataHeatBal->NominalR(MaterNum) = 1.0;
                 ShowWarningError(
@@ -3316,8 +3269,7 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
-                                  state.dataIPShortCut->cNumericFieldNames(6) + " must be >= 0 and <= 1 for material " +
-                                      thisMaterial->Name + '.');
+                                  state.dataIPShortCut->cNumericFieldNames(6) + " must be >= 0 and <= 1 for material " + thisMaterial->Name + '.');
             }
 
             if (!state.dataIPShortCut->lNumericFieldBlanks(9)) {
@@ -3350,8 +3302,7 @@ namespace HeatBalanceManager {
                         state, state.dataIPShortCut->cNumericFieldNames(10) + " must be less than " + state.dataIPShortCut->cNumericFieldNames(9));
                 } else {
                     //  Calculate direct normal transmittance (open area fraction)
-                    Openness = pow_2(1.0 - thisMaterial->ScreenWireDiameter /
-                                               thisMaterial->ScreenWireSpacing);
+                    Openness = pow_2(1.0 - thisMaterial->ScreenWireDiameter / thisMaterial->ScreenWireSpacing);
                     if ((thisMaterial->TausFrontBeamBeam - Openness) / Openness > 0.01) {
                         ShowSevereError(state,
                                         state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", screen openness specified.");
@@ -3362,13 +3313,10 @@ namespace HeatBalanceManager {
                         ShowContinueError(state, " using the formula (1-diameter/spacing)**2");
                         ShowContinueError(state, " ...the screen diameter is recalculated from the material openness specified ");
                         ShowContinueError(state, " ...and wire spacing using the formula = wire spacing * (1.0 - SQRT(Opennes))");
-                        thisMaterial->ScreenWireDiameter =
-                            thisMaterial->ScreenWireSpacing *
-                            (1.0 - std::sqrt(thisMaterial->TausFrontBeamBeam));
-                        ShowContinueError(state,
-                                          format(" ...Recalculated {}={:.4R} m",
-                                                 state.dataIPShortCut->cNumericFieldNames(10),
-                                                 thisMaterial->ScreenWireDiameter));
+                        thisMaterial->ScreenWireDiameter = thisMaterial->ScreenWireSpacing * (1.0 - std::sqrt(thisMaterial->TausFrontBeamBeam));
+                        ShowContinueError(
+                            state,
+                            format(" ...Recalculated {}={:.4R} m", state.dataIPShortCut->cNumericFieldNames(10), thisMaterial->ScreenWireDiameter));
                     }
                 }
             }
@@ -3800,15 +3748,13 @@ namespace HeatBalanceManager {
             }
             if (thisMaterial->SlatSeparation < 0.001) {
                 ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Seperation");
-                ShowContinueError(state,
-                                  format("{} [{:.2R}]. Slate spacing must be > 0.0",
-                                         state.dataIPShortCut->cNumericFieldNames(2),
-                                         thisMaterial->SlatSeparation));
+                ShowContinueError(
+                    state,
+                    format("{} [{:.2R}]. Slate spacing must be > 0.0", state.dataIPShortCut->cNumericFieldNames(2), thisMaterial->SlatSeparation));
                 ShowContinueError(state, "...Setting slate spacing to default value of 0.025 m and simulation continues.");
                 thisMaterial->SlatSeparation = 0.025;
             }
-            if (thisMaterial->SlatWidth < 0.001 ||
-                thisMaterial->SlatWidth >= 2.0 * thisMaterial->SlatSeparation) {
+            if (thisMaterial->SlatWidth < 0.001 || thisMaterial->SlatWidth >= 2.0 * thisMaterial->SlatSeparation) {
                 ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Width");
                 ShowContinueError(state,
                                   format("{} [{:.2R}]. Slat width range is 0 < Width <= 2*Spacing",
@@ -3817,8 +3763,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, "...Setting slate width equal to slate spacing and simulation continues.");
                 thisMaterial->SlatWidth = thisMaterial->SlatSeparation;
             }
-            if (thisMaterial->SlatCrown < 0.0 ||
-                thisMaterial->SlatCrown >= 0.5 * thisMaterial->SlatWidth) {
+            if (thisMaterial->SlatCrown < 0.0 || thisMaterial->SlatCrown >= 0.5 * thisMaterial->SlatWidth) {
                 ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Crown");
                 ShowContinueError(state,
                                   format("{} [{:.2R}]. Slat crwon range is 0 <= crown < 0.5*Width",
@@ -3941,8 +3886,7 @@ namespace HeatBalanceManager {
             thisMaterial->InitMoisture = MaterialProps(15);
 
             if (thisMaterial->Conductivity > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) =
-                    thisMaterial->Thickness / thisMaterial->Conductivity;
+                state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
                 thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
             } else {
                 ShowSevereError(
@@ -3956,10 +3900,8 @@ namespace HeatBalanceManager {
                 ShowContinueError(state,
                                   state.dataIPShortCut->cNumericFieldNames(15) + " is greater than " + state.dataIPShortCut->cNumericFieldNames(13) +
                                       ". It must be less or equal.");
-                ShowContinueError(
-                    state, format("{} = {:.3T}.", state.dataIPShortCut->cNumericFieldNames(13), thisMaterial->Porosity));
-                ShowContinueError(
-                    state, format("{} = {:.3T}.", state.dataIPShortCut->cNumericFieldNames(15), thisMaterial->InitMoisture));
+                ShowContinueError(state, format("{} = {:.3T}.", state.dataIPShortCut->cNumericFieldNames(13), thisMaterial->Porosity));
+                ShowContinueError(state, format("{} = {:.3T}.", state.dataIPShortCut->cNumericFieldNames(15), thisMaterial->InitMoisture));
                 ShowContinueError(state,
                                   format("{} is reset to the maximum (saturation) value = {:.3T}.",
                                          state.dataIPShortCut->cNumericFieldNames(15),
@@ -4118,8 +4060,7 @@ namespace HeatBalanceManager {
                 auto *thisMaterial = state.dataMaterial->Material(MaterNum);
                 switch (thisMaterial->Group) {
                 case Material::MaterialGroup::Air: {
-                    print(
-                        state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
+                    print(state.files.eio, Format_702, thisMaterial->Name, thisMaterial->Resistance);
                 } break;
                 default: {
                     print(state.files.eio,
@@ -4397,7 +4338,7 @@ namespace HeatBalanceManager {
         int TotWindow5Constructs; // Number of constructions from Window5 data file
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
-        bool EOFonW5File;                                  // True if EOF encountered reading Window5 data file
+        bool EOFonW5File;                           // True if EOF encountered reading Window5 data file
         Material::MaterialGroup MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
@@ -4502,14 +4443,11 @@ namespace HeatBalanceManager {
 
                 // Find the material in the list of materials
 
-                thisConstruct.LayerPoint(Layer) =
-                    UtilityRoutines::FindItemInPtrList(ConstructAlphas(Layer), state.dataMaterial->Material);
+                thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInPtrList(ConstructAlphas(Layer), state.dataMaterial->Material);
 
                 // count number of glass layers
                 if (thisConstruct.LayerPoint(Layer) > 0) {
-                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group ==
-                        Material::MaterialGroup::WindowGlass)
-                        ++iMatGlass;
+                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::WindowGlass) ++iMatGlass;
                     MaterialLayerGroup = state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group;
                     if ((MaterialLayerGroup == Material::MaterialGroup::GlassEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::ShadeEquivalentLayer) ||
@@ -4517,9 +4455,8 @@ namespace HeatBalanceManager {
                         (MaterialLayerGroup == Material::MaterialGroup::BlindEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::ScreenEquivalentLayer) ||
                         (MaterialLayerGroup == Material::MaterialGroup::GapEquivalentLayer)) {
-                        ShowSevereError(state,
-                                        "Invalid material layer type in window " + state.dataHeatBalMgr->CurrentModuleObject + " = " +
-                                            thisConstruct.Name);
+                        ShowSevereError(
+                            state, "Invalid material layer type in window " + state.dataHeatBalMgr->CurrentModuleObject + " = " + thisConstruct.Name);
                         ShowSevereError(state,
                                         "Equivalent Layer material type = " + ConstructAlphas(Layer) +
                                             " is allowed only in Construction:WindowEquivalentLayer window object.");
@@ -4529,17 +4466,13 @@ namespace HeatBalanceManager {
 
                 if (thisConstruct.LayerPoint(Layer) == 0) {
                     // This may be a TC GlazingGroup
-                    thisConstruct.LayerPoint(Layer) =
-                        UtilityRoutines::FindItemInList(ConstructAlphas(Layer), state.dataHeatBal->TCGlazings);
+                    thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), state.dataHeatBal->TCGlazings);
 
                     if (thisConstruct.LayerPoint(Layer) > 0) {
                         // reset layer pointer to the first glazing in the TC GlazingGroup
-                        thisConstruct.LayerPoint(Layer) =
-                            state.dataHeatBal->TCGlazings(thisConstruct.LayerPoint(Layer)).LayerPoint(1);
+                        thisConstruct.LayerPoint(Layer) = state.dataHeatBal->TCGlazings(thisConstruct.LayerPoint(Layer)).LayerPoint(1);
                         thisConstruct.TCLayer = thisConstruct.LayerPoint(Layer);
-                        if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group ==
-                            Material::MaterialGroup::WindowGlass)
-                            ++iMatGlass;
+                        if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::WindowGlass) ++iMatGlass;
                         thisConstruct.TCFlag = 1;
                         thisConstruct.TCMasterConst = ConstrNum;
                         thisConstruct.TCGlassID = iMatGlass; // the TC glass layer ID
@@ -4550,14 +4483,12 @@ namespace HeatBalanceManager {
 
                 if (thisConstruct.LayerPoint(Layer) == 0) {
                     ShowSevereError(state,
-                                    "Did not find matching material for " + state.dataHeatBalMgr->CurrentModuleObject + ' ' +
-                                        thisConstruct.Name + ", missing material = " + ConstructAlphas(Layer));
+                                    "Did not find matching material for " + state.dataHeatBalMgr->CurrentModuleObject + ' ' + thisConstruct.Name +
+                                        ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
-                    state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
-                        state.dataHeatBal->NominalR(thisConstruct.LayerPoint(Layer));
-                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group ==
-                            Material::MaterialGroup::RegularMaterial &&
+                    state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += state.dataHeatBal->NominalR(thisConstruct.LayerPoint(Layer));
+                    if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->Group == Material::MaterialGroup::RegularMaterial &&
                         !state.dataMaterial->Material(thisConstruct.LayerPoint(Layer))->ROnly) {
                         state.dataHeatBal->NoRegularMaterialsUsed = false;
                     }
@@ -4722,8 +4653,8 @@ namespace HeatBalanceManager {
 
                 if (state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) == 0) {
                     ShowSevereError(state,
-                                    "Did not find matching material for " + state.dataHeatBalMgr->CurrentModuleObject + ' ' +
-                                        thisConstruct.Name + ", missing material = " + ConstructAlphas(Layer));
+                                    "Did not find matching material for " + state.dataHeatBalMgr->CurrentModuleObject + ' ' + thisConstruct.Name +
+                                        ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
                     MaterialLayerGroup =
@@ -5198,10 +5129,8 @@ namespace HeatBalanceManager {
             bool withNoncompatibleShades =
                 (Mat->Group == Material::MaterialGroup::Shade || Mat->Group == Material::MaterialGroup::WindowBlind ||
                  Mat->Group == Material::MaterialGroup::Screen || Mat->Group == Material::MaterialGroup::GlassEquivalentLayer ||
-                 Mat->Group == Material::MaterialGroup::GapEquivalentLayer ||
-                 Mat->Group == Material::MaterialGroup::ShadeEquivalentLayer ||
-                 Mat->Group == Material::MaterialGroup::DrapeEquivalentLayer ||
-                 Mat->Group == Material::MaterialGroup::ScreenEquivalentLayer ||
+                 Mat->Group == Material::MaterialGroup::GapEquivalentLayer || Mat->Group == Material::MaterialGroup::ShadeEquivalentLayer ||
+                 Mat->Group == Material::MaterialGroup::DrapeEquivalentLayer || Mat->Group == Material::MaterialGroup::ScreenEquivalentLayer ||
                  Mat->Group == Material::MaterialGroup::BlindEquivalentLayer || Surf.HasShadeControl);
             if (withNoncompatibleShades) {
                 ShowSevereError(state, "Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window");
@@ -7319,8 +7248,7 @@ namespace HeatBalanceManager {
                     if (NGlSys == 1) {
                         thisMaterial->Name = "W5:" + DesiredConstructionName + ":GLASS" + NumName(IGlass);
                     } else {
-                        thisMaterial->Name =
-                            "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GLASS" + NumName(IGlass);
+                        thisMaterial->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GLASS" + NumName(IGlass);
                     }
                     thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
                     thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
@@ -7350,8 +7278,7 @@ namespace HeatBalanceManager {
                     if (NGlSys == 1) {
                         thisMaterial->Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
                     } else {
-                        thisMaterial->Name =
-                            "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GAP" + NumName(IGap);
+                        thisMaterial->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GAP" + NumName(IGap);
                     }
                     thisMaterial->Thickness *= 0.001;
                     thisMaterial->Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
@@ -7381,8 +7308,7 @@ namespace HeatBalanceManager {
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
                         state.dataHeatBal->NominalR(MaterNum) =
                             thisMaterial->Thickness /
-                            (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 +
-                             thisMaterial->GasCon(3, 1) * 90000.0);
+                            (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
                     }
                 }
             }
@@ -7490,10 +7416,8 @@ namespace HeatBalanceManager {
                 }
 
                 thisConstruct.OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
-                thisConstruct.InsideAbsorpThermal =
-                    state.dataMaterial->Material(TotMaterialsPrev + NGlass(IGlSys))->AbsorpThermalBack;
-                thisConstruct.OutsideAbsorpThermal =
-                    state.dataMaterial->Material(TotMaterialsPrev + 1)->AbsorpThermalFront;
+                thisConstruct.InsideAbsorpThermal = state.dataMaterial->Material(TotMaterialsPrev + NGlass(IGlSys))->AbsorpThermalBack;
+                thisConstruct.OutsideAbsorpThermal = state.dataMaterial->Material(TotMaterialsPrev + 1)->AbsorpThermalFront;
                 thisConstruct.TypeIsWindow = true;
                 thisConstruct.FromWindow5DataFile = true;
                 thisConstruct.W5FileGlazingSysHeight = WinHeight(IGlSys);
@@ -8023,7 +7947,8 @@ namespace HeatBalanceManager {
             thisConstruct.LayerPoint(2) = iFCConcreteLayer;
 
             // The fictitious insulation is the outside layer
-            MaterNum = UtilityRoutines::FindItemInPtrList("~FC_Insulation_" + fmt::to_string(Loop + TotFfactorConstructs), state.dataMaterial->Material);
+            MaterNum =
+                UtilityRoutines::FindItemInPtrList("~FC_Insulation_" + fmt::to_string(Loop + TotFfactorConstructs), state.dataMaterial->Material);
             thisConstruct.LayerPoint(1) = MaterNum;
 
             // CR 8886 Rsoil should be in SI unit. From ASHRAE 90.1-2010 SI
@@ -8665,8 +8590,7 @@ namespace HeatBalanceManager {
 
             if (thisMaterial->SimpleWindowSHGC < 0.7206) {
 
-                thisMaterial->Trans = 0.939998 * pow_2(thisMaterial->SimpleWindowSHGC) +
-                                                               0.20332 * thisMaterial->SimpleWindowSHGC;
+                thisMaterial->Trans = 0.939998 * pow_2(thisMaterial->SimpleWindowSHGC) + 0.20332 * thisMaterial->SimpleWindowSHGC;
             } else { // >= 0.7206
 
                 thisMaterial->Trans = 1.30415 * thisMaterial->SimpleWindowSHGC - 0.30515;
@@ -8677,14 +8601,12 @@ namespace HeatBalanceManager {
             if (thisMaterial->SimpleWindowSHGC <= 0.15) {
                 thisMaterial->Trans = 0.41040 * thisMaterial->SimpleWindowSHGC;
             } else { // > 0.15
-                thisMaterial->Trans = 0.085775 * pow_2(thisMaterial->SimpleWindowSHGC) +
-                                                               0.963954 * thisMaterial->SimpleWindowSHGC - 0.084958;
+                thisMaterial->Trans = 0.085775 * pow_2(thisMaterial->SimpleWindowSHGC) + 0.963954 * thisMaterial->SimpleWindowSHGC - 0.084958;
             }
         } else { // interpolate. 3.4 <= Ufactor <= 4.5
 
             if (thisMaterial->SimpleWindowSHGC < 0.7206) {
-                TsolHiSide = 0.939998 * pow_2(thisMaterial->SimpleWindowSHGC) +
-                             0.20332 * thisMaterial->SimpleWindowSHGC;
+                TsolHiSide = 0.939998 * pow_2(thisMaterial->SimpleWindowSHGC) + 0.20332 * thisMaterial->SimpleWindowSHGC;
             } else { // >= 0.7206
                 TsolHiSide = 1.30415 * thisMaterial->SimpleWindowSHGC - 0.30515;
             }
@@ -8692,12 +8614,10 @@ namespace HeatBalanceManager {
             if (thisMaterial->SimpleWindowSHGC <= 0.15) {
                 TsolLowSide = 0.41040 * thisMaterial->SimpleWindowSHGC;
             } else { // > 0.15
-                TsolLowSide = 0.085775 * pow_2(thisMaterial->SimpleWindowSHGC) +
-                              0.963954 * thisMaterial->SimpleWindowSHGC - 0.084958;
+                TsolLowSide = 0.085775 * pow_2(thisMaterial->SimpleWindowSHGC) + 0.963954 * thisMaterial->SimpleWindowSHGC - 0.084958;
             }
 
-            thisMaterial->Trans =
-                ((thisMaterial->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (TsolHiSide - TsolLowSide) + TsolLowSide;
+            thisMaterial->Trans = ((thisMaterial->SimpleWindowUfactor - 3.4) / (4.5 - 3.4)) * (TsolHiSide - TsolLowSide) + TsolLowSide;
         }
         if (thisMaterial->Trans < 0.0) thisMaterial->Trans = 0.0;
 
@@ -8733,16 +8653,14 @@ namespace HeatBalanceManager {
         // step 6. determine visible properties.
         if (thisMaterial->SimpleWindowVTinputByUser) {
             thisMaterial->TransVis = thisMaterial->SimpleWindowVisTran;
-            thisMaterial->ReflectVisBeamBack = -0.7409 * pow_3(thisMaterial->TransVis) +
-                                                                        1.6531 * pow_2(thisMaterial->TransVis) -
-                                                                        1.2299 * thisMaterial->TransVis + 0.4545;
+            thisMaterial->ReflectVisBeamBack =
+                -0.7409 * pow_3(thisMaterial->TransVis) + 1.6531 * pow_2(thisMaterial->TransVis) - 1.2299 * thisMaterial->TransVis + 0.4545;
             if (thisMaterial->TransVis + thisMaterial->ReflectVisBeamBack >= 1.0) {
                 thisMaterial->ReflectVisBeamBack = 0.999 - thisMaterial->TransVis;
             }
 
-            thisMaterial->ReflectVisBeamFront = -0.0622 * pow_3(thisMaterial->TransVis) +
-                                                                         0.4277 * pow_2(thisMaterial->TransVis) -
-                                                                         0.4169 * thisMaterial->TransVis + 0.2399;
+            thisMaterial->ReflectVisBeamFront =
+                -0.0622 * pow_3(thisMaterial->TransVis) + 0.4277 * pow_2(thisMaterial->TransVis) - 0.4169 * thisMaterial->TransVis + 0.2399;
             if (thisMaterial->TransVis + thisMaterial->ReflectVisBeamFront >= 1.0) {
                 thisMaterial->ReflectVisBeamFront = 0.999 - thisMaterial->TransVis;
             }
@@ -8948,8 +8866,7 @@ namespace HeatBalanceManager {
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                thisMaterial->GasPointer =
-                    UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material);
+                thisMaterial->GasPointer = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material);
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -9559,14 +9476,9 @@ namespace HeatBalanceManager {
                                       "\" invalid matrix dimensions.  Basis matrix dimension can only be 2 x 1.");
             }
             thisConstruct.BSDFInput.BasisMat.allocate(NumCols, NumRows);
-            Get2DMatrix(state,
-                        thisConstruct.BSDFInput.BasisMatIndex,
-                        thisConstruct.BSDFInput.BasisMat);
+            Get2DMatrix(state, thisConstruct.BSDFInput.BasisMatIndex, thisConstruct.BSDFInput.BasisMat);
             if (thisConstruct.BSDFInput.BasisType == DataBSDFWindow::Basis::WINDOW)
-                CalculateBasisLength(state,
-                                     thisConstruct.BSDFInput,
-                                     ConstrNum,
-                                     thisConstruct.BSDFInput.NBasis);
+                CalculateBasisLength(state, thisConstruct.BSDFInput, ConstrNum, thisConstruct.BSDFInput.NBasis);
 
             // determine number of layers and optical layers
             NumOfTotalLayers = (NumAlphas - 9) / 3;
@@ -9622,7 +9534,7 @@ namespace HeatBalanceManager {
 
                 if (thisConstruct.BSDFInput.BasisType == DataBSDFWindow::Basis::Custom) {
                     thisConstruct.BSDFInput.NBasis = NumRows; // For custom basis, no rows in transmittance
-                                                                                             // matrix defines the basis length
+                                                              // matrix defines the basis length
                 }
 
                 thisConstruct.BSDFInput.SolFrtTrans.allocate(NumCols, NumRows);
@@ -9634,9 +9546,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state,
                                       "Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state,
-                                thisConstruct.BSDFInput.SolFrtTransIndex,
-                                thisConstruct.BSDFInput.SolFrtTrans);
+                    Get2DMatrix(state, thisConstruct.BSDFInput.SolFrtTransIndex, thisConstruct.BSDFInput.SolFrtTrans);
                 }
 
                 // *******************************************************************************
@@ -9677,9 +9587,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state,
                                       "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state,
-                                thisConstruct.BSDFInput.SolBkReflIndex,
-                                thisConstruct.BSDFInput.SolBkRefl);
+                    Get2DMatrix(state, thisConstruct.BSDFInput.SolBkReflIndex, thisConstruct.BSDFInput.SolBkRefl);
                 }
 
                 // *******************************************************************************
@@ -9720,9 +9628,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(
                         state, "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state,
-                                thisConstruct.BSDFInput.VisFrtTransIndex,
-                                thisConstruct.BSDFInput.VisFrtTrans);
+                    Get2DMatrix(state, thisConstruct.BSDFInput.VisFrtTransIndex, thisConstruct.BSDFInput.VisFrtTrans);
                 }
 
                 // *******************************************************************************
@@ -9762,9 +9668,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state,
                                       "Visble back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state,
-                                thisConstruct.BSDFInput.VisBkReflIndex,
-                                thisConstruct.BSDFInput.VisBkRefl);
+                    Get2DMatrix(state, thisConstruct.BSDFInput.VisBkReflIndex, thisConstruct.BSDFInput.VisBkRefl);
                 }
 
                 // ALLOCATE(Construct(ConstrNum)%BSDFInput%Layer(NumOfOpticalLayers))
@@ -9772,22 +9676,18 @@ namespace HeatBalanceManager {
                     AlphaIndex = 9 + (Layer * 3) - 2;
                     currentOpticalLayer = int(Layer / 2) + 1;
                     // Material info is contained in the thermal construct
-                    thisConstruct.LayerPoint(Layer) =
-                        UtilityRoutines::FindItemInPtrList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
+                    thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInPtrList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
 
                     // Simon: Load only if optical layer
                     if (mod(Layer, 2) != 0) {
-                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).MaterialIndex =
-                            thisConstruct.LayerPoint(Layer);
+                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).MaterialIndex = thisConstruct.LayerPoint(Layer);
 
                         ++AlphaIndex;
                         // *******************************************************************************
                         // Front absorptance matrix
                         // *******************************************************************************
-                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex =
-                            MatrixIndex(state, locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(
-                            state, thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
+                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(state, locAlphaArgs(AlphaIndex));
+                        Get2DMatrixDimensions(state, thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
@@ -9836,10 +9736,8 @@ namespace HeatBalanceManager {
                         // *******************************************************************************
                         // Back absorptance matrix
                         // *******************************************************************************
-                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex =
-                            MatrixIndex(state, locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(
-                            state, thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
+                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(state, locAlphaArgs(AlphaIndex));
+                        Get2DMatrixDimensions(state, thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
@@ -10085,21 +9983,17 @@ namespace HeatBalanceManager {
                     AlphaIndex = 9 + (Layer * 3) - 2;
                     currentOpticalLayer = int(Layer / 2) + 1;
 
-                    thisConstruct.LayerPoint(Layer) =
-                        UtilityRoutines::FindItemInPtrList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
+                    thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInPtrList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
 
                     if (mod(Layer, 2) != 0) {
-                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).MaterialIndex =
-                            thisConstruct.LayerPoint(Layer);
+                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).MaterialIndex = thisConstruct.LayerPoint(Layer);
 
                         // *******************************************************************************
                         // Front absorptance matrix
                         // *******************************************************************************
                         ++AlphaIndex;
-                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex =
-                            MatrixIndex(state, locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(
-                            state, thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
+                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex = MatrixIndex(state, locAlphaArgs(AlphaIndex));
+                        Get2DMatrixDimensions(state, thisConstruct.BSDFInput.Layer(currentOpticalLayer).FrtAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
                             ErrorsFound = true;
@@ -10149,10 +10043,8 @@ namespace HeatBalanceManager {
                         // Back absorptance matrix
                         // *******************************************************************************
                         ++AlphaIndex;
-                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex =
-                            MatrixIndex(state, locAlphaArgs(AlphaIndex));
-                        Get2DMatrixDimensions(
-                            state, thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
+                        thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex = MatrixIndex(state, locAlphaArgs(AlphaIndex));
+                        Get2DMatrixDimensions(state, thisConstruct.BSDFInput.Layer(currentOpticalLayer).BkAbsIndex, NumRows, NumCols);
 
                         if (NumRows != 1) {
                             ErrorsFound = true;

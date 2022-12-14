@@ -2012,7 +2012,7 @@ namespace HeatBalanceIntRadExchange {
             for (int j = l; j <= u; ++j, jk += n) {
                 I[jk] *= Akk_inv;
             }
-            int ik(A.index(k, l));             // [ ik ] == ( i, k )
+            int ik(A.index(k, l));              // [ ik ] == ( i, k )
             for (int i = l; i < k; ++i, ++ik) { // Eliminate kth column entries from I in rows above k
                 Real64 const Aik(A[ik]);
                 int ji(A.index(l, i)); // [ ji ] == ( j, i )
