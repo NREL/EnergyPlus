@@ -1213,7 +1213,6 @@ namespace WaterToAirHeatPump {
         Real64 QLatActual;                // Qlatent at actual operating conditions
         Real64 SHRss;                     // Sensible heat ratio at steady state
         Real64 SHReff;                    // Effective sensible heat ratio at part-load condition
-        Array1D<Real64> Par(4);           // Parameter array passed to RegulaFalsi function
         int SolFlag;                      // Solution flag returned from RegulaFalsi function
         Real64 LoadSideAirInletEnth_Unit; // calc conditions for unit
         Real64 LoadResidual;              // loop convergence criteria
@@ -1734,7 +1733,6 @@ namespace WaterToAirHeatPump {
         Real64 CompSuctionSatTemp; // Temperature of Saturated Refrigerant at Compressor Suction Pressure [C]
         bool StillSimulatingFlag;  // Final Simulation Flag
         bool Converged;            // Overall convergence Flag
-        Array1D<Real64> Par(4);    // Parameter array passed to RegulaFalsi function
         int SolFlag;               // Solution flag returned from RegulaFalsi function
         Real64 LoadResidual;       // loop convergence criteria
         Real64 SourceResidual;     // loop convergence criteria

@@ -220,11 +220,6 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, HXAction HXActionMode);
 
-        Real64 demandSideFlowResidual(EnergyPlusData &state,
-                                      Real64 DmdSideMassFlowRate,
-                                      Array1D<Real64> const &Par // Par(1) = HX index number
-        );
-
         void oneTimeInit(EnergyPlusData &state) override;
     };
 
