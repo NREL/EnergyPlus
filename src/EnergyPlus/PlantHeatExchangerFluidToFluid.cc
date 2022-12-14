@@ -1723,8 +1723,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
     int constexpr MaxIte(500);   // Maximum number of iterations for solver
     Real64 constexpr Acc(1.e-3); // Accuracy of solver result
 
-    int SolFla;             // Flag of solver
-    Array1D<Real64> Par(2); // Parameter array passed to solver
+    int SolFla; // Flag of solver
 
     // mass flow rate of fluid entering from supply side loop
     Real64 SupSideMdot = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
@@ -1745,13 +1744,13 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
 
     case HXAction::HeatingSupplySideLoop: {
         if ((LeavingTempFullFlow > TargetSupplySideLoopLeavingTemp) && (TargetSupplySideLoopLeavingTemp > LeavingTempMinFlow)) {
-            // need to solve
-            Par(2) = TargetSupplySideLoopLeavingTemp;
-            auto f =
-                std::bind(&HeatExchangerStruct::demandSideFlowResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-
+            auto f = [&state, this, TargetSupplySideLoopLeavingTemp](Real64 const DmdSideMassFlowRate) {
+                Real64 SupSideMdot = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
+                this->calculate(state, SupSideMdot, DmdSideMassFlowRate);
+                return TargetSupplySideLoopLeavingTemp - this->SupplySideLoop.OutletTemp;
+            };
             General::SolveRoot(
-                state, Acc, MaxIte, SolFla, DmdSideMdot, f, this->DemandSideLoop.MassFlowRateMin, this->DemandSideLoop.MassFlowRateMax, Par);
+                state, Acc, MaxIte, SolFla, DmdSideMdot, f, this->DemandSideLoop.MassFlowRateMin, this->DemandSideLoop.MassFlowRateMax);
 
             if (SolFla == -1) { // no convergence
                 if (!state.dataGlobal->WarmupFlag) {
@@ -1807,13 +1806,13 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
     }
     case HXAction::CoolingSupplySideLoop: {
         if ((LeavingTempFullFlow < TargetSupplySideLoopLeavingTemp) && (TargetSupplySideLoopLeavingTemp < LeavingTempMinFlow)) {
-            // need to solve
-            Par(2) = TargetSupplySideLoopLeavingTemp;
-            auto f =
-                std::bind(&HeatExchangerStruct::demandSideFlowResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-
+            auto f = [&state, this, TargetSupplySideLoopLeavingTemp](Real64 const DmdSideMassFlowRate) {
+                Real64 SupSideMdot = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
+                this->calculate(state, SupSideMdot, DmdSideMassFlowRate);
+                return TargetSupplySideLoopLeavingTemp - this->SupplySideLoop.OutletTemp;
+            };
             General::SolveRoot(
-                state, Acc, MaxIte, SolFla, DmdSideMdot, f, this->DemandSideLoop.MassFlowRateMin, this->DemandSideLoop.MassFlowRateMax, Par);
+                state, Acc, MaxIte, SolFla, DmdSideMdot, f, this->DemandSideLoop.MassFlowRateMin, this->DemandSideLoop.MassFlowRateMax);
 
             if (SolFla == -1) { // no convergence
                 if (!state.dataGlobal->WarmupFlag) {
@@ -1870,34 +1869,6 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
     }
 }
 
-Real64 HeatExchangerStruct::demandSideFlowResidual(EnergyPlusData &state,
-                                                   Real64 const DmdSideMassFlowRate,
-                                                   Array1D<Real64> const &Par // Par(1) = HX index number
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         B. Griffith
-    //       DATE WRITTEN   December 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // calculate residual value for regula falsi solver
-
-    Real64 Residuum; // Residual to be minimized to zero
-
-    Real64 MdotTrial = DmdSideMassFlowRate;
-    Real64 SupSideMdot = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
-
-    this->calculate(state, SupSideMdot, MdotTrial);
-
-    Real64 SupSideLoopOutletTemp = this->SupplySideLoop.OutletTemp;
-
-    Residuum = Par(2) - SupSideLoopOutletTemp;
-
-    return Residuum;
-}
 void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 {
 
