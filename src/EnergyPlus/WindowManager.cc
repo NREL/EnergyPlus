@@ -339,7 +339,6 @@ namespace WindowManager {
         // Loop over constructions and find those that are glazing constructions
         for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-            auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
             if (!thisConstruct.TypeIsWindow) continue;
             if (thisConstruct.WindowTypeBSDF) continue; // Skip Complex Fenestrations, they have separate
             if (thisConstruct.WindowTypeEQL) continue;  // skip Equivalent Layer Fenestration
@@ -350,6 +349,8 @@ namespace WindowManager {
             }
 
             TotLay = thisConstruct.TotLayers;
+
+            auto const *thisMaterial = state.dataMaterial->Material(thisConstruct.LayerPoint(1));
 
             // First layer must be glass, shade, screen or blind to be a glazing construction
             if (thisMaterial->Group != Material::MaterialGroup::WindowGlass && thisMaterial->Group != Material::MaterialGroup::Shade &&
