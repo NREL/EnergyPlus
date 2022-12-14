@@ -12625,7 +12625,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         if (NoCompOutput <= QZnReq) return;
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if (NoCompOutput <= QZnReq || QZnReq >= -DataHVACGlobals::SmallLoad) {
+        if (NoCompOutput <= QZnReq || (QZnReq >= -DataHVACGlobals::SmallLoad && !HRCoolingMode)) {
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive = false;
             if (!this->SuppHeatingCoilPresent) return;
         }
