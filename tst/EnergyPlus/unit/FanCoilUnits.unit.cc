@@ -2285,9 +2285,9 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
         " ScheduleTypeLimits, Fraction, 0.0, 1.0, CONTINUOUS;",
         " NodeList, Zone1Inlets, Zone1FCAirOut;",
         " NodeList, Zone1Exhausts, Zone1FCAirIn;",
-        " Coil:Cooling:Water, Zone1FCCoolCoil, FCAvailSch, 0.0002, 0.5, 7.22, 24.34, 14.0, 0.0095, 0.009, Zone1FCChWIn, Zone1FCChWOut, "
+        " Coil:Cooling:Water, Zone1FCCoolCoil, FCAvailSch, 0.0002, 0.5, 7.22, 24.34, 14.0, 0.0095, 0.009, Zone1FCChWIn, Zone1FCChWOut, ",
         "Zone1FCFanOut, Zone1FCCCOut, SimpleAnalysis, CrossFlow;",
-        " Coil:Heating:Water, Zone1FanCoilHeatingCoil, FCAvailSch, 150.0, 0.00014, Zone1FCHWIn, Zone1FCHWOut, Zone1FCCCOut, Zone1FCAirOut, "
+        " Coil:Heating:Water, Zone1FanCoilHeatingCoil, FCAvailSch, 150.0, 0.00014, Zone1FCHWIn, Zone1FCHWOut, Zone1FCCCOut, Zone1FCAirOut, ",
         "UFactorTimesAreaAndDesignWaterFlowRate, autosize, 82.2, 16.6, 71.1, 32.2, ;",
 
         " ZoneHVAC:FourPipeFanCoil,",
@@ -2529,9 +2529,9 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
     int MaxIte = 4;
     int SolFla;
     Real64 mdot;
-    Real64 constexpr QZnReq2 = -1000.0;
 
-    auto f = [this, QZnReq2](Real64 const mdot) {
+    auto f = [this](Real64 const mdot) {
+        Real64 constexpr QZnReq2 = -1000.0;
         int FanCoilNum = 1;
         int ControlledZoneNum = 1;
         bool FirstHVACIteration = false;
