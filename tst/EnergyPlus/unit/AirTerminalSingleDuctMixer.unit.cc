@@ -5042,6 +5042,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataHVACVarRefFlow->VRFTU(1).ZoneNum = 1;
+    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive = true;
+
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
@@ -6799,6 +6801,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataHVACVarRefFlow->VRFTU(1).ZoneNum = 1;
+    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive = true;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
