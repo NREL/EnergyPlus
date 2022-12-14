@@ -7737,9 +7737,9 @@ namespace WindowManager {
                         } break;
                         case Material::MaterialGroup::GapEquivalentLayer: {
                             GapVentType = "Sealed";
-                            if (thisMaterial->GapVentType == 2) {
+                            if (thisMaterial->GapVentType == Material::GapVentTypeEnum::VentedIndoor) {
                                 GapVentType = "VentedIndoor";
-                            } else if (thisMaterial->GapVentType == 3) {
+                            } else if (thisMaterial->GapVentType == Material::GapVentTypeEnum::VentedOutdoor) {
                                 GapVentType = "VentedOutdoor";
                             }
                             static constexpr std::string_view Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
