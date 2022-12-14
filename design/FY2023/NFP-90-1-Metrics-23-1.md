@@ -213,6 +213,25 @@ Example files that include the VariableSpeed DX coils will need to be updated.
     -   PackagedTerminalAirConditionerVSAS.idf	– Variable speed cooling & heating
     -   PackagedTerminalHeatPumpVSAS.idf		     – Variable speed cooling & heating
 
+## E-mail and Conference Call Conclusions ##
+Comments from Technicalities call on 14-Dec-22:
+-   Neal Kruis:
+    -   Will your calculations take into consideration the physical configuration of the coils -- i.e. in-building, rooftop, others?
+    -   Not saying this is required, but curious.
+    -   Will these be calculated and reported for the special coils that are specifically for Data Centers?
+-   Mike Witte:
+    -   Caution against trying to make assumptions about the configuration of coils in EnergyPlus, 
+        because they are analytical models rather that exact representations of manufactured equipment.
+-   Richard Roustad:
+    -   Might want to consider a user input field -- requesting that metrics be calculated and reported 
+        for that instance of the coil.
+-   Jason Glazer:
+    -   You mentioned that some calculations are being done according to the 2023 version of an AHRI standard
+        Originally, the intent in calculating these metrics was to use the versions referenced by ASHRAE 90.1
+-   Tianzhen Hong:
+    -   Suggestion that reporting of the metrics should be very clear about what version of the standard was used 
+        to do the calculations.
+
 ## Acknowledgments
 TBD
 
