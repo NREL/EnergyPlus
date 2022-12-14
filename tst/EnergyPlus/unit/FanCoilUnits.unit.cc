@@ -75,6 +75,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

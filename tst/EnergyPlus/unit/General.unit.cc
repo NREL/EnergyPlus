@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 
 namespace EnergyPlus {
 
