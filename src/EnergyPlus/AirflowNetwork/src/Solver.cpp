@@ -6642,16 +6642,12 @@ namespace AirflowNetwork {
                     }
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
-                    auto & thisState = m_state;  // can't use m_state directly in the capture list, just create a reference
-                    auto f = [&thisState, PressureSet](Real64 const ControllerMassFlowRate){return AFNPressureResidual(thisState, ControllerMassFlowRate, PressureSet);};
-                    General::SolveRoot(m_state,
-                                       ErrorToler,
-                                       MaxIte,
-                                       SolFla,
-                                       ExhaustFanMassFlowRate,
-                                       f,
-                                       MinExhaustMassFlowrate,
-                                       MaxExhaustMassFlowrate);
+                    auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                    auto f = [&thisState, PressureSet](Real64 const ControllerMassFlowRate) {
+                        return AFNPressureResidual(thisState, ControllerMassFlowRate, PressureSet);
+                    };
+                    General::SolveRoot(
+                        m_state, ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, f, MinExhaustMassFlowrate, MaxExhaustMassFlowrate);
                     if (SolFla == -1) {
                         if (!m_state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
@@ -6736,16 +6732,11 @@ namespace AirflowNetwork {
                     }
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
-                    auto & thisState = m_state;  // can't use m_state directly in the capture list, just create a reference
-                    auto f = [&thisState, PressureSet](Real64 const ControllerMassFlowRate){return AFNPressureResidual(thisState, ControllerMassFlowRate, PressureSet);};
-                    General::SolveRoot(m_state,
-                                       ErrorToler,
-                                       MaxIte,
-                                       SolFla,
-                                       ReliefMassFlowRate,
-                                       f,
-                                       MinReliefMassFlowrate,
-                                       MaxReliefMassFlowrate);
+                    auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                    auto f = [&thisState, PressureSet](Real64 const ControllerMassFlowRate) {
+                        return AFNPressureResidual(thisState, ControllerMassFlowRate, PressureSet);
+                    };
+                    General::SolveRoot(m_state, ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, f, MinReliefMassFlowrate, MaxReliefMassFlowrate);
                     if (SolFla == -1) {
                         if (!m_state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
@@ -6773,8 +6764,7 @@ namespace AirflowNetwork {
 
     Real64 AFNPressureResidual(EnergyPlusData &state,
                                Real64 const ControllerMassFlowRate, // Pressure setpoint
-                               Real64 PressureSet
-    )
+                               Real64 PressureSet)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -12256,7 +12246,6 @@ namespace AirflowNetwork {
         bool DuctSizingRTFlag;
         bool DuctSizingRBFlag;
         Real64 hydraulicDiameter = 0.0;
-        Array1D<Real64> Par(9); // Parameters passed to RegulaFalsi
         Real64 SupplyTrunkD = 0.0;
         Real64 SupplyTrunkArea = 0.0;
         Real64 SupplyBranchD = 0.0;
@@ -12381,13 +12370,13 @@ namespace AirflowNetwork {
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.supply_trunk_pressure_loss;
-                        Par(2) = DisSysCompCVFData(1).FlowRate;
-                        Par(3) = SumLength;
-                        Par(4) = DynamicLoss;
-                        Par(5) = MaxRough;
-
-                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                        auto &deltaP = simulation_control.ductSizing.supply_trunk_pressure_loss;
+                        auto &MassFlowRate = DisSysCompCVFData(1).FlowRate;
+                        auto f = [&thisState, deltaP, MassFlowRate, SumLength, DynamicLoss, MaxRough](Real64 const D) {
+                            return DuctDResidual(thisState, D, deltaP, MassFlowRate, SumLength, DynamicLoss, MaxRough);
+                        };
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, f, MinDiameter, MaxDiameter);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (ErrCountDuct == 0) {
@@ -12500,13 +12489,12 @@ namespace AirflowNetwork {
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.supply_branch_pressure_loss;
-                        Par(2) = MdotBranch;
-                        Par(3) = SumLength;
-                        Par(4) = DynamicLoss;
-                        Par(5) = MaxRough;
-
-                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                        auto &deltaP = simulation_control.ductSizing.supply_branch_pressure_loss;
+                        auto f = [&thisState, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough](Real64 const D) {
+                            return DuctDResidual(thisState, D, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough);
+                        };
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, f, MinDiameter, MaxDiameter);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (ErrCountDuct == 0) {
@@ -12623,13 +12611,13 @@ namespace AirflowNetwork {
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.return_trunk_pressure_loss;
-                        Par(2) = DisSysCompCVFData(1).FlowRate;
-                        Par(3) = SumLength;
-                        Par(4) = DynamicLoss;
-                        Par(5) = MaxRough;
-
-                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                        auto &deltaP = simulation_control.ductSizing.return_trunk_pressure_loss;
+                        auto &massFlowRate = DisSysCompCVFData(1).FlowRate;
+                        auto f = [&thisState, deltaP, massFlowRate, SumLength, DynamicLoss, MaxRough](Real64 const D) {
+                            return DuctDResidual(thisState, D, deltaP, massFlowRate, SumLength, DynamicLoss, MaxRough);
+                        };
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, f, MinDiameter, MaxDiameter);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (ErrCountDuct == 0) {
@@ -12743,13 +12731,12 @@ namespace AirflowNetwork {
                     } else {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
-                        Par(1) = simulation_control.ductSizing.return_branch_pressure_loss;
-                        Par(2) = MdotBranch;
-                        Par(3) = SumLength;
-                        Par(4) = DynamicLoss;
-                        Par(5) = MaxRough;
-
-                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, DuctDResidual, MinDiameter, MaxDiameter, Par);
+                        auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
+                        auto &deltaP = simulation_control.ductSizing.return_branch_pressure_loss;
+                        auto f = [&thisState, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough](Real64 const D) {
+                            return DuctDResidual(thisState, D, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough);
+                        };
+                        General::SolveRoot(m_state, EPS, MaxIte, SolFla, hydraulicDiameter, f, MinDiameter, MaxDiameter);
                         if (SolFla == -1) {
                             if (!m_state.dataGlobal->WarmupFlag) {
                                 if (ErrCountDuct == 0) {
@@ -12950,20 +12937,14 @@ namespace AirflowNetwork {
 
     Real64 DuctDResidual(EnergyPlusData &state,
                          Real64 D, // duct diameter
-                         Array1D<Real64> const &Par)
+                         Real64 DeltaP,
+                         Real64 MassFlowrate,
+                         Real64 TotalL,
+                         Real64 TotalLossCoe,
+                         Real64 MaxRough)
     {
-        Real64 DuctDResidual;
-        Real64 CalcDeltaP;
-        Real64 DeltaP = Par(1);
-        Real64 MassFlowrate = Par(2);
-        Real64 TotalL = Par(3);
-        Real64 TotalLossCoe = Par(4);
-        Real64 MaxRough = Par(5);
-
-        CalcDeltaP = state.afn->CalcDuctDiameter(D, DeltaP, MassFlowrate, TotalL, TotalLossCoe, MaxRough);
-
-        DuctDResidual = (CalcDeltaP - DeltaP) / DeltaP;
-        return DuctDResidual;
+        Real64 CalcDeltaP = state.afn->CalcDuctDiameter(D, DeltaP, MassFlowrate, TotalL, TotalLossCoe, MaxRough);
+        return (CalcDeltaP - DeltaP) / DeltaP;
     }
 
     void OccupantVentilationControlProp::calc(EnergyPlusData &state,
