@@ -84,7 +84,6 @@ namespace CurveManager {
     {
         Invalid = -1,
         Linear,
-        BiLinear,
         Quadratic,
         BiQuadratic,
         Cubic,
@@ -155,15 +154,9 @@ namespace CurveManager {
         std::string ObjectType;                             // Curve object type
         CurveType curveType = CurveType::Invalid;           // Curve type (see parameter definitions above)
         InterpType InterpolationType = InterpType::Invalid; // Table interpolation method
-        int DataFormat = 0;                                 // format of tabular data
         int TableIndex = 0;                               // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
         int NumDims = 0;                                  // Number of dimensions (AKA, independent variables)
-        int NumIVLowErrorIndex = 0;                       // Index to table object error message for too few IV's
-        int NumIVHighErrorIndex = 0;                      // Index to table object error message for too many IV's
-        int X1SortOrder = 1;                              // sort order for table data for X1
-        int X2SortOrder = 1;                              // sort order for table data for X2
         int GridValueIndex = 0;                           // Index of output within RGI for new Table:Lookup
-        Real64 NormalizationValue = 1.0;                  // normalization value (TODO: Move from Table object)
         Real64 Coeff1 = 0.0;                              // constant coefficient
         Real64 Coeff2 = 0.0;                              // linear coeff (1st independent variable)
         Real64 Coeff3 = 0.0;                              // quadratic coeff (1st independent variable)
@@ -194,16 +187,6 @@ namespace CurveManager {
         bool CurveMaxPresent = false;                     // if TRUE, then cap maximum curve output
         bool Var1MinPresent = false;                      // uses data set limit to set Var1Min if false
         bool Var1MaxPresent = false;                      // uses data set limit to set Var1Max if false
-        bool Var2MinPresent = false;                      // uses data set limit to set Var2Min if false
-        bool Var2MaxPresent = false;                      // uses data set limit to set Var2Max if false
-        bool Var3MinPresent = false;                      // uses data set limit to set Var3Min if false
-        bool Var3MaxPresent = false;                      // uses data set limit to set Var3Max if false
-        bool Var4MinPresent = false;                      // uses data set limit to set Var4Min if false
-        bool Var4MaxPresent = false;                      // uses data set limit to set Var4Max if false
-        bool Var5MinPresent = false;                      // uses data set limit to set Var5Min if false
-        bool Var5MaxPresent = false;                      // uses data set limit to set Var5Max if false
-        bool Var6MinPresent = false;                      // uses data set limit to set Var6Min if false
-        bool Var6MaxPresent = false;                      // uses data set limit to set Var6Max if false
         Array1D<TriQuadraticCurveDataStruct> Tri2ndOrder; // structure for triquadratic curve data
         bool EMSOverrideOn = false;                       // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue = 0.0;               // Value of curve result EMS is directing to use
@@ -220,8 +203,6 @@ namespace CurveManager {
     class TableFile
     {
     public:
-        TableFile() = default;
-        TableFile(EnergyPlusData &state, fs::path const &path);
         fs::path filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
@@ -241,9 +222,9 @@ namespace CurveManager {
         static std::map<std::string, Btwxt::Method> interpMethods;
         static std::map<std::string, Btwxt::Method> extrapMethods;
         // Map RGI collection to string name of independent variable list
-        int addGrid(std::string indVarListName, Btwxt::GriddedData grid)
+        int addGrid(const std::string& indVarListName, Btwxt::GriddedData grid)
         {
-            grids.emplace_back(Btwxt::RegularGridInterpolator(grid));
+            grids.emplace_back(grid);
             gridMap.emplace(indVarListName, grids.size() - 1);
             return static_cast<int>(grids.size()) - 1;
         };
@@ -251,7 +232,6 @@ namespace CurveManager {
         int addOutputValues(int gridIndex, std::vector<double> values);
         int getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
-        std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
         std::map<std::string, const json &> independentVarRefs;
         std::map<fs::path, TableFile> tableFiles;
@@ -262,9 +242,7 @@ namespace CurveManager {
         std::vector<Btwxt::RegularGridInterpolator> grids;
     };
 
-    // Functions
-
-    void BtwxtMessageCallback(Btwxt::MsgLevel messageType, std::string message, void *contextPtr);
+    void BtwxtMessageCallback(Btwxt::MsgLevel messageType, const std::string& message, void *contextPtr);
 
     void ResetPerformanceCurveOutput(EnergyPlusData &state);
 
@@ -309,7 +287,7 @@ namespace CurveManager {
     bool CheckCurveDims(EnergyPlusData &state,
                         int CurveIndex,
                         std::vector<int> validDims,
-                        const std::string_view routineName,
+                        std::string_view routineName,
                         std::string_view objectType,
                         std::string_view objectName,
                         std::string_view curveFieldText);

@@ -120,7 +120,7 @@ namespace CurveManager {
     void BtwxtMessageCallback(const Btwxt::MsgLevel messageType, const std::string message, void *contextPtr)
     {
         std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)contextPtr;
-        std::string fullMessage = contextPair.second + ": " + message;
+        std::string fullMessage = format("{}: {}", contextPair.second, message);
         if (messageType == Btwxt::MsgLevel::MSG_ERR) {
             ShowSevereError(*contextPair.first, fullMessage);
             ShowFatalError(*contextPair.first, "Btwxt: Errors discovered, program terminates.");
@@ -128,8 +128,6 @@ namespace CurveManager {
             if (static_cast<int>(messageType) >= Btwxt::LOG_LEVEL) {
                 if (messageType == Btwxt::MsgLevel::MSG_WARN) {
                     ShowWarningError(*contextPair.first, fullMessage);
-                } else if (messageType == Btwxt::MsgLevel::MSG_INFO) {
-                    ShowMessage(*contextPair.first, fullMessage);
                 } else {
                     ShowMessage(*contextPair.first, fullMessage);
                 }
@@ -148,15 +146,13 @@ namespace CurveManager {
         // Reset curve outputs prior to simulating air loops, plant loops, etc.
         // This allows the report variable for curve/table objects to show an inactive state.
 
-        using DataLoopNode::SensedNodeFlagValue;
-
         for (int CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput = SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1 = SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2 = SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3 = SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4 = SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5 = SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1 = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2 = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3 = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4 = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5 = DataLoopNode::SensedNodeFlagValue;
         }
     }
 
@@ -384,7 +380,7 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(7),
@@ -394,7 +390,7 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(9),
@@ -405,17 +401,17 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for Y is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -480,22 +476,22 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for Y is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the OInput Unit Type for Z is invalid.");
+                    ShowWarningError(state, format("In {} named {} the OInput Unit Type for Z is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 5) {
                 if (!IsCurveOutputTypeValid(Alphas(5))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -543,7 +539,7 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(5),
@@ -554,12 +550,12 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -608,7 +604,7 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(6),
@@ -619,12 +615,12 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -671,7 +667,7 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(4),
@@ -682,12 +678,12 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -739,7 +735,7 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(7),
@@ -749,7 +745,7 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(9),
@@ -760,17 +756,17 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for Y is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -822,7 +818,7 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(7),
@@ -832,7 +828,7 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(9),
@@ -843,17 +839,17 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for Y is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -899,7 +895,7 @@ namespace CurveManager {
             }
 
             if (Numbers(3) > Numbers(4)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(3),
@@ -910,12 +906,12 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -971,7 +967,7 @@ namespace CurveManager {
             }
 
             if (Numbers(11) > Numbers(12)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(11),
@@ -981,7 +977,7 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(13) > Numbers(14)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(13),
@@ -992,17 +988,17 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for Y is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveOutputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -1080,7 +1076,7 @@ namespace CurveManager {
             }
 
             if (Numbers(28) > Numbers(29)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(28),
@@ -1090,7 +1086,7 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(30) > Numbers(31)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(30),
@@ -1100,7 +1096,7 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(32) > Numbers(33)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(32),
@@ -1111,22 +1107,22 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for Y is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 4) {
                 if (!IsCurveInputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for Z is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 5) {
                 if (!IsCurveOutputTypeValid(Alphas(5))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -1187,7 +1183,7 @@ namespace CurveManager {
                 int MinIndex = 2 * i + 4;
                 int MaxIndex = MinIndex + 1;
                 if (Numbers(MinIndex) > Numbers(MaxIndex)) { // error
-                    ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                    ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                     ShowContinueError(state,
                                       format("{} [{:.R2}] > {} [{.R2}]",
                                              state.dataIPShortCut->cNumericFieldNames(MinIndex),
@@ -1200,13 +1196,13 @@ namespace CurveManager {
                 if (NumAlphas >= InputTypeIndex) {
                     if (!IsCurveInputTypeValid(Alphas(InputTypeIndex))) {
                         ShowWarningError(
-                            state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for " + VarNames[i] + " is invalid.");
+                            state, format("In {} named {} the Input Unit Type for {} is invalid.", CurrentModuleObject, Alphas(1), VarNames[i]));
                     }
                 }
             }
             if (NumAlphas >= 6) {
                 if (!IsCurveOutputTypeValid(Alphas(6))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -1269,7 +1265,7 @@ namespace CurveManager {
                 int MinIndex = 2 * i + 5;
                 int MaxIndex = MinIndex + 1;
                 if (Numbers(MinIndex) > Numbers(MaxIndex)) { // error
-                    ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                    ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                     ShowContinueError(state,
                                       format("{} [{:.R2}] > {} [{.R2}]",
                                              state.dataIPShortCut->cNumericFieldNames(MinIndex),
@@ -1282,13 +1278,13 @@ namespace CurveManager {
                 if (NumAlphas >= InputTypeIndex) {
                     if (!IsCurveInputTypeValid(Alphas(InputTypeIndex))) {
                         ShowWarningError(
-                            state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for " + VarNames[i] + " is invalid.");
+                            state, format("In {} named {} the Input Unit Type for {} is invalid.", CurrentModuleObject, Alphas(1), VarNames[i]));
                     }
                 }
             }
             if (NumAlphas >= 7) {
                 if (!IsCurveOutputTypeValid(Alphas(7))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -1335,12 +1331,12 @@ namespace CurveManager {
             }
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         }
@@ -1391,7 +1387,7 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(5),
@@ -1401,7 +1397,7 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(7),
@@ -1457,7 +1453,7 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(5),
@@ -1469,12 +1465,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         } // Exponential Skew Normal
@@ -1524,7 +1520,7 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(6),
@@ -1536,12 +1532,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         } // Sigmoid
@@ -1589,7 +1585,7 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(4),
@@ -1601,12 +1597,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         } // Rectangular Hyperbola Type 1
@@ -1654,7 +1650,7 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(4),
@@ -1666,12 +1662,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         } // Rectangular Hyperbola Type 2
@@ -1719,7 +1715,7 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                 ShowContinueError(state,
                                   format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(4),
@@ -1731,12 +1727,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         } // Exponential Decay
@@ -1787,12 +1783,12 @@ namespace CurveManager {
 
             if (NumAlphas >= 2) {
                 if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Input Unit Type for X is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
             if (NumAlphas >= 3) {
                 if (!IsCurveOutputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                    ShowWarningError(state, format("In {} named {} the Output Unit Type is invalid.", CurrentModuleObject, Alphas(1)));
                 }
             }
         } // Exponential Decay
@@ -1834,7 +1830,7 @@ namespace CurveManager {
                     dirMax = std::max(dirMax, Numbers(j));
                     if (j > 1) {
                         if (windDirs[j - 2] >= windDirs[j - 1]) {
-                            ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
+                            ShowSevereError(state, format("GetCurveInput: An {} object ", CurrentModuleObject));
                             ShowContinueError(state,
                                               "has either the same values for two consecutive wind directions, or a lower wind direction value after "
                                               "a higher wind direction value.");
@@ -1851,7 +1847,7 @@ namespace CurveManager {
                 }
                 // Check that the first table value is zero
                 if (dirMin != 0.0) {
-                    ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
+                    ShowSevereError(state, format("GetCurveInput: An {} object ", CurrentModuleObject));
                     ShowContinueError(state, format("has a nonzero minimum value of {:.2R}", dirMin));
                     ShowContinueError(state, "Wind direction values must begin at zero.");
                     ErrorsFound = true;
@@ -1883,8 +1879,7 @@ namespace CurveManager {
                     // Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
                     if (!UtilityRoutines::SameString(Alphas(2), wpcName)) {
                         ShowSevereError(state,
-                                        "GetCurveInput: Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + Alphas(2) + " in " +
-                                            CurrentModuleObject + " = " + Alphas(1));
+                                        format("GetCurveInput: Invalid {} = {} in {} = ", state.dataIPShortCut->cAlphaFieldNames(2), Alphas(2), CurrentModuleObject));
                         ShowContinueError(state, "The valid name is " + wpcName);
                         ErrorsFound = true;
                     }
@@ -1895,7 +1890,7 @@ namespace CurveManager {
 
                     state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::BtwxtMethod;
 
-                    std::string contextString = CurrentModuleObject + " \"" + Alphas(1) + "\"";
+                    std::string contextString = format("{} \"{}\"", CurrentModuleObject, Alphas(1));
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
@@ -1912,7 +1907,7 @@ namespace CurveManager {
 
                     MaxTableNums = NumNumbers;
                     if (NumNumbers != numWindDir) {
-                        ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                        ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                         ShowContinueError(state,
                                           format("The number of data entries must match the number of wind directions given in the wind pressure "
                                                  "coefficient array. Number of data entries = {}",
@@ -1975,7 +1970,7 @@ namespace CurveManager {
                 // Loop through independent variables in list and add them to the grid
                 for (auto indVar : fields.at("independent_variables")) {
                     std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
-                    std::string contextString = "Table:IndependentVariable \"" + indVarName + "\"";
+                    std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
@@ -1988,7 +1983,7 @@ namespace CurveManager {
                         if (indVarInstance.count("unit_type")) {
                             std::string unitType = indVarInstance.at("unit_type").get<std::string>();
                             if (!IsCurveOutputTypeValid(unitType)) {
-                                ShowSevereError(state, contextString + ": Unit Type [" + unitType + "] is invalid");
+                                ShowSevereError(state, format("{}: Unit Type [{}] is invalid", contextString, unitType));
                             }
                         }
 
@@ -1998,12 +1993,12 @@ namespace CurveManager {
                             std::string tmp = indVarInstance.at("external_file_name").get<std::string>();
                             fs::path filePath(tmp);
                             if (!indVarInstance.count("external_file_column_number")) {
-                                ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
+                                ShowSevereError(state, format("{}: No column number defined for external file \"{}\"", contextString, filePath.string()));
                                 ErrorsFound = true;
                             }
                             if (!indVarInstance.count("external_file_starting_row_number")) {
                                 ShowSevereError(state,
-                                                contextString + ": No starting row number defined for external file \"" + filePath.string() + "\"");
+                                                format("{}: No starting row number defined for external file \"{}\"", contextString, filePath.string()));
                                 ErrorsFound = true;
                             }
 
@@ -2034,7 +2029,7 @@ namespace CurveManager {
                                 axis.push_back(value.at("value").get<Real64>());
                             }
                         } else {
-                            ShowSevereError(state, contextString + ": No values defined.");
+                            ShowSevereError(state, format("{}: No values defined.", contextString));
                             ErrorsFound = true;
                         }
 
@@ -2047,7 +2042,7 @@ namespace CurveManager {
 
                         if (indVarInstance.count("extrapolation_method")) {
                             if (indVarInstance.at("extrapolation_method") == "Unavailable") {
-                                ShowSevereError(state, contextString + ": Extrapolation method \"Unavailable\" is not yet available.");
+                                ShowSevereError(state, format("{}: Extrapolation method \"Unavailable\" is not yet available.", contextString));
                                 ErrorsFound = true;
                             }
                             extrapMethod = CurveManager::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method").get<std::string>());
@@ -2090,7 +2085,7 @@ namespace CurveManager {
 
                     } else {
                         // Independent variable does not exist
-                        ShowSevereError(state, contextString + ": No Table:IndependentVariable found.");
+                        ShowSevereError(state, format("{}: No Table:IndependentVariable found.", contextString));
                         ErrorsFound = true;
                     }
                 }
@@ -2114,7 +2109,7 @@ namespace CurveManager {
 
                 std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
 
-                std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveNum).Name + "\"";
+                std::string contextString = format("Table:Lookup \"{}\"", state.dataCurveManager->PerfCurve(CurveNum).Name);
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                 Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
@@ -2122,7 +2117,7 @@ namespace CurveManager {
                 if (fields.count("output_unit_type")) {
                     std::string unitType = fields.at("output_unit_type").get<std::string>();
                     if (!IsCurveOutputTypeValid(unitType)) {
-                        ShowSevereError(state, contextString + ": Output Unit Type [" + unitType + "] is invalid");
+                        ShowSevereError(state, format("{}: Output Unit Type [{}] is invalid", contextString, unitType));
                     }
                 }
 
@@ -2198,11 +2193,11 @@ namespace CurveManager {
                     fs::path filePath(tmp);
 
                     if (!fields.count("external_file_column_number")) {
-                        ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
+                        ShowSevereError(state, format("{}: No column number defined for external file \"{}\"", contextString, filePath.string()));
                         ErrorsFound = true;
                     }
                     if (!fields.count("external_file_starting_row_number")) {
-                        ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath.string() + "\"");
+                        ShowSevereError(state, format("{}: No starting row number defined for external file \"{}\"", contextString, filePath.string()));
                         ErrorsFound = true;
                     }
 
@@ -2228,7 +2223,7 @@ namespace CurveManager {
                         lookupValues.push_back(value.at("output_value").get<Real64>() / normalizationDivisor);
                     }
                 } else {
-                    ShowSevereError(state, contextString + ": No values defined.");
+                    ShowSevereError(state, format("{}: No values defined.", contextString));
                     ErrorsFound = true;
                 }
 
@@ -2249,8 +2244,7 @@ namespace CurveManager {
                     }
                     if (pointsSpecified && pointsUnspecified) {
                         ShowSevereError(state,
-                                        contextString + ": Table is to be normalized using AutomaticWithDivisor, but not all independent variables "
-                                                        "define a normalization reference value. Make sure either:");
+                                        format("{}: Table is to be normalized using AutomaticWithDivisor, but not all independent variables define a normalization reference value. Make sure either:", contextString));
                         ShowContinueError(state, "  Make sure either:");
                         ShowContinueError(state, "    a) a normalization reference value is defined for each independent variable, or");
                         ShowContinueError(state, "    b) no normalization reference values are defined.");
@@ -2288,15 +2282,10 @@ namespace CurveManager {
             gridIndex = gridMap.at(indVarListName);
         } else {
             // Independent variable list does not exist
-            ShowSevereError(state, "Table:Lookup \"" + indVarListName + "\" : No Table:IndependentVariableList found.");
+            ShowSevereError(state, format("Table:Lookup \"{}\" : No Table:IndependentVariableList found.", indVarListName));
             ErrorsFound = true;
         }
         return gridIndex;
-    }
-
-    std::pair<double, double> BtwxtManager::getGridAxisLimits(int gridIndex, int axisIndex)
-    {
-        return grids[gridIndex].get_axis_limits(axisIndex);
     }
 
     int BtwxtManager::addOutputValues(int gridIndex, std::vector<double> values)
@@ -2429,7 +2418,7 @@ namespace CurveManager {
                 switch (dim) {
                 case 1:
                     SetupOutputVariable(state,
-                                        "Performance Curve Input Variable " + numStr + " Value",
+                                        format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1,
                                         OutputProcessor::SOVTimeStepType::HVAC,
@@ -2438,7 +2427,7 @@ namespace CurveManager {
                     break;
                 case 2:
                     SetupOutputVariable(state,
-                                        "Performance Curve Input Variable " + numStr + " Value",
+                                        format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2,
                                         OutputProcessor::SOVTimeStepType::HVAC,
@@ -2447,7 +2436,7 @@ namespace CurveManager {
                     break;
                 case 3:
                     SetupOutputVariable(state,
-                                        "Performance Curve Input Variable " + numStr + " Value",
+                                        format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3,
                                         OutputProcessor::SOVTimeStepType::HVAC,
@@ -2456,7 +2445,7 @@ namespace CurveManager {
                     break;
                 case 4:
                     SetupOutputVariable(state,
-                                        "Performance Curve Input Variable " + numStr + " Value",
+                                        format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4,
                                         OutputProcessor::SOVTimeStepType::HVAC,
@@ -2465,7 +2454,7 @@ namespace CurveManager {
                     break;
                 case 5:
                     SetupOutputVariable(state,
-                                        "Performance Curve Input Variable " + numStr + " Value",
+                                        format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5,
                                         OutputProcessor::SOVTimeStepType::HVAC,
@@ -2474,7 +2463,7 @@ namespace CurveManager {
                     break;
                 case 6:
                     SetupOutputVariable(state,
-                                        "Performance Curve Input Variable " + numStr + " Value",
+                                        format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput6,
                                         OutputProcessor::SOVTimeStepType::HVAC,
@@ -2732,7 +2721,7 @@ namespace CurveManager {
             target.push_back(var);
         }
 
-        std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveIndex).Name + "\"";
+        std::string contextString = format("Table:Lookup \"{}\"", state.dataCurveManager->PerfCurve(CurveIndex).Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
         Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(
@@ -2834,7 +2823,7 @@ namespace CurveManager {
         } else {
             // Not compatible
             ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName));
-            ShowContinueError(state, "...Invalid curve for " + std::string{curveFieldText} + ".");
+            ShowContinueError(state, format("...Invalid curve for {}.", curveFieldText));
             std::string validString = fmt::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {
                 validString += format(" or {}", validDims[i]);
@@ -2843,7 +2832,7 @@ namespace CurveManager {
             std::string plural2 = validDims[validDims.size() - 1] > 1 ? "s" : "";
             ShowContinueError(
                 state, format("...Input curve=\"{}\" has {} dimension{}.", state.dataCurveManager->PerfCurve(CurveIndex).Name, curveDim, plural1));
-            ShowContinueError(state, "...Curve type must have " + validString + " dimension" + plural2 + ".");
+            ShowContinueError(state, format("...Curve type must have {} dimension{}.", validString, plural2));
             return true;
         }
     }
@@ -2930,7 +2919,7 @@ namespace CurveManager {
 
         GetCurveCheckOut = GetCurveIndex(state, alph); // convert curve name to pointer
         if (GetCurveCheckOut == 0) {
-            ShowSevereError(state, "Curve Not Found for Object=\"" + ObjName + "\" :: " + alph);
+            ShowSevereError(state, format("Curve Not Found for Object=\"{}\" :: {}", ObjName, alph));
             errFlag = true;
         }
         return GetCurveCheckOut;
@@ -3301,7 +3290,7 @@ namespace CurveManager {
                 RR = format("{:.7R}", RoughnessRatio);
                 Re = format("{:.1R}", ReynoldsNumber);
                 ShowSevereError(state, "Plant Pressure System: Error in moody friction factor calculation");
-                ShowContinueError(state, "Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
+                ShowContinueError(state, format("Current Conditions: Roughness Ratio={}; Reynolds Number={}", RR, Re));
                 ShowContinueError(state, "These conditions resulted in an unhandled numeric issue.");
                 ShowContinueError(state, "Please contact EnergyPlus support/development team to raise an alert about this issue");
                 ShowContinueError(state, "This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");
@@ -3341,8 +3330,8 @@ namespace CurveManager {
         if (curveIndex > 0) {
             CurveVal = CurveValue(state, curveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
             if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, callingRoutineObj + "=\"" + objectName + "\" curve values");
-                ShowContinueError(state, "... " + cFieldName + " = " + cFieldValue + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
+                ShowWarningError(state, format("{}=\"{}\" curve values", callingRoutineObj, objectName));
+                ShowContinueError(state, format("... {} = {} output is not equal to 1.0 (+ or - 10%) at rated conditions.", cFieldName, cFieldValue));
                 ShowContinueError(state, format("... Curve output at rated conditions = {:.3T}", CurveVal));
             }
         }
