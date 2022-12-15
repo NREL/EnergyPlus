@@ -11908,9 +11908,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     EXPECT_NEAR(0.528942, thisSys->m_CycRatio, 0.0001); // cycling ratio
     EXPECT_EQ(1, thisSys->m_CoolingSpeedNum);           // Speed number
     EXPECT_NEAR(1.02,
-                state->dataCurveManager->PerfCurve(21).CurveInput1,
+                state->dataCurveManager->PerfCurve(21).inputs[0],
                 0.0001); // Speed 1 Total Cooling Capacity Function of Flow Fraction Curve input value
-    EXPECT_NEAR(1.02, state->dataCurveManager->PerfCurve(22).CurveInput1,
+    EXPECT_NEAR(1.02, state->dataCurveManager->PerfCurve(22).inputs[0],
                 0.0001);                                                     // Speed 1 Total EIR Function of Flow Fraction Curve input value
     EXPECT_NEAR(0.4896, state->dataHVACGlobal->MSHPMassFlowRateLow, 0.0001); // cycling ratio
     // #8580
@@ -11944,15 +11944,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     EXPECT_NEAR(0.15358, thisSys->m_CycRatio, 0.0001); // cycling ratio
     EXPECT_EQ(1, thisSys->m_HeatingSpeedNum);          // Speed number
     EXPECT_NEAR(0.90667,
-                state->dataCurveManager->PerfCurve(13).CurveInput1,
+                state->dataCurveManager->PerfCurve(13).inputs[0],
                 0.0001); // Speed 1 Total Cooling Capacity Function of Flow Fraction Curve input value
     EXPECT_NEAR(0.98506,
-                state->dataCurveManager->PerfCurve(13).CurveOutput,
+                state->dataCurveManager->PerfCurve(13).output,
                 0.0001); // Speed 1 Total Cooling Capacity Function of Flow Fraction Curve input value
     EXPECT_NEAR(0.90667,
-                state->dataCurveManager->PerfCurve(23).CurveInput1,
+                state->dataCurveManager->PerfCurve(23).inputs[0],
                 0.0001); // Speed 1 Total Cooling Capacity Function of Flow Fraction Curve input value
-    EXPECT_NEAR(1.03138, state->dataCurveManager->PerfCurve(23).CurveOutput,
+    EXPECT_NEAR(1.03138, state->dataCurveManager->PerfCurve(23).output,
                 0.0001);                                                     // Speed 1 Total EIR Function of Flow Fraction Curve input value
     EXPECT_NEAR(0.4896, state->dataHVACGlobal->MSHPMassFlowRateLow, 0.0001); // cycling ratio
 }

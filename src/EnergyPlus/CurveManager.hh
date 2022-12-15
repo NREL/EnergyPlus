@@ -190,13 +190,8 @@ namespace CurveManager {
         Array1D<TriQuadraticCurveDataStruct> Tri2ndOrder; // structure for triquadratic curve data
         bool EMSOverrideOn = false;                       // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue = 0.0;               // Value of curve result EMS is directing to use
-        Real64 CurveOutput = 0.0;                         // curve output or result
-        Real64 CurveInput1 = 0.0;                         // curve input #1 (e.g., x or X1 variable)
-        Real64 CurveInput2 = 0.0;                         // curve input #2 (e.g., y or X2 variable)
-        Real64 CurveInput3 = 0.0;                         // curve input #3 (e.g., z or X3 variable)
-        Real64 CurveInput4 = 0.0;                         // curve input #4 (e.g., X4 variable)
-        Real64 CurveInput5 = 0.0;                         // curve input #5 (e.g., X5 variable)
-        Real64 CurveInput6 = 0.0;                         // curve input #6 (e.g., X6 variable)
+        Real64 output = 0.0;                              // curve output or result
+        std::array<Real64, 6> inputs = {0.0};             // curve inputs
     };
 
     // Table file objects
@@ -242,7 +237,7 @@ namespace CurveManager {
         std::vector<Btwxt::RegularGridInterpolator> grids;
     };
 
-    void BtwxtMessageCallback(Btwxt::MsgLevel messageType, const std::string& message, void *contextPtr);
+    void BtwxtMessageCallback(Btwxt::MsgLevel messageType, std::string message, void *contextPtr);
 
     void ResetPerformanceCurveOutput(EnergyPlusData &state);
 

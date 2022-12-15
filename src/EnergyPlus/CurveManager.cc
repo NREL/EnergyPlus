@@ -147,12 +147,13 @@ namespace CurveManager {
         // This allows the report variable for curve/table objects to show an inactive state.
 
         for (int CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput = DataLoopNode::SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1 = DataLoopNode::SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2 = DataLoopNode::SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3 = DataLoopNode::SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4 = DataLoopNode::SensedNodeFlagValue;
-            state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5 = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).output = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).inputs[0] = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).inputs[1] = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).inputs[2] = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).inputs[3] = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).inputs[4] = DataLoopNode::SensedNodeFlagValue;
+            state.dataCurveManager->PerfCurve(CurveIndex).inputs[5] = DataLoopNode::SensedNodeFlagValue;
         }
     }
 
@@ -211,13 +212,13 @@ namespace CurveManager {
         if (state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideOn)
             CurveValue = state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideCurveValue;
 
-        state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput = CurveValue;
-        state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1 = Var1;
-        if (present(Var2)) state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2 = Var2;
-        if (present(Var3)) state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3 = Var3;
-        if (present(Var4)) state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4 = Var4;
-        if (present(Var5)) state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5 = Var5;
-        if (present(Var6)) state.dataCurveManager->PerfCurve(CurveIndex).CurveInput6 = Var6;
+        state.dataCurveManager->PerfCurve(CurveIndex).output = CurveValue;
+        state.dataCurveManager->PerfCurve(CurveIndex).inputs[0] = Var1;
+        if (present(Var2)) state.dataCurveManager->PerfCurve(CurveIndex).inputs[1] = Var2;
+        if (present(Var3)) state.dataCurveManager->PerfCurve(CurveIndex).inputs[2] = Var3;
+        if (present(Var4)) state.dataCurveManager->PerfCurve(CurveIndex).inputs[3] = Var4;
+        if (present(Var5)) state.dataCurveManager->PerfCurve(CurveIndex).inputs[4] = Var5;
+        if (present(Var6)) state.dataCurveManager->PerfCurve(CurveIndex).inputs[5] = Var6;
 
         return CurveValue;
     }
@@ -2420,7 +2421,7 @@ namespace CurveManager {
                     SetupOutputVariable(state,
                                         format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
-                                        state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1,
+                                        state.dataCurveManager->PerfCurve(CurveIndex).inputs[0],
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
@@ -2429,7 +2430,7 @@ namespace CurveManager {
                     SetupOutputVariable(state,
                                         format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
-                                        state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2,
+                                        state.dataCurveManager->PerfCurve(CurveIndex).inputs[1],
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
@@ -2438,7 +2439,7 @@ namespace CurveManager {
                     SetupOutputVariable(state,
                                         format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
-                                        state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3,
+                                        state.dataCurveManager->PerfCurve(CurveIndex).inputs[2],
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
@@ -2447,7 +2448,7 @@ namespace CurveManager {
                     SetupOutputVariable(state,
                                         format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
-                                        state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4,
+                                        state.dataCurveManager->PerfCurve(CurveIndex).inputs[3],
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
@@ -2456,7 +2457,7 @@ namespace CurveManager {
                     SetupOutputVariable(state,
                                         format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
-                                        state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5,
+                                        state.dataCurveManager->PerfCurve(CurveIndex).inputs[4],
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
@@ -2465,7 +2466,7 @@ namespace CurveManager {
                     SetupOutputVariable(state,
                                         format("Performance Curve Input Variable {} Value", numStr),
                                         OutputProcessor::Unit::None,
-                                        state.dataCurveManager->PerfCurve(CurveIndex).CurveInput6,
+                                        state.dataCurveManager->PerfCurve(CurveIndex).inputs[5],
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
@@ -2479,7 +2480,7 @@ namespace CurveManager {
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
-                                state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput,
+                                state.dataCurveManager->PerfCurve(CurveIndex).output,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataCurveManager->PerfCurve(CurveIndex).Name);
