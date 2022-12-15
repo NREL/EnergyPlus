@@ -849,11 +849,18 @@ namespace WaterThermalTanks {
                                 bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
-        Real64 PLRResidualHPWH(EnergyPlusData &state, Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
+        Real64 PLRResidualHPWH(EnergyPlusData &state, Real64 HPPartLoadRatio, Real64 desTankTemp, TankOperatingMode mode, Real64 mDotWater);
 
         Real64 PLRResidualIterSpeed(EnergyPlusData &state,
                                     Real64 SpeedRatio, // speed ratio between two speed levels
-                                    Array1D<Real64> const &Par);
+                                    int HPNum,
+                                    int SpeedNum,
+                                    int HPWaterInletNode,
+                                    int HPWaterOutletNode,
+                                    Real64 RhoWater,
+                                    Real64 desTankTemp,
+                                    TankOperatingMode mode,
+                                    bool FirstHVACIteration);
 
         static void ValidatePLFCurve(EnergyPlusData &state, int CurveIndex, bool &IsValid);
 

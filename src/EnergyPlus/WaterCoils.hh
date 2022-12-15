@@ -401,16 +401,6 @@ namespace WaterCoils {
 
     void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef);
 
-    Real64 SimpleHeatingCoilUAResidual(EnergyPlusData &state,
-                                       Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
-    Real64 SimpleCoolingCoilUAResidual(EnergyPlusData &state,
-                                       Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
     // Iterate Routine for Cooling Coil
 
     void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
@@ -485,11 +475,6 @@ namespace WaterCoils {
                       Real64 const H,  // specific enthalpy {J/kg}
                       Real64 const RH, // relative humidity value (0.0-1.0)
                       Real64 const PB  // barometric pressure {Pascals}
-    );
-
-    Real64 EnthalpyResidual(EnergyPlusData &state,
-                            Real64 const Tprov,        // test value of Tdb [C]
-                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     );
 
     Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum); // coil number, [-]
@@ -593,7 +578,6 @@ struct WaterCoilsData : BaseGlobalStruct
     Array1D_bool MyCoilReportFlag;
     Array1D_bool PlantLoopScanFlag;
     Array1D<Real64> CoefSeries = Array1D<Real64>(5); // Tuned Changed to static: High call count: Set before use
-    Array1D<Real64> Par = Array1D<Real64>(4);        // Tuned Changed to static: High call count: Set before use
     bool NoSatCurveIntersect = false;                // TRUE if failed to find apparatus dew-point
     bool BelowInletWaterTemp = false;                // TRUE if apparatus dew-point below design inlet water temperature
     bool CBFTooLarge = false;                        // TRUE if the coil bypass factor is unrealistically large
@@ -633,7 +617,6 @@ struct WaterCoilsData : BaseGlobalStruct
         this->MyCoilReportFlag.deallocate();
         this->PlantLoopScanFlag.deallocate();
         this->CoefSeries = Array1D<Real64>(5);
-        this->Par = Array1D<Real64>(4);
         this->NoSatCurveIntersect = false;
         this->BelowInletWaterTemp = false;
         this->CBFTooLarge = false;

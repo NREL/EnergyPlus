@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -419,4 +420,121 @@ TEST_F(EnergyPlusFixture, OARequirements_calcDesignSpecificationOutdoorAir)
     oaNum = UtilityRoutines::FindItemInList(thisOAReqName, state->dataSize->OARequirements);
     Real64 zone2OA = DataSizing::calcDesignSpecificationOutdoorAir(*state, oaNum, zoneNum, UseOccSchFlag, UseMinOASchFlag);
     EXPECT_EQ(expectedOA, zone2OA);
+}
+
+TEST_F(EnergyPlusFixture, GetCoilDesFlowT_Test)
+{
+    state->dataEnvrn->StdRhoAir = 1.1;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->SysSizPeakDDNum.allocate(1);
+    state->dataSize->SysSizPeakDDNum(1).TimeStepAtTotCoolPk.allocate(2);
+    state->dataSize->SysSizPeakDDNum(1).TimeStepAtSensCoolPk.allocate(2);
+    state->dataSize->CalcSysSizing.allocate(1);
+    state->dataSize->CalcSysSizing(1).SumZoneCoolLoadSeq.allocate(2);
+    state->dataSize->CalcSysSizing(1).CoolZoneAvgTempSeq.allocate(2);
+    state->dataSize->SysSizInput(1).AirPriLoopName = "MyAirloop";
+    state->dataSize->FinalSysSizing(1).AirPriLoopName = "MyAirloop";
+    state->dataSize->FinalSysSizing(1).CoolSupTemp = 12.3;
+    state->dataSize->FinalSysSizing(1).CoolSupHumRat = 0.008;
+    state->dataSize->FinalSysSizing(1).DesCoolVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->SysSizPeakDDNum(1).TotCoolPeakDD = 1;
+    state->dataSize->SysSizPeakDDNum(1).SensCoolPeakDD = 1;
+    state->dataSize->SysSizPeakDDNum(1).TimeStepAtTotCoolPk(1) = 1;
+    state->dataSize->SysSizPeakDDNum(1).TimeStepAtSensCoolPk(1) = 2;
+    state->dataSize->CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 1000.0;
+    state->dataSize->CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 24.0;
+    state->dataSize->CalcSysSizing(1).SumZoneCoolLoadSeq(2) = 500.0;
+    state->dataSize->CalcSysSizing(1).CoolZoneAvgTempSeq(2) = 22.0;
+    state->dataSize->CalcSysSizing(1).MixTempAtCoolPeak = 30.0;
+    state->dataSize->DataAirFlowUsedForSizing = 0.5;
+
+    int curSysNum = 1;
+    Real64 CpAirStd = 1.1;
+    Real64 DesCoilAirFlow = 0.0;
+    Real64 DesCoilExitTemp = 0.0;
+    Real64 DesCoilExitHumRat = 0.0;
+
+    // design data are used
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VAV;
+    DataSizing::GetCoilDesFlowT(*state, curSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+    EXPECT_NEAR(DesCoilAirFlow, state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak / state->dataEnvrn->StdRhoAir, 0.00001);
+    EXPECT_NEAR(DesCoilExitTemp, state->dataSize->FinalSysSizing(1).CoolSupTemp, 0.00001);
+    EXPECT_NEAR(DesCoilExitHumRat, state->dataSize->FinalSysSizing(1).CoolSupHumRat, 0.00001);
+
+    // design data and DataAirFlowUsedForSizing are used
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::OnOff;
+    DesCoilAirFlow = 0.0;
+    DesCoilExitTemp = 0.0;
+    DesCoilExitHumRat = 0.0;
+    DataSizing::GetCoilDesFlowT(*state, curSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+    EXPECT_NEAR(DesCoilAirFlow, state->dataSize->DataAirFlowUsedForSizing, 0.00001);
+    EXPECT_NEAR(DesCoilExitTemp, state->dataSize->FinalSysSizing(1).CoolSupTemp, 0.00001);
+    EXPECT_NEAR(DesCoilExitHumRat, state->dataSize->FinalSysSizing(1).CoolSupHumRat, 0.00001);
+
+    // at high loads DesCoilExitTemp equals design
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VT;
+    DesCoilAirFlow = 0.0;
+    DesCoilExitTemp = 0.0;
+    DesCoilExitHumRat = 0.0;
+    DataSizing::GetCoilDesFlowT(*state, curSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+    EXPECT_NEAR(DesCoilAirFlow, state->dataSize->FinalSysSizing(1).DesCoolVolFlow, 0.00001);
+    EXPECT_NEAR(DesCoilExitTemp, state->dataSize->FinalSysSizing(1).CoolSupTemp, 0.00001);
+    EXPECT_NEAR(DesCoilExitHumRat, 0.008005, 0.00001);
+
+    // at low loads DesCoilExitTemp is higher than design
+    DesCoilAirFlow = 0.0;
+    DesCoilExitTemp = 0.0;
+    DesCoilExitHumRat = 0.0;
+    state->dataSize->CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 10.0;
+    DataSizing::GetCoilDesFlowT(*state, curSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+    EXPECT_NEAR(DesCoilAirFlow, state->dataSize->FinalSysSizing(1).DesCoolVolFlow, 0.00001);
+    EXPECT_GT(DesCoilExitTemp, state->dataSize->FinalSysSizing(1).CoolSupTemp);
+    EXPECT_NEAR(DesCoilExitTemp, 15.735537, 0.00001);
+    EXPECT_GT(DesCoilExitHumRat, state->dataSize->FinalSysSizing(1).CoolSupHumRat);
+    EXPECT_NEAR(DesCoilExitHumRat, 0.01003, 0.00001);
+
+    // coil air flow and humrat are calculated
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::Bypass;
+    DesCoilAirFlow = 0.0;
+    DesCoilExitTemp = 0.0;
+    DesCoilExitHumRat = 0.0;
+    DataSizing::GetCoilDesFlowT(*state, curSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+    EXPECT_NEAR(DesCoilAirFlow, 0.805901, 0.00001);
+    EXPECT_NEAR(DesCoilExitTemp, state->dataSize->FinalSysSizing(1).CoolSupTemp, 0.00001);
+    EXPECT_NEAR(DesCoilExitHumRat, 0.008005, 0.00001);
+
+    // design data used, humrat is calculated.
+    // VT and Bypass used sequenced cooling load and zone cooling temp using DD timestep
+    state->dataSize->SysSizInput(1).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::VT;
+    DesCoilAirFlow = 0.0;
+    DesCoilExitTemp = 0.0;
+    DesCoilExitHumRat = 0.0;
+    DataSizing::GetCoilDesFlowT(*state, curSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+    EXPECT_NEAR(DesCoilAirFlow, state->dataSize->FinalSysSizing(1).DesCoolVolFlow, 0.00001);
+    EXPECT_NEAR(DesCoilExitTemp, state->dataSize->FinalSysSizing(1).CoolSupTemp, 0.00001);
+    EXPECT_NEAR(DesCoilExitHumRat, 0.008005, 0.00001);
+
+    // design data used, humrat is calculated
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::CapacityControl::Bypass;
+    DesCoilAirFlow = 0.0;
+    DesCoilExitTemp = 0.0;
+    DesCoilExitHumRat = 0.0;
+    DataSizing::GetCoilDesFlowT(*state, curSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+    EXPECT_NEAR(DesCoilAirFlow, state->dataSize->FinalSysSizing(1).DesCoolVolFlow, 0.00001);
+    EXPECT_NEAR(DesCoilExitTemp, state->dataSize->FinalSysSizing(1).CoolSupTemp, 0.00001);
+    EXPECT_NEAR(DesCoilExitHumRat, 0.008005, 0.00001);
+
+    // DesCoilAirFlow will be calculated
+    state->dataSize->CalcSysSizing(1).SumZoneCoolLoadSeq(2) = 5.0;
+    DesCoilAirFlow = 0.0;
+    DesCoilExitTemp = 0.0;
+    DesCoilExitHumRat = 0.0;
+    DataSizing::GetCoilDesFlowT(*state, curSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+    EXPECT_NEAR(DesCoilAirFlow, 0.685436, 0.00001);
+    EXPECT_NEAR(DesCoilExitTemp, state->dataSize->FinalSysSizing(1).CoolSupTemp, 0.00001);
+    EXPECT_NEAR(DesCoilExitHumRat, 0.008005, 0.00001);
 }

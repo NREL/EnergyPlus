@@ -132,9 +132,17 @@ Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state
     } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
         if (thisLoadComp.CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) {
             // there will be a valid set-point on outlet
-            return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
+            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) {
+                return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
+            } else {
+                return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointLo;
+            }
         } else { // use plant loop overall set-point
-            return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
+            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) {
+                return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
+            } else {
+                return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointLo;
+            }
         }
     } else {
         // there's no other enums for loop demand calcs, so I don't have a reasonable unit test for these
@@ -359,6 +367,15 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
     this->oneTimeInit(state); // plant setup
 
     if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+        if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
+            this->sizeLoadSide(state);
+            if (this->waterSource) {
+                this->sizeSrcSideWSHP(state);
+            } else if (this->airSource) {
+                this->sizeSrcSideASHP(state);
+            }
+        }
+
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                        DataGlobalConstants::InitConvTemp,
@@ -389,15 +406,9 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 }
 
 void EIRPlantLoopHeatPump::getDesignCapacities(
-    EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
 {
     if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
-        this->sizeLoadSide(state);
-        if (this->waterSource) {
-            this->sizeSrcSideWSHP(state);
-        } else if (this->airSource) {
-            this->sizeSrcSideASHP(state);
-        }
         MinLoad = 0.0;
         MaxLoad = this->referenceCapacity;
         OptLoad = this->referenceCapacity;
@@ -756,6 +767,35 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     }
 
     this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
+
+    std::string_view const typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)];
+    if (this->sourceSideDesignVolFlowRateWasAutoSized) {
+        this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
+        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+            BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+        }
+        if (state.dataPlnt->PlantFirstSizesOkayToReport) {
+            BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+        }
+    } else {
+        // source design flow was hard-sized
+        if (this->sourceSideDesignVolFlowRate > 0.0) {
+            if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                if (state.dataGlobal->DoPlantSizing) {
+                    BaseSizer::reportSizerOutput(state,
+                                                 typeName,
+                                                 this->name,
+                                                 "Design Size Source Side Volume Flow Rate [m3/s]",
+                                                 tmpSourceVolFlow,
+                                                 "User-Specified Source Side Volume Flow Rate [m3/s]",
+                                                 this->sourceSideDesignVolFlowRate);
+                } else {
+                    BaseSizer::reportSizerOutput(
+                        state, typeName, this->name, "User-Specified Source Side Volume Flow Rate [m3/s]", this->sourceSideDesignVolFlowRate);
+                }
+            }
+        }
+    }
 
     if (errorsFound) {
         ShowFatalError(state, "Preceding sizing errors cause program termination"); // LCOV_EXCL_LINE

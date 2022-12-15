@@ -941,7 +941,6 @@ namespace HVACCooledBeam {
         int ControlNode;              // the water inlet node
         int InAirNode;                // the air inlet node
         bool UnitOn;                  // TRUE if unit is on
-        Array1D<Real64> Par(5);
         int SolFlag;
         Real64 ErrTolerance;
         auto &CoolBeam = state.dataHVACCooledBeam->CoolBeam;
@@ -981,13 +980,15 @@ namespace HVACCooledBeam {
                 if ((QMax < QToCoolSetPt - QSup - SmallLoad) && (QMax != QMin)) {
                     // The cooled beam system can meet the demand.
                     // Set up the iterative calculation of chilled water flow rate
-                    Par(1) = double(CBNum);
-                    Par(2) = double(ZoneNodeNum);
-                    Par(3) = QToCoolSetPt - QSup; // load to be met by the beams
-                    Par(4) = QMin;
-                    Par(5) = QMax;
                     ErrTolerance = 0.01;
-                    General::SolveRoot(state, ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
+                    auto f = [&state, CBNum, ZoneNodeNum, QToCoolSetPt, QSup, QMin, QMax](Real64 const CWFlow) {
+                        Real64 const par3 = QToCoolSetPt - QSup;
+                        Real64 UnitOutput(0.0);
+                        Real64 TWOut(0.0);
+                        CalcCoolBeam(state, CBNum, ZoneNodeNum, CWFlow, UnitOutput, TWOut);
+                        return (par3 - UnitOutput) / (QMax - QMin);
+                    };
+                    General::SolveRoot(state, ErrTolerance, 50, SolFlag, CWFlow, f, MinColdWaterFlow, MaxColdWaterFlow);
                     if (SolFlag == -1) {
                         ShowWarningError(state, "Cold water control failed in cooled beam unit " + CoolBeam(CBNum).Name);
                         ShowContinueError(state, "  Iteration limit exceeded in calculating cold water mass flow rate");
@@ -1156,60 +1157,6 @@ namespace HVACCooledBeam {
             }
         }
         LoadMet = -WaterCoolPower * CoolBeam(CBNum).NumBeams;
-    }
-
-    Real64 CoolBeamResidual(EnergyPlusData &state,
-                            Real64 const CWFlow, // cold water flow rate in kg/s
-                            Array1D<Real64> const &Par)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   February 2009
-        //       MODIFIED
-        //       RE-ENGINEERED
-
-        // PURPOSE OF THIS FUNCTION:
-        // Calculates residual function (Requested Unit Load - Unit Output) / Max Unit Output
-        // Unit Output depends on the cold water flow rate which is being varied to zero the residual.
-
-        // METHODOLOGY EMPLOYED:
-        // Calls CalcCoolBeam, and calculates the residual as defined above.
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int CBIndex;
-        int ZoneNodeIndex;
-        Real64 UnitOutput(0.0);
-        Real64 TWOut(0.0);
-
-        CBIndex = int(Par(1));
-        ZoneNodeIndex = int(Par(2));
-        CalcCoolBeam(state, CBIndex, ZoneNodeIndex, CWFlow, UnitOutput, TWOut);
-        Residuum = (Par(3) - UnitOutput) / (Par(5) - Par(4));
-
-        return Residuum;
     }
 
     void UpdateCoolBeam(EnergyPlusData &state, int const CBNum)
