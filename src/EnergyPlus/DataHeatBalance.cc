@@ -703,10 +703,10 @@ int AssignReverseConstructionNumber(EnergyPlusData &state,
         //  Put in new attributes
         NewConstrNum = state.dataHeatBal->TotConstructs;
         state.dataConstruction->Construct(NewConstrNum).IsUsed = true;
-        state.dataConstruction->Construct(state.dataHeatBal->TotConstructs) = thisConstruct; // preserve some of the attributes.
+        state.dataConstruction->Construct(state.dataHeatBal->TotConstructs) = state.dataConstruction->Construct(ConstrNum); // preserve some of the attributes.
         // replace others...
-        state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).Name = "iz-" + thisConstruct.Name;
-        state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotLayers = thisConstruct.TotLayers;
+        state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).Name = "iz-" + state.dataConstruction->Construct(ConstrNum).Name;
+        state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
         for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(nLayer) = state.dataConstruction->LayerPoint(nLayer);
             if (state.dataConstruction->LayerPoint(nLayer) != 0) {
