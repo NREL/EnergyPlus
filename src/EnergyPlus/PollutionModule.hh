@@ -76,6 +76,29 @@ namespace PollutionModule {
         Num
     };
 
+    enum class Pollutant
+    {
+        Invalid = -1,
+        SO2,
+        NOx,
+        N2O,
+        PM,
+        PM2_5,
+        PM10,
+        CO,
+        CO2,
+        CH4,
+        NH3,
+        NMVOC,
+        Hg,
+        Pb,
+        NuclearHigh,
+        NuclearLow,
+        WaterEnvironmentalFactors,
+        Source,
+        Num
+    };
+
     // MODULE VARIABLE DECLARATIONS:
     // Total for all of the Pollutants
     // Total Carbon Equivalent Components

@@ -114,29 +114,6 @@ namespace DataGlobalConstants {
         Num
     };
 
-    enum class Pollutant
-    {
-        Invalid = -1,
-        SO2,
-        NOx,
-        N2O,
-        PM,
-        PM2_5,
-        PM10,
-        CO,
-        CO2,
-        CH4,
-        NH3,
-        NMVOC,
-        Hg,
-        Pb,
-        NuclearHigh,
-        NuclearLow,
-        WaterEnvironmentalFactors,
-        Source,
-        Num
-    };
-
     static constexpr std::array<std::string_view, static_cast<int>(ResourceType::Num)> ResourceTypeNamesUC = {"ELECTRICITY",
                                                                                                               "NATURALGAS",
                                                                                                               "GASOLINE",
@@ -195,41 +172,6 @@ namespace DataGlobalConstants {
                                                                                                             "Condensate",
                                                                                                             "OtherFuel1",
                                                                                                             "OtherFuel2"};
-
-    static constexpr std::array<std::string_view, static_cast<int>(Pollutant::Num)> PollutantNamesUC = {"SO2",
-                                                                                                        "NOX",
-                                                                                                        "N2O",
-                                                                                                        "PM",
-                                                                                                        "PM2.5",
-                                                                                                        "PM10",
-                                                                                                        "CO",
-                                                                                                        "CO2",
-                                                                                                        "CH4",
-                                                                                                        "NH3",
-                                                                                                        "NMVOC",
-                                                                                                        "HG",
-                                                                                                        "PB",
-                                                                                                        "NUCLEAR HIGH",
-                                                                                                        "NUCLEAR LOW",
-                                                                                                        "WATERENVIRONMENTALFACTORS",
-                                                                                                        "SOURCE"};
-    static constexpr std::array<std::string_view, static_cast<int>(Pollutant::Num)> PollutantNames = {"SO2",
-                                                                                                      "NOx",
-                                                                                                      "N2O",
-                                                                                                      "PM",
-                                                                                                      "PM2.5",
-                                                                                                      "PM10",
-                                                                                                      "CO",
-                                                                                                      "CO2",
-                                                                                                      "CH4",
-                                                                                                      "NH3",
-                                                                                                      "NMVOC",
-                                                                                                      "Hg",
-                                                                                                      "Pb",
-                                                                                                      "Nuclear High",
-                                                                                                      "Nuclear Low",
-                                                                                                      "WaterEnvironmentalFactors",
-                                                                                                      "Source"};
 
     enum class CallIndicator
     {
@@ -336,25 +278,6 @@ struct DataGlobalConstantsData : BaseGlobalStruct
                                                                        DataGlobalConstants::ResourceType::Condensate,
                                                                        DataGlobalConstants::ResourceType::OtherFuel1,
                                                                        DataGlobalConstants::ResourceType::OtherFuel2};
-
-    std::vector<DataGlobalConstants::Pollutant> AllPollutants = {DataGlobalConstants::Pollutant::Invalid,
-                                                                 DataGlobalConstants::Pollutant::SO2,
-                                                                 DataGlobalConstants::Pollutant::NOx,
-                                                                 DataGlobalConstants::Pollutant::N2O,
-                                                                 DataGlobalConstants::Pollutant::PM,
-                                                                 DataGlobalConstants::Pollutant::PM2_5,
-                                                                 DataGlobalConstants::Pollutant::PM10,
-                                                                 DataGlobalConstants::Pollutant::CO,
-                                                                 DataGlobalConstants::Pollutant::CO2,
-                                                                 DataGlobalConstants::Pollutant::CH4,
-                                                                 DataGlobalConstants::Pollutant::NH3,
-                                                                 DataGlobalConstants::Pollutant::NMVOC,
-                                                                 DataGlobalConstants::Pollutant::Hg,
-                                                                 DataGlobalConstants::Pollutant::Pb,
-                                                                 DataGlobalConstants::Pollutant::NuclearHigh,
-                                                                 DataGlobalConstants::Pollutant::NuclearLow,
-                                                                 DataGlobalConstants::Pollutant::WaterEnvironmentalFactors,
-                                                                 DataGlobalConstants::Pollutant::Source};
 
     void clear_state() override
     {
