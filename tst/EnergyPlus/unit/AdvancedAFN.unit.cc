@@ -127,10 +127,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = -50.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 10.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = -50.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 10.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 2.0;
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
@@ -142,10 +142,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 10.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 50.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 10.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 50.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 2.0;
 
     state->afn->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenProbStatus);

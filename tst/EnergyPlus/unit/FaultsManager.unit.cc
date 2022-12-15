@@ -109,8 +109,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.0129;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 21.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 7.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 21.0;
 
     // Inputs:
     FanNum = 1;
@@ -360,8 +360,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.0129;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 21.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 7.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 21.0;
 
     // Inputs: fans
     FanNum = 1;

@@ -437,10 +437,10 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     constantcurve1.coeff[3] = 0.0;
     constantcurve1.coeff[4] = 0.0;
     constantcurve1.coeff[5] = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
+    constantcurve1.limits[0].min = 10.0;
+    constantcurve1.limits[0].max = 25.0;
+    constantcurve1.limits[1].min = 0.0;
+    constantcurve1.limits[1].max = 100.0;
     constantcurve1.CurveMin = 1.0;
     constantcurve1.CurveMax = 1.0;
     // quadratic curve
@@ -451,8 +451,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
     constantcurve2.coeff[2] = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
+    constantcurve2.limits[0].min = 0.0;
+    constantcurve2.limits[0].max = 1.0;
     constantcurve2.CurveMin = 1.0;
     constantcurve2.CurveMax = 1.0;
     // set coil parameter
@@ -856,10 +856,10 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     constantcurve1.coeff[3] = 0.0;
     constantcurve1.coeff[4] = 0.0;
     constantcurve1.coeff[5] = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
+    constantcurve1.limits[0].min = 10.0;
+    constantcurve1.limits[0].max = 25.0;
+    constantcurve1.limits[1].min = 0.0;
+    constantcurve1.limits[1].max = 100.0;
     constantcurve1.CurveMin = 1.0;
     constantcurve1.CurveMax = 1.0;
     // quadratic curve
@@ -870,8 +870,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
     constantcurve2.coeff[2] = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
+    constantcurve2.limits[0].min = 0.0;
+    constantcurve2.limits[0].max = 1.0;
     constantcurve2.CurveMin = 1.0;
     constantcurve2.CurveMax = 1.0;
     // set coil parameter
@@ -1275,10 +1275,10 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     constantcurve1.coeff[3] = 0.0;
     constantcurve1.coeff[4] = 0.0;
     constantcurve1.coeff[5] = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
+    constantcurve1.limits[0].min = 10.0;
+    constantcurve1.limits[0].max = 25.0;
+    constantcurve1.limits[1].min = 0.0;
+    constantcurve1.limits[1].max = 100.0;
     constantcurve1.CurveMin = 1.0;
     constantcurve1.CurveMax = 1.0;
     // quadratic curve
@@ -1289,8 +1289,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
     constantcurve2.coeff[2] = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
+    constantcurve2.limits[0].min = 0.0;
+    constantcurve2.limits[0].max = 1.0;
     constantcurve2.CurveMin = 1.0;
     constantcurve2.CurveMax = 1.0;
     // set coil parameter
@@ -1509,10 +1509,10 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     constantcurve1.coeff[3] = 0.0;
     constantcurve1.coeff[4] = 0.0;
     constantcurve1.coeff[5] = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
+    constantcurve1.limits[0].min = 10.0;
+    constantcurve1.limits[0].max = 25.0;
+    constantcurve1.limits[1].min = 0.0;
+    constantcurve1.limits[1].max = 100.0;
     constantcurve1.CurveMin = 1.0;
     constantcurve1.CurveMax = 1.0;
     // quadratic curve
@@ -1523,8 +1523,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
     constantcurve2.coeff[2] = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
+    constantcurve2.limits[0].min = 0.0;
+    constantcurve2.limits[0].max = 1.0;
     constantcurve2.CurveMin = 1.0;
     constantcurve2.CurveMax = 1.0;
     // set coil parameter

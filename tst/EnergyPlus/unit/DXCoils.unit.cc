@@ -177,10 +177,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 2.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 2.0;
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
@@ -192,10 +192,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.7;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 0.7;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 1.0;
 
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
@@ -207,10 +207,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = -100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = -100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 100.0;
 
     SetPredefinedTables(*state);
     SizeDXCoil(*state, 2);
@@ -332,10 +332,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 2.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 2.0;
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
@@ -347,10 +347,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.7;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 0.7;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 1.0;
 
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
@@ -362,10 +362,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = -100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = -100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 100.0;
 
     SetPredefinedTables(*state);
     SizeDXCoil(*state, 2);
@@ -493,10 +493,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[3] = 0.005999544;
     pCurve->coeff[4] = -0.0000900072;
     pCurve->coeff[5] = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->limits[0].min = -100;
+    pCurve->limits[0].max = 100;
+    pCurve->limits[1].min = -100;
+    pCurve->limits[1].max = 100;
 
     Coil.MSCCapFTemp(1) = nCapfT1;
 
@@ -507,8 +507,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
 
@@ -524,10 +524,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[3] = -0.0085714308;
     pCurve->coeff[4] = 0.0000857142;
     pCurve->coeff[5] = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->limits[0].min = -100;
+    pCurve->limits[0].max = 100;
+    pCurve->limits[1].min = -100;
+    pCurve->limits[1].max = 100;
 
     Coil.MSEIRFTemp(1) = nEIRfT1;
 
@@ -538,8 +538,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
 
@@ -552,8 +552,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 1;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 1;
     pCurve->CurveMin = 0.7;
     pCurve->CurveMax = 1;
 
@@ -569,10 +569,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[3] = 0;
     pCurve->coeff[4] = 0;
     pCurve->coeff[5] = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->limits[0].min = -100;
+    pCurve->limits[0].max = 100;
+    pCurve->limits[1].min = -100;
+    pCurve->limits[1].max = 100;
 
     Coil.MSWasteHeat(1) = nConstantBiquadratic;
     Coil.MSWasteHeat(2) = nConstantBiquadratic;
@@ -587,10 +587,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[3] = 0.005999544;
     pCurve->coeff[4] = -0.0000900072;
     pCurve->coeff[5] = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->limits[0].min = -100;
+    pCurve->limits[0].max = 100;
+    pCurve->limits[1].min = -100;
+    pCurve->limits[1].max = 100;
 
     Coil.MSCCapFTemp(2) = nCapfT2;
 
@@ -601,8 +601,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
 
@@ -618,10 +618,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[3] = -0.0085714308;
     pCurve->coeff[4] = 0.0000857142;
     pCurve->coeff[5] = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->limits[0].min = -100;
+    pCurve->limits[0].max = 100;
+    pCurve->limits[1].min = -100;
+    pCurve->limits[1].max = 100;
 
     Coil.MSEIRFTemp(2) = nEIRfT2;
 
@@ -632,8 +632,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
 
@@ -646,8 +646,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 1;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 1;
     pCurve->CurveMin = 0.7;
     pCurve->CurveMax = 1;
 
@@ -835,10 +835,10 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->coeff[3] = 0.005999544;
     pCurve->coeff[4] = -0.0000900072;
     pCurve->coeff[5] = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->limits[0].min = -100;
+    pCurve->limits[0].max = 100;
+    pCurve->limits[1].min = -100;
+    pCurve->limits[1].max = 100;
 
     Coil.CCapFTemp(1) = nCapfT2;
 
@@ -849,8 +849,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
 
@@ -866,10 +866,10 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->coeff[3] = -0.0085714308;
     pCurve->coeff[4] = 0.0000857142;
     pCurve->coeff[5] = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->limits[0].min = -100;
+    pCurve->limits[0].max = 100;
+    pCurve->limits[1].min = -100;
+    pCurve->limits[1].max = 100;
 
     Coil.EIRFTemp(1) = nEIRfT2;
 
@@ -880,8 +880,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
 
@@ -894,8 +894,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 1;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 1;
     pCurve->CurveMin = 0.7;
     pCurve->CurveMax = 1;
 
@@ -3904,10 +3904,10 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0024332436;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -4.5036e-005;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = -0.00053367984;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 13.88;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 23.88;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 18.33;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 51.66;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 13.88;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 23.88;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 18.33;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 51.66;
 
     CurveNum = 2;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP2";
@@ -3920,10 +3920,10 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 5.16005999999982e-005;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -2.97756e-005;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = -0.00035908596;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 13.88;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 23.88;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 18.33;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 51.66;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 13.88;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 23.88;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 18.33;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 51.66;
 
     CurveNum = 3;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP1";
@@ -3936,10 +3936,10 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.029628603;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.000161676;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = -2.349e-005;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = -100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = -100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 100.0;
 
     CurveNum = 4;
     state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP2";
@@ -3952,10 +3952,10 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0266002056;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.000191484;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = -6.5772e-005;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = -100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = -100.0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 100.0;
 
     state->dataDXCoils->DXCoil(1).MSCCapFTemp(1) = 1;
     state->dataDXCoils->DXCoil(1).MSCCapFTemp(2) = 2;
@@ -4061,10 +4061,10 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     constantcurve1.coeff[3] = 0.0;
     constantcurve1.coeff[4] = 0.0;
     constantcurve1.coeff[5] = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
+    constantcurve1.limits[0].min = 10.0;
+    constantcurve1.limits[0].max = 25.0;
+    constantcurve1.limits[1].min = 0.0;
+    constantcurve1.limits[1].max = 100.0;
     constantcurve1.CurveMin = 1.0;
     constantcurve1.CurveMax = 1.0;
     // quadratic curve
@@ -4075,8 +4075,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
     constantcurve2.coeff[2] = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
+    constantcurve2.limits[0].min = 0.0;
+    constantcurve2.limits[0].max = 1.0;
     constantcurve2.CurveMin = 1.0;
     constantcurve2.CurveMax = 1.0;
     // test 1: dry cooling
@@ -4217,10 +4217,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     constantcurve1.coeff[3] = 0.0;
     constantcurve1.coeff[4] = 0.0;
     constantcurve1.coeff[5] = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
+    constantcurve1.limits[0].min = 10.0;
+    constantcurve1.limits[0].max = 25.0;
+    constantcurve1.limits[1].min = 0.0;
+    constantcurve1.limits[1].max = 100.0;
     constantcurve1.CurveMin = 1.0;
     constantcurve1.CurveMax = 1.0;
     // quadratic curve
@@ -4231,8 +4231,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     constantcurve2.coeff[0] = 1.0;
     constantcurve2.coeff[1] = 0.0;
     constantcurve2.coeff[2] = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
+    constantcurve2.limits[0].min = 0.0;
+    constantcurve2.limits[0].max = 1.0;
     constantcurve2.CurveMin = 1.0;
     constantcurve2.CurveMax = 1.0;
     // set coil parameter
@@ -4282,7 +4282,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate at low speed
     EXPECT_DOUBLE_EQ(0.0075, AirInletNode.HumRat);               // input check
     EXPECT_DOUBLE_EQ(AirInletNode.HumRat, AirOutletNode.HumRat); // dry cooling only
-    ;
+    
     // check against hand calculation at low speed
     Real64 results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateLow * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                                                Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));

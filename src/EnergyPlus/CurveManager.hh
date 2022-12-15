@@ -114,6 +114,8 @@ namespace CurveManager {
         Num
     };
 
+    struct Limits {Real64 min = 0.0; Real64 max = 0.0;};
+
     struct PerformanceCurveData
     {
         // Members
@@ -125,18 +127,7 @@ namespace CurveManager {
         int NumDims = 0;                                  // Number of dimensions (AKA, independent variables)
         int GridValueIndex = 0;                           // Index of output within RGI for new Table:Lookup
         std::array<Real64, 12> coeff;                     // curve coefficients
-        Real64 Var1Max = 0.0;                             // maximum of 1st independent variable
-        Real64 Var1Min = 0.0;                             // minimum of 1st independent variable
-        Real64 Var2Max = 0.0;                             // maximum of 2nd independent variable
-        Real64 Var2Min = 0.0;                             // minimum of 2nd independent variable
-        Real64 Var3Max = 0.0;                             // maximum of 3rd independent variable
-        Real64 Var3Min = 0.0;                             // minimum of 3rd independent variable
-        Real64 Var4Max = 0.0;                             // maximum of 4th independent variable
-        Real64 Var4Min = 0.0;                             // minimum of 4th independent variable
-        Real64 Var5Max = 0.0;                             // maximum of 5th independent variable
-        Real64 Var5Min = 0.0;                             // minimum of 5th independent variable
-        Real64 Var6Max = 0.0;                             // maximum of 6th independent variable
-        Real64 Var6Min = 0.0;                             // minimum of 6th independent variable
+        std::array<Limits, 6> limits;                     // min/max of independent variables
         Real64 CurveMin = 0.0;                            // minimum value of curve output
         Real64 CurveMax = 0.0;                            // maximum value of curve output
         bool CurveMinPresent = false;                     // If TRUE, then cap minimum curve output

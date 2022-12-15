@@ -133,8 +133,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->coeff[1] = -0.002955;
     pCurve->coeff[2] = 5.8e-005;
     pCurve->coeff[3] = 0.025335;
-    pCurve->Var1Min = -5;
-    pCurve->Var1Max = 25;
+    pCurve->limits[0].min = -5;
+    pCurve->limits[0].max = 25;
 
     Coil.CCapFTemp(1) = nCapfT;
 
@@ -146,8 +146,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
     Coil.CCapFFlow(1) = nCapfFF;
@@ -161,8 +161,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->coeff[1] = 0.008767;
     pCurve->coeff[2] = 0.000625;
     pCurve->coeff[3] = -0.009037;
-    pCurve->Var1Min = -5;
-    pCurve->Var1Max = 25;
+    pCurve->limits[0].min = -5;
+    pCurve->limits[0].max = 25;
     Coil.EIRFTemp(1) = nEIRfT;
 
     int constexpr nEIRfFF = 4;
@@ -173,8 +173,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
     Coil.EIRFFlow(1) = nEIRfFF;
@@ -187,8 +187,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 1;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 1;
     pCurve->CurveMin = 0.7;
     pCurve->CurveMax = 1;
     Coil.PLFFPLR(1) = nPLFfPLR;
@@ -334,8 +334,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     pCurve->coeff[1] = 0.002955; // previously -ve
     pCurve->coeff[2] = 5.8e-005;
     pCurve->coeff[3] = 0.025335;
-    pCurve->Var1Min = 5; // previously -ve
-    pCurve->Var1Max = 25;
+    pCurve->limits[0].min = 5; // previously -ve
+    pCurve->limits[0].max = 25;
 
     Coil.CCapFTemp(1) = nCapfT;
 
@@ -347,8 +347,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
     Coil.CCapFFlow(1) = nCapfFF;
@@ -362,8 +362,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     pCurve->coeff[1] = 0.008767;
     pCurve->coeff[2] = 0.000625;
     pCurve->coeff[3] = 0.009037; // previously -ve
-    pCurve->Var1Min = 5;       // previously -ve
-    pCurve->Var1Max = 25;
+    pCurve->limits[0].min = 5;       // previously -ve
+    pCurve->limits[0].max = 25;
     Coil.EIRFTemp(1) = nEIRfT;
 
     int constexpr nEIRfFF = 4;
@@ -374,8 +374,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 2;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 2;
     Coil.EIRFFlow(1) = nEIRfFF;
@@ -388,8 +388,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     pCurve->coeff[0] = 1;
     pCurve->coeff[1] = 0;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 1;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 1;
     pCurve->CurveMin = 0.7;
     pCurve->CurveMax = 1;
     Coil.PLFFPLR(1) = nPLFfPLR;
@@ -526,8 +526,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     pCurve->coeff[1] = 0.028;
     pCurve->coeff[2] = 0;
     pCurve->coeff[3] = 0;
-    pCurve->Var1Min = -20;
-    pCurve->Var1Max = 20;
+    pCurve->limits[0].min = -20;
+    pCurve->limits[0].max = 20;
 
     Coil.CCapFTemp(1) = nCapfT;
 
@@ -540,8 +540,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     pCurve->coeff[1] = 0.16;
     pCurve->coeff[2] = 0;
     pCurve->coeff[3] = 0;
-    pCurve->Var1Min = 0.5;
-    pCurve->Var1Max = 1.5;
+    pCurve->limits[0].min = 0.5;
+    pCurve->limits[0].max = 1.5;
     Coil.CCapFFlow(1) = nCapfFF;
 
     int constexpr nEIRfT = 3;
@@ -555,10 +555,10 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     pCurve->coeff[3] = 0.005;
     pCurve->coeff[4] = 0;
     pCurve->coeff[5] = -0.001;
-    pCurve->Var1Min = 12.778;
-    pCurve->Var1Max = 23.889;
-    pCurve->Var2Min = 18;
-    pCurve->Var2Max = 46.111;
+    pCurve->limits[0].min = 12.778;
+    pCurve->limits[0].max = 23.889;
+    pCurve->limits[1].min = 18;
+    pCurve->limits[1].max = 46.111;
     Coil.EIRFTemp(1) = nEIRfT;
 
     int constexpr nEIRfFF = 4;
@@ -570,8 +570,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     pCurve->coeff[1] = -0.03;
     pCurve->coeff[2] = 0.001;
     pCurve->coeff[3] = 0;
-    pCurve->Var1Min = -20;
-    pCurve->Var1Max = 20;
+    pCurve->limits[0].min = -20;
+    pCurve->limits[0].max = 20;
     pCurve->CurveMin = -20;
     pCurve->CurveMax = 20;
     Coil.EIRFFlow(1) = nEIRfFF;
@@ -584,8 +584,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     pCurve->coeff[0] = 0.75;
     pCurve->coeff[1] = 0.25;
     pCurve->coeff[2] = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 1;
+    pCurve->limits[0].min = 0;
+    pCurve->limits[0].max = 1;
     pCurve->CurveMin = 0;
     pCurve->CurveMax = 1;
     Coil.PLFFPLR(1) = nPLFfPLR;
@@ -1063,10 +1063,10 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.000275634;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -0.000143667;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = -0.000246286;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 4.44;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 10;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 23.89;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 46.11;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 4.44;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 10;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 23.89;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 46.11;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
@@ -1082,10 +1082,10 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = -0.017129784;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.000773288;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = -0.000922024;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 4.44;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 10;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 10;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 46.11;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 4.44;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 10;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 10;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 46.11;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
@@ -1099,8 +1099,8 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.433532026;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = -0.762289434;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.412199944;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 1;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
@@ -1156,10 +1156,10 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 8.581056E-02;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -4.261176E-03;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 8.661899E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.22;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 26.67;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 7.22;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 26.67;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
@@ -1175,10 +1175,10 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 4.342595E-02;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -1.000651E-03;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 1.920106E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.22;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 26.67;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 7.22;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 26.67;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
@@ -1191,8 +1191,8 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 2.778889E-01;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 2.338363E-01;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[2] = 4.883748E-01;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.15;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 1.15;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
@@ -1246,10 +1246,10 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 1.463106E-01;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -4.474066E-03;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 9.813408E-03;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.22;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 18.81;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 35.09;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 7.22;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 18.81;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 35.09;
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
@@ -1265,10 +1265,10 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 3.469525E-02;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = -3.624458E-04;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 6.749423E-04;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.22;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 12.78;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 18.81;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 35.09;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 7.22;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 18.81;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 35.09;
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
@@ -1288,10 +1288,10 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooledReform)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[7] = 1.349969E-02;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[8] = 0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[9] = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 17.52;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 33.32;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.10;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 1.08;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 17.52;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 33.32;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 0.10;
+    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 1.08;
     state->dataChillerReformulatedEIR->ElecReformEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     state->dataPlnt->TotNumLoops = 1;
@@ -1456,8 +1456,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     //?? Default PLF cofficients source ?
     EXPECT_EQ(0.90, thisCoolPLFfPLR.coeff[0]);
     EXPECT_EQ(0.10, thisCoolPLFfPLR.coeff[1]);
-    EXPECT_EQ(0.0, thisCoolPLFfPLR.Var1Min);
-    EXPECT_EQ(1.0, thisCoolPLFfPLR.Var1Max);
+    EXPECT_EQ(0.0, thisCoolPLFfPLR.limits[0].min);
+    EXPECT_EQ(1.0, thisCoolPLFfPLR.limits[0].max);
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     // check user PLF curve PLR limits
@@ -1521,8 +1521,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
     thisCoolPLFfPLR.coeff[0] = 0.75; // = a 0.8
     thisCoolPLFfPLR.coeff[1] = 0.25; // = b 0.2
-    thisCoolPLFfPLR.Var1Min = 0.0; // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.Var1Max = 1.0; // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR.limits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.limits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
@@ -1568,8 +1568,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     // AHRI Std 210/240-2023 default PLF curve is linear equation, PLF = a + b * PLR
     thisCoolPLFfPLR.coeff[0] = 0.80; //
     thisCoolPLFfPLR.coeff[1] = 0.20; //
-    thisCoolPLFfPLR.Var1Min = 0.0; // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.Var1Max = 1.0; // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR.limits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.limits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
@@ -1826,8 +1826,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // ckeck user PLF curve coefficients
     EXPECT_EQ(0.90, thisCoolPLFfPLR.coeff[0]);
     EXPECT_EQ(0.10, thisCoolPLFfPLR.coeff[1]);
-    EXPECT_EQ(0.0, thisCoolPLFfPLR.Var1Min);
-    EXPECT_EQ(1.0, thisCoolPLFfPLR.Var1Max);
+    EXPECT_EQ(0.0, thisCoolPLFfPLR.limits[0].min);
+    EXPECT_EQ(1.0, thisCoolPLFfPLR.limits[0].max);
     Real64 minEIRfLowPLRXInput(0.0);
     Real64 maxEIRfLowPLRXInput(0.0);
     // check user PLF curve PLR limits
@@ -1882,8 +1882,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
     thisCoolPLFfPLR.coeff[0] = 0.75; // = a
     thisCoolPLFfPLR.coeff[1] = 0.25; // = b
-    thisCoolPLFfPLR.Var1Min = 0.0; // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.Var1Max = 1.0; // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR.limits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.limits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
@@ -1933,8 +1933,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // AHRI Std 210/240-2023 default PLF curve is linear equation, PLF = a + b * PLR
     thisCoolPLFfPLR.coeff[0] = 0.80; // = a
     thisCoolPLFfPLR.coeff[1] = 0.20; // = b
-    thisCoolPLFfPLR.Var1Min = 0.0; // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.Var1Max = 1.0; // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR.limits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.limits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
