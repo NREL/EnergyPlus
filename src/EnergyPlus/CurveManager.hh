@@ -342,11 +342,11 @@ namespace CurveManager {
     Real64 CalculateMoodyFrictionFactor(EnergyPlusData &state, Real64 ReynoldsNumber, Real64 RoughnessRatio);
 
     void checkCurveIsNormalizedToOne(EnergyPlusData &state,
-                                     std::string callingRoutineObj,   // calling routine with object type
-                                     std::string objectName,          // parent object where curve is used
+                                     const std::string& callingRoutineObj,   // calling routine with object type
+                                     const std::string& objectName,          // parent object where curve is used
                                      int curveIndex,                  // index to curve object
-                                     std::string cFieldName,          // object field name
-                                     std::string cFieldValue,         // user input curve name
+                                     const std::string& cFieldName,          // object field name
+                                     const std::string& cFieldValue,         // user input curve name
                                      Real64 Var1,                     // required 1st independent variable
                                      Optional<Real64 const> Var2 = _, // 2nd independent variable
                                      Optional<Real64 const> Var3 = _, // 3rd independent variable

@@ -2066,7 +2066,7 @@ namespace CurveManager {
                             max_val = max_grid_value;
                         }
 
-                        varListLimits[varListName].push_back({min_val, max_val});
+                        varListLimits[varListName].emplace_back(min_val, max_val);
 
                         Real64 normalizationRefValue;
                         if (indVarInstance.count("normalization_reference_value")) {
@@ -2326,14 +2326,14 @@ namespace CurveManager {
             return true;
         }
         std::ifstream file(fullPath);
-        std::string line("");
+        std::string line;
         numRows = 0;
         numColumns = 0;
         while (getline(file, line)) {
             ++numRows;
             std::size_t pos(0);
             std::size_t colNum(1);
-            while ((pos = line.find(",")) != std::string::npos) {
+            while ((pos = line.find(',')) != std::string::npos) {
                 if (colNum > numColumns) {
                     numColumns = colNum;
                     contents.resize(numColumns);
@@ -2343,7 +2343,7 @@ namespace CurveManager {
                 ++colNum;
             }
             // Anything after the last comma
-            if (line.size() > 0) {
+            if (!line.empty()) {
                 if (colNum > numColumns) {
                     numColumns = colNum;
                     contents.resize(numColumns);
@@ -2353,7 +2353,7 @@ namespace CurveManager {
             }
             // flesh out columns if row ends early
             while (colNum <= numColumns) {
-                contents[colNum - 1].push_back("");
+                contents[colNum - 1].emplace_back("");
                 ++colNum;
             }
         }
@@ -3303,11 +3303,11 @@ namespace CurveManager {
     }
 
     void checkCurveIsNormalizedToOne(EnergyPlusData &state,
-                                     std::string const callingRoutineObj, // calling routine with object type
-                                     std::string const objectName,        // parent object where curve is used
+                                     std::string const& callingRoutineObj, // calling routine with object type
+                                     std::string const& objectName,        // parent object where curve is used
                                      int const curveIndex,                // index to curve object
-                                     std::string const cFieldName,        // object field name
-                                     std::string const cFieldValue,       // user input curve name
+                                     std::string const& cFieldName,        // object field name
+                                     std::string const& cFieldValue,       // user input curve name
                                      Real64 const Var1,                   // required 1st independent variable
                                      Optional<Real64 const> Var2,         // 2nd independent variable
                                      Optional<Real64 const> Var3,         // 3rd independent variable
