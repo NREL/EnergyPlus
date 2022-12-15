@@ -6717,6 +6717,7 @@ namespace WindowManager {
                 if (thisMaterial->Group == Material::MaterialGroup::ComplexWindowGap) {
                     LayPtr = thisMaterial->GasPointer;
                 }
+                auto const *thisMaterial = state.dataMaterial->Material(LayPtr);
                 state.dataWindowManager->gap[IGap - 1] = thisMaterial->Thickness;
                 state.dataWindowManager->gnmix[IGap - 1] = thisMaterial->NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= state.dataWindowManager->gnmix[IGap - 1]; ++IMix) {
