@@ -4707,7 +4707,6 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     Real64 UnitFlowToler;   // flow rate tolerance
     Real64 QDelivered;
     Real64 FracDelivered;
-    Array1D<Real64> Par(11);
     int SolFlag;
     Real64 ErrTolerance;
     Real64 MaxSteamCap; // steam coil capacity at full load

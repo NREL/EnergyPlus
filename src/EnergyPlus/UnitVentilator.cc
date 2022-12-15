@@ -2400,7 +2400,6 @@ namespace UnitVentilator {
         Real64 Tinlet;      // temperature of air coming into the unit ventilator [degrees C]
         Real64 Toutdoor;    // temperature of outdoor air being introduced into the unit ventilator [degrees C]
         Real64 mdot;
-        Array1D<Real64> Par(3); // parameters passed to RegulaFalsi function
 
         switch (unitVent.CoilOption) {
         case CoilsUsed::Both:

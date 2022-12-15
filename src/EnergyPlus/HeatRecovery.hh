@@ -425,11 +425,6 @@ namespace HeatRecovery {
                                          Real64 Z    // capacity rate ratio
     );
 
-    Real64 GetResidCrossFlowBothUnmixed(EnergyPlusData &state,
-                                        Real64 NTU,                      // number of transfer units
-                                        std::array<Real64, 2> const &Par // par(1) = Eps, par(2) = Z
-    );
-
     int GetSupplyInletNode(EnergyPlusData &state,
                            std::string const &HXName, // must match HX names for the ExchCond type
                            bool &ErrorsFound          // set to true if problem
