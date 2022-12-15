@@ -124,18 +124,7 @@ namespace CurveManager {
         int TableIndex = 0;                               // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
         int NumDims = 0;                                  // Number of dimensions (AKA, independent variables)
         int GridValueIndex = 0;                           // Index of output within RGI for new Table:Lookup
-        Real64 Coeff1 = 0.0;                              // constant coefficient
-        Real64 Coeff2 = 0.0;                              // linear coeff (1st independent variable)
-        Real64 Coeff3 = 0.0;                              // quadratic coeff (1st independent variable)
-        Real64 Coeff4 = 0.0;                              // linear coeff (2nd ind var) or cubic coeff
-        Real64 Coeff5 = 0.0;                              // quadratic coeff (2nd independent variable)
-        Real64 Coeff6 = 0.0;                              // cross coeff (1st & 2nd ind var)
-        Real64 Coeff7 = 0.0;                              // cubic coeff for bicubic (1st ind var)
-        Real64 Coeff8 = 0.0;                              // cubic coeff for bicubic (2nd ind var)
-        Real64 Coeff9 = 0.0;                              // cross coeff for bicubic (1st quadratic & 2nd linear)
-        Real64 Coeff10 = 0.0;                             // cross coeff for bicubic (1st linear & 2nd quadratic)
-        Real64 Coeff11 = 0.0;                             // cross coeff
-        Real64 Coeff12 = 0.0;                             // cross coeff
+        std::array<Real64, 12> coeff;                     // curve coefficients
         Real64 Var1Max = 0.0;                             // maximum of 1st independent variable
         Real64 Var1Min = 0.0;                             // minimum of 1st independent variable
         Real64 Var2Max = 0.0;                             // maximum of 2nd independent variable

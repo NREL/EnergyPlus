@@ -287,7 +287,7 @@ protected:
         state->dataCurveManager->NumCurves = 1;
         state->dataCurveManager->PerfCurve(1).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(1).curveType = CurveManager::CurveType::Linear;
-        state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
+        state->dataCurveManager->PerfCurve(1).coeff[0] = 1.0;
 
         state->dataEnvrn->OutDryBulbTemp = 35.0;
         state->dataEnvrn->OutHumRat = 0.0141066;

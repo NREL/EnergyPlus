@@ -361,12 +361,12 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(7);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(8);
             state.dataCurveManager->PerfCurve(CurveNum).Var2Min = Numbers(9);
@@ -446,18 +446,18 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 3;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
 
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff7 = Numbers(7);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff8 = Numbers(8);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff9 = Numbers(9);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff10 = Numbers(10);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff11 = Numbers(11);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff12 = Numbers(12);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[6] = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[7] = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[8] = Numbers(9);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[9] = Numbers(10);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[10] = Numbers(11);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[11] = Numbers(12);
 
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(13);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(14);
@@ -524,10 +524,10 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(6);
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
@@ -588,11 +588,11 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(6);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(7);
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
@@ -653,9 +653,9 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(5);
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
@@ -716,12 +716,12 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(7);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(8);
             state.dataCurveManager->PerfCurve(CurveNum).Var2Min = Numbers(9);
@@ -799,12 +799,12 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(7);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(8);
             state.dataCurveManager->PerfCurve(CurveNum).Var2Min = Numbers(9);
@@ -882,8 +882,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(4);
             if (NumNumbers > 4 && !state.dataIPShortCut->lNumericFieldBlanks(5)) {
@@ -944,16 +944,16 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff7 = Numbers(7);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff8 = Numbers(8);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff9 = Numbers(9);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff10 = Numbers(10);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[6] = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[7] = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[8] = Numbers(9);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[9] = Numbers(10);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(11);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(12);
             state.dataCurveManager->PerfCurve(CurveNum).Var2Min = Numbers(13);
@@ -1152,11 +1152,11 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 4;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(6);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(7);
             state.dataCurveManager->PerfCurve(CurveNum).Var2Min = Numbers(8);
@@ -1232,12 +1232,12 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 5;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(7);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(8);
             state.dataCurveManager->PerfCurve(CurveNum).Var2Min = Numbers(9);
@@ -1314,9 +1314,9 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(5);
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
@@ -1366,10 +1366,10 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(6);
             state.dataCurveManager->PerfCurve(CurveNum).Var2Min = Numbers(7);
@@ -1434,10 +1434,10 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(6);
 
@@ -1500,11 +1500,11 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(6);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(7);
 
@@ -1567,9 +1567,9 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(5);
 
@@ -1632,9 +1632,9 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(5);
 
@@ -1697,9 +1697,9 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(5);
 
@@ -1762,11 +1762,11 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(6);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(7);
 
@@ -2583,41 +2583,41 @@ namespace CurveManager {
 
         switch (Curve.curveType) {
         case CurveType::Linear: {
-            CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2;
+            CurveValue = Curve.coeff[0] + V1 * Curve.coeff[1];
         } break;
         case CurveType::Quadratic: {
-            CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3);
+            CurveValue = Curve.coeff[0] + V1 * (Curve.coeff[1] + V1 * Curve.coeff[2]);
         } break;
         case CurveType::QuadLinear: {
-            CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5;
+            CurveValue = Curve.coeff[0] + V1 * Curve.coeff[1] + V2 * Curve.coeff[2] + V3 * Curve.coeff[3] + V4 * Curve.coeff[4];
         } break;
         case CurveType::QuintLinear: {
-            CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5 + V5 * Curve.Coeff6;
+            CurveValue = Curve.coeff[0] + V1 * Curve.coeff[1] + V2 * Curve.coeff[2] + V3 * Curve.coeff[3] + V4 * Curve.coeff[4] + V5 * Curve.coeff[5];
         } break;
         case CurveType::Cubic: {
-            CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4));
+            CurveValue = Curve.coeff[0] + V1 * (Curve.coeff[1] + V1 * (Curve.coeff[2] + V1 * Curve.coeff[3]));
         } break;
         case CurveType::Quartic: {
-            CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * (Curve.Coeff4 + V1 * Curve.Coeff5)));
+            CurveValue = Curve.coeff[0] + V1 * (Curve.coeff[1] + V1 * (Curve.coeff[2] + V1 * (Curve.coeff[3] + V1 * Curve.coeff[4])));
         } break;
         case CurveType::BiQuadratic: {
-            CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3) + V2 * (Curve.Coeff4 + V2 * Curve.Coeff5) + V1 * V2 * Curve.Coeff6;
+            CurveValue = Curve.coeff[0] + V1 * (Curve.coeff[1] + V1 * Curve.coeff[2]) + V2 * (Curve.coeff[3] + V2 * Curve.coeff[4]) + V1 * V2 * Curve.coeff[5];
         } break;
         case CurveType::QuadraticLinear: {
-            CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3)) + (Curve.Coeff4 + V1 * (Curve.Coeff5 + V1 * Curve.Coeff6)) * V2;
+            CurveValue = (Curve.coeff[0] + V1 * (Curve.coeff[1] + V1 * Curve.coeff[2])) + (Curve.coeff[3] + V1 * (Curve.coeff[4] + V1 * Curve.coeff[5])) * V2;
         } break;
         case CurveType::CubicLinear: {
-            CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4))) + (Curve.Coeff5 + V1 * Curve.Coeff6) * V2;
+            CurveValue = (Curve.coeff[0] + V1 * (Curve.coeff[1] + V1 * (Curve.coeff[2] + V1 * Curve.coeff[3]))) + (Curve.coeff[4] + V1 * Curve.coeff[5]) * V2;
         } break;
         case CurveType::BiCubic: {
-            CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 +
-                         V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 +
-                         V1 * V2 * V2 * Curve.Coeff10;
+            CurveValue = Curve.coeff[0] + V1 * Curve.coeff[1] + V1 * V1 * Curve.coeff[2] + V2 * Curve.coeff[3] + V2 * V2 * Curve.coeff[4] +
+                         V1 * V2 * Curve.coeff[5] + V1 * V1 * V1 * Curve.coeff[6] + V2 * V2 * V2 * Curve.coeff[7] + V1 * V1 * V2 * Curve.coeff[8] +
+                         V1 * V2 * V2 * Curve.coeff[9];
         } break;
         case CurveType::ChillerPartLoadWithLift: {
-            CurveValue = Curve.Coeff1 + Curve.Coeff2 * V1 + Curve.Coeff3 * V1 * V1 + Curve.Coeff4 * V2 + Curve.Coeff5 * V2 * V2 +
-                         Curve.Coeff6 * V1 * V2 + Curve.Coeff7 * V1 * V1 * V1 + Curve.Coeff8 * V2 * V2 * V2 + Curve.Coeff9 * V1 * V1 * V2 +
-                         Curve.Coeff10 * V1 * V2 * V2 + Curve.Coeff11 * V1 * V1 * V2 * V2 + Curve.Coeff12 * V3 * V2 * V2 * V2;
+            CurveValue = Curve.coeff[0] + Curve.coeff[1] * V1 + Curve.coeff[2] * V1 * V1 + Curve.coeff[3] * V2 + Curve.coeff[4] * V2 * V2 +
+                         Curve.coeff[5] * V1 * V2 + Curve.coeff[6] * V1 * V1 * V1 + Curve.coeff[7] * V2 * V2 * V2 + Curve.coeff[8] * V1 * V1 * V2 +
+                         Curve.coeff[9] * V1 * V2 * V2 + Curve.coeff[10] * V1 * V1 * V2 * V2 + Curve.coeff[11] * V3 * V2 * V2 * V2;
         } break;
         case CurveType::TriQuadratic: {
             auto const &Tri2ndOrder(Curve.tri2ndOrder);
@@ -2635,38 +2635,38 @@ namespace CurveManager {
                          Tri2ndOrder[26] * V1 * V2 * V3;
         } break;
         case CurveType::Exponent: {
-            CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::pow(V1, Curve.Coeff3);
+            CurveValue = Curve.coeff[0] + Curve.coeff[1] * std::pow(V1, Curve.coeff[2]);
         } break;
         case CurveType::FanPressureRise: {
-            CurveValue = V1 * (Curve.Coeff1 * V1 + Curve.Coeff2 + Curve.Coeff3 * std::sqrt(V2)) + Curve.Coeff4 * V2;
+            CurveValue = V1 * (Curve.coeff[0] * V1 + Curve.coeff[1] + Curve.coeff[2] * std::sqrt(V2)) + Curve.coeff[3] * V2;
         } break;
         case CurveType::ExponentialSkewNormal: {
-            CoeffZ1 = (V1 - Curve.Coeff1) / Curve.Coeff2;
-            CoeffZ2 = (Curve.Coeff4 * V1 * std::exp(Curve.Coeff3 * V1) - Curve.Coeff1) / Curve.Coeff2;
-            CoeffZ3 = -Curve.Coeff1 / Curve.Coeff2;
+            CoeffZ1 = (V1 - Curve.coeff[0]) / Curve.coeff[1];
+            CoeffZ2 = (Curve.coeff[3] * V1 * std::exp(Curve.coeff[2] * V1) - Curve.coeff[0]) / Curve.coeff[1];
+            CoeffZ3 = -Curve.coeff[0] / Curve.coeff[1];
             CurveValueNumer = std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
             CurveValueDenom = std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
             CurveValue = CurveValueNumer / CurveValueDenom;
         } break;
         case CurveType::Sigmoid: {
-            CurveValueExp = std::exp((Curve.Coeff3 - V1) / Curve.Coeff4);
-            CurveValue = Curve.Coeff1 + Curve.Coeff2 / std::pow(1.0 + CurveValueExp, Curve.Coeff5);
+            CurveValueExp = std::exp((Curve.coeff[2] - V1) / Curve.coeff[3]);
+            CurveValue = Curve.coeff[0] + Curve.coeff[1] / std::pow(1.0 + CurveValueExp, Curve.coeff[4]);
         } break;
         case CurveType::RectangularHyperbola1: {
-            CurveValueNumer = Curve.Coeff1 * V1;
-            CurveValueDenom = Curve.Coeff2 + V1;
-            CurveValue = (CurveValueNumer / CurveValueDenom) + Curve.Coeff3;
+            CurveValueNumer = Curve.coeff[0] * V1;
+            CurveValueDenom = Curve.coeff[1] + V1;
+            CurveValue = (CurveValueNumer / CurveValueDenom) + Curve.coeff[2];
         } break;
         case CurveType::RectangularHyperbola2: {
-            CurveValueNumer = Curve.Coeff1 * V1;
-            CurveValueDenom = Curve.Coeff2 + V1;
-            CurveValue = (CurveValueNumer / CurveValueDenom) + (Curve.Coeff3 * V1);
+            CurveValueNumer = Curve.coeff[0] * V1;
+            CurveValueDenom = Curve.coeff[1] + V1;
+            CurveValue = (CurveValueNumer / CurveValueDenom) + (Curve.coeff[2] * V1);
         } break;
         case CurveType::ExponentialDecay: {
-            CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1);
+            CurveValue = Curve.coeff[0] + Curve.coeff[1] * std::exp(Curve.coeff[2] * V1);
         } break;
         case CurveType::DoubleExponentialDecay: {
-            CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1) + Curve.Coeff4 * std::exp(Curve.Coeff5 * V1);
+            CurveValue = Curve.coeff[0] + Curve.coeff[1] * std::exp(Curve.coeff[2] * V1) + Curve.coeff[3] * std::exp(Curve.coeff[4] * V1);
         } break;
         default: {
             CurveValue = 0.0;

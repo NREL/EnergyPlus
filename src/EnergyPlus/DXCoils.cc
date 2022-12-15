@@ -5536,9 +5536,9 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             {
                 if (state.dataCurveManager->PerfCurve(indexSHCurve).ObjectType == "Curve:Quadratic") {
-                    state.dataDXCoils->DXCoil(DXCoilNum).C1Te = state.dataCurveManager->PerfCurve(indexSHCurve).Coeff1;
-                    state.dataDXCoils->DXCoil(DXCoilNum).C2Te = state.dataCurveManager->PerfCurve(indexSHCurve).Coeff2;
-                    state.dataDXCoils->DXCoil(DXCoilNum).C3Te = state.dataCurveManager->PerfCurve(indexSHCurve).Coeff3;
+                    state.dataDXCoils->DXCoil(DXCoilNum).C1Te = state.dataCurveManager->PerfCurve(indexSHCurve).coeff[0];
+                    state.dataDXCoils->DXCoil(DXCoilNum).C2Te = state.dataCurveManager->PerfCurve(indexSHCurve).coeff[1];
+                    state.dataDXCoils->DXCoil(DXCoilNum).C3Te = state.dataCurveManager->PerfCurve(indexSHCurve).coeff[2];
 
                 } else {
                     ShowSevereError(
@@ -5658,9 +5658,9 @@ void GetDXCoils(EnergyPlusData &state)
         } else {
             {
                 if (state.dataCurveManager->PerfCurve(indexSCCurve).ObjectType == "Curve:Quadratic") {
-                    state.dataDXCoils->DXCoil(DXCoilNum).C1Tc = state.dataCurveManager->PerfCurve(indexSCCurve).Coeff1;
-                    state.dataDXCoils->DXCoil(DXCoilNum).C2Tc = state.dataCurveManager->PerfCurve(indexSCCurve).Coeff2;
-                    state.dataDXCoils->DXCoil(DXCoilNum).C3Tc = state.dataCurveManager->PerfCurve(indexSCCurve).Coeff3;
+                    state.dataDXCoils->DXCoil(DXCoilNum).C1Tc = state.dataCurveManager->PerfCurve(indexSCCurve).coeff[0];
+                    state.dataDXCoils->DXCoil(DXCoilNum).C2Tc = state.dataCurveManager->PerfCurve(indexSCCurve).coeff[1];
+                    state.dataDXCoils->DXCoil(DXCoilNum).C3Tc = state.dataCurveManager->PerfCurve(indexSCCurve).coeff[2];
 
                 } else {
                     ShowSevereError(

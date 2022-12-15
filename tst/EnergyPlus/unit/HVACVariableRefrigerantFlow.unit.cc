@@ -196,11 +196,11 @@ protected:
         state->dataCurveManager->PerfCurve.allocate(10);
         state->dataCurveManager->PerfCurve(1).InterpolationType = InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(1).curveType = CurveType::Linear;
-        state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
+        state->dataCurveManager->PerfCurve(1).coeff[0] = 1.0;
         state->dataCurveManager->PerfCurve(1).CurveMax = 1.0;
         state->dataCurveManager->PerfCurve(2).InterpolationType = InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(2).curveType = CurveType::Linear;
-        state->dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
+        state->dataCurveManager->PerfCurve(2).coeff[0] = 1.0;
         state->dataCurveManager->PerfCurve(2).CurveMax = 1.0;
 
         int NumAirLoops = state->dataHVACGlobal->NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
@@ -2853,12 +2853,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     thisCurve.curveType = CurveType::BiQuadratic;
     thisCurve.ObjectType = "Curve:Biquadratic";
     thisCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-    thisCurve.Coeff1 = 724.71125;  // Coefficient1 Constant
-    thisCurve.Coeff2 = -21.867868; // Coefficient2 x
-    thisCurve.Coeff3 = 0.52480042; // Coefficient3 x**2
-    thisCurve.Coeff4 = -17.043566; // Coefficient4 y
-    thisCurve.Coeff5 = -.40346383; // Coefficient5 y**2
-    thisCurve.Coeff6 = 0.29573589; // Coefficient6 x*y
+    thisCurve.coeff[0] = 724.71125;  // Coefficient1 Constant
+    thisCurve.coeff[1] = -21.867868; // Coefficient2 x
+    thisCurve.coeff[2] = 0.52480042; // Coefficient3 x**2
+    thisCurve.coeff[3] = -17.043566; // Coefficient4 y
+    thisCurve.coeff[4] = -.40346383; // Coefficient5 y**2
+    thisCurve.coeff[5] = 0.29573589; // Coefficient6 x*y
     thisCurve.Var1Min = 15;        // Minimum Value of x
     thisCurve.Var1Max = 65;        // Maximum Value of x
     thisCurve.Var2Min = -30;       // Minimum Value of y
