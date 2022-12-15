@@ -114,39 +114,6 @@ namespace CurveManager {
         Num
     };
 
-    struct TriQuadraticCurveDataStruct
-    {
-        // Members
-        // this structure is for 27 coefficient full triquadratic (!)
-        Real64 CoeffA0 = 0.0;
-        Real64 CoeffA1 = 0.0;
-        Real64 CoeffA2 = 0.0;
-        Real64 CoeffA3 = 0.0;
-        Real64 CoeffA4 = 0.0;
-        Real64 CoeffA5 = 0.0;
-        Real64 CoeffA6 = 0.0;
-        Real64 CoeffA7 = 0.0;
-        Real64 CoeffA8 = 0.0;
-        Real64 CoeffA9 = 0.0;
-        Real64 CoeffA10 = 0.0;
-        Real64 CoeffA11 = 0.0;
-        Real64 CoeffA12 = 0.0;
-        Real64 CoeffA13 = 0.0;
-        Real64 CoeffA14 = 0.0;
-        Real64 CoeffA15 = 0.0;
-        Real64 CoeffA16 = 0.0;
-        Real64 CoeffA17 = 0.0;
-        Real64 CoeffA18 = 0.0;
-        Real64 CoeffA19 = 0.0;
-        Real64 CoeffA20 = 0.0;
-        Real64 CoeffA21 = 0.0;
-        Real64 CoeffA22 = 0.0;
-        Real64 CoeffA23 = 0.0;
-        Real64 CoeffA24 = 0.0;
-        Real64 CoeffA25 = 0.0;
-        Real64 CoeffA26 = 0.0;
-    };
-
     struct PerformanceCurveData
     {
         // Members
@@ -187,7 +154,7 @@ namespace CurveManager {
         bool CurveMaxPresent = false;                     // if TRUE, then cap maximum curve output
         bool Var1MinPresent = false;                      // uses data set limit to set Var1Min if false
         bool Var1MaxPresent = false;                      // uses data set limit to set Var1Max if false
-        Array1D<TriQuadraticCurveDataStruct> Tri2ndOrder; // structure for triquadratic curve data
+        std::array<Real64, 27> tri2ndOrder;               // 27 coefficient full triquadratic (!)
         bool EMSOverrideOn = false;                       // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue = 0.0;               // Value of curve result EMS is directing to use
         Real64 output = 0.0;                              // curve output or result

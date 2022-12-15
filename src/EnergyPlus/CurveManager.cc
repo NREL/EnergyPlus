@@ -1031,36 +1031,33 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 3;
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-            state.dataCurveManager->PerfCurve(CurveNum).Tri2ndOrder.allocate(1);
-            for (auto &e : state.dataCurveManager->PerfCurve(CurveNum).Tri2ndOrder) {
-                e.CoeffA0 = Numbers(1);
-                e.CoeffA1 = Numbers(2);
-                e.CoeffA2 = Numbers(3);
-                e.CoeffA3 = Numbers(4);
-                e.CoeffA4 = Numbers(5);
-                e.CoeffA5 = Numbers(6);
-                e.CoeffA6 = Numbers(7);
-                e.CoeffA7 = Numbers(8);
-                e.CoeffA8 = Numbers(9);
-                e.CoeffA9 = Numbers(10);
-                e.CoeffA10 = Numbers(11);
-                e.CoeffA11 = Numbers(12);
-                e.CoeffA12 = Numbers(13);
-                e.CoeffA13 = Numbers(14);
-                e.CoeffA14 = Numbers(15);
-                e.CoeffA15 = Numbers(16);
-                e.CoeffA16 = Numbers(17);
-                e.CoeffA17 = Numbers(18);
-                e.CoeffA18 = Numbers(19);
-                e.CoeffA19 = Numbers(20);
-                e.CoeffA20 = Numbers(21);
-                e.CoeffA21 = Numbers(22);
-                e.CoeffA22 = Numbers(23);
-                e.CoeffA23 = Numbers(24);
-                e.CoeffA24 = Numbers(25);
-                e.CoeffA25 = Numbers(26);
-                e.CoeffA26 = Numbers(27);
-            }
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[0] = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[1] = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[2] = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[3] = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[4] = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[5] = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[6] = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[7] = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[8] = Numbers(9);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[9] = Numbers(10);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[10] = Numbers(11);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[11] = Numbers(12);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[12] = Numbers(13);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[13] = Numbers(14);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[14] = Numbers(15);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[15] = Numbers(16);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[16] = Numbers(17);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[17] = Numbers(18);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[18] = Numbers(19);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[19] = Numbers(20);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[20] = Numbers(21);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[21] = Numbers(22);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[22] = Numbers(23);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[23] = Numbers(24);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[24] = Numbers(25);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[25] = Numbers(26);
+            state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[26] = Numbers(27);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(28);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(29);
             state.dataCurveManager->PerfCurve(CurveNum).Var2Min = Numbers(30);
@@ -2623,19 +2620,19 @@ namespace CurveManager {
                          Curve.Coeff10 * V1 * V2 * V2 + Curve.Coeff11 * V1 * V1 * V2 * V2 + Curve.Coeff12 * V3 * V2 * V2 * V2;
         } break;
         case CurveType::TriQuadratic: {
-            auto const &Tri2ndOrder(Curve.Tri2ndOrder(1));
+            auto const &Tri2ndOrder(Curve.tri2ndOrder);
             auto const V1s(V1 * V1);
             auto const V2s(V2 * V2);
             auto const V3s(V3 * V3);
-            CurveValue = Tri2ndOrder.CoeffA0 + Tri2ndOrder.CoeffA1 * V1s + Tri2ndOrder.CoeffA2 * V1 + Tri2ndOrder.CoeffA3 * V2s +
-                         Tri2ndOrder.CoeffA4 * V2 + Tri2ndOrder.CoeffA5 * V3s + Tri2ndOrder.CoeffA6 * V3 + Tri2ndOrder.CoeffA7 * V1s * V2s +
-                         Tri2ndOrder.CoeffA8 * V1 * V2 + Tri2ndOrder.CoeffA9 * V1 * V2s + Tri2ndOrder.CoeffA10 * V1s * V2 +
-                         Tri2ndOrder.CoeffA11 * V1s * V3s + Tri2ndOrder.CoeffA12 * V1 * V3 + Tri2ndOrder.CoeffA13 * V1 * V3s +
-                         Tri2ndOrder.CoeffA14 * V1s * V3 + Tri2ndOrder.CoeffA15 * V2s * V3s + Tri2ndOrder.CoeffA16 * V2 * V3 +
-                         Tri2ndOrder.CoeffA17 * V2 * V3s + Tri2ndOrder.CoeffA18 * V2s * V3 + Tri2ndOrder.CoeffA19 * V1s * V2s * V3s +
-                         Tri2ndOrder.CoeffA20 * V1s * V2s * V3 + Tri2ndOrder.CoeffA21 * V1s * V2 * V3s + Tri2ndOrder.CoeffA22 * V1 * V2s * V3s +
-                         Tri2ndOrder.CoeffA23 * V1s * V2 * V3 + Tri2ndOrder.CoeffA24 * V1 * V2s * V3 + Tri2ndOrder.CoeffA25 * V1 * V2 * V3s +
-                         Tri2ndOrder.CoeffA26 * V1 * V2 * V3;
+            CurveValue = Tri2ndOrder[0] + Tri2ndOrder[1] * V1s + Tri2ndOrder[2] * V1 + Tri2ndOrder[3] * V2s +
+                         Tri2ndOrder[4] * V2 + Tri2ndOrder[5] * V3s + Tri2ndOrder[6] * V3 + Tri2ndOrder[7] * V1s * V2s +
+                         Tri2ndOrder[8] * V1 * V2 + Tri2ndOrder[9] * V1 * V2s + Tri2ndOrder[10] * V1s * V2 +
+                         Tri2ndOrder[11] * V1s * V3s + Tri2ndOrder[12] * V1 * V3 + Tri2ndOrder[13] * V1 * V3s +
+                         Tri2ndOrder[14] * V1s * V3 + Tri2ndOrder[15] * V2s * V3s + Tri2ndOrder[16] * V2 * V3 +
+                         Tri2ndOrder[17] * V2 * V3s + Tri2ndOrder[18] * V2s * V3 + Tri2ndOrder[19] * V1s * V2s * V3s +
+                         Tri2ndOrder[20] * V1s * V2s * V3 + Tri2ndOrder[21] * V1s * V2 * V3s + Tri2ndOrder[22] * V1 * V2s * V3s +
+                         Tri2ndOrder[23] * V1s * V2 * V3 + Tri2ndOrder[24] * V1 * V2s * V3 + Tri2ndOrder[25] * V1 * V2 * V3s +
+                         Tri2ndOrder[26] * V1 * V2 * V3;
         } break;
         case CurveType::Exponent: {
             CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::pow(V1, Curve.Coeff3);
