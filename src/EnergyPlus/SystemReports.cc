@@ -2443,7 +2443,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             unitsForVar.allocate(NumVariables);
                             ResourceTypes.clear();
                             for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
+                                ResourceTypes.insert(
+                                    std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                             }
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
@@ -2866,7 +2867,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             unitsForVar.allocate(NumVariables);
                             ResourceTypes.clear();
                             for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
+                                ResourceTypes.insert(
+                                    std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                             }
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
@@ -3104,7 +3106,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             unitsForVar.allocate(NumVariables);
                             ResourceTypes.clear();
                             for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
+                                ResourceTypes.insert(
+                                    std::pair<int, DataGlobalConstants::ResourceType>(idx, DataGlobalConstants::ResourceType::Invalid));
                             }
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);

@@ -89,10 +89,10 @@ namespace HeatingCoils {
         int HCoilType_Num = 0;
         DataGlobalConstants::ResourceType ResourceType =
             DataGlobalConstants::ResourceType::Invalid; // Type of fuel used, reference resource type integers
-        std::string Schedule;                        // HeatingCoil Operation Schedule
-        int SchedPtr = 0;                            // Pointer to the correct schedule
-        int InsuffTemperatureWarn = 0;               // Used for recurring error message
-        Real64 InletAirMassFlowRate = 0.0;           // MassFlow through the HeatingCoil being Simulated [kg/Sec]
+        std::string Schedule;                           // HeatingCoil Operation Schedule
+        int SchedPtr = 0;                               // Pointer to the correct schedule
+        int InsuffTemperatureWarn = 0;                  // Used for recurring error message
+        Real64 InletAirMassFlowRate = 0.0;              // MassFlow through the HeatingCoil being Simulated [kg/Sec]
         Real64 OutletAirMassFlowRate = 0.0;
         Real64 InletAirTemp = 0.0;
         Real64 OutletAirTemp = 0.0;
