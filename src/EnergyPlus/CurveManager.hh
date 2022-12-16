@@ -118,24 +118,27 @@ namespace CurveManager {
 
     struct PerformanceCurveData
     {
-        // Members
+        // Basic data
         std::string Name;                                   // Curve Name
         std::string ObjectType;                             // Curve object type
         CurveType curveType = CurveType::Invalid;           // Curve type (see parameter definitions above)
+        // Table data stuff
         InterpType InterpolationType = InterpType::Invalid; // Table interpolation method
         int TableIndex = 0;                               // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
         int NumDims = 0;                                  // Number of dimensions (AKA, independent variables)
         int GridValueIndex = 0;                           // Index of output within RGI for new Table:Lookup
+        // input coefficients
         std::array<Real64, 12> coeff = {0.0};                     // curve coefficients
-        std::array<Limits, 6> inputLimits;                     // min/max of independent variables
-        Limits outputLimits;                              // min/max of curve output
-        bool Var1MinPresent = false;                      // uses data set limit to set Var1Min if false
-        bool Var1MaxPresent = false;                      // uses data set limit to set Var1Max if false
         std::array<Real64, 27> tri2ndOrder;               // 27 coefficient full triquadratic (!)
+        // independent variables
+        std::array<Real64, 6> inputs = {0.0};             // curve inputs
+        std::array<Limits, 6> inputLimits;                     // min/max of independent variables
+        // dependent (output) variable
+        Real64 output = 0.0;                              // curve output or result
+        Limits outputLimits;                              // min/max of curve output
+        // EMS override
         bool EMSOverrideOn = false;                       // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue = 0.0;               // Value of curve result EMS is directing to use
-        Real64 output = 0.0;                              // curve output or result
-        std::array<Real64, 6> inputs = {0.0};             // curve inputs
     };
 
     // Table file objects

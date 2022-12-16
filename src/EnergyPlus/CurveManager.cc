@@ -1893,13 +1893,12 @@ namespace CurveManager {
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
                     state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
-                    state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
+                    state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].minPresent = true;
                     state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 360.0;
-                    state.dataCurveManager->PerfCurve(CurveNum).Var1MaxPresent = true;
+                    state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].maxPresent = true;
 
                     state.dataCurveManager->PerfCurve(CurveNum).outputLimits.min = -1.0;
                     state.dataCurveManager->PerfCurve(CurveNum).outputLimits.minPresent = true;
-
                     state.dataCurveManager->PerfCurve(CurveNum).outputLimits.max = 1.0;
                     state.dataCurveManager->PerfCurve(CurveNum).outputLimits.maxPresent = true;
 
