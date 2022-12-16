@@ -127,7 +127,8 @@ namespace CurveManager {
         int NumDims = 0;                                  // Number of dimensions (AKA, independent variables)
         int GridValueIndex = 0;                           // Index of output within RGI for new Table:Lookup
         std::array<Real64, 12> coeff;                     // curve coefficients
-        std::array<Limits, 6> limits;                     // min/max of independent variables
+        std::array<Limits, 6> inputLimits;                     // min/max of independent variables
+        Limits outputLimits;
         Real64 CurveMin = 0.0;                            // minimum value of curve output
         Real64 CurveMax = 0.0;                            // maximum value of curve output
         bool CurveMinPresent = false;                     // If TRUE, then cap minimum curve output

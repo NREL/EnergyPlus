@@ -367,10 +367,10 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(7);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(8);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = Numbers(9);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = Numbers(10);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = Numbers(9);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = Numbers(10);
             if (NumNumbers > 10 && !state.dataIPShortCut->lNumericFieldBlanks(11)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(11);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -459,12 +459,12 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[10] = Numbers(11);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[11] = Numbers(12);
 
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(13);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(14);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = Numbers(15);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = Numbers(16);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[2].min = Numbers(17);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[2].max = Numbers(18);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(13);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(14);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = Numbers(15);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = Numbers(16);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = Numbers(17);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = Numbers(18);
 
             if (NumNumbers > 18 && !state.dataIPShortCut->lNumericFieldBlanks(19)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(19);
@@ -528,8 +528,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(6);
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(7);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -593,8 +593,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(7);
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(8);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -656,8 +656,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(5);
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(6);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -722,10 +722,10 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(7);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(8);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = Numbers(9);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = Numbers(10);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = Numbers(9);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = Numbers(10);
             if (NumNumbers > 10 && !state.dataIPShortCut->lNumericFieldBlanks(11)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(11);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -805,10 +805,10 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(7);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(8);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = Numbers(9);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = Numbers(10);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = Numbers(9);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = Numbers(10);
             if (NumNumbers > 10 && !state.dataIPShortCut->lNumericFieldBlanks(11)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(11);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -884,8 +884,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(4);
             if (NumNumbers > 4 && !state.dataIPShortCut->lNumericFieldBlanks(5)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(5);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -954,10 +954,10 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[7] = Numbers(8);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[8] = Numbers(9);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[9] = Numbers(10);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(11);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(12);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = Numbers(13);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = Numbers(14);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(11);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(12);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = Numbers(13);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = Numbers(14);
             if (NumNumbers > 14 && !state.dataIPShortCut->lNumericFieldBlanks(15)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(15);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -1058,12 +1058,12 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[24] = Numbers(25);
             state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[25] = Numbers(26);
             state.dataCurveManager->PerfCurve(CurveNum).tri2ndOrder[26] = Numbers(27);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(28);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(29);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = Numbers(30);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = Numbers(31);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[2].min = Numbers(32);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[2].max = Numbers(33);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(28);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(29);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = Numbers(30);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = Numbers(31);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = Numbers(32);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = Numbers(33);
             if (NumNumbers > 33 && !state.dataIPShortCut->lNumericFieldBlanks(34)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(34);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -1157,14 +1157,14 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(7);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = Numbers(8);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = Numbers(9);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[2].min = Numbers(10);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[2].max = Numbers(11);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[3].min = Numbers(12);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[3].max = Numbers(13);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = Numbers(9);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = Numbers(10);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = Numbers(11);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = Numbers(12);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = Numbers(13);
 
             if (NumNumbers > 13 && !state.dataIPShortCut->lNumericFieldBlanks(14)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(14);
@@ -1238,16 +1238,16 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[5] = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(7);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(8);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = Numbers(9);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = Numbers(10);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[2].min = Numbers(11);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[2].max = Numbers(12);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[3].min = Numbers(13);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[3].max = Numbers(14);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[4].min = Numbers(15);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[4].max = Numbers(16);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = Numbers(9);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = Numbers(10);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = Numbers(11);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = Numbers(12);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = Numbers(13);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = Numbers(14);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[4].min = Numbers(15);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[4].max = Numbers(16);
             if (NumNumbers > 16 && !state.dataIPShortCut->lNumericFieldBlanks(17)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(17);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -1317,8 +1317,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(5);
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(6);
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
@@ -1370,10 +1370,10 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = Numbers(7);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = Numbers(8);
 
             if (NumNumbers > 8 && !state.dataIPShortCut->lNumericFieldBlanks(9)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(9);
@@ -1438,8 +1438,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(6);
 
             if (NumNumbers > 6 && !state.dataIPShortCut->lNumericFieldBlanks(7)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(7);
@@ -1505,8 +1505,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(7);
 
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(8);
@@ -1570,8 +1570,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(5);
 
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(6);
@@ -1635,8 +1635,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(5);
 
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(6);
@@ -1700,8 +1700,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[0] = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[1] = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(4);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(5);
 
             if (NumNumbers > 5 && !state.dataIPShortCut->lNumericFieldBlanks(6)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(6);
@@ -1767,8 +1767,8 @@ namespace CurveManager {
             state.dataCurveManager->PerfCurve(CurveNum).coeff[2] = Numbers(3);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[3] = Numbers(4);
             state.dataCurveManager->PerfCurve(CurveNum).coeff[4] = Numbers(5);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = Numbers(6);
-            state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = Numbers(7);
 
             if (NumNumbers > 7 && !state.dataIPShortCut->lNumericFieldBlanks(8)) {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(8);
@@ -1892,9 +1892,9 @@ namespace CurveManager {
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
 
-                    state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0.0;
+                    state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
                     state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
-                    state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = 360.0;
+                    state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 360.0;
                     state.dataCurveManager->PerfCurve(CurveNum).Var1MaxPresent = true;
 
                     state.dataCurveManager->PerfCurve(CurveNum).CurveMin = -1.0;
@@ -2128,23 +2128,23 @@ namespace CurveManager {
                     double vMin, vMax;
                     std::tie(vMin, vMax) = varListLimits.at(indVarListName)[i - 1];
                     if (i == 1) {
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = vMin;
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = vMax;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = vMin;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = vMax;
                     } else if (i == 2) {
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[1].min = vMin;
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[1].max = vMax;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = vMin;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = vMax;
                     } else if (i == 3) {
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[2].min = vMin;
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[2].max = vMax;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].min = vMin;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[2].max = vMax;
                     } else if (i == 4) {
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[3].min = vMin;
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[3].max = vMax;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[3].min = vMin;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[3].max = vMax;
                     } else if (i == 5) {
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[4].min = vMin;
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[4].max = vMax;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[4].min = vMin;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[4].max = vMax;
                     } else if (i == 6) {
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[5].min = vMin;
-                        state.dataCurveManager->PerfCurve(CurveNum).limits[5].max = vMax;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[5].min = vMin;
+                        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[5].max = vMax;
                     }
                 }
 
@@ -2575,11 +2575,11 @@ namespace CurveManager {
         Real64 CurveValueExp;   // Exponential term in sigmoid curve
         auto const &Curve(state.dataCurveManager->PerfCurve(CurveIndex));
 
-        Real64 const V1(max(min(Var1, Curve.limits[0].max), Curve.limits[0].min));                        // 1st independent variable after limits imposed
-        Real64 const V2(Var2.present() ? max(min(Var2, Curve.limits[1].max), Curve.limits[1].min) : 0.0); // 2nd independent variable after limits imposed
-        Real64 const V3(Var3.present() ? max(min(Var3, Curve.limits[2].max), Curve.limits[2].min) : 0.0); // 3rd independent variable after limits imposed
-        Real64 const V4(Var4.present() ? max(min(Var4, Curve.limits[3].max), Curve.limits[3].min) : 0.0); // 4th independent variable after limits imposed
-        Real64 const V5(Var5.present() ? max(min(Var5, Curve.limits[4].max), Curve.limits[4].min) : 0.0); // 5th independent variable after limits imposed
+        Real64 const V1(max(min(Var1, Curve.inputLimits[0].max), Curve.inputLimits[0].min));                        // 1st independent variable after limits imposed
+        Real64 const V2(Var2.present() ? max(min(Var2, Curve.inputLimits[1].max), Curve.inputLimits[1].min) : 0.0); // 2nd independent variable after limits imposed
+        Real64 const V3(Var3.present() ? max(min(Var3, Curve.inputLimits[2].max), Curve.inputLimits[2].min) : 0.0); // 3rd independent variable after limits imposed
+        Real64 const V4(Var4.present() ? max(min(Var4, Curve.inputLimits[3].max), Curve.inputLimits[3].min) : 0.0); // 4th independent variable after limits imposed
+        Real64 const V5(Var5.present() ? max(min(Var5, Curve.inputLimits[4].max), Curve.inputLimits[4].min) : 0.0); // 5th independent variable after limits imposed
 
         switch (Curve.curveType) {
         case CurveType::Linear: {
@@ -2691,31 +2691,31 @@ namespace CurveManager {
     {
         // TODO: Generalize for N-dims
         Real64 var = Var1;
-        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).limits[0].max), state.dataCurveManager->PerfCurve(CurveIndex).limits[0].min);
+        var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[0].max), state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[0].min);
         std::vector<double> target{var};
         if (present(Var2)) {
             var = Var2;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).limits[1].max), state.dataCurveManager->PerfCurve(CurveIndex).limits[1].min);
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[1].max), state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[1].min);
             target.push_back(var);
         }
         if (present(Var3)) {
             var = Var3;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).limits[2].max), state.dataCurveManager->PerfCurve(CurveIndex).limits[2].min);
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[2].max), state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[2].min);
             target.push_back(var);
         }
         if (present(Var4)) {
             var = Var4;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).limits[3].max), state.dataCurveManager->PerfCurve(CurveIndex).limits[3].min);
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[3].max), state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[3].min);
             target.push_back(var);
         }
         if (present(Var5)) {
             var = Var5;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).limits[4].max), state.dataCurveManager->PerfCurve(CurveIndex).limits[4].min);
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[4].max), state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[4].min);
             target.push_back(var);
         }
         if (present(Var6)) {
             var = Var6;
-            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).limits[5].max), state.dataCurveManager->PerfCurve(CurveIndex).limits[5].min);
+            var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[5].max), state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[5].min);
             target.push_back(var);
         }
 
@@ -2950,18 +2950,18 @@ namespace CurveManager {
         // Given the curve index, returns the minimum and maximum values specified in the input
         // for the independent variables of the performance curve.
 
-        Var1Min = state.dataCurveManager->PerfCurve(CurveIndex).limits[0].min;
-        Var1Max = state.dataCurveManager->PerfCurve(CurveIndex).limits[0].max;
-        if (present(Var2Min)) Var2Min = state.dataCurveManager->PerfCurve(CurveIndex).limits[1].min;
-        if (present(Var2Max)) Var2Max = state.dataCurveManager->PerfCurve(CurveIndex).limits[1].max;
-        if (present(Var3Min)) Var3Min = state.dataCurveManager->PerfCurve(CurveIndex).limits[2].min;
-        if (present(Var3Max)) Var3Max = state.dataCurveManager->PerfCurve(CurveIndex).limits[2].max;
-        if (present(Var4Min)) Var4Min = state.dataCurveManager->PerfCurve(CurveIndex).limits[3].min;
-        if (present(Var4Max)) Var4Max = state.dataCurveManager->PerfCurve(CurveIndex).limits[3].max;
-        if (present(Var5Min)) Var5Min = state.dataCurveManager->PerfCurve(CurveIndex).limits[4].min;
-        if (present(Var5Max)) Var5Max = state.dataCurveManager->PerfCurve(CurveIndex).limits[4].max;
-        if (present(Var6Min)) Var6Min = state.dataCurveManager->PerfCurve(CurveIndex).limits[5].min;
-        if (present(Var6Max)) Var6Max = state.dataCurveManager->PerfCurve(CurveIndex).limits[5].max;
+        Var1Min = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[0].min;
+        Var1Max = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[0].max;
+        if (present(Var2Min)) Var2Min = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[1].min;
+        if (present(Var2Max)) Var2Max = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[1].max;
+        if (present(Var3Min)) Var3Min = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[2].min;
+        if (present(Var3Max)) Var3Max = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[2].max;
+        if (present(Var4Min)) Var4Min = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[3].min;
+        if (present(Var4Max)) Var4Max = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[3].max;
+        if (present(Var5Min)) Var5Min = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[4].min;
+        if (present(Var5Max)) Var5Max = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[4].max;
+        if (present(Var6Min)) Var6Min = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[5].min;
+        if (present(Var6Max)) Var6Max = state.dataCurveManager->PerfCurve(CurveIndex).inputLimits[5].max;
     }
 
     void SetCurveOutputMinMaxValues(EnergyPlusData &state,

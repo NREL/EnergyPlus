@@ -2859,10 +2859,10 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     thisCurve.coeff[3] = -17.043566; // Coefficient4 y
     thisCurve.coeff[4] = -.40346383; // Coefficient5 y**2
     thisCurve.coeff[5] = 0.29573589; // Coefficient6 x*y
-    thisCurve.limits[0].min = 15;        // Minimum Value of x
-    thisCurve.limits[0].max = 65;        // Maximum Value of x
-    thisCurve.limits[1].min = -30;       // Minimum Value of y
-    thisCurve.limits[1].max = 15;        // Maximum Value of y
+    thisCurve.inputLimits[0].min = 15;        // Minimum Value of x
+    thisCurve.inputLimits[0].max = 65;        // Maximum Value of x
+    thisCurve.inputLimits[1].min = -30;       // Minimum Value of y
+    thisCurve.inputLimits[1].max = 15;        // Maximum Value of y
 
     // Run and Check
     double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(*state, Tdis, CondHeat, CurveNum, Te);
@@ -14475,19 +14475,19 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(0.15, thisVRF.MinPLR);
     // EIRFPLR curve minimum PLR value specified
     CurveManager::GetCurveMinMaxValues(*state, thisVRF.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
-    EXPECT_EQ(0.25, thisCoolEIRFPLR.limits[0].min);
+    EXPECT_EQ(0.25, thisCoolEIRFPLR.inputLimits[0].min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
-    EXPECT_EQ(1.00, thisCoolEIRFPLR.limits[0].max);
+    EXPECT_EQ(1.00, thisCoolEIRFPLR.inputLimits[0].max);
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
-    EXPECT_GT(thisCoolEIRFPLR.limits[0].min, thisVRF.MinPLR); // expect warning message
+    EXPECT_GT(thisCoolEIRFPLR.inputLimits[0].min, thisVRF.MinPLR); // expect warning message
     minEIRfLowPLRXInput = 0.0;
     maxEIRfLowPLRXInput = 0.0;
     CurveManager::GetCurveMinMaxValues(*state, thisVRF.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
-    EXPECT_EQ(0.25, thisHeatEIRFPLR.limits[0].min);
+    EXPECT_EQ(0.25, thisHeatEIRFPLR.inputLimits[0].min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
-    EXPECT_EQ(1.00, thisHeatEIRFPLR.limits[0].max);
+    EXPECT_EQ(1.00, thisHeatEIRFPLR.inputLimits[0].max);
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
-    EXPECT_GT(thisHeatEIRFPLR.limits[0].min, thisVRF.MinPLR); // expect warning message
+    EXPECT_GT(thisHeatEIRFPLR.inputLimits[0].min, thisVRF.MinPLR); // expect warning message
     EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
     EXPECT_TRUE(compare_enums(thisVRF.FuelTypeNum,
                               DataGlobalConstants::ResourceType::Electricity)); // Check fuel type input that uses

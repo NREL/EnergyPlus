@@ -446,10 +446,10 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     state->dataCurveManager->PerfCurve(CurveNum).coeff[3] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[4] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[5] = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).limits[1].min = 0;
-    state->dataCurveManager->PerfCurve(CurveNum).limits[1].max = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].min = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[1].max = 0;
 
     // make the call for dry full load operating condition
     EvapCond(EvapCoolNum).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(*state, EvapCoolNum, DryWetMode, FlowRatio);
@@ -740,8 +740,8 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[0] = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).coeff[1] = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).limits[0].max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 1.0;
 
     // set up the flow rates for a direct RDDSpecial
     thisEvapCooler.evapCoolerType = EvapCoolerType::DirectResearchSpecial;

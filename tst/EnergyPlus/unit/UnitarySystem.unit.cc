@@ -19809,8 +19809,8 @@ TEST_F(AirloopUnitarySysTest, WSHPVariableSpeedCoilSizing)
     state->dataCurveManager->PerfCurve(1).coeff[0] = 1.5;
     state->dataCurveManager->PerfCurve(1).coeff[3] = -0.017; // yields roughly 1.0 at water rating point of 29.4444
     state->dataCurveManager->PerfCurve(1).curveType = CurveManager::CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(1).limits[0].max = 50.0;
-    state->dataCurveManager->PerfCurve(1).limits[1].max = 50.0;
+    state->dataCurveManager->PerfCurve(1).inputLimits[0].max = 50.0;
+    state->dataCurveManager->PerfCurve(1).inputLimits[1].max = 50.0;
     state->dataCurveManager->PerfCurve(2).coeff[0] = 1.0;
     state->dataCurveManager->PerfCurve(2).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(2).curveType = CurveManager::CurveType::Linear;

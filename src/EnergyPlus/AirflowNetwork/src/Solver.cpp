@@ -6821,9 +6821,9 @@ namespace AirflowNetwork {
 
         state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = CurveManager::InterpType::BtwxtMethod;
 
-        state.dataCurveManager->PerfCurve(CurveNum).limits[0].min = 0.0;
+        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].min = 0.0;
         state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
-        state.dataCurveManager->PerfCurve(CurveNum).limits[0].max = 360.0;
+        state.dataCurveManager->PerfCurve(CurveNum).inputLimits[0].max = 360.0;
         state.dataCurveManager->PerfCurve(CurveNum).Var1MaxPresent = true;
 
         state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
