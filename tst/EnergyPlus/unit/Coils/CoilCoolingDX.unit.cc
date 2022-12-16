@@ -441,8 +441,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     constantcurve1.inputLimits[0].max = 25.0;
     constantcurve1.inputLimits[1].min = 0.0;
     constantcurve1.inputLimits[1].max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1.outputLimits.min = 1.0;
+    constantcurve1.outputLimits.max = 1.0;
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = CurveManager::CurveType::Quadratic;
@@ -453,8 +453,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     constantcurve2.coeff[2] = 0.0;
     constantcurve2.inputLimits[0].min = 0.0;
     constantcurve2.inputLimits[0].max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2.outputLimits.min = 1.0;
+    constantcurve2.outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
@@ -860,8 +860,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     constantcurve1.inputLimits[0].max = 25.0;
     constantcurve1.inputLimits[1].min = 0.0;
     constantcurve1.inputLimits[1].max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1.outputLimits.min = 1.0;
+    constantcurve1.outputLimits.max = 1.0;
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = CurveManager::CurveType::Quadratic;
@@ -872,8 +872,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     constantcurve2.coeff[2] = 0.0;
     constantcurve2.inputLimits[0].min = 0.0;
     constantcurve2.inputLimits[0].max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2.outputLimits.min = 1.0;
+    constantcurve2.outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
@@ -1279,8 +1279,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     constantcurve1.inputLimits[0].max = 25.0;
     constantcurve1.inputLimits[1].min = 0.0;
     constantcurve1.inputLimits[1].max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1.outputLimits.min = 1.0;
+    constantcurve1.outputLimits.max = 1.0;
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = CurveManager::CurveType::Quadratic;
@@ -1291,8 +1291,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     constantcurve2.coeff[2] = 0.0;
     constantcurve2.inputLimits[0].min = 0.0;
     constantcurve2.inputLimits[0].max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2.outputLimits.min = 1.0;
+    constantcurve2.outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
@@ -1513,8 +1513,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     constantcurve1.inputLimits[0].max = 25.0;
     constantcurve1.inputLimits[1].min = 0.0;
     constantcurve1.inputLimits[1].max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1.outputLimits.min = 1.0;
+    constantcurve1.outputLimits.max = 1.0;
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = CurveManager::CurveType::Quadratic;
@@ -1525,8 +1525,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     constantcurve2.coeff[2] = 0.0;
     constantcurve2.inputLimits[0].min = 0.0;
     constantcurve2.inputLimits[0].max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2.outputLimits.min = 1.0;
+    constantcurve2.outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity

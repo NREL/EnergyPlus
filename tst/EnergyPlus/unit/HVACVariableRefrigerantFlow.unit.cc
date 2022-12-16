@@ -197,11 +197,11 @@ protected:
         state->dataCurveManager->PerfCurve(1).InterpolationType = InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(1).curveType = CurveType::Linear;
         state->dataCurveManager->PerfCurve(1).coeff[0] = 1.0;
-        state->dataCurveManager->PerfCurve(1).CurveMax = 1.0;
+        state->dataCurveManager->PerfCurve(1).outputLimits.max = 1.0;
         state->dataCurveManager->PerfCurve(2).InterpolationType = InterpType::EvaluateCurveToLimits;
         state->dataCurveManager->PerfCurve(2).curveType = CurveType::Linear;
         state->dataCurveManager->PerfCurve(2).coeff[0] = 1.0;
-        state->dataCurveManager->PerfCurve(2).CurveMax = 1.0;
+        state->dataCurveManager->PerfCurve(2).outputLimits.max = 1.0;
 
         int NumAirLoops = state->dataHVACGlobal->NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
         state->dataAirSystemsData->PrimaryAirSystems.allocate(NumAirLoops);

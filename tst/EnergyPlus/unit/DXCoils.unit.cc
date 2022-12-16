@@ -509,8 +509,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.MSCCapFFlow(1) = nCapfFF1;
 
@@ -540,8 +540,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.MSEIRFFlow(1) = nEIRfFF1;
 
@@ -554,8 +554,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 1;
-    pCurve->CurveMin = 0.7;
-    pCurve->CurveMax = 1;
+    pCurve->outputLimits.min = 0.7;
+    pCurve->outputLimits.max = 1;
 
     Coil.MSPLFFPLR(1) = nPLFfPLR1;
 
@@ -603,8 +603,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.MSCCapFFlow(2) = nCapfFF2;
 
@@ -634,8 +634,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.MSEIRFFlow(2) = nEIRfFF2;
 
@@ -648,8 +648,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 1;
-    pCurve->CurveMin = 0.7;
-    pCurve->CurveMax = 1;
+    pCurve->outputLimits.min = 0.7;
+    pCurve->outputLimits.max = 1;
 
     Coil.MSPLFFPLR(2) = nPLFfPLR2;
 
@@ -851,8 +851,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.CCapFFlow(1) = nCapfFF2;
 
@@ -882,8 +882,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.EIRFFlow(1) = nEIRfFF2;
 
@@ -896,8 +896,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 1;
-    pCurve->CurveMin = 0.7;
-    pCurve->CurveMax = 1;
+    pCurve->outputLimits.min = 0.7;
+    pCurve->outputLimits.max = 1;
 
     Coil.PLFFPLR(1) = nPLFfPLR2;
 
@@ -4065,8 +4065,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     constantcurve1.inputLimits[0].max = 25.0;
     constantcurve1.inputLimits[1].min = 0.0;
     constantcurve1.inputLimits[1].max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1.outputLimits.min = 1.0;
+    constantcurve1.outputLimits.max = 1.0;
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = CurveType::Quadratic;
@@ -4077,8 +4077,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     constantcurve2.coeff[2] = 0.0;
     constantcurve2.inputLimits[0].min = 0.0;
     constantcurve2.inputLimits[0].max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2.outputLimits.min = 1.0;
+    constantcurve2.outputLimits.max = 1.0;
     // test 1: dry cooling
     Coil.BypassedFlowFrac(1) = 0.0;
     Coil.InletAirMassFlowRate = 1.0;
@@ -4221,8 +4221,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     constantcurve1.inputLimits[0].max = 25.0;
     constantcurve1.inputLimits[1].min = 0.0;
     constantcurve1.inputLimits[1].max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1.outputLimits.min = 1.0;
+    constantcurve1.outputLimits.max = 1.0;
     // quadratic curve
     constantcurve2.Name = "constant quadratic curve";
     constantcurve2.curveType = CurveType::Quadratic;
@@ -4233,8 +4233,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     constantcurve2.coeff[2] = 0.0;
     constantcurve2.inputLimits[0].min = 0.0;
     constantcurve2.inputLimits[0].max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2.outputLimits.min = 1.0;
+    constantcurve2.outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
@@ -4282,7 +4282,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate at low speed
     EXPECT_DOUBLE_EQ(0.0075, AirInletNode.HumRat);               // input check
     EXPECT_DOUBLE_EQ(AirInletNode.HumRat, AirOutletNode.HumRat); // dry cooling only
-    
+
     // check against hand calculation at low speed
     Real64 results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateLow * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                                                Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));

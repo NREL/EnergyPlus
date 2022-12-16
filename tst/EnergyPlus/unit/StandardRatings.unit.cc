@@ -148,8 +148,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
     Coil.CCapFFlow(1) = nCapfFF;
 
     int constexpr nEIRfT = 3;
@@ -175,8 +175,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
     Coil.EIRFFlow(1) = nEIRfFF;
 
     int constexpr nPLFfPLR = 5;
@@ -189,8 +189,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 1;
-    pCurve->CurveMin = 0.7;
-    pCurve->CurveMax = 1;
+    pCurve->outputLimits.min = 0.7;
+    pCurve->outputLimits.max = 1;
     Coil.PLFFPLR(1) = nPLFfPLR;
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
@@ -349,8 +349,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
     Coil.CCapFFlow(1) = nCapfFF;
 
     int constexpr nEIRfT = 3;
@@ -376,8 +376,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
     Coil.EIRFFlow(1) = nEIRfFF;
 
     int constexpr nPLFfPLR = 5;
@@ -390,8 +390,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 1;
-    pCurve->CurveMin = 0.7;
-    pCurve->CurveMax = 1;
+    pCurve->outputLimits.min = 0.7;
+    pCurve->outputLimits.max = 1;
     Coil.PLFFPLR(1) = nPLFfPLR;
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
@@ -572,8 +572,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     pCurve->coeff[3] = 0;
     pCurve->inputLimits[0].min = -20;
     pCurve->inputLimits[0].max = 20;
-    pCurve->CurveMin = -20;
-    pCurve->CurveMax = 20;
+    pCurve->outputLimits.min = -20;
+    pCurve->outputLimits.max = 20;
     Coil.EIRFFlow(1) = nEIRfFF;
 
     int constexpr nPLFfPLR = 5;
@@ -586,8 +586,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     pCurve->coeff[2] = 0;
     pCurve->inputLimits[0].min = 0;
     pCurve->inputLimits[0].max = 1;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 1;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 1;
     Coil.PLFFPLR(1) = nPLFfPLR;
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
