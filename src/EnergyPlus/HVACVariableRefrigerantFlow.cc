@@ -12625,7 +12625,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         if (NoCompOutput <= QZnReq) return;
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if (NoCompOutput <= QZnReq || (QZnReq >= -1.0*DataHVACGlobals::SmallLoad && !HRCoolingMode)) {
+        if (NoCompOutput <= QZnReq || (QZnReq >= -DataHVACGlobals::SmallLoad && !HRCoolingMode)) {
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).coolingCoilActive = false;
             if (!this->SuppHeatingCoilPresent) return;
         }
@@ -12647,7 +12647,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
 
     // set supplemental heating coil calculation if the condition requires
     if (this->SuppHeatingCoilPresent) {
-        if ((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
+        if (((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) || ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad)) ||
             (this->isSetPointControlled && this->suppTempSetPoint > state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode).Temp)) {
             Real64 ZoneLoad = 0.0;
             Real64 LoadToHeatingSP = 0.0;
@@ -12665,7 +12665,11 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
             } else {
                 getVRFTUZoneLoad(state, VRFTUNum, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP, false);
                 if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
-                    SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                    if ((QZnReq - FullOutput) > DataHVACGlobals::SmallLoad && QZnReq < 0.0) {
+                        SuppHeatCoilLoad = max(0.0, QZnReq - FullOutput);
+                    } else {
+                        SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                    }
                     this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
                     if (this->DesignSuppHeatingCapacity > 0.0) {
                         this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
