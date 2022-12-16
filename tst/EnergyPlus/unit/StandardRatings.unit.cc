@@ -361,8 +361,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     pCurve->coeff[0] = 0.704658;
     pCurve->coeff[1] = 0.008767;
     pCurve->coeff[2] = 0.000625;
-    pCurve->coeff[3] = 0.009037; // previously -ve
-    pCurve->inputLimits[0].min = 5;       // previously -ve
+    pCurve->coeff[3] = 0.009037;    // previously -ve
+    pCurve->inputLimits[0].min = 5; // previously -ve
     pCurve->inputLimits[0].max = 25;
     Coil.EIRFTemp(1) = nEIRfT;
 
@@ -1519,8 +1519,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.coeff[0] = 0.75; // = a 0.8
-    thisCoolPLFfPLR.coeff[1] = 0.25; // = b 0.2
+    thisCoolPLFfPLR.coeff[0] = 0.75;          // = a 0.8
+    thisCoolPLFfPLR.coeff[1] = 0.25;          // = b 0.2
     thisCoolPLFfPLR.inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
     thisCoolPLFfPLR.inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
@@ -1566,8 +1566,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     // Test 3: user PLF curve is the same as the AHRI Std 210/240-2023 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2023 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.coeff[0] = 0.80; //
-    thisCoolPLFfPLR.coeff[1] = 0.20; //
+    thisCoolPLFfPLR.coeff[0] = 0.80;          //
+    thisCoolPLFfPLR.coeff[1] = 0.20;          //
     thisCoolPLFfPLR.inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
     thisCoolPLFfPLR.inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
@@ -1880,8 +1880,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.coeff[0] = 0.75; // = a
-    thisCoolPLFfPLR.coeff[1] = 0.25; // = b
+    thisCoolPLFfPLR.coeff[0] = 0.75;          // = a
+    thisCoolPLFfPLR.coeff[1] = 0.25;          // = b
     thisCoolPLFfPLR.inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
     thisCoolPLFfPLR.inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
@@ -1931,8 +1931,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // Test 3: user PLF curve is the same as the AHRI Std 210/240-2023 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2023 default PLF curve
     // AHRI Std 210/240-2023 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.coeff[0] = 0.80; // = a
-    thisCoolPLFfPLR.coeff[1] = 0.20; // = b
+    thisCoolPLFfPLR.coeff[0] = 0.80;          // = a
+    thisCoolPLFfPLR.coeff[1] = 0.20;          // = b
     thisCoolPLFfPLR.inputLimits[0].min = 0.0; // PLR minimum value allowed by the PLF curve
     thisCoolPLFfPLR.inputLimits[0].max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables

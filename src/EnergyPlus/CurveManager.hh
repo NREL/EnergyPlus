@@ -114,31 +114,37 @@ namespace CurveManager {
         Num
     };
 
-    struct Limits {Real64 min = 0.0; Real64 max = 0.0; bool minPresent = false; bool maxPresent = false;};
+    struct Limits
+    {
+        Real64 min = 0.0;
+        Real64 max = 0.0;
+        bool minPresent = false;
+        bool maxPresent = false;
+    };
 
     struct PerformanceCurveData
     {
         // Basic data
-        std::string Name;                                   // Curve Name
-        std::string ObjectType;                             // Curve object type
-        CurveType curveType = CurveType::Invalid;           // Curve type (see parameter definitions above)
+        std::string Name;                         // Curve Name
+        std::string ObjectType;                   // Curve object type
+        CurveType curveType = CurveType::Invalid; // Curve type (see parameter definitions above)
         // Table data stuff
         InterpType InterpolationType = InterpType::Invalid; // Table interpolation method
-        int TableIndex = 0;                               // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
-        int NumDims = 0;                                  // Number of dimensions (AKA, independent variables)
-        int GridValueIndex = 0;                           // Index of output within RGI for new Table:Lookup
+        int TableIndex = 0;     // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
+        int NumDims = 0;        // Number of dimensions (AKA, independent variables)
+        int GridValueIndex = 0; // Index of output within RGI for new Table:Lookup
         // input coefficients
-        std::array<Real64, 12> coeff = {0.0};                     // curve coefficients
-        std::array<Real64, 27> tri2ndOrder;               // 27 coefficient full triquadratic (!)
+        std::array<Real64, 12> coeff = {0.0}; // curve coefficients
+        std::array<Real64, 27> tri2ndOrder;   // 27 coefficient full triquadratic (!)
         // independent variables
-        std::array<Real64, 6> inputs = {0.0};             // curve inputs
-        std::array<Limits, 6> inputLimits;                     // min/max of independent variables
+        std::array<Real64, 6> inputs = {0.0}; // curve inputs
+        std::array<Limits, 6> inputLimits;    // min/max of independent variables
         // dependent (output) variable
-        Real64 output = 0.0;                              // curve output or result
-        Limits outputLimits;                              // min/max of curve output
+        Real64 output = 0.0; // curve output or result
+        Limits outputLimits; // min/max of curve output
         // EMS override
-        bool EMSOverrideOn = false;                       // if TRUE, then EMS is calling to override curve value
-        Real64 EMSOverrideCurveValue = 0.0;               // Value of curve result EMS is directing to use
+        bool EMSOverrideOn = false;         // if TRUE, then EMS is calling to override curve value
+        Real64 EMSOverrideCurveValue = 0.0; // Value of curve result EMS is directing to use
     };
 
     // Table file objects
@@ -164,7 +170,7 @@ namespace CurveManager {
         static std::map<std::string, Btwxt::Method> interpMethods;
         static std::map<std::string, Btwxt::Method> extrapMethods;
         // Map RGI collection to string name of independent variable list
-        int addGrid(const std::string& indVarListName, Btwxt::GriddedData grid)
+        int addGrid(const std::string &indVarListName, Btwxt::GriddedData grid)
         {
             grids.emplace_back(grid);
             gridMap.emplace(indVarListName, grids.size() - 1);
@@ -284,17 +290,17 @@ namespace CurveManager {
     Real64 CalculateMoodyFrictionFactor(EnergyPlusData &state, Real64 ReynoldsNumber, Real64 RoughnessRatio);
 
     void checkCurveIsNormalizedToOne(EnergyPlusData &state,
-                                     const std::string& callingRoutineObj,   // calling routine with object type
-                                     const std::string& objectName,          // parent object where curve is used
-                                     int curveIndex,                  // index to curve object
-                                     const std::string& cFieldName,          // object field name
-                                     const std::string& cFieldValue,         // user input curve name
-                                     Real64 Var1,                     // required 1st independent variable
-                                     Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                     Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                     Optional<Real64 const> Var4 = _, // 4th independent variable
-                                     Optional<Real64 const> Var5 = _, // 5th independent variable
-                                     Optional<Real64 const> Var6 = _  // 6th independent variable
+                                     const std::string &callingRoutineObj, // calling routine with object type
+                                     const std::string &objectName,        // parent object where curve is used
+                                     int curveIndex,                       // index to curve object
+                                     const std::string &cFieldName,        // object field name
+                                     const std::string &cFieldValue,       // user input curve name
+                                     Real64 Var1,                          // required 1st independent variable
+                                     Optional<Real64 const> Var2 = _,      // 2nd independent variable
+                                     Optional<Real64 const> Var3 = _,      // 3rd independent variable
+                                     Optional<Real64 const> Var4 = _,      // 4th independent variable
+                                     Optional<Real64 const> Var5 = _,      // 5th independent variable
+                                     Optional<Real64 const> Var6 = _       // 6th independent variable
     );
 
 } // namespace CurveManager

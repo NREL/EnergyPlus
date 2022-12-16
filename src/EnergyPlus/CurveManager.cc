@@ -2802,8 +2802,7 @@ namespace CurveManager {
             }
             std::string plural1 = curveDim > 1 ? "s" : "";
             std::string plural2 = validDims[validDims.size() - 1] > 1 ? "s" : "";
-            ShowContinueError(
-                state, format("...Input curve=\"{}\" has {} dimension{}.", thisCurve.Name, curveDim, plural1));
+            ShowContinueError(state, format("...Input curve=\"{}\" has {} dimension{}.", thisCurve.Name, curveDim, plural1));
             ShowContinueError(state, format("...Curve type must have {} dimension{}.", validString, plural2));
             return true;
         }
@@ -2915,7 +2914,7 @@ namespace CurveManager {
         // Given the curve index, returns the minimum and maximum values specified in the input
         // for the independent variables of the performance curve.
 
-        auto &thisCurve =  state.dataCurveManager->PerfCurve(CurveIndex);
+        auto &thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
         Var1Min = thisCurve.inputLimits[0].min;
         Var1Max = thisCurve.inputLimits[0].max;
         if (present(Var2Min)) Var2Min = thisCurve.inputLimits[1].min;
@@ -3135,7 +3134,7 @@ namespace CurveManager {
         // DP = [f*(L/D) + K] * (rho * V^2) / 2
 
         auto &curve = state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex);
-        
+
         // Intermediate calculations
         Real64 const CrossSectArea = (DataGlobalConstants::Pi / 4.0) * pow_2(curve.EquivDiameter);
         Real64 const Velocity = MassFlow / (Density * CrossSectArea);
@@ -3155,7 +3154,9 @@ namespace CurveManager {
 
         // Calculate the friction factor and pressure drop
         Real64 FrictionFactor = curve.ConstantFPresent ? curve.ConstantF : CalculateMoodyFrictionFactor(state, ReynoldsNumber, RoughnessRatio);
-        Real64 PressureCurveValue = curve.EMSOverrideOn ? curve.EMSOverrideCurveValue : (FrictionFactor * (curve.EquivLength / curve.EquivDiameter) + curve.MinorLossCoeff) * (Density * pow_2(Velocity)) / 2.0;
+        Real64 PressureCurveValue = curve.EMSOverrideOn ? curve.EMSOverrideCurveValue
+                                                        : (FrictionFactor * (curve.EquivLength / curve.EquivDiameter) + curve.MinorLossCoeff) *
+                                                              (Density * pow_2(Velocity)) / 2.0;
         curve.CurveOutput = PressureCurveValue;
         return PressureCurveValue;
     }
@@ -3193,7 +3194,8 @@ namespace CurveManager {
         } else {
             if (!state.dataCurveManager->FrictionFactorErrorHasOccurred) {
                 ShowSevereError(state, "Plant Pressure System: Error in moody friction factor calculation");
-                ShowContinueError(state, format("Current Conditions: Roughness Ratio={:.7R}; Reynolds Number={:.1R}", RoughnessRatio, ReynoldsNumber));
+                ShowContinueError(state,
+                                  format("Current Conditions: Roughness Ratio={:.7R}; Reynolds Number={:.1R}", RoughnessRatio, ReynoldsNumber));
                 ShowContinueError(state, "These conditions resulted in an unhandled numeric issue.");
                 ShowContinueError(state, "Please contact EnergyPlus support/development team to raise an alert about this issue");
                 ShowContinueError(state, "This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");
